@@ -1,0 +1,11 @@
+.gitignore
+Gemfile
+yarn.lock
+.yarn
+.vscode
+android
+ios
+node_modules
+example/bare
+example/expo
+CHANGELOG.md

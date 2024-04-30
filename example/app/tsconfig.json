@@ -1,0 +1,10 @@
+{
+  "extends": "eslint-config-react-native-matipl01/tsconfig.base",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@lib": ["../../src"],
+      "@app": ["./src"]
+    }
+  }
+}

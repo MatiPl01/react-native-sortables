@@ -1,0 +1,15 @@
+{
+  "name": "example-app",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-native": "0.73.6",
+    "react-native-safe-area-context": "^4.9.0"
+  },
+  "devDependencies": {
+    "babel-plugin-module-resolver": "^5.0.2"
+  },
+  "react-native": "index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}
