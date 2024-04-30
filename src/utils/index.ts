@@ -1,1 +1,1 @@
-export * from './greeting';
+export * from './render';

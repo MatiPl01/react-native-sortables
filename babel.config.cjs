@@ -18,6 +18,7 @@ module.exports = {
           '@lib': path.join(rootDir, rootPkg['react-native'])
         }
       }
-    ]
+    ],
+    'react-native-reanimated/plugin'
   ]
 };
