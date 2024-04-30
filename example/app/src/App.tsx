@@ -13,8 +13,8 @@ const DEFAULT_CATEGORIES = [
   'music',
   'food',
   'travel',
-  'fashion',
-]
+  'fashion'
+];
 
 export default function App() {
   return (
