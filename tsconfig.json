@@ -8,6 +8,6 @@
       "@app": ["example/app/src/"]
     }
   },
-  "include": ["src", "jest.config.ts", "eslint.config.js", "__tests__"],
+  "include": ["src", "jest.config.ts", "__tests__"],
   "exclude": ["example"]
 }
