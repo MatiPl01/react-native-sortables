@@ -27,7 +27,7 @@ module.exports = function (api) {
             '@app': path.join(appDir, appPkg['react-native'])
           }
         }
-      ]
+      ],
     ]
   };
 };

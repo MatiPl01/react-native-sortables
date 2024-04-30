@@ -1,17 +1,34 @@
-import { createContext, useContext } from 'react';
+import { createContext, type PropsWithChildren, useContext } from 'react';
 
-type ContextReturnType<T, U extends string> = {
-  [K in U as `${K}`]: React.Context<T>;
+type ContextReturnType<
+  ContextName extends string,
+  ContextValue,
+  ProviderProps
+> = {
+  [K in ContextName as `${K}Provider`]: React.FC<ProviderProps>;
 } & {
-  [K in U as `use${K}`]: () => T;
+  [K in ContextName as `use${K}Context`]: () => ContextValue;
 };
 
-export default function createGuardedContext<T>() {
-  return function <U extends string>(name: U): ContextReturnType<T, U> {
-    const Context = createContext<T | null>(null);
+export default function createGuardedContext<ContextName extends string>(
+  name: ContextName
+) {
+  return function <
+    ContextValue extends object,
+    ProviderProps extends PropsWithChildren<object>
+  >(
+    factory: (props: Omit<ProviderProps, 'children'>) => ContextValue
+  ): ContextReturnType<ContextName, ContextValue, ProviderProps> {
+    const Context = createContext<ContextValue | null>(null);
     Context.displayName = name;
 
-    const useGuardedContext = (): T => {
+    const Provider: React.FC<ProviderProps> = ({ children, ...props }) => {
+      const value = factory(props);
+
+      return <Context.Provider value={value}>{children}</Context.Provider>;
+    };
+
+    const useGuardedContext = (): ContextValue => {
       const context = useContext(Context);
 
       if (context === null) {
@@ -20,12 +37,12 @@ export default function createGuardedContext<T>() {
         );
       }
 
-      return context as T;
+      return context;
     };
 
     return {
-      [`use${name}`]: useGuardedContext,
-      [name]: Context
-    } as ContextReturnType<T, U>;
+      [`${name}Provider`]: Provider,
+      [`use${name}Context`]: useGuardedContext
+    } as ContextReturnType<ContextName, ContextValue, ProviderProps>;
   };
 }
