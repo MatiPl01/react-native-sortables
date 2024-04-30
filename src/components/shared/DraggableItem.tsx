@@ -1,17 +1,19 @@
-import { PropsWithChildren, useEffect } from "react";
-import { useMeasurementsContext } from "../../contexts";
-import Animated from "react-native-reanimated";
+import type { PropsWithChildren } from 'react';
+import { useEffect } from 'react';
+import Animated from 'react-native-reanimated';
+
+import { useMeasurementsContext } from '../../contexts';
 
 type DraggableItemProps = PropsWithChildren<{
   id: string;
 }>;
 
-export default function DraggableItem({ id, children }: DraggableItemProps) {
+export default function DraggableItem({ children, id }: DraggableItemProps) {
   const { measureItem, removeItem } = useMeasurementsContext();
 
   useEffect(() => {
     return () => removeItem(id);
-  }, []);
+  }, [id, removeItem]);
 
   return (
     <Animated.View
@@ -20,7 +22,7 @@ export default function DraggableItem({ id, children }: DraggableItemProps) {
           layout: { height, width }
         }
       }) => {
-        measureItem(id, { width, height });
+        measureItem(id, { height, width });
       }}>
       {children}
     </Animated.View>

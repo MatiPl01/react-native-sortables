@@ -1,1 +1,1 @@
-export * from './MeasurementsProvider'
+export * from './MeasurementsProvider';

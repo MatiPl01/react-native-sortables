@@ -1,8 +1,8 @@
-import { useCallback, useMemo, type PropsWithChildren } from 'react';
-import { useSharedValue, type SharedValue } from 'react-native-reanimated';
+import { type ReactNode, useCallback, useMemo } from 'react';
+import { type SharedValue, useSharedValue } from 'react-native-reanimated';
 
+import type { Dimensions } from '../types';
 import { createGuardedContext } from './utils';
-import { Dimensions } from '../types';
 
 type MeasurementsContextType = {
   itemDimensions: SharedValue<Record<string, Dimensions>>;
@@ -10,15 +10,11 @@ type MeasurementsContextType = {
   removeItem: (id: string) => void;
 };
 
-type MeasurementsProviderProps = PropsWithChildren<{}>;
+type MeasurementsProviderProps = { children: ReactNode };
 
-const {
-  MeasurementsProvider,
-  useMeasurementsContext
-} = createGuardedContext('Measurements')<
-  MeasurementsContextType,
-  MeasurementsProviderProps
->(() => {
+const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
+  'Measurements'
+)<MeasurementsContextType, MeasurementsProviderProps>(() => {
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
 
   const measureItem = useCallback((id: string, dimensions: Dimensions) => {
@@ -35,7 +31,7 @@ const {
       measureItem,
       removeItem
     }),
-    []
+    [itemDimensions, measureItem, removeItem]
   );
 });
 
