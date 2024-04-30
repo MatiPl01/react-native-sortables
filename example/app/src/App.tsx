@@ -1,7 +1,6 @@
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, Text, View } from 'react-native';
 import { SortableView } from '@lib';
-import { useState } from 'react';
 
 const DEFAULT_CATEGORIES = [
   'sports',
@@ -18,13 +17,11 @@ const DEFAULT_CATEGORIES = [
 ]
 
 export default function App() {
-  const [favoriteCategories, setFavoriteCategories] = useState(DEFAULT_CATEGORIES);
-
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <SortableView style={styles.cellContainer}>
-          {favoriteCategories.map(category => (
+          {DEFAULT_CATEGORIES.map(category => (
             <View key={category} style={styles.cell}>
               <Text style={styles.cellText}>{category}</Text>
             </View>

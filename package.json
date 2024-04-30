@@ -82,7 +82,7 @@
     "lint": "eslint . --config ./eslint.config.js",
     "lint:fix": "eslint --fix . --config ./eslint.config.js",
     "postinstall": "yarn husky:install",
-    "prepare": "yarn build",
+    "prepare": "husky",
     "test": "jest",
     "typecheck": "tsc -p tsconfig.json --noEmit && yarn example:app typecheck"
   },
