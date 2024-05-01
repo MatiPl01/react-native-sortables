@@ -22,7 +22,7 @@ export default function SortableGridExample() {
     []
   );
 
-  return <SortableGrid data={TILES} renderItem={renderItem} />;
+  return <SortableGrid data={TILES} renderItem={renderItem} numColumns={5} />;
 }
 
 const styles = StyleSheet.create({

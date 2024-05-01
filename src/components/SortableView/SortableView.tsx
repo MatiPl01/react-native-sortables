@@ -3,7 +3,7 @@ import { View, type ViewProps } from 'react-native';
 
 import { MeasurementsProvider } from '../../contexts';
 import { validateChildren } from '../../utils';
-import { DraggableItem } from '../shared';
+import { DraggableView } from '../shared';
 
 export type SortableViewProps = {
   enableDrag?: boolean;
@@ -21,9 +21,9 @@ function SortableView({ children, ...viewProps }: SortableViewProps) {
 
 function SortableViewInner({ children }: { children: ReactNode }) {
   return validateChildren(children).map(([key, child]) => (
-    <DraggableItem id={key} key={key}>
+    <DraggableView id={key} key={key}>
       {child}
-    </DraggableItem>
+    </DraggableView>
   ));
 }
 
