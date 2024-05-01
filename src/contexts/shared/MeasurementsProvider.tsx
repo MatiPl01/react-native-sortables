@@ -1,14 +1,9 @@
 import type { PropsWithChildren } from 'react';
-import { useMemo } from 'react';
-import {
-  type SharedValue,
-  useAnimatedReaction,
-  useSharedValue
-} from 'react-native-reanimated';
+import { type SharedValue, useSharedValue } from 'react-native-reanimated';
 
-import { useUICallback } from '../hooks';
-import type { Dimensions } from '../types';
-import { createGuardedContext } from './utils';
+import { useUICallback } from '../../hooks';
+import type { Dimensions } from '../../types';
+import { createGuardedContext } from '../utils';
 
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
@@ -47,29 +42,12 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
     measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
   });
 
-  useAnimatedReaction(
-    () => initialMeasurementsCompleted.value,
-    completed => {
-      console.log('Initial measurements completed:', completed);
-    }
-  );
-
-  useAnimatedReaction(
-    () => itemDimensions.value,
-    dimensions => {
-      console.log('Item dimensions:', dimensions);
-    }
-  );
-
-  return useMemo<MeasurementsContextType>(
-    () => ({
-      initialMeasurementsCompleted,
-      itemDimensions,
-      measureItem,
-      removeItem
-    }),
-    [initialMeasurementsCompleted, itemDimensions, measureItem, removeItem]
-  );
+  return {
+    initialMeasurementsCompleted,
+    itemDimensions,
+    measureItem,
+    removeItem
+  };
 });
 
 export { MeasurementsProvider, useMeasurementsContext };

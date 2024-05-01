@@ -1,2 +1,2 @@
 export * from './SortableGrid';
-export * from './SortableView';
+export * from './SortableFlex';

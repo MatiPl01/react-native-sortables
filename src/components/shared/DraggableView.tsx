@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { ViewProps } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { useMeasurementsContext } from '../../contexts';
+import { useMeasurementsContext } from '../../contexts/shared';
 
 type DraggableViewProps = {
   id: string;

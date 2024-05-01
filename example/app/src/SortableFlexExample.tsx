@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { SortableView } from '@lib';
+import { SortableFlex } from '@lib';
 
 const DEFAULT_CATEGORIES = [
   'sports',
@@ -15,15 +15,15 @@ const DEFAULT_CATEGORIES = [
   'fashion'
 ];
 
-export default function SortableViewExample() {
+export default function SortableFlexExample() {
   return (
-    <SortableView style={styles.cellContainer}>
+    <SortableFlex style={styles.cellContainer}>
       {DEFAULT_CATEGORIES.map(category => (
         <View key={category} style={styles.cell}>
           <Text style={styles.cellText}>{category}</Text>
         </View>
       ))}
-    </SortableView>
+    </SortableFlex>
   );
 }
 

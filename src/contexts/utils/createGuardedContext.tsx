@@ -1,4 +1,9 @@
-import { createContext, type PropsWithChildren, useContext } from 'react';
+import {
+  createContext,
+  type PropsWithChildren,
+  useContext,
+  useMemo
+} from 'react';
 
 type ContextReturnType<
   ContextName extends string,
@@ -25,7 +30,10 @@ export default function createGuardedContext<ContextName extends string>(
     const Provider: React.FC<ProviderProps> = ({ children, ...props }) => {
       const value = factory(props);
 
-      return <Context.Provider value={value}>{children}</Context.Provider>;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, react-hooks/exhaustive-deps
+      const memoValue = useMemo(() => value, [...Object.values(value)]);
+
+      return <Context.Provider value={memoValue}>{children}</Context.Provider>;
     };
 
     const useGuardedContext = (): ContextValue => {
