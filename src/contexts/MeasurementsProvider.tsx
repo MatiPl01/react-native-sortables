@@ -1,7 +1,7 @@
 import { type ReactNode, useCallback, useMemo } from 'react';
 import { type SharedValue, useSharedValue } from 'react-native-reanimated';
 
-import type { Dimensions } from '../types';
+import type { Dimensions } from '../types/layout';
 import { createGuardedContext } from './utils';
 
 type MeasurementsContextType = {

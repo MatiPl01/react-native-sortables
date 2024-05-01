@@ -1,1 +1,2 @@
-export { default as SortableView } from './SortableView';
+export * from './SortableGrid';
+export * from './SortableView';
