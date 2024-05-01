@@ -1,37 +1,74 @@
-import { type ReactNode, useCallback, useMemo } from 'react';
-import { type SharedValue, useSharedValue } from 'react-native-reanimated';
+import type { PropsWithChildren } from 'react';
+import { useMemo } from 'react';
+import {
+  type SharedValue,
+  useAnimatedReaction,
+  useSharedValue
+} from 'react-native-reanimated';
 
-import type { Dimensions } from '../types/layout';
+import { useUICallback } from '../hooks';
+import type { Dimensions } from '../types';
 import { createGuardedContext } from './utils';
 
 type MeasurementsContextType = {
+  initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   measureItem: (id: string, dimensions: Dimensions) => void;
   removeItem: (id: string) => void;
 };
 
-type MeasurementsProviderProps = { children: ReactNode };
+type MeasurementsProviderProps = PropsWithChildren<{
+  itemsCount: number;
+}>;
 
 const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
   'Measurements'
-)<MeasurementsContextType, MeasurementsProviderProps>(() => {
+)<MeasurementsContextType, MeasurementsProviderProps>(({ itemsCount }) => {
+  const initialMeasurementsCompleted = useSharedValue(false);
+  const measuredItemsCount = useSharedValue(0);
+
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
 
-  const measureItem = useCallback((id: string, dimensions: Dimensions) => {
-    console.log('Measuring item', id, dimensions);
-  }, []);
+  const measureItem = useUICallback((id: string, dimensions: Dimensions) => {
+    'worklet';
+    itemDimensions.value[id] = dimensions;
+    measuredItemsCount.value += 1;
+    // Update the array of item dimensions only after all items have been measured
+    // to reduce the number of times animated reactions are triggered
+    if (measuredItemsCount.value === itemsCount) {
+      initialMeasurementsCompleted.value = true;
+      itemDimensions.value = { ...itemDimensions.value };
+    }
+  });
 
-  const removeItem = useCallback((id: string) => {
-    console.log('Removing item', id);
-  }, []);
+  const removeItem = useUICallback((id: string) => {
+    'worklet';
+    delete itemDimensions.value[id];
+    measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
+  });
+
+  useAnimatedReaction(
+    () => initialMeasurementsCompleted.value,
+    completed => {
+      console.log('Initial measurements completed:', completed);
+    }
+  );
+
+  useAnimatedReaction(
+    () => itemDimensions.value,
+    dimensions => {
+      console.log('Item dimensions:', dimensions);
+    }
+  );
 
   return useMemo<MeasurementsContextType>(
     () => ({
+      initialMeasurementsCompleted,
       itemDimensions,
       measureItem,
       removeItem
     }),
-    [itemDimensions, measureItem, removeItem]
+    [initialMeasurementsCompleted, itemDimensions, measureItem, removeItem]
   );
 });
 

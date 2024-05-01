@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactElement } from 'react';
 import { View, type ViewProps } from 'react-native';
 
 import { MeasurementsProvider } from '../../contexts';
@@ -10,17 +10,23 @@ export type SortableViewProps = {
 } & ViewProps;
 
 function SortableView({ children, ...viewProps }: SortableViewProps) {
+  const childrenArray = validateChildren(children);
+
   return (
-    <MeasurementsProvider>
+    <MeasurementsProvider itemsCount={childrenArray.length}>
       <View {...viewProps}>
-        <SortableViewInner>{children}</SortableViewInner>
+        <SortableViewInner childrenArray={childrenArray} />
       </View>
     </MeasurementsProvider>
   );
 }
 
-function SortableViewInner({ children }: { children: ReactNode }) {
-  return validateChildren(children).map(([key, child]) => (
+type SortableViewInnerProps = {
+  childrenArray: Array<[string, ReactElement]>;
+};
+
+function SortableViewInner({ childrenArray }: SortableViewInnerProps) {
+  return childrenArray.map(([key, child]) => (
     <DraggableView id={key} key={key}>
       {child}
     </DraggableView>

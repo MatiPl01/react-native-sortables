@@ -20,7 +20,7 @@ function SortableGrid<I>({
   renderItem
 }: SortableGridProps<I>) {
   return (
-    <MeasurementsProvider>
+    <MeasurementsProvider itemsCount={data.length}>
       <SortableGridInner
         data={data}
         keyExtractor={keyExtractor}
