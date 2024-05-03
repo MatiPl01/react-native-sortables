@@ -11,22 +11,17 @@ import { defaultKeyExtractor, typedMemo } from '../../utils';
 import { DraggableView } from '../shared';
 import type { SortableGridRenderItem } from './types';
 
-type OrientationProps = {
-  orientation?: 'vertical'; // for now, just support vertical orientation
-  columns?: number;
-};
-
 export type SortableGridProps<I> = {
   data: Array<I>;
+  columns?: number;
   renderItem: SortableGridRenderItem<I>;
   keyExtractor?: (item: I, index: number) => string;
-} & OrientationProps;
+};
 
 function SortableGrid<I>({
   columns = 1,
   data,
   keyExtractor = defaultKeyExtractor,
-  orientation = 'vertical',
   renderItem
 }: SortableGridProps<I>) {
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
@@ -34,10 +29,7 @@ function SortableGrid<I>({
   return (
     <MeasurementsProvider itemsCount={data.length}>
       <PositionsProvider itemKeys={itemKeys}>
-        <GridLayoutProvider
-          columns={columns}
-          orientation={orientation}
-          rows={-1}>
+        <GridLayoutProvider columns={columns}>
           <SortableGridInner
             columns={columns}
             data={data}
