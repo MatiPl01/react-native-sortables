@@ -18,7 +18,6 @@ import {
 type FlexLayoutContextType = {
   stretch: boolean;
   containerHeight: SharedValue<number>;
-  overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
 };
 
 type FlexLayoutProviderProps = PropsWithChildren<FlexProps>;
@@ -41,13 +40,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
   const columnGap = columnGapProp ?? gap;
   const rowGap = rowGapProp ?? gap;
 
-  const { containerWidth, itemDimensions } = useMeasurementsContext();
+  const { containerWidth, itemDimensions, overrideItemDimensions } =
+    useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const containerHeight = useSharedValue(-1);
-  const overrideItemDimensions = useSharedValue<
-    Record<string, Partial<Dimensions>>
-  >({});
 
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
   const crossAxisGroupSizes = useSharedValue<Array<number>>([]);

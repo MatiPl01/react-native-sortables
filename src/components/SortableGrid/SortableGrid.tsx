@@ -8,7 +8,7 @@ import {
   useGridLayoutContext
 } from '../../contexts';
 import { defaultKeyExtractor, typedMemo } from '../../utils';
-import SortableGridItem from './SortableGridItem';
+import { DraggableView } from '../shared';
 import type { SortableGridRenderItem } from './types';
 
 export type SortableGridProps<I> = {
@@ -29,7 +29,7 @@ function SortableGrid<I>({
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
 
   return (
-    <SharedProvider enabled={dragEnabled} itemKeys={itemKeys}>
+    <SharedProvider dragEnabled={dragEnabled} itemKeys={itemKeys}>
       <GridLayoutProvider columnsCount={columns}>
         <SortableGridInner
           columns={columns}
@@ -67,12 +67,12 @@ function SortableGridInner<I>({
       {data.map((item, index) => {
         const key = keyExtractor(item, index);
         return (
-          <SortableGridItem
+          <DraggableView
             itemKey={key}
             key={key}
             style={animatedColumnWidthStyle}>
             {renderItem({ item })}
-          </SortableGridItem>
+          </DraggableView>
         );
       })}
     </Animated.View>

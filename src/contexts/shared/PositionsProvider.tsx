@@ -45,10 +45,4 @@ const { PositionsProvider, usePositionsContext } = createGuardedContext(
   };
 });
 
-function useItemPosition(key: string): SharedValue<Position | undefined> {
-  const { itemPositions } = usePositionsContext();
-
-  return useDerivedValue(() => itemPositions.value[key]);
-}
-
-export { PositionsProvider, useItemPosition, usePositionsContext };
+export { PositionsProvider, usePositionsContext };

@@ -1,4 +1,4 @@
-import { type ReactElement, useRef } from 'react';
+import { cloneElement, type ReactElement, useRef } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
@@ -9,7 +9,7 @@ import {
   useFlexLayoutContext
 } from '../../contexts';
 import { areArraysDifferent, validateChildren } from '../../utils';
-import SortableFlexItem from './SortableFlexItem';
+import { DraggableView } from '../shared';
 
 export type SortableFlexProps = {
   dragEnabled?: boolean;
@@ -29,7 +29,7 @@ function SortableFlex({
   }
 
   return (
-    <SharedProvider enabled={dragEnabled} itemKeys={itemKeysRef.current}>
+    <SharedProvider dragEnabled={dragEnabled} itemKeys={itemKeysRef.current}>
       <FlexLayoutProvider {...((viewProps.style as FlexProps) ?? {})}>
         <SortableFlexInner
           childrenArray={childrenArray}
@@ -49,7 +49,7 @@ function SortableFlexInner({
   childrenArray,
   viewProps
 }: SortableFlexInnerProps) {
-  const { containerHeight } = useFlexLayoutContext();
+  const { containerHeight, stretch } = useFlexLayoutContext();
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height:
@@ -63,9 +63,12 @@ function SortableFlexInner({
       {...viewProps}
       style={[viewProps.style, animatedContainerHeightStyle]}>
       {childrenArray.map(([key, child]) => (
-        <SortableFlexItem itemKey={key} key={key}>
-          {child}
-        </SortableFlexItem>
+        <DraggableView itemKey={key} key={key}>
+          {cloneElement(child, {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            style: [child.props?.style, stretch && { flexGrow: 1 }]
+          })}
+        </DraggableView>
       ))}
     </Animated.View>
   );

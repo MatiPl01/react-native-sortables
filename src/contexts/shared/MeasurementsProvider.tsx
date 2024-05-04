@@ -9,6 +9,7 @@ import { createGuardedContext } from '../utils';
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
+  overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
   containerWidth: SharedValue<number>;
   measureItem: (key: string, dimensions: Dimensions) => void;
   removeItem: (key: string) => void;
@@ -28,6 +29,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
 
   const initialMeasurementsCompleted = useSharedValue(false);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
+  const overrideItemDimensions = useSharedValue<
+    Record<string, Partial<Dimensions>>
+  >({});
 
   const containerWidth = useSharedValue(-1);
 
@@ -71,6 +75,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
       initialMeasurementsCompleted,
       itemDimensions,
       measureItem,
+      overrideItemDimensions,
       removeItem
     }
   };

@@ -6,18 +6,18 @@ import { PositionsProvider } from './PositionsProvider';
 
 type SharedProviderProps = PropsWithChildren<{
   itemKeys: Array<string>;
-  enabled: boolean;
+  dragEnabled: boolean;
 }>;
 
 export default function SharedProvider({
   children,
-  enabled,
+  dragEnabled,
   itemKeys
 }: SharedProviderProps) {
   return (
     <MeasurementsProvider itemsCount={itemKeys.length}>
       <PositionsProvider itemKeys={itemKeys}>
-        <DragProvider enabled={enabled}>{children}</DragProvider>
+        <DragProvider enabled={dragEnabled}>{children}</DragProvider>
       </PositionsProvider>
     </MeasurementsProvider>
   );
