@@ -1,3 +1,3 @@
-# 📕 Your library title
+# 🔀 React Native Sortables
 
-🚀 Your awesome library description
+Under development...
