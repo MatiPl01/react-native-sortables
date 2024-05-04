@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 import { cloneElement, isValidElement, useEffect } from 'react';
-import { type LayoutChangeEvent, View, type ViewProps } from 'react-native';
+import { type LayoutChangeEvent, type ViewProps } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useDerivedValue
@@ -52,21 +52,19 @@ export default function SortableFlexItem({
   return (
     <Animated.View
       {...viewProps}
-      style={[style, animatedStyle, { backgroundColor: 'red' }]}>
-      <View
-        onLayout={({
-          nativeEvent: {
-            layout: { height, width }
-          }
-        }: LayoutChangeEvent) => {
-          measureItem(key, { height, width });
-        }}>
-        {isValidElement(children) &&
-          cloneElement(children as ReactElement, {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            style: [children.props?.style, stretch && { flexGrow: 1 }]
-          })}
-      </View>
+      style={[style, animatedStyle]}
+      onLayout={({
+        nativeEvent: {
+          layout: { height, width }
+        }
+      }: LayoutChangeEvent) => {
+        measureItem(key, { height, width });
+      }}>
+      {isValidElement(children) &&
+        cloneElement(children as ReactElement, {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          style: [children.props?.style, stretch && { flexGrow: 1 }]
+        })}
     </Animated.View>
   );
 }

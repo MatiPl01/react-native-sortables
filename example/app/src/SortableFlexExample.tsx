@@ -12,25 +12,14 @@ const DEFAULT_CATEGORIES = [
   'music',
   'food',
   'travel',
-  'fashion',
-  'a',
-  'b',
-  'c',
-  'd',
-  'e',
-  'f'
-].slice(0, 5);
+  'fashion'
+];
 
 export default function SortableFlexExample() {
   return (
     <SortableFlex style={styles.cellContainer}>
-      {DEFAULT_CATEGORIES.map((category, i) => (
-        <View
-          key={category}
-          style={[
-            styles.cell,
-            { minHeight: [40, 94, 69, 70, 50, 71, 59, 58, 58, 81][i] }
-          ]}>
+      {DEFAULT_CATEGORIES.map(category => (
+        <View key={category} style={styles.cell}>
           <Text style={styles.cellText}>{category}</Text>
         </View>
       ))}
@@ -42,9 +31,9 @@ const styles = StyleSheet.create({
   cellContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    height: 600,
     backgroundColor: '#ddd',
-    gap: 10
+    rowGap: 2,
+    columnGap: 5
   },
   cell: {
     paddingHorizontal: 15,

@@ -120,6 +120,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
           alignContent,
           alignItems,
           columnGap,
+          flexWrap,
           justifyContent,
           rowGap
         }
@@ -127,11 +128,17 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
 
       if (positions) {
         itemPositions.value = positions;
-
-        console.log('\n\npositions: ', JSON.stringify(positions, null, 2));
       }
     },
-    [groupBy, alignContent, alignItems, columnGap, justifyContent, rowGap]
+    [
+      groupBy,
+      alignContent,
+      alignItems,
+      columnGap,
+      flexWrap,
+      justifyContent,
+      rowGap
+    ]
   );
 
   // OVERRIDE ITEM DIMENSIONS UPDATER
@@ -141,7 +148,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
       groups: itemGroups.value
     }),
     ({ groupSizes, groups }) => {
-      if (!groupSizes.length || !groups.length) {
+      if (!groupSizes.length || !groups.length || !stretch) {
         return;
       }
 
@@ -184,7 +191,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
       }
     }: LayoutChangeEvent) => {
       // TODO - improve (calculate height if it is not set)
-      console.log({ height });
       containerHeight.value = height;
     },
     [containerHeight]

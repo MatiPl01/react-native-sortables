@@ -9,9 +9,9 @@ export type AlignContent =
   | 'center'
   | 'flex-end'
   | 'flex-start'
-  | 'space-around' //
-  | 'space-between' //
-  | 'space-evenly' //
+  | 'space-around' // TODO: add support
+  | 'space-between' // TODO: add support
+  | 'space-evenly' // TODO: add support
   | 'stretch';
 export type AlignItems = 'center' | 'flex-end' | 'flex-start' | 'stretch';
 export type FlexWrap = 'nowrap' | 'wrap' | 'wrap-reverse';
