@@ -2,16 +2,16 @@ export type JustifyContent =
   | 'center'
   | 'flex-end'
   | 'flex-start'
-  | 'space-around' //
+  | 'space-around'
   | 'space-between'
-  | 'space-evenly'; //
+  | 'space-evenly';
 export type AlignContent =
   | 'center'
   | 'flex-end'
   | 'flex-start'
-  | 'space-around'
-  | 'space-between'
-  | 'space-evenly'
+  | 'space-around' //
+  | 'space-between' //
+  | 'space-evenly' //
   | 'stretch';
 export type AlignItems = 'center' | 'flex-end' | 'flex-start' | 'stretch';
 export type FlexWrap = 'nowrap' | 'wrap' | 'wrap-reverse';

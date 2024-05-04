@@ -12,7 +12,13 @@ const DEFAULT_CATEGORIES = [
   'music',
   'food',
   'travel',
-  'fashion'
+  'fashion',
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f'
 ].slice(0, 5);
 
 export default function SortableFlexExample() {
@@ -36,11 +42,9 @@ const styles = StyleSheet.create({
   cellContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    height: 400,
+    height: 600,
     backgroundColor: '#ddd',
-    justifyContent: 'space-evenly',
-    columnGap: 2,
-    gap: 5
+    gap: 10
   },
   cell: {
     paddingHorizontal: 15,

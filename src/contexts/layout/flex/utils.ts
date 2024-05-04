@@ -49,7 +49,7 @@ export const groupItems = (
   return groups;
 };
 
-const getGroupSizes = (
+export const getGroupSizes = (
   groups: Array<Array<string>>,
   itemDimensions: Record<string, Dimensions>,
   sizeBy: 'height' | 'width'
@@ -68,30 +68,32 @@ const alignHelper = (
 ): Array<number> => {
   'worklet';
   let startOffset = 0;
-  let gap = gapProp;
+  let adjustedGap = gapProp;
 
-  const getTotalSize = () => sum(sizes) + gap * (sizes.length - 1);
+  const getTotalSize = (gap: number) => sum(sizes) + gap * (sizes.length - 1);
 
   switch (align) {
     case 'flex-end':
-      startOffset = containerSize - getTotalSize();
+      startOffset = containerSize - getTotalSize(gapProp);
       break;
     case 'center':
-      startOffset = (containerSize - getTotalSize()) / 2;
+      startOffset = (containerSize - getTotalSize(gapProp)) / 2;
       break;
     case 'space-between':
-      gap = (containerSize - sum(sizes)) / (sizes.length - 1);
+      adjustedGap = (containerSize - sum(sizes)) / (sizes.length - 1);
       break;
     case 'space-evenly':
-      gap = (containerSize - sum(sizes)) / (sizes.length + 1);
-      startOffset = gap;
+      adjustedGap =
+        (containerSize - sum(sizes) + 2 * gapProp) / (sizes.length + 1);
+      startOffset = (containerSize - getTotalSize(adjustedGap)) / 2;
       break;
     case 'space-around':
-      gap = (containerSize - sum(sizes)) / sizes.length;
-      startOffset = gap / 2;
+      console.log('space-around', sum(sizes), containerSize, gapProp);
+      adjustedGap = (containerSize - sum(sizes) + gapProp) / sizes.length;
+      startOffset = (containerSize - getTotalSize(adjustedGap)) / 2;
       break;
     case 'stretch': {
-      const totalSize = getTotalSize();
+      const totalSize = getTotalSize(gapProp);
       if (totalSize === 0) break;
       const multiplier = containerSize / totalSize;
       return sizes.map(size => size * multiplier);
@@ -101,7 +103,7 @@ const alignHelper = (
   const offsets = [startOffset];
 
   for (let i = 0; i < sizes.length - 1; i++) {
-    offsets.push((startOffset += (sizes[i] ?? 0) + gap));
+    offsets.push((startOffset += (sizes[i] ?? 0) + adjustedGap));
   }
 
   return offsets;
@@ -114,6 +116,12 @@ const alignFlexContent = (
   containerSize: number
 ): Array<number> => {
   'worklet';
+  console.log('\n\n>>>', {
+    align,
+    containerSize,
+    gap,
+    groupSizes
+  });
   return alignHelper(align, gap, groupSizes, containerSize);
 };
 
@@ -147,6 +155,7 @@ const alignGroupItems = (
 export const getItemPositions = (
   groups: Array<Array<string>>,
   groupBy: Dimension,
+  crossAxisGroupSizes: Array<number>,
   itemDimensions: Record<string, Dimensions>,
   containerDimensions: Dimensions,
   {
@@ -163,6 +172,8 @@ export const getItemPositions = (
   'worklet';
   const positions: Record<string, Position> = {};
 
+  console.log('\n\nitemDimensions: ', JSON.stringify(itemDimensions, null, 2));
+
   const mainAxisDimension = groupBy;
   let crossAxisDimension: Dimension = 'height';
   let groupsGap: number = rowGap;
@@ -178,11 +189,6 @@ export const getItemPositions = (
     crossAxisContainerSize = containerDimensions.width;
   }
 
-  const crossAxisGroupSizes = getGroupSizes(
-    groups,
-    itemDimensions,
-    crossAxisDimension
-  );
   const crossAxisGroupOffsets = alignFlexContent(
     alignContent,
     groupsGap,

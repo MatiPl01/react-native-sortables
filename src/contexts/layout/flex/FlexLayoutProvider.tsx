@@ -4,13 +4,21 @@ import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
+import type { Dimensions } from '../../../types';
 import { useMeasurementsContext, usePositionsContext } from '../..';
 import { createGuardedContext } from '../../utils';
 import type { FlexProps } from './types';
-import { areDimensionsCorrect, getItemPositions, groupItems } from './utils';
+import {
+  areDimensionsCorrect,
+  getGroupSizes,
+  getItemPositions,
+  groupItems
+} from './utils';
 
 type FlexLayoutContextType = {
+  stretch: boolean;
   containerHeight: SharedValue<number>;
+  overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
 };
 
 type FlexLayoutProviderProps = PropsWithChildren<FlexProps>;
@@ -19,7 +27,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
   'FlexLayout'
 )<FlexLayoutContextType, FlexLayoutProviderProps>(({
   alignContent = 'flex-start',
-  alignItems = 'flex-start',
+  alignItems = 'stretch',
   children,
   columnGap: columnGapProp,
   flexDirection = 'row',
@@ -28,6 +36,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
   justifyContent = 'flex-start',
   rowGap: rowGapProp
 }) => {
+  const stretch = alignItems === 'stretch';
   const groupBy = flexDirection.startsWith('column') ? 'height' : 'width';
   const columnGap = columnGapProp ?? gap;
   const rowGap = rowGapProp ?? gap;
@@ -36,8 +45,12 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const containerHeight = useSharedValue(-1);
+  const overrideItemDimensions = useSharedValue<
+    Record<string, Partial<Dimensions>>
+  >({});
 
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
+  const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
 
   // ITEM GROUPS UPDATER
   useAnimatedReaction(
@@ -62,10 +75,17 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
         groupBy,
         flexWrap === 'nowrap' ? Infinity : containerDimensions[groupBy]
       );
+      if (!groups) return;
 
-      if (groups) {
-        itemGroups.value = groups;
-      }
+      // Calculate group cross axis sizes
+      const sizes = getGroupSizes(
+        groups,
+        dimensions,
+        groupBy === 'height' ? 'width' : 'height'
+      );
+
+      itemGroups.value = groups;
+      crossAxisGroupSizes.value = sizes;
     },
     [groupBy, flexWrap, columnGap, rowGap]
   );
@@ -77,10 +97,15 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
         height: containerHeight.value,
         width: containerWidth.value
       },
-      groups: itemGroups.value
+      groups: itemGroups.value,
+      sizes: crossAxisGroupSizes.value
     }),
-    ({ containerDimensions, groups }) => {
-      if (!areDimensionsCorrect(containerDimensions) || !groups.length) {
+    ({ containerDimensions, groups, sizes }) => {
+      if (
+        !areDimensionsCorrect(containerDimensions) ||
+        !groups.length ||
+        !sizes.length
+      ) {
         itemPositions.value = EMPTY_OBJECT;
         return;
       }
@@ -88,6 +113,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
       const positions = getItemPositions(
         groups,
         groupBy,
+        sizes,
         itemDimensions.value,
         containerDimensions,
         {
@@ -106,6 +132,49 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
       }
     },
     [groupBy, alignContent, alignItems, columnGap, justifyContent, rowGap]
+  );
+
+  // OVERRIDE ITEM DIMENSIONS UPDATER
+  useAnimatedReaction(
+    () => ({
+      groupSizes: crossAxisGroupSizes.value,
+      groups: itemGroups.value
+    }),
+    ({ groupSizes, groups }) => {
+      if (!groupSizes.length || !groups.length) {
+        return;
+      }
+
+      const overriddenDimension = groupBy === 'height' ? 'width' : 'height';
+      const overrideDimensions: Record<string, Partial<Dimensions>> = {};
+
+      for (let i = 0; i < groups.length; i++) {
+        const group = groups[i];
+        const groupSize = groupSizes[i];
+
+        if (!group || groupSize === undefined) {
+          return;
+        }
+
+        for (const key of group) {
+          const currentDimensions = overrideItemDimensions.value[key];
+
+          if (
+            currentDimensions &&
+            currentDimensions[overriddenDimension] === groupSize
+          ) {
+            overrideDimensions[key] = currentDimensions;
+          } else {
+            overrideDimensions[key] = {
+              [overriddenDimension]: groupSize
+            };
+          }
+        }
+      }
+
+      overrideItemDimensions.value = overrideDimensions;
+    },
+    [stretch]
   );
 
   const measureContainer = useCallback(
@@ -129,7 +198,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
       </>
     ),
     value: {
-      containerHeight
+      containerHeight,
+      overrideItemDimensions,
+      stretch
     }
   };
 });
