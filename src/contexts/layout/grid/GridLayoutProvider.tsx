@@ -1,6 +1,4 @@
-import { type PropsWithChildren, useCallback } from 'react';
-import type { LayoutChangeEvent } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { type PropsWithChildren } from 'react';
 import {
   type SharedValue,
   useAnimatedReaction,
@@ -18,7 +16,6 @@ import { getColumnIndex, getRowIndex } from './utils';
 type GridLayoutContextType = {
   columnWidth: SharedValue<number>;
   containerHeight: SharedValue<number>;
-  rowOffsets: SharedValue<Array<number>>;
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{
@@ -27,21 +24,16 @@ type GridLayoutProviderProps = PropsWithChildren<{
 
 const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
   'GridLayout'
-)<GridLayoutContextType, GridLayoutProviderProps>(({
-  children,
-  columnsCount
-}) => {
-  const { itemDimensions } = useMeasurementsContext();
+)<GridLayoutContextType, GridLayoutProviderProps>(({ columnsCount }) => {
+  const { containerWidth, itemDimensions } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
-
-  const containerWidth = useSharedValue(-1);
-  const containerHeight = useDerivedValue(
-    () => rowOffsets.value[rowOffsets.value.length - 1] ?? -1
-  );
   const columnWidth = useDerivedValue(() =>
     containerWidth.value === -1 ? -1 : containerWidth.value / columnsCount
+  );
+  const containerHeight = useDerivedValue(
+    () => rowOffsets.value[rowOffsets.value.length - 1] ?? -1
   );
 
   // ROW OFFSETS UPDATER
@@ -122,35 +114,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
     [columnsCount]
   );
 
-  const handleMeasurement = useCallback(
-    ({
-      nativeEvent: {
-        layout: { width }
-      }
-    }: LayoutChangeEvent) => {
-      containerWidth.value = width;
-    },
-    [containerWidth]
-  );
-
   return {
-    children: (
-      <View style={styles.container} onLayout={handleMeasurement}>
-        {children}
-      </View>
-    ),
     value: {
       columnWidth,
-      containerHeight,
-      rowOffsets
+      containerHeight
     }
   };
-});
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%'
-  }
 });
 
 export { GridLayoutProvider, useGridLayoutContext };

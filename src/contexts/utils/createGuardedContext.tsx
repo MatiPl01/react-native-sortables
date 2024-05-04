@@ -29,6 +29,12 @@ export default function createGuardedContext<ContextName extends string>(
     const Provider: React.FC<ProviderProps> = props => {
       const { children = props.children, value } = factory(props);
 
+      if (!value) {
+        throw new Error(
+          `${name}Context value must be provided. You likely forgot to return it from the factory function.`
+        );
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, react-hooks/exhaustive-deps
       const memoValue = useMemo(() => value, [...Object.values(value)]);
 
