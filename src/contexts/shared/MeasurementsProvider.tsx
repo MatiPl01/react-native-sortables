@@ -1,10 +1,6 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import { type LayoutChangeEvent, StyleSheet, View } from 'react-native';
-import {
-  type SharedValue,
-  useDerivedValue,
-  useSharedValue
-} from 'react-native-reanimated';
+import { type SharedValue, useSharedValue } from 'react-native-reanimated';
 
 import { useUICallback } from '../../hooks';
 import type { Dimensions } from '../../types';
@@ -14,8 +10,6 @@ type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   containerWidth: SharedValue<number>;
-  containerHeight: SharedValue<number>;
-  rowOffsets: SharedValue<Array<number>>;
   measureItem: (key: string, dimensions: Dimensions) => void;
   removeItem: (key: string) => void;
 };
@@ -35,11 +29,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
   const initialMeasurementsCompleted = useSharedValue(false);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
 
-  const rowOffsets = useSharedValue<Array<number>>([]);
   const containerWidth = useSharedValue(-1);
-  const containerHeight = useDerivedValue(
-    () => rowOffsets.value[rowOffsets.value.length - 1] ?? -1
-  );
 
   const measureItem = useUICallback((key: string, dimensions: Dimensions) => {
     'worklet';
@@ -77,13 +67,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
       </View>
     ),
     value: {
-      containerHeight,
       containerWidth,
       initialMeasurementsCompleted,
       itemDimensions,
       measureItem,
-      removeItem,
-      rowOffsets
+      removeItem
     }
   };
 });

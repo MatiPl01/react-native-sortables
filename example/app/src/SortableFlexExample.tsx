@@ -18,8 +18,13 @@ const DEFAULT_CATEGORIES = [
 export default function SortableFlexExample() {
   return (
     <SortableFlex style={styles.cellContainer}>
-      {DEFAULT_CATEGORIES.map(category => (
-        <View key={category} style={[styles.cell, { minHeight: Math.random() * 100 }]}>
+      {DEFAULT_CATEGORIES.map((category, i) => (
+        <View
+          key={category}
+          style={[
+            styles.cell,
+            { minHeight: [40, 94, 69, 70, 50, 71, 59, 58, 58, 81][i] }
+          ]}>
           <Text style={styles.cellText}>{category}</Text>
         </View>
       ))}
@@ -29,9 +34,11 @@ export default function SortableFlexExample() {
 
 const styles = StyleSheet.create({
   cellContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     flexWrap: 'wrap',
-    alignItems: 'center'
+    alignItems: 'center',
+    height: 200,
+    backgroundColor: '#ddd'
   },
   cell: {
     paddingHorizontal: 15,

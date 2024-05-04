@@ -1,14 +1,10 @@
 import { type ReactElement, useRef } from 'react';
-import type { ViewProps } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import type { FlexProps } from '../../contexts';
-import { FlexLayoutProvider } from '../../contexts';
-import {
-  MeasurementsProvider,
-  PositionsProvider,
-  useMeasurementsContext
-} from '../../contexts/shared';
+import { FlexLayoutProvider, useFlexLayoutContext } from '../../contexts';
+import { MeasurementsProvider, PositionsProvider } from '../../contexts/shared';
 import { areArraysDifferent, validateChildren } from '../../utils';
 import { DraggableView } from '../shared';
 
@@ -46,14 +42,17 @@ function SortableFlexInner({
   childrenArray,
   viewProps
 }: SortableFlexInnerProps) {
-  const { containerHeight } = useMeasurementsContext();
+  const { containerHeight } = useFlexLayoutContext();
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
-    height: containerHeight.value === -1 ? 'auto' : containerHeight.value
+    height:
+      containerHeight.value === -1
+        ? (viewProps?.style as ViewStyle)?.height
+        : containerHeight.value
   }));
 
   return (
-    <Animated.View {...viewProps} style={animatedContainerHeightStyle}>
+    <Animated.View {...viewProps} style={[viewProps.style]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView itemKey={key} key={key}>
           {child}

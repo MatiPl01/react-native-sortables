@@ -2,7 +2,8 @@ import { type PropsWithChildren } from 'react';
 import {
   type SharedValue,
   useAnimatedReaction,
-  useDerivedValue
+  useDerivedValue,
+  useSharedValue
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
@@ -14,6 +15,7 @@ import { getColumnIndex, getRowIndex } from './utils';
 
 type GridLayoutContextType = {
   columnWidth: SharedValue<number>;
+  containerHeight: SharedValue<number>;
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{
@@ -23,12 +25,15 @@ type GridLayoutProviderProps = PropsWithChildren<{
 const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
   'GridLayout'
 )<GridLayoutContextType, GridLayoutProviderProps>(({ columnsCount }) => {
-  const { containerWidth, itemDimensions, rowOffsets } =
-    useMeasurementsContext();
+  const { containerWidth, itemDimensions } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
+  const rowOffsets = useSharedValue<Array<number>>([]);
   const columnWidth = useDerivedValue(() =>
     containerWidth.value === -1 ? -1 : containerWidth.value / columnsCount
+  );
+  const containerHeight = useDerivedValue(
+    () => rowOffsets.value[rowOffsets.value.length - 1] ?? -1
   );
 
   // ROW OFFSETS UPDATER
@@ -111,7 +116,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
 
   return {
     value: {
-      columnWidth
+      columnWidth,
+      containerHeight
     }
   };
 });
