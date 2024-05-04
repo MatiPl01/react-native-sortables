@@ -1,1 +1,1 @@
-export * from './grid/GridLayoutProvider';
+export * from './grid';

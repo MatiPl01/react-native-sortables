@@ -7,7 +7,7 @@ import {
   MeasurementsProvider,
   PositionsProvider,
   useGridLayoutContext
-} from '../../contexts/shared';
+} from '../../contexts';
 import { defaultKeyExtractor, typedMemo } from '../../utils';
 import { DraggableView } from '../shared';
 import type { SortableGridRenderItem } from './types';

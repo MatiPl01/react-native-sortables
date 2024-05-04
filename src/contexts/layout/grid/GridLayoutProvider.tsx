@@ -13,7 +13,7 @@ import type { Position } from '../../../types';
 import { areArraysDifferent, arePositionsDifferent } from '../../../utils';
 import { useMeasurementsContext, usePositionsContext } from '../../shared';
 import { createGuardedContext } from '../../utils';
-import { getRowIndex } from './utils';
+import { getColumnIndex, getRowIndex } from './utils';
 
 type GridLayoutContextType = {
   columnWidth: SharedValue<number>;
@@ -95,7 +95,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
 
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
         const rowIndex = getRowIndex(parseInt(itemIndex), columnsCount);
-        const colIndex = parseInt(itemIndex) % columnsCount;
+        const colIndex = getColumnIndex(parseInt(itemIndex), columnsCount);
 
         const y = offsets[rowIndex];
         if (y === undefined) {
