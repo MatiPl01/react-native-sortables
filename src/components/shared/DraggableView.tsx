@@ -41,9 +41,10 @@ export default function DraggableView({
       style={[style, animatedStyle]}
       onLayout={({
         nativeEvent: {
-          layout: { height, width }
+          layout: { height, width, x, y }
         }
       }) => {
+        console.log(key, { x, y });
         measureItem(key, { height, width });
       }}>
       {children}

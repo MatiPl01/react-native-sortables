@@ -34,13 +34,12 @@ export default function SortableFlexExample() {
 
 const styles = StyleSheet.create({
   cellContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     flexWrap: 'wrap',
-    alignItems: 'flex-end',
-    alignContent: 'space-between',
-    justifyContent: 'flex-end',
-    height: 200,
+    height: 400,
     backgroundColor: '#ddd',
+    justifyContent: 'space-evenly',
+    columnGap: 2,
     gap: 5
   },
   cell: {

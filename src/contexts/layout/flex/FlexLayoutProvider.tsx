@@ -4,10 +4,10 @@ import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
-import { useMeasurementsContext, usePositionsContext } from '../../../contexts';
+import { useMeasurementsContext, usePositionsContext } from '../..';
 import { createGuardedContext } from '../../utils';
-import type { FlexProps, ItemGroups } from './types';
-import { groupItems } from './utils';
+import type { FlexProps } from './types';
+import { areDimensionsCorrect, getItemPositions, groupItems } from './utils';
 
 type FlexLayoutContextType = {
   containerHeight: SharedValue<number>;
@@ -19,7 +19,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
   'FlexLayout'
 )<FlexLayoutContextType, FlexLayoutProviderProps>(({
   alignContent = 'flex-start',
-  // alignItems = 'flex-start',
+  alignItems = 'flex-start',
   children,
   columnGap: columnGapProp,
   flexDirection = 'row',
@@ -28,6 +28,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
   justifyContent = 'flex-start',
   rowGap: rowGapProp
 }) => {
+  const groupBy = flexDirection.startsWith('column') ? 'height' : 'width';
   const columnGap = columnGapProp ?? gap;
   const rowGap = rowGapProp ?? gap;
 
@@ -36,58 +37,75 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
 
   const containerHeight = useSharedValue(-1);
 
-  const itemGroups = useSharedValue<ItemGroups>([]);
+  const itemGroups = useSharedValue<Array<Array<string>>>([]);
 
   // ITEM GROUPS UPDATER
   useAnimatedReaction(
     () => ({
+      containerDimensions: {
+        height: containerHeight.value,
+        width: containerWidth.value
+      },
       dimensions: itemDimensions.value,
-      idxToKey: indexToKey.value,
-      maxHeight: containerHeight.value,
-      maxWidth: containerWidth.value
+      idxToKey: indexToKey.value
     }),
-    ({ dimensions, idxToKey, maxHeight, maxWidth }) => {
-      if (maxHeight === -1 || maxWidth === -1) {
+    ({ containerDimensions, dimensions, idxToKey }) => {
+      if (!areDimensionsCorrect(containerDimensions)) {
         return;
       }
 
       // Group items based on the layout direction
-      const groupBy = flexDirection.startsWith('column') ? 'height' : 'width';
-      const itemsGap = groupBy === 'height' ? rowGap : columnGap;
-      let limit: number;
-
-      if (flexWrap === 'nowrap') {
-        limit = Infinity;
-      } else if (groupBy === 'height') {
-        limit = maxHeight;
-      } else {
-        limit = maxWidth;
-      }
-
-      const groups = groupItems(idxToKey, dimensions, itemsGap, groupBy, limit);
+      const groups = groupItems(
+        idxToKey,
+        dimensions,
+        groupBy === 'height' ? rowGap : columnGap,
+        groupBy,
+        flexWrap === 'nowrap' ? Infinity : containerDimensions[groupBy]
+      );
 
       if (groups) {
         itemGroups.value = groups;
       }
     },
-    [flexDirection, flexWrap, columnGap, rowGap]
+    [groupBy, flexWrap, columnGap, rowGap]
   );
 
   // ITEM POSITIONS UPDATER
   useAnimatedReaction(
     () => ({
-      dimensions: itemDimensions.value,
+      containerDimensions: {
+        height: containerHeight.value,
+        width: containerWidth.value
+      },
       groups: itemGroups.value
     }),
-    ({ groups }) => {
-      if (!groups.length) {
+    ({ containerDimensions, groups }) => {
+      if (!areDimensionsCorrect(containerDimensions) || !groups.length) {
         itemPositions.value = EMPTY_OBJECT;
         return;
       }
 
-      // const positions = [].reduce()
+      const positions = getItemPositions(
+        groups,
+        groupBy,
+        itemDimensions.value,
+        containerDimensions,
+        {
+          alignContent,
+          alignItems,
+          columnGap,
+          justifyContent,
+          rowGap
+        }
+      );
+
+      if (positions) {
+        itemPositions.value = positions;
+
+        console.log('\n\npositions: ', JSON.stringify(positions, null, 2));
+      }
     },
-    [flexDirection, justifyContent, alignContent, rowGap, columnGap]
+    [groupBy, alignContent, alignItems, columnGap, justifyContent, rowGap]
   );
 
   const measureContainer = useCallback(

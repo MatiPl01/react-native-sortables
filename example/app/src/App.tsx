@@ -17,7 +17,7 @@ export default function App() {
       <SafeAreaView style={styles.container}>
         <SortableFlexExample />
         <Spacer height={20} />
-        <SortableGridExample />
+        {/* <SortableGridExample /> */}
       </SafeAreaView>
     </SafeAreaProvider>
   );
