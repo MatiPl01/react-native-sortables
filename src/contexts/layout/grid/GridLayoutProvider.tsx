@@ -17,6 +17,7 @@ import { getRowIndex } from './utils';
 
 type GridLayoutContextType = {
   columnWidth: SharedValue<number>;
+  containerHeight: SharedValue<number>;
   rowOffsets: SharedValue<Array<number>>;
 };
 
@@ -33,12 +34,15 @@ const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
   const { itemDimensions } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
-  const containerWidth = useSharedValue(-1);
+  const rowOffsets = useSharedValue<Array<number>>([]);
 
+  const containerWidth = useSharedValue(-1);
+  const containerHeight = useDerivedValue(
+    () => rowOffsets.value[rowOffsets.value.length - 1] ?? -1
+  );
   const columnWidth = useDerivedValue(() =>
     containerWidth.value === -1 ? -1 : containerWidth.value / columnsCount
   );
-  const rowOffsets = useSharedValue<Array<number>>([]);
 
   // ROW OFFSETS UPDATER
   useAnimatedReaction(
@@ -137,6 +141,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
     ),
     value: {
       columnWidth,
+      containerHeight,
       rowOffsets
     }
   };

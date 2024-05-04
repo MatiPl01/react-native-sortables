@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useAnimatedStyle } from 'react-native-reanimated';
+import { StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import {
   GridLayoutProvider,
@@ -53,23 +53,30 @@ function SortableGridInner<I>({
   keyExtractor,
   renderItem
 }: SortableGridInnerProps<I>) {
-  const { columnWidth } = useGridLayoutContext();
+  const { columnWidth, containerHeight } = useGridLayoutContext();
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const animatedColumnWidthStyle = useAnimatedStyle(() => ({
     width: columnWidth.value === -1 ? `${100 / columns}%` : columnWidth.value
   }));
 
+  const animatedContainerHeightStyle = useAnimatedStyle(() => ({
+    height: containerHeight.value === -1 ? 'auto' : containerHeight.value
+  }));
+
   return (
-    <View style={styles.gridContainer}>
+    <Animated.View style={[styles.gridContainer, animatedContainerHeightStyle]}>
       {data.map((item, index) => {
         const key = keyExtractor(item, index);
         return (
-          <DraggableView itemKey={key} key={key} style={animatedStyle}>
+          <DraggableView
+            itemKey={key}
+            key={key}
+            style={animatedColumnWidthStyle}>
             {renderItem({ item })}
           </DraggableView>
         );
       })}
-    </View>
+    </Animated.View>
   );
 }
 
