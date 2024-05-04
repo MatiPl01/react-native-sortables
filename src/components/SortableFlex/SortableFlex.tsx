@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { View, type ViewProps } from 'react-native';
 
-import { MeasurementsProvider } from '../../contexts/shared';
+import { MeasurementsProvider, PositionsProvider } from '../../contexts/shared';
 import { validateChildren } from '../../utils';
 import { DraggableView } from '../shared';
 
@@ -14,9 +14,12 @@ function SortableFlex({ children, ...viewProps }: SortableFlexProps) {
 
   return (
     <MeasurementsProvider itemsCount={childrenArray.length}>
-      <View {...viewProps}>
-        <SortableFlexInner childrenArray={childrenArray} />
-      </View>
+      {/* TODO */}
+      <PositionsProvider itemKeys={[]}>
+        <View {...viewProps}>
+          <SortableFlexInner childrenArray={childrenArray} />
+        </View>
+      </PositionsProvider>
     </MeasurementsProvider>
   );
 }
@@ -27,7 +30,7 @@ type SortableFlexInnerProps = {
 
 function SortableFlexInner({ childrenArray }: SortableFlexInnerProps) {
   return childrenArray.map(([key, child]) => (
-    <DraggableView id={key} key={key}>
+    <DraggableView itemKey={key} key={key}>
       {child}
     </DraggableView>
   ));

@@ -22,7 +22,14 @@ export default function SortableGridExample() {
     []
   );
 
-  return <SortableGrid data={TILES} renderItem={renderItem} columns={5} />;
+  return (
+    <>
+      <SortableGrid data={TILES} renderItem={renderItem} columns={5} />
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Grid footer</Text>
+      </View>
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -44,5 +51,16 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 5
+  },
+  footer: {
+    height: 100,
+    backgroundColor: '#FF6347',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  footerText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold'
   }
 });

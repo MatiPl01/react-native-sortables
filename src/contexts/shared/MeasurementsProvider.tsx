@@ -8,8 +8,8 @@ import { createGuardedContext } from '../utils';
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
-  measureItem: (id: string, dimensions: Dimensions) => void;
-  removeItem: (id: string) => void;
+  measureItem: (key: string, dimensions: Dimensions) => void;
+  removeItem: (key: string) => void;
 };
 
 type MeasurementsProviderProps = PropsWithChildren<{
@@ -24,9 +24,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
 
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
 
-  const measureItem = useUICallback((id: string, dimensions: Dimensions) => {
+  const measureItem = useUICallback((key: string, dimensions: Dimensions) => {
     'worklet';
-    itemDimensions.value[id] = dimensions;
+    itemDimensions.value[key] = dimensions;
     measuredItemsCount.value += 1;
     // Update the array of item dimensions only after all items have been measured
     // to reduce the number of times animated reactions are triggered
@@ -36,17 +36,19 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
     }
   });
 
-  const removeItem = useUICallback((id: string) => {
+  const removeItem = useUICallback((key: string) => {
     'worklet';
-    delete itemDimensions.value[id];
+    delete itemDimensions.value[key];
     measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
   });
 
   return {
-    initialMeasurementsCompleted,
-    itemDimensions,
-    measureItem,
-    removeItem
+    value: {
+      initialMeasurementsCompleted,
+      itemDimensions,
+      measureItem,
+      removeItem
+    }
   };
 });
 

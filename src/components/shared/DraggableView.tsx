@@ -1,33 +1,50 @@
 import { useEffect } from 'react';
 import type { ViewProps } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { useMeasurementsContext } from '../../contexts/shared';
+import { useItemPosition, useMeasurementsContext } from '../../contexts/shared';
 
 type DraggableViewProps = {
-  id: string;
+  itemKey: string;
 } & ViewProps;
 
 export default function DraggableView({
   children,
-  id,
+  itemKey: key,
+  style,
   ...viewProps
 }: DraggableViewProps) {
   const { measureItem, removeItem } = useMeasurementsContext();
+  const itemPosition = useItemPosition(key);
 
   useEffect(() => {
-    return () => removeItem(id);
-  }, [id, removeItem]);
+    return () => removeItem(key);
+  }, [key, removeItem]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    if (!itemPosition.value) {
+      return {
+        position: 'relative'
+      };
+    }
+
+    return {
+      left: itemPosition.value.x,
+      position: 'absolute',
+      top: itemPosition.value.y
+    };
+  });
 
   return (
     <Animated.View
       {...viewProps}
+      style={[style, animatedStyle]}
       onLayout={({
         nativeEvent: {
           layout: { height, width }
         }
       }) => {
-        measureItem(id, { height, width });
+        measureItem(key, { height, width });
       }}>
       {children}
     </Animated.View>

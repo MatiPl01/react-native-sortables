@@ -1,9 +1,5 @@
-import {
-  createContext,
-  type PropsWithChildren,
-  useContext,
-  useMemo
-} from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 type ContextReturnType<
   ContextName extends string,
@@ -22,13 +18,16 @@ export default function createGuardedContext<ContextName extends string>(
     ContextValue extends object,
     ProviderProps extends PropsWithChildren<object>
   >(
-    factory: (props: Omit<ProviderProps, 'children'>) => ContextValue
+    factory: (props: ProviderProps) => {
+      value: ContextValue;
+      children?: ReactNode;
+    }
   ): ContextReturnType<ContextName, ContextValue, ProviderProps> {
     const Context = createContext<ContextValue | null>(null);
     Context.displayName = name;
 
-    const Provider: React.FC<ProviderProps> = ({ children, ...props }) => {
-      const value = factory(props);
+    const Provider: React.FC<ProviderProps> = props => {
+      const { children = props.children, value } = factory(props);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, react-hooks/exhaustive-deps
       const memoValue = useMemo(() => value, [...Object.values(value)]);

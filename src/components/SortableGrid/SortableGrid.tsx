@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import type { ViewStyle } from 'react-native';
 import { StyleSheet, View } from 'react-native';
+import { useAnimatedStyle } from 'react-native-reanimated';
 
 import {
   GridLayoutProvider,
   MeasurementsProvider,
-  PositionsProvider
+  PositionsProvider,
+  useGridLayoutContext
 } from '../../contexts/shared';
 import { defaultKeyExtractor, typedMemo } from '../../utils';
 import { DraggableView } from '../shared';
@@ -29,7 +30,7 @@ function SortableGrid<I>({
   return (
     <MeasurementsProvider itemsCount={data.length}>
       <PositionsProvider itemKeys={itemKeys}>
-        <GridLayoutProvider columns={columns}>
+        <GridLayoutProvider columnsCount={columns}>
           <SortableGridInner
             columns={columns}
             data={data}
@@ -52,16 +53,18 @@ function SortableGridInner<I>({
   keyExtractor,
   renderItem
 }: SortableGridInnerProps<I>) {
-  const style: ViewStyle = {
-    width: `${100 / columns}%`
-  };
+  const { columnWidth } = useGridLayoutContext();
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    width: columnWidth.value === -1 ? `${100 / columns}%` : columnWidth.value
+  }));
 
   return (
     <View style={styles.gridContainer}>
       {data.map((item, index) => {
-        const id = keyExtractor(item, index);
+        const key = keyExtractor(item, index);
         return (
-          <DraggableView id={id} key={id} style={style}>
+          <DraggableView itemKey={key} key={key} style={animatedStyle}>
             {renderItem({ item })}
           </DraggableView>
         );

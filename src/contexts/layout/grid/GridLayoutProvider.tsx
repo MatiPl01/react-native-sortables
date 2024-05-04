@@ -1,55 +1,65 @@
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren, useCallback } from 'react';
+import type { LayoutChangeEvent } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
   type SharedValue,
   useAnimatedReaction,
+  useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
 import type { Position } from '../../../types';
-import { areArraysDifferent } from '../../../utils';
+import { areArraysDifferent, arePositionsDifferent } from '../../../utils';
 import { useMeasurementsContext, usePositionsContext } from '../../shared';
 import { createGuardedContext } from '../../utils';
-import { getColumnIndex, getRowIndex } from './utils';
+import { getRowIndex } from './utils';
 
 type GridLayoutContextType = {
+  columnWidth: SharedValue<number>;
   rowOffsets: SharedValue<Array<number>>;
-  columnOffsets: SharedValue<Array<number>>;
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{
-  itemsCount: number;
   columnsCount: number;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
   'GridLayout'
 )<GridLayoutContextType, GridLayoutProviderProps>(({
-  columnsCount,
-  itemsCount
+  children,
+  columnsCount
 }) => {
   const { itemDimensions } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
-  const rowOffsets = useSharedValue<Array<number>>([]);
-  const columnOffsets = useSharedValue<Array<number>>([]);
+  const containerWidth = useSharedValue(-1);
 
+  const columnWidth = useDerivedValue(() =>
+    containerWidth.value === -1 ? -1 : containerWidth.value / columnsCount
+  );
+  const rowOffsets = useSharedValue<Array<number>>([]);
+
+  // ROW OFFSETS UPDATER
   useAnimatedReaction(
     () => ({
       dimensions: itemDimensions.value,
       idxToKey: indexToKey.value
     }),
     ({ dimensions, idxToKey }) => {
-      const offsets = {
-        column: [0],
-        row: [0]
-      };
+      const offsets = [0];
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
-        const rowIndex = getRowIndex(parseInt(itemIndex), itemsCount);
-        const columnIndex = getColumnIndex(parseInt(itemIndex), itemsCount);
+        const rowIndex = getRowIndex(parseInt(itemIndex), columnsCount);
+        const itemHeight = dimensions[key]?.height;
+
+        // Return if the item height is not yet measured
+        if (itemHeight === undefined) {
+          return;
+        }
+
         offsets[rowIndex + 1] = Math.max(
           offsets[rowIndex + 1] ?? 0,
-          (offsets[rowIndex] ?? 0) + (dimensions[key]?.height ?? 0)
+          (offsets[rowIndex] ?? 0) + itemHeight
         );
       }
       // Update row offsets only if they have changed
@@ -63,45 +73,79 @@ const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
         rowOffsets.value = offsets;
       }
     },
-    [itemsCount]
+    [columnsCount]
   );
 
+  // ITEM POSITIONS UPDATER
   useAnimatedReaction(
     () => ({
+      colWidth: columnWidth.value,
       idxToKey: indexToKey.value,
-      offsets: {
-        column: columnOffsets.value,
-        row: rowOffsets.value
-      }
+      offsets: rowOffsets.value
     }),
-    ({ idxToKey, offsets }) => {
-      // Calculate item positions based on their order in the grid
+    ({ colWidth, idxToKey, offsets }) => {
+      if (colWidth === -1 || offsets.length === 0) {
+        return;
+      }
       const positions: Record<string, Position> = {};
 
-      for (const [index, key] of Object.entries(idxToKey)) {
-        const rowIndex = getRowIndex(parseInt(index), columnsCount);
-        const columnIndex = getColumnIndex(parseInt(index), itemsCount);
-        const rowOffset = rowOffsets.value[rowIndex];
-        const columnOffset = offsets.column[columnIndex];
+      for (const [itemIndex, key] of Object.entries(idxToKey)) {
+        const rowIndex = getRowIndex(parseInt(itemIndex), columnsCount);
+        const colIndex = parseInt(itemIndex) % columnsCount;
 
-        if (!rowOffset || !columnOffset) {
+        const y = offsets[rowIndex];
+        if (y === undefined) {
           return;
         }
 
-        positions[key] = {
-          x: columnOffset,
-          y: rowOffset
+        const currentPosition = itemPositions.value[key];
+        const calculatedPosition = {
+          x: colIndex * colWidth,
+          y
         };
+
+        // Re-use existing position object if its properties are the same
+        // (this prevents unnecessary reaction triggers in item components)
+        positions[key] =
+          !currentPosition ||
+          arePositionsDifferent(currentPosition, calculatedPosition)
+            ? calculatedPosition
+            : currentPosition;
       }
 
       itemPositions.value = positions;
-    }
+    },
+    [columnsCount]
+  );
+
+  const handleMeasurement = useCallback(
+    ({
+      nativeEvent: {
+        layout: { width }
+      }
+    }: LayoutChangeEvent) => {
+      containerWidth.value = width;
+    },
+    [containerWidth]
   );
 
   return {
-    columnOffsets,
-    rowOffsets
+    children: (
+      <View style={styles.container} onLayout={handleMeasurement}>
+        {children}
+      </View>
+    ),
+    value: {
+      columnWidth,
+      rowOffsets
+    }
   };
+});
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%'
+  }
 });
 
 export { GridLayoutProvider, useGridLayoutContext };
