@@ -36,9 +36,12 @@ const styles = StyleSheet.create({
   cellContainer: {
     flexDirection: 'column',
     flexWrap: 'wrap',
-    alignItems: 'center',
+    alignItems: 'flex-end',
+    alignContent: 'space-between',
+    justifyContent: 'flex-end',
     height: 200,
-    backgroundColor: '#ddd'
+    backgroundColor: '#ddd',
+    gap: 5
   },
   cell: {
     paddingHorizontal: 15,

@@ -1,3 +1,5 @@
+import type { Dimensions } from '../../../types';
+
 export type FlexProps = Partial<{
   justifyContent:
     | 'center'
@@ -20,4 +22,9 @@ export type FlexProps = Partial<{
   rowGap: number;
   columnGap: number;
   gap: number;
+}>;
+
+export type ItemGroups = Array<{
+  items: Array<string>;
+  dimensions: Dimensions;
 }>;

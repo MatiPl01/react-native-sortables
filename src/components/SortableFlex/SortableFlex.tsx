@@ -52,7 +52,9 @@ function SortableFlexInner({
   }));
 
   return (
-    <Animated.View {...viewProps} style={[viewProps.style]}>
+    <Animated.View
+      {...viewProps}
+      style={[viewProps.style, animatedContainerHeightStyle]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView itemKey={key} key={key}>
           {child}

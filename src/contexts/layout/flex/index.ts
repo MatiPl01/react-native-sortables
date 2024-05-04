@@ -1,2 +1,2 @@
 export * from './FlexLayoutProvider';
-export * from './types';
+export type { FlexProps } from './types';
