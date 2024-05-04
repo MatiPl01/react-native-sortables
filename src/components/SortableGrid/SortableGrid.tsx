@@ -6,7 +6,8 @@ import {
   GridLayoutProvider,
   MeasurementsProvider,
   PositionsProvider,
-  useGridLayoutContext
+  useGridLayoutContext,
+  useMeasurementsContext
 } from '../../contexts';
 import { defaultKeyExtractor, typedMemo } from '../../utils';
 import { DraggableView } from '../shared';
@@ -53,7 +54,8 @@ function SortableGridInner<I>({
   keyExtractor,
   renderItem
 }: SortableGridInnerProps<I>) {
-  const { columnWidth, containerHeight } = useGridLayoutContext();
+  const { containerHeight } = useMeasurementsContext();
+  const { columnWidth } = useGridLayoutContext();
 
   const animatedColumnWidthStyle = useAnimatedStyle(() => ({
     width: columnWidth.value === -1 ? `${100 / columns}%` : columnWidth.value
