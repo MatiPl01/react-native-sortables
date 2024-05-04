@@ -9,7 +9,7 @@ import {
   useGridLayoutContext
 } from '../../contexts';
 import { defaultKeyExtractor, typedMemo } from '../../utils';
-import { DraggableView } from '../shared';
+import SortableGridItem from './SortableGridItem';
 import type { SortableGridRenderItem } from './types';
 
 export type SortableGridProps<I> = {
@@ -68,12 +68,12 @@ function SortableGridInner<I>({
       {data.map((item, index) => {
         const key = keyExtractor(item, index);
         return (
-          <DraggableView
+          <SortableGridItem
             itemKey={key}
             key={key}
             style={animatedColumnWidthStyle}>
             {renderItem({ item })}
-          </DraggableView>
+          </SortableGridItem>
         );
       })}
     </Animated.View>

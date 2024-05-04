@@ -6,7 +6,7 @@ import type { FlexProps } from '../../contexts';
 import { FlexLayoutProvider, useFlexLayoutContext } from '../../contexts';
 import { MeasurementsProvider, PositionsProvider } from '../../contexts/shared';
 import { areArraysDifferent, validateChildren } from '../../utils';
-import { DraggableView } from '../shared';
+import SortableFlexItem from './SortableFlexItem';
 
 export type SortableFlexProps = ViewProps;
 
@@ -56,9 +56,9 @@ function SortableFlexInner({
       {...viewProps}
       style={[viewProps.style, animatedContainerHeightStyle]}>
       {childrenArray.map(([key, child]) => (
-        <DraggableView itemKey={key} key={key}>
+        <SortableFlexItem itemKey={key} key={key}>
           {child}
-        </DraggableView>
+        </SortableFlexItem>
       ))}
     </Animated.View>
   );

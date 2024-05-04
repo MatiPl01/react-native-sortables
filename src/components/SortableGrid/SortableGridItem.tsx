@@ -4,16 +4,16 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { useItemPosition, useMeasurementsContext } from '../../contexts/shared';
 
-type DraggableViewProps = {
+type SortableGridItemProps = {
   itemKey: string;
 } & ViewProps;
 
-export default function DraggableView({
+export default function SortableGridItem({
   children,
   itemKey: key,
   style,
   ...viewProps
-}: DraggableViewProps) {
+}: SortableGridItemProps) {
   const { measureItem, removeItem } = useMeasurementsContext();
   const itemPosition = useItemPosition(key);
 
