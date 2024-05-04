@@ -51,9 +51,9 @@
   "keywords": [],
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "bash -c tsc --noEmit",
-      "prettier --write --ignore-unknown"
+      "yarn format:code",
+      "yarn lint:fix",
+      "bash -c tsc --noEmit"
     ],
     "package.json": [
       "yarn format:deps"
