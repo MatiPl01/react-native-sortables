@@ -1,64 +1,82 @@
-import type { ViewStyle } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { useMemo } from 'react';
+import { StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { MeasurementsProvider } from '../../contexts';
+import {
+  GridLayoutProvider,
+  MeasurementsProvider,
+  PositionsProvider,
+  useGridLayoutContext
+} from '../../contexts';
 import { defaultKeyExtractor, typedMemo } from '../../utils';
 import { DraggableView } from '../shared';
 import type { SortableGridRenderItem } from './types';
 
 export type SortableGridProps<I> = {
   data: Array<I>;
-  numColumns: number;
+  columns?: number;
   renderItem: SortableGridRenderItem<I>;
   keyExtractor?: (item: I, index: number) => string;
 };
 
 function SortableGrid<I>({
+  columns = 1,
   data,
   keyExtractor = defaultKeyExtractor,
-  numColumns,
   renderItem
 }: SortableGridProps<I>) {
+  const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
+
   return (
-    <MeasurementsProvider>
-      <SortableGridInner
-        data={data}
-        keyExtractor={keyExtractor}
-        numColumns={numColumns}
-        renderItem={renderItem}
-      />
+    <MeasurementsProvider itemsCount={data.length}>
+      <PositionsProvider itemKeys={itemKeys}>
+        <GridLayoutProvider columnsCount={columns}>
+          <SortableGridInner
+            columns={columns}
+            data={data}
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
+          />
+        </GridLayoutProvider>
+      </PositionsProvider>
     </MeasurementsProvider>
   );
 }
 
 type SortableGridInnerProps<I> = Required<
-  Pick<
-    SortableGridProps<I>,
-    'data' | 'keyExtractor' | 'numColumns' | 'renderItem'
-  >
+  Pick<SortableGridProps<I>, 'columns' | 'data' | 'keyExtractor' | 'renderItem'>
 >;
 
 function SortableGridInner<I>({
+  columns,
   data,
   keyExtractor,
-  numColumns,
   renderItem
 }: SortableGridInnerProps<I>) {
-  const style: ViewStyle = {
-    width: `${100 / numColumns}%`
-  };
+  const { columnWidth, containerHeight } = useGridLayoutContext();
+
+  const animatedColumnWidthStyle = useAnimatedStyle(() => ({
+    width: columnWidth.value === -1 ? `${100 / columns}%` : columnWidth.value
+  }));
+
+  const animatedContainerHeightStyle = useAnimatedStyle(() => ({
+    height: containerHeight.value === -1 ? 'auto' : containerHeight.value
+  }));
 
   return (
-    <View style={styles.gridContainer}>
+    <Animated.View style={[styles.gridContainer, animatedContainerHeightStyle]}>
       {data.map((item, index) => {
-        const id = keyExtractor(item, index);
+        const key = keyExtractor(item, index);
         return (
-          <DraggableView id={id} key={id} style={style}>
+          <DraggableView
+            itemKey={key}
+            key={key}
+            style={animatedColumnWidthStyle}>
             {renderItem({ item })}
           </DraggableView>
         );
       })}
-    </View>
+    </Animated.View>
   );
 }
 
