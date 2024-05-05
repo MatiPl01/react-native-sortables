@@ -8,19 +8,20 @@ import {
   SharedProvider,
   useFlexLayoutContext
 } from '../../contexts';
-import { areArraysDifferent, validateChildren } from '../../utils';
+import type { SharedProps } from '../../types';
+import {
+  areArraysDifferent,
+  getPropsWithDefaults,
+  validateChildren
+} from '../../utils';
 import { DraggableView } from '../shared';
 
-export type SortableFlexProps = {
-  dragEnabled?: boolean;
-} & ViewProps;
+export type SortableFlexProps = SharedProps & ViewProps;
 
-function SortableFlex({
-  children,
-  dragEnabled = true,
-  ...viewProps
-}: SortableFlexProps) {
-  const childrenArray = validateChildren(children);
+function SortableFlex(props: SortableFlexProps) {
+  const { rest: viewProps, sharedProps } = getPropsWithDefaults(props);
+
+  const childrenArray = validateChildren(viewProps.children);
   const itemKeysRef = useRef<Array<string>>([]);
 
   const newItemKeys = childrenArray.map(([key]) => key);
@@ -29,7 +30,7 @@ function SortableFlex({
   }
 
   return (
-    <SharedProvider dragEnabled={dragEnabled} itemKeys={itemKeysRef.current}>
+    <SharedProvider {...sharedProps} itemKeys={itemKeysRef.current}>
       <FlexLayoutProvider {...((viewProps.style as FlexProps) ?? {})}>
         <SortableFlexInner
           childrenArray={childrenArray}
@@ -49,7 +50,7 @@ function SortableFlexInner({
   childrenArray,
   viewProps
 }: SortableFlexInnerProps) {
-  const { containerHeight, stretch } = useFlexLayoutContext();
+  const { containerHeight, reverseXAxis, stretch } = useFlexLayoutContext();
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height:
@@ -63,7 +64,7 @@ function SortableFlexInner({
       {...viewProps}
       style={[viewProps.style, animatedContainerHeightStyle]}>
       {childrenArray.map(([key, child]) => (
-        <DraggableView itemKey={key} key={key}>
+        <DraggableView itemKey={key} key={key} reverseXAxis={reverseXAxis}>
           {cloneElement(child, {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             style: [child.props?.style, stretch && { flexGrow: 1 }]

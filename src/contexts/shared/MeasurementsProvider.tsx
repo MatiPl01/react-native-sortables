@@ -30,7 +30,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
   children,
   itemsCount
 }) => {
-  const { activeItemDropped } = useDragContext();
+  const { activationProgress } = useDragContext();
 
   const measuredItemsCount = useSharedValue(0);
 
@@ -72,7 +72,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
   );
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
-    zIndex: activeItemDropped.value ? 0 : 1
+    zIndex: activationProgress.value > 0 ? 1 : 0
   }));
 
   return {

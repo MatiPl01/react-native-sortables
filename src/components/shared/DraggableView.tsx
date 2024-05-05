@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { type LayoutChangeEvent, type ViewProps } from 'react-native';
+import {
+  type LayoutChangeEvent,
+  StyleSheet,
+  type ViewProps
+} from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  interpolate,
+  interpolateColor,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -19,11 +25,13 @@ import { getItemZIndex } from '../../utils';
 
 type DraggableViewProps = {
   itemKey: string;
+  reverseXAxis?: boolean;
 } & ViewProps;
 
 export default function DraggableView({
   children,
   itemKey: key,
+  reverseXAxis,
   style,
   ...viewProps
 }: DraggableViewProps) {
@@ -33,8 +41,13 @@ export default function DraggableView({
     activationProgress,
     activeItemDropped,
     activeItemKey,
+    activeItemOpacity,
     activeItemPosition,
-    enabled
+    activeItemScale,
+    activeItemShadowOpacity,
+    enabled,
+    inactiveItemOpacity,
+    inactiveItemScale
   } = useDragContext();
   const itemPosition = useItemPosition(key);
 
@@ -102,7 +115,9 @@ export default function DraggableView({
             return;
           }
           activeItemPosition.value = {
-            x: dragStartPosition.value.x + e.translationX,
+            x:
+              dragStartPosition.value.x +
+              (reverseXAxis ? -1 : 1) * e.translationX,
             y: dragStartPosition.value.y + e.translationY
           };
         })
@@ -111,6 +126,7 @@ export default function DraggableView({
     [
       key,
       enabled,
+      reverseXAxis,
       handleDragEnd,
       isTouched,
       isActive,
@@ -148,10 +164,42 @@ export default function DraggableView({
     };
   });
 
+  const animatedDecorationStyle = useAnimatedStyle(() => {
+    const resultantProgress =
+      2 * pressProgress.value - activationProgress.value;
+
+    return {
+      opacity: interpolate(
+        resultantProgress,
+        [-1, 0, 1],
+        [inactiveItemOpacity.value, 1, activeItemOpacity.value]
+      ),
+      shadowColor: interpolateColor(
+        resultantProgress,
+        [-1, 0, 1],
+        [
+          'transparent',
+          'transparent',
+          `rgba(0, 0, 0, ${activeItemShadowOpacity.value})`
+        ]
+      ),
+      shadowOpacity: interpolate(resultantProgress, [-1, 0, 1], [0, 0, 1]),
+      transform: [
+        {
+          scale: interpolate(
+            resultantProgress,
+            [-1, 0, 1],
+            [inactiveItemScale.value, 1, activeItemScale.value]
+          )
+        }
+      ]
+    };
+  });
+
   return (
     <Animated.View
       {...viewProps}
-      style={[style, animatedStyle]}
+      style={[styles.decoration, style, animatedStyle, animatedDecorationStyle]}
       onLayout={({
         nativeEvent: {
           layout: { height, width }
@@ -163,3 +211,14 @@ export default function DraggableView({
     </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  decoration: {
+    elevation: 5,
+    shadowOffset: {
+      height: 0,
+      width: 0
+    },
+    shadowRadius: 5
+  }
+});

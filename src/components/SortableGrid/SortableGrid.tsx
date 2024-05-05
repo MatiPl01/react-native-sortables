@@ -7,7 +7,12 @@ import {
   SharedProvider,
   useGridLayoutContext
 } from '../../contexts';
-import { defaultKeyExtractor, typedMemo } from '../../utils';
+import type { SharedProps } from '../../types';
+import {
+  defaultKeyExtractor,
+  getPropsWithDefaults,
+  typedMemo
+} from '../../utils';
 import { DraggableView } from '../shared';
 import type { SortableGridRenderItem } from './types';
 
@@ -15,21 +20,19 @@ export type SortableGridProps<I> = {
   data: Array<I>;
   renderItem: SortableGridRenderItem<I>;
   columns?: number;
-  dragEnabled?: boolean;
   keyExtractor?: (item: I, index: number) => string;
-};
+} & SharedProps;
 
-function SortableGrid<I>({
-  columns = 1,
-  data,
-  dragEnabled = true,
-  keyExtractor = defaultKeyExtractor,
-  renderItem
-}: SortableGridProps<I>) {
+function SortableGrid<I>(props: SortableGridProps<I>) {
+  const {
+    rest: { columns = 1, data, keyExtractor = defaultKeyExtractor, renderItem },
+    sharedProps
+  } = getPropsWithDefaults(props);
+
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
 
   return (
-    <SharedProvider dragEnabled={dragEnabled} itemKeys={itemKeys}>
+    <SharedProvider {...sharedProps} itemKeys={itemKeys}>
       <GridLayoutProvider columnsCount={columns}>
         <SortableGridInner
           columns={columns}

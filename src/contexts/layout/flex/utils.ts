@@ -1,3 +1,4 @@
+import { OFFSET_EPS } from '../../../constants';
 import type { Dimension, Dimensions, Position } from '../../../types';
 import { sum } from '../../../utils';
 import type {
@@ -31,7 +32,7 @@ export const groupItems = (
     }
     const itemDimension = itemDimensions[limitedDimension];
     const gap = currentGroup.length > 0 ? itemsGap : 0;
-    if (currentDimension + itemDimension > limit) {
+    if (currentDimension + itemDimension - limit > OFFSET_EPS) {
       groups.push(currentGroup);
       currentGroup = [];
       currentDimension = 0;
