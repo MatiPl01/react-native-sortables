@@ -24,7 +24,12 @@ export default function SortableGridExample() {
 
   return (
     <>
-      <SortableGrid data={TILES} renderItem={renderItem} columns={5} />
+      <SortableGrid
+        data={TILES}
+        renderItem={renderItem}
+        columns={5}
+        reorderStrategy='insert'
+      />
       <View style={styles.footer}>
         <Text style={styles.footerText}>Grid footer</Text>
       </View>

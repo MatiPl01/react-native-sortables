@@ -15,6 +15,7 @@ type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
+  containerHeight: SharedValue<number>;
   containerWidth: SharedValue<number>;
   measureItem: (key: string, dimensions: Dimensions) => void;
   removeItem: (key: string) => void;
@@ -41,6 +42,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
   >({});
 
   const containerWidth = useSharedValue(-1);
+  const containerHeight = useSharedValue(-1);
 
   const measureItem = useUICallback((key: string, dimensions: Dimensions) => {
     'worklet';
@@ -84,6 +86,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
       </Animated.View>
     ),
     value: {
+      containerHeight,
       containerWidth,
       initialMeasurementsCompleted,
       itemDimensions,
