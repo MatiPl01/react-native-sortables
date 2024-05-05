@@ -1,25 +1,50 @@
 import { type PropsWithChildren } from 'react';
-import { type SharedValue, useSharedValue } from 'react-native-reanimated';
+import {
+  type SharedValue,
+  useDerivedValue,
+  useSharedValue
+} from 'react-native-reanimated';
 
-import type { Position } from '../../types';
+import type {
+  ActiveItemDecorationSettings,
+  Position,
+  Sharedify
+} from '../../types';
 import { createGuardedContext } from '../utils';
 
 type DragContextType = {
+  enabled: boolean;
   activeItemKey: SharedValue<null | string>;
   activationProgress: SharedValue<number>;
   activeItemPosition: SharedValue<Position>;
   activeItemDropped: SharedValue<boolean>;
-  enabled: boolean;
-};
+} & Sharedify<ActiveItemDecorationSettings>;
 
-type DragProviderProps = PropsWithChildren<{
-  enabled: boolean;
-}>;
+type DragProviderProps = PropsWithChildren<
+  {
+    enabled: boolean;
+  } & ActiveItemDecorationSettings
+>;
 
 const { DragProvider, useDragContext } = createGuardedContext('Drag')<
   DragContextType,
   DragProviderProps
->(({ enabled }) => {
+>(({
+  activeItemOpacity: activeItemOpacityProp = 1,
+  activeItemScale: activeItemScaleProp = 1.1,
+  activeItemShadowOpacity: activeItemShadowOpacityProp = 0.15,
+  enabled,
+  inactiveItemOpacity: inactiveItemOpacityProp = 0.5,
+  inactiveItemScale: inactiveItemScaleProp = 1
+}) => {
+  const activeItemScale = useDerivedValue(() => activeItemScaleProp);
+  const activeItemOpacity = useDerivedValue(() => activeItemOpacityProp);
+  const activeItemShadowOpacity = useDerivedValue(
+    () => activeItemShadowOpacityProp
+  );
+  const inactiveItemScale = useDerivedValue(() => inactiveItemScaleProp);
+  const inactiveItemOpacity = useDerivedValue(() => inactiveItemOpacityProp);
+
   const activeItemKey = useSharedValue<null | string>(null);
   const activationProgress = useSharedValue(0);
   const activeItemPosition = useSharedValue<Position>({ x: 0, y: 0 });
@@ -30,8 +55,13 @@ const { DragProvider, useDragContext } = createGuardedContext('Drag')<
       activationProgress,
       activeItemDropped,
       activeItemKey,
+      activeItemOpacity,
       activeItemPosition,
-      enabled
+      activeItemScale,
+      activeItemShadowOpacity,
+      enabled,
+      inactiveItemOpacity,
+      inactiveItemScale
     }
   };
 });

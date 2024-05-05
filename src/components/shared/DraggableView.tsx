@@ -16,6 +16,7 @@ import {
 import { useDragContext, useMeasurementsContext } from '../../contexts';
 import { useItemPosition } from '../../hooks';
 import { getItemZIndex } from '../../utils';
+import ActiveItemDecoration from './ActiveItemDecoration';
 
 type DraggableViewProps = {
   itemKey: string;
@@ -159,7 +160,11 @@ export default function DraggableView({
       }: LayoutChangeEvent) => {
         measureItem(key, { height, width });
       }}>
-      <GestureDetector gesture={panGesture}>{children}</GestureDetector>
+      <GestureDetector gesture={panGesture}>
+        <ActiveItemDecoration pressProgress={pressProgress}>
+          {children}
+        </ActiveItemDecoration>
+      </GestureDetector>
     </Animated.View>
   );
 }

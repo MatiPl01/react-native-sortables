@@ -2,6 +2,8 @@
 import { useCallback, useRef } from 'react';
 import { runOnUI } from 'react-native-reanimated';
 
+import type { AnyFunction } from '../types';
+
 export function useStableCallback<C extends AnyFunction>(callback: C) {
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
