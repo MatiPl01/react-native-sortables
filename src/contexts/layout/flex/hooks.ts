@@ -10,7 +10,7 @@ import { useFlexLayoutContext } from './FlexLayoutProvider';
 
 export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
   const { itemDimensions } = useMeasurementsContext();
-  const { indexToKey, itemPositions } = usePositionsContext();
+  const { indexToKey, itemPositions, keyToIndex } = usePositionsContext();
   const { crossAxisGroupOffsets, flexDirection, itemGroups, keyToGroup } =
     useFlexLayoutContext();
 
@@ -27,7 +27,7 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
   }
 
   useActiveItemReaction(
-    ({ activeKey, centerPosition, position }) => {
+    ({ activeIndex, activeKey, centerPosition, position }) => {
       'worklet';
       let groupIndex = keyToGroup.value[activeKey];
       if (groupIndex === undefined) {
@@ -99,12 +99,16 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
       if (overlappingItemKey === undefined) {
         return;
       }
+      const overlappingIndex = keyToIndex.value[overlappingItemKey];
+      if (overlappingIndex === undefined) {
+        return;
+      }
 
       // Update the order of items
       indexToKey.value = reorderItems(
         indexToKey.value,
-        indexToKey.value.indexOf(activeKey),
-        indexToKey.value.indexOf(overlappingItemKey),
+        activeIndex,
+        overlappingIndex,
         strategy
       );
     },
