@@ -30,12 +30,12 @@ const { DragProvider, useDragContext } = createGuardedContext('Drag')<
   DragContextType,
   DragProviderProps
 >(({
-  activeItemOpacity: activeItemOpacityProp = 1,
-  activeItemScale: activeItemScaleProp = 1.1,
-  activeItemShadowOpacity: activeItemShadowOpacityProp = 0.15,
+  activeItemOpacity: activeItemOpacityProp,
+  activeItemScale: activeItemScaleProp,
+  activeItemShadowOpacity: activeItemShadowOpacityProp,
   enabled,
-  inactiveItemOpacity: inactiveItemOpacityProp = 0.5,
-  inactiveItemScale: inactiveItemScaleProp = 1
+  inactiveItemOpacity: inactiveItemOpacityProp,
+  inactiveItemScale: inactiveItemScaleProp
 }) => {
   const activeItemScale = useDerivedValue(() => activeItemScaleProp);
   const activeItemOpacity = useDerivedValue(() => activeItemOpacityProp);
