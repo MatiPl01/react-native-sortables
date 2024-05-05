@@ -50,7 +50,7 @@ function SortableFlexInner({
   childrenArray,
   viewProps
 }: SortableFlexInnerProps) {
-  const { containerHeight, stretch } = useFlexLayoutContext();
+  const { containerHeight, reverseXAxis, stretch } = useFlexLayoutContext();
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height:
@@ -64,7 +64,7 @@ function SortableFlexInner({
       {...viewProps}
       style={[viewProps.style, animatedContainerHeightStyle]}>
       {childrenArray.map(([key, child]) => (
-        <DraggableView itemKey={key} key={key}>
+        <DraggableView itemKey={key} key={key} reverseXAxis={reverseXAxis}>
           {cloneElement(child, {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             style: [child.props?.style, stretch && { flexGrow: 1 }]

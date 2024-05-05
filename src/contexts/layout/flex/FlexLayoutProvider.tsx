@@ -17,6 +17,7 @@ import {
 
 type FlexLayoutContextType = {
   stretch: boolean;
+  reverseXAxis: boolean;
   containerHeight: SharedValue<number>;
 };
 
@@ -203,6 +204,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
     value: {
       containerHeight,
       overrideItemDimensions,
+      // x axis must be reversed if the direction is row-reverse, because
+      // left offset in absolute positioning is calculated from the right edge
+      reverseXAxis: flexDirection === 'row-reverse',
       stretch
     }
   };
