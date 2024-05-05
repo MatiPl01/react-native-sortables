@@ -15,7 +15,7 @@ import { getColumnIndex, getRowIndex } from './utils';
 
 type GridLayoutContextType = {
   columnWidth: SharedValue<number>;
-  containerHeight: SharedValue<number>;
+  rowOffsets: SharedValue<Array<number>>;
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{
@@ -25,15 +25,13 @@ type GridLayoutProviderProps = PropsWithChildren<{
 const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
   'GridLayout'
 )<GridLayoutContextType, GridLayoutProviderProps>(({ columnsCount }) => {
-  const { containerWidth, itemDimensions } = useMeasurementsContext();
+  const { containerHeight, containerWidth, itemDimensions } =
+    useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
   const columnWidth = useDerivedValue(() =>
     containerWidth.value === -1 ? -1 : containerWidth.value / columnsCount
-  );
-  const containerHeight = useDerivedValue(
-    () => rowOffsets.value[rowOffsets.value.length - 1] ?? -1
   );
 
   // ROW OFFSETS UPDATER
@@ -67,6 +65,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
         )
       ) {
         rowOffsets.value = offsets;
+        containerHeight.value = offsets[offsets.length - 1] ?? 0;
       }
     },
     [columnsCount]
@@ -117,7 +116,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
   return {
     value: {
       columnWidth,
-      containerHeight
+      rowOffsets
     }
   };
 });

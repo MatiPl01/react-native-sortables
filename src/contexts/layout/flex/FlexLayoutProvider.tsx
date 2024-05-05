@@ -1,6 +1,5 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import { type LayoutChangeEvent, StyleSheet, View } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
@@ -18,7 +17,6 @@ import {
 type FlexLayoutContextType = {
   stretch: boolean;
   reverseXAxis: boolean;
-  containerHeight: SharedValue<number>;
 };
 
 type FlexLayoutProviderProps = PropsWithChildren<FlexProps>;
@@ -41,11 +39,13 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
   const columnGap = columnGapProp ?? gap;
   const rowGap = rowGapProp ?? gap;
 
-  const { containerWidth, itemDimensions, overrideItemDimensions } =
-    useMeasurementsContext();
+  const {
+    containerHeight,
+    containerWidth,
+    itemDimensions,
+    overrideItemDimensions
+  } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
-
-  const containerHeight = useSharedValue(-1);
 
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
   const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
@@ -202,7 +202,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
       </>
     ),
     value: {
-      containerHeight,
       overrideItemDimensions,
       // x axis must be reversed if the direction is row-reverse, because
       // left offset in absolute positioning is calculated from the right edge

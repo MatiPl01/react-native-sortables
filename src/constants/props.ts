@@ -6,5 +6,6 @@ export const SHARED_PROPS: Required<SharedProps> = {
   activeItemShadowOpacity: 0.2,
   dragEnabled: true,
   inactiveItemOpacity: 0.5,
-  inactiveItemScale: 1
+  inactiveItemScale: 1,
+  reorderStrategy: 'insert'
 };

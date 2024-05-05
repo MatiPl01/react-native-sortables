@@ -6,7 +6,8 @@ import type { FlexProps } from '../../contexts';
 import {
   FlexLayoutProvider,
   SharedProvider,
-  useFlexLayoutContext
+  useFlexLayoutContext,
+  useMeasurementsContext
 } from '../../contexts';
 import type { SharedProps } from '../../types';
 import {
@@ -50,7 +51,8 @@ function SortableFlexInner({
   childrenArray,
   viewProps
 }: SortableFlexInnerProps) {
-  const { containerHeight, reverseXAxis, stretch } = useFlexLayoutContext();
+  const { containerHeight } = useMeasurementsContext();
+  const { reverseXAxis, stretch } = useFlexLayoutContext();
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height:

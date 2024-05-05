@@ -5,7 +5,9 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import {
   GridLayoutProvider,
   SharedProvider,
-  useGridLayoutContext
+  useGridLayoutContext,
+  useGridOrderUpdater,
+  useMeasurementsContext
 } from '../../contexts';
 import type { SharedProps } from '../../types';
 import {
@@ -26,19 +28,20 @@ export type SortableGridProps<I> = {
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
     rest: { columns = 1, data, keyExtractor = defaultKeyExtractor, renderItem },
-    sharedProps
+    sharedProps: { reorderStrategy, ...providerProps }
   } = getPropsWithDefaults(props);
 
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
 
   return (
-    <SharedProvider {...sharedProps} itemKeys={itemKeys}>
+    <SharedProvider {...providerProps} itemKeys={itemKeys}>
       <GridLayoutProvider columnsCount={columns}>
         <SortableGridInner
           columns={columns}
           data={data}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
+          reorderStrategy={reorderStrategy}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -46,16 +49,23 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 }
 
 type SortableGridInnerProps<I> = Required<
-  Pick<SortableGridProps<I>, 'columns' | 'data' | 'keyExtractor' | 'renderItem'>
+  Pick<
+    SortableGridProps<I>,
+    'columns' | 'data' | 'keyExtractor' | 'renderItem' | 'reorderStrategy'
+  >
 >;
 
 function SortableGridInner<I>({
   columns,
   data,
   keyExtractor,
-  renderItem
+  renderItem,
+  reorderStrategy
 }: SortableGridInnerProps<I>) {
-  const { columnWidth, containerHeight } = useGridLayoutContext();
+  const { containerHeight } = useMeasurementsContext();
+  const { columnWidth } = useGridLayoutContext();
+
+  useGridOrderUpdater(columns, reorderStrategy);
 
   const animatedColumnWidthStyle = useAnimatedStyle(() => ({
     width: columnWidth.value === -1 ? `${100 / columns}%` : columnWidth.value
