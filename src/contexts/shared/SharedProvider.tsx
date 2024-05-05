@@ -15,10 +15,12 @@ export default function SharedProvider({
   itemKeys
 }: SharedProviderProps) {
   return (
-    <MeasurementsProvider itemsCount={itemKeys.length}>
-      <PositionsProvider itemKeys={itemKeys}>
-        <DragProvider enabled={dragEnabled}>{children}</DragProvider>
-      </PositionsProvider>
-    </MeasurementsProvider>
+    <PositionsProvider itemKeys={itemKeys}>
+      <DragProvider enabled={dragEnabled}>
+        <MeasurementsProvider itemsCount={itemKeys.length}>
+          {children}
+        </MeasurementsProvider>
+      </DragProvider>
+    </PositionsProvider>
   );
 }

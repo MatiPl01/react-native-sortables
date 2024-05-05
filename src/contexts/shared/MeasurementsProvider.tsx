@@ -1,10 +1,15 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import { type LayoutChangeEvent, StyleSheet, View } from 'react-native';
-import { type SharedValue, useSharedValue } from 'react-native-reanimated';
+import { type LayoutChangeEvent, StyleSheet } from 'react-native';
+import Animated, {
+  type SharedValue,
+  useAnimatedStyle,
+  useSharedValue
+} from 'react-native-reanimated';
 
 import { useUICallback } from '../../hooks';
 import type { Dimensions } from '../../types';
 import { createGuardedContext } from '../utils';
+import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
@@ -25,6 +30,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
   children,
   itemsCount
 }) => {
+  const { activeItemDropped } = useDragContext();
+
   const measuredItemsCount = useSharedValue(0);
 
   const initialMeasurementsCompleted = useSharedValue(false);
@@ -64,11 +71,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
     [containerWidth]
   );
 
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    zIndex: activeItemDropped.value ? 0 : 1
+  }));
+
   return {
     children: (
-      <View style={styles.container} onLayout={measureContainer}>
+      <Animated.View
+        style={[styles.container, animatedContainerStyle]}
+        onLayout={measureContainer}>
         {children}
-      </View>
+      </Animated.View>
     ),
     value: {
       containerWidth,

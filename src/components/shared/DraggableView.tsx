@@ -15,6 +15,7 @@ import {
 } from '../../constants';
 import { useDragContext, useMeasurementsContext } from '../../contexts';
 import { useItemPosition } from '../../hooks';
+import { getItemZIndex } from '../../utils';
 
 type DraggableViewProps = {
   itemKey: string;
@@ -28,8 +29,13 @@ export default function DraggableView({
 }: DraggableViewProps) {
   const { measureItem, overrideItemDimensions, removeItem } =
     useMeasurementsContext();
-  const { activationProgress, activeItemKey, activeItemPosition, enabled } =
-    useDragContext();
+  const {
+    activationProgress,
+    activeItemDropped,
+    activeItemKey,
+    activeItemPosition,
+    enabled
+  } = useDragContext();
   const itemPosition = useItemPosition(key);
 
   const overriddenDimensions = useDerivedValue(
@@ -37,6 +43,7 @@ export default function DraggableView({
   );
 
   const isTouched = useSharedValue(false);
+  const isActive = useDerivedValue(() => activeItemKey.value === key);
   const pressProgress = useSharedValue(0);
   const dragStartPosition = useSharedValue({ x: 0, y: 0 });
 
@@ -46,7 +53,23 @@ export default function DraggableView({
 
   const handleDragEnd = useCallback(() => {
     'worklet';
-  }, []);
+    isTouched.value = false;
+    activeItemKey.value = null;
+    pressProgress.value = withTiming(0, { duration: TIME_TO_ACTIVATE_PAN });
+    activationProgress.value = withTiming(
+      0,
+      { duration: TIME_TO_ACTIVATE_PAN },
+      () => {
+        activeItemDropped.value = true;
+      }
+    );
+  }, [
+    activationProgress,
+    activeItemKey,
+    activeItemDropped,
+    isTouched,
+    pressProgress
+  ]);
 
   const panGesture = useMemo(
     () =>
@@ -72,12 +95,12 @@ export default function DraggableView({
             y: itemPosition.y.value ?? 0
           };
           activeItemKey.value = key;
-          // activeItemDropped.value = false;
+          activeItemDropped.value = false;
         })
         .onUpdate(e => {
-          // if (!isActive.value) {
-          //   return;
-          // }
+          if (!isActive.value) {
+            return;
+          }
           activeItemPosition.value = {
             x: dragStartPosition.value.x + e.translationX,
             y: dragStartPosition.value.y + e.translationY
@@ -90,10 +113,12 @@ export default function DraggableView({
       enabled,
       handleDragEnd,
       isTouched,
+      isActive,
       itemPosition,
       activationProgress,
       activeItemKey,
       activeItemPosition,
+      activeItemDropped,
       dragStartPosition,
       pressProgress
     ]
@@ -106,10 +131,19 @@ export default function DraggableView({
       };
     }
 
+    const x = itemPosition.x.value;
+    const y = itemPosition.y.value;
+
     return {
       left: itemPosition.x.value,
       position: 'absolute',
       top: itemPosition.y.value,
+      zIndex: getItemZIndex(
+        isActive.value,
+        pressProgress.value,
+        { x, y },
+        activeItemPosition.value
+      ),
       ...overriddenDimensions.value
     };
   });
