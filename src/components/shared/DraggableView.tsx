@@ -19,8 +19,11 @@ import {
   ACTIVATE_PAN_ANIMATION_DELAY,
   TIME_TO_ACTIVATE_PAN
 } from '../../constants';
-import { useDragContext, useMeasurementsContext } from '../../contexts';
-import { useItemPosition } from '../../hooks';
+import {
+  useDragContext,
+  useItemPosition,
+  useMeasurementsContext
+} from '../../contexts';
 import { getItemZIndex } from '../../utils';
 
 type DraggableViewProps = {

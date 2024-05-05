@@ -154,7 +154,7 @@ const alignGroupItems = (
   }
 };
 
-export const getItemPositions = (
+export const calculateLayout = (
   groups: Array<Array<string>>,
   groupBy: Dimension,
   crossAxisGroupSizes: Array<number>,
@@ -176,7 +176,10 @@ export const getItemPositions = (
     | 'justifyContent'
     | 'rowGap'
   >
-): Record<string, Position> | null => {
+): {
+  crossAxisGroupOffsets: Array<number>;
+  itemPositions: Record<string, Position>;
+} | null => {
   'worklet';
   const positions: Record<string, Position> = {};
 
@@ -244,5 +247,5 @@ export const getItemPositions = (
     }
   }
 
-  return positions;
+  return { crossAxisGroupOffsets, itemPositions: positions };
 };

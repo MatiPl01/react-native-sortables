@@ -9,3 +9,5 @@ export type Position = {
 };
 
 export type Dimension = 'height' | 'width';
+
+export type Coordinate = 'x' | 'y';

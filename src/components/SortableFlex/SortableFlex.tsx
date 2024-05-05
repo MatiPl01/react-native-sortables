@@ -7,9 +7,10 @@ import {
   FlexLayoutProvider,
   SharedProvider,
   useFlexLayoutContext,
+  useFlexOrderUpdater,
   useMeasurementsContext
 } from '../../contexts';
-import type { SharedProps } from '../../types';
+import type { ReorderStrategy, SharedProps } from '../../types';
 import {
   areArraysDifferent,
   getPropsWithDefaults,
@@ -20,7 +21,10 @@ import { DraggableView } from '../shared';
 export type SortableFlexProps = SharedProps & ViewProps;
 
 function SortableFlex(props: SortableFlexProps) {
-  const { rest: viewProps, sharedProps } = getPropsWithDefaults(props);
+  const {
+    rest: viewProps,
+    sharedProps: { reorderStrategy, ...providerProps }
+  } = getPropsWithDefaults(props);
 
   const childrenArray = validateChildren(viewProps.children);
   const itemKeysRef = useRef<Array<string>>([]);
@@ -31,10 +35,11 @@ function SortableFlex(props: SortableFlexProps) {
   }
 
   return (
-    <SharedProvider {...sharedProps} itemKeys={itemKeysRef.current}>
+    <SharedProvider {...providerProps} itemKeys={itemKeysRef.current}>
       <FlexLayoutProvider {...((viewProps.style as FlexProps) ?? {})}>
         <SortableFlexInner
           childrenArray={childrenArray}
+          reorderStrategy={reorderStrategy}
           viewProps={viewProps}
         />
       </FlexLayoutProvider>
@@ -45,14 +50,18 @@ function SortableFlex(props: SortableFlexProps) {
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
   viewProps: ViewProps;
+  reorderStrategy: ReorderStrategy;
 };
 
 function SortableFlexInner({
   childrenArray,
+  reorderStrategy,
   viewProps
 }: SortableFlexInnerProps) {
   const { containerHeight } = useMeasurementsContext();
-  const { reverseXAxis, stretch } = useFlexLayoutContext();
+  const { flexDirection, stretch } = useFlexLayoutContext();
+
+  useFlexOrderUpdater(reorderStrategy);
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height:
@@ -66,7 +75,12 @@ function SortableFlexInner({
       {...viewProps}
       style={[viewProps.style, animatedContainerHeightStyle]}>
       {childrenArray.map(([key, child]) => (
-        <DraggableView itemKey={key} key={key} reverseXAxis={reverseXAxis}>
+        <DraggableView
+          itemKey={key}
+          key={key}
+          // When flexDirection is row-reverse, we need to reverse the x-axis
+          // because right offset in absolute position is calculated from the right edge
+          reverseXAxis={flexDirection === 'row-reverse'}>
           {cloneElement(child, {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             style: [child.props?.style, stretch && { flexGrow: 1 }]
