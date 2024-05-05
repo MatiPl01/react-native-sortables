@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules */
 import type { Dimension, Dimensions, Position } from '../../../types';
 import { sum } from '../../../utils';
 import type {

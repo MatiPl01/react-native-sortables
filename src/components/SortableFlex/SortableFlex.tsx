@@ -1,16 +1,25 @@
-import { type ReactElement, useRef } from 'react';
+import { cloneElement, type ReactElement, useRef } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import type { FlexProps } from '../../contexts';
-import { FlexLayoutProvider, useFlexLayoutContext } from '../../contexts';
-import { MeasurementsProvider, PositionsProvider } from '../../contexts/shared';
+import {
+  FlexLayoutProvider,
+  SharedProvider,
+  useFlexLayoutContext
+} from '../../contexts';
 import { areArraysDifferent, validateChildren } from '../../utils';
-import SortableFlexItem from './SortableFlexItem';
+import { DraggableView } from '../shared';
 
-export type SortableFlexProps = ViewProps;
+export type SortableFlexProps = {
+  dragEnabled?: boolean;
+} & ViewProps;
 
-function SortableFlex({ children, ...viewProps }: SortableFlexProps) {
+function SortableFlex({
+  children,
+  dragEnabled = true,
+  ...viewProps
+}: SortableFlexProps) {
   const childrenArray = validateChildren(children);
   const itemKeysRef = useRef<Array<string>>([]);
 
@@ -20,16 +29,14 @@ function SortableFlex({ children, ...viewProps }: SortableFlexProps) {
   }
 
   return (
-    <MeasurementsProvider itemsCount={childrenArray.length}>
-      <PositionsProvider itemKeys={itemKeysRef.current}>
-        <FlexLayoutProvider {...((viewProps.style as FlexProps) ?? {})}>
-          <SortableFlexInner
-            childrenArray={childrenArray}
-            viewProps={viewProps}
-          />
-        </FlexLayoutProvider>
-      </PositionsProvider>
-    </MeasurementsProvider>
+    <SharedProvider dragEnabled={dragEnabled} itemKeys={itemKeysRef.current}>
+      <FlexLayoutProvider {...((viewProps.style as FlexProps) ?? {})}>
+        <SortableFlexInner
+          childrenArray={childrenArray}
+          viewProps={viewProps}
+        />
+      </FlexLayoutProvider>
+    </SharedProvider>
   );
 }
 
@@ -42,7 +49,7 @@ function SortableFlexInner({
   childrenArray,
   viewProps
 }: SortableFlexInnerProps) {
-  const { containerHeight } = useFlexLayoutContext();
+  const { containerHeight, stretch } = useFlexLayoutContext();
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height:
@@ -56,9 +63,12 @@ function SortableFlexInner({
       {...viewProps}
       style={[viewProps.style, animatedContainerHeightStyle]}>
       {childrenArray.map(([key, child]) => (
-        <SortableFlexItem itemKey={key} key={key}>
-          {child}
-        </SortableFlexItem>
+        <DraggableView itemKey={key} key={key}>
+          {cloneElement(child, {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            style: [child.props?.style, stretch && { flexGrow: 1 }]
+          })}
+        </DraggableView>
       ))}
     </Animated.View>
   );

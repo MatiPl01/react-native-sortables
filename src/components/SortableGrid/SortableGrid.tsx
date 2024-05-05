@@ -4,42 +4,41 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import {
   GridLayoutProvider,
-  MeasurementsProvider,
-  PositionsProvider,
+  SharedProvider,
   useGridLayoutContext
 } from '../../contexts';
 import { defaultKeyExtractor, typedMemo } from '../../utils';
-import SortableGridItem from './SortableGridItem';
+import { DraggableView } from '../shared';
 import type { SortableGridRenderItem } from './types';
 
 export type SortableGridProps<I> = {
   data: Array<I>;
-  columns?: number;
   renderItem: SortableGridRenderItem<I>;
+  columns?: number;
+  dragEnabled?: boolean;
   keyExtractor?: (item: I, index: number) => string;
 };
 
 function SortableGrid<I>({
   columns = 1,
   data,
+  dragEnabled = true,
   keyExtractor = defaultKeyExtractor,
   renderItem
 }: SortableGridProps<I>) {
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
 
   return (
-    <MeasurementsProvider itemsCount={data.length}>
-      <PositionsProvider itemKeys={itemKeys}>
-        <GridLayoutProvider columnsCount={columns}>
-          <SortableGridInner
-            columns={columns}
-            data={data}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-          />
-        </GridLayoutProvider>
-      </PositionsProvider>
-    </MeasurementsProvider>
+    <SharedProvider dragEnabled={dragEnabled} itemKeys={itemKeys}>
+      <GridLayoutProvider columnsCount={columns}>
+        <SortableGridInner
+          columns={columns}
+          data={data}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+        />
+      </GridLayoutProvider>
+    </SharedProvider>
   );
 }
 
@@ -68,12 +67,12 @@ function SortableGridInner<I>({
       {data.map((item, index) => {
         const key = keyExtractor(item, index);
         return (
-          <SortableGridItem
+          <DraggableView
             itemKey={key}
             key={key}
             style={animatedColumnWidthStyle}>
             {renderItem({ item })}
-          </SortableGridItem>
+          </DraggableView>
         );
       })}
     </Animated.View>
