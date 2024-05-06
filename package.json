@@ -20,7 +20,7 @@
     "@types/react": "^18.2.6",
     "@types/react-test-renderer": "^18.0.7",
     "babel-plugin-module-resolver": "^5.0.2",
-    "eslint": "^8.56.0",
+    "eslint": "^9.2.0",
     "eslint-config-react-native-matipl01": "2.1.0",
     "get-yarn-workspaces": "^1.0.2",
     "globals": "^15.0.0",
