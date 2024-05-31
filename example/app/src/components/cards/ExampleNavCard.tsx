@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors, radius, spacing, text } from '../../theme';
 import { ExamplesScreenRoute, useAppNavigation } from '../../types/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -6,15 +6,10 @@ import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 type ExampleCardProps = {
   title: string;
-  preview: React.ReactNode;
   route: ExamplesScreenRoute;
 };
 
-export default function ExampleNavCard({
-  title,
-  preview,
-  route
-}: ExampleCardProps) {
+export default function ExampleNavCard({ title, route }: ExampleCardProps) {
   const navigation = useAppNavigation();
 
   return (
@@ -24,19 +19,30 @@ export default function ExampleNavCard({
       onPress={() => {
         navigation.navigate(route);
       }}>
-      <Text style={text.label1}>{title}</Text>
-      <FontAwesomeIcon icon={faChevronRight} color={colors.foreground3} />
+      <View style={styles.cardContent}>
+        <Text style={[text.label1, styles.title]}>{title}</Text>
+        <FontAwesomeIcon icon={faChevronRight} color={colors.foreground3} />
+      </View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
+    flexDirection: 'row',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     backgroundColor: colors.background1,
     borderRadius: radius.md,
+    gap: spacing.md
+  },
+  cardContent: {
+    flexGrow: 1,
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between'
+  },
+  title: {
+    color: colors.foreground1
   }
 });
