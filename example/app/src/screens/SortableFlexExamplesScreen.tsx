@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { SortableFlex } from '@lib';
+import { spacing } from '../theme';
 
 const DEFAULT_CATEGORIES = [
   'sports',
@@ -15,19 +16,25 @@ const DEFAULT_CATEGORIES = [
   'fashion'
 ];
 
-export default function SortableFlexExample() {
+export default function SortableFlexExamplesScreen() {
   return (
-    <SortableFlex style={styles.cellContainer}>
-      {DEFAULT_CATEGORIES.map(category => (
-        <View key={category} style={styles.cell}>
-          <Text style={styles.cellText}>{category}</Text>
-        </View>
-      ))}
-    </SortableFlex>
+    <View style={styles.wrapper}>
+      <SortableFlex style={styles.cellContainer}>
+        {DEFAULT_CATEGORIES.map(category => (
+          <View key={category} style={styles.cell}>
+            <Text style={styles.cellText}>{category}</Text>
+          </View>
+        ))}
+      </SortableFlex>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.lg
+  },
   cellContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',

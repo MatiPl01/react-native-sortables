@@ -16,7 +16,7 @@ function Tile({ index }: TileProps) {
   );
 }
 
-export default function SortableGridExample() {
+export default function SortableGridExamplesScreen() {
   const renderItem = useCallback<SortableGridRenderItem<number>>(
     ({ item }) => <Tile index={item} />,
     []
