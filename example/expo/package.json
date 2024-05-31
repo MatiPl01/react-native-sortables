@@ -2,7 +2,7 @@
   "name": "example-expo",
   "version": "1.0.0",
   "dependencies": {
-    "expo": "^50.0.17",
+    "expo": "~50.0.19",
     "expo-status-bar": "1.11.1"
   },
   "engines": {
