@@ -1,4 +1,4 @@
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet, View } from 'react-native';
 import SortableFlexExample from './SortableFlexExample';
 import SortableGridExample from './SortableGridExample';
