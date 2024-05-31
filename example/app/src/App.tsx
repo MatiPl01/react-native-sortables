@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import SortableFlexExample from './SortableFlexExample';
 import SortableGridExample from './SortableGridExample';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeArea } from './components';
 
 type SpacerProps = {
   height: number;
@@ -16,11 +17,11 @@ export default function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
-        <SafeAreaView style={styles.container}>
+        <SafeArea>
           <SortableFlexExample />
           <Spacer height={20} />
           <SortableGridExample />
-        </SafeAreaView>
+        </SafeArea>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
