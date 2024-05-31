@@ -1,22 +1,27 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import { type LayoutChangeEvent, StyleSheet, View } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
 import type { Dimensions } from '../../../types';
 import { useMeasurementsContext, usePositionsContext } from '../..';
 import { createGuardedContext } from '../../utils';
-import type { FlexProps } from './types';
+import type { FlexDirection, FlexProps } from './types';
 import {
   areDimensionsCorrect,
+  calculateLayout,
   getGroupSizes,
-  getItemPositions,
   groupItems
 } from './utils';
 
 type FlexLayoutContextType = {
   stretch: boolean;
-  reverseXAxis: boolean;
+  flexDirection: FlexDirection;
+  itemGroups: SharedValue<Array<Array<string>>>;
+  keyToGroup: SharedValue<Record<string, number>>;
+  crossAxisGroupSizes: SharedValue<Array<number>>;
+  crossAxisGroupOffsets: SharedValue<Array<number>>;
 };
 
 type FlexLayoutProviderProps = PropsWithChildren<FlexProps>;
@@ -48,7 +53,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
+  const keyToGroup = useSharedValue<Record<string, number>>({});
   const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
+  const crossAxisGroupOffsets = useSharedValue<Array<number>>([]);
 
   // ITEM GROUPS UPDATER
   useAnimatedReaction(
@@ -84,6 +91,15 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
 
       itemGroups.value = groups;
       crossAxisGroupSizes.value = sizes;
+
+      // Update key to group mapping
+      const keyToGroupMapping: Record<string, number> = {};
+      groups.forEach((group, index) => {
+        group.forEach(key => {
+          keyToGroupMapping[key] = index;
+        });
+      });
+      keyToGroup.value = keyToGroupMapping;
     },
     [groupBy, flexWrap, columnGap, rowGap]
   );
@@ -108,7 +124,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
         return;
       }
 
-      const positions = getItemPositions(
+      const result = calculateLayout(
         groups,
         groupBy,
         sizes,
@@ -124,8 +140,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
         }
       );
 
-      if (positions) {
-        itemPositions.value = positions;
+      if (result) {
+        itemPositions.value = result.itemPositions;
+        crossAxisGroupOffsets.value = result.crossAxisGroupOffsets;
       }
     },
     [
@@ -202,10 +219,12 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
       </>
     ),
     value: {
+      crossAxisGroupOffsets,
+      crossAxisGroupSizes,
+      flexDirection,
+      itemGroups,
+      keyToGroup,
       overrideItemDimensions,
-      // x axis must be reversed if the direction is row-reverse, because
-      // left offset in absolute positioning is calculated from the right edge
-      reverseXAxis: flexDirection === 'row-reverse',
       stretch
     }
   };

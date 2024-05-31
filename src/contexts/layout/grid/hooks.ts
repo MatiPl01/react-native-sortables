@@ -1,9 +1,7 @@
-import { useAnimatedReaction } from 'react-native-reanimated';
-
 import type { ReorderStrategy } from '../../../types';
 import { reorderItems } from '../../../utils';
 import {
-  useDragContext,
+  useActiveItemReaction,
   useMeasurementsContext,
   usePositionsContext
 } from '../../shared';
@@ -14,34 +12,14 @@ export function useGridOrderUpdater(
   numColumns: number,
   strategy: ReorderStrategy
 ): void {
-  const { containerHeight, itemDimensions } = useMeasurementsContext();
-  const { indexToKey, keyToIndex } = usePositionsContext();
+  const { containerHeight } = useMeasurementsContext();
+  const { indexToKey } = usePositionsContext();
   const { rowOffsets } = useGridLayoutContext();
-  const { activeItemKey, activeItemPosition } = useDragContext();
 
-  useAnimatedReaction(
-    () => ({
-      activeKey: activeItemKey.value,
-      activePosition: activeItemPosition.value
-    }),
-    ({ activeKey, activePosition }) => {
-      if (activeKey === null) {
-        return;
-      }
-      const dimensions = itemDimensions.value[activeKey];
-      if (!dimensions) {
-        return;
-      }
-
-      const centerY = activePosition.y + dimensions.height / 2;
-      const centerX = activePosition.x + dimensions.width / 2;
-      const activeIndex = keyToIndex.value[activeKey];
+  useActiveItemReaction(
+    ({ activeIndex, centerPosition: { x, y }, dimensions }) => {
+      'worklet';
       const itemsCount = indexToKey.value.length;
-
-      if (activeIndex === undefined) {
-        return;
-      }
-
       const rowIndex = getRowIndex(activeIndex, numColumns);
       const columnIndex = getColumnIndex(activeIndex, numColumns);
 
@@ -56,24 +34,24 @@ export function useGridOrderUpdater(
 
       // Check if the center of the active item is over the top or bottom edge of the container
       let dy = 0;
-      if (yOffsetAbove > 0 && centerY < yOffsetAbove) {
+      if (yOffsetAbove > 0 && y < yOffsetAbove) {
         dy = -1;
       } else if (
         yOffsetBelow !== undefined &&
         yOffsetBelow < containerHeight.value &&
-        centerY > yOffsetBelow
+        y > yOffsetBelow
       ) {
         dy = 1;
       }
 
       // Check if the center of the active item is over the left or right edge of the container
       let dx = 0;
-      if (xOffsetLeft > 0 && centerX < xOffsetLeft) {
+      if (xOffsetLeft > 0 && x < xOffsetLeft) {
         dx = -1;
       } else if (
         columnIndex < numColumns - 1 &&
         activeIndex < itemsCount &&
-        centerX > xOffsetRight
+        x > xOffsetRight
       ) {
         dx = 1;
       }
@@ -92,6 +70,7 @@ export function useGridOrderUpdater(
         newIndex,
         strategy
       );
-    }
+    },
+    [strategy]
   );
 }

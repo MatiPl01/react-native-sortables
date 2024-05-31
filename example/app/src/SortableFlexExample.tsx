@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
   cellContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'center',
     backgroundColor: '#ddd',
     rowGap: 2,
     columnGap: 5
