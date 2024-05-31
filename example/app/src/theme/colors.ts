@@ -4,6 +4,6 @@ export const colors = {
   background3: '#DDE2E3',
 
   foreground1: '#000000',
-  foreground2: '#18191B',
-  foreground3: '#323335'
+  foreground2: '#323335',
+  foreground3: '#414344'
 } as const;
