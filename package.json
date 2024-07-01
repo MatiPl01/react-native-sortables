@@ -30,7 +30,7 @@
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
-    "react-native": "0.73.6",
+    "react-native": "0.74.3",
     "react-native-builder-bob": "^0.23.2",
     "react-native-gesture-handler": "^2.16.1",
     "react-native-reanimated": "^3.9.0",
