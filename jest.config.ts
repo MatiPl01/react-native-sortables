@@ -29,6 +29,7 @@ const config: JestConfigWithTsJest = {
       }
     ]
   },
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transformIgnorePatterns: ['jest-runner'],
   verbose: true
 };
