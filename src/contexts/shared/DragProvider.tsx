@@ -1,14 +1,12 @@
 import { type PropsWithChildren } from 'react';
-import {
-  type SharedValue,
-  useDerivedValue,
-  useSharedValue
-} from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 
+import { useAnimatableValue } from '../../hooks';
 import type {
   ActiveItemDecorationSettings,
-  Position,
-  Sharedify
+  AnimatedValues,
+  Position
 } from '../../types';
 import { createGuardedContext } from '../utils';
 
@@ -18,7 +16,7 @@ type DragContextType = {
   activationProgress: SharedValue<number>;
   activeItemPosition: SharedValue<Position>;
   activeItemDropped: SharedValue<boolean>;
-} & Sharedify<ActiveItemDecorationSettings>;
+} & AnimatedValues<ActiveItemDecorationSettings>;
 
 type DragProviderProps = PropsWithChildren<
   {
@@ -37,13 +35,13 @@ const { DragProvider, useDragContext } = createGuardedContext('Drag')<
   inactiveItemOpacity: inactiveItemOpacityProp,
   inactiveItemScale: inactiveItemScaleProp
 }) => {
-  const activeItemScale = useDerivedValue(() => activeItemScaleProp);
-  const activeItemOpacity = useDerivedValue(() => activeItemOpacityProp);
-  const activeItemShadowOpacity = useDerivedValue(
-    () => activeItemShadowOpacityProp
+  const activeItemScale = useAnimatableValue(activeItemScaleProp);
+  const activeItemOpacity = useAnimatableValue(activeItemOpacityProp);
+  const activeItemShadowOpacity = useAnimatableValue(
+    activeItemShadowOpacityProp
   );
-  const inactiveItemScale = useDerivedValue(() => inactiveItemScaleProp);
-  const inactiveItemOpacity = useDerivedValue(() => inactiveItemOpacityProp);
+  const inactiveItemScale = useAnimatableValue(inactiveItemScaleProp);
+  const inactiveItemOpacity = useAnimatableValue(inactiveItemOpacityProp);
 
   const activeItemKey = useSharedValue<null | string>(null);
   const activationProgress = useSharedValue(0);
