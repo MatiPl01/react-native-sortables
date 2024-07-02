@@ -2,8 +2,8 @@
   "name": "example-expo",
   "version": "1.0.0",
   "dependencies": {
-    "expo": "~50.0.19",
-    "expo-status-bar": "1.11.1"
+    "expo": "^51.0.17",
+    "expo-status-bar": "~1.12.1"
   },
   "engines": {
     "node": ">=18"
