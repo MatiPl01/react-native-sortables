@@ -9,7 +9,7 @@ import {
   useGridOrderUpdater,
   useMeasurementsContext
 } from '../../contexts';
-import type { SharedProps } from '../../types';
+import type { Prettify, SharedProps } from '../../types';
 import {
   defaultKeyExtractor,
   getPropsWithDefaults,
@@ -18,12 +18,14 @@ import {
 import { DraggableView } from '../shared';
 import type { SortableGridRenderItem } from './types';
 
-export type SortableGridProps<I> = {
-  data: Array<I>;
-  renderItem: SortableGridRenderItem<I>;
-  columns?: number;
-  keyExtractor?: (item: I, index: number) => string;
-} & SharedProps;
+export type SortableGridProps<I> = Prettify<
+  {
+    data: Array<I>;
+    renderItem: SortableGridRenderItem<I>;
+    columns?: number;
+    keyExtractor?: (item: I, index: number) => string;
+  } & SharedProps
+>;
 
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {

@@ -4,12 +4,19 @@ import type { SharedValue } from 'react-native-reanimated';
 
 export type AnyFunction = (...args: Array<any>) => any;
 
-export type Sharedify<T> = {
-  [K in keyof T]: T[K] extends SharedValue<any>
-    ? T[K]
-    : T[K] extends infer U | undefined
-      ? U extends undefined
-        ? SharedValue<U> | undefined
-        : SharedValue<U>
-      : never;
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+  // eslint-disable-next-line @typescript-eslint/ban-types
+} & {};
+
+export type Animatable<V> = SharedValue<V> | V;
+
+export type UnAnimatable<V> = V extends SharedValue<infer U> ? U : V;
+
+export type AnimatableValues<T extends Record<string, any>> = {
+  [K in keyof T]: Animatable<UnAnimatable<T[K]>>;
+};
+
+export type AnimatedValues<T extends Record<string, any>> = {
+  [K in keyof T]: SharedValue<UnAnimatable<T[K]>>;
 };
