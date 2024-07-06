@@ -1,7 +1,5 @@
 /* eslint-disable import/no-unused-modules */
-import { type JestConfigWithTsJest, pathsToModuleNameMapper } from 'ts-jest';
-
-import { compilerOptions } from './tsconfig.json';
+import { type JestConfigWithTsJest } from 'ts-jest';
 
 const config: JestConfigWithTsJest = {
   clearMocks: true,
@@ -10,9 +8,6 @@ const config: JestConfigWithTsJest = {
   },
   moduleDirectories: ['../../node_modules', '<rootDir>'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths ?? {}, {
-    prefix: '<rootDir>/'
-  }),
   preset: 'jest-expo',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transform: {

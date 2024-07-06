@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 
-import type { ActiveItemDecorationSettings } from '@/types';
-
+import type { ActiveItemDecorationSettings } from '../../types';
 import { DragProvider } from './DragProvider';
 import { MeasurementsProvider } from './MeasurementsProvider';
 import { PositionsProvider } from './PositionsProvider';

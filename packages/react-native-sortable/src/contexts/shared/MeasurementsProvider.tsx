@@ -1,15 +1,15 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import { type LayoutChangeEvent, StyleSheet } from 'react-native';
+import type { LayoutChangeEvent } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, {
   type SharedValue,
   useAnimatedStyle,
   useSharedValue
 } from 'react-native-reanimated';
 
-import { createGuardedContext } from '@/contexts/utils';
-import { useUICallback } from '@/hooks';
-import type { Dimensions } from '@/types';
-
+import { useUICallback } from '../../hooks';
+import type { Dimensions } from '../../types';
+import { createGuardedContext } from '../utils';
 import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {

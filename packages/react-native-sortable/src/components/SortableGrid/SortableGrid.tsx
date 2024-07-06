@@ -2,17 +2,20 @@ import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { DraggableView } from '@/components/shared';
 import {
   GridLayoutProvider,
   SharedProvider,
   useGridLayoutContext,
   useGridOrderUpdater,
   useMeasurementsContext
-} from '@/contexts';
-import type { Prettify, SharedProps } from '@/types';
-import { defaultKeyExtractor, getPropsWithDefaults, typedMemo } from '@/utils';
-
+} from '../../contexts';
+import type { Prettify, SharedProps } from '../../types';
+import {
+  defaultKeyExtractor,
+  getPropsWithDefaults,
+  typedMemo
+} from '../../utils';
+import { DraggableView } from '../shared';
 import type { SortableGridRenderItem } from './types';
 
 export type SortableGridProps<I> = Prettify<

@@ -1,11 +1,10 @@
+import type { ReorderStrategy } from '../../../types';
+import { reorderItems } from '../../../utils';
 import {
   useActiveItemReaction,
   useMeasurementsContext,
   usePositionsContext
-} from '@/contexts/shared';
-import type { ReorderStrategy } from '@/types';
-import { reorderItems } from '@/utils';
-
+} from '../../shared';
 import { useGridLayoutContext } from './GridLayoutProvider';
 import { getColumnIndex, getRowIndex } from './utils';
 

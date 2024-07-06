@@ -7,22 +7,8 @@ module.exports = {
   parserOptions: {
     project: path.join(__dirname, 'tsconfig.json')
   },
-  settings: {
-    'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true,
-        project: path.join(__dirname, 'tsconfig.json')
-      }
-    }
-  },
   rules: {
-    'no-relative-import-paths/no-relative-import-paths': [
-      'warn',
-      {
-        allowSameFolder: true,
-        prefix: '@',
-        rootDir: path.relative(rootDir, path.join(__dirname, 'src'))
-      }
-    ]
+    'no-relative-import-paths/no-relative-import-paths': 'off',
+    "import/no-absolute-path": "error",
   }
 };

@@ -2,13 +2,13 @@ import { type PropsWithChildren } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
 
-import { createGuardedContext } from '@/contexts/utils';
-import { useAnimatableValue } from '@/hooks';
+import { useAnimatableValue } from '../../hooks';
 import type {
   ActiveItemDecorationSettings,
   AnimatedValues,
   Position
-} from '@/types';
+} from '../../types';
+import { createGuardedContext } from '../utils';
 
 type DragContextType = {
   enabled: boolean;

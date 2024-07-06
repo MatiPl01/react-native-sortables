@@ -1,12 +1,10 @@
-/* eslint-disable import/no-unused-modules */
+import type { Coordinate, Dimension, ReorderStrategy } from '../../../types';
+import { reorderItems } from '../../../utils';
 import {
   useActiveItemReaction,
   useMeasurementsContext,
   usePositionsContext
-} from '@/contexts/shared';
-import type { Coordinate, Dimension, ReorderStrategy } from '@/types';
-import { reorderItems } from '@/utils';
-
+} from '../../shared';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
 
 export function useFlexOrderUpdater(strategy: ReorderStrategy): void {

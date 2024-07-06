@@ -8,6 +8,6 @@ export type Position = {
   y: number;
 };
 
-export type Dimension = 'height' | 'width';
+export type Dimension = keyof Dimensions;
 
-export type Coordinate = 'x' | 'y';
+export type Coordinate = keyof Position;

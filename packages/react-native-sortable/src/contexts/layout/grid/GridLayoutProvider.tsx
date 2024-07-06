@@ -6,12 +6,11 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '@/constants';
-import { useMeasurementsContext, usePositionsContext } from '@/contexts/shared';
-import { createGuardedContext } from '@/contexts/utils';
-import type { Position } from '@/types';
-import { areArraysDifferent, arePositionsDifferent } from '@/utils';
-
+import { OFFSET_EPS } from '../../../constants';
+import type { Position } from '../../../types';
+import { areArraysDifferent, arePositionsDifferent } from '../../../utils';
+import { useMeasurementsContext, usePositionsContext } from '../../shared';
+import { createGuardedContext } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
 
 type GridLayoutContextType = {
