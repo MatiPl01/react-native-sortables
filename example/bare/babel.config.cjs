@@ -23,7 +23,7 @@ module.exports = function (api) {
             '@': path.join(appDir, 'src')
           }
         }
-      ],
+      ]
     ]
   };
 };

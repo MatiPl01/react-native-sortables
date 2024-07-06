@@ -20,14 +20,14 @@
     "jest": "^29.7.0",
     "jest-expo": "^51.0.3"
   },
-  "react-native": "index.ts",
-  "scripts": {
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "jest"
-  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "bash -c tsc --noEmit"
     ]
+  },
+  "react-native": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   }
 }

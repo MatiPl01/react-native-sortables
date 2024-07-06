@@ -1,3 +1,3 @@
 module.exports = {
-  "extends": "react-native-matipl01",
-}
+  extends: 'react-native-matipl01'
+};

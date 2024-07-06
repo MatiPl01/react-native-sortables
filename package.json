@@ -26,11 +26,11 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "yarn format:code",
-      "yarn lint:fix"
+      "prettier --write . --ignore-unknown",
+      "eslint --fix ."
     ],
     "package.json": [
-      "yarn format:deps"
+      "syncpack format"
     ]
   },
   "packageManager": "yarn@4.1.1",

@@ -25,6 +25,11 @@
     "CHANGELOG.md"
   ],
   "keywords": [],
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "bash -c tsc --noEmit"
+    ]
+  },
   "main": "dist/commonjs/index",
   "module": "dist/module/index",
   "peerDependencies": {
@@ -43,10 +48,5 @@
     "test": "jest",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "types": "dist/typescript/index.d.ts",
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "bash -c tsc --noEmit"
-    ]
-  }
+  "types": "dist/typescript/index.d.ts"
 }
