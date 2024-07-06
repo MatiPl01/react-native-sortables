@@ -3,13 +3,13 @@ import {
   ExamplesListScreen,
   SortableFlexExamplesScreen,
   SortableGridExamplesScreen
-} from '../screens';
+} from '@/screens';
 import {
   ExamplesScreenRoute,
   ExamplesStackParamList
-} from '../types/navigation';
+} from '@/types/navigation';
 import { View } from 'react-native';
-import { flex } from '../theme';
+import { flex } from '@/theme';
 
 const ExamplesStack = createNativeStackNavigator<ExamplesStackParamList>();
 

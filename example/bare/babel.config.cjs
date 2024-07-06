@@ -7,7 +7,6 @@ const path = require('path');
 const rootDir = path.resolve(__dirname, '../..');
 
 const appDir = path.resolve(__dirname, '../app');
-const appPkg = require(path.join(appDir, 'package.json'));
 
 module.exports = function (api) {
   api.cache(true);
@@ -22,7 +21,7 @@ module.exports = function (api) {
           extensions: ['.ts', '.tsx', '.svg', '.json'],
           // This needs to be mirrored in ../app/tsconfig.json
           alias: {
-            '@example': path.join(appDir, appPkg['react-native'])
+            '@': path.join(appDir, 'src')
           }
         }
       ],

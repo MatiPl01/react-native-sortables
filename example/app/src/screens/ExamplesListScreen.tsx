@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import { colors, spacing } from '../theme';
-import { ExampleNavCard } from '../components';
-import { ExamplesScreenRoute } from '../types/navigation';
+import { colors, spacing } from '@/theme';
+import { ExampleNavCard } from '@/components';
+import { ExamplesScreenRoute } from '@/types/navigation';
 
 export default function ExamplesListScreen() {
   return (

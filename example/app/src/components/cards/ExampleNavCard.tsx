@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors, radius, spacing, text } from '../../theme';
-import { ExamplesScreenRoute, useAppNavigation } from '../../types/navigation';
+import { colors, radius, spacing, text } from '@/theme';
+import { ExamplesScreenRoute, useAppNavigation } from '@/types/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 

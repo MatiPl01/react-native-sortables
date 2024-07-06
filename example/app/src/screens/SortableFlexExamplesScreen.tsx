@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { SortableFlex } from 'react-native-sortable';
-import { spacing } from '../theme';
+import { spacing } from '@/theme';
 
 const DEFAULT_CATEGORIES = [
   'sports',

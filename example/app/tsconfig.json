@@ -1,10 +1,10 @@
 {
   "extends": "eslint-config-react-native-matipl01/tsconfig.base",
   "compilerOptions": {
-    "baseUrl": "../..",
+    "baseUrl": ".",
     "paths": {
-      "@example": ["example/app/src/"],
-      "react-native-sortable": ["packages/react-native-sortable/src/"]
+      "@/*": ["src/*"],
+      "react-native-sortable": ["../../packages/react-native-sortable/src/"]
     }
   }
 }

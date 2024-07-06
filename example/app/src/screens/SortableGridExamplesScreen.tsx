@@ -7,7 +7,7 @@ import {
 } from 'react-native-sortable';
 import { useCallback, useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
-import { Slider } from '../components';
+import { Slider } from '@/components';
 
 const STRATEGIES: ReorderStrategy[] = ['insert', 'swap'];
 
