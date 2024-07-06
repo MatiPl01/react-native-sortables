@@ -4,9 +4,10 @@
     "types": ["node", "jest"],
     "baseUrl": ".",
     "paths": {
-      "@example": ["example/app/src/"]
+      "@example": ["example/app/src/"],
+      "react-native-sortable": ["packages/react-native-sortable/src/"]
     }
   },
   "include": ["packages", "jest.config.ts", "__tests__"],
-  "exclude": ["example"]
+  "exclude": ["example", "**/dist"]
 }

@@ -2,7 +2,8 @@
   "name": "example-bare",
   "version": "1.0.0",
   "dependencies": {
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-sortable": "workspace:*"
   },
   "private": true,
   "scripts": {

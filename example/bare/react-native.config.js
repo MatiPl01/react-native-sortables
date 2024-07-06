@@ -11,6 +11,9 @@ const appPkg = require(path.resolve(appDir, 'package.json'));
 
 let dependencies = {};
 
+console.log('rootPkg', rootPkg);
+console.log('appPkg', appPkg);
+
 [
   // Include library dependencies that will normally be installed with
   // the library (dependencies in the top-level package.json)
@@ -24,5 +27,7 @@ let dependencies = {};
     root: path.resolve(__dirname, `../../node_modules/${dep}`)
   };
 });
+
+console.log('dependencies', dependencies);
 
 module.exports = { dependencies };

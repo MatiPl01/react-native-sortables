@@ -7295,6 +7295,7 @@ __metadata:
   resolution: "example-bare@workspace:example/bare"
   dependencies:
     react-native: "npm:*"
+    react-native-sortable: "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -7304,6 +7305,7 @@ __metadata:
   dependencies:
     expo: "npm:^51.0.17"
     expo-status-bar: "npm:~1.12.1"
+    react-native-sortable: "workspace:*"
   languageName: unknown
   linkType: soft
 
