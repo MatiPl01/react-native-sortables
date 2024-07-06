@@ -9,6 +9,6 @@ module.exports = {
   },
   rules: {
     'no-relative-import-paths/no-relative-import-paths': 'off',
-    "import/no-absolute-path": "error",
+    'import/no-absolute-path': 'error'
   }
 };

@@ -1,5 +1,9 @@
 {
   "extends": "eslint-config-react-native-matipl01/tsconfig.base",
-  "include": ["packages", "jest.config.ts", "packages/react-native-sortable/jest.setup.js"],
+  "include": [
+    "packages",
+    "jest.config.ts",
+    "packages/react-native-sortable/jest.setup.js"
+  ],
   "exclude": ["example", "**/dist"]
 }
