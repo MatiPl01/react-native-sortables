@@ -16,9 +16,20 @@
     "react-native-svg": "^15.3.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/runtime": "^7.24.7",
+    "@react-native/babel-preset": "^0.74.85",
+    "@react-native/metro-config": "^0.74.85",
     "babel-plugin-module-resolver": "^5.0.2",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/react-native": "^12.5.1",
+    "@types/react": "^18.3.3",
+    "@types/react-test-renderer": "^18.3.0",
+    "react-test-renderer": "^18.3.1",
     "jest": "^29.7.0",
-    "jest-expo": "^51.0.3"
+    "jest-expo": "^51.0.3",
+    "lint-staged": "^15.2.7"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
