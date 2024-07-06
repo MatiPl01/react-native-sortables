@@ -1,8 +1,8 @@
 {
   "name": "example-bare",
   "version": "1.0.0",
-  "engines": {
-    "node": ">=18"
+  "dependencies": {
+    "react-native-reanimated": "3.13.0"
   },
   "private": true,
   "scripts": {

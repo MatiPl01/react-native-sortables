@@ -1,3 +1,3 @@
-# 🔀 React Native Sortables
+# 🔀 React Native Sortable
 
 Under development...

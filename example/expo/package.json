@@ -3,10 +3,8 @@
   "version": "1.0.0",
   "dependencies": {
     "expo": "^51.0.17",
-    "expo-status-bar": "~1.12.1"
-  },
-  "engines": {
-    "node": ">=18"
+    "expo-status-bar": "~1.12.1",
+    "react-native-reanimated": "3.10.1"
   },
   "main": "index.js",
   "private": true,

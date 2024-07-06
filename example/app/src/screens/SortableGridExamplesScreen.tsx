@@ -4,7 +4,7 @@ import {
   SortableGridRenderItem,
   ReorderStrategy,
   SortableGridProps
-} from '@lib';
+} from 'react-native-sortable';
 import { useCallback, useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import { Slider } from '../components';

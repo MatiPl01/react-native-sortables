@@ -14,7 +14,10 @@ const config: JestConfigWithTsJest = {
   }),
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   preset: 'jest-expo',
-  roots: ['<rootDir>/src', '<rootDir>/example/app'],
+  roots: [
+    '<rootDir>/packages/react-native-sortable/src',
+    '<rootDir>/example/app'
+  ],
   transform: {
     '^.+\\.jsx?$': [
       'babel-jest',

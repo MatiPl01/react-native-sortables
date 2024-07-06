@@ -1,0 +1,45 @@
+{
+  "name": "react-native-sortable",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^10.0.7",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.1",
+    "@types/react-test-renderer": "^18.3.0",
+    "react": "^18.3.1",
+    "react-native": "^0.74.3",
+    "react-native-builder-bob": "^0.23.2",
+    "react-native-gesture-handler": "^2.17.1",
+    "react-native-reanimated": "3.13.0",
+    "semantic-release": "^24.0.0",
+    "typescript": "^5.5.3"
+  },
+  "files": [
+    "src",
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "keywords": [],
+  "main": "dist/commonjs/index",
+  "module": "dist/module/index",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-gesture-handler": ">=2.0.0",
+    "react-native-reanimated": ">=3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "react-native": "src/index",
+  "scripts": {
+    "build": "yarn clean && bob build",
+    "clean": "../../scripts/clean.sh"
+  },
+  "types": "dist/typescript/index.d.ts"
+}
