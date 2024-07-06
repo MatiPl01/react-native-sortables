@@ -1,13 +1,9 @@
 {
   "extends": "eslint-config-react-native-matipl01/tsconfig.base",
-  "compilerOptions": {
-    "types": ["node", "jest"],
-    "baseUrl": ".",
-    "paths": {
-      "@lib": ["src"],
-      "@app": ["example/app/src/"]
-    }
-  },
-  "include": ["src", "jest.config.ts", "__tests__"],
-  "exclude": ["example"]
+  "include": [
+    "packages",
+    "jest.config.ts",
+    "packages/react-native-sortable/jest.setup.js"
+  ],
+  "exclude": ["example", "**/dist"]
 }

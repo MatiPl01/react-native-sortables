@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules */
 import type { Coordinate, Dimension, ReorderStrategy } from '../../../types';
 import { reorderItems } from '../../../utils';
 import {

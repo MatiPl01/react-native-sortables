@@ -1,27 +1,29 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors, radius, spacing, text } from '../../theme';
-import { ExamplesScreenRoute, useAppNavigation } from '../../types/navigation';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { colors, radius, spacing, text } from '@/theme';
+import type { ExamplesScreenRoute } from '@/types/navigation';
+import { useAppNavigation } from '@/types/navigation';
 
 type ExampleCardProps = {
   title: string;
   route: ExamplesScreenRoute;
 };
 
-export default function ExampleNavCard({ title, route }: ExampleCardProps) {
+export default function ExampleNavCard({ route, title }: ExampleCardProps) {
   const navigation = useAppNavigation();
 
   return (
     <TouchableOpacity
-      style={styles.card}
       activeOpacity={0.5}
+      style={styles.card}
       onPress={() => {
         navigation.navigate(route);
       }}>
       <View style={styles.cardContent}>
         <Text style={[text.label1, styles.title]}>{title}</Text>
-        <FontAwesomeIcon icon={faChevronRight} color={colors.foreground3} />
+        <FontAwesomeIcon color={colors.foreground3} icon={faChevronRight} />
       </View>
     </TouchableOpacity>
   );
@@ -29,17 +31,17 @@ export default function ExampleNavCard({ title, route }: ExampleCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
     backgroundColor: colors.background1,
     borderRadius: radius.md,
-    gap: spacing.md
+    flexDirection: 'row',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md
   },
   cardContent: {
-    flexGrow: 1,
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
+    flexGrow: 1,
     justifyContent: 'space-between'
   },
   title: {

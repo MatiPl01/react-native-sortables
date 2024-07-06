@@ -6,6 +6,4 @@ yarn.lock
 android
 ios
 node_modules
-example/bare
-example/expo
 CHANGELOG.md

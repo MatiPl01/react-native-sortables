@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { SortableFlex } from '@lib';
-import { spacing } from '../theme';
+import { SortableFlex } from 'react-native-sortable';
+
+import { spacing } from '@/theme';
 
 const DEFAULT_CATEGORIES = [
   'sports',
@@ -31,33 +32,33 @@ export default function SortableFlexExamplesScreen() {
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    paddingHorizontal: spacing.xs,
-    paddingVertical: spacing.lg
+  cell: {
+    alignItems: 'center',
+    backgroundColor: '#FFA500',
+    borderRadius: 25,
+    justifyContent: 'center',
+    marginHorizontal: 3,
+    marginVertical: 2,
+    paddingHorizontal: 15,
+    paddingVertical: 10
   },
   cellContainer: {
+    columnGap: 5,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    rowGap: 2,
-    columnGap: 5
-  },
-  cell: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginHorizontal: 3,
-    marginVertical: 2,
-    backgroundColor: '#FFA500',
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center'
+    rowGap: 2
   },
   cellText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
-    textShadowOffset: { width: -1, height: 1 },
+    textShadowOffset: { height: 1, width: -1 },
     textShadowRadius: 5
+  },
+  wrapper: {
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.lg
   }
 });

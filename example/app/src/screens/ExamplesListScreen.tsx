@@ -1,20 +1,21 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import { colors, spacing } from '../theme';
-import { ExampleNavCard } from '../components';
-import { ExamplesScreenRoute } from '../types/navigation';
+
+import { ExampleNavCard } from '@/components';
+import { colors, spacing } from '@/theme';
+import { ExamplesScreenRoute } from '@/types/navigation';
 
 export default function ExamplesListScreen() {
   return (
     <ScrollView
-      style={styles.scrollView}
-      contentContainerStyle={styles.scrollViewContent}>
+      contentContainerStyle={styles.scrollViewContent}
+      style={styles.scrollView}>
       <ExampleNavCard
-        title='Sortable Grid'
         route={ExamplesScreenRoute.SortableGridExamples}
+        title='Sortable Grid'
       />
       <ExampleNavCard
-        title='Sortable Flex'
         route={ExamplesScreenRoute.SortableFlexExamples}
+        title='Sortable Flex'
       />
     </ScrollView>
   );
@@ -22,10 +23,10 @@ export default function ExamplesListScreen() {
 
 const styles = StyleSheet.create({
   scrollView: {
+    backgroundColor: colors.background3,
     flex: 1,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-    backgroundColor: colors.background3
+    paddingVertical: spacing.xl
   },
   scrollViewContent: {
     gap: spacing.md

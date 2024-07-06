@@ -1,0 +1,4 @@
+{
+  "extends": "eslint-config-react-native-matipl01/tsconfig.base",
+  "exclude": ["dist"]
+}

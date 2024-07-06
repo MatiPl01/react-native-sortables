@@ -10,7 +10,7 @@ export default function SafeArea({ children }: SafeAreaProps) {
 
   return (
     <View
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom, flex: 1 }}>
+      style={{ flex: 1, paddingBottom: insets.bottom, paddingTop: insets.top }}>
       {children}
     </View>
   );

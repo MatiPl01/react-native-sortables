@@ -24,14 +24,14 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: 🔎 Run typecheck
-        run: yarn typecheck
-
       - name: 🧹 Run lint
         run: yarn lint
 
       - name: 🎨 Run Prettier check
         run: yarn format:check
+
+      - name: 🔎 Run typecheck
+        run: yarn typecheck
 
       - name: 🧪 Run tests
         run: yarn test

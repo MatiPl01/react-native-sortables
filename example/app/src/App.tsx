@@ -1,9 +1,10 @@
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 import { SafeArea } from './components';
 import { ExamplesStackNavigator } from './navigation';
-import { NavigationContainer } from '@react-navigation/native';
 
 export default function App() {
   return (
