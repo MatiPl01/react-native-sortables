@@ -7294,7 +7294,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "example-bare@workspace:example/bare"
   dependencies:
-    react-native-reanimated: "npm:3.13.0"
+    react-native: "npm:*"
   languageName: unknown
   linkType: soft
 
@@ -7304,7 +7304,6 @@ __metadata:
   dependencies:
     expo: "npm:^51.0.17"
     expo-status-bar: "npm:~1.12.1"
-    react-native-reanimated: "npm:3.10.1"
   languageName: unknown
   linkType: soft
 
@@ -13337,26 +13336,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.13.0":
-  version: 3.13.0
-  resolution: "react-native-reanimated@npm:3.13.0"
-  dependencies:
-    "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
-    "@babel/plugin-transform-nullish-coalescing-operator": "npm:^7.0.0-0"
-    "@babel/plugin-transform-optional-chaining": "npm:^7.0.0-0"
-    "@babel/plugin-transform-shorthand-properties": "npm:^7.0.0-0"
-    "@babel/plugin-transform-template-literals": "npm:^7.0.0-0"
-    "@babel/preset-typescript": "npm:^7.16.7"
-    convert-source-map: "npm:^2.0.0"
-    invariant: "npm:^2.2.4"
-  peerDependencies:
-    "@babel/core": ^7.0.0-0
-    react: "*"
-    react-native: "*"
-  checksum: 10c0/1ed00c96f357866974d56c5bc7696b692c012400072a680e09c275c6574bdfc16c44f51b896d3c61d6425b1125f39e0b7e20b52407ef8a7f00c11d56e4ebaa9d
-  languageName: node
-  linkType: hard
-
 "react-native-safe-area-context@npm:^4.10.3":
   version: 4.10.7
   resolution: "react-native-safe-area-context@npm:4.10.7"
@@ -13426,7 +13405,7 @@ __metadata:
     react-native: "npm:^0.74.3"
     react-native-builder-bob: "npm:^0.23.2"
     react-native-gesture-handler: "npm:^2.17.1"
-    react-native-reanimated: "npm:3.13.0"
+    react-native-reanimated: "npm:3.10.1"
     semantic-release: "npm:^24.0.0"
     typescript: "npm:^5.5.3"
   peerDependencies:
@@ -13450,7 +13429,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:^0.74.3":
+"react-native@npm:*, react-native@npm:^0.74.3":
   version: 0.74.3
   resolution: "react-native@npm:0.74.3"
   dependencies:

@@ -2,7 +2,7 @@
   "name": "example-bare",
   "version": "1.0.0",
   "dependencies": {
-    "react-native-reanimated": "3.13.0"
+    "react-native": "*"
   },
   "private": true,
   "scripts": {
