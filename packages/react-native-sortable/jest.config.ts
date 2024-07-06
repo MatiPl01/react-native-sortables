@@ -8,11 +8,13 @@ const config: JestConfigWithTsJest = {
   fakeTimers: {
     enableGlobally: true
   },
-  moduleDirectories: ['../../node_modules'],
+  moduleDirectories: ['../../node_modules', '<rootDir>'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths ?? {}),
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths ?? {}, {
+    prefix: '<rootDir>/'
+  }),
   preset: 'jest-expo',
-  setupFilesAfterEnv: ['./jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transform: {
     '^.+\\.jsx?$': [
       'babel-jest',
