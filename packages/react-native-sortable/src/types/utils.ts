@@ -20,3 +20,9 @@ export type AnimatableValues<T extends Record<string, any>> = {
 export type AnimatedValues<T extends Record<string, any>> = {
   [K in keyof T]: SharedValue<UnAnimatable<T[K]>>;
 };
+
+export type RequiredBy<T, K extends keyof T> = Omit<T, K> &
+  Required<Pick<T, K>>;
+
+export type RequiredExcept<T, K extends keyof T> = Omit<Required<T>, K> &
+  Pick<T, K>;
