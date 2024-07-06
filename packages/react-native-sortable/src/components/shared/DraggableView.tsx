@@ -18,13 +18,13 @@ import Animated, {
 import {
   ACTIVATE_PAN_ANIMATION_DELAY,
   TIME_TO_ACTIVATE_PAN
-} from '../../constants';
+} from '@/constants';
 import {
   useDragContext,
   useItemPosition,
   useMeasurementsContext
-} from '../../contexts';
-import { getItemZIndex } from '../../utils';
+} from '@/contexts';
+import { getItemZIndex } from '@/utils';
 
 type DraggableViewProps = {
   itemKey: string;

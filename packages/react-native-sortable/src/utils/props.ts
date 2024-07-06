@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable import/no-unused-modules */
-import { SHARED_PROPS } from '../constants';
-import type { SharedProps } from '../types';
+import { SHARED_PROPS } from '@/constants';
+import type { SharedProps } from '@/types';
 
 export const getPropsWithDefaults = <P extends SharedProps>(
   props: P

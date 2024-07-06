@@ -6,9 +6,10 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { useUICallback } from '../../hooks';
-import type { Dimensions } from '../../types';
-import { createGuardedContext } from '../utils';
+import { createGuardedContext } from '@/contexts/utils';
+import { useUICallback } from '@/hooks';
+import type { Dimensions } from '@/types';
+
 import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {

@@ -12,26 +12,22 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
-    "babel-plugin-module-resolver": "^5.0.2",
     "eslint": "^8.56.0",
     "eslint-config-react-native-matipl01": "2.1.0",
     "get-yarn-workspaces": "^1.0.2",
     "husky": "^9.0.11",
-    "jest": "^29.7.0",
-    "jest-expo": "^51.0.3",
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.2",
     "react-test-renderer": "^18.3.1",
     "syncpack": "^12.3.3",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
+    "typescript": "5.3.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "yarn format:code",
-      "yarn lint:fix",
-      "bash -c tsc --noEmit"
+      "yarn lint:fix"
     ],
     "package.json": [
       "yarn format:deps"
@@ -50,12 +46,13 @@
     "format:code": "prettier --write . --ignore-unknown",
     "format:deps": "syncpack format",
     "husky:install": "./scripts/husky.sh",
+    "lib": "yarn workspace react-native-sortable",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "postinstall": "yarn husky:install",
     "prepare": "husky",
-    "test": "jest",
-    "typecheck": "tsc -p tsconfig.json --noEmit && yarn example:app typecheck"
+    "test": "yarn example:app test",
+    "typecheck": "yarn lib typecheck && yarn example:app typecheck"
   },
   "type": "module",
   "workspaces": [

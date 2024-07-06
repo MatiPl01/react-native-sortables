@@ -15,7 +15,7 @@
     "react-native-gesture-handler": "^2.17.1",
     "react-native-reanimated": "3.10.1",
     "semantic-release": "^24.0.0",
-    "typescript": "^5.5.3"
+    "typescript": "5.3.3"
   },
   "files": [
     "src",
@@ -39,7 +39,14 @@
   "react-native": "src/index",
   "scripts": {
     "build": "yarn clean && bob build",
-    "clean": "../../scripts/clean.sh"
+    "clean": "../../scripts/clean.sh",
+    "test": "jest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "types": "dist/typescript/index.d.ts"
+  "types": "dist/typescript/index.d.ts",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "bash -c tsc --noEmit"
+    ]
+  }
 }

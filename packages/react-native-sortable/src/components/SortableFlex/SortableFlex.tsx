@@ -2,21 +2,21 @@ import { cloneElement, type ReactElement, useRef } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import type { FlexProps } from '../../contexts';
+import { DraggableView } from '@/components/shared';
+import type { FlexProps } from '@/contexts';
 import {
   FlexLayoutProvider,
   SharedProvider,
   useFlexLayoutContext,
   useFlexOrderUpdater,
   useMeasurementsContext
-} from '../../contexts';
-import type { ReorderStrategy, SharedProps } from '../../types';
+} from '@/contexts';
+import type { ReorderStrategy, SharedProps } from '@/types';
 import {
   areArraysDifferent,
   getPropsWithDefaults,
   validateChildren
-} from '../../utils';
-import { DraggableView } from '../shared';
+} from '@/utils';
 
 export type SortableFlexProps = SharedProps & ViewProps;
 

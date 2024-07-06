@@ -1,6 +1,7 @@
-import { OFFSET_EPS } from '../../../constants';
-import type { Dimension, Dimensions, Position } from '../../../types';
-import { sum } from '../../../utils';
+import { OFFSET_EPS } from '@/constants';
+import type { Dimension, Dimensions, Position } from '@/types';
+import { sum } from '@/utils';
+
 import type {
   AlignContent,
   AlignItems,

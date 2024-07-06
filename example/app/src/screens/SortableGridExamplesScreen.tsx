@@ -1,15 +1,16 @@
-import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
-import {
-  SortableGrid,
-  SortableGridRenderItem,
-  ReorderStrategy,
-  SortableGridProps
-} from 'react-native-sortable';
 import { useCallback, useState } from 'react';
+import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
+import type {
+  ReorderStrategy,
+  SortableGridProps,
+  SortableGridRenderItem
+} from 'react-native-sortable';
+import { SortableGrid } from 'react-native-sortable';
+
 import { Slider } from '@/components';
 
-const STRATEGIES: ReorderStrategy[] = ['insert', 'swap'];
+const STRATEGIES: Array<ReorderStrategy> = ['insert', 'swap'];
 
 const COLUMNS = [4, 5, 6];
 
@@ -44,16 +45,16 @@ export default function SortableGridExamplesScreen() {
   );
 
   const props: SortableGridProps<number> = {
-    data: TILES,
-    renderItem,
-    columns,
-    reorderStrategy: strategy,
-    dragEnabled,
-    activeItemScale,
     activeItemOpacity,
+    activeItemScale,
     activeItemShadowOpacity,
+    columns,
+    data: TILES,
+    dragEnabled,
     inactiveItemOpacity,
-    inactiveItemScale
+    inactiveItemScale,
+    renderItem,
+    reorderStrategy: strategy
   };
 
   return (
@@ -105,35 +106,35 @@ export default function SortableGridExamplesScreen() {
       <View style={styles.optionsRow}>
         <Text style={styles.optionText}>Active Item Scale</Text>
         <View style={styles.options}>
-          <Slider from={1} to={2} current={activeItemScale} />
+          <Slider current={activeItemScale} from={1} to={2} />
         </View>
       </View>
 
       <View style={styles.optionsRow}>
         <Text style={styles.optionText}>Active Item Opacity</Text>
         <View style={styles.options}>
-          <Slider from={0} to={1} current={activeItemOpacity} />
+          <Slider current={activeItemOpacity} from={0} to={1} />
         </View>
       </View>
 
       <View style={styles.optionsRow}>
         <Text style={styles.optionText}>Active Item Shadow Opacity</Text>
         <View style={styles.options}>
-          <Slider from={0} to={1} current={activeItemShadowOpacity} />
+          <Slider current={activeItemShadowOpacity} from={0} to={1} />
         </View>
       </View>
 
       <View style={styles.optionsRow}>
         <Text style={styles.optionText}>Inactive Item Opacity</Text>
         <View style={styles.options}>
-          <Slider from={0} to={1} current={inactiveItemOpacity} />
+          <Slider current={inactiveItemOpacity} from={0} to={1} />
         </View>
       </View>
 
       <View style={styles.optionsRow}>
         <Text style={styles.optionText}>Inactive Item Scale</Text>
         <View style={styles.options}>
-          <Slider from={0} to={1} current={inactiveItemScale} />
+          <Slider current={inactiveItemScale} from={0} to={1} />
         </View>
       </View>
     </ScrollView>
@@ -141,14 +142,11 @@ export default function SortableGridExamplesScreen() {
 }
 
 const styles = StyleSheet.create({
-  optionsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-    marginHorizontal: 20,
-    gap: 10,
-    minHeight: 40
+  evenTile: {
+    backgroundColor: '#FF4500'
+  },
+  oddTile: {
+    backgroundColor: '#FFA500'
   },
   optionText: {
     flexBasis: 1,
@@ -157,27 +155,30 @@ const styles = StyleSheet.create({
   },
   options: {
     flexBasis: 1,
-    flexGrow: 1,
     flexDirection: 'row',
+    flexGrow: 1,
     justifyContent: 'flex-end'
   },
-  tile: {
-    aspectRatio: 1,
+  optionsRow: {
     alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'space-between',
+    marginHorizontal: 20,
+    marginVertical: 5,
+    minHeight: 40
+  },
+  tile: {
+    alignItems: 'center',
+    aspectRatio: 1,
     justifyContent: 'center'
-  },
-  oddTile: {
-    backgroundColor: '#FFA500'
-  },
-  evenTile: {
-    backgroundColor: '#FF4500'
   },
   tileText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
-    textShadowOffset: { width: -1, height: 1 },
+    textShadowOffset: { height: 1, width: -1 },
     textShadowRadius: 5
   }
 });

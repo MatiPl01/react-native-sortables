@@ -1,4 +1,4 @@
-import type { SharedProps } from '../types';
+import type { SharedProps } from '@/types';
 
 export const SHARED_PROPS: Required<SharedProps> = {
   activeItemOpacity: 1,

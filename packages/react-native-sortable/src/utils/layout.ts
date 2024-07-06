@@ -1,4 +1,4 @@
-import type { Position, ReorderStrategy } from '../types';
+import type { Position, ReorderStrategy } from '@/types';
 
 export const getItemZIndex = (
   isActive: boolean,

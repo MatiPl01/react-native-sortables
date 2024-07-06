@@ -1,15 +1,14 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { View } from 'react-native';
+
 import {
   ExamplesListScreen,
   SortableFlexExamplesScreen,
   SortableGridExamplesScreen
 } from '@/screens';
-import {
-  ExamplesScreenRoute,
-  ExamplesStackParamList
-} from '@/types/navigation';
-import { View } from 'react-native';
 import { flex } from '@/theme';
+import type { ExamplesStackParamList } from '@/types/navigation';
+import { ExamplesScreenRoute } from '@/types/navigation';
 
 const ExamplesStack = createNativeStackNavigator<ExamplesStackParamList>();
 

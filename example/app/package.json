@@ -16,10 +16,18 @@
     "react-native-svg": "^15.3.0"
   },
   "devDependencies": {
-    "babel-plugin-module-resolver": "^5.0.2"
+    "babel-plugin-module-resolver": "^5.0.2",
+    "jest": "^29.7.0",
+    "jest-expo": "^51.0.3"
   },
   "react-native": "index.ts",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "jest"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "bash -c tsc --noEmit"
+    ]
   }
 }

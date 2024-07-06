@@ -3,9 +3,9 @@ import { useEffect, useRef } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
-import type { Position } from '../../types';
-import { areArraysDifferent } from '../../utils';
-import { createGuardedContext } from '../utils';
+import { createGuardedContext } from '@/contexts/utils';
+import type { Position } from '@/types';
+import { areArraysDifferent } from '@/utils';
 
 type PositionsContextType = {
   keyToIndex: SharedValue<Record<string, number>>;

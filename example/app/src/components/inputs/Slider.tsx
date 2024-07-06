@@ -1,8 +1,8 @@
 import { memo, useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
-  SharedValue,
   useAnimatedStyle,
   useSharedValue
 } from 'react-native-reanimated';
@@ -13,14 +13,14 @@ type SliderProps = {
   current: SharedValue<number>;
 };
 
-function Slider({ from, to, current }: SliderProps) {
+function Slider({ current, from, to }: SliderProps) {
   const sliderWidth = useSharedValue(0);
   const panStartValue = useSharedValue(0);
 
   const getOffsetX = useCallback(
-    (from: number, to: number, value: number) => {
+    (start: number, end: number, value: number) => {
       'worklet';
-      return ((value - from) / (to - from)) * sliderWidth.value;
+      return ((value - start) / (end - start)) * sliderWidth.value;
     },
     [sliderWidth]
   );
@@ -41,7 +41,7 @@ function Slider({ from, to, current }: SliderProps) {
           const nextValue = from + (to - from) * (nextPosition / maxPosition);
           current.value = nextValue;
         }),
-    [from, to]
+    [current, from, getOffsetX, panStartValue, sliderWidth, to]
   );
 
   const tapGesture = useMemo(
@@ -51,8 +51,8 @@ function Slider({ from, to, current }: SliderProps) {
           const nextValue = from + (to - from) * (x / sliderWidth.value);
           current.value = nextValue;
         })
-        .hitSlop({ top: 10, bottom: 10, left: 10, right: 10 }),
-    [from, to]
+        .hitSlop({ bottom: 10, left: 10, right: 10, top: 10 }),
+    [current, from, sliderWidth, to]
   );
 
   const animatedThumbStyle = useAnimatedStyle(
@@ -84,23 +84,23 @@ function Slider({ from, to, current }: SliderProps) {
 }
 
 const styles = StyleSheet.create({
-  sliderContainer: {
-    width: '100%',
-    justifyContent: 'center'
-  },
   sliderBar: {
-    height: 10,
+    backgroundColor: 'gray',
     borderRadius: 5,
-    backgroundColor: 'gray'
+    height: 10
+  },
+  sliderContainer: {
+    justifyContent: 'center',
+    width: '100%'
   },
   sliderThumb: {
-    width: 25,
+    backgroundColor: 'blue',
+    borderRadius: 25,
     height: 25,
     left: -12.5,
-    borderRadius: 25,
-    backgroundColor: 'blue',
     position: 'absolute',
-    top: -7.5
+    top: -7.5,
+    width: 25
   }
 });
 

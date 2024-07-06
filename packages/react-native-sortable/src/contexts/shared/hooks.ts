@@ -4,7 +4,8 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import type { Dimensions, Position } from '../../types';
+import type { Dimensions, Position } from '@/types';
+
 import { useDragContext } from './DragProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
 import { usePositionsContext } from './PositionsProvider';
