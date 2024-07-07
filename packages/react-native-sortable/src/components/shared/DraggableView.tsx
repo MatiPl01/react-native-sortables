@@ -51,7 +51,8 @@ export default function DraggableView({
     activeItemShadowOpacity,
     enabled,
     inactiveItemOpacity,
-    inactiveItemScale
+    inactiveItemScale,
+    touchedItemKey
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
   const itemPosition = useItemPosition(key);
@@ -60,7 +61,6 @@ export default function DraggableView({
     () => overrideItemDimensions.value[key]
   );
 
-  const isTouched = useSharedValue(false);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
   const pressProgress = useSharedValue(0);
   const dragStartPosition = useSharedValue({ x: 0, y: 0 });
@@ -71,7 +71,7 @@ export default function DraggableView({
 
   const handleDragEnd = useCallback(() => {
     'worklet';
-    isTouched.value = false;
+    touchedItemKey.value = null;
     activeItemKey.value = null;
     pressProgress.value = withTiming(0, { duration: TIME_TO_ACTIVATE_PAN });
     activationProgress.value = withTiming(
@@ -85,7 +85,7 @@ export default function DraggableView({
     activationProgress,
     activeItemKey,
     activeItemDropped,
-    isTouched,
+    touchedItemKey,
     pressProgress
   ]);
 
@@ -94,18 +94,18 @@ export default function DraggableView({
       Gesture.Pan()
         .activateAfterLongPress(TIME_TO_ACTIVATE_PAN)
         .onTouchesDown(() => {
-          isTouched.value = true;
           const progress = withDelay(
             ACTIVATE_PAN_ANIMATION_DELAY,
             withTiming(1, {
               duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
             })
           );
+          touchedItemKey.value = key;
           pressProgress.value = progress;
           activationProgress.value = progress;
         })
         .onStart(() => {
-          if (!isTouched.value) {
+          if (touchedItemKey.value === null) {
             return;
           }
           updateStartScrollOffset?.();
@@ -134,11 +134,11 @@ export default function DraggableView({
       enabled,
       reverseXAxis,
       handleDragEnd,
-      isTouched,
       isActive,
       itemPosition,
       activationProgress,
       activeItemKey,
+      touchedItemKey,
       activeItemPosition,
       activeItemDropped,
       dragStartPosition,

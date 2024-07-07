@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import {
   AutoScrollFlatListExampleScreen,
   AutoScrollScrollViewExampleScreen,
+  DropIndicatorExampleScreen,
   ExamplesListScreen,
   SortableFlexExamplesScreen,
   SortableGridExamplesScreen
@@ -41,6 +42,10 @@ export default function ExamplesStackNavigator() {
         <ExamplesStack.Screen
           component={AutoScrollFlatListExampleScreen}
           name={ExamplesScreenRoute.AutoScrollFlatListExample}
+        />
+        <ExamplesStack.Screen
+          component={DropIndicatorExampleScreen}
+          name={ExamplesScreenRoute.DropIndicatorExamples}
         />
       </ExamplesStack.Navigator>
     </View>

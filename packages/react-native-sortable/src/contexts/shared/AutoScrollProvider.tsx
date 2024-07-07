@@ -12,7 +12,7 @@ import {
 } from 'react-native-reanimated';
 
 import { useAnimatableValue, useSmoothValueChange } from '../../hooks';
-import type { AutoScrollProps } from '../../types';
+import type { AutoScrollSettings } from '../../types';
 import { createEnhancedContext } from '../utils';
 import { useDragContext } from './DragProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
@@ -23,7 +23,7 @@ type AutoScrollContextType = {
   dragStartScrollOffset: SharedValue<number>;
 };
 
-type AutoScrollProviderProps = PropsWithChildren<AutoScrollProps>;
+type AutoScrollProviderProps = PropsWithChildren<AutoScrollSettings>;
 
 const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   'AutoScroll',

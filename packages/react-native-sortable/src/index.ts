@@ -1,4 +1,10 @@
 /* eslint-disable import/no-unused-modules */
 
-export * from './components';
+export type {
+  DropIndicatorComponentProps,
+  SortableFlexProps,
+  SortableGridProps,
+  SortableGridRenderItem
+} from './components';
+export { SortableFlex, SortableGrid } from './components';
 export type { ReorderStrategy } from './types';

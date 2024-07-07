@@ -1,5 +1,7 @@
+import type { ComponentType } from 'react';
 import type { AnimatedRef } from 'react-native-reanimated';
 
+import type { DropIndicatorComponentProps } from '../components';
 import type { AnimatableValues, Prettify } from './utils';
 
 export type ActiveItemDecorationSettings = AnimatableValues<{
@@ -10,7 +12,7 @@ export type ActiveItemDecorationSettings = AnimatableValues<{
   inactiveItemScale: number;
 }>;
 
-export type AutoScrollProps = {
+export type AutoScrollSettings = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scrollableRef: AnimatedRef<any>; // TODO - type this properly
 } & AnimatableValues<{
@@ -19,6 +21,11 @@ export type AutoScrollProps = {
   autoScrollEnabled: boolean;
 }>;
 
+export type DropIndicatorSettings = {
+  DropIndicatorComponent: ComponentType<DropIndicatorComponentProps>;
+  showDropIndicator: boolean;
+};
+
 export type ReorderStrategy = 'insert' | 'swap';
 
 export type SharedProps = Prettify<
@@ -26,5 +33,6 @@ export type SharedProps = Prettify<
     dragEnabled?: boolean;
     reorderStrategy?: ReorderStrategy;
   } & Partial<ActiveItemDecorationSettings> &
-    Partial<AutoScrollProps>
+    Partial<AutoScrollSettings> &
+    Partial<DropIndicatorSettings>
 >;
