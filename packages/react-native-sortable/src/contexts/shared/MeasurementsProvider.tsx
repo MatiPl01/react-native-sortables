@@ -9,7 +9,7 @@ import Animated, {
 
 import { useUICallback } from '../../hooks';
 import type { Dimensions } from '../../types';
-import { createGuardedContext } from '../utils';
+import { createEnhancedContext } from '../utils';
 import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
@@ -26,7 +26,7 @@ type MeasurementsProviderProps = PropsWithChildren<{
   itemsCount: number;
 }>;
 
-const { MeasurementsProvider, useMeasurementsContext } = createGuardedContext(
+const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   'Measurements'
 )<MeasurementsContextType, MeasurementsProviderProps>(({
   children,

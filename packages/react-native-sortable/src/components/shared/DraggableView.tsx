@@ -20,6 +20,7 @@ import {
   TIME_TO_ACTIVATE_PAN
 } from '../../constants';
 import {
+  useAutoScrollContext,
   useDragContext,
   useItemPosition,
   useMeasurementsContext
@@ -52,6 +53,7 @@ export default function DraggableView({
     inactiveItemOpacity,
     inactiveItemScale
   } = useDragContext();
+  const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
   const itemPosition = useItemPosition(key);
 
   const overriddenDimensions = useDerivedValue(
@@ -106,6 +108,7 @@ export default function DraggableView({
           if (!isTouched.value) {
             return;
           }
+          updateStartScrollOffset?.();
           dragStartPosition.value = activeItemPosition.value = {
             x: itemPosition.x.value ?? 0,
             y: itemPosition.y.value ?? 0
@@ -139,7 +142,8 @@ export default function DraggableView({
       activeItemPosition,
       activeItemDropped,
       dragStartPosition,
-      pressProgress
+      pressProgress,
+      updateStartScrollOffset
     ]
   );
 

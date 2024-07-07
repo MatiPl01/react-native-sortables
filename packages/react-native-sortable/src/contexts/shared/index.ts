@@ -1,3 +1,4 @@
+export { useAutoScrollContext } from './AutoScrollProvider';
 export { useDragContext } from './DragProvider';
 export * from './hooks';
 export { useMeasurementsContext } from './MeasurementsProvider';
