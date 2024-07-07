@@ -15,7 +15,7 @@ function createCards(count: number) {
 const FEW_CARDS = createCards(6);
 const MANY_CARDS = createCards(20);
 
-export default function AutoScrollExampleScreen() {
+export default function AutoScrollScrollViewExampleScreen() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   const renderItem = useCallback<

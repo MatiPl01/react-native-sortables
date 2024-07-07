@@ -18,8 +18,12 @@ export default function ExamplesListScreen() {
         title='Sortable Flex'
       />
       <ExampleNavCard
-        route={ExamplesScreenRoute.AutoScrollExample}
-        title='Auto Scroll'
+        route={ExamplesScreenRoute.AutoScrollScrollViewExample}
+        title='Auto Scroll - ScrollView'
+      />
+      <ExampleNavCard
+        route={ExamplesScreenRoute.AutoScrollFlatListExample}
+        title='Auto Scroll - FlatList'
       />
     </ScrollView>
   );
