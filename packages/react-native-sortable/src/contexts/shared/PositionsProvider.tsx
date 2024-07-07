@@ -5,7 +5,7 @@ import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
 import type { Position } from '../../types';
 import { areArraysDifferent } from '../../utils';
-import { createGuardedContext } from '../utils';
+import { createEnhancedContext } from '../utils';
 
 type PositionsContextType = {
   keyToIndex: SharedValue<Record<string, number>>;
@@ -17,7 +17,7 @@ type PositionsProviderProps = PropsWithChildren<{
   itemKeys: Array<string>;
 }>;
 
-const { PositionsProvider, usePositionsContext } = createGuardedContext(
+const { PositionsProvider, usePositionsContext } = createEnhancedContext(
   'Positions'
 )<PositionsContextType, PositionsProviderProps>(({ itemKeys }) => {
   const prevKeysRef = useRef<Array<string>>([]);

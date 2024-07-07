@@ -14,8 +14,9 @@ export type AutoScrollProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scrollableRef: AnimatedRef<any>; // TODO - type this properly
 } & AnimatableValues<{
-  offsetFromTop?: number;
-  activationOffset?: [number, number] | number;
+  autoScrollActivationOffset: [number, number] | number;
+  autoScrollSpeed: number;
+  autoScrollEnabled: boolean;
 }>;
 
 export type ReorderStrategy = 'insert' | 'swap';

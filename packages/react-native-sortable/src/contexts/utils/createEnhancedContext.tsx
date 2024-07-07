@@ -4,16 +4,20 @@ import { createContext, useContext, useMemo } from 'react';
 type ContextReturnType<
   ContextName extends string,
   ContextValue,
-  ProviderProps
+  ProviderProps,
+  Guarded extends boolean = true
 > = {
   [K in ContextName as `${K}Provider`]: React.FC<ProviderProps>;
 } & {
-  [K in ContextName as `use${K}Context`]: () => ContextValue;
+  [K in ContextName as `use${K}Context`]: () => Guarded extends true
+    ? ContextValue
+    : ContextValue | null;
 };
 
-export default function createGuardedContext<ContextName extends string>(
-  name: ContextName
-) {
+export default function createEnhancedContext<
+  ContextName extends string,
+  Guarded extends boolean = true
+>(name: ContextName, guarded?: Guarded) {
   return function <
     ContextValue extends object,
     ProviderProps extends PropsWithChildren<object>
@@ -22,7 +26,7 @@ export default function createGuardedContext<ContextName extends string>(
       value: ContextValue;
       children?: ReactNode;
     }
-  ): ContextReturnType<ContextName, ContextValue, ProviderProps> {
+  ): ContextReturnType<ContextName, ContextValue, ProviderProps, Guarded> {
     const Context = createContext<ContextValue | null>(null);
     Context.displayName = name;
 
@@ -41,10 +45,10 @@ export default function createGuardedContext<ContextName extends string>(
       return <Context.Provider value={memoValue}>{children}</Context.Provider>;
     };
 
-    const useGuardedContext = (): ContextValue => {
+    const useEnhancedContext = (): ContextValue | null => {
       const context = useContext(Context);
 
-      if (context === null) {
+      if (guarded && context === null) {
         throw new Error(
           `${name} context must be used within a ${name}Provider`
         );
@@ -55,7 +59,7 @@ export default function createGuardedContext<ContextName extends string>(
 
     return {
       [`${name}Provider`]: Provider,
-      [`use${name}Context`]: useGuardedContext
+      [`use${name}Context`]: useEnhancedContext
     } as ContextReturnType<ContextName, ContextValue, ProviderProps>;
   };
 }

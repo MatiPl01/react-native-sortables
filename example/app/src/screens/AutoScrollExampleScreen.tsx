@@ -39,6 +39,16 @@ export default function AutoScrollExampleScreen() {
     scrollableRef
   };
 
+  // const [h, setH] = useState(200); // TODO - add support for proper auto scroll and dragged item positioning when the content offset changes
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setH(prev => (prev === 200 ? 400 : 200));
+  //   }, 1000);
+
+  //   return () => clearInterval(interval);
+  // }, []);
+
   return (
     <Animated.ScrollView
       contentContainerStyle={styles.container}

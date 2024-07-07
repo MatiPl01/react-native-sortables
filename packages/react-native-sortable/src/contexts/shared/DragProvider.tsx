@@ -8,7 +8,7 @@ import type {
   AnimatedValues,
   Position
 } from '../../types';
-import { createGuardedContext } from '../utils';
+import { createEnhancedContext } from '../utils';
 
 type DragContextType = {
   enabled: boolean;
@@ -24,7 +24,7 @@ type DragProviderProps = PropsWithChildren<
   } & ActiveItemDecorationSettings
 >;
 
-const { DragProvider, useDragContext } = createGuardedContext('Drag')<
+const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   DragContextType,
   DragProviderProps
 >(({

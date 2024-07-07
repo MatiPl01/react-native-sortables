@@ -1,1 +1,1 @@
-export { default as createGuardedContext } from './createGuardedContext';
+export { default as createEnhancedContext } from './createEnhancedContext';

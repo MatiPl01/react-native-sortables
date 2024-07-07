@@ -3,7 +3,8 @@ import type { PropsWithChildren } from 'react';
 
 import type {
   ActiveItemDecorationSettings,
-  AutoScrollProps
+  AutoScrollProps,
+  PartialBy
 } from '../../types';
 import ContextProviderComposer from '../utils/ContextProviderComposer';
 import { AutoScrollProvider } from './AutoScrollProvider';
@@ -16,15 +17,16 @@ type SharedProviderProps = PropsWithChildren<
     itemKeys: Array<string>;
     dragEnabled: boolean;
   } & ActiveItemDecorationSettings &
-    Partial<AutoScrollProps>
+    PartialBy<AutoScrollProps, 'scrollableRef'>
 >;
 
 export default function SharedProvider({
-  activationOffset,
+  autoScrollActivationOffset,
+  autoScrollEnabled,
+  autoScrollSpeed,
   children,
   dragEnabled,
   itemKeys,
-  offsetFromTop,
   scrollableRef,
   ...activeItemDecorationSettings
 }: SharedProviderProps) {
@@ -37,8 +39,9 @@ export default function SharedProvider({
   if (scrollableRef) {
     providers.push(
       <AutoScrollProvider
-        activationOffset={activationOffset}
-        offsetFromTop={offsetFromTop}
+        autoScrollActivationOffset={autoScrollActivationOffset}
+        autoScrollEnabled={autoScrollEnabled}
+        autoScrollSpeed={autoScrollSpeed}
         scrollableRef={scrollableRef}
       />
     );

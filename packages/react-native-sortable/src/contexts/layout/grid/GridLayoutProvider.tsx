@@ -10,7 +10,7 @@ import { OFFSET_EPS } from '../../../constants';
 import type { Position } from '../../../types';
 import { areArraysDifferent, arePositionsDifferent } from '../../../utils';
 import { useMeasurementsContext, usePositionsContext } from '../../shared';
-import { createGuardedContext } from '../../utils';
+import { createEnhancedContext } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
 
 type GridLayoutContextType = {
@@ -22,7 +22,7 @@ type GridLayoutProviderProps = PropsWithChildren<{
   columnsCount: number;
 }>;
 
-const { GridLayoutProvider, useGridLayoutContext } = createGuardedContext(
+const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   'GridLayout'
 )<GridLayoutContextType, GridLayoutProviderProps>(({ columnsCount }) => {
   const { containerHeight, containerWidth, itemDimensions } =

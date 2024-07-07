@@ -6,7 +6,7 @@ import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 import { EMPTY_OBJECT } from '../../../constants';
 import type { Dimensions } from '../../../types';
 import { useMeasurementsContext, usePositionsContext } from '../../shared';
-import { createGuardedContext } from '../../utils';
+import { createEnhancedContext } from '../../utils';
 import type { FlexDirection, FlexProps } from './types';
 import {
   areDimensionsCorrect,
@@ -26,7 +26,7 @@ type FlexLayoutContextType = {
 
 type FlexLayoutProviderProps = PropsWithChildren<FlexProps>;
 
-const { FlexLayoutProvider, useFlexLayoutContext } = createGuardedContext(
+const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
   'FlexLayout'
 )<FlexLayoutContextType, FlexLayoutProviderProps>(({
   alignContent = 'flex-start',
