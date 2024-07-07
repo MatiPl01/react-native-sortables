@@ -5,9 +5,9 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import {
   GridLayoutProvider,
   SharedProvider,
+  useAnimatedContainerHeightStyle,
   useGridLayoutContext,
-  useGridOrderUpdater,
-  useMeasurementsContext
+  useGridOrderUpdater
 } from '../../contexts';
 import type { Prettify, SharedProps } from '../../types';
 import {
@@ -64,7 +64,6 @@ function SortableGridInner<I>({
   renderItem,
   reorderStrategy
 }: SortableGridInnerProps<I>) {
-  const { containerHeight } = useMeasurementsContext();
   const { columnWidth } = useGridLayoutContext();
 
   useGridOrderUpdater(columns, reorderStrategy);
@@ -72,10 +71,7 @@ function SortableGridInner<I>({
   const animatedColumnWidthStyle = useAnimatedStyle(() => ({
     width: columnWidth.value === -1 ? `${100 / columns}%` : columnWidth.value
   }));
-
-  const animatedContainerHeightStyle = useAnimatedStyle(() => ({
-    height: containerHeight.value === -1 ? 'auto' : containerHeight.value
-  }));
+  const animatedContainerHeightStyle = useAnimatedContainerHeightStyle();
 
   return (
     <Animated.View style={[styles.gridContainer, animatedContainerHeightStyle]}>

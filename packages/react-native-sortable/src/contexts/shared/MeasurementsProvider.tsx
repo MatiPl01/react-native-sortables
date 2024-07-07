@@ -3,21 +3,24 @@ import type { LayoutChangeEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, {
   type SharedValue,
+  useAnimatedReaction,
   useAnimatedStyle,
-  useSharedValue
+  useSharedValue,
+  withTiming
 } from 'react-native-reanimated';
 
-import { useUICallback } from '../../hooks';
+import { useAnimatedTimeout, useUICallback } from '../../hooks';
 import type { Dimensions } from '../../types';
 import { createEnhancedContext } from '../utils';
 import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
-  initialMeasurementsCompleted: SharedValue<boolean>;
+  measurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
-  containerHeight: SharedValue<number>;
-  containerWidth: SharedValue<number>;
+  targetContainerHeight: SharedValue<number>;
+  animatedContainerHeight: SharedValue<number>;
+  targetContainerWidth: SharedValue<number>;
   measureItem: (key: string, dimensions: Dimensions) => void;
   removeItem: (key: string) => void;
 };
@@ -36,31 +39,62 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
 
   const measuredItemsCount = useSharedValue(0);
 
-  const initialMeasurementsCompleted = useSharedValue(false);
+  const updateTimeout = useAnimatedTimeout();
+  const measurementsCompleted = useSharedValue(false);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const overrideItemDimensions = useSharedValue<
     Record<string, Partial<Dimensions>>
   >({});
 
-  const containerWidth = useSharedValue(-1);
-  const containerHeight = useSharedValue(-1);
+  const targetContainerWidth = useSharedValue(-1);
+  const targetContainerHeight = useSharedValue(-1);
+  const animatedContainerHeight = useSharedValue(-1);
+
+  const updateMeasurements = useCallback(
+    (update: () => void) => {
+      'worklet';
+      // Set to false while measurements are being updated
+      measurementsCompleted.value = false;
+
+      // Update the measurements
+      update();
+
+      // Debounce the update to the measurements array to optimize performance
+      // (decrease the number of times animated reactions are triggered)
+      // Update only if the number of measurements is the same as the number of items
+      if (measuredItemsCount.value === itemsCount) {
+        updateTimeout.clear();
+        updateTimeout.set(() => {
+          measurementsCompleted.value = true;
+          itemDimensions.value = { ...itemDimensions.value };
+        }, 100);
+      }
+    },
+    [
+      itemDimensions,
+      itemsCount,
+      measuredItemsCount,
+      measurementsCompleted,
+      updateTimeout
+    ]
+  );
 
   const measureItem = useUICallback((key: string, dimensions: Dimensions) => {
     'worklet';
-    itemDimensions.value[key] = dimensions;
-    measuredItemsCount.value += 1;
-    // Update the array of item dimensions only after all items have been measured
-    // to reduce the number of times animated reactions are triggered
-    if (measuredItemsCount.value === itemsCount) {
-      initialMeasurementsCompleted.value = true;
-      itemDimensions.value = { ...itemDimensions.value };
-    }
+    updateMeasurements(() => {
+      if (!itemDimensions.value[key]) {
+        measuredItemsCount.value += 1;
+      }
+      itemDimensions.value[key] = dimensions;
+    });
   });
 
   const removeItem = useUICallback((key: string) => {
     'worklet';
-    delete itemDimensions.value[key];
-    measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
+    updateMeasurements(() => {
+      delete itemDimensions.value[key];
+      measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
+    });
   });
 
   const measureContainer = useCallback(
@@ -69,9 +103,24 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
         layout: { width }
       }
     }: LayoutChangeEvent) => {
-      containerWidth.value = width;
+      targetContainerWidth.value = width;
     },
-    [containerWidth]
+    [targetContainerWidth]
+  );
+
+  useAnimatedReaction(
+    () => targetContainerHeight.value,
+    targetHeight => {
+      if (targetHeight === -1) {
+        return;
+      }
+      if (animatedContainerHeight.value === -1) {
+        animatedContainerHeight.value = targetHeight;
+      } else {
+        animatedContainerHeight.value = withTiming(targetHeight);
+      }
+    },
+    [targetContainerHeight]
   );
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
@@ -87,13 +136,14 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       </Animated.View>
     ),
     value: {
-      containerHeight,
-      containerWidth,
-      initialMeasurementsCompleted,
+      animatedContainerHeight,
       itemDimensions,
       measureItem,
+      measurementsCompleted,
       overrideItemDimensions,
-      removeItem
+      removeItem,
+      targetContainerHeight,
+      targetContainerWidth
     }
   };
 });

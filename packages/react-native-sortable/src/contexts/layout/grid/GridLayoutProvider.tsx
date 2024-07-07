@@ -25,22 +25,33 @@ type GridLayoutProviderProps = PropsWithChildren<{
 const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   'GridLayout'
 )<GridLayoutContextType, GridLayoutProviderProps>(({ columnsCount }) => {
-  const { containerHeight, containerWidth, itemDimensions } =
-    useMeasurementsContext();
+  const {
+    itemDimensions,
+    measurementsCompleted,
+    targetContainerHeight,
+    targetContainerWidth
+  } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
   const columnWidth = useDerivedValue(() =>
-    containerWidth.value === -1 ? -1 : containerWidth.value / columnsCount
+    targetContainerWidth.value === -1
+      ? -1
+      : targetContainerWidth.value / columnsCount
   );
 
   // ROW OFFSETS UPDATER
   useAnimatedReaction(
     () => ({
+      canUpdate: measurementsCompleted.value,
       dimensions: itemDimensions.value,
       idxToKey: indexToKey.value
     }),
-    ({ dimensions, idxToKey }) => {
+    ({ canUpdate, dimensions, idxToKey }) => {
+      if (!canUpdate) {
+        return;
+      }
+      console.log('row updater');
       const offsets = [0];
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
         const rowIndex = getRowIndex(parseInt(itemIndex), columnsCount);
@@ -65,7 +76,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
         )
       ) {
         rowOffsets.value = offsets;
-        containerHeight.value = offsets[offsets.length - 1] ?? 0;
+        targetContainerHeight.value = offsets[offsets.length - 1] ?? 0;
       }
     },
     [columnsCount]
@@ -74,12 +85,13 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   // ITEM POSITIONS UPDATER
   useAnimatedReaction(
     () => ({
+      canUpdate: measurementsCompleted.value,
       colWidth: columnWidth.value,
       idxToKey: indexToKey.value,
       offsets: rowOffsets.value
     }),
-    ({ colWidth, idxToKey, offsets }) => {
-      if (colWidth === -1 || offsets.length === 0) {
+    ({ canUpdate, colWidth, idxToKey, offsets }) => {
+      if (colWidth === -1 || offsets.length === 0 || !canUpdate) {
         return;
       }
       const positions: Record<string, Position> = {};
@@ -108,6 +120,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
             : currentPosition;
       }
 
+      console.log(positions);
       itemPositions.value = positions;
     },
     [columnsCount]

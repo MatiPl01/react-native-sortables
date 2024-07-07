@@ -12,7 +12,7 @@ export function useGridOrderUpdater(
   numColumns: number,
   strategy: ReorderStrategy
 ): void {
-  const { containerHeight } = useMeasurementsContext();
+  const { targetContainerHeight } = useMeasurementsContext();
   const { indexToKey } = usePositionsContext();
   const { rowOffsets } = useGridLayoutContext();
 
@@ -38,7 +38,7 @@ export function useGridOrderUpdater(
         dy = -1;
       } else if (
         yOffsetBelow !== undefined &&
-        yOffsetBelow < containerHeight.value &&
+        yOffsetBelow < targetContainerHeight.value &&
         y > yOffsetBelow
       ) {
         dy = 1;

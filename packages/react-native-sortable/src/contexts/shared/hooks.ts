@@ -1,8 +1,13 @@
 import { useMemo } from 'react';
-import type { EasingFunction, SharedValue } from 'react-native-reanimated';
+import type {
+  AnimatedStyle,
+  EasingFunction,
+  SharedValue
+} from 'react-native-reanimated';
 import {
   Easing,
   useAnimatedReaction,
+  useAnimatedStyle,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
@@ -182,4 +187,22 @@ export function useActiveItemReaction(
     },
     deps
   );
+}
+
+export function useAnimatedContainerHeightStyle(): AnimatedStyle {
+  const { animatedContainerHeight, targetContainerHeight } =
+    useMeasurementsContext();
+
+  return useAnimatedStyle(() => {
+    let height: 'auto' | number = 'auto';
+    if (targetContainerHeight.value !== -1) {
+      if (animatedContainerHeight.value === -1) {
+        height = targetContainerHeight.value;
+      } else {
+        height = animatedContainerHeight.value;
+      }
+    }
+
+    return { height };
+  });
 }

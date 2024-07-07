@@ -1,14 +1,14 @@
 import { cloneElement, type ReactElement, useRef } from 'react';
-import type { ViewProps, ViewStyle } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import type { ViewProps } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import type { FlexProps } from '../../contexts';
 import {
   FlexLayoutProvider,
   SharedProvider,
+  useAnimatedContainerHeightStyle,
   useFlexLayoutContext,
-  useFlexOrderUpdater,
-  useMeasurementsContext
+  useFlexOrderUpdater
 } from '../../contexts';
 import type { ReorderStrategy, SharedProps } from '../../types';
 import {
@@ -58,17 +58,11 @@ function SortableFlexInner({
   reorderStrategy,
   viewProps
 }: SortableFlexInnerProps) {
-  const { containerHeight } = useMeasurementsContext();
   const { flexDirection, stretch } = useFlexLayoutContext();
 
   useFlexOrderUpdater(reorderStrategy);
 
-  const animatedContainerHeightStyle = useAnimatedStyle(() => ({
-    height:
-      containerHeight.value === -1
-        ? (viewProps?.style as ViewStyle)?.height
-        : containerHeight.value
-  }));
+  const animatedContainerHeightStyle = useAnimatedContainerHeightStyle();
 
   return (
     <Animated.View

@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-redeclare */
+import { useMemo } from 'react';
 import {
   isSharedValue,
   type SharedValue,
   useAnimatedReaction,
   useDerivedValue,
-  useSharedValue
+  useSharedValue,
+  withTiming
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../constants';
@@ -32,7 +34,7 @@ export function useAnimatableValue<V, F extends (value: V) => any>(
 export function useSmoothValueChange(
   initialValue: SharedValue<number>,
   target: SharedValue<number>,
-  speed: SharedValue<number>
+  speed?: SharedValue<number>
 ): SharedValue<number> {
   'worklet';
   const currentValue = useSharedValue(initialValue.value);
@@ -48,7 +50,7 @@ export function useSmoothValueChange(
 
   useAnimatedReaction(
     () => ({
-      mul: speed.value,
+      mul: speed?.value ?? 1,
       remaining: remainingDifference.value,
       to: target.value
     }),
@@ -65,8 +67,37 @@ export function useSmoothValueChange(
 
       remainingDifference.value = difference - step;
     },
-    [target]
+    [target, speed]
   );
 
   return currentValue;
+}
+
+type AnimatedTimeout = {
+  set: (callback: () => void, duration: number) => void;
+  clear: () => void;
+};
+
+export function useAnimatedTimeout(): AnimatedTimeout {
+  'worklet';
+  const value = useSharedValue(0);
+
+  return useMemo(
+    () => ({
+      clear: () => {
+        'worklet';
+        value.value = 0;
+      },
+      set: (callback: () => void, duration: number) => {
+        'worklet';
+        value.value = withTiming(1, { duration }, completed => {
+          if (completed) {
+            value.value = 0;
+            callback();
+          }
+        });
+      }
+    }),
+    [value]
+  );
 }

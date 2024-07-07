@@ -45,10 +45,10 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
   const rowGap = rowGapProp ?? gap;
 
   const {
-    containerHeight,
-    containerWidth,
     itemDimensions,
-    overrideItemDimensions
+    overrideItemDimensions,
+    targetContainerHeight,
+    targetContainerWidth
   } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
@@ -61,8 +61,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
   useAnimatedReaction(
     () => ({
       containerDimensions: {
-        height: containerHeight.value,
-        width: containerWidth.value
+        height: targetContainerHeight.value,
+        width: targetContainerWidth.value
       },
       dimensions: itemDimensions.value,
       idxToKey: indexToKey.value
@@ -108,8 +108,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
   useAnimatedReaction(
     () => ({
       containerDimensions: {
-        height: containerHeight.value,
-        width: containerWidth.value
+        height: targetContainerHeight.value,
+        width: targetContainerWidth.value
       },
       groups: itemGroups.value,
       sizes: crossAxisGroupSizes.value
@@ -206,9 +206,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
       }
     }: LayoutChangeEvent) => {
       // TODO - improve (calculate height if it is not set)
-      containerHeight.value = height;
+      targetContainerHeight.value = height;
     },
-    [containerHeight]
+    [targetContainerHeight]
   );
 
   return {
