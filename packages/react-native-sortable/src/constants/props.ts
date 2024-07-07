@@ -6,7 +6,7 @@ export const SHARED_PROPS: RequiredExcept<SharedProps, 'scrollableRef'> = {
   activeItemShadowOpacity: 0.2,
   autoScrollActivationOffset: 40,
   autoScrollEnabled: true,
-  autoScrollSpeed: 1,
+  autoScrollSpeed: 0.5,
   dragEnabled: true,
   inactiveItemOpacity: 0.5,
   inactiveItemScale: 1,

@@ -31,10 +31,10 @@ export default function AutoScrollFlatListExampleScreen() {
     SortableGridRenderItem<ReturnType<typeof createCards>[number]>
   >(
     ({ item }) => (
-      <Animated.View style={styles.card}>
+      <View style={styles.card}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
-      </Animated.View>
+      </View>
     ),
     []
   );
@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: 'white',
     borderRadius: 10,
-    elevation: 5,
     gap: 16,
     marginHorizontal: 6,
     marginVertical: 8,
