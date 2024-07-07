@@ -15,17 +15,17 @@ function createCards(count: number) {
 const FEW_CARDS = createCards(6);
 const MANY_CARDS = createCards(20);
 
-export default function AutoScrollExampleScreen() {
+export default function AutoScrollScrollViewExampleScreen() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   const renderItem = useCallback<
     SortableGridRenderItem<ReturnType<typeof createCards>[number]>
   >(
     ({ item }) => (
-      <Animated.View style={styles.card}>
+      <View style={styles.card}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
-      </Animated.View>
+      </View>
     ),
     []
   );
@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: 'white',
     borderRadius: 10,
-    elevation: 5,
     gap: 16,
     marginHorizontal: 6,
     marginVertical: 8,

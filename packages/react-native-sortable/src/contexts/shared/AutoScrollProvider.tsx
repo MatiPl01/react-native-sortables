@@ -136,7 +136,11 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   }, [dragStartScrollOffset, scrollOffset]);
 
   return {
-    children: <View ref={containerRef}>{children}</View>,
+    children: (
+      <View collapsable={false} ref={containerRef}>
+        {children}
+      </View>
+    ),
     value: {
       dragStartScrollOffset,
       scrollOffset,

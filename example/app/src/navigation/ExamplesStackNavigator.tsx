@@ -2,7 +2,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View } from 'react-native';
 
 import {
-  AutoScrollExampleScreen,
+  AutoScrollFlatListExampleScreen,
+  AutoScrollScrollViewExampleScreen,
   ExamplesListScreen,
   SortableFlexExamplesScreen,
   SortableGridExamplesScreen
@@ -34,8 +35,12 @@ export default function ExamplesStackNavigator() {
           name={ExamplesScreenRoute.SortableFlexExamples}
         />
         <ExamplesStack.Screen
-          component={AutoScrollExampleScreen}
-          name={ExamplesScreenRoute.AutoScrollExample}
+          component={AutoScrollScrollViewExampleScreen}
+          name={ExamplesScreenRoute.AutoScrollScrollViewExample}
+        />
+        <ExamplesStack.Screen
+          component={AutoScrollFlatListExampleScreen}
+          name={ExamplesScreenRoute.AutoScrollFlatListExample}
         />
       </ExamplesStack.Navigator>
     </View>
