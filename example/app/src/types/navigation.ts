@@ -4,6 +4,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 export enum ExamplesScreenRoute {
   AutoScrollFlatListExample = 'AutoScrollFlatListExample',
   AutoScrollScrollViewExample = 'AutoScrollScrollViewExample',
+  DropIndicatorExamples = 'DropIndicatorExamples',
   ExamplesList = 'ExamplesList',
   SortableFlexExamples = 'SortableFlexExamples',
   SortableGridExamples = 'SortableGridExamples'
@@ -15,6 +16,7 @@ export type ExamplesStackParamList = {
   [ExamplesScreenRoute.SortableGridExamples]: undefined;
   [ExamplesScreenRoute.AutoScrollScrollViewExample]: undefined;
   [ExamplesScreenRoute.AutoScrollFlatListExample]: undefined;
+  [ExamplesScreenRoute.DropIndicatorExamples]: undefined;
 };
 
 type CombinedNavigationProps = ExamplesStackParamList;
