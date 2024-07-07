@@ -5,8 +5,9 @@ import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
   Easing,
   interpolate,
+  useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue
+  useSharedValue
 } from 'react-native-reanimated';
 
 import {
@@ -20,8 +21,8 @@ import type { Position } from '../../types';
 export type DropIndicatorComponentProps = {
   activationProgress: SharedValue<number>;
   touchedItemKey: SharedValue<null | string>;
-  dropIndex: SharedValue<null | number>;
-  dropPosition: SharedValue<Position | null>;
+  dropIndex: SharedValue<number>;
+  dropPosition: SharedValue<Position>;
 };
 
 type DropIndicatorProps = {
@@ -39,17 +40,21 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
   });
   const { height, width } = useItemDimensions(touchedItemKey);
 
-  const dropIndex = useDerivedValue(
-    () =>
-      (touchedItemKey.value !== null
-        ? keyToIndex.value[touchedItemKey.value]
-        : null) ?? null
-  );
-  const dropPosition = useDerivedValue(
-    () =>
-      (touchedItemKey.value !== null
-        ? itemPositions.value[touchedItemKey.value]
-        : null) ?? null
+  const dropIndex = useSharedValue(0);
+  const dropPosition = useSharedValue<Position>({ x: 0, y: 0 });
+
+  useAnimatedReaction(
+    () => ({
+      kToI: keyToIndex.value,
+      key: touchedItemKey.value,
+      positions: itemPositions.value
+    }),
+    ({ kToI, key, positions }) => {
+      if (key !== null) {
+        dropIndex.value = kToI[key] ?? 0;
+        dropPosition.value = positions[key] ?? { x: 0, y: 0 };
+      }
+    }
   );
 
   const animatedStyle = useAnimatedStyle(() => {
