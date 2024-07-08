@@ -27,7 +27,7 @@
     "react-native-reanimated": "3.10.1",
     "react-test-renderer": "^18.3.1",
     "semantic-release": "^24.0.0",
-    "typescript": "5.3.3"
+    "typescript": "5.5.3"
   },
   "files": [
     "src",
