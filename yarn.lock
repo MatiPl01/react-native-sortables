@@ -3645,9 +3645,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/flash-list@npm:^1.7.0":
+"@shopify/flash-list@file:/Users/mateu/Downloads/flash-list::locator=example-app%40workspace%3Aexample%2Fapp":
   version: 1.7.0
-  resolution: "@shopify/flash-list@npm:1.7.0"
+  resolution: "@shopify/flash-list@file:/Users/mateu/Downloads/flash-list#/Users/mateu/Downloads/flash-list::hash=58d034&locator=example-app%40workspace%3Aexample%2Fapp"
   dependencies:
     recyclerlistview: "npm:4.2.1"
     tslib: "npm:2.6.3"
@@ -3655,7 +3655,7 @@ __metadata:
     "@babel/runtime": "*"
     react: "*"
     react-native: "*"
-  checksum: 10c0/4a4335c02da0053d945b1ed59739d0986b7c1d454fb544bbb19f8df66c601e29412d88f23f2ebb0dadee682967b322d7654d1128043b74f88de1709d6ccbb405
+  checksum: 10c0/7b1344248303042292ae375893495f378a34b9297f159209db1e7ffe5d7d9ccba1debba3e3c88dada1209c97bb906e666d8f35aacd04c57b6cfa6cac3efc0267
   languageName: node
   linkType: hard
 
@@ -7319,7 +7319,7 @@ __metadata:
     "@react-native/metro-config": "npm:^0.74.85"
     "@react-navigation/native": "npm:^6.1.17"
     "@react-navigation/native-stack": "npm:^6.9.26"
-    "@shopify/flash-list": "npm:^1.7.0"
+    "@shopify/flash-list": "file:/Users/mateu/Downloads/flash-list"
     "@testing-library/react-hooks": "npm:^8.0.1"
     "@testing-library/react-native": "npm:^12.5.1"
     "@types/react": "npm:^18.3.3"
@@ -7331,7 +7331,7 @@ __metadata:
     react: "npm:^18.3.1"
     react-native: "npm:^0.74.3"
     react-native-gesture-handler: "npm:^2.17.1"
-    react-native-reanimated: "npm:3.10.1"
+    react-native-reanimated: "npm:^3.13.0"
     react-native-safe-area-context: "npm:^4.10.3"
     react-native-screens: "npm:^3.31.1"
     react-native-sortable: "workspace:*"
@@ -13379,9 +13379,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.10.1":
-  version: 3.10.1
-  resolution: "react-native-reanimated@npm:3.10.1"
+"react-native-reanimated@npm:^3.13.0":
+  version: 3.13.0
+  resolution: "react-native-reanimated@npm:3.13.0"
   dependencies:
     "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
     "@babel/plugin-transform-nullish-coalescing-operator": "npm:^7.0.0-0"
@@ -13395,7 +13395,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10c0/0154123649214bd8a83710056594590d9b5f073c5f8911f5b59a0a4f5dcca671d98b475bc4f3bb106b6c8b5c3dcb645a4973efdbe8dbd997bfae2797bd83f546
+  checksum: 10c0/1ed00c96f357866974d56c5bc7696b692c012400072a680e09c275c6574bdfc16c44f51b896d3c61d6425b1125f39e0b7e20b52407ef8a7f00c11d56e4ebaa9d
   languageName: node
   linkType: hard
 
@@ -13468,7 +13468,7 @@ __metadata:
     react-native: "npm:^0.74.3"
     react-native-builder-bob: "npm:^0.23.2"
     react-native-gesture-handler: "npm:^2.17.1"
-    react-native-reanimated: "npm:3.10.1"
+    react-native-reanimated: "npm:^3.13.0"
     react-test-renderer: "npm:^18.3.1"
     semantic-release: "npm:^24.0.0"
     typescript: "npm:5.3.3"

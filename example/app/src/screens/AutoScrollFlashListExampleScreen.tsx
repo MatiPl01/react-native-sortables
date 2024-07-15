@@ -1,9 +1,8 @@
-import type { FlashListProps, ListRenderItem } from '@shopify/flash-list';
-import { FlashList } from '@shopify/flash-list';
+import type { FlashList, ListRenderItem } from '@shopify/flash-list';
+import { AnimatedFlashList } from '@shopify/flash-list';
 import { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import type { AnimatedProps } from 'react-native-reanimated';
-import Animated, { useAnimatedRef } from 'react-native-reanimated';
+import { useAnimatedRef } from 'react-native-reanimated';
 import {
   SortableGrid,
   type SortableGridRenderItem
@@ -24,12 +23,6 @@ const LIST_ITEMS = Array.from({ length: 10 }, (_, i) => ({
   key: i,
   title: `Item ${i + 1}`
 }));
-
-const AnimatedFlashList = Animated.createAnimatedComponent(
-  FlashList
-) as React.ComponentClass<
-  AnimatedProps<FlashListProps<(typeof LIST_ITEMS)[number]>>
->;
 
 export default function AutoScrollFlatListExampleScreen() {
   const scrollableRef =
