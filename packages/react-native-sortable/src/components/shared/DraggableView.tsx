@@ -204,18 +204,25 @@ export default function DraggableView({
   });
 
   return (
-    <Animated.View
-      {...viewProps}
-      style={[styles.decoration, style, animatedStyle, animatedDecorationStyle]}
-      onLayout={({
-        nativeEvent: {
-          layout: { height, width }
-        }
-      }: LayoutChangeEvent) => {
-        measureItem(key, { height, width });
-      }}>
-      <GestureDetector gesture={panGesture}>{children}</GestureDetector>
-    </Animated.View>
+    <GestureDetector gesture={panGesture}>
+      <Animated.View
+        {...viewProps}
+        style={[
+          styles.decoration,
+          style,
+          animatedStyle,
+          animatedDecorationStyle
+        ]}
+        onLayout={({
+          nativeEvent: {
+            layout: { height, width }
+          }
+        }: LayoutChangeEvent) => {
+          measureItem(key, { height, width });
+        }}>
+        {children}
+      </Animated.View>
+    </GestureDetector>
   );
 }
 
