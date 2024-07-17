@@ -6,8 +6,6 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-  interpolate,
-  interpolateColor,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -26,6 +24,7 @@ import {
   useMeasurementsContext
 } from '../../contexts';
 import { getItemZIndex } from '../../utils';
+import ItemDecoration from './ItemDecoration';
 
 type DraggableViewProps = {
   itemKey: string;
@@ -45,13 +44,8 @@ export default function DraggableView({
     activationProgress,
     activeItemDropped,
     activeItemKey,
-    activeItemOpacity,
     activeItemPosition,
-    activeItemScale,
-    activeItemShadowOpacity,
     enabled,
-    inactiveItemOpacity,
-    inactiveItemScale,
     touchedItemKey
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
@@ -128,6 +122,7 @@ export default function DraggableView({
           };
         })
         .onFinalize(handleDragEnd)
+        .onTouchesCancelled(handleDragEnd)
         .enabled(enabled),
     [
       key,
@@ -158,9 +153,8 @@ export default function DraggableView({
     const y = itemPosition.y.value;
 
     return {
-      left: itemPosition.x.value,
       position: 'absolute',
-      top: itemPosition.y.value,
+      transform: [{ translateX: x }, { translateY: y }],
       zIndex: getItemZIndex(
         isActive.value,
         pressProgress.value,
@@ -171,48 +165,11 @@ export default function DraggableView({
     };
   });
 
-  const animatedDecorationStyle = useAnimatedStyle(() => {
-    const resultantProgress =
-      2 * pressProgress.value - activationProgress.value;
-
-    return {
-      opacity: interpolate(
-        resultantProgress,
-        [-1, 0, 1],
-        [inactiveItemOpacity.value, 1, activeItemOpacity.value]
-      ),
-      shadowColor: interpolateColor(
-        resultantProgress,
-        [-1, 0, 1],
-        [
-          'transparent',
-          'transparent',
-          `rgba(0, 0, 0, ${activeItemShadowOpacity.value})`
-        ]
-      ),
-      shadowOpacity: interpolate(resultantProgress, [-1, 0, 1], [0, 0, 1]),
-      transform: [
-        {
-          scale: interpolate(
-            resultantProgress,
-            [-1, 0, 1],
-            [inactiveItemScale.value, 1, activeItemScale.value]
-          )
-        }
-      ]
-    };
-  });
-
   return (
     <GestureDetector gesture={panGesture}>
       <Animated.View
         {...viewProps}
-        style={[
-          styles.decoration,
-          style,
-          animatedStyle,
-          animatedDecorationStyle
-        ]}
+        style={[styles.draggableView, style, animatedStyle]}
         onLayout={({
           nativeEvent: {
             layout: { height, width }
@@ -220,19 +177,17 @@ export default function DraggableView({
         }: LayoutChangeEvent) => {
           measureItem(key, { height, width });
         }}>
-        {children}
+        <ItemDecoration pressProgress={pressProgress}>
+          {children}
+        </ItemDecoration>
       </Animated.View>
     </GestureDetector>
   );
 }
 
 const styles = StyleSheet.create({
-  decoration: {
-    elevation: 5,
-    shadowOffset: {
-      height: 0,
-      width: 0
-    },
-    shadowRadius: 5
+  draggableView: {
+    left: 0,
+    top: 0
   }
 });
