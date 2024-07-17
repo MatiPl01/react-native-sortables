@@ -68,6 +68,7 @@ export default function AutoScrollFlatListExampleScreen() {
       ListHeaderComponentStyle={styles.foreground}
       ref={scrollableRef}
       renderItem={renderListItem}
+      estimatedItemSize={60}
       ListFooterComponent={
         <>
           <View style={styles.section}>

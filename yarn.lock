@@ -3645,9 +3645,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/flash-list@file:/Users/mateu/Downloads/flash-list::locator=example-app%40workspace%3Aexample%2Fapp":
+"@shopify/flash-list@npm:1.7.0":
   version: 1.7.0
-  resolution: "@shopify/flash-list@file:/Users/mateu/Downloads/flash-list#/Users/mateu/Downloads/flash-list::hash=58d034&locator=example-app%40workspace%3Aexample%2Fapp"
+  resolution: "@shopify/flash-list@npm:1.7.0"
   dependencies:
     recyclerlistview: "npm:4.2.1"
     tslib: "npm:2.6.3"
@@ -3655,7 +3655,21 @@ __metadata:
     "@babel/runtime": "*"
     react: "*"
     react-native: "*"
-  checksum: 10c0/7b1344248303042292ae375893495f378a34b9297f159209db1e7ffe5d7d9ccba1debba3e3c88dada1209c97bb906e666d8f35aacd04c57b6cfa6cac3efc0267
+  checksum: 10c0/4a4335c02da0053d945b1ed59739d0986b7c1d454fb544bbb19f8df66c601e29412d88f23f2ebb0dadee682967b322d7654d1128043b74f88de1709d6ccbb405
+  languageName: node
+  linkType: hard
+
+"@shopify/flash-list@patch:@shopify/flash-list@npm%3A1.7.0#~/.yarn/patches/@shopify-flash-list-npm-1.7.0-8b9f270a18.patch":
+  version: 1.7.0
+  resolution: "@shopify/flash-list@patch:@shopify/flash-list@npm%3A1.7.0#~/.yarn/patches/@shopify-flash-list-npm-1.7.0-8b9f270a18.patch::version=1.7.0&hash=4a7ce2"
+  dependencies:
+    recyclerlistview: "npm:4.2.1"
+    tslib: "npm:2.6.3"
+  peerDependencies:
+    "@babel/runtime": "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/ad31eb9d0676d83351b5378fd4d3dfc4fc4e0c99f9e4f904a926249a2c36f7f89fbfddee22fc49c46e0690d1f3aaf5f7cd398372b3ed5052bd461d2753ba367e
   languageName: node
   linkType: hard
 
@@ -7319,7 +7333,7 @@ __metadata:
     "@react-native/metro-config": "npm:^0.74.85"
     "@react-navigation/native": "npm:^6.1.17"
     "@react-navigation/native-stack": "npm:^6.9.26"
-    "@shopify/flash-list": "file:/Users/mateu/Downloads/flash-list"
+    "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A1.7.0#~/.yarn/patches/@shopify-flash-list-npm-1.7.0-8b9f270a18.patch"
     "@testing-library/react-hooks": "npm:^8.0.1"
     "@testing-library/react-native": "npm:^12.5.1"
     "@types/react": "npm:^18.3.3"
