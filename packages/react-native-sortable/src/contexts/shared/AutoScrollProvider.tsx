@@ -96,13 +96,6 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
     }
   );
 
-  useAnimatedReaction(
-    () => scrollOffset.value,
-    value => {
-      console.log('scrollOffset', value);
-    }
-  );
-
   // AUTO SCROLL HANDLER
   // Automatically scrolls the container when the active item is near the edge
   useAnimatedReaction(
