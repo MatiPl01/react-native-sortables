@@ -1,6 +1,10 @@
 import { type PropsWithChildren } from 'react';
+import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { useSharedValue } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue
+} from 'react-native-reanimated';
 
 import { useAnimatableValue } from '../../hooks';
 import type {
@@ -32,6 +36,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   activeItemOpacity: activeItemOpacityProp,
   activeItemScale: activeItemScaleProp,
   activeItemShadowOpacity: activeItemShadowOpacityProp,
+  children,
   enabled,
   inactiveItemOpacity: inactiveItemOpacityProp,
   inactiveItemScale: inactiveItemScaleProp
@@ -50,7 +55,16 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const activeItemPosition = useSharedValue<Position>({ x: 0, y: 0 });
   const activeItemDropped = useSharedValue(true);
 
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    zIndex: activationProgress.value > 0 ? 1 : 0
+  }));
+
   return {
+    children: (
+      <Animated.View style={[styles.container, animatedContainerStyle]}>
+        {children}
+      </Animated.View>
+    ),
     value: {
       activationProgress,
       activeItemDropped,
@@ -65,6 +79,12 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       touchedItemKey
     }
   };
+});
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%'
+  }
 });
 
 export { DragProvider, useDragContext };

@@ -1,16 +1,11 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { StyleSheet } from 'react-native';
-import Animated, {
-  type SharedValue,
-  useAnimatedStyle,
-  useSharedValue
-} from 'react-native-reanimated';
+import { View } from 'react-native';
+import { type SharedValue, useSharedValue } from 'react-native-reanimated';
 
 import { useUICallback } from '../../hooks';
 import type { Dimensions } from '../../types';
 import { createEnhancedContext } from '../utils';
-import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
@@ -32,8 +27,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   children,
   itemsCount
 }) => {
-  const { activationProgress } = useDragContext();
-
   const measuredItemsCount = useSharedValue(0);
 
   const initialMeasurementsCompleted = useSharedValue(false);
@@ -74,18 +67,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     [containerWidth]
   );
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    zIndex: activationProgress.value > 0 ? 1 : 0
-  }));
-
   return {
-    children: (
-      <Animated.View
-        style={[styles.container, animatedContainerStyle]}
-        onLayout={measureContainer}>
-        {children}
-      </Animated.View>
-    ),
+    children: <View onLayout={measureContainer}>{children}</View>,
     value: {
       containerHeight,
       containerWidth,
@@ -96,12 +79,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       removeItem
     }
   };
-});
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%'
-  }
 });
 
 export { MeasurementsProvider, useMeasurementsContext };
