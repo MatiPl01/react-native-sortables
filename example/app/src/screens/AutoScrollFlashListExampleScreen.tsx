@@ -64,11 +64,11 @@ export default function AutoScrollFlatListExampleScreen() {
     <AnimatedFlashList
       contentContainerStyle={styles.container}
       data={LIST_ITEMS}
+      estimatedItemSize={60}
       ListFooterComponentStyle={styles.foreground}
       ListHeaderComponentStyle={styles.foreground}
       ref={scrollableRef}
       renderItem={renderListItem}
-      estimatedItemSize={60}
       ListFooterComponent={
         <>
           <View style={styles.section}>
