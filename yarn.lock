@@ -3645,6 +3645,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@shopify/flash-list@npm:1.7.0":
+  version: 1.7.0
+  resolution: "@shopify/flash-list@npm:1.7.0"
+  dependencies:
+    recyclerlistview: "npm:4.2.1"
+    tslib: "npm:2.6.3"
+  peerDependencies:
+    "@babel/runtime": "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/4a4335c02da0053d945b1ed59739d0986b7c1d454fb544bbb19f8df66c601e29412d88f23f2ebb0dadee682967b322d7654d1128043b74f88de1709d6ccbb405
+  languageName: node
+  linkType: hard
+
+"@shopify/flash-list@patch:@shopify/flash-list@npm%3A1.7.0#~/.yarn/patches/@shopify-flash-list-npm-1.7.0-8b9f270a18.patch":
+  version: 1.7.0
+  resolution: "@shopify/flash-list@patch:@shopify/flash-list@npm%3A1.7.0#~/.yarn/patches/@shopify-flash-list-npm-1.7.0-8b9f270a18.patch::version=1.7.0&hash=4a7ce2"
+  dependencies:
+    recyclerlistview: "npm:4.2.1"
+    tslib: "npm:2.6.3"
+  peerDependencies:
+    "@babel/runtime": "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/ad31eb9d0676d83351b5378fd4d3dfc4fc4e0c99f9e4f904a926249a2c36f7f89fbfddee22fc49c46e0690d1f3aaf5f7cd398372b3ed5052bd461d2753ba367e
+  languageName: node
+  linkType: hard
+
 "@sideway/address@npm:^4.1.5":
   version: 4.1.5
   resolution: "@sideway/address@npm:4.1.5"
@@ -7305,6 +7333,7 @@ __metadata:
     "@react-native/metro-config": "npm:^0.74.85"
     "@react-navigation/native": "npm:^6.1.17"
     "@react-navigation/native-stack": "npm:^6.9.26"
+    "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A1.7.0#~/.yarn/patches/@shopify-flash-list-npm-1.7.0-8b9f270a18.patch"
     "@testing-library/react-hooks": "npm:^8.0.1"
     "@testing-library/react-native": "npm:^12.5.1"
     "@types/react": "npm:^18.3.3"
@@ -7316,7 +7345,7 @@ __metadata:
     react: "npm:^18.3.1"
     react-native: "npm:^0.74.3"
     react-native-gesture-handler: "npm:^2.17.1"
-    react-native-reanimated: "npm:3.10.1"
+    react-native-reanimated: "npm:^3.13.0"
     react-native-safe-area-context: "npm:^4.10.3"
     react-native-screens: "npm:^3.31.1"
     react-native-sortable: "workspace:*"
@@ -10876,7 +10905,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.debounce@npm:^4.0.8":
+"lodash.debounce@npm:4.0.8, lodash.debounce@npm:^4.0.8":
   version: 4.0.8
   resolution: "lodash.debounce@npm:4.0.8"
   checksum: 10c0/762998a63e095412b6099b8290903e0a8ddcb353ac6e2e0f2d7e7d03abd4275fe3c689d88960eb90b0dde4f177554d51a690f22a343932ecbc50a5d111849987
@@ -13139,7 +13168,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:15.8.1, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -13364,9 +13393,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.10.1":
-  version: 3.10.1
-  resolution: "react-native-reanimated@npm:3.10.1"
+"react-native-reanimated@npm:^3.13.0":
+  version: 3.13.0
+  resolution: "react-native-reanimated@npm:3.13.0"
   dependencies:
     "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
     "@babel/plugin-transform-nullish-coalescing-operator": "npm:^7.0.0-0"
@@ -13380,7 +13409,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10c0/0154123649214bd8a83710056594590d9b5f073c5f8911f5b59a0a4f5dcca671d98b475bc4f3bb106b6c8b5c3dcb645a4973efdbe8dbd997bfae2797bd83f546
+  checksum: 10c0/1ed00c96f357866974d56c5bc7696b692c012400072a680e09c275c6574bdfc16c44f51b896d3c61d6425b1125f39e0b7e20b52407ef8a7f00c11d56e4ebaa9d
   languageName: node
   linkType: hard
 
@@ -13453,7 +13482,7 @@ __metadata:
     react-native: "npm:^0.74.3"
     react-native-builder-bob: "npm:^0.23.2"
     react-native-gesture-handler: "npm:^2.17.1"
-    react-native-reanimated: "npm:3.10.1"
+    react-native-reanimated: "npm:^3.13.0"
     react-test-renderer: "npm:^18.3.1"
     semantic-release: "npm:^24.0.0"
     typescript: "npm:5.3.3"
@@ -13687,6 +13716,20 @@ __metadata:
     source-map: "npm:~0.6.1"
     tslib: "npm:^2.0.1"
   checksum: 10c0/a45168c82195f24fa2c70293a624fece0069a2e8e8adb637f9963777735f81cb3bb62e55172db677ec3573b08b2daaf1eddd85b74da6fe0bd37c9b15eeaf94b4
+  languageName: node
+  linkType: hard
+
+"recyclerlistview@npm:4.2.1":
+  version: 4.2.1
+  resolution: "recyclerlistview@npm:4.2.1"
+  dependencies:
+    lodash.debounce: "npm:4.0.8"
+    prop-types: "npm:15.8.1"
+    ts-object-utils: "npm:0.0.5"
+  peerDependencies:
+    react: ">= 15.2.1"
+    react-native: ">= 0.30.0"
+  checksum: 10c0/58c2f5fa6372b31f82a1fc976ddbf9c45fa2c1a2fcaab417e39096152c4815463357ff410603db1df7dabab3a383bdef80db04c54a667bc40c5a0ce130e68961
   languageName: node
   linkType: hard
 
@@ -15583,6 +15626,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ts-object-utils@npm:0.0.5":
+  version: 0.0.5
+  resolution: "ts-object-utils@npm:0.0.5"
+  checksum: 10c0/0279f8a7504b3905f2b14769769985f214154f1aedc60077c3baaced078369ae465aecc6acc04c614f40893e559d05697f6f4ef9fc411e3b6d1d15e6269a5e14
+  languageName: node
+  linkType: hard
+
 "ts-toolbelt@npm:9.6.0":
   version: 9.6.0
   resolution: "ts-toolbelt@npm:9.6.0"
@@ -15602,7 +15652,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.1, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2":
+"tslib@npm:2.6.3, tslib@npm:^2.0.1, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2":
   version: 2.6.3
   resolution: "tslib@npm:2.6.3"
   checksum: 10c0/2598aef53d9dbe711af75522464b2104724d6467b26a60f2bdac8297d2b5f1f6b86a71f61717384aa8fd897240467aaa7bcc36a0700a0faf751293d1331db39a
