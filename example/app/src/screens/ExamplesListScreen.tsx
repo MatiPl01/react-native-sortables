@@ -26,6 +26,10 @@ export default function ExamplesListScreen() {
         title='Auto Scroll - FlatList'
       />
       <ExampleNavCard
+        route={ExamplesScreenRoute.AutoScrollFlashListExample}
+        title='Auto Scroll - FlashList'
+      />
+      <ExampleNavCard
         route={ExamplesScreenRoute.DropIndicatorExamples}
         title='Drop Indicator'
       />
