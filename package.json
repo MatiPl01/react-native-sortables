@@ -25,7 +25,7 @@
       "syncpack format"
     ]
   },
-  "packageManager": "yarn@4.1.1",
+  "packageManager": "yarn@4.3.1",
   "private": true,
   "scripts": {
     "build": "yarn workspace react-native-sortable build",
