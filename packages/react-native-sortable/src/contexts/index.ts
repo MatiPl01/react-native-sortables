@@ -1,2 +1,3 @@
+export * from './hooks';
 export * from './layout';
-export * from './shared/providers';
+export * from './shared';

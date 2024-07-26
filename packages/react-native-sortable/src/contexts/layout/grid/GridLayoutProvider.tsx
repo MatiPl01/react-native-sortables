@@ -8,7 +8,7 @@ import {
 
 import { OFFSET_EPS } from '../../../constants';
 import { areArraysDifferent } from '../../../utils';
-import { useMeasurementsContext, usePositionsContext } from '../../shared/providers';
+import { useMeasurementsContext, usePositionsContext } from '../../shared';
 import { createEnhancedContext } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
 

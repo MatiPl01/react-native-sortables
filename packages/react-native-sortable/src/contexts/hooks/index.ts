@@ -1,81 +1,78 @@
-import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
-
-import type { Dimensions, Position } from '../../types';
+/* eslint-disable import/no-unused-modules */
+import { useMemo } from 'react';
+import type { EasingFunction, SharedValue } from 'react-native-reanimated';
 import {
-  useAutoScrollContext,
+  Easing,
+  useAnimatedReaction,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated';
+
+import type {
+  AnimatedOptionalPosition,
+  Dimensions,
+  Position
+} from '../../types';
+import {
   useDragContext,
   useMeasurementsContext,
   usePositionsContext
 } from '../shared';
 
-// type UseItemPositionOptions = {
-//   ignoreActive?: boolean;
-//   easing?: EasingFunction;
-//   duration?: number;
-// };
+type UseItemPositionOptions = {
+  ignoreActive?: boolean;
+  easing?: EasingFunction;
+  duration?: number;
+};
 
-// export function useItemPosition(
-//   key: string,
-//   {
-//     duration = 300,
-//     easing = Easing.inOut(Easing.ease),
-//     ignoreActive = false
-//   }: UseItemPositionOptions = {}
-// ): {
-//   x: SharedValue<null | number>;
-//   y: SharedValue<null | number>;
-// } {
-//   const { itemPositions } = usePositionsContext();
-//   const { activeItemKey, activeItemPosition } = useDragContext();
-//   const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
+export function useItemPosition(
+  key: string,
+  isActive: SharedValue<boolean>,
+  {
+    duration = 300,
+    easing = Easing.inOut(Easing.ease),
+    ignoreActive = false
+  }: UseItemPositionOptions = {}
+): AnimatedOptionalPosition {
+  const { currentItemPositions, targetItemPositions } = usePositionsContext();
 
-//   const { x: posX, y: posY } = itemPositions.get(key, true);
-//   const x = useSharedValue<null | number>(null);
-//   const y = useSharedValue<null | number>(null);
+  const currentPosition = currentItemPositions.get(key, true);
+  const targetPosition = targetItemPositions.get(key, true);
 
-//   const animationConfig = useMemo(
-//     () => ({
-//       duration,
-//       easing
-//     }),
-//     [duration, easing]
-//   );
+  const animationConfig = useMemo(
+    () => ({
+      duration,
+      easing
+    }),
+    [duration, easing]
+  );
 
-//   useAnimatedReaction(
-//     () => ({
-//       isActive: activeItemKey.value === key,
-//       position: { x: posX.value, y: posY.value }
-//     }),
-//     ({ isActive, position }) => {
-//       if (!ignoreActive && isActive) {
-//         return;
-//       }
-//       x.value =
-//         x.value === null ? position.x : withTiming(position.x, animationConfig);
-//       y.value =
-//         y.value === null ? position.y : withTiming(position.y, animationConfig);
-//     },
-//     [ignoreActive, animationConfig]
-//   );
+  // Animate to the target position oly when the item is not active
+  // The drag provider will animate the position of the currently active item
+  useAnimatedReaction(
+    () => ({
+      active: isActive.value,
+      targetX: targetPosition.x.value,
+      targetY: targetPosition.y.value
+    }),
+    ({ active, targetX, targetY }) => {
+      if (targetX === null || targetY === null || (!ignoreActive && active)) {
+        return;
+      }
+      currentPosition.x.value =
+        currentPosition.x.value === null
+          ? targetX
+          : withTiming(targetX, animationConfig);
+      currentPosition.y.value =
+        currentPosition.y.value === null
+          ? targetY
+          : withTiming(targetY, animationConfig);
+    },
+    [ignoreActive, animationConfig]
+  );
 
-//   useAnimatedReaction(
-//     () => ({
-//       position: activeItemPosition.value,
-//       translateY:
-//         (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0)
-//     }),
-//     ({ position, translateY }) => {
-//       if (!ignoreActive && activeItemKey.value === key) {
-//         x.value = position.x;
-//         y.value = position.y + translateY;
-//       }
-//     },
-//     [scrollOffset, dragStartScrollOffset, ignoreActive]
-//   );
-
-//   return { x, y };
-// }
+  return currentPosition;
+}
 
 export function useItemDimensions(key: string): {
   width: SharedValue<number>;
@@ -118,16 +115,13 @@ export function useActiveItemReaction(
   const { keyToIndex } = usePositionsContext();
   const { itemDimensions } = useMeasurementsContext();
   const { activeItemKey, activeItemPosition } = useDragContext();
-  const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
-      activePosition: activeItemPosition.value,
-      scrollOffsetDiff:
-        (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0)
+      activePosition: activeItemPosition.value
     }),
-    ({ activeKey, activePosition, scrollOffsetDiff }) => {
+    ({ activeKey, activePosition }) => {
       if (activeKey === null) {
         return;
       }
@@ -136,8 +130,7 @@ export function useActiveItemReaction(
         return;
       }
 
-      const centerY =
-        activePosition.y + dimensions.height / 2 + scrollOffsetDiff;
+      const centerY = activePosition.y + dimensions.height / 2;
       const centerX = activePosition.x + dimensions.width / 2;
       const activeIndex = keyToIndex.current[activeKey]?.value;
 

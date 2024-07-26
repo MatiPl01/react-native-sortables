@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 
-import { DropIndicator } from '../../components';
 import type {
   ActiveItemDecorationSettings,
   AutoScrollSettings,
@@ -9,7 +8,6 @@ import type {
   PartialBy
 } from '../../types';
 import { ContextProviderComposer } from '../utils';
-import { PositionsUpdater } from './helpers';
 import {
   AutoScrollProvider,
   DragProvider,
@@ -38,28 +36,33 @@ export default function SharedProvider({
   showDropIndicator,
   ...activeItemDecorationSettings
 }: SharedProviderProps) {
+  // The order of the providers is important (they are dependent on each other)
   const providers = [
-    <PositionsProvider itemKeys={itemKeys} />,
+    // Provides information about currently dragged item
     <DragProvider {...activeItemDecorationSettings} enabled={dragEnabled} />,
-    <MeasurementsProvider itemKeys={itemKeys} />
-  ];
-
-  if (scrollableRef) {
-    providers.push(
+    // Provides measurements of items
+    <MeasurementsProvider itemKeys={itemKeys} />,
+    // Automatically scrolls the scrollable container (if the reference to
+    // the scrollable container is provided)
+    scrollableRef && (
       <AutoScrollProvider
         autoScrollActivationOffset={autoScrollActivationOffset}
         autoScrollEnabled={autoScrollEnabled}
         autoScrollSpeed={autoScrollSpeed}
         scrollableRef={scrollableRef}
       />
-    );
-  }
+    ),
+    // Provides the current and target positions of items, updates the position
+    // of the active item
+    <PositionsProvider itemKeys={itemKeys} />
+  ];
+
   return (
     <ContextProviderComposer providers={providers}>
-      <PositionsUpdater />
-      {showDropIndicator && (
+      {/* TODO - show drop indicator */}
+      {/* {showDropIndicator && (
         <DropIndicator DropIndicatorComponent={DropIndicatorComponent} />
-      )}
+      )} */}
       {children}
     </ContextProviderComposer>
   );

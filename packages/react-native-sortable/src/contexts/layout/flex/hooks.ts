@@ -1,15 +1,12 @@
 import type { Coordinate, Dimension, ReorderStrategy } from '../../../types';
 import { reorderItems } from '../../../utils';
-import {
-  useActiveItemReaction,
-  useMeasurementsContext,
-  usePositionsContext
-} from '../../shared/providers';
+import { useActiveItemReaction } from '../../hooks';
+import { useMeasurementsContext, usePositionsContext } from '../../shared';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
 
 export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
   const { itemDimensions } = useMeasurementsContext();
-  const { indexToKey, itemPositions, keyToIndex } = usePositionsContext();
+  const { indexToKey, keyToIndex, targetItemPositions } = usePositionsContext();
   const { crossAxisGroupOffsets, flexDirection, itemGroups, keyToGroup } =
     useFlexLayoutContext();
 
@@ -70,24 +67,26 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
         if (!otherDimensions) {
           continue;
         }
-        const otherPosition = itemPositions.value[key];
+        const otherPosition = targetItemPositions.current[key];
         if (!otherPosition) {
+          continue;
+        }
+        const otherMainPosition = otherPosition[mainCoordinate].value;
+        if (otherMainPosition === null) {
           continue;
         }
 
         // Item before the active item in the group
-        if (otherPosition[mainCoordinate] < position[mainCoordinate]) {
-          const otherEnd =
-            otherPosition[mainCoordinate] + otherDimensions[mainDimension];
+        if (otherMainPosition < position[mainCoordinate]) {
+          const otherEnd = otherMainPosition + otherDimensions[mainDimension];
           if (otherEnd > centerPosition[mainCoordinate]) {
             overlappingItemKey = key;
             break;
           }
         }
-
         // Item after the active item in the group
-        if (otherPosition[mainCoordinate] > position[mainCoordinate]) {
-          const otherStart = otherPosition[mainCoordinate];
+        if (otherMainPosition > position[mainCoordinate]) {
+          const otherStart = otherMainPosition;
           if (otherStart < centerPosition[mainCoordinate]) {
             overlappingItemKey = key;
             break;
@@ -98,7 +97,7 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
       if (overlappingItemKey === undefined) {
         return;
       }
-      const overlappingIndex = keyToIndex.value[overlappingItemKey];
+      const overlappingIndex = keyToIndex.current[overlappingItemKey]?.value;
       if (overlappingIndex === undefined) {
         return;
       }

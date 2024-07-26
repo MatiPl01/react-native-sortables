@@ -22,6 +22,7 @@ import {
 import {
   useAutoScrollContext,
   useDragContext,
+  useItemPosition,
   useItemZIndex,
   useMeasurementsContext,
   usePositionsContext
@@ -41,13 +42,11 @@ export default function DraggableView({
 }: DraggableViewProps) {
   const { measureItem, overrideItemDimensions, removeItem } =
     useMeasurementsContext();
-  const { currentItemPositions } = usePositionsContext();
   const {
     activationProgress,
     activeItemDropped,
     activeItemKey,
     activeItemOpacity,
-    activeItemPosition,
     activeItemScale,
     activeItemShadowOpacity,
     dragStartPosition,
@@ -56,13 +55,14 @@ export default function DraggableView({
     inactiveItemScale,
     touchedItemKey
   } = useDragContext();
+  const { setActiveItemPosition } = usePositionsContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
 
-  const position = currentItemPositions.get(key, true);
   const overriddenDimensions = overrideItemDimensions.get(key, true);
 
   const isActive = useDerivedValue(() => activeItemKey.value === key);
   const pressProgress = useSharedValue(0);
+  const position = useItemPosition(key, isActive);
   const zIndex = useItemZIndex(key, pressProgress);
 
   useEffect(() => {
@@ -120,12 +120,11 @@ export default function DraggableView({
           if (!isActive.value) {
             return;
           }
-          activeItemPosition.value = {
-            x:
-              dragStartPosition.value.x +
+          setActiveItemPosition(
+            dragStartPosition.value.x +
               (reverseXAxis ? -1 : 1) * e.translationX,
-            y: dragStartPosition.value.y + e.translationY
-          };
+            dragStartPosition.value.y + e.translationY
+          );
         })
         .onFinalize(handleDragEnd)
         .enabled(enabled),
@@ -142,7 +141,7 @@ export default function DraggableView({
       activeItemDropped,
       dragStartPosition,
       pressProgress,
-      activeItemPosition,
+      setActiveItemPosition,
       updateStartScrollOffset
     ]
   );

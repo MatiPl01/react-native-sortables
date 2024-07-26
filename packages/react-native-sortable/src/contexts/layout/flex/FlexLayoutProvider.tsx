@@ -3,9 +3,8 @@ import { type LayoutChangeEvent, StyleSheet, View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
-import { EMPTY_OBJECT } from '../../../constants';
-import type { Dimensions } from '../../../types';
-import { useMeasurementsContext, usePositionsContext } from '../../shared/providers';
+import { areArraysDifferent } from '../../../utils';
+import { useMeasurementsContext, usePositionsContext } from '../../shared';
 import { createEnhancedContext } from '../../utils';
 import type { FlexDirection, FlexProps } from './types';
 import {
@@ -50,7 +49,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
     itemDimensions,
     overrideItemDimensions
   } = useMeasurementsContext();
-  const { indexToKey, itemPositions } = usePositionsContext();
+  const { indexToKey, targetItemPositions } = usePositionsContext();
 
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
   const keyToGroup = useSharedValue<Record<string, number>>({});
@@ -120,11 +119,10 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
         !groups.length ||
         !sizes.length
       ) {
-        itemPositions.value = EMPTY_OBJECT;
         return;
       }
 
-      const result = calculateLayout(
+      const layout = calculateLayout(
         groups,
         groupBy,
         sizes,
@@ -140,9 +138,26 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
         }
       );
 
-      if (result) {
-        itemPositions.value = result.itemPositions;
-        crossAxisGroupOffsets.value = result.crossAxisGroupOffsets;
+      if (!layout) {
+        return;
+      }
+
+      if (
+        areArraysDifferent(
+          layout.crossAxisGroupOffsets,
+          crossAxisGroupOffsets.value
+        )
+      ) {
+        crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
+      }
+      // Update item positions one by one to avoid unnecessary reaction calls
+      for (const key in layout.itemPositions) {
+        const targetPosition = targetItemPositions.current[key];
+        const layoutPosition = layout.itemPositions[key];
+        if (targetPosition && layoutPosition) {
+          targetPosition.x.value = layoutPosition.x;
+          targetPosition.y.value = layoutPosition.y;
+        }
       }
     },
     [
@@ -168,7 +183,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
       }
 
       const overriddenDimension = groupBy === 'height' ? 'width' : 'height';
-      const overrideDimensions: Record<string, Partial<Dimensions>> = {};
 
       for (let i = 0; i < groups.length; i++) {
         const group = groups[i];
@@ -179,22 +193,16 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
         }
 
         for (const key of group) {
-          const currentDimensions = overrideItemDimensions.value[key];
+          const currentDimensions = overrideItemDimensions.current[key];
 
           if (
             currentDimensions &&
-            currentDimensions[overriddenDimension] === groupSize
+            currentDimensions.value[overriddenDimension] !== groupSize
           ) {
-            overrideDimensions[key] = currentDimensions;
-          } else {
-            overrideDimensions[key] = {
-              [overriddenDimension]: groupSize
-            };
+            currentDimensions.value[overriddenDimension] = groupSize;
           }
         }
       }
-
-      overrideItemDimensions.value = overrideDimensions;
     },
     [stretch]
   );
