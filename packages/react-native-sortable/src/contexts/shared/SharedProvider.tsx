@@ -9,10 +9,13 @@ import type {
   PartialBy
 } from '../../types';
 import { ContextProviderComposer } from '../utils';
-import { AutoScrollProvider } from './AutoScrollProvider';
-import { DragProvider } from './DragProvider';
-import { MeasurementsProvider } from './MeasurementsProvider';
-import { PositionsProvider } from './PositionsProvider';
+import { PositionsUpdater } from './helpers';
+import {
+  AutoScrollProvider,
+  DragProvider,
+  MeasurementsProvider,
+  PositionsProvider
+} from './providers';
 
 type SharedProviderProps = PropsWithChildren<
   {
@@ -38,7 +41,7 @@ export default function SharedProvider({
   const providers = [
     <PositionsProvider itemKeys={itemKeys} />,
     <DragProvider {...activeItemDecorationSettings} enabled={dragEnabled} />,
-    <MeasurementsProvider itemsCount={itemKeys.length} />
+    <MeasurementsProvider itemKeys={itemKeys} />
   ];
 
   if (scrollableRef) {
@@ -53,6 +56,7 @@ export default function SharedProvider({
   }
   return (
     <ContextProviderComposer providers={providers}>
+      <PositionsUpdater />
       {showDropIndicator && (
         <DropIndicator DropIndicatorComponent={DropIndicatorComponent} />
       )}

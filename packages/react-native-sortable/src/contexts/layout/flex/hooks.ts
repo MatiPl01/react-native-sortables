@@ -4,7 +4,7 @@ import {
   useActiveItemReaction,
   useMeasurementsContext,
   usePositionsContext
-} from '../../shared';
+} from '../../shared/providers';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
 
 export function useFlexOrderUpdater(strategy: ReorderStrategy): void {

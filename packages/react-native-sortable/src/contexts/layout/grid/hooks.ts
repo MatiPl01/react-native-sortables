@@ -4,7 +4,7 @@ import {
   useActiveItemReaction,
   useMeasurementsContext,
   usePositionsContext
-} from '../../shared';
+} from '../../shared/providers';
 import { useGridLayoutContext } from './GridLayoutProvider';
 import { getColumnIndex, getRowIndex } from './utils';
 

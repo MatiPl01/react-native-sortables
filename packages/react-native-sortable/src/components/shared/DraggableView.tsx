@@ -22,10 +22,10 @@ import {
 import {
   useAutoScrollContext,
   useDragContext,
-  useItemPosition,
-  useMeasurementsContext
+  useItemZIndex,
+  useMeasurementsContext,
+  usePositionsContext
 } from '../../contexts';
-import { getItemZIndex } from '../../utils';
 
 type DraggableViewProps = {
   itemKey: string;
@@ -41,6 +41,7 @@ export default function DraggableView({
 }: DraggableViewProps) {
   const { measureItem, overrideItemDimensions, removeItem } =
     useMeasurementsContext();
+  const { currentItemPositions } = usePositionsContext();
   const {
     activationProgress,
     activeItemDropped,
@@ -49,21 +50,20 @@ export default function DraggableView({
     activeItemPosition,
     activeItemScale,
     activeItemShadowOpacity,
+    dragStartPosition,
     enabled,
     inactiveItemOpacity,
     inactiveItemScale,
     touchedItemKey
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
-  const itemPosition = useItemPosition(key);
 
-  const overriddenDimensions = useDerivedValue(
-    () => overrideItemDimensions.value[key]
-  );
+  const position = currentItemPositions.get(key, true);
+  const overriddenDimensions = overrideItemDimensions.get(key, true);
 
   const isActive = useDerivedValue(() => activeItemKey.value === key);
   const pressProgress = useSharedValue(0);
-  const dragStartPosition = useSharedValue({ x: 0, y: 0 });
+  const zIndex = useItemZIndex(key, pressProgress);
 
   useEffect(() => {
     return () => removeItem(key);
@@ -109,9 +109,9 @@ export default function DraggableView({
             return;
           }
           updateStartScrollOffset?.();
-          dragStartPosition.value = activeItemPosition.value = {
-            x: itemPosition.x.value ?? 0,
-            y: itemPosition.y.value ?? 0
+          dragStartPosition.value = {
+            x: position.x.value ?? 0,
+            y: position.y.value ?? 0
           };
           activeItemKey.value = key;
           activeItemDropped.value = false;
@@ -132,41 +132,37 @@ export default function DraggableView({
     [
       key,
       enabled,
+      position,
       reverseXAxis,
       handleDragEnd,
       isActive,
-      itemPosition,
       activationProgress,
       activeItemKey,
       touchedItemKey,
-      activeItemPosition,
       activeItemDropped,
       dragStartPosition,
       pressProgress,
+      activeItemPosition,
       updateStartScrollOffset
     ]
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (itemPosition.x.value === null || itemPosition.y.value === null) {
+    if (position.x.value === null || position.y.value === null) {
       return {
         position: 'relative'
       };
     }
 
-    const x = itemPosition.x.value;
-    const y = itemPosition.y.value;
+    // TODO - change to transform instead of top/left
+    const x = position.x.value;
+    const y = position.y.value;
 
     return {
-      left: itemPosition.x.value,
+      left: x,
       position: 'absolute',
-      top: itemPosition.y.value,
-      zIndex: getItemZIndex(
-        isActive.value,
-        pressProgress.value,
-        { x, y },
-        activeItemPosition.value
-      ),
+      top: y,
+      zIndex: zIndex.value,
       ...overriddenDimensions.value
     };
   });

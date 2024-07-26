@@ -6,16 +6,20 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue
 } from 'react-native-reanimated';
+import type { ComplexSharedValues } from 'reanimated-utils';
+import { useComplexSharedValues } from 'reanimated-utils';
 
-import { useUICallback } from '../../hooks';
-import type { Dimensions } from '../../types';
-import { createEnhancedContext } from '../utils';
+import { useUICallback } from '../../../hooks';
+import type { Dimensions } from '../../../types';
+import { createEnhancedContext } from '../../utils';
 import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
-  overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
+  overrideItemDimensions: ComplexSharedValues<
+    Record<string, SharedValue<Partial<Dimensions>>>
+  >;
   containerHeight: SharedValue<number>;
   containerWidth: SharedValue<number>;
   measureItem: (key: string, dimensions: Dimensions) => void;
@@ -23,14 +27,14 @@ type MeasurementsContextType = {
 };
 
 type MeasurementsProviderProps = PropsWithChildren<{
-  itemsCount: number;
+  itemKeys: Array<string>;
 }>;
 
 const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   'Measurements'
 )<MeasurementsContextType, MeasurementsProviderProps>(({
   children,
-  itemsCount
+  itemKeys
 }) => {
   const { activationProgress } = useDragContext();
 
@@ -38,9 +42,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
 
   const initialMeasurementsCompleted = useSharedValue(false);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
-  const overrideItemDimensions = useSharedValue<
-    Record<string, Partial<Dimensions>>
-  >({});
+  const overrideItemDimensions = useComplexSharedValues(
+    s => s.record(s.mutable({ height: 0, width: 0 })),
+    itemKeys
+  );
 
   const containerWidth = useSharedValue(-1);
   const containerHeight = useSharedValue(-1);
@@ -51,7 +56,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     measuredItemsCount.value += 1;
     // Update the array of item dimensions only after all items have been measured
     // to reduce the number of times animated reactions are triggered
-    if (measuredItemsCount.value === itemsCount) {
+    if (measuredItemsCount.value === itemKeys.length) {
       initialMeasurementsCompleted.value = true;
       itemDimensions.value = { ...itemDimensions.value };
     }

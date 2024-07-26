@@ -13,10 +13,10 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '../../constants';
-import { useAnimatableValue } from '../../hooks';
-import type { AutoScrollSettings } from '../../types';
-import { createEnhancedContext } from '../utils';
+import { OFFSET_EPS } from '../../../constants';
+import { useAnimatableValue } from '../../../hooks';
+import type { AutoScrollSettings } from '../../../types';
+import { createEnhancedContext } from '../../utils';
 import { useDragContext } from './DragProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
 

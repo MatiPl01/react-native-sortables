@@ -7,9 +7,8 @@ import {
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
-import type { Position } from '../../../types';
-import { areArraysDifferent, arePositionsDifferent } from '../../../utils';
-import { useMeasurementsContext, usePositionsContext } from '../../shared';
+import { areArraysDifferent } from '../../../utils';
+import { useMeasurementsContext, usePositionsContext } from '../../shared/providers';
 import { createEnhancedContext } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
 
@@ -27,7 +26,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
 )<GridLayoutContextType, GridLayoutProviderProps>(({ columnsCount }) => {
   const { containerHeight, containerWidth, itemDimensions } =
     useMeasurementsContext();
-  const { indexToKey, itemPositions } = usePositionsContext();
+  const { indexToKey, targetItemPositions } = usePositionsContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
   const columnWidth = useDerivedValue(() =>
@@ -82,7 +81,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
       if (colWidth === -1 || offsets.length === 0) {
         return;
       }
-      const positions: Record<string, Position> = {};
 
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
         const rowIndex = getRowIndex(parseInt(itemIndex), columnsCount);
@@ -93,22 +91,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
           return;
         }
 
-        const currentPosition = itemPositions.value[key];
-        const calculatedPosition = {
-          x: colIndex * colWidth,
-          y
-        };
-
-        // Re-use existing position object if its properties are the same
-        // (this prevents unnecessary reaction triggers in item components)
-        positions[key] =
-          !currentPosition ||
-          arePositionsDifferent(currentPosition, calculatedPosition)
-            ? calculatedPosition
-            : currentPosition;
+        const targetPosition = targetItemPositions.current[key];
+        if (targetPosition) {
+          targetPosition.x.value = colIndex * colWidth;
+          targetPosition.y.value = y;
+        }
       }
-
-      itemPositions.value = positions;
     },
     [columnsCount]
   );

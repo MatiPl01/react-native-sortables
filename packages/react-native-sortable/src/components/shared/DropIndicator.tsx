@@ -32,7 +32,7 @@ type DropIndicatorProps = {
 function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
   const { activationProgress, activeItemDropped, touchedItemKey } =
     useDragContext();
-  const { itemPositions, keyToIndex } = usePositionsContext();
+  const { keyToIndex, targetItemPositions } = usePositionsContext();
 
   const { x, y } = useItemPosition(touchedItemKey, {
     easing: Easing.out(Easing.ease),
@@ -44,15 +44,22 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
   const dropPosition = useSharedValue<Position>({ x: 0, y: 0 });
 
   useAnimatedReaction(
-    () => ({
-      kToI: keyToIndex.value,
-      key: touchedItemKey.value,
-      positions: itemPositions.value
-    }),
-    ({ kToI, key, positions }) => {
-      if (key !== null) {
-        dropIndex.value = kToI[key] ?? 0;
-        dropPosition.value = positions[key] ?? { x: 0, y: 0 };
+    () => {
+      const key = touchedItemKey.value;
+      return (
+        key && {
+          index: keyToIndex.current[key]?.value ?? 0,
+          position: {
+            x: targetItemPositions.current[key]?.x.value ?? 0,
+            y: targetItemPositions.current[key]?.y.value ?? 0
+          }
+        }
+      );
+    },
+    params => {
+      if (params) {
+        dropIndex.value = params.index;
+        dropPosition.value = params.position;
       }
     }
   );

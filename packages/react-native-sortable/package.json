@@ -1,6 +1,9 @@
 {
   "name": "react-native-sortable",
   "version": "1.0.0",
+  "dependencies": {
+    "reanimated-utils": "^1.1.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
@@ -58,7 +61,7 @@
     "build": "yarn clean && bob build",
     "clean": "../../scripts/clean.sh",
     "postpack": "rm ./README.md",
-    "prepack": "bob build && cp ../../README.md ./README.md",
+    "prepack": "bob build && rm -rf *.tgz && cp ../../README.md ./README.md",
     "test": "jest",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

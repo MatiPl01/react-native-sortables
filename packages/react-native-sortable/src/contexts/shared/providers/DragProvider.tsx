@@ -2,13 +2,13 @@ import { type PropsWithChildren } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
 
-import { useAnimatableValue } from '../../hooks';
+import { useAnimatableValue } from '../../../hooks';
 import type {
   ActiveItemDecorationSettings,
   AnimatedValues,
   Position
-} from '../../types';
-import { createEnhancedContext } from '../utils';
+} from '../../../types';
+import { createEnhancedContext } from '../../utils';
 
 type DragContextType = {
   enabled: boolean;
@@ -17,6 +17,7 @@ type DragContextType = {
   activationProgress: SharedValue<number>;
   activeItemPosition: SharedValue<Position>;
   activeItemDropped: SharedValue<boolean>;
+  dragStartPosition: SharedValue<Position>;
 } & AnimatedValues<ActiveItemDecorationSettings>;
 
 type DragProviderProps = PropsWithChildren<
@@ -48,6 +49,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const touchedItemKey = useSharedValue<null | string>(null);
   const activationProgress = useSharedValue(0);
   const activeItemPosition = useSharedValue<Position>({ x: 0, y: 0 });
+  const dragStartPosition = useSharedValue({ x: 0, y: 0 });
   const activeItemDropped = useSharedValue(true);
 
   return {
@@ -59,6 +61,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       activeItemPosition,
       activeItemScale,
       activeItemShadowOpacity,
+      dragStartPosition,
       enabled,
       inactiveItemOpacity,
       inactiveItemScale,
