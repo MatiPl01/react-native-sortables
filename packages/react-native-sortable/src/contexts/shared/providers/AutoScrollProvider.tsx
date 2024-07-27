@@ -107,10 +107,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
       return {
         currentOffset: scrollOffset.value,
         itemHeight: activeItemHeight.value,
-        itemOffset:
-          activeItemPosition.value.y +
-          scrollOffset.value -
-          dragStartScrollOffset.value,
+        itemOffset: activeItemPosition.value.y,
         threshold: offsetThreshold.value
       };
     },

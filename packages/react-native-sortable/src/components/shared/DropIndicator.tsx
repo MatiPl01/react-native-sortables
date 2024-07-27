@@ -37,7 +37,7 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
   const position = useItemPosition(touchedItemKey, false, {
     easing: Easing.out(Easing.ease),
     ignoreActive: true
-  });
+  }); 
   const { height, width } = useItemDimensions(touchedItemKey);
 
   const dropIndex = useSharedValue(0);

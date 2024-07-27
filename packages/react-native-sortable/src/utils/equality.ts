@@ -1,3 +1,5 @@
+import type { SharedValue } from 'react-native-reanimated';
+
 import type { Position } from '../types';
 
 export const areArraysDifferent = <T>(
@@ -18,4 +20,15 @@ export const arePositionsDifferent = (
 ): boolean => {
   'worklet';
   return pos1.x !== pos2.x || pos1.y !== pos2.y;
+};
+
+export const updateIfDifferent = <T>(
+  value: SharedValue<T>,
+  newValue: T,
+  areDifferent: (a: T, b: T) => boolean
+): void => {
+  'worklet';
+  if (areDifferent(value.value, newValue)) {
+    value.value = newValue;
+  }
 };

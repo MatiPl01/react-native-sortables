@@ -6,7 +6,11 @@ import type { ComplexSharedValues } from 'reanimated-utils';
 import { useComplexSharedValues } from 'reanimated-utils';
 
 import type { AnimatedOptionalPosition, Position } from '../../../types';
-import { areArraysDifferent } from '../../../utils';
+import {
+  areArraysDifferent,
+  arePositionsDifferent,
+  updateIfDifferent
+} from '../../../utils';
 import { createEnhancedContext } from '../../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useDragContext } from './DragProvider';
@@ -88,7 +92,11 @@ const { PositionsProvider, usePositionsContext } = createEnhancedContext(
       };
 
       // Update activeItemPosition in the drag context
-      activeItemPosition.value = currentPosition;
+      updateIfDifferent(
+        activeItemPosition,
+        currentPosition,
+        arePositionsDifferent
+      );
       // Update the current position of the active item
       // (for efficiency, update it directly instead of reacting to activeItemPosition
       // changes and checking whether the item is active)

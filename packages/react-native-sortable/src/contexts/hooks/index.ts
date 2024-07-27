@@ -29,23 +29,19 @@ type UseItemPositionOptions = {
 };
 
 export function useItemPosition(
-  animatableKey: Animatable<null | string>,
-  isActive: Animatable<boolean>,
+  key: string,
+  isActive: SharedValue<boolean>,
   {
     duration = 300,
-    easing = Easing.inOut(Easing.ease)
+    easing = Easing.inOut(Easing.ease),
+    ignoreActive = false
   }: UseItemPositionOptions = {}
-): { current: AnimatedOptionalPosition | null } {
+): AnimatedOptionalPosition {
   const { currentItemPositions, targetItemPositions } = usePositionsContext();
 
-  const currentPosition = useAnimatedSelect(k => {
-    'worklet';
-    return k !== null ? currentItemPositions.get(k) ?? null : null;
-  }, animatableKey);
-  const targetPosition = useAnimatedSelect(k => {
-    'worklet';
-    return k !== null ? targetItemPositions.get(k) ?? null : null;
-  }, animatableKey);
+  const currentPosition = currentItemPositions.get(key, true);
+  const targetPosition = targetItemPositions.get(key, true);
+
   const animationConfig = useMemo(
     () => ({
       duration,
@@ -58,29 +54,24 @@ export function useItemPosition(
   // The drag provider will animate the position of the currently active item
   useAnimatedReaction(
     () => ({
-      active: isSharedValue(isActive) ? isActive.value : isActive,
-      targetX: targetPosition.current?.x.value ?? null,
-      targetY: targetPosition.current?.y.value ?? null
+      active: isActive.value,
+      targetX: targetPosition.x.value,
+      targetY: targetPosition.y.value
     }),
     ({ active, targetX, targetY }) => {
-      if (
-        targetX === null ||
-        targetY === null ||
-        !currentPosition.current ||
-        active !== null
-      ) {
+      if (targetX === null || targetY === null || (!ignoreActive && active)) {
         return;
       }
-      currentPosition.current.x.value =
-        currentPosition.current.x.value === null
+      currentPosition.x.value =
+        currentPosition.x.value === null
           ? targetX
           : withTiming(targetX, animationConfig);
-      currentPosition.current.y.value =
-        currentPosition.current.y.value === null
+      currentPosition.y.value =
+        currentPosition.y.value === null
           ? targetY
           : withTiming(targetY, animationConfig);
     },
-    [animationConfig, isActive]
+    [ignoreActive, animationConfig]
   );
 
   return currentPosition;
