@@ -3,7 +3,11 @@ import type { SharedValue } from 'react-native-reanimated';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { TIME_TO_ACTIVATE_PAN } from '../../constants';
-import { useAnimatableValue, useJSStableCallback } from '../../hooks';
+import {
+  useAnimatableValue,
+  useHaptics,
+  useJSStableCallback
+} from '../../hooks';
 import type {
   ActiveItemDecorationSettings,
   AnimatedValues,
@@ -14,7 +18,7 @@ import { createEnhancedContext } from '../utils';
 import { usePositionsContext } from './PositionsProvider';
 
 type DragContextType = {
-  enabled: boolean;
+  disabled: boolean;
   activeItemKey: SharedValue<null | string>;
   touchedItemKey: SharedValue<null | string>;
   activationProgress: SharedValue<number>;
@@ -32,7 +36,8 @@ type DragContextType = {
 
 type DragProviderProps = PropsWithChildren<
   {
-    enabled: boolean;
+    dragDisabled: boolean;
+    hapticsDisabled: boolean;
   } & ActiveItemDecorationSettings &
     SortableCallbacks
 >;
@@ -44,7 +49,8 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   activeItemOpacity: activeItemOpacityProp,
   activeItemScale: activeItemScaleProp,
   activeItemShadowOpacity: activeItemShadowOpacityProp,
-  enabled,
+  dragDisabled,
+  hapticsDisabled,
   inactiveItemOpacity: inactiveItemOpacityProp,
   inactiveItemScale: inactiveItemScaleProp,
   onDragEnd,
@@ -74,6 +80,8 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const stableOnDragEnd = useJSStableCallback(onDragEnd);
   const stableOnOrderChange = useJSStableCallback(onOrderChange);
 
+  const haptics = useHaptics(!hapticsDisabled);
+
   const handleDragStart = useCallback(
     (key: string) => {
       'worklet';
@@ -81,6 +89,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       activeItemDropped.value = false;
       dragStartIndex.value = keyToIndex.value[key]!;
 
+      haptics.medium();
       stableOnDragStart({
         fromIndex: dragStartIndex.value,
         key
@@ -91,7 +100,8 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       activeItemDropped,
       activeItemKey,
       dragStartIndex,
-      keyToIndex
+      keyToIndex,
+      haptics
     ]
   );
 
@@ -99,7 +109,6 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
     (key: string) => {
       'worklet';
       touchedItemKey.value = null;
-      activeItemKey.value = null;
       activationProgress.value = withTiming(
         0,
         { duration: TIME_TO_ACTIVATE_PAN },
@@ -108,11 +117,16 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
         }
       );
 
-      stableOnDragEnd({
-        fromIndex: dragStartIndex.value,
-        key,
-        toIndex: keyToIndex.value[key]!
-      });
+      haptics.medium();
+      if (activeItemKey.value !== null) {
+        activeItemKey.value = null;
+
+        stableOnDragEnd({
+          fromIndex: dragStartIndex.value,
+          key,
+          toIndex: keyToIndex.value[key]!
+        });
+      }
     },
     [
       activeItemDropped,
@@ -121,7 +135,8 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       activationProgress,
       dragStartIndex,
       keyToIndex,
-      stableOnDragEnd
+      stableOnDragEnd,
+      haptics
     ]
   );
 
@@ -135,6 +150,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       'worklet';
       indexToKey.value = newOrder;
 
+      haptics.light();
       stableOnOrderChange({
         fromIndex,
         key,
@@ -142,7 +158,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
         toIndex
       });
     },
-    [indexToKey, stableOnOrderChange]
+    [indexToKey, stableOnOrderChange, haptics]
   );
 
   return {
@@ -154,7 +170,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       activeItemPosition,
       activeItemScale,
       activeItemShadowOpacity,
-      enabled,
+      disabled: dragDisabled,
       handleDragEnd,
       handleDragStart,
       handleOrderChange,
