@@ -19,6 +19,18 @@ export function useGridOrderUpdater(
       const itemsCount = indexToKey.value.length;
       const rowIndex = getRowIndex(activeIndex, numColumns);
       const columnIndex = getColumnIndex(activeIndex, numColumns);
+      console.log(
+        'activeIndex',
+        activeIndex,
+        'rowIndex',
+        rowIndex,
+        'columnIndex',
+        columnIndex,
+        'x',
+        x,
+        'y',
+        y
+      );
 
       // Get active item bounding box
       const yOffsetAbove = rowOffsets.value[rowIndex];
@@ -28,6 +40,16 @@ export function useGridOrderUpdater(
       const yOffsetBelow = rowOffsets.value[rowIndex + 1];
       const xOffsetLeft = columnIndex * dimensions.width;
       const xOffsetRight = (columnIndex + 1) * dimensions.width;
+      console.log(
+        'xOffsetLeft',
+        xOffsetLeft,
+        'xOffsetRight',
+        xOffsetRight,
+        'yOffsetAbove',
+        yOffsetAbove,
+        'yOffsetBelow',
+        yOffsetBelow
+      );
 
       // Check if the center of the active item is over the top or bottom edge of the container
       let dy = 0;
@@ -53,6 +75,8 @@ export function useGridOrderUpdater(
         dx = 1;
       }
 
+      console.log('dx', dx, 'dy', dy);
+
       const indexOffset = dy * numColumns + dx;
       // Swap the active item with the item at the new index
       const newIndex = activeIndex + indexOffset;
@@ -67,6 +91,7 @@ export function useGridOrderUpdater(
         newIndex,
         strategy
       );
+      console.log('indexToKey.value', indexToKey.value);
     },
     [strategy]
   );

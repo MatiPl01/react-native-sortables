@@ -52,7 +52,8 @@ export default function AutoScrollScrollViewExampleScreen() {
   return (
     <Animated.ScrollView
       contentContainerStyle={styles.container}
-      ref={scrollableRef}>
+      ref={scrollableRef}
+      scrollEventThrottle={16}>
       <View style={styles.section}>
         <Text style={styles.title}>Before SortableGrid</Text>
       </View>

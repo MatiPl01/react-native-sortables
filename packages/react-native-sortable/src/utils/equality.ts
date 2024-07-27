@@ -1,6 +1,6 @@
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { Position } from '../types';
+import type { Maybe, Position } from '../types';
 
 export const areArraysDifferent = <T>(
   arr1: Array<T>,
@@ -15,11 +15,11 @@ export const areArraysDifferent = <T>(
 };
 
 export const arePositionsDifferent = (
-  pos1: Position,
-  pos2: Position
+  pos1: Maybe<Position>,
+  pos2: Maybe<Position>
 ): boolean => {
   'worklet';
-  return pos1.x !== pos2.x || pos1.y !== pos2.y;
+  return pos1 !== pos2 && (pos1?.x !== pos2?.x || pos1?.y !== pos2?.y);
 };
 
 export const updateIfDifferent = <T>(

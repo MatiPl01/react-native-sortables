@@ -15,7 +15,7 @@ type DragContextType = {
   activeItemKey: SharedValue<null | string>;
   touchedItemKey: SharedValue<null | string>;
   activationProgress: SharedValue<number>;
-  activeItemPosition: SharedValue<Position>;
+  activeItemPosition: SharedValue<Position | null>;
   activeItemDropped: SharedValue<boolean>;
   dragStartPosition: SharedValue<Position>;
 } & AnimatedValues<ActiveItemDecorationSettings>;
@@ -48,7 +48,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const activeItemKey = useSharedValue<null | string>(null);
   const touchedItemKey = useSharedValue<null | string>(null);
   const activationProgress = useSharedValue(0);
-  const activeItemPosition = useSharedValue<Position>({ x: 0, y: 0 });
+  const activeItemPosition = useSharedValue<Position | null>(null);
   const dragStartPosition = useSharedValue({ x: 0, y: 0 });
   const activeItemDropped = useSharedValue(true);
 

@@ -35,13 +35,11 @@ const { PositionsProvider, usePositionsContext } = createEnhancedContext(
   'Positions'
 )<PositionsContextType, PositionsProviderProps>(({ itemKeys }) => {
   const { activeItemKey, activeItemPosition } = useDragContext();
-  const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
+  const { currentScrollOffset, dragStartScrollOffset } =
+    useAutoScrollContext() ?? {};
 
   const prevKeysRef = useRef<Array<string>>([]);
-  const activeItemPositionWithoutScroll = useSharedValue<Position>({
-    x: 0,
-    y: 0
-  });
+  const activeItemPositionWithoutScroll = useSharedValue<Position | null>(null);
 
   const indexToKey = useSharedValue(itemKeys);
   const keyToIndex = useComplexSharedValues(
@@ -78,19 +76,20 @@ const { PositionsProvider, usePositionsContext } = createEnhancedContext(
   useAnimatedReaction(
     () => ({
       key: activeItemKey.value,
-      offset: (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0),
+      offset:
+        (currentScrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0),
       positionWithoutScroll: activeItemPositionWithoutScroll.value
     }),
     ({ key, offset, positionWithoutScroll }) => {
-      if (key === null) {
+      if (key === null || positionWithoutScroll === null) {
+        activeItemPositionWithoutScroll.value = null;
+        activeItemPosition.value = null;
         return;
       }
-
       const currentPosition = {
         x: positionWithoutScroll.x,
         y: positionWithoutScroll.y + offset
       };
-
       // Update activeItemPosition in the drag context
       updateIfDifferent(
         activeItemPosition,

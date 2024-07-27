@@ -69,6 +69,7 @@ export default function AutoScrollFlatListExampleScreen() {
       ListHeaderComponentStyle={styles.foreground}
       ref={scrollableRef}
       renderItem={renderListItem}
+      scrollEventThrottle={16}
       ListFooterComponent={
         <>
           <View style={styles.section}>

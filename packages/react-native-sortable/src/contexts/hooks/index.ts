@@ -139,7 +139,7 @@ export function useActiveItemReaction(
       activePosition: activeItemPosition.value
     }),
     ({ activeKey, activePosition }) => {
-      if (activeKey === null) {
+      if (activeKey === null || activePosition === null) {
         return;
       }
       const dimensions = itemDimensions.value[activeKey];

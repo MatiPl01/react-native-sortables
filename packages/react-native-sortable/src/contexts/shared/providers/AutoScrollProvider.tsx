@@ -22,7 +22,7 @@ import { useMeasurementsContext } from './MeasurementsProvider';
 
 type AutoScrollContextType = {
   updateStartScrollOffset: () => void;
-  scrollOffset: SharedValue<number>;
+  currentScrollOffset: SharedValue<number>;
   dragStartScrollOffset: SharedValue<number>;
 };
 
@@ -42,7 +42,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   const { activeItemKey, activeItemPosition } = useDragContext();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  const scrollOffset = useScrollViewOffset(scrollableRef);
+  const currentScrollOffset = useScrollViewOffset(scrollableRef);
   const targetScrollOffset = useSharedValue(-1);
   const dragStartScrollOffset = useAnimatableValue(-1);
   const containerRef = useAnimatedRef<View>();
@@ -67,7 +67,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   // Updates the scroll position smoothly
   // (quickly at first, then slower if the remaining distance is small)
   const frameCallback = useFrameCallback(() => {
-    const currentOffset = scrollOffset.value;
+    const currentOffset = currentScrollOffset.value;
     const targetOffset = targetScrollOffset.value;
     const diff = targetOffset - currentOffset;
 
@@ -100,14 +100,19 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   // Automatically scrolls the container when the active item is near the edge
   useAnimatedReaction(
     () => {
-      if (!enabled.value || activeItemHeight.value === -1) {
+      const itemOffset = activeItemPosition.value?.y;
+      if (
+        !enabled.value ||
+        activeItemHeight.value === -1 ||
+        itemOffset === undefined
+      ) {
         return null;
       }
 
       return {
-        currentOffset: scrollOffset.value,
+        currentOffset: currentScrollOffset.value,
         itemHeight: activeItemHeight.value,
-        itemOffset: activeItemPosition.value.y,
+        itemOffset,
         threshold: offsetThreshold.value
       };
     },
@@ -152,8 +157,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
 
   const updateStartScrollOffset = useCallback(() => {
     'worklet';
-    dragStartScrollOffset.value = scrollOffset.value;
-  }, [dragStartScrollOffset, scrollOffset]);
+    dragStartScrollOffset.value = currentScrollOffset.value;
+  }, [dragStartScrollOffset, currentScrollOffset]);
 
   return {
     children: (
@@ -162,8 +167,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
       </View>
     ),
     value: {
+      currentScrollOffset,
       dragStartScrollOffset,
-      scrollOffset,
       updateStartScrollOffset
     }
   };
