@@ -7345,6 +7345,7 @@ __metadata:
     react: "npm:^18.3.1"
     react-native: "npm:^0.74.3"
     react-native-gesture-handler: "npm:^2.17.1"
+    react-native-haptic-feedback: "npm:^2.2.0"
     react-native-reanimated: "npm:^3.13.0"
     react-native-safe-area-context: "npm:^4.10.3"
     react-native-screens: "npm:^3.31.1"
@@ -13393,6 +13394,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-haptic-feedback@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "react-native-haptic-feedback@npm:2.2.0"
+  peerDependencies:
+    react-native: ">=0.60.0"
+  checksum: 10c0/6939804b1e3a4c1e35052a65c2536a00b6d7d93b2b5a5c4fc6ef690a06d043c38bf95536f9b54acfb32d08abf901b847171a574d0d863acfdee59cce012d2497
+  languageName: node
+  linkType: hard
+
 "react-native-reanimated@npm:^3.13.0":
   version: 3.13.0
   resolution: "react-native-reanimated@npm:3.13.0"
@@ -13482,6 +13492,7 @@ __metadata:
     react-native: "npm:^0.74.3"
     react-native-builder-bob: "npm:^0.23.2"
     react-native-gesture-handler: "npm:^2.17.1"
+    react-native-haptic-feedback: "npm:^2.2.0"
     react-native-reanimated: "npm:^3.13.0"
     react-test-renderer: "npm:^18.3.1"
     semantic-release: "npm:^24.0.0"
@@ -13491,6 +13502,9 @@ __metadata:
     react-native: "*"
     react-native-gesture-handler: ">=2.0.0"
     react-native-reanimated: ">=3.0.0"
+  dependenciesMeta:
+    react-native-haptic-feedback:
+      optional: true
   languageName: unknown
   linkType: soft
 
