@@ -42,10 +42,11 @@ export default function DraggableView({
     useMeasurementsContext();
   const {
     activationProgress,
-    activeItemDropped,
     activeItemKey,
     activeItemPosition,
     enabled,
+    handleDragEnd,
+    handleDragStart,
     touchedItemKey
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
@@ -63,25 +64,14 @@ export default function DraggableView({
     return () => removeItem(key);
   }, [key, removeItem]);
 
-  const handleDragEnd = useCallback(() => {
+  const onDragEnd = useCallback(() => {
     'worklet';
-    touchedItemKey.value = null;
-    activeItemKey.value = null;
+    if (activeItemKey.value === null) {
+      return;
+    }
     pressProgress.value = withTiming(0, { duration: TIME_TO_ACTIVATE_PAN });
-    activationProgress.value = withTiming(
-      0,
-      { duration: TIME_TO_ACTIVATE_PAN },
-      () => {
-        activeItemDropped.value = true;
-      }
-    );
-  }, [
-    activationProgress,
-    activeItemKey,
-    activeItemDropped,
-    touchedItemKey,
-    pressProgress
-  ]);
+    handleDragEnd(key);
+  }, [key, activeItemKey, pressProgress, handleDragEnd]);
 
   const panGesture = useMemo(
     () =>
@@ -102,13 +92,12 @@ export default function DraggableView({
           if (touchedItemKey.value === null) {
             return;
           }
-          updateStartScrollOffset?.();
           dragStartPosition.value = activeItemPosition.value = {
             x: itemPosition.x.value ?? 0,
             y: itemPosition.y.value ?? 0
           };
-          activeItemKey.value = key;
-          activeItemDropped.value = false;
+          updateStartScrollOffset?.();
+          handleDragStart(key);
         })
         .onUpdate(e => {
           if (!isActive.value) {
@@ -121,21 +110,20 @@ export default function DraggableView({
             y: dragStartPosition.value.y + e.translationY
           };
         })
-        .onFinalize(handleDragEnd)
-        .onTouchesCancelled(handleDragEnd)
+        .onFinalize(onDragEnd)
+        .onTouchesCancelled(onDragEnd)
         .enabled(enabled),
     [
       key,
       enabled,
       reverseXAxis,
-      handleDragEnd,
+      handleDragStart,
+      onDragEnd,
       isActive,
       itemPosition,
       activationProgress,
-      activeItemKey,
       touchedItemKey,
       activeItemPosition,
-      activeItemDropped,
       dragStartPosition,
       pressProgress,
       updateStartScrollOffset

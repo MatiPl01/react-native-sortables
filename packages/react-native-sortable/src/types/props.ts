@@ -26,6 +26,21 @@ export type DropIndicatorSettings = {
   showDropIndicator: boolean;
 };
 
+export type SortableCallbacks = {
+  onDragStart?: (params: { key: string; fromIndex: number }) => void;
+  onDragEnd?: (params: {
+    key: string;
+    fromIndex: number;
+    toIndex: number;
+  }) => void;
+  onOrderChange?: (params: {
+    newOrder: Array<string>;
+    fromIndex: number;
+    toIndex: number;
+    key: string;
+  }) => void;
+};
+
 export type ReorderStrategy = 'insert' | 'swap';
 
 export type SharedProps = Prettify<
@@ -34,5 +49,6 @@ export type SharedProps = Prettify<
     reorderStrategy?: ReorderStrategy;
   } & Partial<ActiveItemDecorationSettings> &
     Partial<AutoScrollSettings> &
-    Partial<DropIndicatorSettings>
+    Partial<DropIndicatorSettings> &
+    SortableCallbacks
 >;

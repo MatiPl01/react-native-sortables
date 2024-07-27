@@ -6,7 +6,8 @@ import type {
   ActiveItemDecorationSettings,
   AutoScrollSettings,
   DropIndicatorSettings,
-  PartialBy
+  PartialBy,
+  SortableCallbacks
 } from '../../types';
 import { ContextProviderComposer } from '../utils';
 import { AutoScrollProvider } from './AutoScrollProvider';
@@ -20,7 +21,8 @@ type SharedProviderProps = PropsWithChildren<
     dragEnabled: boolean;
   } & ActiveItemDecorationSettings &
     DropIndicatorSettings &
-    PartialBy<AutoScrollSettings, 'scrollableRef'>
+    PartialBy<AutoScrollSettings, 'scrollableRef'> &
+    SortableCallbacks
 >;
 
 export default function SharedProvider({
@@ -33,11 +35,11 @@ export default function SharedProvider({
   itemKeys,
   scrollableRef,
   showDropIndicator,
-  ...activeItemDecorationSettings
+  ...dragProviderProps
 }: SharedProviderProps) {
   const providers = [
     <PositionsProvider itemKeys={itemKeys} />,
-    <DragProvider {...activeItemDecorationSettings} enabled={dragEnabled} />,
+    <DragProvider {...dragProviderProps} enabled={dragEnabled} />,
     <MeasurementsProvider itemsCount={itemKeys.length} />
   ];
 
