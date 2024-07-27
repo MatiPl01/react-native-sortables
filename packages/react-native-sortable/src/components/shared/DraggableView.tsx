@@ -44,7 +44,7 @@ export default function DraggableView({
     activationProgress,
     activeItemKey,
     activeItemPosition,
-    enabled,
+    disabled,
     handleDragEnd,
     handleDragStart,
     touchedItemKey
@@ -66,18 +66,19 @@ export default function DraggableView({
 
   const onDragEnd = useCallback(() => {
     'worklet';
-    if (touchedItemKey.value === null) {
-      return;
-    }
     pressProgress.value = withTiming(0, { duration: TIME_TO_ACTIVATE_PAN });
     handleDragEnd(key);
-  }, [key, touchedItemKey, pressProgress, handleDragEnd]);
+  }, [key, pressProgress, handleDragEnd]);
 
   const panGesture = useMemo(
     () =>
       Gesture.Pan()
         .activateAfterLongPress(TIME_TO_ACTIVATE_PAN)
         .onTouchesDown(() => {
+          // Ignore touch if another item is already being touched/activated
+          if (touchedItemKey.value !== null) {
+            return;
+          }
           const progress = withDelay(
             ACTIVATE_PAN_ANIMATION_DELAY,
             withTiming(1, {
@@ -112,10 +113,10 @@ export default function DraggableView({
         })
         .onFinalize(onDragEnd)
         .onTouchesCancelled(onDragEnd)
-        .enabled(enabled),
+        .enabled(!disabled),
     [
       key,
-      enabled,
+      disabled,
       reverseXAxis,
       handleDragStart,
       onDragEnd,

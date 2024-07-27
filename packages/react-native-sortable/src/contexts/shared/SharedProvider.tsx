@@ -18,7 +18,8 @@ import { PositionsProvider } from './PositionsProvider';
 type SharedProviderProps = PropsWithChildren<
   {
     itemKeys: Array<string>;
-    dragEnabled: boolean;
+    dragDisabled: boolean;
+    hapticsDisabled: boolean;
   } & ActiveItemDecorationSettings &
     DropIndicatorSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
@@ -31,7 +32,6 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollSpeed,
   children,
-  dragEnabled,
   itemKeys,
   scrollableRef,
   showDropIndicator,
@@ -39,7 +39,7 @@ export default function SharedProvider({
 }: SharedProviderProps) {
   const providers = [
     <PositionsProvider itemKeys={itemKeys} />,
-    <DragProvider {...dragProviderProps} enabled={dragEnabled} />,
+    <DragProvider {...dragProviderProps} />,
     <MeasurementsProvider itemsCount={itemKeys.length} />
   ];
 

@@ -58,7 +58,8 @@ export type ReorderStrategy = 'insert' | 'swap';
 
 export type SharedProps = Prettify<
   {
-    dragEnabled?: boolean;
+    dragDisabled?: boolean;
+    hapticsDisabled?: boolean;
     reorderStrategy?: ReorderStrategy;
   } & Partial<ActiveItemDecorationSettings> &
     Partial<AutoScrollSettings> &

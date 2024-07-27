@@ -1272,6 +1272,13 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNReactNativeHapticFeedback (2.2.0):
+    - RCT-Folly
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Codegen
+    - React-Core
+    - ReactCommon/turbomodule/core
   - RNReanimated (3.10.1):
     - DoubleConversion
     - glog
@@ -1443,6 +1450,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
   - "RNFlashList (from `../../../node_modules/@shopify/flash-list`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
+  - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
@@ -1566,6 +1574,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@shopify/flash-list"
   RNGestureHandler:
     :path: "../../../node_modules/react-native-gesture-handler"
+  RNReactNativeHapticFeedback:
+    :path: "../../../node_modules/react-native-haptic-feedback"
   RNReanimated:
     :path: "../../../node_modules/react-native-reanimated"
   RNScreens:
@@ -1632,6 +1642,7 @@ SPEC CHECKSUMS:
   ReactCommon: f00e436b3925a7ae44dfa294b43ef360fbd8ccc4
   RNFlashList: c52e511c81ede0b8e44d4eb884b8a861976b111d
   RNGestureHandler: 42f1d03e80c71bdfd6de5dae295ddc3b8b73f8b2
+  RNReactNativeHapticFeedback: 616c35bdec7d20d4c524a7949ca9829c09e35f37
   RNReanimated: adc1be87c8d2b79827b0e2993705d61c563a7f37
   RNScreens: d3d50aa84db4541eee00fbb1f32151030f56c510
   RNSVG: 7b44aa4df2587946e28496adf2e10a16f08c1250

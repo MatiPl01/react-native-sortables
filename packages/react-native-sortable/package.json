@@ -24,6 +24,7 @@
     "react-native": "^0.74.3",
     "react-native-builder-bob": "^0.23.2",
     "react-native-gesture-handler": "^2.17.1",
+    "react-native-haptic-feedback": "^2.2.0",
     "react-native-reanimated": "3.10.1",
     "react-test-renderer": "^18.3.1",
     "semantic-release": "^24.0.0",
@@ -49,6 +50,9 @@
     "react-native": "*",
     "react-native-gesture-handler": ">=2.0.0",
     "react-native-reanimated": ">=3.0.0"
+  },
+  "optionalDependencies": {
+    "react-native-haptic-feedback": ">=2.0.0"
   },
   "publishConfig": {
     "access": "public"
