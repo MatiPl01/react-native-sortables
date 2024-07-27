@@ -66,12 +66,12 @@ export default function DraggableView({
 
   const onDragEnd = useCallback(() => {
     'worklet';
-    if (activeItemKey.value === null) {
+    if (touchedItemKey.value === null) {
       return;
     }
     pressProgress.value = withTiming(0, { duration: TIME_TO_ACTIVATE_PAN });
     handleDragEnd(key);
-  }, [key, activeItemKey, pressProgress, handleDragEnd]);
+  }, [key, touchedItemKey, pressProgress, handleDragEnd]);
 
   const panGesture = useMemo(
     () =>

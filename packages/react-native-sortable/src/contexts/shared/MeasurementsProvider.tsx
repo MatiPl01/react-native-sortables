@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { useUICallback } from '../../hooks';
+import { useUIStableCallback } from '../../hooks';
 import type { Dimensions } from '../../types';
 import { createEnhancedContext } from '../utils';
 import { useDragContext } from './DragProvider';
@@ -45,19 +45,21 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const containerWidth = useSharedValue(-1);
   const containerHeight = useSharedValue(-1);
 
-  const measureItem = useUICallback((key: string, dimensions: Dimensions) => {
-    'worklet';
-    itemDimensions.value[key] = dimensions;
-    measuredItemsCount.value += 1;
-    // Update the array of item dimensions only after all items have been measured
-    // to reduce the number of times animated reactions are triggered
-    if (measuredItemsCount.value === itemsCount) {
-      initialMeasurementsCompleted.value = true;
-      itemDimensions.value = { ...itemDimensions.value };
+  const measureItem = useUIStableCallback(
+    (key: string, dimensions: Dimensions) => {
+      'worklet';
+      itemDimensions.value[key] = dimensions;
+      measuredItemsCount.value += 1;
+      // Update the array of item dimensions only after all items have been measured
+      // to reduce the number of times animated reactions are triggered
+      if (measuredItemsCount.value === itemsCount) {
+        initialMeasurementsCompleted.value = true;
+        itemDimensions.value = { ...itemDimensions.value };
+      }
     }
-  });
+  );
 
-  const removeItem = useUICallback((key: string) => {
+  const removeItem = useUIStableCallback((key: string) => {
     'worklet';
     delete itemDimensions.value[key];
     measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);

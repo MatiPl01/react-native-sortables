@@ -5,6 +5,7 @@ import {
   AutoScrollFlashListExampleScreen,
   AutoScrollFlatListExampleScreen,
   AutoScrollScrollViewExampleScreen,
+  CallbacksExampleScreen,
   DropIndicatorExampleScreen,
   ExamplesListScreen,
   SortableFlexExamplesScreen,
@@ -51,6 +52,10 @@ export default function ExamplesStackNavigator() {
         <ExamplesStack.Screen
           component={DropIndicatorExampleScreen}
           name={ExamplesScreenRoute.DropIndicatorExamples}
+        />
+        <ExamplesStack.Screen
+          component={CallbacksExampleScreen}
+          name={ExamplesScreenRoute.SortableCallbacks}
         />
       </ExamplesStack.Navigator>
     </View>

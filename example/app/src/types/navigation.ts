@@ -7,6 +7,7 @@ export enum ExamplesScreenRoute {
   AutoScrollScrollViewExample = 'AutoScrollScrollViewExample',
   DropIndicatorExamples = 'DropIndicatorExamples',
   ExamplesList = 'ExamplesList',
+  SortableCallbacks = 'SortableCallbacks',
   SortableFlexExamples = 'SortableFlexExamples',
   SortableGridExamples = 'SortableGridExamples'
 }
@@ -19,6 +20,7 @@ export type ExamplesStackParamList = {
   [ExamplesScreenRoute.AutoScrollFlatListExample]: undefined;
   [ExamplesScreenRoute.DropIndicatorExamples]: undefined;
   [ExamplesScreenRoute.AutoScrollFlashListExample]: undefined;
+  [ExamplesScreenRoute.SortableCallbacks]: undefined;
 };
 
 type CombinedNavigationProps = ExamplesStackParamList;

@@ -1,9 +1,9 @@
-import { type PropsWithChildren } from 'react';
+import { type PropsWithChildren, useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { runOnJS, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { TIME_TO_ACTIVATE_PAN } from '../../constants';
-import { useAnimatableValue, useStableCallback } from '../../hooks';
+import { useAnimatableValue, useJSStableCallback } from '../../hooks';
 import type {
   ActiveItemDecorationSettings,
   AnimatedValues,
@@ -68,42 +68,64 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const activeItemDropped = useSharedValue(true);
   const dragStartIndex = useSharedValue(-1);
 
-  const handleDragStart = useStableCallback((key: string) => {
-    'worklet';
-    activeItemKey.value = key;
-    activeItemDropped.value = false;
-    dragStartIndex.value = keyToIndex.value[key]!;
+  // Create stable callbacks to avoid re-rendering when the callback
+  // function is not memoized
+  const stableOnDragStart = useJSStableCallback(onDragStart);
+  const stableOnDragEnd = useJSStableCallback(onDragEnd);
+  const stableOnOrderChange = useJSStableCallback(onOrderChange);
 
-    if (onDragStart) {
-      runOnJS(onDragStart)({
+  const handleDragStart = useCallback(
+    (key: string) => {
+      'worklet';
+      activeItemKey.value = key;
+      activeItemDropped.value = false;
+      dragStartIndex.value = keyToIndex.value[key]!;
+
+      stableOnDragStart({
         fromIndex: dragStartIndex.value,
         key
       });
-    }
-  });
+    },
+    [
+      stableOnDragStart,
+      activeItemDropped,
+      activeItemKey,
+      dragStartIndex,
+      keyToIndex
+    ]
+  );
 
-  const handleDragEnd = useStableCallback((key: string) => {
-    'worklet';
-    touchedItemKey.value = null;
-    activeItemKey.value = null;
-    activationProgress.value = withTiming(
-      0,
-      { duration: TIME_TO_ACTIVATE_PAN },
-      () => {
-        activeItemDropped.value = true;
-      }
-    );
+  const handleDragEnd = useCallback(
+    (key: string) => {
+      'worklet';
+      touchedItemKey.value = null;
+      activeItemKey.value = null;
+      activationProgress.value = withTiming(
+        0,
+        { duration: TIME_TO_ACTIVATE_PAN },
+        () => {
+          activeItemDropped.value = true;
+        }
+      );
 
-    if (onDragEnd) {
-      runOnJS(onDragEnd)({
+      stableOnDragEnd({
         fromIndex: dragStartIndex.value,
         key,
         toIndex: keyToIndex.value[key]!
       });
-    }
-  });
+    },
+    [
+      activeItemDropped,
+      touchedItemKey,
+      activeItemKey,
+      activationProgress,
+      dragStartIndex,
+      keyToIndex,
+      stableOnDragEnd
+    ]
+  );
 
-  const handleOrderChange = useStableCallback(
+  const handleOrderChange = useCallback(
     (
       key: string,
       fromIndex: number,
@@ -113,15 +135,14 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       'worklet';
       indexToKey.value = newOrder;
 
-      if (onOrderChange) {
-        runOnJS(onOrderChange)({
-          fromIndex,
-          key,
-          newOrder,
-          toIndex
-        });
-      }
-    }
+      stableOnOrderChange({
+        fromIndex,
+        key,
+        newOrder,
+        toIndex
+      });
+    },
+    [indexToKey, stableOnOrderChange]
   );
 
   return {
