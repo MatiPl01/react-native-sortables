@@ -110,8 +110,8 @@ export default function DraggableView({
           }
           updateStartScrollOffset?.();
           dragStartPosition.value = {
-            x: position.x.value ?? 0,
-            y: position.y.value ?? 0
+            x: position.current?.x.value ?? 0,
+            y: position.current?.y.value ?? 0
           };
           activeItemKey.value = key;
           activeItemDropped.value = false;
@@ -147,16 +147,15 @@ export default function DraggableView({
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (position.x.value === null || position.y.value === null) {
+    const x = position.current?.x.value ?? null;
+    const y = position.current?.y.value ?? null;
+    if (x === null || y === null) {
       return {
         position: 'relative'
       };
     }
 
     // TODO - change to transform instead of top/left
-    const x = position.x.value;
-    const y = position.y.value;
-
     return {
       left: x,
       position: 'absolute',

@@ -57,7 +57,7 @@ const { PositionsProvider, usePositionsContext } = createEnhancedContext(
     () => indexToKey.value,
     idxToKey => {
       for (let i = 0; i < idxToKey.length; i++) {
-        keyToIndex.current[idxToKey[i]!]!.value = i;
+        keyToIndex.set(idxToKey[i]!, i);
       }
     }
   );
@@ -82,19 +82,17 @@ const { PositionsProvider, usePositionsContext } = createEnhancedContext(
         return;
       }
 
-      const x = positionWithoutScroll.x;
-      const y = positionWithoutScroll.y + offset;
+      const currentPosition = {
+        x: positionWithoutScroll.x,
+        y: positionWithoutScroll.y + offset
+      };
 
       // Update activeItemPosition in the drag context
-      activeItemPosition.value = { x, y };
+      activeItemPosition.value = currentPosition;
       // Update the current position of the active item
       // (for efficiency, update it directly instead of reacting to activeItemPosition
       // changes and checking whether the item is active)
-      const currentItemPosition = currentItemPositions.current[key];
-      if (currentItemPosition) {
-        currentItemPosition.x.value = x;
-        currentItemPosition.y.value = y;
-      }
+      currentItemPositions.set(key, currentPosition);
     }
   );
 

@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 
+import { DropIndicator } from '../../components';
 import type {
   ActiveItemDecorationSettings,
   AutoScrollSettings,
@@ -59,10 +60,9 @@ export default function SharedProvider({
 
   return (
     <ContextProviderComposer providers={providers}>
-      {/* TODO - show drop indicator */}
-      {/* {showDropIndicator && (
+      {showDropIndicator && (
         <DropIndicator DropIndicatorComponent={DropIndicatorComponent} />
-      )} */}
+      )}
       {children}
     </ContextProviderComposer>
   );

@@ -152,7 +152,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
       }
       // Update item positions one by one to avoid unnecessary reaction calls
       for (const key in layout.itemPositions) {
-        const targetPosition = targetItemPositions.current[key];
+        const targetPosition = targetItemPositions.get(key);
         const layoutPosition = layout.itemPositions[key];
         if (targetPosition && layoutPosition) {
           targetPosition.x.value = layoutPosition.x;
@@ -193,7 +193,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
         }
 
         for (const key of group) {
-          const currentDimensions = overrideItemDimensions.current[key];
+          const currentDimensions = overrideItemDimensions.get(key);
 
           if (
             currentDimensions &&

@@ -34,7 +34,7 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
     useDragContext();
   const { keyToIndex, targetItemPositions } = usePositionsContext();
 
-  const { x, y } = useItemPosition(touchedItemKey, {
+  const position = useItemPosition(touchedItemKey, false, {
     easing: Easing.out(Easing.ease),
     ignoreActive: true
   });
@@ -48,10 +48,10 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
       const key = touchedItemKey.value;
       return (
         key && {
-          index: keyToIndex.current[key]?.value ?? 0,
+          index: keyToIndex.get(key)?.value ?? 0,
           position: {
-            x: targetItemPositions.current[key]?.x.value ?? 0,
-            y: targetItemPositions.current[key]?.y.value ?? 0
+            x: targetItemPositions.get(key)?.x.value ?? 0,
+            y: targetItemPositions.get(key)?.y.value ?? 0
           }
         }
       );
@@ -65,8 +65,8 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    const translateX = x.value;
-    const translateY = y.value;
+    const translateX = position?.current?.x.value ?? null;
+    const translateY = position?.current?.y.value ?? null;
 
     if (
       (activeItemDropped.value && activationProgress.value === 0) ||

@@ -67,7 +67,7 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
         if (!otherDimensions) {
           continue;
         }
-        const otherPosition = targetItemPositions.current[key];
+        const otherPosition = targetItemPositions.get(key);
         if (!otherPosition) {
           continue;
         }
@@ -97,7 +97,7 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
       if (overlappingItemKey === undefined) {
         return;
       }
-      const overlappingIndex = keyToIndex.current[overlappingItemKey]?.value;
+      const overlappingIndex = keyToIndex.get(overlappingItemKey)?.value;
       if (overlappingIndex === undefined) {
         return;
       }

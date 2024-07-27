@@ -91,10 +91,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
           return;
         }
 
-        const targetPosition = targetItemPositions.current[key];
-        if (targetPosition) {
-          targetPosition.x.value = colIndex * colWidth;
-          targetPosition.y.value = y;
+        if (targetItemPositions.has(key)) {
+          targetItemPositions.set(key, {
+            x: colIndex * colWidth,
+            y: y
+          });
         }
       }
     },

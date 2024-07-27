@@ -43,7 +43,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const initialMeasurementsCompleted = useSharedValue(false);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const overrideItemDimensions = useComplexSharedValues(
-    s => s.record(s.mutable({ height: 0, width: 0 })),
+    s => s.record(s.mutable({})),
     itemKeys
   );
 

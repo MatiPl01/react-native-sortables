@@ -3,12 +3,15 @@ import { useMemo } from 'react';
 import type { EasingFunction, SharedValue } from 'react-native-reanimated';
 import {
   Easing,
+  isSharedValue,
   useAnimatedReaction,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
 
+import { useAnimatedSelect } from '../../hooks';
 import type {
+  Animatable,
   AnimatedOptionalPosition,
   Dimensions,
   Position
@@ -26,19 +29,23 @@ type UseItemPositionOptions = {
 };
 
 export function useItemPosition(
-  key: string,
-  isActive: SharedValue<boolean>,
+  animatableKey: Animatable<null | string>,
+  isActive: Animatable<boolean>,
   {
     duration = 300,
-    easing = Easing.inOut(Easing.ease),
-    ignoreActive = false
+    easing = Easing.inOut(Easing.ease)
   }: UseItemPositionOptions = {}
-): AnimatedOptionalPosition {
+): { current: AnimatedOptionalPosition | null } {
   const { currentItemPositions, targetItemPositions } = usePositionsContext();
 
-  const currentPosition = currentItemPositions.get(key, true);
-  const targetPosition = targetItemPositions.get(key, true);
-
+  const currentPosition = useAnimatedSelect(k => {
+    'worklet';
+    return k !== null ? currentItemPositions.get(k) ?? null : null;
+  }, animatableKey);
+  const targetPosition = useAnimatedSelect(k => {
+    'worklet';
+    return k !== null ? targetItemPositions.get(k) ?? null : null;
+  }, animatableKey);
   const animationConfig = useMemo(
     () => ({
       duration,
@@ -51,30 +58,35 @@ export function useItemPosition(
   // The drag provider will animate the position of the currently active item
   useAnimatedReaction(
     () => ({
-      active: isActive.value,
-      targetX: targetPosition.x.value,
-      targetY: targetPosition.y.value
+      active: isSharedValue(isActive) ? isActive.value : isActive,
+      targetX: targetPosition.current?.x.value ?? null,
+      targetY: targetPosition.current?.y.value ?? null
     }),
     ({ active, targetX, targetY }) => {
-      if (targetX === null || targetY === null || (!ignoreActive && active)) {
+      if (
+        targetX === null ||
+        targetY === null ||
+        !currentPosition.current ||
+        active !== null
+      ) {
         return;
       }
-      currentPosition.x.value =
-        currentPosition.x.value === null
+      currentPosition.current.x.value =
+        currentPosition.current.x.value === null
           ? targetX
           : withTiming(targetX, animationConfig);
-      currentPosition.y.value =
-        currentPosition.y.value === null
+      currentPosition.current.y.value =
+        currentPosition.current.y.value === null
           ? targetY
           : withTiming(targetY, animationConfig);
     },
-    [ignoreActive, animationConfig]
+    [animationConfig, isActive]
   );
 
   return currentPosition;
 }
 
-export function useItemDimensions(key: string): {
+export function useItemDimensions(animatableKey: Animatable<null | string>): {
   width: SharedValue<number>;
   height: SharedValue<number>;
 } {
@@ -82,20 +94,34 @@ export function useItemDimensions(key: string): {
 
   const width = useSharedValue(0);
   const height = useSharedValue(0);
-  const overrideDimensions = overrideItemDimensions.get(key, true);
+  const overrideDimensions = useAnimatedSelect(k => {
+    'worklet';
+    return k !== null ? overrideItemDimensions.get(k) ?? null : null;
+  }, animatableKey);
 
   useAnimatedReaction(
-    () => ({
-      h:
-        overrideDimensions.value?.height ??
-        itemDimensions.value[key]?.height ??
-        0,
-      w:
-        overrideDimensions.value?.width ?? itemDimensions.value[key]?.width ?? 0
-    }),
-    ({ h, w }) => {
-      width.value = w;
-      height.value = h;
+    () => {
+      const key = isSharedValue(animatableKey)
+        ? animatableKey.value
+        : animatableKey;
+      return (
+        key && {
+          h:
+            overrideDimensions.current?.value?.height ??
+            itemDimensions.value[key]?.height ??
+            0,
+          w:
+            overrideDimensions.current?.value?.width ??
+            itemDimensions.value[key]?.width ??
+            0
+        }
+      );
+    },
+    dimensions => {
+      if (dimensions) {
+        width.value = dimensions.w;
+        height.value = dimensions.h;
+      }
     }
   );
 
@@ -132,7 +158,7 @@ export function useActiveItemReaction(
 
       const centerY = activePosition.y + dimensions.height / 2;
       const centerX = activePosition.x + dimensions.width / 2;
-      const activeIndex = keyToIndex.current[activeKey]?.value;
+      const activeIndex = keyToIndex.get(activeKey)?.value;
 
       if (activeIndex === undefined) {
         return;
