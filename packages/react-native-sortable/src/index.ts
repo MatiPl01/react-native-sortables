@@ -7,4 +7,12 @@ export type {
   SortableGridRenderItem
 } from './components';
 export { SortableFlex, SortableGrid } from './components';
-export type { ReorderStrategy } from './types';
+export type {
+  DragEndCallback,
+  DragEndParams,
+  DragStartCallback,
+  DragStartParams,
+  OrderChangeCallback,
+  OrderChangeParams,
+  ReorderStrategy
+} from './types';

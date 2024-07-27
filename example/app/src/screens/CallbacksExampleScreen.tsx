@@ -1,18 +1,48 @@
 import { useCallback } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import type { SortableGridRenderItem } from 'react-native-sortable';
+import type {
+  DragEndCallback,
+  DragStartCallback,
+  OrderChangeCallback,
+  SortableGridRenderItem
+} from 'react-native-sortable';
 import { SortableGrid } from 'react-native-sortable';
 
 import { AnimatedText } from '@/components/misc';
 
 const CARDS = Array.from({ length: 6 }, (_, i) => ({
-  key: i,
+  key: `key${i}`,
   title: `Card ${i + 1}`
 }));
 
+function formatParams(params: { [key: string]: unknown }) {
+  return JSON.stringify(params, null, 2);
+}
+
 export default function CallbacksExampleScreen() {
   const text = useSharedValue('Callback output will be displayed here');
+
+  const onDragStart = useCallback<DragStartCallback>(
+    params => {
+      text.value = `onDragStart:${formatParams(params)}`;
+    },
+    [text]
+  );
+
+  const onDragEnd = useCallback<DragEndCallback>(
+    params => {
+      text.value = `onDragEnd:${formatParams(params)}`;
+    },
+    [text]
+  );
+
+  const onOrderChange = useCallback<OrderChangeCallback>(
+    params => {
+      text.value = `onOrderChange:${formatParams(params)}`;
+    },
+    [text]
+  );
 
   const renderItem = useCallback<
     SortableGridRenderItem<(typeof CARDS)[number]>
@@ -26,12 +56,22 @@ export default function CallbacksExampleScreen() {
   );
 
   return (
-    <ScrollView>
-      <AnimatedText text={text} />
-      <View style={styles.section}>
-        <SortableGrid columns={6} data={CARDS} renderItem={renderItem} />
+    <>
+      <View style={[styles.section, styles.fill]}>
+        <Text style={styles.title}>Callback output</Text>
+        <AnimatedText style={styles.textBox} text={text} multiline />
       </View>
-    </ScrollView>
+      <View style={styles.section}>
+        <SortableGrid
+          columns={3}
+          data={CARDS}
+          renderItem={renderItem}
+          onDragEnd={onDragEnd}
+          onDragStart={onDragStart}
+          onOrderChange={onOrderChange}
+        />
+      </View>
+    </>
   );
 }
 
@@ -50,6 +90,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 3.84
   },
+  fill: {
+    flex: 1
+  },
   section: {
     borderColor: 'black',
     borderRadius: 10,
@@ -59,10 +102,12 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     padding: 12
   },
+  textBox: {
+    flex: 1,
+    fontSize: 16
+  },
   title: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginHorizontal: 6,
-    marginVertical: 6
+    fontWeight: 'bold'
   }
 });
