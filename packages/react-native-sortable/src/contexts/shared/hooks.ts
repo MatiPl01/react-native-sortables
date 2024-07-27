@@ -8,7 +8,7 @@ import {
 } from 'react-native-reanimated';
 
 import { useAnimatableValue } from '../../hooks';
-import type { Animatable, Dimensions, Position } from '../../types';
+import type { Animatable, Dimensions, Maybe, Position } from '../../types';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useDragContext } from './DragProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
@@ -127,19 +127,20 @@ export function useItemDimensions(key: Animatable<null | string>): {
   return { height, width };
 }
 
-export function useActiveItemReaction(
+export function useOrderUpdater(
   callback: (props: {
     activeKey: string;
     activeIndex: number;
     dimensions: Dimensions;
     position: Position;
     centerPosition: Position;
-  }) => void,
+  }) => Maybe<Array<string>>,
   deps?: Array<unknown>
 ) {
   const { keyToIndex } = usePositionsContext();
   const { itemDimensions } = useMeasurementsContext();
-  const { activeItemKey, activeItemPosition } = useDragContext();
+  const { activeItemKey, activeItemPosition, handleOrderChange } =
+    useDragContext();
   const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
   useAnimatedReaction(
@@ -172,13 +173,22 @@ export function useActiveItemReaction(
         y: centerY
       };
 
-      callback({
+      const newOrder = callback({
         activeIndex,
         activeKey,
         centerPosition,
         dimensions,
         position: activePosition
       });
+
+      if (newOrder) {
+        handleOrderChange(
+          activeKey,
+          activeIndex,
+          newOrder.indexOf(activeKey),
+          newOrder
+        );
+      }
     },
     deps
   );

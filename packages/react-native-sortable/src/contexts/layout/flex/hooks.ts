@@ -1,8 +1,8 @@
 import type { Coordinate, Dimension, ReorderStrategy } from '../../../types';
 import { reorderItems } from '../../../utils';
 import {
-  useActiveItemReaction,
   useMeasurementsContext,
+  useOrderUpdater,
   usePositionsContext
 } from '../../shared';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
@@ -25,7 +25,7 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
     crossDimension = 'width';
   }
 
-  useActiveItemReaction(
+  useOrderUpdater(
     ({ activeIndex, activeKey, centerPosition, position }) => {
       'worklet';
       let groupIndex = keyToGroup.value[activeKey];
@@ -103,8 +103,8 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
         return;
       }
 
-      // Update the order of items
-      indexToKey.value = reorderItems(
+      // Return the new order of items
+      return reorderItems(
         indexToKey.value,
         activeIndex,
         overlappingIndex,

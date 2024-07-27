@@ -1,14 +1,17 @@
-import { type PropsWithChildren } from 'react';
+import { type PropsWithChildren, useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { useSharedValue } from 'react-native-reanimated';
+import { useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { useAnimatableValue } from '../../hooks';
+import { TIME_TO_ACTIVATE_PAN } from '../../constants';
+import { useAnimatableValue, useJSStableCallback } from '../../hooks';
 import type {
   ActiveItemDecorationSettings,
   AnimatedValues,
-  Position
+  Position,
+  SortableCallbacks
 } from '../../types';
 import { createEnhancedContext } from '../utils';
+import { usePositionsContext } from './PositionsProvider';
 
 type DragContextType = {
   enabled: boolean;
@@ -17,12 +20,21 @@ type DragContextType = {
   activationProgress: SharedValue<number>;
   activeItemPosition: SharedValue<Position>;
   activeItemDropped: SharedValue<boolean>;
+  handleDragStart: (key: string) => void;
+  handleDragEnd: (key: string) => void;
+  handleOrderChange: (
+    key: string,
+    fromIndex: number,
+    toIndex: number,
+    newOrder: Array<string>
+  ) => void;
 } & AnimatedValues<ActiveItemDecorationSettings>;
 
 type DragProviderProps = PropsWithChildren<
   {
     enabled: boolean;
-  } & ActiveItemDecorationSettings
+  } & ActiveItemDecorationSettings &
+    SortableCallbacks
 >;
 
 const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
@@ -34,8 +46,13 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   activeItemShadowOpacity: activeItemShadowOpacityProp,
   enabled,
   inactiveItemOpacity: inactiveItemOpacityProp,
-  inactiveItemScale: inactiveItemScaleProp
+  inactiveItemScale: inactiveItemScaleProp,
+  onDragEnd,
+  onDragStart,
+  onOrderChange
 }) => {
+  const { indexToKey, keyToIndex } = usePositionsContext();
+
   const activeItemScale = useAnimatableValue(activeItemScaleProp);
   const activeItemOpacity = useAnimatableValue(activeItemOpacityProp);
   const activeItemShadowOpacity = useAnimatableValue(
@@ -49,6 +66,84 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const activationProgress = useSharedValue(0);
   const activeItemPosition = useSharedValue<Position>({ x: 0, y: 0 });
   const activeItemDropped = useSharedValue(true);
+  const dragStartIndex = useSharedValue(-1);
+
+  // Create stable callbacks to avoid re-rendering when the callback
+  // function is not memoized
+  const stableOnDragStart = useJSStableCallback(onDragStart);
+  const stableOnDragEnd = useJSStableCallback(onDragEnd);
+  const stableOnOrderChange = useJSStableCallback(onOrderChange);
+
+  const handleDragStart = useCallback(
+    (key: string) => {
+      'worklet';
+      activeItemKey.value = key;
+      activeItemDropped.value = false;
+      dragStartIndex.value = keyToIndex.value[key]!;
+
+      stableOnDragStart({
+        fromIndex: dragStartIndex.value,
+        key
+      });
+    },
+    [
+      stableOnDragStart,
+      activeItemDropped,
+      activeItemKey,
+      dragStartIndex,
+      keyToIndex
+    ]
+  );
+
+  const handleDragEnd = useCallback(
+    (key: string) => {
+      'worklet';
+      touchedItemKey.value = null;
+      activeItemKey.value = null;
+      activationProgress.value = withTiming(
+        0,
+        { duration: TIME_TO_ACTIVATE_PAN },
+        () => {
+          activeItemDropped.value = true;
+        }
+      );
+
+      stableOnDragEnd({
+        fromIndex: dragStartIndex.value,
+        key,
+        toIndex: keyToIndex.value[key]!
+      });
+    },
+    [
+      activeItemDropped,
+      touchedItemKey,
+      activeItemKey,
+      activationProgress,
+      dragStartIndex,
+      keyToIndex,
+      stableOnDragEnd
+    ]
+  );
+
+  const handleOrderChange = useCallback(
+    (
+      key: string,
+      fromIndex: number,
+      toIndex: number,
+      newOrder: Array<string>
+    ) => {
+      'worklet';
+      indexToKey.value = newOrder;
+
+      stableOnOrderChange({
+        fromIndex,
+        key,
+        newOrder,
+        toIndex
+      });
+    },
+    [indexToKey, stableOnOrderChange]
+  );
 
   return {
     value: {
@@ -60,6 +155,9 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       activeItemScale,
       activeItemShadowOpacity,
       enabled,
+      handleDragEnd,
+      handleDragStart,
+      handleOrderChange,
       inactiveItemOpacity,
       inactiveItemScale,
       touchedItemKey
