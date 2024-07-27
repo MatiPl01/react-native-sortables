@@ -1,8 +1,8 @@
 import type { ReorderStrategy } from '../../../types';
 import { reorderItems } from '../../../utils';
 import {
-  useActiveItemReaction,
   useMeasurementsContext,
+  useOrderUpdater,
   usePositionsContext
 } from '../../shared';
 import { useGridLayoutContext } from './GridLayoutProvider';
@@ -16,7 +16,7 @@ export function useGridOrderUpdater(
   const { indexToKey } = usePositionsContext();
   const { rowOffsets } = useGridLayoutContext();
 
-  useActiveItemReaction(
+  useOrderUpdater(
     ({ activeIndex, centerPosition: { x, y }, dimensions }) => {
       'worklet';
       const itemsCount = indexToKey.value.length;
@@ -63,13 +63,8 @@ export function useGridOrderUpdater(
         return;
       }
 
-      // Update the order of items
-      indexToKey.value = reorderItems(
-        indexToKey.value,
-        activeIndex,
-        newIndex,
-        strategy
-      );
+      // return the new order of items
+      return reorderItems(indexToKey.value, activeIndex, newIndex, strategy);
     },
     [strategy]
   );

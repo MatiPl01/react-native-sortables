@@ -33,6 +33,10 @@ export default function ExamplesListScreen() {
         route={ExamplesScreenRoute.DropIndicatorExamples}
         title='Drop Indicator'
       />
+      <ExampleNavCard
+        route={ExamplesScreenRoute.SortableCallbacks}
+        title='Sortable callbacks'
+      />
     </ScrollView>
   );
 }

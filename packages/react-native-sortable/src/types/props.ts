@@ -26,6 +26,34 @@ export type DropIndicatorSettings = {
   showDropIndicator: boolean;
 };
 
+export type DragStartParams = {
+  key: string;
+  fromIndex: number;
+};
+
+export type DragEndParams = {
+  key: string;
+  fromIndex: number;
+  toIndex: number;
+};
+
+export type OrderChangeParams = {
+  newOrder: Array<string>;
+  fromIndex: number;
+  toIndex: number;
+  key: string;
+};
+
+export type DragStartCallback = (params: DragStartParams) => void;
+export type DragEndCallback = (params: DragEndParams) => void;
+export type OrderChangeCallback = (params: OrderChangeParams) => void;
+
+export type SortableCallbacks = {
+  onDragStart?: DragStartCallback;
+  onDragEnd?: DragEndCallback;
+  onOrderChange?: OrderChangeCallback;
+};
+
 export type ReorderStrategy = 'insert' | 'swap';
 
 export type SharedProps = Prettify<
@@ -34,5 +62,6 @@ export type SharedProps = Prettify<
     reorderStrategy?: ReorderStrategy;
   } & Partial<ActiveItemDecorationSettings> &
     Partial<AutoScrollSettings> &
-    Partial<DropIndicatorSettings>
+    Partial<DropIndicatorSettings> &
+    SortableCallbacks
 >;
