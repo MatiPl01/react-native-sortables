@@ -117,10 +117,10 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
         }
       );
 
-      haptics.medium();
       if (activeItemKey.value !== null) {
         activeItemKey.value = null;
 
+        haptics.medium();
         stableOnDragEnd({
           fromIndex: dragStartIndex.value,
           key,

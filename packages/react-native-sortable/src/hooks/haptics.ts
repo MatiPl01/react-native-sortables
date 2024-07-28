@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import { ReactNativeHapticFeedback } from '../lib';
 
@@ -9,6 +10,7 @@ type HapticImpact = {
 
 export function useHaptics(enabled: boolean): HapticImpact {
   let hapticFeedback: ReturnType<typeof ReactNativeHapticFeedback.load> = null;
+  const enabledValue = useDerivedValue(() => enabled);
 
   if (enabled) {
     hapticFeedback = ReactNativeHapticFeedback.load();
@@ -16,17 +18,17 @@ export function useHaptics(enabled: boolean): HapticImpact {
 
   const light = useCallback(() => {
     'worklet';
-    if (hapticFeedback) {
+    if (hapticFeedback && enabledValue.value) {
       hapticFeedback('impactLight');
     }
-  }, [hapticFeedback]);
+  }, [hapticFeedback, enabledValue]);
 
   const medium = useCallback(() => {
     'worklet';
-    if (hapticFeedback) {
+    if (hapticFeedback && enabledValue.value) {
       hapticFeedback('impactMedium');
     }
-  }, [hapticFeedback]);
+  }, [hapticFeedback, enabledValue]);
 
   return useMemo(
     () => ({
