@@ -57,7 +57,7 @@ const load = () => {
       try {
         nativeTrigger(type, triggerOptions);
       } catch (err) {
-        console.warn('RNReactNativeHapticFeedback is not available');
+        console.warn('react-native-haptic-feedback is not available');
       }
     };
 

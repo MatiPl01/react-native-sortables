@@ -1,4 +1,4 @@
-import type { Position } from '../types';
+import type { Vector } from '../types';
 
 export const areArraysDifferent = <T>(
   arr1: Array<T>,
@@ -12,10 +12,7 @@ export const areArraysDifferent = <T>(
   );
 };
 
-export const arePositionsDifferent = (
-  pos1: Position,
-  pos2: Position
-): boolean => {
+export const areVectorsDifferent = (pos1: Vector, pos2: Vector): boolean => {
   'worklet';
   return pos1.x !== pos2.x || pos1.y !== pos2.y;
 };

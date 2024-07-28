@@ -3,14 +3,14 @@ import { useEffect, useRef } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
-import type { Position } from '../../types';
+import type { Vector } from '../../types';
 import { areArraysDifferent } from '../../utils';
 import { createEnhancedContext } from '../utils';
 
 type PositionsContextType = {
   keyToIndex: SharedValue<Record<string, number>>;
   indexToKey: SharedValue<Array<string>>;
-  itemPositions: SharedValue<Record<string, Position>>;
+  itemPositions: SharedValue<Record<string, Vector>>;
 };
 
 type PositionsProviderProps = PropsWithChildren<{
@@ -27,7 +27,7 @@ const { PositionsProvider, usePositionsContext } = createEnhancedContext(
     Object.fromEntries(indexToKey.value.map((key, index) => [key, index]))
   );
 
-  const itemPositions = useSharedValue<Record<string, Position>>({});
+  const itemPositions = useSharedValue<Record<string, Vector>>({});
 
   useEffect(() => {
     if (areArraysDifferent(itemKeys, prevKeysRef.current)) {

@@ -29,7 +29,7 @@ function Tile({ index }: TileProps) {
 }
 
 export default function SortableGridExamplesScreen() {
-  const [dragDisabled, setDragDisabled] = useState(false);
+  const [dragEnabled, setDragEnabled] = useState(true);
   const [strategy, setStrategy] = useState<ReorderStrategy>(STRATEGIES[0]!);
   const [columns, setColumns] = useState(5); // TODO - fix size calculations and positioning
 
@@ -50,7 +50,7 @@ export default function SortableGridExamplesScreen() {
     activeItemShadowOpacity,
     columns,
     data: TILES,
-    dragDisabled,
+    dragEnabled,
     inactiveItemOpacity,
     inactiveItemScale,
     renderItem,
@@ -64,9 +64,9 @@ export default function SortableGridExamplesScreen() {
       <View style={styles.optionsRow}>
         <Text style={styles.optionText}>Drag Enabled</Text>
         <Button
-          title={dragDisabled ? 'enable' : 'disable'}
+          title={dragEnabled ? 'disable' : 'enable'}
           onPress={() => {
-            setDragDisabled(!dragDisabled);
+            setDragEnabled(!dragEnabled);
           }}
         />
       </View>

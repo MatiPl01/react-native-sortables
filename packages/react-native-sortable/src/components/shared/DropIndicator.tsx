@@ -4,7 +4,6 @@ import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
   Easing,
-  interpolate,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue
@@ -15,14 +14,14 @@ import {
   useItemDimensions,
   useItemPosition,
   usePositionsContext
-} from '../../contexts';
-import type { Position } from '../../types';
+} from '../../contexts/shared';
+import type { Vector } from '../../types';
 
 export type DropIndicatorComponentProps = {
   activationProgress: SharedValue<number>;
   touchedItemKey: SharedValue<null | string>;
   dropIndex: SharedValue<number>;
-  dropPosition: SharedValue<Position>;
+  dropPosition: SharedValue<Vector>;
 };
 
 type DropIndicatorProps = {
@@ -41,7 +40,7 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
   const { height, width } = useItemDimensions(touchedItemKey);
 
   const dropIndex = useSharedValue(0);
-  const dropPosition = useSharedValue<Position>({ x: 0, y: 0 });
+  const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
 
   useAnimatedReaction(
     () => ({
@@ -89,36 +88,9 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
   );
 }
 
-export function DefaultDropIndicator({
-  activationProgress
-}: DropIndicatorComponentProps): JSX.Element {
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: activationProgress.value,
-    transform: [
-      {
-        scale: interpolate(
-          Math.pow(activationProgress.value, 1 / 3),
-          [0, 1],
-          [1.1, 1]
-        )
-      }
-    ]
-  }));
-
-  return <Animated.View style={[styles.indicator, animatedStyle]} />;
-}
-
 const styles = StyleSheet.create({
   container: {
     position: 'absolute'
-  },
-  indicator: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    borderColor: 'black',
-    borderRadius: 10,
-    borderStyle: 'dashed',
-    borderWidth: 2,
-    flex: 1
   }
 });
 

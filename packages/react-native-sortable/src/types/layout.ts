@@ -3,11 +3,11 @@ export type Dimensions = {
   height: number;
 };
 
-export type Position = {
+export type Vector = {
   x: number;
   y: number;
 };
 
 export type Dimension = keyof Dimensions;
 
-export type Coordinate = keyof Position;
+export type Coordinate = keyof Vector;

@@ -8,7 +8,7 @@ import {
 } from 'react-native-reanimated';
 
 import { useAnimatableValue } from '../../hooks';
-import type { Animatable, Dimensions, Maybe, Position } from '../../types';
+import type { Animatable, Dimensions, Maybe, Vector } from '../../types';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useDragContext } from './DragProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
@@ -132,8 +132,8 @@ export function useOrderUpdater(
     activeKey: string;
     activeIndex: number;
     dimensions: Dimensions;
-    position: Position;
-    centerPosition: Position;
+    position: Vector;
+    centerPosition: Vector;
   }) => Maybe<Array<string>>,
   deps?: Array<unknown>
 ) {

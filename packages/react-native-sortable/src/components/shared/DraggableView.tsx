@@ -43,7 +43,7 @@ export default function DraggableView({
   const {
     activationProgress,
     activeItemPosition,
-    disabled,
+    enabled,
     handleDragEnd,
     handleDragStart,
     inactiveAnimationProgress,
@@ -116,10 +116,10 @@ export default function DraggableView({
         })
         .onFinalize(onDragEnd)
         .onTouchesCancelled(onDragEnd)
-        .enabled(!disabled),
+        .enabled(enabled),
     [
       key,
-      disabled,
+      enabled,
       isTouched,
       reverseXAxis,
       handleDragStart,

@@ -7,8 +7,8 @@ import {
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
-import type { Position } from '../../../types';
-import { areArraysDifferent, arePositionsDifferent } from '../../../utils';
+import type { Vector } from '../../../types';
+import { areArraysDifferent, areVectorsDifferent } from '../../../utils';
 import { useMeasurementsContext, usePositionsContext } from '../../shared';
 import { createEnhancedContext } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
@@ -82,7 +82,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
       if (colWidth === -1 || offsets.length === 0) {
         return;
       }
-      const positions: Record<string, Position> = {};
+      const positions: Record<string, Vector> = {};
 
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
         const rowIndex = getRowIndex(parseInt(itemIndex), columnsCount);
@@ -103,7 +103,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
         // (this prevents unnecessary reaction triggers in item components)
         positions[key] =
           !currentPosition ||
-          arePositionsDifferent(currentPosition, calculatedPosition)
+          areVectorsDifferent(currentPosition, calculatedPosition)
             ? calculatedPosition
             : currentPosition;
       }

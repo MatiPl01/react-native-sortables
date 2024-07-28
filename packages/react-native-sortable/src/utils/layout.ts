@@ -1,10 +1,10 @@
-import type { Position, ReorderStrategy } from '../types';
+import type { ReorderStrategy, Vector } from '../types';
 
 export const getItemZIndex = (
   isActive: boolean,
   pressProgress: number,
-  position: Position,
-  targetPosition?: Position
+  position: Vector,
+  targetPosition?: Vector
 ): number => {
   'worklet';
   if (isActive) {
