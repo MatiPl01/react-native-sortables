@@ -4,40 +4,49 @@ import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
   interpolate,
   interpolateColor,
-  useAnimatedStyle
+  useAnimatedStyle,
+  useDerivedValue
 } from 'react-native-reanimated';
 
 import { useDragContext } from '../../contexts';
 
 type ItemDecorationProps = {
+  itemKey: string;
   pressProgress: SharedValue<number>;
 } & ViewProps;
 
 export default function ItemDecoration({
+  itemKey,
   pressProgress,
   ...rest
 }: ItemDecorationProps) {
   const {
-    activationProgress,
     activeItemOpacity,
     activeItemScale,
     activeItemShadowOpacity,
+    inactiveAnimationProgress,
     inactiveItemOpacity,
-    inactiveItemScale
+    inactiveItemScale,
+    touchedItemKey
   } = useDragContext();
 
+  const resultingProgress = useDerivedValue(() =>
+    touchedItemKey.value === itemKey || pressProgress.value > 0
+      ? pressProgress.value
+      : -inactiveAnimationProgress.value
+  );
+
   const animatedStyle = useAnimatedStyle(() => {
-    const resultantProgress =
-      2 * pressProgress.value - activationProgress.value;
+    const progress = resultingProgress.value;
 
     return {
       opacity: interpolate(
-        resultantProgress,
+        progress,
         [-1, 0, 1],
         [inactiveItemOpacity.value, 1, activeItemOpacity.value]
       ),
       shadowColor: interpolateColor(
-        resultantProgress,
+        progress,
         [-1, 0, 1],
         [
           'transparent',
@@ -45,11 +54,11 @@ export default function ItemDecoration({
           `rgba(0, 0, 0, ${activeItemShadowOpacity.value})`
         ]
       ),
-      shadowOpacity: interpolate(resultantProgress, [-1, 0, 1], [0, 0, 1]),
+      shadowOpacity: interpolate(progress, [-1, 0, 1], [0, 0, 1]),
       transform: [
         {
           scale: interpolate(
-            resultantProgress,
+            progress,
             [-1, 0, 1],
             [inactiveItemScale.value, 1, activeItemScale.value]
           )

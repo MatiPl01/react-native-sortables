@@ -22,6 +22,7 @@ type DragContextType = {
   activeItemKey: SharedValue<null | string>;
   touchedItemKey: SharedValue<null | string>;
   activationProgress: SharedValue<number>;
+  inactiveAnimationProgress: SharedValue<number>;
   activeItemPosition: SharedValue<Position>;
   activeItemDropped: SharedValue<boolean>;
   handleDragStart: (key: string) => void;
@@ -70,6 +71,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const activeItemKey = useSharedValue<null | string>(null);
   const touchedItemKey = useSharedValue<null | string>(null);
   const activationProgress = useSharedValue(0);
+  const inactiveAnimationProgress = useSharedValue(0);
   const activeItemPosition = useSharedValue<Position>({ x: 0, y: 0 });
   const activeItemDropped = useSharedValue(true);
   const dragStartIndex = useSharedValue(-1);
@@ -108,17 +110,17 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const handleDragEnd = useCallback(
     (key: string) => {
       'worklet';
-      touchedItemKey.value = null;
-      activationProgress.value = withTiming(
-        0,
-        { duration: TIME_TO_ACTIVATE_PAN },
-        () => {
-          activeItemDropped.value = true;
-        }
-      );
+      const delayed = (callback?: (finished: boolean | undefined) => void) =>
+        withTiming(0, { duration: TIME_TO_ACTIVATE_PAN }, callback);
 
-      haptics.medium();
+      touchedItemKey.value = null;
+      inactiveAnimationProgress.value = delayed();
+      activationProgress.value = delayed(finished => {
+        if (finished) activeItemDropped.value = true;
+      });
+
       if (activeItemKey.value !== null) {
+        haptics.medium();
         activeItemKey.value = null;
 
         stableOnDragEnd({
@@ -133,6 +135,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       touchedItemKey,
       activeItemKey,
       activationProgress,
+      inactiveAnimationProgress,
       dragStartIndex,
       keyToIndex,
       stableOnDragEnd,
@@ -174,6 +177,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       handleDragEnd,
       handleDragStart,
       handleOrderChange,
+      inactiveAnimationProgress,
       inactiveItemOpacity,
       inactiveItemScale,
       touchedItemKey
