@@ -73,10 +73,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const updateTouchedItemDimensions = useCallback(
     (key: string) => {
       'worklet';
-      touchedItemDimensions.value = itemDimensions.value[key] ?? {
-        height: 0,
-        width: 0
-      };
+      touchedItemDimensions.value = itemDimensions.value[key] ?? null;
     },
     [touchedItemDimensions, itemDimensions]
   );

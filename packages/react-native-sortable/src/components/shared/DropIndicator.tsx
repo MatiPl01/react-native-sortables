@@ -16,13 +16,13 @@ import {
   useItemPosition,
   usePositionsContext
 } from '../../contexts';
-import type { Position } from '../../types';
+import type { Vector } from '../../types';
 
 export type DropIndicatorComponentProps = {
   activationProgress: SharedValue<number>;
   touchedItemKey: SharedValue<null | string>;
   dropIndex: SharedValue<number>;
-  dropPosition: SharedValue<Position>;
+  dropPosition: SharedValue<Vector>;
 };
 
 type DropIndicatorProps = {
@@ -41,7 +41,7 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
   const { height, width } = useItemDimensions(touchedItemKey);
 
   const dropIndex = useSharedValue(0);
-  const dropPosition = useSharedValue<Position>({ x: 0, y: 0 });
+  const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
 
   useAnimatedReaction(
     () => ({

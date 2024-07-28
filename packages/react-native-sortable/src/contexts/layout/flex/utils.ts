@@ -1,5 +1,5 @@
 import { OFFSET_EPS } from '../../../constants';
-import type { Dimension, Dimensions, Position } from '../../../types';
+import type { Dimension, Dimensions, Vector } from '../../../types';
 import { sum } from '../../../utils';
 import type {
   AlignContent,
@@ -178,10 +178,10 @@ export const calculateLayout = (
   >
 ): {
   crossAxisGroupOffsets: Array<number>;
-  itemPositions: Record<string, Position>;
+  itemPositions: Record<string, Vector>;
 } | null => {
   'worklet';
-  const positions: Record<string, Position> = {};
+  const positions: Record<string, Vector> = {};
 
   const mainAxisDimension = groupBy;
   let crossAxisDimension: Dimension = 'height';

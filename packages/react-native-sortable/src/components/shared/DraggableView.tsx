@@ -47,12 +47,13 @@ export default function DraggableView({
   const {
     activationProgress,
     activeItemKey,
-    activeItemPosition,
     disabled,
     handleDragEnd,
     handleDragStart,
     handleDragUpdate,
-    touchedItemKey
+    handleTouchStart,
+    touchedItemKey,
+    touchedItemPosition
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
   const itemPosition = useItemPosition(key);
@@ -79,18 +80,18 @@ export default function DraggableView({
     () =>
       Gesture.Pan()
         .activateAfterLongPress(TIME_TO_ACTIVATE_PAN)
-        .onTouchesDown(() => {
+        .onTouchesDown(e => {
           // Ignore touch if another item is already being touched/activated
           if (touchedItemKey.value !== null) {
             return;
           }
-          touchedItemKey.value = key;
           pressProgress.value = activationProgress.value = withDelay(
             ACTIVATE_PAN_ANIMATION_DELAY,
             withTiming(1, {
               duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
             })
           );
+          handleTouchStart(e, key);
           updateTouchedItemDimensions(key);
         })
         .onStart(() => {
@@ -118,6 +119,7 @@ export default function DraggableView({
       pressProgress,
       activationProgress,
       onDragEnd,
+      handleTouchStart,
       handleDragStart,
       handleDragUpdate,
       updateStartScrollOffset,
@@ -142,7 +144,7 @@ export default function DraggableView({
         isActive.value,
         pressProgress.value,
         { x, y },
-        activeItemPosition.value
+        touchedItemPosition.value
       ),
       ...overriddenDimensions.value
     };
