@@ -20,6 +20,7 @@ type MeasurementsContextType = {
   containerWidth: SharedValue<number>;
   measureItem: (key: string, dimensions: Dimensions) => void;
   removeItem: (key: string) => void;
+  updateTouchedItemDimensions: (key: string) => void;
 };
 
 type MeasurementsProviderProps = PropsWithChildren<{
@@ -32,7 +33,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   children,
   itemsCount
 }) => {
-  const { activationProgress } = useDragContext();
+  const { activeItemDropped, touchedItemDimensions, touchedItemKey } =
+    useDragContext();
 
   const measuredItemsCount = useSharedValue(0);
 
@@ -50,6 +52,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       'worklet';
       itemDimensions.value[key] = dimensions;
       measuredItemsCount.value += 1;
+      if (touchedItemKey.value === key) {
+        touchedItemDimensions.value = dimensions;
+      }
       // Update the array of item dimensions only after all items have been measured
       // to reduce the number of times animated reactions are triggered
       if (measuredItemsCount.value === itemsCount) {
@@ -65,6 +70,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
   });
 
+  const updateTouchedItemDimensions = useCallback(
+    (key: string) => {
+      'worklet';
+      touchedItemDimensions.value = itemDimensions.value[key] ?? {
+        height: 0,
+        width: 0
+      };
+    },
+    [touchedItemDimensions, itemDimensions]
+  );
+
   const measureContainer = useCallback(
     ({
       nativeEvent: {
@@ -77,7 +93,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   );
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
-    zIndex: activationProgress.value > 0 ? 1 : 0
+    zIndex: activeItemDropped.value ? 0 : 1
   }));
 
   return {
@@ -95,7 +111,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       itemDimensions,
       measureItem,
       overrideItemDimensions,
-      removeItem
+      removeItem,
+      updateTouchedItemDimensions
     }
   };
 });

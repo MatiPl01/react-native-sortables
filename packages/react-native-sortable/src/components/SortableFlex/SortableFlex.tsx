@@ -80,6 +80,8 @@ function SortableFlexInner({
           key={key}
           // When flexDirection is row-reverse, we need to reverse the x-axis
           // because right offset in absolute position is calculated from the right edge
+          // TODO - change this not to pass to separate draggable view
+          // components causing re-renders of them all
           reverseXAxis={flexDirection === 'row-reverse'}>
           {cloneElement(child, {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

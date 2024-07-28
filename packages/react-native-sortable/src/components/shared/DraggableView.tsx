@@ -38,8 +38,12 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { measureItem, overrideItemDimensions, removeItem } =
-    useMeasurementsContext();
+  const {
+    measureItem,
+    overrideItemDimensions,
+    removeItem,
+    updateTouchedItemDimensions
+  } = useMeasurementsContext();
   const {
     activationProgress,
     activeItemKey,
@@ -47,18 +51,19 @@ export default function DraggableView({
     disabled,
     handleDragEnd,
     handleDragStart,
+    handleDragUpdate,
     touchedItemKey
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
   const itemPosition = useItemPosition(key);
 
+  const itemDimensions = useSharedValue({ height: 0, width: 0 });
   const overriddenDimensions = useDerivedValue(
     () => overrideItemDimensions.value[key]
   );
 
   const isActive = useDerivedValue(() => activeItemKey.value === key);
   const pressProgress = useSharedValue(0);
-  const dragStartPosition = useSharedValue({ x: 0, y: 0 });
 
   useEffect(() => {
     return () => removeItem(key);
@@ -79,24 +84,19 @@ export default function DraggableView({
           if (touchedItemKey.value !== null) {
             return;
           }
-          const progress = withDelay(
+          touchedItemKey.value = key;
+          pressProgress.value = activationProgress.value = withDelay(
             ACTIVATE_PAN_ANIMATION_DELAY,
             withTiming(1, {
               duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
             })
           );
-          touchedItemKey.value = key;
-          pressProgress.value = progress;
-          activationProgress.value = progress;
+          updateTouchedItemDimensions(key);
         })
         .onStart(() => {
           if (touchedItemKey.value === null) {
             return;
           }
-          dragStartPosition.value = activeItemPosition.value = {
-            x: itemPosition.x.value ?? 0,
-            y: itemPosition.y.value ?? 0
-          };
           updateStartScrollOffset?.();
           handleDragStart(key);
         })
@@ -104,42 +104,36 @@ export default function DraggableView({
           if (!isActive.value) {
             return;
           }
-          activeItemPosition.value = {
-            x:
-              dragStartPosition.value.x +
-              (reverseXAxis ? -1 : 1) * e.translationX,
-            y: dragStartPosition.value.y + e.translationY
-          };
+          handleDragUpdate(e, reverseXAxis);
         })
         .onFinalize(onDragEnd)
         .onTouchesCancelled(onDragEnd)
         .enabled(!disabled),
     [
       key,
-      disabled,
-      reverseXAxis,
-      handleDragStart,
-      onDragEnd,
-      isActive,
-      itemPosition,
-      activationProgress,
       touchedItemKey,
-      activeItemPosition,
-      dragStartPosition,
+      reverseXAxis,
+      disabled,
+      isActive,
       pressProgress,
-      updateStartScrollOffset
+      activationProgress,
+      onDragEnd,
+      handleDragStart,
+      handleDragUpdate,
+      updateStartScrollOffset,
+      updateTouchedItemDimensions
     ]
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (itemPosition.x.value === null || itemPosition.y.value === null) {
+    const x = itemPosition.x.value;
+    const y = itemPosition.y.value;
+
+    if (x === null || y === null) {
       return {
         position: 'relative'
       };
     }
-
-    const x = itemPosition.x.value;
-    const y = itemPosition.y.value;
 
     return {
       position: 'absolute',
@@ -164,6 +158,7 @@ export default function DraggableView({
             layout: { height, width }
           }
         }: LayoutChangeEvent) => {
+          itemDimensions.value = { height, width };
           measureItem(key, { height, width });
         }}>
         <ItemDecoration pressProgress={pressProgress}>
