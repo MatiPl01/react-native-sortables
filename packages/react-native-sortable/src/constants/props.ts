@@ -1,4 +1,4 @@
-import { DefaultDropIndicator } from '../components';
+import { DefaultDropIndicator } from '../components/defaults';
 import type { RequiredExcept, SharedProps, SortableCallbacks } from '../types';
 
 type OptionalProps = 'scrollableRef' | keyof SortableCallbacks;
@@ -11,8 +11,8 @@ export const SHARED_PROPS: RequiredExcept<SharedProps, OptionalProps> = {
   autoScrollActivationOffset: 40,
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
-  dragDisabled: false,
-  hapticsDisabled: false,
+  dragEnabled: true,
+  hapticsEnabled: false,
   inactiveItemOpacity: 0.5,
   inactiveItemScale: 1,
   onDragEnd: undefined,

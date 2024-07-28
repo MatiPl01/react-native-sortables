@@ -1,25 +1,27 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 
-import { DropIndicator } from '../../components';
+import DropIndicator from '../components/shared/DropIndicator';
 import type {
   ActiveItemDecorationSettings,
   AutoScrollSettings,
   DropIndicatorSettings,
   PartialBy,
   SortableCallbacks
-} from '../../types';
-import { ContextProviderComposer } from '../utils';
-import { AutoScrollProvider } from './AutoScrollProvider';
-import { DragProvider } from './DragProvider';
-import { MeasurementsProvider } from './MeasurementsProvider';
-import { PositionsProvider } from './PositionsProvider';
+} from '../types';
+import {
+  AutoScrollProvider,
+  DragProvider,
+  MeasurementsProvider,
+  PositionsProvider
+} from './shared';
+import { ContextProviderComposer } from './utils';
 
 type SharedProviderProps = PropsWithChildren<
   {
     itemKeys: Array<string>;
-    dragDisabled: boolean;
-    hapticsDisabled: boolean;
+    dragEnabled: boolean;
+    hapticsEnabled: boolean;
   } & ActiveItemDecorationSettings &
     DropIndicatorSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
@@ -53,6 +55,7 @@ export default function SharedProvider({
       />
     );
   }
+
   return (
     <ContextProviderComposer providers={providers}>
       {showDropIndicator && (

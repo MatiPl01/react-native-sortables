@@ -11,19 +11,19 @@ import {
 import type {
   ActiveItemDecorationSettings,
   AnimatedValues,
-  Position,
-  SortableCallbacks
+  SortableCallbacks,
+  Vector
 } from '../../types';
 import { createEnhancedContext } from '../utils';
 import { usePositionsContext } from './PositionsProvider';
 
 type DragContextType = {
-  disabled: boolean;
+  enabled: boolean;
   activeItemKey: SharedValue<null | string>;
   touchedItemKey: SharedValue<null | string>;
   activationProgress: SharedValue<number>;
   inactiveAnimationProgress: SharedValue<number>;
-  activeItemPosition: SharedValue<Position>;
+  activeItemPosition: SharedValue<Vector>;
   activeItemDropped: SharedValue<boolean>;
   handleDragStart: (key: string) => void;
   handleDragEnd: (key: string) => void;
@@ -37,8 +37,8 @@ type DragContextType = {
 
 type DragProviderProps = PropsWithChildren<
   {
-    dragDisabled: boolean;
-    hapticsDisabled: boolean;
+    dragEnabled: boolean;
+    hapticsEnabled: boolean;
   } & ActiveItemDecorationSettings &
     SortableCallbacks
 >;
@@ -50,8 +50,8 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   activeItemOpacity: activeItemOpacityProp,
   activeItemScale: activeItemScaleProp,
   activeItemShadowOpacity: activeItemShadowOpacityProp,
-  dragDisabled,
-  hapticsDisabled,
+  dragEnabled,
+  hapticsEnabled,
   inactiveItemOpacity: inactiveItemOpacityProp,
   inactiveItemScale: inactiveItemScaleProp,
   onDragEnd,
@@ -72,7 +72,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const touchedItemKey = useSharedValue<null | string>(null);
   const activationProgress = useSharedValue(0);
   const inactiveAnimationProgress = useSharedValue(0);
-  const activeItemPosition = useSharedValue<Position>({ x: 0, y: 0 });
+  const activeItemPosition = useSharedValue<Vector>({ x: 0, y: 0 });
   const activeItemDropped = useSharedValue(true);
   const dragStartIndex = useSharedValue(-1);
 
@@ -82,7 +82,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const stableOnDragEnd = useJSStableCallback(onDragEnd);
   const stableOnOrderChange = useJSStableCallback(onOrderChange);
 
-  const haptics = useHaptics(!hapticsDisabled);
+  const haptics = useHaptics(hapticsEnabled);
 
   const handleDragStart = useCallback(
     (key: string) => {
@@ -173,7 +173,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       activeItemPosition,
       activeItemScale,
       activeItemShadowOpacity,
-      disabled: dragDisabled,
+      enabled: dragEnabled,
       handleDragEnd,
       handleDragStart,
       handleOrderChange,
