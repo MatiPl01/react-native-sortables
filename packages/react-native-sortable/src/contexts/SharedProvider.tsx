@@ -12,6 +12,7 @@ import type {
 import {
   AutoScrollProvider,
   DragProvider,
+  LayerProvider,
   MeasurementsProvider,
   PositionsProvider
 } from './shared';
@@ -34,14 +35,16 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollSpeed,
   children,
+  dragEnabled,
   itemKeys,
   scrollableRef,
   showDropIndicator,
   ...dragProviderProps
 }: SharedProviderProps) {
   const providers = [
+    <LayerProvider />,
     <PositionsProvider itemKeys={itemKeys} />,
-    <DragProvider {...dragProviderProps} />,
+    <DragProvider dragEnabled={dragEnabled} {...dragProviderProps} />,
     <MeasurementsProvider itemsCount={itemKeys.length} />
   ];
 

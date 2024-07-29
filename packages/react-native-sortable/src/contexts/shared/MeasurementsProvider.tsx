@@ -3,14 +3,12 @@ import type { LayoutChangeEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, {
   type SharedValue,
-  useAnimatedStyle,
   useSharedValue
 } from 'react-native-reanimated';
 
 import { useUIStableCallback } from '../../hooks';
 import type { Dimensions } from '../../types';
 import { createEnhancedContext } from '../utils';
-import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
@@ -32,8 +30,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   children,
   itemsCount
 }) => {
-  const { activationProgress } = useDragContext();
-
   const measuredItemsCount = useSharedValue(0);
 
   const initialMeasurementsCompleted = useSharedValue(false);
@@ -76,15 +72,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     [containerWidth]
   );
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    zIndex: activationProgress.value > 0 ? 1 : 0
-  }));
-
   return {
     children: (
-      <Animated.View
-        style={[styles.container, animatedContainerStyle]}
-        onLayout={measureContainer}>
+      <Animated.View style={styles.container} onLayout={measureContainer}>
         {children}
       </Animated.View>
     ),

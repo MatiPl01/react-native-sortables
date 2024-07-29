@@ -15,6 +15,7 @@ import type {
   Vector
 } from '../../types';
 import { createEnhancedContext } from '../utils';
+import { LayerState, useLayerContext } from './LayerProvider';
 import { usePositionsContext } from './PositionsProvider';
 
 type DragContextType = {
@@ -25,6 +26,7 @@ type DragContextType = {
   inactiveAnimationProgress: SharedValue<number>;
   activeItemPosition: SharedValue<Vector>;
   activeItemDropped: SharedValue<boolean>;
+  handleTouchStart: (key: string) => void;
   handleDragStart: (key: string) => void;
   handleDragEnd: (key: string) => void;
   handleOrderChange: (
@@ -59,6 +61,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   onOrderChange
 }) => {
   const { indexToKey, keyToIndex } = usePositionsContext();
+  const { updateLayer } = useLayerContext() ?? {};
 
   const activeItemScale = useAnimatableValue(activeItemScaleProp);
   const activeItemOpacity = useAnimatableValue(activeItemOpacityProp);
@@ -83,6 +86,16 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const stableOnOrderChange = useJSStableCallback(onOrderChange);
 
   const haptics = useHaptics(hapticsEnabled);
+
+  const handleTouchStart = useCallback(
+    (key: string) => {
+      'worklet';
+      touchedItemKey.value = key;
+      activationProgress.value = 0;
+      updateLayer?.(LayerState.Focused);
+    },
+    [updateLayer, activationProgress, touchedItemKey]
+  );
 
   const handleDragStart = useCallback(
     (key: string) => {
@@ -116,10 +129,14 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       touchedItemKey.value = null;
       inactiveAnimationProgress.value = delayed();
       activationProgress.value = delayed(finished => {
-        if (finished) activeItemDropped.value = true;
+        if (finished) {
+          activeItemDropped.value = true;
+          updateLayer?.(LayerState.Idle);
+        }
       });
 
       if (activeItemKey.value !== null) {
+        updateLayer?.(LayerState.Intermediate);
         haptics.medium();
         activeItemKey.value = null;
 
@@ -139,6 +156,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       dragStartIndex,
       keyToIndex,
       stableOnDragEnd,
+      updateLayer,
       haptics
     ]
   );
@@ -177,6 +195,7 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       handleDragEnd,
       handleDragStart,
       handleOrderChange,
+      handleTouchStart,
       inactiveAnimationProgress,
       inactiveItemOpacity,
       inactiveItemScale,

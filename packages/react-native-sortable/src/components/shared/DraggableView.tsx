@@ -46,6 +46,7 @@ export default function DraggableView({
     enabled,
     handleDragEnd,
     handleDragStart,
+    handleTouchStart,
     inactiveAnimationProgress,
     touchedItemKey
   } = useDragContext();
@@ -79,18 +80,17 @@ export default function DraggableView({
           if (touchedItemKey.value !== null) {
             return;
           }
-          touchedItemKey.value = key;
-          activationProgress.value = 0;
-          const delayed = () =>
+          handleTouchStart(key);
+          const animate = () =>
             withDelay(
               ACTIVATE_PAN_ANIMATION_DELAY,
               withTiming(1, {
                 duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
               })
             );
-          pressProgress.value = delayed();
-          activationProgress.value = delayed();
-          inactiveAnimationProgress.value = delayed();
+          pressProgress.value = animate();
+          activationProgress.value = animate();
+          inactiveAnimationProgress.value = animate();
         })
         .onStart(() => {
           if (!isTouched.value) {
@@ -122,8 +122,6 @@ export default function DraggableView({
       enabled,
       isTouched,
       reverseXAxis,
-      handleDragStart,
-      onDragEnd,
       itemPosition,
       activationProgress,
       touchedItemKey,
@@ -131,6 +129,9 @@ export default function DraggableView({
       dragStartPosition,
       pressProgress,
       inactiveAnimationProgress,
+      handleTouchStart,
+      handleDragStart,
+      onDragEnd,
       updateStartScrollOffset
     ]
   );
