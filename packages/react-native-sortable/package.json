@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "devDependencies": {
     "@babel/core": "^7.24.7",
-    "@babel/preset-env": "^7.24.7",
+    "@babel/preset-env": "^7.25.0",
     "@babel/runtime": "^7.24.7",
     "@react-native/babel-preset": "^0.74.85",
     "@react-native/metro-config": "^0.74.85",
