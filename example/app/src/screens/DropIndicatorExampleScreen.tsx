@@ -14,7 +14,7 @@ import type {
   DropIndicatorComponentProps,
   SortableGridRenderItem
 } from 'react-native-sortable';
-import { SortableGrid } from 'react-native-sortable';
+import { SortableGrid, SortableLayer } from 'react-native-sortable';
 
 const COLUMNS = 3;
 const NUM_CARDS = 2 * COLUMNS;
@@ -84,31 +84,49 @@ export default function DropIndicatorExampleScreen() {
 
   return (
     <ScrollView>
-      <View style={styles.section}>
-        <Text style={styles.title}>Without Drop Indicator</Text>
-        <SortableGrid columns={COLUMNS} data={CARDS} renderItem={renderItem} />
-      </View>
+      {/* SortableLayer components can be nested if ancestors or 
+      sortable components are different, like in the example case below, 
+      where wrapping sections in SortableLayer is not enough as 2 first 
+      sections have different parent than the last one */}
+      <SortableLayer>
+        <View>
+          <SortableLayer>
+            <View style={styles.section}>
+              <Text style={styles.title}>Without Drop Indicator</Text>
+              <SortableGrid
+                columns={COLUMNS}
+                data={CARDS}
+                renderItem={renderItem}
+              />
+            </View>
+          </SortableLayer>
 
-      <View style={styles.section}>
-        <Text style={styles.title}>Default Drop Indicator</Text>
-        <SortableGrid
-          columns={COLUMNS}
-          data={CARDS}
-          renderItem={renderItem}
-          showDropIndicator
-        />
-      </View>
+          <SortableLayer>
+            <View style={styles.section}>
+              <Text style={styles.title}>Default Drop Indicator</Text>
+              <SortableGrid
+                columns={COLUMNS}
+                data={CARDS}
+                renderItem={renderItem}
+                showDropIndicator
+              />
+            </View>
+          </SortableLayer>
+        </View>
+      </SortableLayer>
 
-      <View style={styles.section}>
-        <Text style={styles.title}>Custom Drop Indicator</Text>
-        <SortableGrid
-          columns={COLUMNS}
-          data={CARDS}
-          DropIndicatorComponent={CustomDropIndicator}
-          renderItem={renderItem}
-          showDropIndicator
-        />
-      </View>
+      <SortableLayer>
+        <View style={styles.section}>
+          <Text style={styles.title}>Custom Drop Indicator</Text>
+          <SortableGrid
+            columns={COLUMNS}
+            data={CARDS}
+            DropIndicatorComponent={CustomDropIndicator}
+            renderItem={renderItem}
+            showDropIndicator
+          />
+        </View>
+      </SortableLayer>
     </ScrollView>
   );
 }
