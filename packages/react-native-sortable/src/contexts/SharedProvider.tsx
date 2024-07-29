@@ -35,7 +35,6 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollSpeed,
   children,
-  dragEnabled,
   itemKeys,
   scrollableRef,
   showDropIndicator,
@@ -44,7 +43,7 @@ export default function SharedProvider({
   const providers = [
     <LayerProvider />,
     <PositionsProvider itemKeys={itemKeys} />,
-    <DragProvider dragEnabled={dragEnabled} {...dragProviderProps} />,
+    <DragProvider {...dragProviderProps} />,
     <MeasurementsProvider itemsCount={itemKeys.length} />
   ];
 
