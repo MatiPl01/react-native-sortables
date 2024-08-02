@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import type { ViewProps } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
@@ -82,17 +83,32 @@ function SortableGridInner<I>({
       {data.map((item, index) => {
         const key = keyExtractor(item, index);
         return (
-          <DraggableView
+          <SortableGridItem
+            item={item}
             itemKey={key}
             key={key}
-            style={animatedColumnWidthStyle}>
-            {renderItem({ item })}
-          </DraggableView>
+            renderItem={renderItem}
+            style={animatedColumnWidthStyle}
+          />
         );
       })}
     </Animated.View>
   );
 }
+
+type SortableGridItemProps<I> = {
+  itemKey: string;
+  item: I;
+  renderItem: SortableGridRenderItem<I>;
+} & ViewProps;
+
+const SortableGridItem = typedMemo(function <I>({
+  item,
+  renderItem,
+  ...rest
+}: SortableGridItemProps<I>) {
+  return <DraggableView {...rest}>{renderItem({ item })}</DraggableView>;
+});
 
 const styles = StyleSheet.create({
   gridContainer: {
