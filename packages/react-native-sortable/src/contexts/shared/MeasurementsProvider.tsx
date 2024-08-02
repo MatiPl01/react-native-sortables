@@ -9,6 +9,7 @@ import Animated, {
 import { useUIStableCallback } from '../../hooks';
 import type { Dimensions } from '../../types';
 import { createEnhancedContext } from '../utils';
+import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
@@ -18,6 +19,7 @@ type MeasurementsContextType = {
   containerWidth: SharedValue<number>;
   measureItem: (key: string, dimensions: Dimensions) => void;
   removeItem: (key: string) => void;
+  updateTouchedItemDimensions: (key: string) => void;
 };
 
 type MeasurementsProviderProps = PropsWithChildren<{
@@ -30,6 +32,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   children,
   itemsCount
 }) => {
+  const { touchedItemDimensions, touchedItemKey } = useDragContext();
+
   const measuredItemsCount = useSharedValue(0);
 
   const initialMeasurementsCompleted = useSharedValue(false);
@@ -46,6 +50,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       'worklet';
       itemDimensions.value[key] = dimensions;
       measuredItemsCount.value += 1;
+      if (touchedItemKey.value === key) {
+        touchedItemDimensions.value = dimensions;
+      }
       // Update the array of item dimensions only after all items have been measured
       // to reduce the number of times animated reactions are triggered
       if (measuredItemsCount.value === itemsCount) {
@@ -72,6 +79,14 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     [containerWidth]
   );
 
+  const updateTouchedItemDimensions = useCallback(
+    (key: string) => {
+      'worklet';
+      touchedItemDimensions.value = itemDimensions.value[key] ?? null;
+    },
+    [touchedItemDimensions, itemDimensions]
+  );
+
   return {
     children: (
       <Animated.View style={styles.container} onLayout={measureContainer}>
@@ -85,7 +100,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       itemDimensions,
       measureItem,
       overrideItemDimensions,
-      removeItem
+      removeItem,
+      updateTouchedItemDimensions
     }
   };
 });

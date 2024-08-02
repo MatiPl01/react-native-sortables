@@ -21,9 +21,9 @@ import { useDragContext } from './DragProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
 
 type AutoScrollContextType = {
-  updateStartScrollOffset: () => void;
   scrollOffset: SharedValue<number>;
   dragStartScrollOffset: SharedValue<number>;
+  updateStartScrollOffset: (providedOffset?: number) => void;
 };
 
 type AutoScrollProviderProps = PropsWithChildren<AutoScrollSettings>;
@@ -39,7 +39,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   scrollableRef
 }) => {
   const { itemDimensions } = useMeasurementsContext();
-  const { activeItemKey, activeItemPosition } = useDragContext();
+  const { activeItemKey, touchedItemPosition } = useDragContext();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);
@@ -100,7 +100,11 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   // Automatically scrolls the container when the active item is near the edge
   useAnimatedReaction(
     () => {
-      if (!enabled.value || activeItemHeight.value === -1) {
+      if (
+        !enabled.value ||
+        activeItemHeight.value === -1 ||
+        !touchedItemPosition.value
+      ) {
         return null;
       }
 
@@ -108,7 +112,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
         currentOffset: scrollOffset.value,
         itemHeight: activeItemHeight.value,
         itemOffset:
-          activeItemPosition.value.y +
+          touchedItemPosition.value.y +
           scrollOffset.value -
           dragStartScrollOffset.value,
         threshold: offsetThreshold.value
@@ -153,10 +157,13 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
     }
   );
 
-  const updateStartScrollOffset = useCallback(() => {
-    'worklet';
-    dragStartScrollOffset.value = scrollOffset.value;
-  }, [dragStartScrollOffset, scrollOffset]);
+  const updateStartScrollOffset = useCallback(
+    (providedOffset?: number) => {
+      'worklet';
+      dragStartScrollOffset.value = providedOffset ?? scrollOffset.value;
+    },
+    [dragStartScrollOffset, scrollOffset]
+  );
 
   return {
     children: (

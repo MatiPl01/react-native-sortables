@@ -32,7 +32,7 @@ export function useItemPosition(
   y: SharedValue<null | number>;
 } {
   const { itemPositions } = usePositionsContext();
-  const { activeItemKey, activeItemPosition } = useDragContext();
+  const { touchedItemKey, touchedItemPosition } = useDragContext();
   const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
   const itemKey = useAnimatableValue(key);
@@ -61,7 +61,7 @@ export function useItemPosition(
 
   useAnimatedReaction(
     () => ({
-      isActive: activeItemKey.value === itemKey.value,
+      isActive: touchedItemKey.value === itemKey.value,
       position:
         itemKey.value !== null ? itemPositions.value[itemKey.value] : null
     }),
@@ -79,12 +79,14 @@ export function useItemPosition(
 
   useAnimatedReaction(
     () => ({
-      position: activeItemPosition.value,
+      position: touchedItemPosition.value,
       translateY:
-        (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0)
+        dragStartScrollOffset?.value === -1
+          ? 0
+          : (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0)
     }),
     ({ position, translateY }) => {
-      if (!ignoreActive && activeItemKey.value === itemKey.value) {
+      if (!ignoreActive && touchedItemKey.value === itemKey.value && position) {
         x.value = position.x;
         y.value = position.y + translateY;
       }
@@ -139,19 +141,19 @@ export function useOrderUpdater(
 ) {
   const { keyToIndex } = usePositionsContext();
   const { itemDimensions } = useMeasurementsContext();
-  const { activeItemKey, activeItemPosition, handleOrderChange } =
+  const { activeItemKey, handleOrderChange, touchedItemPosition } =
     useDragContext();
   const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
-      activePosition: activeItemPosition.value,
+      activePosition: touchedItemPosition.value,
       scrollOffsetDiff:
         (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0)
     }),
     ({ activeKey, activePosition, scrollOffsetDiff }) => {
-      if (activeKey === null) {
+      if (activeKey === null || activePosition === null) {
         return;
       }
       const dimensions = itemDimensions.value[activeKey];
