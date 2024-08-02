@@ -45,14 +45,14 @@
   },
   "main": "dist/commonjs/index",
   "module": "dist/module/index",
+  "optionalDependencies": {
+    "react-native-haptic-feedback": ">=2.0.0"
+  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
     "react-native-gesture-handler": ">=2.0.0",
     "react-native-reanimated": ">=3.0.0"
-  },
-  "optionalDependencies": {
-    "react-native-haptic-feedback": ">=2.0.0"
   },
   "publishConfig": {
     "access": "public"

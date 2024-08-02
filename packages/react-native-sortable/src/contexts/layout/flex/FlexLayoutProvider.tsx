@@ -5,7 +5,10 @@ import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
 import type { Dimensions } from '../../../types';
-import { useMeasurementsContext, usePositionsContext } from '../../shared/providers';
+import {
+  useMeasurementsContext,
+  usePositionsContext
+} from '../../shared/providers';
 import { createEnhancedContext } from '../../utils';
 import type { FlexDirection, FlexProps } from './types';
 import {
