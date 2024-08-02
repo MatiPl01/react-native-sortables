@@ -7,10 +7,12 @@ import {
 import { useAnimatableValue } from '../../../hooks';
 import type { ActiveItemSnapSettings } from '../../../types';
 import { getOffsetDistance } from '../../../utils';
-import { useAutoScrollContext } from '../providers';
-import { useDragContext } from '../providers/DragProvider';
-import { useMeasurementsContext } from '../providers/MeasurementsProvider';
-import { usePositionsContext } from '../providers/PositionsProvider';
+import {
+  useAutoScrollContext,
+  useDragContext,
+  useMeasurementsContext,
+  usePositionsContext
+} from '../providers';
 
 export default function TouchedItemPositionUpdater({
   enableActiveItemSnap,

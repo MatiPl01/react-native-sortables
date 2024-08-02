@@ -4,7 +4,7 @@ import {
   useMeasurementsContext,
   useOrderUpdater,
   usePositionsContext
-} from '../../shared/providers';
+} from '../../shared';
 import { useGridLayoutContext } from './GridLayoutProvider';
 import { getColumnIndex, getRowIndex } from './utils';
 

@@ -9,10 +9,7 @@ import {
 import { OFFSET_EPS } from '../../../constants';
 import type { Vector } from '../../../types';
 import { areArraysDifferent, areVectorsDifferent } from '../../../utils';
-import {
-  useMeasurementsContext,
-  usePositionsContext
-} from '../../shared/providers';
+import { useMeasurementsContext, usePositionsContext } from '../../shared';
 import { createEnhancedContext } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
 

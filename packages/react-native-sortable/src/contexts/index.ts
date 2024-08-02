@@ -1,3 +1,3 @@
 export * from './layout';
-export * from './shared/providers';
+export * from './shared';
 export { default as SharedProvider } from './SharedProvider';
