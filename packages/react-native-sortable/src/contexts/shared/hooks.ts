@@ -9,10 +9,11 @@ import {
 
 import { useAnimatableValue } from '../../hooks';
 import type { Animatable, Dimensions, Maybe, Vector } from '../../types';
-import { useAutoScrollContext } from './AutoScrollProvider';
-import { useDragContext } from './DragProvider';
-import { useMeasurementsContext } from './MeasurementsProvider';
-import { usePositionsContext } from './PositionsProvider';
+import {
+  useDragContext,
+  useMeasurementsContext,
+  usePositionsContext
+} from './providers';
 
 type UseItemPositionOptions = {
   ignoreActive?: boolean;
@@ -31,9 +32,8 @@ export function useItemPosition(
   x: SharedValue<null | number>;
   y: SharedValue<null | number>;
 } {
-  const { itemPositions } = usePositionsContext();
-  const { activeItemKey, activeItemPosition } = useDragContext();
-  const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
+  const { itemPositions, touchedItemPosition } = usePositionsContext();
+  const { touchedItemKey } = useDragContext();
 
   const itemKey = useAnimatableValue(key);
   const x = useSharedValue<null | number>(null);
@@ -61,7 +61,7 @@ export function useItemPosition(
 
   useAnimatedReaction(
     () => ({
-      isActive: activeItemKey.value === itemKey.value,
+      isActive: touchedItemKey.value === itemKey.value,
       position:
         itemKey.value !== null ? itemPositions.value[itemKey.value] : null
     }),
@@ -79,17 +79,15 @@ export function useItemPosition(
 
   useAnimatedReaction(
     () => ({
-      position: activeItemPosition.value,
-      translateY:
-        (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0)
+      position: touchedItemPosition.value
     }),
-    ({ position, translateY }) => {
-      if (!ignoreActive && activeItemKey.value === itemKey.value) {
+    ({ position }) => {
+      if (!ignoreActive && touchedItemKey.value === itemKey.value && position) {
         x.value = position.x;
-        y.value = position.y + translateY;
+        y.value = position.y;
       }
     },
-    [scrollOffset, dragStartScrollOffset, ignoreActive]
+    [ignoreActive]
   );
 
   return { x, y };
@@ -127,6 +125,45 @@ export function useItemDimensions(key: Animatable<null | string>): {
   return { height, width };
 }
 
+export function useItemZIndex(
+  key: string,
+  pressProgress: SharedValue<number>,
+  position: {
+    x: SharedValue<null | number>;
+    y: SharedValue<null | number>;
+  }
+): SharedValue<number> {
+  const { itemPositions } = usePositionsContext();
+  const { touchedItemKey } = useDragContext();
+
+  const zIndex = useSharedValue(0);
+
+  useAnimatedReaction(
+    () => ({
+      isTouched: touchedItemKey.value === key,
+      progress: pressProgress.value,
+      targetPosition: itemPositions.value[key]
+    }),
+    ({ isTouched, progress, targetPosition }) => {
+      if (isTouched) {
+        zIndex.value = 3;
+      } else if (progress > 0) {
+        zIndex.value = 2;
+      } else if (
+        targetPosition &&
+        (position.x.value !== targetPosition.x ||
+          position.y.value !== targetPosition.y)
+      ) {
+        zIndex.value = 1;
+      } else {
+        zIndex.value = 0;
+      }
+    }
+  );
+
+  return zIndex;
+}
+
 export function useOrderUpdater(
   callback: (props: {
     activeKey: string;
@@ -137,21 +174,17 @@ export function useOrderUpdater(
   }) => Maybe<Array<string>>,
   deps?: Array<unknown>
 ) {
-  const { keyToIndex } = usePositionsContext();
+  const { keyToIndex, touchedItemPosition } = usePositionsContext();
   const { itemDimensions } = useMeasurementsContext();
-  const { activeItemKey, activeItemPosition, handleOrderChange } =
-    useDragContext();
-  const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
+  const { activeItemKey, handleOrderChange } = useDragContext();
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
-      activePosition: activeItemPosition.value,
-      scrollOffsetDiff:
-        (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0)
+      activePosition: touchedItemPosition.value
     }),
-    ({ activeKey, activePosition, scrollOffsetDiff }) => {
-      if (activeKey === null) {
+    ({ activeKey, activePosition }) => {
+      if (activeKey === null || activePosition === null) {
         return;
       }
       const dimensions = itemDimensions.value[activeKey];
@@ -159,8 +192,7 @@ export function useOrderUpdater(
         return;
       }
 
-      const centerY =
-        activePosition.y + dimensions.height / 2 + scrollOffsetDiff;
+      const centerY = activePosition.y + dimensions.height / 2;
       const centerX = activePosition.x + dimensions.width / 2;
       const activeIndex = keyToIndex.value[activeKey];
 

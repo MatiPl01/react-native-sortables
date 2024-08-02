@@ -1,20 +1,25 @@
 import { type PropsWithChildren, useCallback } from 'react';
+import type {
+  GestureTouchEvent,
+  GestureUpdateEvent,
+  PanGestureHandlerEventPayload
+} from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { TIME_TO_ACTIVATE_PAN } from '../../constants';
+import { TIME_TO_ACTIVATE_PAN } from '../../../constants';
 import {
   useAnimatableValue,
   useHaptics,
   useJSStableCallback
-} from '../../hooks';
+} from '../../../hooks';
 import type {
   ActiveItemDecorationSettings,
   AnimatedValues,
   SortableCallbacks,
   Vector
-} from '../../types';
-import { createEnhancedContext } from '../utils';
+} from '../../../types';
+import { createEnhancedContext } from '../../utils';
 import { LayerState, useLayerContext } from './LayerProvider';
 import { usePositionsContext } from './PositionsProvider';
 
@@ -24,10 +29,14 @@ type DragContextType = {
   touchedItemKey: SharedValue<null | string>;
   activationProgress: SharedValue<number>;
   inactiveAnimationProgress: SharedValue<number>;
-  activeItemPosition: SharedValue<Vector>;
+  activeItemTranslation: SharedValue<Vector | null>;
   activeItemDropped: SharedValue<boolean>;
-  handleTouchStart: (key: string) => void;
+  handleTouchStart: (e: GestureTouchEvent, key: string) => void;
   handleDragStart: (key: string) => void;
+  handleDragUpdate: (
+    e: GestureUpdateEvent<PanGestureHandlerEventPayload>,
+    reverseXAxis?: boolean
+  ) => void;
   handleDragEnd: (key: string) => void;
   handleOrderChange: (
     key: string,
@@ -60,7 +69,13 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   onDragStart,
   onOrderChange
 }) => {
-  const { indexToKey, keyToIndex } = usePositionsContext();
+  const {
+    indexToKey,
+    itemPositions,
+    keyToIndex,
+    relativeTouchPosition,
+    touchStartPosition
+  } = usePositionsContext();
   const { updateLayer } = useLayerContext() ?? {};
 
   const activeItemScale = useAnimatableValue(activeItemScaleProp);
@@ -70,12 +85,12 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   );
   const inactiveItemScale = useAnimatableValue(inactiveItemScaleProp);
   const inactiveItemOpacity = useAnimatableValue(inactiveItemOpacityProp);
+  const activeItemTranslation = useSharedValue<Vector | null>(null);
 
   const activeItemKey = useSharedValue<null | string>(null);
   const touchedItemKey = useSharedValue<null | string>(null);
   const activationProgress = useSharedValue(0);
   const inactiveAnimationProgress = useSharedValue(0);
-  const activeItemPosition = useSharedValue<Vector>({ x: 0, y: 0 });
   const activeItemDropped = useSharedValue(true);
   const dragStartIndex = useSharedValue(-1);
 
@@ -88,13 +103,32 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const haptics = useHaptics(hapticsEnabled);
 
   const handleTouchStart = useCallback(
-    (key: string) => {
+    (e: GestureTouchEvent, key: string) => {
       'worklet';
       touchedItemKey.value = key;
       activationProgress.value = 0;
       updateLayer?.(LayerState.Focused);
+
+      const itemPosition = itemPositions.value[key];
+      if (itemPosition) {
+        touchStartPosition.value = itemPosition;
+        const touch = e.allTouches[0];
+        relativeTouchPosition.value = touch
+          ? {
+              x: touch.x,
+              y: touch.y
+            }
+          : null;
+      }
     },
-    [updateLayer, activationProgress, touchedItemKey]
+    [
+      touchedItemKey,
+      activationProgress,
+      touchStartPosition,
+      itemPositions,
+      relativeTouchPosition,
+      updateLayer
+    ]
   );
 
   const handleDragStart = useCallback(
@@ -127,6 +161,10 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
         withTiming(0, { duration: TIME_TO_ACTIVATE_PAN }, callback);
 
       touchedItemKey.value = null;
+      touchStartPosition.value = null;
+      relativeTouchPosition.value = null;
+      activeItemTranslation.value = null;
+
       inactiveAnimationProgress.value = delayed();
       activationProgress.value = delayed(finished => {
         if (finished) {
@@ -136,20 +174,24 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       });
 
       if (activeItemKey.value !== null) {
+        activeItemKey.value = null;
         updateLayer?.(LayerState.Intermediate);
         haptics.medium();
-        activeItemKey.value = null;
 
         stableOnDragEnd({
           fromIndex: dragStartIndex.value,
           key,
           toIndex: keyToIndex.value[key]!
         });
+        dragStartIndex.value = -1;
       }
     },
     [
-      activeItemDropped,
       touchedItemKey,
+      touchStartPosition,
+      relativeTouchPosition,
+      activeItemTranslation,
+      activeItemDropped,
       activeItemKey,
       activationProgress,
       inactiveAnimationProgress,
@@ -159,6 +201,20 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       updateLayer,
       haptics
     ]
+  );
+
+  const handleDragUpdate = useCallback(
+    (
+      e: GestureUpdateEvent<PanGestureHandlerEventPayload>,
+      reverseXAxis?: boolean
+    ) => {
+      'worklet';
+      activeItemTranslation.value = {
+        x: (reverseXAxis ? -1 : 1) * e.translationX,
+        y: e.translationY
+      };
+    },
+    [activeItemTranslation]
   );
 
   const handleOrderChange = useCallback(
@@ -188,12 +244,13 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
       activeItemDropped,
       activeItemKey,
       activeItemOpacity,
-      activeItemPosition,
       activeItemScale,
       activeItemShadowOpacity,
+      activeItemTranslation,
       enabled: dragEnabled,
       handleDragEnd,
       handleDragStart,
+      handleDragUpdate,
       handleOrderChange,
       handleTouchStart,
       inactiveAnimationProgress,

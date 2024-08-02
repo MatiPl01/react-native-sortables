@@ -6,18 +6,21 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { useUIStableCallback } from '../../hooks';
-import type { Dimensions } from '../../types';
-import { createEnhancedContext } from '../utils';
+import { useUIStableCallback } from '../../../hooks';
+import type { Dimensions } from '../../../types';
+import { createEnhancedContext } from '../../utils';
+import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
+  touchedItemDimensions: SharedValue<Dimensions | null>;
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
   containerHeight: SharedValue<number>;
   containerWidth: SharedValue<number>;
   measureItem: (key: string, dimensions: Dimensions) => void;
   removeItem: (key: string) => void;
+  updateTouchedItemDimensions: (key: string) => void;
 };
 
 type MeasurementsProviderProps = PropsWithChildren<{
@@ -30,9 +33,12 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   children,
   itemsCount
 }) => {
-  const measuredItemsCount = useSharedValue(0);
+  const { touchedItemKey } = useDragContext();
 
+  const measuredItemsCount = useSharedValue(0);
   const initialMeasurementsCompleted = useSharedValue(false);
+
+  const touchedItemDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const overrideItemDimensions = useSharedValue<
     Record<string, Partial<Dimensions>>
@@ -46,6 +52,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       'worklet';
       itemDimensions.value[key] = dimensions;
       measuredItemsCount.value += 1;
+      if (touchedItemKey.value === key) {
+        touchedItemDimensions.value = dimensions;
+      }
       // Update the array of item dimensions only after all items have been measured
       // to reduce the number of times animated reactions are triggered
       if (measuredItemsCount.value === itemsCount) {
@@ -72,6 +81,14 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     [containerWidth]
   );
 
+  const updateTouchedItemDimensions = useCallback(
+    (key: string) => {
+      'worklet';
+      touchedItemDimensions.value = itemDimensions.value[key] ?? null;
+    },
+    [touchedItemDimensions, itemDimensions]
+  );
+
   return {
     children: (
       <Animated.View style={styles.container} onLayout={measureContainer}>
@@ -85,7 +102,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       itemDimensions,
       measureItem,
       overrideItemDimensions,
-      removeItem
+      removeItem,
+      touchedItemDimensions,
+      updateTouchedItemDimensions
     }
   };
 });

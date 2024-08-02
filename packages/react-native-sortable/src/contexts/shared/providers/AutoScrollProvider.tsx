@@ -13,17 +13,18 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '../../constants';
-import { useAnimatableValue } from '../../hooks';
-import type { AutoScrollSettings } from '../../types';
-import { createEnhancedContext } from '../utils';
+import { OFFSET_EPS } from '../../../constants';
+import { useAnimatableValue } from '../../../hooks';
+import type { AutoScrollSettings } from '../../../types';
+import { createEnhancedContext } from '../../utils';
 import { useDragContext } from './DragProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
+import { usePositionsContext } from './PositionsProvider';
 
 type AutoScrollContextType = {
-  updateStartScrollOffset: () => void;
   scrollOffset: SharedValue<number>;
   dragStartScrollOffset: SharedValue<number>;
+  updateStartScrollOffset: (providedOffset?: number) => void;
 };
 
 type AutoScrollProviderProps = PropsWithChildren<AutoScrollSettings>;
@@ -38,8 +39,9 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   children,
   scrollableRef
 }) => {
+  const { touchedItemPosition } = usePositionsContext();
   const { itemDimensions } = useMeasurementsContext();
-  const { activeItemKey, activeItemPosition } = useDragContext();
+  const { activeItemKey } = useDragContext();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);
@@ -100,17 +102,17 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   // Automatically scrolls the container when the active item is near the edge
   useAnimatedReaction(
     () => {
-      if (!enabled.value || activeItemHeight.value === -1) {
+      if (
+        !enabled.value ||
+        activeItemHeight.value === -1 ||
+        !touchedItemPosition.value
+      ) {
         return null;
       }
 
       return {
-        currentOffset: scrollOffset.value,
         itemHeight: activeItemHeight.value,
-        itemOffset:
-          activeItemPosition.value.y +
-          scrollOffset.value -
-          dragStartScrollOffset.value,
+        itemOffset: touchedItemPosition.value.y,
         threshold: offsetThreshold.value
       };
     },
@@ -126,7 +128,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
         return;
       }
 
-      const { currentOffset, itemHeight, itemOffset, threshold } = props;
+      const { itemHeight, itemOffset, threshold } = props;
       const { height: sH, pageY: sY } = scrollableMeasurements;
       const { height: cH, pageY: cY } = containerMeasurements;
 
@@ -143,20 +145,23 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
       // Scroll up
       if (topDistance > 0 && topOverflow > 0) {
         targetScrollOffset.value =
-          currentOffset - Math.min(topOverflow, topDistance);
+          scrollOffset.value - Math.min(topOverflow, topDistance);
       }
       // Scroll down
       else if (bottomDistance > 0 && bottomOverflow > 0) {
         targetScrollOffset.value =
-          currentOffset + Math.min(bottomOverflow, bottomDistance);
+          scrollOffset.value + Math.min(bottomOverflow, bottomDistance);
       }
     }
   );
 
-  const updateStartScrollOffset = useCallback(() => {
-    'worklet';
-    dragStartScrollOffset.value = scrollOffset.value;
-  }, [dragStartScrollOffset, scrollOffset]);
+  const updateStartScrollOffset = useCallback(
+    (providedOffset?: number) => {
+      'worklet';
+      dragStartScrollOffset.value = providedOffset ?? scrollOffset.value;
+    },
+    [dragStartScrollOffset, scrollOffset]
+  );
 
   return {
     children: (

@@ -14,7 +14,7 @@ import {
   useItemDimensions,
   useItemPosition,
   usePositionsContext
-} from '../../contexts/shared';
+} from '../../contexts/shared/providers';
 import type { Vector } from '../../types';
 
 export type DropIndicatorComponentProps = {

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable import/no-unused-modules */
 
-import { SHARED_PROPS } from '../constants/props';
+import { DEFAULT_SHARED_PROPS } from '../constants/props';
 import type { SharedProps } from '../types';
 
 export const getPropsWithDefaults = <P extends SharedProps>(
@@ -11,14 +11,14 @@ export const getPropsWithDefaults = <P extends SharedProps>(
   sharedProps: Required<SharedProps>;
   rest: Omit<P, keyof SharedProps>;
 } => {
-  const propsWithDefaults = { ...SHARED_PROPS, ...props };
+  const propsWithDefaults = { ...DEFAULT_SHARED_PROPS, ...props };
 
   const sharedProps: Record<string, any> = {};
   const rest: Record<string, any> = {};
 
   for (const key in propsWithDefaults) {
     const k = key as keyof P;
-    if (Object.prototype.hasOwnProperty.call(SHARED_PROPS, k)) {
+    if (Object.prototype.hasOwnProperty.call(DEFAULT_SHARED_PROPS, k)) {
       sharedProps[key] = propsWithDefaults[k];
     } else {
       rest[key] = propsWithDefaults[k];

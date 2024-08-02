@@ -21,9 +21,9 @@ import {
   useAutoScrollContext,
   useDragContext,
   useItemPosition,
+  useItemZIndex,
   useMeasurementsContext
 } from '../../contexts';
-import { getItemZIndex } from '../../utils';
 import ItemDecoration from './ItemDecoration';
 
 type DraggableViewProps = {
@@ -38,28 +38,31 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { measureItem, overrideItemDimensions, removeItem } =
-    useMeasurementsContext();
+  const {
+    measureItem,
+    overrideItemDimensions,
+    removeItem,
+    updateTouchedItemDimensions
+  } = useMeasurementsContext();
   const {
     activationProgress,
-    activeItemPosition,
     enabled,
     handleDragEnd,
     handleDragStart,
+    handleDragUpdate,
     handleTouchStart,
     inactiveAnimationProgress,
     touchedItemKey
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
-  const itemPosition = useItemPosition(key);
 
+  const pressProgress = useSharedValue(0);
+
+  const position = useItemPosition(key);
+  const zIndex = useItemZIndex(key, pressProgress, position);
   const overriddenDimensions = useDerivedValue(
     () => overrideItemDimensions.value[key]
   );
-
-  const isTouched = useDerivedValue(() => touchedItemKey.value === key);
-  const pressProgress = useSharedValue(0);
-  const dragStartPosition = useSharedValue({ x: 0, y: 0 });
 
   useEffect(() => {
     return () => removeItem(key);
@@ -68,19 +71,23 @@ export default function DraggableView({
   const onDragEnd = useCallback(() => {
     'worklet';
     pressProgress.value = withTiming(0, { duration: TIME_TO_ACTIVATE_PAN });
+    updateStartScrollOffset?.(-1);
     handleDragEnd(key);
-  }, [key, pressProgress, handleDragEnd]);
+  }, [key, pressProgress, handleDragEnd, updateStartScrollOffset]);
 
   const panGesture = useMemo(
     () =>
       Gesture.Pan()
         .activateAfterLongPress(TIME_TO_ACTIVATE_PAN)
-        .onTouchesDown(() => {
+        .onTouchesDown(e => {
           // Ignore touch if another item is already being touched/activated
           if (touchedItemKey.value !== null) {
             return;
           }
-          handleTouchStart(key);
+
+          handleTouchStart(e, key);
+          updateTouchedItemDimensions(key);
+
           const animate = () =>
             withDelay(
               ACTIVATE_PAN_ANIMATION_DELAY,
@@ -93,26 +100,17 @@ export default function DraggableView({
           inactiveAnimationProgress.value = animate();
         })
         .onStart(() => {
-          if (!isTouched.value) {
+          if (touchedItemKey.value === null) {
             return;
           }
-          dragStartPosition.value = activeItemPosition.value = {
-            x: itemPosition.x.value ?? 0,
-            y: itemPosition.y.value ?? 0
-          };
           updateStartScrollOffset?.();
           handleDragStart(key);
         })
         .onUpdate(e => {
-          if (!isTouched.value) {
+          if (touchedItemKey.value !== key) {
             return;
           }
-          activeItemPosition.value = {
-            x:
-              dragStartPosition.value.x +
-              (reverseXAxis ? -1 : 1) * e.translationX,
-            y: dragStartPosition.value.y + e.translationY
-          };
+          handleDragUpdate(e, reverseXAxis);
         })
         .onFinalize(onDragEnd)
         .onTouchesCancelled(onDragEnd)
@@ -120,25 +118,23 @@ export default function DraggableView({
     [
       key,
       enabled,
-      isTouched,
       reverseXAxis,
-      itemPosition,
       activationProgress,
       touchedItemKey,
-      activeItemPosition,
-      dragStartPosition,
       pressProgress,
       inactiveAnimationProgress,
       handleTouchStart,
+      handleDragUpdate,
       handleDragStart,
       onDragEnd,
-      updateStartScrollOffset
+      updateStartScrollOffset,
+      updateTouchedItemDimensions
     ]
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    const x = itemPosition.x.value;
-    const y = itemPosition.y.value;
+    const x = position.x.value;
+    const y = position.y.value;
 
     if (x === null || y === null) {
       return {
@@ -149,12 +145,7 @@ export default function DraggableView({
     return {
       position: 'absolute',
       transform: [{ translateX: x }, { translateY: y }],
-      zIndex: getItemZIndex(
-        isTouched.value,
-        pressProgress.value,
-        { x, y },
-        activeItemPosition.value
-      ),
+      zIndex: zIndex.value,
       ...overriddenDimensions.value
     };
   });

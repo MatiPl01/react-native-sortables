@@ -4,6 +4,7 @@ import type { PropsWithChildren } from 'react';
 import DropIndicator from '../components/shared/DropIndicator';
 import type {
   ActiveItemDecorationSettings,
+  ActiveItemSnapSettings,
   AutoScrollSettings,
   DropIndicatorSettings,
   PartialBy,
@@ -14,7 +15,8 @@ import {
   DragProvider,
   LayerProvider,
   MeasurementsProvider,
-  PositionsProvider
+  PositionsProvider,
+  TouchedItemPositionUpdater
 } from './shared';
 import { ContextProviderComposer } from './utils';
 
@@ -24,6 +26,7 @@ type SharedProviderProps = PropsWithChildren<
     dragEnabled: boolean;
     hapticsEnabled: boolean;
   } & ActiveItemDecorationSettings &
+    ActiveItemSnapSettings &
     DropIndicatorSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
     SortableCallbacks
@@ -35,31 +38,36 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollSpeed,
   children,
+  enableActiveItemSnap,
   itemKeys,
   scrollableRef,
   showDropIndicator,
+  snapOffsetX,
+  snapOffsetY,
   ...dragProviderProps
 }: SharedProviderProps) {
   const providers = [
     <LayerProvider />,
     <PositionsProvider itemKeys={itemKeys} />,
     <DragProvider {...dragProviderProps} />,
-    <MeasurementsProvider itemsCount={itemKeys.length} />
-  ];
-
-  if (scrollableRef) {
-    providers.push(
+    <MeasurementsProvider itemsCount={itemKeys.length} />,
+    scrollableRef && (
       <AutoScrollProvider
         autoScrollActivationOffset={autoScrollActivationOffset}
         autoScrollEnabled={autoScrollEnabled}
         autoScrollSpeed={autoScrollSpeed}
         scrollableRef={scrollableRef}
       />
-    );
-  }
+    )
+  ];
 
   return (
     <ContextProviderComposer providers={providers}>
+      <TouchedItemPositionUpdater
+        enableActiveItemSnap={enableActiveItemSnap}
+        snapOffsetX={snapOffsetX}
+        snapOffsetY={snapOffsetY}
+      />
       {showDropIndicator && (
         <DropIndicator DropIndicatorComponent={DropIndicatorComponent} />
       )}
