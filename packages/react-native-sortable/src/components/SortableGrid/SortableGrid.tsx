@@ -23,6 +23,8 @@ export type SortableGridProps<I> = Prettify<
   {
     data: Array<I>;
     renderItem: SortableGridRenderItem<I>;
+    columnGap?: number;
+    rowGap?: number;
     columns?: number;
     keyExtractor?: (item: I, index: number) => string;
   } & SharedProps
@@ -30,7 +32,14 @@ export type SortableGridProps<I> = Prettify<
 
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
-    rest: { columns = 1, data, keyExtractor = defaultKeyExtractor, renderItem },
+    rest: {
+      columnGap = 0,
+      columns = 2,
+      data,
+      keyExtractor = defaultKeyExtractor,
+      renderItem,
+      rowGap = 0
+    },
     sharedProps: { reorderStrategy, ...providerProps }
   } = getPropsWithDefaults(props);
 
@@ -38,13 +47,15 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
   return (
     <SharedProvider {...providerProps} itemKeys={itemKeys}>
-      <GridLayoutProvider columnsCount={columns}>
+      <GridLayoutProvider columnGap={columnGap} columnsCount={columns}>
         <SortableGridInner
+          columnGap={columnGap}
           columns={columns}
           data={data}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           reorderStrategy={reorderStrategy}
+          rowGap={rowGap}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -54,40 +65,64 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 type SortableGridInnerProps<I> = Required<
   Pick<
     SortableGridProps<I>,
-    'columns' | 'data' | 'keyExtractor' | 'renderItem' | 'reorderStrategy'
+    | 'columnGap'
+    | 'columns'
+    | 'data'
+    | 'keyExtractor'
+    | 'renderItem'
+    | 'reorderStrategy'
+    | 'rowGap'
   >
 >;
 
 function SortableGridInner<I>({
+  columnGap,
   columns,
   data,
   keyExtractor,
   renderItem,
-  reorderStrategy
+  reorderStrategy,
+  rowGap
 }: SortableGridInnerProps<I>) {
   const { containerHeight } = useMeasurementsContext();
   const { columnWidth } = useGridLayoutContext();
 
   useGridOrderUpdater(columns, reorderStrategy);
 
-  const animatedColumnWidthStyle = useAnimatedStyle(() => ({
-    width: columnWidth.value === -1 ? `${100 / columns}%` : columnWidth.value
-  }));
+  const animatedColumnWidthStyle = useAnimatedStyle(() =>
+    columnWidth.value === -1
+      ? {
+          flexBasis: `${100 / columns}%`
+        }
+      : { width: columnWidth.value }
+  );
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height: containerHeight.value === -1 ? 'auto' : containerHeight.value
   }));
 
+  const containerSpacingStyle = {
+    marginHorizontal: -columnGap / 2,
+    marginVertical: -rowGap / 2
+  };
+
   return (
-    <Animated.View style={[styles.gridContainer, animatedContainerHeightStyle]}>
+    <Animated.View
+      style={[
+        styles.gridContainer,
+        containerSpacingStyle,
+        animatedContainerHeightStyle
+      ]}>
       {data.map((item, index) => {
         const key = keyExtractor(item, index);
         return (
           <SortableGridItem
+            columnGap={columnGap}
             item={item}
             itemKey={key}
             key={key}
             renderItem={renderItem}
+            rowGap={rowGap}
             style={animatedColumnWidthStyle}
           />
         );
@@ -97,17 +132,35 @@ function SortableGridInner<I>({
 }
 
 type SortableGridItemProps<I> = {
+  columnGap: number;
+  rowGap: number;
   itemKey: string;
   item: I;
   renderItem: SortableGridRenderItem<I>;
 } & ViewProps;
 
 const SortableGridItem = typedMemo(function <I>({
+  columnGap,
   item,
   renderItem,
+  rowGap,
+  style,
   ...rest
 }: SortableGridItemProps<I>) {
-  return <DraggableView {...rest}>{renderItem({ item })}</DraggableView>;
+  const itemSpacingStyle = useMemo(
+    () => ({
+      flexShrink: 1,
+      paddingHorizontal: columnGap / 2,
+      paddingVertical: rowGap / 2
+    }),
+    [columnGap, rowGap]
+  );
+
+  return (
+    <DraggableView style={[itemSpacingStyle, style]} {...rest}>
+      {renderItem({ item })}
+    </DraggableView>
+  );
 });
 
 const styles = StyleSheet.create({

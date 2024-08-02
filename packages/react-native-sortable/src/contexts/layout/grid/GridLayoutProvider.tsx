@@ -20,18 +20,24 @@ type GridLayoutContextType = {
 
 type GridLayoutProviderProps = PropsWithChildren<{
   columnsCount: number;
+  columnGap: number;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   'GridLayout'
-)<GridLayoutContextType, GridLayoutProviderProps>(({ columnsCount }) => {
+)<GridLayoutContextType, GridLayoutProviderProps>(({
+  columnGap,
+  columnsCount
+}) => {
   const { containerHeight, containerWidth, itemDimensions } =
     useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
   const columnWidth = useDerivedValue(() =>
-    containerWidth.value === -1 ? -1 : containerWidth.value / columnsCount
+    containerWidth.value === -1
+      ? -1
+      : containerWidth.value / columnsCount + columnGap / 2
   );
 
   // ROW OFFSETS UPDATER
