@@ -33,21 +33,13 @@ export default function AutoScrollScrollViewExampleScreen() {
   const sharedProps = {
     activeItemScale: 1.15,
     activeItemShadowOpacity: 0.1,
+    columnGap: 12,
     columns: 2,
     inactiveItemOpacity: 0.5,
     renderItem,
+    rowGap: 12,
     scrollableRef
   };
-
-  // const [h, setH] = useState(200); // TODO - add support for proper auto scroll and dragged item positioning when the content offset changes
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setH(prev => (prev === 200 ? 400 : 200));
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
 
   return (
     <Animated.ScrollView
@@ -56,11 +48,11 @@ export default function AutoScrollScrollViewExampleScreen() {
       <View style={styles.section}>
         <Text style={styles.title}>Before SortableGrid</Text>
       </View>
-      <SortableGrid data={FEW_CARDS} {...sharedProps} />
+      <SortableGrid data={MANY_CARDS} {...sharedProps} />
       <View style={styles.section}>
         <Text style={styles.title}>Between SortableGrids</Text>
       </View>
-      <SortableGrid data={MANY_CARDS} {...sharedProps} />
+      <SortableGrid data={FEW_CARDS} {...sharedProps} />
       <View style={styles.section}>
         <Text style={styles.title}>After SortableGrid</Text>
       </View>
@@ -73,8 +65,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     gap: 16,
-    marginHorizontal: 6,
-    marginVertical: 8,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { height: 2, width: 0 },
@@ -82,7 +72,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84
   },
   container: {
-    padding: 12
+    padding: 20
   },
   description: {
     fontSize: 14
@@ -95,8 +85,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     height: 200,
     justifyContent: 'center',
-    marginHorizontal: 6,
-    marginVertical: 8
+    marginVertical: 12
   },
   title: {
     fontSize: 20,
