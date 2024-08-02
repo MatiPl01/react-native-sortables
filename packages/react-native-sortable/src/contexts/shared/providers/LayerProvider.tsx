@@ -1,7 +1,7 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 
-import { createEnhancedContext } from '../utils';
+import { createEnhancedContext } from '../../utils';
 
 export enum LayerState {
   Focused = 2,

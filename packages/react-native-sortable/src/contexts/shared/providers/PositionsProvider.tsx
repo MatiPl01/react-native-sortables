@@ -3,14 +3,17 @@ import { useEffect, useRef } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
-import type { Vector } from '../../types';
-import { areArraysDifferent } from '../../utils';
-import { createEnhancedContext } from '../utils';
+import type { Vector } from '../../../types';
+import { areArraysDifferent } from '../../../utils';
+import { createEnhancedContext } from '../../utils';
 
 type PositionsContextType = {
   keyToIndex: SharedValue<Record<string, number>>;
   indexToKey: SharedValue<Array<string>>;
   itemPositions: SharedValue<Record<string, Vector>>;
+  touchStartPosition: SharedValue<Vector | null>;
+  relativeTouchPosition: SharedValue<Vector | null>;
+  touchedItemPosition: SharedValue<Vector | null>;
 };
 
 type PositionsProviderProps = PropsWithChildren<{
@@ -28,6 +31,9 @@ const { PositionsProvider, usePositionsContext } = createEnhancedContext(
   );
 
   const itemPositions = useSharedValue<Record<string, Vector>>({});
+  const touchStartPosition = useSharedValue<Vector | null>(null);
+  const relativeTouchPosition = useSharedValue<Vector | null>(null);
+  const touchedItemPosition = useSharedValue<Vector | null>(null);
 
   useEffect(() => {
     if (areArraysDifferent(itemKeys, prevKeysRef.current)) {
@@ -40,7 +46,10 @@ const { PositionsProvider, usePositionsContext } = createEnhancedContext(
     value: {
       indexToKey,
       itemPositions,
-      keyToIndex
+      keyToIndex,
+      relativeTouchPosition,
+      touchStartPosition,
+      touchedItemPosition
     }
   };
 });

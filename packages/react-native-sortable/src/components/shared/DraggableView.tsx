@@ -21,9 +21,9 @@ import {
   useAutoScrollContext,
   useDragContext,
   useItemPosition,
+  useItemZIndex,
   useMeasurementsContext
 } from '../../contexts';
-import { getItemZIndex } from '../../utils';
 import ItemDecoration from './ItemDecoration';
 
 type DraggableViewProps = {
@@ -52,18 +52,17 @@ export default function DraggableView({
     handleDragUpdate,
     handleTouchStart,
     inactiveAnimationProgress,
-    touchedItemKey,
-    touchedItemPosition
+    touchedItemKey
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
-  const itemPosition = useItemPosition(key);
 
+  const pressProgress = useSharedValue(0);
+
+  const position = useItemPosition(key);
+  const zIndex = useItemZIndex(key, pressProgress, position);
   const overriddenDimensions = useDerivedValue(
     () => overrideItemDimensions.value[key]
   );
-
-  const isTouched = useDerivedValue(() => touchedItemKey.value === key);
-  const pressProgress = useSharedValue(0);
 
   useEffect(() => {
     return () => removeItem(key);
@@ -108,7 +107,7 @@ export default function DraggableView({
           handleDragStart(key);
         })
         .onUpdate(e => {
-          if (!isTouched.value) {
+          if (touchedItemKey.value !== key) {
             return;
           }
           handleDragUpdate(e, reverseXAxis);
@@ -119,7 +118,6 @@ export default function DraggableView({
     [
       key,
       enabled,
-      isTouched,
       reverseXAxis,
       activationProgress,
       touchedItemKey,
@@ -135,8 +133,8 @@ export default function DraggableView({
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    const x = itemPosition.x.value;
-    const y = itemPosition.y.value;
+    const x = position.x.value;
+    const y = position.y.value;
 
     if (x === null || y === null) {
       return {
@@ -147,12 +145,7 @@ export default function DraggableView({
     return {
       position: 'absolute',
       transform: [{ translateX: x }, { translateY: y }],
-      zIndex: getItemZIndex(
-        isTouched.value,
-        pressProgress.value,
-        { x, y },
-        touchedItemPosition.value
-      ),
+      zIndex: zIndex.value,
       ...overriddenDimensions.value
     };
   });

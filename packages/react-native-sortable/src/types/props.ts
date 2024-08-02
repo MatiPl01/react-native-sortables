@@ -12,6 +12,14 @@ export type ActiveItemDecorationSettings = AnimatableValues<{
   inactiveItemScale: number;
 }>;
 
+export type Offset = `${number}%` | number;
+
+export type ActiveItemSnapSettings = AnimatableValues<{
+  enableActiveItemSnap: boolean;
+  snapOffsetX: Offset;
+  snapOffsetY: Offset;
+}>;
+
 export type AutoScrollSettings = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scrollableRef: AnimatedRef<any>; // TODO - type this properly
@@ -62,6 +70,7 @@ export type SharedProps = Prettify<
     hapticsEnabled?: boolean;
     reorderStrategy?: ReorderStrategy;
   } & Partial<ActiveItemDecorationSettings> &
+    Partial<ActiveItemSnapSettings> &
     Partial<AutoScrollSettings> &
     Partial<DropIndicatorSettings> &
     SortableCallbacks

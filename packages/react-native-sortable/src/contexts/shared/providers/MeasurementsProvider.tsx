@@ -6,14 +6,15 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { useUIStableCallback } from '../../hooks';
-import type { Dimensions } from '../../types';
-import { createEnhancedContext } from '../utils';
+import { useUIStableCallback } from '../../../hooks';
+import type { Dimensions } from '../../../types';
+import { createEnhancedContext } from '../../utils';
 import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
+  touchedItemDimensions: SharedValue<Dimensions | null>;
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
   containerHeight: SharedValue<number>;
   containerWidth: SharedValue<number>;
@@ -32,11 +33,12 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   children,
   itemsCount
 }) => {
-  const { touchedItemDimensions, touchedItemKey } = useDragContext();
+  const { touchedItemKey } = useDragContext();
 
   const measuredItemsCount = useSharedValue(0);
-
   const initialMeasurementsCompleted = useSharedValue(false);
+
+  const touchedItemDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const overrideItemDimensions = useSharedValue<
     Record<string, Partial<Dimensions>>
@@ -101,6 +103,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       measureItem,
       overrideItemDimensions,
       removeItem,
+      touchedItemDimensions,
       updateTouchedItemDimensions
     }
   };

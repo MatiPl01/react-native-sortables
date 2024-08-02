@@ -1,8 +1,10 @@
 import type { PropsWithChildren } from 'react';
 import { cloneElement, memo } from 'react';
 
+import type { Maybe } from '../../types';
+
 type ContextProviderComposerProps = PropsWithChildren<{
-  providers: Array<JSX.Element>;
+  providers: Array<Maybe<JSX.Element>>;
 }>;
 
 // https://frontendbyte.com/how-to-use-react-context-api-usereducer-hooks/
@@ -11,7 +13,7 @@ function ContextProviderComposer({
   providers
 }: ContextProviderComposerProps) {
   return providers.reduceRight((children, parent) => {
-    return cloneElement(parent, { children });
+    return parent ? cloneElement(parent, { children }) : children;
   }, initialChildren);
 }
 

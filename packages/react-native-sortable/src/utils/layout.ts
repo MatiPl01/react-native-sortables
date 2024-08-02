@@ -1,26 +1,23 @@
-import type { Maybe, ReorderStrategy, Vector } from '../types';
+import type { Offset, ReorderStrategy } from '../types';
 
-export const getItemZIndex = (
-  isActive: boolean,
-  pressProgress: number,
-  position: Vector,
-  targetPosition?: Maybe<Vector>
+export const getOffsetDistance = (
+  providedOffset: Offset,
+  distance: number
 ): number => {
   'worklet';
-  if (isActive) {
-    return 3;
+  if (typeof providedOffset === 'number') {
+    return providedOffset;
   }
-  if (pressProgress > 0) {
-    return 2;
+
+  const match = providedOffset.match(/-?\d+(.\d+)?%$/);
+  if (!match) {
+    throw new Error(
+      `[react-native-scrollable] Invalid offset: ${providedOffset}`
+    );
   }
-  // If the item is being re-ordered but is not dragged
-  if (
-    targetPosition &&
-    (position.x !== targetPosition.x || position.y !== targetPosition.y)
-  ) {
-    return 1;
-  }
-  return 0;
+
+  const percentage = parseFloat(match[0]) / 100;
+  return distance * percentage;
 };
 
 const reorderInsert = (

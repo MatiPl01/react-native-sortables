@@ -13,12 +13,13 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '../../constants';
-import { useAnimatableValue } from '../../hooks';
-import type { AutoScrollSettings } from '../../types';
-import { createEnhancedContext } from '../utils';
+import { OFFSET_EPS } from '../../../constants';
+import { useAnimatableValue } from '../../../hooks';
+import type { AutoScrollSettings } from '../../../types';
+import { createEnhancedContext } from '../../utils';
 import { useDragContext } from './DragProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
+import { usePositionsContext } from './PositionsProvider';
 
 type AutoScrollContextType = {
   scrollOffset: SharedValue<number>;
@@ -38,8 +39,9 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   children,
   scrollableRef
 }) => {
+  const { touchedItemPosition } = usePositionsContext();
   const { itemDimensions } = useMeasurementsContext();
-  const { activeItemKey, touchedItemPosition } = useDragContext();
+  const { activeItemKey } = useDragContext();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);

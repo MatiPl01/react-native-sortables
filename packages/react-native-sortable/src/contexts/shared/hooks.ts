@@ -9,10 +9,12 @@ import {
 
 import { useAnimatableValue } from '../../hooks';
 import type { Animatable, Dimensions, Maybe, Vector } from '../../types';
-import { useAutoScrollContext } from './AutoScrollProvider';
-import { useDragContext } from './DragProvider';
-import { useMeasurementsContext } from './MeasurementsProvider';
-import { usePositionsContext } from './PositionsProvider';
+import {
+  useAutoScrollContext,
+  useDragContext,
+  useMeasurementsContext,
+  usePositionsContext
+} from './providers';
 
 type UseItemPositionOptions = {
   ignoreActive?: boolean;
@@ -31,8 +33,8 @@ export function useItemPosition(
   x: SharedValue<null | number>;
   y: SharedValue<null | number>;
 } {
-  const { itemPositions } = usePositionsContext();
-  const { touchedItemKey, touchedItemPosition } = useDragContext();
+  const { itemPositions, touchedItemPosition } = usePositionsContext();
+  const { touchedItemKey } = useDragContext();
   const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
   const itemKey = useAnimatableValue(key);
@@ -129,6 +131,45 @@ export function useItemDimensions(key: Animatable<null | string>): {
   return { height, width };
 }
 
+export function useItemZIndex(
+  key: string,
+  pressProgress: SharedValue<number>,
+  position: {
+    x: SharedValue<null | number>;
+    y: SharedValue<null | number>;
+  }
+): SharedValue<number> {
+  const { itemPositions } = usePositionsContext();
+  const { touchedItemKey } = useDragContext();
+
+  const zIndex = useSharedValue(0);
+
+  useAnimatedReaction(
+    () => ({
+      isTouched: touchedItemKey.value === key,
+      progress: pressProgress.value,
+      targetPosition: itemPositions.value[key]
+    }),
+    ({ isTouched, progress, targetPosition }) => {
+      if (isTouched) {
+        zIndex.value = 3;
+      } else if (progress > 0) {
+        zIndex.value = 2;
+      } else if (
+        targetPosition &&
+        (position.x.value !== targetPosition.x ||
+          position.y.value !== targetPosition.y)
+      ) {
+        zIndex.value = 1;
+      } else {
+        zIndex.value = 0;
+      }
+    }
+  );
+
+  return zIndex;
+}
+
 export function useOrderUpdater(
   callback: (props: {
     activeKey: string;
@@ -139,10 +180,9 @@ export function useOrderUpdater(
   }) => Maybe<Array<string>>,
   deps?: Array<unknown>
 ) {
-  const { keyToIndex } = usePositionsContext();
+  const { keyToIndex, touchedItemPosition } = usePositionsContext();
   const { itemDimensions } = useMeasurementsContext();
-  const { activeItemKey, handleOrderChange, touchedItemPosition } =
-    useDragContext();
+  const { activeItemKey, handleOrderChange } = useDragContext();
   const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
   useAnimatedReaction(
