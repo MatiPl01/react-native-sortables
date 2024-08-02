@@ -7,6 +7,7 @@ import {
 import { useAnimatableValue } from '../../../hooks';
 import type { ActiveItemSnapSettings } from '../../../types';
 import { getOffsetDistance } from '../../../utils';
+import { useAutoScrollContext } from '../providers';
 import { useDragContext } from '../providers/DragProvider';
 import { useMeasurementsContext } from '../providers/MeasurementsProvider';
 import { usePositionsContext } from '../providers/PositionsProvider';
@@ -20,6 +21,7 @@ export default function TouchedItemPositionUpdater({
   const { relativeTouchPosition, touchStartPosition, touchedItemPosition } =
     usePositionsContext();
   const { activationProgress, activeItemTranslation } = useDragContext();
+  const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
   const snapEnabled = useAnimatableValue(enableActiveItemSnap);
   const snapOffsetX = useAnimatableValue(providedSnapOffsetX);
@@ -59,17 +61,25 @@ export default function TouchedItemPositionUpdater({
       dX: deltaX.value,
       dY: deltaY.value,
       enableSnap: snapEnabled.value,
+      scrollOffsetY:
+        dragStartScrollOffset?.value === -1
+          ? 0
+          : (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0),
       startPosition: touchStartPosition.value,
       translation: activeItemTranslation.value
     }),
-    ({ dX, dY, enableSnap, startPosition, translation }) => {
+    ({ dX, dY, enableSnap, scrollOffsetY, startPosition, translation }) => {
       if (!startPosition) {
         touchedItemPosition.value = null;
         return;
       }
       touchedItemPosition.value = {
         x: startPosition.x + (translation?.x ?? 0) - (enableSnap ? dX : 0),
-        y: startPosition.y + (translation?.y ?? 0) - (enableSnap ? dY : 0)
+        y:
+          startPosition.y +
+          (translation?.y ?? 0) -
+          (enableSnap ? dY : 0) +
+          scrollOffsetY
       };
     }
   );

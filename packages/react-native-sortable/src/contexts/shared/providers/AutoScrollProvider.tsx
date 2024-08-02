@@ -111,12 +111,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
       }
 
       return {
-        currentOffset: scrollOffset.value,
         itemHeight: activeItemHeight.value,
-        itemOffset:
-          touchedItemPosition.value.y +
-          scrollOffset.value -
-          dragStartScrollOffset.value,
+        itemOffset: touchedItemPosition.value.y,
         threshold: offsetThreshold.value
       };
     },
@@ -132,7 +128,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
         return;
       }
 
-      const { currentOffset, itemHeight, itemOffset, threshold } = props;
+      const { itemHeight, itemOffset, threshold } = props;
       const { height: sH, pageY: sY } = scrollableMeasurements;
       const { height: cH, pageY: cY } = containerMeasurements;
 
@@ -149,12 +145,12 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
       // Scroll up
       if (topDistance > 0 && topOverflow > 0) {
         targetScrollOffset.value =
-          currentOffset - Math.min(topOverflow, topDistance);
+          scrollOffset.value - Math.min(topOverflow, topDistance);
       }
       // Scroll down
       else if (bottomDistance > 0 && bottomOverflow > 0) {
         targetScrollOffset.value =
-          currentOffset + Math.min(bottomOverflow, bottomDistance);
+          scrollOffset.value + Math.min(bottomOverflow, bottomDistance);
       }
     }
   );

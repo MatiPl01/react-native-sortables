@@ -10,7 +10,6 @@ import {
 import { useAnimatableValue } from '../../hooks';
 import type { Animatable, Dimensions, Maybe, Vector } from '../../types';
 import {
-  useAutoScrollContext,
   useDragContext,
   useMeasurementsContext,
   usePositionsContext
@@ -35,7 +34,6 @@ export function useItemPosition(
 } {
   const { itemPositions, touchedItemPosition } = usePositionsContext();
   const { touchedItemKey } = useDragContext();
-  const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
   const itemKey = useAnimatableValue(key);
   const x = useSharedValue<null | number>(null);
@@ -81,19 +79,15 @@ export function useItemPosition(
 
   useAnimatedReaction(
     () => ({
-      position: touchedItemPosition.value,
-      translateY:
-        dragStartScrollOffset?.value === -1
-          ? 0
-          : (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0)
+      position: touchedItemPosition.value
     }),
-    ({ position, translateY }) => {
+    ({ position }) => {
       if (!ignoreActive && touchedItemKey.value === itemKey.value && position) {
         x.value = position.x;
-        y.value = position.y + translateY;
+        y.value = position.y;
       }
     },
-    [scrollOffset, dragStartScrollOffset, ignoreActive]
+    [ignoreActive]
   );
 
   return { x, y };
@@ -183,16 +177,13 @@ export function useOrderUpdater(
   const { keyToIndex, touchedItemPosition } = usePositionsContext();
   const { itemDimensions } = useMeasurementsContext();
   const { activeItemKey, handleOrderChange } = useDragContext();
-  const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
-      activePosition: touchedItemPosition.value,
-      scrollOffsetDiff:
-        (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0)
+      activePosition: touchedItemPosition.value
     }),
-    ({ activeKey, activePosition, scrollOffsetDiff }) => {
+    ({ activeKey, activePosition }) => {
       if (activeKey === null || activePosition === null) {
         return;
       }
@@ -201,8 +192,7 @@ export function useOrderUpdater(
         return;
       }
 
-      const centerY =
-        activePosition.y + dimensions.height / 2 + scrollOffsetDiff;
+      const centerY = activePosition.y + dimensions.height / 2;
       const centerX = activePosition.x + dimensions.width / 2;
       const activeIndex = keyToIndex.value[activeKey];
 
