@@ -64,7 +64,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const handleItemMeasurement = useCallback(
     (key: string, ref: AnimatedRef<Animated.View>): boolean => {
       'worklet';
-      console.log('>>> handleItemMeasurement', key);
       const dimensions = measure(ref);
       const storedDimensions = itemDimensions.value[key];
       if (

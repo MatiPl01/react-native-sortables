@@ -76,14 +76,6 @@ export default function TouchedItemPositionUpdater({
         touchedItemPosition.value = null;
         return;
       }
-      console.log('touched pos', {
-        x: startPosition.x + (translation?.x ?? 0) - (enableSnap ? dX : 0),
-        y:
-          startPosition.y +
-          (translation?.y ?? 0) -
-          (enableSnap ? dY : 0) +
-          scrollOffsetY
-      });
       touchedItemPosition.value = {
         x: startPosition.x + (translation?.x ?? 0) - (enableSnap ? dX : 0),
         y:

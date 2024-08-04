@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortable';
@@ -30,20 +30,10 @@ export default function AutoScrollScrollViewExampleScreen() {
     []
   );
 
-  const [columns, setColumns] = useState(2);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setColumns(prevColumns => (prevColumns === 2 ? 3 : 2));
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
   const sharedProps = {
     activeItemScale: 1.15,
     activeItemShadowOpacity: 0.1,
     columnGap: 12,
-    columns,
     inactiveItemOpacity: 0.5,
     renderItem,
     rowGap: 12,
@@ -57,11 +47,11 @@ export default function AutoScrollScrollViewExampleScreen() {
       <View style={styles.section}>
         <Text style={styles.title}>Before SortableGrid</Text>
       </View>
-      <SortableGrid data={MANY_CARDS} {...sharedProps} />
+      <SortableGrid columns={3} data={MANY_CARDS} {...sharedProps} />
       <View style={styles.section}>
         <Text style={styles.title}>Between SortableGrids</Text>
       </View>
-      <SortableGrid data={FEW_CARDS} {...sharedProps} />
+      <SortableGrid columns={2} data={FEW_CARDS} {...sharedProps} />
       <View style={styles.section}>
         <Text style={styles.title}>After SortableGrid</Text>
       </View>
