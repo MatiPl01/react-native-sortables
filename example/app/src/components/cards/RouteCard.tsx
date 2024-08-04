@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation } from '@react-navigation/native';
 import type { PropsWithChildren } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Defs, LinearGradient, Rect, Stop, Svg } from 'react-native-svg';
 
 import { colors, radius, spacing, text } from '@/theme';
 
@@ -25,7 +26,41 @@ export default function RouteCard({ children, route, title }: RouteCardProps) {
       onPress={() => {
         navigation.navigate(route as never);
       }}>
-      {children}
+      {children && (
+        <View>
+          {children}
+          {/* Gradient overlay */}
+          <View style={[styles.gradient, StyleSheet.absoluteFill]}>
+            <Svg height='100%' width='100%'>
+              <Defs>
+                <LinearGradient
+                  id='horizontal-gradient'
+                  x1='0'
+                  x2='1'
+                  y1='0'
+                  y2='0'>
+                  <Stop
+                    offset='0.25'
+                    stopColor={colors.background1}
+                    stopOpacity='0'
+                  />
+                  <Stop
+                    offset='0.95'
+                    stopColor={colors.background1}
+                    stopOpacity='1'
+                  />
+                </LinearGradient>
+              </Defs>
+
+              <Rect
+                fill='url(#horizontal-gradient)'
+                height='100%'
+                width='100%'
+              />
+            </Svg>
+          </View>
+        </View>
+      )}
       <View style={styles.footer}>
         <Text style={[text.label1, styles.title]}>{title}</Text>
         <FontAwesomeIcon color={colors.foreground3} icon={faChevronRight} />
@@ -46,6 +81,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between'
+  },
+  gradient: {
+    marginBottom: -spacing.md,
+    marginHorizontal: -spacing.lg
   },
   title: {
     color: colors.foreground1
