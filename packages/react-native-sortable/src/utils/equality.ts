@@ -1,4 +1,4 @@
-import type { Vector } from '../types';
+import type { Dimensions, Vector } from '../types';
 
 export const areArraysDifferent = <T>(
   arr1: Array<T>,
@@ -12,7 +12,29 @@ export const areArraysDifferent = <T>(
   );
 };
 
-export const areVectorsDifferent = (pos1: Vector, pos2: Vector): boolean => {
+export const areVectorsDifferent = (
+  pos1: Vector,
+  pos2: Vector,
+  epx?: number
+): boolean => {
   'worklet';
+  if (epx) {
+    return Math.abs(pos1.x - pos2.x) > epx || Math.abs(pos1.y - pos2.y) > epx;
+  }
   return pos1.x !== pos2.x || pos1.y !== pos2.y;
+};
+
+export const areDimensionsDifferent = (
+  dim1: Dimensions,
+  dim2: Dimensions,
+  eps?: number
+): boolean => {
+  'worklet';
+  if (eps) {
+    return (
+      Math.abs(dim1.width - dim2.width) > eps ||
+      Math.abs(dim1.height - dim2.height) > eps
+    );
+  }
+  return dim1.width !== dim2.width || dim1.height !== dim2.height;
 };

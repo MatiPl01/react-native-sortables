@@ -47,7 +47,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
   return (
     <SharedProvider {...providerProps} itemKeys={itemKeys}>
-      <GridLayoutProvider columnGap={columnGap} columnsCount={columns}>
+      <GridLayoutProvider columnCount={columns} columnGap={columnGap}>
         <SortableGridInner
           columnGap={columnGap}
           columns={columns}
@@ -86,16 +86,15 @@ function SortableGridInner<I>({
 }: SortableGridInnerProps<I>) {
   const { containerHeight } = useMeasurementsContext();
   const { columnWidth } = useGridLayoutContext();
-
   useGridOrderUpdater(columns, reorderStrategy);
 
-  const animatedColumnWidthStyle = useAnimatedStyle(() =>
-    columnWidth.value === -1
+  const animatedColumnWidthStyle = useAnimatedStyle(() => {
+    return columnWidth.value === -1
       ? {
           flexBasis: `${100 / columns}%`
         }
-      : { width: columnWidth.value }
-  );
+      : { width: columnWidth.value };
+  });
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height: containerHeight.value === -1 ? 'auto' : containerHeight.value

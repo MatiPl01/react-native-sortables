@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import {
-  type LayoutChangeEvent,
-  StyleSheet,
-  type ViewProps
-} from 'react-native';
+import { StyleSheet, type ViewProps } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -56,6 +53,7 @@ export default function DraggableView({
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
 
+  const viewRef = useAnimatedRef<Animated.View>();
   const pressProgress = useSharedValue(0);
 
   const position = useItemPosition(key);
@@ -152,15 +150,10 @@ export default function DraggableView({
 
   return (
     <Animated.View
+      ref={viewRef}
       {...viewProps}
       style={[styles.draggableView, style, animatedStyle]}
-      onLayout={({
-        nativeEvent: {
-          layout: { height, width }
-        }
-      }: LayoutChangeEvent) => {
-        measureItem(key, { height, width });
-      }}>
+      onLayout={() => measureItem(key, viewRef)}>
       <GestureDetector gesture={panGesture}>
         <ItemDecoration itemKey={key} pressProgress={pressProgress}>
           {children}
