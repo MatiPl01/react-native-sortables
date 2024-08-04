@@ -31,8 +31,8 @@
     "build": "yarn workspace react-native-sortable build",
     "clean": "yarn workspace react-native-sortable clean",
     "example:app": "yarn workspace example-app",
-    "example:bare": "yarn workspace example-bare",
-    "example:expo": "yarn workspace example-expo",
+    "example:fabric": "yarn workspace example-fabric",
+    "example:paper": "yarn workspace example-paper",
     "format": "yarn format:code && yarn format:deps",
     "format:check": "prettier --check . --ignore-unknown",
     "format:code": "prettier --write . --ignore-unknown",
@@ -47,8 +47,10 @@
     "typecheck": "yarn lib typecheck && yarn example:app typecheck"
   },
   "type": "module",
-  "workspaces": [
-    "example/*",
-    "packages/*"
-  ]
+  "workspaces": {
+    "packages": [
+      "example/*",
+      "packages/*"
+    ]
+  }
 }

@@ -177,5 +177,4 @@ dist
 .DS_Store
 
 **/dist
-.expo
 *.tgz

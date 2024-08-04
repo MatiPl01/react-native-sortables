@@ -51,7 +51,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
 
   const activeItemHeight = useDerivedValue(() => {
     const key = activeItemKey.value;
-    return key ? itemDimensions.value[key]?.height ?? -1 : -1;
+    return key ? (itemDimensions.value[key]?.height ?? -1) : -1;
   });
   const offsetThreshold = useAnimatableValue(
     autoScrollActivationOffset,
