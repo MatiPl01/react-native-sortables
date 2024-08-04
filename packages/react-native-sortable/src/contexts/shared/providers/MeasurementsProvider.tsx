@@ -2,23 +2,34 @@ import { type PropsWithChildren, useCallback } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, {
+  type AnimatedRef,
+  measure,
+  runOnUI,
   type SharedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
-import { useUIStableCallback } from '../../../hooks';
+import { useStableCallback } from '../../../hooks';
 import type { Dimensions } from '../../../types';
+import {
+  type AnimatedTimeoutID,
+  areDimensionsDifferent,
+  clearAnimatedTimeout,
+  setAnimatedTimeout
+} from '../../../utils';
 import { createEnhancedContext } from '../../utils';
 import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
-  touchedItemDimensions: SharedValue<Dimensions | null>;
+  touchedItemWidth: SharedValue<number>;
+  touchedItemHeight: SharedValue<number>;
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
   containerHeight: SharedValue<number>;
   containerWidth: SharedValue<number>;
-  measureItem: (key: string, dimensions: Dimensions) => void;
+  measureAllItems: () => boolean;
+  measureItem: (key: string, ref: AnimatedRef<Animated.View>) => void;
   removeItem: (key: string) => void;
   updateTouchedItemDimensions: (key: string) => void;
 };
@@ -37,37 +48,99 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
 
   const measuredItemsCount = useSharedValue(0);
   const initialMeasurementsCompleted = useSharedValue(false);
+  const updateTimeoutId = useSharedValue<AnimatedTimeoutID>(-1);
+  const itemRefs = useSharedValue<Record<string, AnimatedRef<Animated.View>>>(
+    {}
+  );
 
-  const touchedItemDimensions = useSharedValue<Dimensions | null>(null);
+  const touchedItemWidth = useSharedValue<number>(-1);
+  const touchedItemHeight = useSharedValue<number>(-1);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const overrideItemDimensions = useSharedValue<
     Record<string, Partial<Dimensions>>
   >({});
-
   const containerWidth = useSharedValue(-1);
   const containerHeight = useSharedValue(-1);
 
-  const measureItem = useUIStableCallback(
-    (key: string, dimensions: Dimensions) => {
+  const handleItemMeasurement = useCallback(
+    (key: string, ref: AnimatedRef<Animated.View>): boolean => {
       'worklet';
+      const dimensions = measure(ref);
+      const storedDimensions = itemDimensions.value[key];
+      if (
+        !dimensions ||
+        (storedDimensions &&
+          !areDimensionsDifferent(storedDimensions, dimensions, 0.1))
+      ) {
+        return false;
+      }
+
+      if (!itemDimensions.value[key]) {
+        measuredItemsCount.value += 1;
+      }
+
       itemDimensions.value[key] = dimensions;
-      measuredItemsCount.value += 1;
       if (touchedItemKey.value === key) {
-        touchedItemDimensions.value = dimensions;
+        touchedItemWidth.value = dimensions.width;
+        touchedItemHeight.value = dimensions.height;
       }
-      // Update the array of item dimensions only after all items have been measured
-      // to reduce the number of times animated reactions are triggered
-      if (measuredItemsCount.value === itemsCount) {
-        initialMeasurementsCompleted.value = true;
-        itemDimensions.value = { ...itemDimensions.value };
-      }
+
+      return true;
+    },
+    [
+      itemDimensions,
+      measuredItemsCount,
+      touchedItemWidth,
+      touchedItemHeight,
+      touchedItemKey
+    ]
+  );
+
+  const measureItem = useStableCallback(
+    (key: string, ref: AnimatedRef<Animated.View>) => {
+      runOnUI(() => {
+        itemRefs.value[key] = ref;
+        const isUpdated = handleItemMeasurement(key, ref);
+        if (!isUpdated) {
+          return;
+        }
+
+        // Update the array of item dimensions only after all items have been
+        // measured to reduce the number of times animated reactions are triggered
+        if (measuredItemsCount.value === itemsCount) {
+          clearAnimatedTimeout(updateTimeoutId.value);
+          updateTimeoutId.value = setAnimatedTimeout(
+            () => {
+              itemDimensions.value = { ...itemDimensions.value };
+              initialMeasurementsCompleted.value = true;
+              updateTimeoutId.value = -1;
+            },
+            initialMeasurementsCompleted.value ? 200 : 100
+          );
+        }
+      })();
     }
   );
 
-  const removeItem = useUIStableCallback((key: string) => {
+  const measureAllItems = useCallback(() => {
     'worklet';
-    delete itemDimensions.value[key];
-    measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
+    let areDifferent = false;
+    for (const key in itemRefs.value) {
+      areDifferent =
+        handleItemMeasurement(key, itemRefs.value[key]!) || areDifferent;
+    }
+    if (areDifferent) {
+      itemDimensions.value = { ...itemDimensions.value };
+    }
+    return areDifferent;
+  }, [handleItemMeasurement, itemDimensions, itemRefs]);
+
+  const removeItem = useStableCallback((key: string) => {
+    'worklet';
+    runOnUI(() => {
+      delete itemDimensions.value[key];
+      measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
+    })();
   });
 
   const measureContainer = useCallback(
@@ -84,9 +157,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const updateTouchedItemDimensions = useCallback(
     (key: string) => {
       'worklet';
-      touchedItemDimensions.value = itemDimensions.value[key] ?? null;
+      const dimensions = itemDimensions.value[key] ?? null;
+      touchedItemWidth.value = dimensions?.width ?? -1;
+      touchedItemHeight.value = dimensions?.height ?? -1;
     },
-    [touchedItemDimensions, itemDimensions]
+    [itemDimensions, touchedItemWidth, touchedItemHeight]
   );
 
   return {
@@ -100,10 +175,12 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       containerWidth,
       initialMeasurementsCompleted,
       itemDimensions,
+      measureAllItems,
       measureItem,
       overrideItemDimensions,
       removeItem,
-      touchedItemDimensions,
+      touchedItemHeight,
+      touchedItemWidth,
       updateTouchedItemDimensions
     }
   };

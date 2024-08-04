@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
+import type { ViewStyle } from 'react-native';
 
 import DropIndicator from '../components/shared/DropIndicator';
 import type {
@@ -25,6 +26,7 @@ type SharedProviderProps = PropsWithChildren<
     itemKeys: Array<string>;
     dragEnabled: boolean;
     hapticsEnabled: boolean;
+    dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     DropIndicatorSettings &
@@ -38,6 +40,7 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollSpeed,
   children,
+  dropIndicatorStyle,
   enableActiveItemSnap,
   itemKeys,
   scrollableRef,
@@ -69,7 +72,10 @@ export default function SharedProvider({
         snapOffsetY={snapOffsetY}
       />
       {showDropIndicator && (
-        <DropIndicator DropIndicatorComponent={DropIndicatorComponent} />
+        <DropIndicator
+          DropIndicatorComponent={DropIndicatorComponent}
+          style={dropIndicatorStyle}
+        />
       )}
       {children}
     </ContextProviderComposer>

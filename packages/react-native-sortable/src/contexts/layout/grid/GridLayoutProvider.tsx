@@ -2,8 +2,8 @@ import { type PropsWithChildren } from 'react';
 import {
   type SharedValue,
   useAnimatedReaction,
-  useDerivedValue,
-  useSharedValue
+  useSharedValue,
+  withTiming
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
@@ -19,25 +19,68 @@ type GridLayoutContextType = {
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{
-  columnsCount: number;
+  columnCount: number;
   columnGap: number;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   'GridLayout'
 )<GridLayoutContextType, GridLayoutProviderProps>(({
-  columnGap,
-  columnsCount
+  columnCount,
+  columnGap
 }) => {
-  const { containerHeight, containerWidth, itemDimensions } =
-    useMeasurementsContext();
+  const {
+    containerHeight,
+    containerWidth,
+    itemDimensions,
+    measureAllItems,
+    touchedItemWidth
+  } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
-  const columnWidth = useDerivedValue(() =>
-    containerWidth.value === -1
-      ? -1
-      : containerWidth.value / columnsCount + columnGap / 2
+  const columnWidth = useSharedValue(-1);
+  const targetColumnWidth = useSharedValue(-1);
+
+  // TARGET COLUMN WIDTH UPDATER
+  useAnimatedReaction(
+    () => ({
+      width: containerWidth.value
+    }),
+    ({ width }) => {
+      if (width !== -1) {
+        targetColumnWidth.value = width / columnCount + columnGap / 2;
+      }
+    },
+    [columnCount, columnGap]
+  );
+
+  // ANIMATED COLUMN WIDTH UPDATER
+  useAnimatedReaction(
+    () => ({
+      targetWidth: targetColumnWidth.value
+    }),
+    ({ targetWidth }) => {
+      if (columnWidth.value === -1) {
+        columnWidth.value = targetWidth;
+      } else {
+        // Manually trigger the measurement of all items to ensure that they
+        // dimensions are correctly updated when the column width changes
+        columnWidth.value = withTiming(targetWidth, undefined, measureAllItems);
+      }
+    }
+  );
+
+  // TOUCHED ITEM WIDTH UPDATER
+  useAnimatedReaction(
+    () => ({
+      width: columnWidth.value
+    }),
+    ({ width }) => {
+      if (touchedItemWidth.value && width !== -1) {
+        touchedItemWidth.value = width;
+      }
+    }
   );
 
   // ROW OFFSETS UPDATER
@@ -49,7 +92,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
     ({ dimensions, idxToKey }) => {
       const offsets = [0];
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
-        const rowIndex = getRowIndex(parseInt(itemIndex), columnsCount);
+        const rowIndex = getRowIndex(parseInt(itemIndex), columnCount);
         const itemHeight = dimensions[key]?.height;
 
         // Return if the item height is not yet measured
@@ -70,17 +113,26 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
           (a, b) => Math.abs(a - b) < OFFSET_EPS
         )
       ) {
+        console.log('>>> current rowOffsets.value', rowOffsets.value);
+        console.log('>>> set rowOffsets.value', offsets);
         rowOffsets.value = offsets;
-        containerHeight.value = offsets[offsets.length - 1] ?? 0;
+        const newHeight = offsets[offsets.length - 1] ?? 0;
+        if (containerHeight.value === -1) {
+          console.log('>>> set containerHeight.value', newHeight);
+          containerHeight.value = newHeight;
+        } else {
+          console.log('>>> set containerHeight.value withTiming', newHeight);
+          containerHeight.value = withTiming(newHeight);
+        }
       }
     },
-    [columnsCount]
+    [columnCount]
   );
 
   // ITEM POSITIONS UPDATER
   useAnimatedReaction(
     () => ({
-      colWidth: columnWidth.value,
+      colWidth: targetColumnWidth.value,
       idxToKey: indexToKey.value,
       offsets: rowOffsets.value
     }),
@@ -91,8 +143,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
       const positions: Record<string, Vector> = {};
 
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
-        const rowIndex = getRowIndex(parseInt(itemIndex), columnsCount);
-        const colIndex = getColumnIndex(parseInt(itemIndex), columnsCount);
+        const rowIndex = getRowIndex(parseInt(itemIndex), columnCount);
+        const colIndex = getColumnIndex(parseInt(itemIndex), columnCount);
 
         const y = offsets[rowIndex];
         if (y === undefined) {
@@ -116,7 +168,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
 
       itemPositions.value = positions;
     },
-    [columnsCount]
+    [columnCount]
   );
 
   return {

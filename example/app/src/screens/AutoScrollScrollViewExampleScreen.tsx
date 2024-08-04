@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortable';
@@ -30,11 +30,20 @@ export default function AutoScrollScrollViewExampleScreen() {
     []
   );
 
+  const [columns, setColumns] = useState(2);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setColumns(prevColumns => (prevColumns === 2 ? 3 : 2));
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   const sharedProps = {
     activeItemScale: 1.15,
     activeItemShadowOpacity: 0.1,
     columnGap: 12,
-    columns: 2,
+    columns,
     inactiveItemOpacity: 0.5,
     renderItem,
     rowGap: 12,

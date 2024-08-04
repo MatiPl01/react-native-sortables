@@ -31,7 +31,7 @@ function Tile({ index }: TileProps) {
 export default function SortableGridExamplesScreen() {
   const [dragEnabled, setDragEnabled] = useState(true);
   const [strategy, setStrategy] = useState<ReorderStrategy>(STRATEGIES[0]!);
-  const [columns, setColumns] = useState(5); // TODO - fix size calculations and positioning
+  const [columns, setColumns] = useState(5);
 
   const activeItemScale = useSharedValue(1.1);
   const activeItemOpacity = useSharedValue(1);
