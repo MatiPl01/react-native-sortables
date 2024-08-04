@@ -1,3 +1,4 @@
+export * from './arrays';
 export * from './children';
 export * from './equality';
 export * from './keys';

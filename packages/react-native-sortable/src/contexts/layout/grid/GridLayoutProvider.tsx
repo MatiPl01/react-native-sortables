@@ -33,14 +33,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
     containerHeight,
     containerWidth,
     itemDimensions,
-    measureAllItems,
-    touchedItemWidth
+    overrideItemDimensions
   } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
   const columnWidth = useSharedValue(-1);
-  const targetColumnWidth = useSharedValue(-1);
 
   // TARGET COLUMN WIDTH UPDATER
   useAnimatedReaction(
@@ -49,38 +47,17 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
     }),
     ({ width }) => {
       if (width !== -1) {
-        targetColumnWidth.value = width / columnCount + columnGap / 2;
+        const colWidth = width / columnCount + columnGap / 2;
+        overrideItemDimensions.value = Object.fromEntries(
+          Object.keys(itemDimensions.value).map(key => [
+            key,
+            { width: colWidth }
+          ])
+        );
+        columnWidth.value = colWidth;
       }
     },
     [columnCount, columnGap]
-  );
-
-  // ANIMATED COLUMN WIDTH UPDATER
-  useAnimatedReaction(
-    () => ({
-      targetWidth: targetColumnWidth.value
-    }),
-    ({ targetWidth }) => {
-      if (columnWidth.value === -1) {
-        columnWidth.value = targetWidth;
-      } else {
-        // Manually trigger the measurement of all items to ensure that they
-        // dimensions are correctly updated when the column width changes
-        columnWidth.value = withTiming(targetWidth, undefined, measureAllItems);
-      }
-    }
-  );
-
-  // TOUCHED ITEM WIDTH UPDATER
-  useAnimatedReaction(
-    () => ({
-      width: columnWidth.value
-    }),
-    ({ width }) => {
-      if (touchedItemWidth.value && width !== -1) {
-        touchedItemWidth.value = width;
-      }
-    }
   );
 
   // ROW OFFSETS UPDATER
@@ -113,15 +90,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
           (a, b) => Math.abs(a - b) < OFFSET_EPS
         )
       ) {
-        console.log('>>> current rowOffsets.value', rowOffsets.value);
-        console.log('>>> set rowOffsets.value', offsets);
         rowOffsets.value = offsets;
         const newHeight = offsets[offsets.length - 1] ?? 0;
         if (containerHeight.value === -1) {
-          console.log('>>> set containerHeight.value', newHeight);
           containerHeight.value = newHeight;
         } else {
-          console.log('>>> set containerHeight.value withTiming', newHeight);
           containerHeight.value = withTiming(newHeight);
         }
       }
@@ -132,7 +105,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   // ITEM POSITIONS UPDATER
   useAnimatedReaction(
     () => ({
-      colWidth: targetColumnWidth.value,
+      colWidth: columnWidth.value,
       idxToKey: indexToKey.value,
       offsets: rowOffsets.value
     }),
