@@ -7477,7 +7477,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.0.11":
+"husky@npm:^9.1.4":
   version: 9.1.4
   resolution: "husky@npm:9.1.4"
   bin:
@@ -11565,7 +11565,7 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-config-react-native-matipl01: "npm:2.1.0"
     get-yarn-workspaces: "npm:^1.0.2"
-    husky: "npm:^9.0.11"
+    husky: "npm:^9.1.4"
     lint-staged: "npm:^15.2.7"
     prettier: "npm:^3.3.2"
     syncpack: "npm:^12.3.3"
