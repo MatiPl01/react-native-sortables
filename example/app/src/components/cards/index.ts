@@ -1,1 +1,1 @@
-export { default as ExampleNavCard } from './ExampleNavCard';
+export { default as RouteCard } from './RouteCard';

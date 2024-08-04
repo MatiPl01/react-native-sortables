@@ -4,7 +4,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SafeArea } from './components';
-import { ExamplesStackNavigator } from './navigation';
+import { ExamplesStackNavigator } from './examples';
 
 export default function App() {
   return (

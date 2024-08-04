@@ -1,25 +1,24 @@
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { colors, radius, spacing, text } from '@/theme';
-import type { ExamplesScreenRoute } from '@/types/navigation';
-import { useAppNavigation } from '@/types/navigation';
 
-type ExampleCardProps = {
+type RouteCardProps = {
   title: string;
-  route: ExamplesScreenRoute;
+  route: string;
 };
 
-export default function ExampleNavCard({ route, title }: ExampleCardProps) {
-  const navigation = useAppNavigation();
+export default function RouteCard({ route, title }: RouteCardProps) {
+  const navigation = useNavigation();
 
   return (
     <TouchableOpacity
       activeOpacity={0.5}
       style={styles.card}
       onPress={() => {
-        navigation.navigate(route);
+        navigation.navigate(route as never);
       }}>
       <View style={styles.cardContent}>
         <Text style={[text.label1, styles.title]}>{title}</Text>
