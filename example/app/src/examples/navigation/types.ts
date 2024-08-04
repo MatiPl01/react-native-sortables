@@ -1,10 +1,13 @@
+import type { RouteCardComponent } from '@/components';
+
 export type Route = {
   name: string;
+  CardComponent?: RouteCardComponent;
 } & (
   | {
       routes: Routes;
     }
-  | { component: React.ComponentType<unknown> }
+  | { Component: React.ComponentType }
 );
 
 export type Routes = Record<string, Route>;

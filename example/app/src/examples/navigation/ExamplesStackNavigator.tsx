@@ -9,7 +9,7 @@ import type { Routes } from './types';
 import { getScreenTitle, hasRoutes } from './utils';
 
 const StackNavigator =
-  createNativeStackNavigator<Record<string, React.ComponentType<unknown>>>();
+  createNativeStackNavigator<Record<string, React.ComponentType>>();
 
 function createStackNavigator(routes: Routes): React.ComponentType {
   return function Navigator() {
@@ -29,9 +29,11 @@ function createRoutesScreen(routes: Routes, path: string): React.ComponentType {
       <ScrollView
         contentContainerStyle={styles.scrollViewContent}
         style={styles.scrollView}>
-        {Object.entries(routes).map(([key, { name }]) => (
-          <RouteCard key={key} route={`${path}/${key}`} title={name} />
-        ))}
+        {Object.entries(routes).map(
+          ([key, { CardComponent = RouteCard, name }]) => (
+            <CardComponent key={key} route={`${path}/${key}`} title={name} />
+          )
+        )}
       </ScrollView>
     );
   }
@@ -62,7 +64,7 @@ function createNavigationScreens(
       }
       return (
         <StackNavigator.Screen
-          component={value.component}
+          component={value.Component}
           key={key}
           name={newPath}
           options={{ title: value.name }}
