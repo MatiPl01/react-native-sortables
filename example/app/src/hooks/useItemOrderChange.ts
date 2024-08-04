@@ -1,13 +1,17 @@
 /* eslint-disable import/no-unused-modules */
 import { useIsFocused } from '@react-navigation/native';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export default function useItemOrderChange<I>(
   initialData: Array<I>,
-  selectedItem: number
+  selectedIndex: number
 ): Array<I> {
   const [data, setData] = useState(initialData);
-  const currentActiveIndexRef = useRef(selectedItem);
+  const currentActiveIndexRef = useRef(selectedIndex);
+  const selectedItem = useMemo(
+    () => initialData[selectedIndex],
+    [initialData, selectedIndex]
+  );
 
   const isFocused = useIsFocused();
 
@@ -15,19 +19,21 @@ export default function useItemOrderChange<I>(
     (index: number) => {
       setData(prevData => {
         const newData = [...prevData];
-        const activeIndex = currentActiveIndexRef.current;
-        const activeItem = newData[activeIndex];
+        const currentActiveIndex = prevData.findIndex(
+          item => item === selectedItem
+        );
+        const activeItem = newData[currentActiveIndex];
         currentActiveIndexRef.current = index;
 
         if (activeItem) {
-          newData.splice(activeIndex, 1);
+          newData.splice(currentActiveIndex, 1);
           newData.splice(index, 0, activeItem);
           return newData;
         }
         return prevData;
       });
     },
-    [setData]
+    [setData, selectedItem]
   );
 
   useEffect(() => {
