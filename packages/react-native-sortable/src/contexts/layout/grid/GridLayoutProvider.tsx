@@ -47,7 +47,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
     }),
     ({ width }) => {
       if (width !== -1) {
-        const colWidth = width / columnCount + columnGap / 2;
+        const colWidth = (width + columnGap) / columnCount;
         overrideItemDimensions.value = Object.fromEntries(
           Object.keys(itemDimensions.value).map(key => [
             key,
