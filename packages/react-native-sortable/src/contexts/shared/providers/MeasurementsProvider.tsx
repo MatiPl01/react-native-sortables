@@ -28,7 +28,6 @@ type MeasurementsContextType = {
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
   containerHeight: SharedValue<number>;
   containerWidth: SharedValue<number>;
-  measureAllItems: () => boolean;
   measureItem: (key: string, ref: AnimatedRef<Animated.View>) => void;
   removeItem: (key: string) => void;
   updateTouchedItemDimensions: (key: string) => void;
@@ -65,6 +64,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const handleItemMeasurement = useCallback(
     (key: string, ref: AnimatedRef<Animated.View>): boolean => {
       'worklet';
+      console.log('>>> handleItemMeasurement', key);
       const dimensions = measure(ref);
       const storedDimensions = itemDimensions.value[key];
       if (
@@ -109,31 +109,15 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
         // measured to reduce the number of times animated reactions are triggered
         if (measuredItemsCount.value === itemsCount) {
           clearAnimatedTimeout(updateTimeoutId.value);
-          updateTimeoutId.value = setAnimatedTimeout(
-            () => {
-              itemDimensions.value = { ...itemDimensions.value };
-              initialMeasurementsCompleted.value = true;
-              updateTimeoutId.value = -1;
-            },
-            initialMeasurementsCompleted.value ? 200 : 100
-          );
+          updateTimeoutId.value = setAnimatedTimeout(() => {
+            itemDimensions.value = { ...itemDimensions.value };
+            initialMeasurementsCompleted.value = true;
+            updateTimeoutId.value = -1;
+          }, 100);
         }
       })();
     }
   );
-
-  const measureAllItems = useCallback(() => {
-    'worklet';
-    let areDifferent = false;
-    for (const key in itemRefs.value) {
-      areDifferent =
-        handleItemMeasurement(key, itemRefs.value[key]!) || areDifferent;
-    }
-    if (areDifferent) {
-      itemDimensions.value = { ...itemDimensions.value };
-    }
-    return areDifferent;
-  }, [handleItemMeasurement, itemDimensions, itemRefs]);
 
   const removeItem = useStableCallback((key: string) => {
     'worklet';
@@ -175,7 +159,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       containerWidth,
       initialMeasurementsCompleted,
       itemDimensions,
-      measureAllItems,
       measureItem,
       overrideItemDimensions,
       removeItem,

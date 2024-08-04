@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { StyleSheet, type ViewProps } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
@@ -22,6 +23,8 @@ import {
   useMeasurementsContext
 } from '../../contexts';
 import ItemDecoration from './ItemDecoration';
+
+const RELATIVE_STYLE: ViewStyle = { position: 'relative' };
 
 type DraggableViewProps = {
   itemKey: string;
@@ -52,7 +55,6 @@ export default function DraggableView({
     touchedItemKey
   } = useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
-
   const viewRef = useAnimatedRef<Animated.View>();
   const pressProgress = useSharedValue(0);
 
@@ -135,9 +137,7 @@ export default function DraggableView({
     const y = position.y.value;
 
     if (x === null || y === null) {
-      return {
-        position: 'relative'
-      };
+      return RELATIVE_STYLE;
     }
 
     return {

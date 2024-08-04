@@ -6,7 +6,6 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import {
   GridLayoutProvider,
   SharedProvider,
-  useGridLayoutContext,
   useGridOrderUpdater,
   useMeasurementsContext
 } from '../../contexts';
@@ -14,7 +13,8 @@ import type { Prettify, SharedProps } from '../../types';
 import {
   defaultKeyExtractor,
   getPropsWithDefaults,
-  typedMemo
+  typedMemo,
+  zipArrays
 } from '../../utils';
 import { DraggableView } from '../shared';
 import type { SortableGridRenderItem } from './types';
@@ -43,7 +43,10 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     sharedProps: { reorderStrategy, ...providerProps }
   } = getPropsWithDefaults(props);
 
-  const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
+  const itemKeys = useMemo(
+    () => data.map((item, index) => `${keyExtractor(item, index)}-${columns}`),
+    [data, columns, keyExtractor]
+  );
 
   const containerSpacingStyle = {
     marginHorizontal: -columnGap / 2,
@@ -54,14 +57,15 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     <SharedProvider
       {...providerProps}
       dropIndicatorStyle={containerSpacingStyle}
-      itemKeys={itemKeys}>
+      itemKeys={itemKeys}
+      key={columns}>
       <GridLayoutProvider columnCount={columns} columnGap={columnGap}>
         <SortableGridInner
           columnGap={columnGap}
           columns={columns}
           containerSpacingStyle={containerSpacingStyle}
           data={data}
-          keyExtractor={keyExtractor}
+          itemKeys={itemKeys}
           renderItem={renderItem}
           reorderStrategy={reorderStrategy}
           rowGap={rowGap}
@@ -73,13 +77,13 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
 type SortableGridInnerProps<I> = {
   containerSpacingStyle: ViewStyle;
+  itemKeys: Array<string>;
 } & Required<
   Pick<
     SortableGridProps<I>,
     | 'columnGap'
     | 'columns'
     | 'data'
-    | 'keyExtractor'
     | 'renderItem'
     | 'reorderStrategy'
     | 'rowGap'
@@ -91,22 +95,20 @@ function SortableGridInner<I>({
   columns,
   containerSpacingStyle,
   data,
-  keyExtractor,
+  itemKeys,
   renderItem,
   reorderStrategy,
   rowGap
 }: SortableGridInnerProps<I>) {
   const { containerHeight } = useMeasurementsContext();
-  const { columnWidth } = useGridLayoutContext();
   useGridOrderUpdater(columns, reorderStrategy);
 
-  const animatedColumnWidthStyle = useAnimatedStyle(() => {
-    return columnWidth.value === -1
-      ? {
-          flexBasis: `${100 / columns}%`
-        }
-      : { width: columnWidth.value };
-  });
+  const columnWidthStyle = useMemo<ViewStyle>(
+    () => ({
+      flexBasis: `${100 / columns}%`
+    }),
+    [columns]
+  );
 
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height: containerHeight.value === -1 ? 'auto' : containerHeight.value
@@ -119,20 +121,17 @@ function SortableGridInner<I>({
         containerSpacingStyle,
         animatedContainerHeightStyle
       ]}>
-      {data.map((item, index) => {
-        const key = keyExtractor(item, index);
-        return (
-          <SortableGridItem
-            columnGap={columnGap}
-            item={item}
-            itemKey={key}
-            key={key}
-            renderItem={renderItem}
-            rowGap={rowGap}
-            style={animatedColumnWidthStyle}
-          />
-        );
-      })}
+      {zipArrays(data, itemKeys).map(([item, key]) => (
+        <SortableGridItem
+          columnGap={columnGap}
+          item={item}
+          itemKey={key}
+          key={key}
+          renderItem={renderItem}
+          rowGap={rowGap}
+          style={columnWidthStyle}
+        />
+      ))}
     </Animated.View>
   );
 }
@@ -143,6 +142,7 @@ type SortableGridItemProps<I> = {
   itemKey: string;
   item: I;
   renderItem: SortableGridRenderItem<I>;
+  style: ViewStyle;
 } & ViewProps;
 
 const SortableGridItem = typedMemo(function <I>({
@@ -163,7 +163,10 @@ const SortableGridItem = typedMemo(function <I>({
   );
 
   return (
-    <DraggableView style={[itemSpacingStyle, style]} {...rest}>
+    <DraggableView
+      key={rest.itemKey}
+      style={[itemSpacingStyle, style]}
+      {...rest}>
       {renderItem({ item })}
     </DraggableView>
   );
