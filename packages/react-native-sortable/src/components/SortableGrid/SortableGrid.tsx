@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { ViewProps } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
@@ -45,12 +45,21 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
 
+  const containerSpacingStyle = {
+    marginHorizontal: -columnGap / 2,
+    marginVertical: -rowGap / 2
+  };
+
   return (
-    <SharedProvider {...providerProps} itemKeys={itemKeys}>
+    <SharedProvider
+      {...providerProps}
+      dropIndicatorStyle={containerSpacingStyle}
+      itemKeys={itemKeys}>
       <GridLayoutProvider columnCount={columns} columnGap={columnGap}>
         <SortableGridInner
           columnGap={columnGap}
           columns={columns}
+          containerSpacingStyle={containerSpacingStyle}
           data={data}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
@@ -62,7 +71,9 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   );
 }
 
-type SortableGridInnerProps<I> = Required<
+type SortableGridInnerProps<I> = {
+  containerSpacingStyle: ViewStyle;
+} & Required<
   Pick<
     SortableGridProps<I>,
     | 'columnGap'
@@ -78,6 +89,7 @@ type SortableGridInnerProps<I> = Required<
 function SortableGridInner<I>({
   columnGap,
   columns,
+  containerSpacingStyle,
   data,
   keyExtractor,
   renderItem,
@@ -99,11 +111,6 @@ function SortableGridInner<I>({
   const animatedContainerHeightStyle = useAnimatedStyle(() => ({
     height: containerHeight.value === -1 ? 'auto' : containerHeight.value
   }));
-
-  const containerSpacingStyle = {
-    marginHorizontal: -columnGap / 2,
-    marginVertical: -rowGap / 2
-  };
 
   return (
     <Animated.View

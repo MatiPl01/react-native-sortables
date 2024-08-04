@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { memo } from 'react';
+import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
@@ -11,8 +12,8 @@ import Animated, {
 
 import {
   useDragContext,
-  useItemDimensions,
   useItemPosition,
+  useMeasurementsContext,
   usePositionsContext
 } from '../../contexts/shared/providers';
 import type { Vector } from '../../types';
@@ -26,9 +27,11 @@ export type DropIndicatorComponentProps = {
 
 type DropIndicatorProps = {
   DropIndicatorComponent: ComponentType<DropIndicatorComponentProps>;
+  style?: ViewStyle;
 };
 
-function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
+function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
+  const { touchedItemHeight, touchedItemWidth } = useMeasurementsContext();
   const { activationProgress, activeItemDropped, touchedItemKey } =
     useDragContext();
   const { itemPositions, keyToIndex } = usePositionsContext();
@@ -37,7 +40,6 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
     easing: Easing.out(Easing.ease),
     ignoreActive: true
   });
-  const { height, width } = useItemDimensions(touchedItemKey);
 
   const dropIndex = useSharedValue(0);
   const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
@@ -69,15 +71,15 @@ function DropIndicator({ DropIndicatorComponent }: DropIndicatorProps) {
     }
 
     return {
-      height: height.value,
+      height: touchedItemHeight.value,
       opacity: 1,
       transform: [{ translateX }, { translateY }],
-      width: width.value
+      width: touchedItemWidth.value
     };
   });
 
   return (
-    <Animated.View style={[styles.container, animatedStyle]}>
+    <Animated.View style={[styles.container, animatedStyle, style]}>
       <DropIndicatorComponent
         activationProgress={activationProgress}
         dropIndex={dropIndex}

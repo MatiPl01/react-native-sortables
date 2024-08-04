@@ -19,7 +19,7 @@ export default function TouchedItemPositionUpdater({
   snapOffsetX: providedSnapOffsetX,
   snapOffsetY: providedSnapOffsetY
 }: ActiveItemSnapSettings) {
-  const { touchedItemDimensions } = useMeasurementsContext();
+  const { touchedItemHeight, touchedItemWidth } = useMeasurementsContext();
   const { relativeTouchPosition, touchStartPosition, touchedItemPosition } =
     usePositionsContext();
   const { activationProgress, activeItemTranslation } = useDragContext();
@@ -41,10 +41,11 @@ export default function TouchedItemPositionUpdater({
   useAnimatedReaction(
     () => ({
       enableSnap: snapEnabled.value,
+      height: touchedItemHeight.value,
       oX: snapOffsetX.value,
       oY: snapOffsetY.value,
       touchPosition: relativeTouchPosition.value,
-      ...touchedItemDimensions.value
+      width: touchedItemWidth.value
     }),
     ({ enableSnap, height, oX, oY, touchPosition, width }) => {
       if (!enableSnap || !height || !width || !touchPosition) {
@@ -75,6 +76,14 @@ export default function TouchedItemPositionUpdater({
         touchedItemPosition.value = null;
         return;
       }
+      console.log('touched pos', {
+        x: startPosition.x + (translation?.x ?? 0) - (enableSnap ? dX : 0),
+        y:
+          startPosition.y +
+          (translation?.y ?? 0) -
+          (enableSnap ? dY : 0) +
+          scrollOffsetY
+      });
       touchedItemPosition.value = {
         x: startPosition.x + (translation?.x ?? 0) - (enableSnap ? dX : 0),
         y:

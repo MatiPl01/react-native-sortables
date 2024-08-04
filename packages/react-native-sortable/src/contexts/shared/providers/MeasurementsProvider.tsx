@@ -6,7 +6,6 @@ import Animated, {
   measure,
   runOnUI,
   type SharedValue,
-  useAnimatedReaction,
   useSharedValue
 } from 'react-native-reanimated';
 
@@ -24,11 +23,12 @@ import { useDragContext } from './DragProvider';
 type MeasurementsContextType = {
   initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
-  touchedItemDimensions: SharedValue<Dimensions | null>;
+  touchedItemWidth: SharedValue<number>;
+  touchedItemHeight: SharedValue<number>;
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
   containerHeight: SharedValue<number>;
   containerWidth: SharedValue<number>;
-  measureAllItems: () => void;
+  measureAllItems: () => boolean;
   measureItem: (key: string, ref: AnimatedRef<Animated.View>) => void;
   removeItem: (key: string) => void;
   updateTouchedItemDimensions: (key: string) => void;
@@ -53,7 +53,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     {}
   );
 
-  const touchedItemDimensions = useSharedValue<Dimensions | null>(null);
+  const touchedItemWidth = useSharedValue<number>(-1);
+  const touchedItemHeight = useSharedValue<number>(-1);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const overrideItemDimensions = useSharedValue<
     Record<string, Partial<Dimensions>>
@@ -65,10 +66,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     (key: string, ref: AnimatedRef<Animated.View>): boolean => {
       'worklet';
       const dimensions = measure(ref);
+      const storedDimensions = itemDimensions.value[key];
       if (
         !dimensions ||
-        (itemDimensions.value[key] &&
-          !areDimensionsDifferent(itemDimensions.value[key], dimensions))
+        (storedDimensions &&
+          !areDimensionsDifferent(storedDimensions, dimensions, 0.1))
       ) {
         return false;
       }
@@ -79,12 +81,19 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
 
       itemDimensions.value[key] = dimensions;
       if (touchedItemKey.value === key) {
-        touchedItemDimensions.value = dimensions;
+        touchedItemWidth.value = dimensions.width;
+        touchedItemHeight.value = dimensions.height;
       }
 
       return true;
     },
-    [itemDimensions, measuredItemsCount, touchedItemDimensions, touchedItemKey]
+    [
+      itemDimensions,
+      measuredItemsCount,
+      touchedItemWidth,
+      touchedItemHeight,
+      touchedItemKey
+    ]
   );
 
   const measureItem = useStableCallback(
@@ -99,11 +108,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
         // Update the array of item dimensions only after all items have been
         // measured to reduce the number of times animated reactions are triggered
         if (measuredItemsCount.value === itemsCount) {
-          console.log('schedule update 2');
           clearAnimatedTimeout(updateTimeoutId.value);
           updateTimeoutId.value = setAnimatedTimeout(
             () => {
-              console.log('update 2');
               itemDimensions.value = { ...itemDimensions.value };
               initialMeasurementsCompleted.value = true;
               updateTimeoutId.value = -1;
@@ -117,22 +124,16 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
 
   const measureAllItems = useCallback(() => {
     'worklet';
-    console.log('measureAllItems');
-    let isUpdated = false;
+    let areDifferent = false;
     for (const key in itemRefs.value) {
-      isUpdated = handleItemMeasurement(key, itemRefs.value[key]!) || isUpdated;
+      areDifferent =
+        handleItemMeasurement(key, itemRefs.value[key]!) || areDifferent;
     }
-    if (isUpdated) {
+    if (areDifferent) {
       itemDimensions.value = { ...itemDimensions.value };
     }
+    return areDifferent;
   }, [handleItemMeasurement, itemDimensions, itemRefs]);
-
-  useAnimatedReaction(
-    () => itemDimensions.value,
-    () => {
-      console.log('Item dimensions updated:', itemDimensions.value);
-    }
-  );
 
   const removeItem = useStableCallback((key: string) => {
     'worklet';
@@ -156,9 +157,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const updateTouchedItemDimensions = useCallback(
     (key: string) => {
       'worklet';
-      touchedItemDimensions.value = itemDimensions.value[key] ?? null;
+      const dimensions = itemDimensions.value[key] ?? null;
+      touchedItemWidth.value = dimensions?.width ?? -1;
+      touchedItemHeight.value = dimensions?.height ?? -1;
     },
-    [touchedItemDimensions, itemDimensions]
+    [itemDimensions, touchedItemWidth, touchedItemHeight]
   );
 
   return {
@@ -176,7 +179,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       measureItem,
       overrideItemDimensions,
       removeItem,
-      touchedItemDimensions,
+      touchedItemHeight,
+      touchedItemWidth,
       updateTouchedItemDimensions
     }
   };

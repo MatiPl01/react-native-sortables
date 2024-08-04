@@ -29,32 +29,58 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   columnCount,
   columnGap
 }) => {
-  const { containerHeight, containerWidth, itemDimensions, measureAllItems } =
-    useMeasurementsContext();
+  const {
+    containerHeight,
+    containerWidth,
+    itemDimensions,
+    measureAllItems,
+    touchedItemWidth
+  } = useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
   const columnWidth = useSharedValue(-1);
+  const targetColumnWidth = useSharedValue(-1);
 
-  // COLUMN WIDTH UPDATER
+  // TARGET COLUMN WIDTH UPDATER
   useAnimatedReaction(
     () => ({
       width: containerWidth.value
     }),
     ({ width }) => {
-      if (width === -1) {
-        return;
-      }
-      const newWidth = width / columnCount + columnGap / 2;
-      if (columnWidth.value === -1) {
-        columnWidth.value = newWidth;
-      } else {
-        // Manually trigger the measurement of all items to ensure that they
-        // dimensions are correctly updated when the column width changes
-        columnWidth.value = withTiming(newWidth, undefined, measureAllItems);
+      if (width !== -1) {
+        targetColumnWidth.value = width / columnCount + columnGap / 2;
       }
     },
     [columnCount, columnGap]
+  );
+
+  // ANIMATED COLUMN WIDTH UPDATER
+  useAnimatedReaction(
+    () => ({
+      targetWidth: targetColumnWidth.value
+    }),
+    ({ targetWidth }) => {
+      if (columnWidth.value === -1) {
+        columnWidth.value = targetWidth;
+      } else {
+        // Manually trigger the measurement of all items to ensure that they
+        // dimensions are correctly updated when the column width changes
+        columnWidth.value = withTiming(targetWidth, undefined, measureAllItems);
+      }
+    }
+  );
+
+  // TOUCHED ITEM WIDTH UPDATER
+  useAnimatedReaction(
+    () => ({
+      width: columnWidth.value
+    }),
+    ({ width }) => {
+      if (touchedItemWidth.value && width !== -1) {
+        touchedItemWidth.value = width;
+      }
+    }
   );
 
   // ROW OFFSETS UPDATER
@@ -106,7 +132,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   // ITEM POSITIONS UPDATER
   useAnimatedReaction(
     () => ({
-      colWidth: columnWidth.value,
+      colWidth: targetColumnWidth.value,
       idxToKey: indexToKey.value,
       offsets: rowOffsets.value
     }),
