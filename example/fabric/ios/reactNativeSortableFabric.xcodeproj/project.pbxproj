@@ -11,9 +11,9 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		6F381D84B05C144CAA1BD4FF /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C533A30003BD96456469A66B /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a */; };
+		1A7B7FFA14EFE24C5BD677CB /* libPods-reactNativeSortableFabric.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD447D27B1229B19DAB61B17 /* libPods-reactNativeSortableFabric.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		928A9D8C23F2777952DF153E /* libPods-reactNativeSortableFabric.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96F60E06067E070759581B78 /* libPods-reactNativeSortableFabric.a */; };
+		ED8D7A2815F4C923D499A95D /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4375DCEB665CAA2E49195AE2 /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a */; };
 		EF0B906F8DA099E088450DE3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F0B311F5B5D0D9D6CED4A71C /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		00CC3F705928BC6E92BA9240 /* Pods-reactNativeSortableFabric.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeSortableFabric.debug.xcconfig"; path = "Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric.debug.xcconfig"; sourceTree = "<group>"; };
 		00E356EE1AD99517003FC87E /* reactNativeSortableFabricTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = reactNativeSortableFabricTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* reactNativeSortableFabricTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = reactNativeSortableFabricTests.m; sourceTree = "<group>"; };
@@ -38,15 +39,14 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = reactNativeSortableFabric/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = reactNativeSortableFabric/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = RnDiffApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		3D1617C970D866EE8A68F7AF /* Pods-reactNativeSortableFabric.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeSortableFabric.release.xcconfig"; path = "Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric.release.xcconfig"; sourceTree = "<group>"; };
+		18AE8CA308A60D57BE6BBC2C /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig"; path = "Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig"; sourceTree = "<group>"; };
+		4193525486C502FF7BF3105E /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig"; path = "Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig"; sourceTree = "<group>"; };
+		4375DCEB665CAA2E49195AE2 /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = reactNativeSortableFabric/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		96F60E06067E070759581B78 /* libPods-reactNativeSortableFabric.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-reactNativeSortableFabric.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A37C7F99A0796E5184810473 /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig"; path = "Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig"; sourceTree = "<group>"; };
-		AA33FE146B3145DCBE177C16 /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig"; path = "Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig"; sourceTree = "<group>"; };
-		C533A30003BD96456469A66B /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA0FAB33C91B79D98B17F5B1 /* Pods-reactNativeSortableFabric.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeSortableFabric.debug.xcconfig"; path = "Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric.debug.xcconfig"; sourceTree = "<group>"; };
+		AD36E2D7775590768ADBAE0E /* Pods-reactNativeSortableFabric.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeSortableFabric.release.xcconfig"; path = "Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F0B311F5B5D0D9D6CED4A71C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = reactNativeSortableFabric/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		FD447D27B1229B19DAB61B17 /* libPods-reactNativeSortableFabric.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-reactNativeSortableFabric.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6F381D84B05C144CAA1BD4FF /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a in Frameworks */,
+				ED8D7A2815F4C923D499A95D /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				928A9D8C23F2777952DF153E /* libPods-reactNativeSortableFabric.a in Frameworks */,
+				1A7B7FFA14EFE24C5BD677CB /* libPods-reactNativeSortableFabric.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,8 +105,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				96F60E06067E070759581B78 /* libPods-reactNativeSortableFabric.a */,
-				C533A30003BD96456469A66B /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a */,
+				FD447D27B1229B19DAB61B17 /* libPods-reactNativeSortableFabric.a */,
+				4375DCEB665CAA2E49195AE2 /* libPods-reactNativeSortableFabric-reactNativeSortableFabricTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -145,10 +145,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				DA0FAB33C91B79D98B17F5B1 /* Pods-reactNativeSortableFabric.debug.xcconfig */,
-				3D1617C970D866EE8A68F7AF /* Pods-reactNativeSortableFabric.release.xcconfig */,
-				A37C7F99A0796E5184810473 /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig */,
-				AA33FE146B3145DCBE177C16 /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig */,
+				00CC3F705928BC6E92BA9240 /* Pods-reactNativeSortableFabric.debug.xcconfig */,
+				AD36E2D7775590768ADBAE0E /* Pods-reactNativeSortableFabric.release.xcconfig */,
+				18AE8CA308A60D57BE6BBC2C /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig */,
+				4193525486C502FF7BF3105E /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -160,12 +160,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "reactNativeSortableFabricTests" */;
 			buildPhases = (
-				9872EAC841ECEB15703926DC /* [CP] Check Pods Manifest.lock */,
+				0454D037C5632324339180AC /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				94C2CCB5E6F52DE1FFF14444 /* [CP] Embed Pods Frameworks */,
-				86C71F13B63916D42DEA73DA /* [CP] Copy Pods Resources */,
+				212492EA00CB700487F69D11 /* [CP] Embed Pods Frameworks */,
+				257FC2A590BC7788D3632AB7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -181,13 +181,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "reactNativeSortableFabric" */;
 			buildPhases = (
-				99441A989B25920142824115 /* [CP] Check Pods Manifest.lock */,
+				D043A996862F315F5477109E /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				B1C2CA03D25E8CD0B8012A87 /* [CP] Embed Pods Frameworks */,
-				2085D7B134C6451CF9B0255A /* [CP] Copy Pods Resources */,
+				E5DABB39DCBA4AB53BE09F1B /* [CP] Embed Pods Frameworks */,
+				315DE226671036FD71C0AC81 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -271,58 +271,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		2085D7B134C6451CF9B0255A /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		86C71F13B63916D42DEA73DA /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		94C2CCB5E6F52DE1FFF14444 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9872EAC841ECEB15703926DC /* [CP] Check Pods Manifest.lock */ = {
+		0454D037C5632324339180AC /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -344,7 +293,58 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		99441A989B25920142824115 /* [CP] Check Pods Manifest.lock */ = {
+		212492EA00CB700487F69D11 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		257FC2A590BC7788D3632AB7 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests/Pods-reactNativeSortableFabric-reactNativeSortableFabricTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		315DE226671036FD71C0AC81 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-reactNativeSortableFabric/Pods-reactNativeSortableFabric-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D043A996862F315F5477109E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -366,7 +366,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B1C2CA03D25E8CD0B8012A87 /* [CP] Embed Pods Frameworks */ = {
+		E5DABB39DCBA4AB53BE09F1B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -416,7 +416,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A37C7F99A0796E5184810473 /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig */;
+			baseConfigurationReference = 18AE8CA308A60D57BE6BBC2C /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -443,7 +443,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AA33FE146B3145DCBE177C16 /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig */;
+			baseConfigurationReference = 4193525486C502FF7BF3105E /* Pods-reactNativeSortableFabric-reactNativeSortableFabricTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -467,7 +467,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DA0FAB33C91B79D98B17F5B1 /* Pods-reactNativeSortableFabric.debug.xcconfig */;
+			baseConfigurationReference = 00CC3F705928BC6E92BA9240 /* Pods-reactNativeSortableFabric.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -495,7 +495,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3D1617C970D866EE8A68F7AF /* Pods-reactNativeSortableFabric.release.xcconfig */;
+			baseConfigurationReference = AD36E2D7775590768ADBAE0E /* Pods-reactNativeSortableFabric.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
