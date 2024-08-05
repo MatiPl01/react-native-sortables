@@ -6,6 +6,7 @@ import Animated, {
   measure,
   runOnUI,
   type SharedValue,
+  useAnimatedStyle,
   useSharedValue
 } from 'react-native-reanimated';
 
@@ -127,12 +128,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   });
 
   const measureContainer = useCallback(
-    ({
-      nativeEvent: {
-        layout: { width }
-      }
-    }: LayoutChangeEvent) => {
-      containerWidth.value = width;
+    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
+      containerWidth.value = layout.width;
+      console.log('containerWidth: ', containerWidth.value, layout.height);
     },
     [containerWidth]
   );
@@ -147,9 +145,19 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     [itemDimensions, touchedItemWidth, touchedItemHeight]
   );
 
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    height: containerHeight.value
+  }));
+
   return {
     children: (
-      <Animated.View style={styles.container} onLayout={measureContainer}>
+      <Animated.View
+        style={[
+          styles.container,
+          animatedContainerStyle,
+          { backgroundColor: 'red' }
+        ]}
+        onLayout={measureContainer}>
         {children}
       </Animated.View>
     ),

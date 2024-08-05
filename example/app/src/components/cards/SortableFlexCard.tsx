@@ -1,7 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 import { SortableFlex } from 'react-native-sortable';
 
-import { useItemOrderChange } from '@/hooks';
 import { colors, radius, spacing } from '@/theme';
 
 import type { RouteCardComponent } from './RouteCard';
@@ -23,12 +22,13 @@ const ACTIVE_INDEX = 2;
 const ACTIVE_ITEM = DATA[ACTIVE_INDEX];
 
 const SortableFlexCard: RouteCardComponent = props => {
-  const data = useItemOrderChange(DATA, ACTIVE_INDEX);
+  // const data = useItemOrderChange(DATA, ACTIVE_INDEX);
+  return null;
 
   return (
     <RouteCard {...props}>
       <SortableFlex dragEnabled={false} style={styles.container}>
-        {data.map(item => (
+        {DATA.map(item => (
           <Text
             key={item}
             style={[styles.cell, item === ACTIVE_ITEM && styles.activeCell]}>

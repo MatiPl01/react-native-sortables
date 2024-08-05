@@ -1,7 +1,7 @@
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation } from '@react-navigation/native';
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Defs, LinearGradient, Rect, Stop, Svg } from 'react-native-svg';
 
@@ -18,6 +18,7 @@ export type RouteCardComponent = (
 
 export default function RouteCard({ children, route, title }: RouteCardProps) {
   const navigation = useNavigation();
+  const [dimensions, setDimensions] = useState({ height: 0, width: 0 });
 
   return (
     <TouchableOpacity
@@ -30,8 +31,15 @@ export default function RouteCard({ children, route, title }: RouteCardProps) {
         <View>
           {children}
           {/* Gradient overlay */}
-          <View style={[styles.gradient, StyleSheet.absoluteFill]}>
-            <Svg height='100%' width='100%'>
+          <View
+            style={[styles.gradient, StyleSheet.absoluteFill]}
+            onLayout={e => {
+              setDimensions({
+                height: e.nativeEvent.layout.height,
+                width: e.nativeEvent.layout.width
+              });
+            }}>
+            <Svg height={dimensions.height} width={dimensions.width}>
               <Defs>
                 <LinearGradient
                   id='horizontal-gradient'

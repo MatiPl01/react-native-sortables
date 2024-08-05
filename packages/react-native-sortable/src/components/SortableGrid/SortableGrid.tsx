@@ -1,13 +1,11 @@
 import { useMemo } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
-import { StyleSheet } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { StyleSheet, View } from 'react-native';
 
 import {
   GridLayoutProvider,
   SharedProvider,
-  useGridOrderUpdater,
-  useMeasurementsContext
+  useGridOrderUpdater
 } from '../../contexts';
 import type { Prettify, SharedProps } from '../../types';
 import {
@@ -53,22 +51,26 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     marginVertical: -rowGap / 2
   };
 
+  const sharedProps = {
+    columnGap,
+    columns,
+    rowGap
+  };
+
   return (
     <SharedProvider
       {...providerProps}
       dropIndicatorStyle={containerSpacingStyle}
       itemKeys={itemKeys}
       key={columns}>
-      <GridLayoutProvider columnCount={columns} columnGap={columnGap}>
+      <GridLayoutProvider {...sharedProps}>
         <SortableGridInner
-          columnGap={columnGap}
-          columns={columns}
           containerSpacingStyle={containerSpacingStyle}
           data={data}
           itemKeys={itemKeys}
           renderItem={renderItem}
           reorderStrategy={reorderStrategy}
-          rowGap={rowGap}
+          {...sharedProps}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -100,7 +102,6 @@ function SortableGridInner<I>({
   reorderStrategy,
   rowGap
 }: SortableGridInnerProps<I>) {
-  const { containerHeight } = useMeasurementsContext();
   useGridOrderUpdater(columns, reorderStrategy);
 
   const columnWidthStyle = useMemo<ViewStyle>(
@@ -110,17 +111,12 @@ function SortableGridInner<I>({
     [columns]
   );
 
-  const animatedContainerHeightStyle = useAnimatedStyle(() => ({
-    height: containerHeight.value === -1 ? 'auto' : containerHeight.value
-  }));
+  // const animatedContainerHeightStyle = useAnimatedStyle(() => ({
+  //   height: containerHeight.value === -1 ? 'auto' : containerHeight.value
+  // }));
 
   return (
-    <Animated.View
-      style={[
-        styles.gridContainer,
-        containerSpacingStyle,
-        animatedContainerHeightStyle
-      ]}>
+    <View style={[styles.gridContainer, containerSpacingStyle]}>
       {zipArrays(data, itemKeys).map(([item, key]) => (
         <SortableGridItem
           columnGap={columnGap}
@@ -132,7 +128,7 @@ function SortableGridInner<I>({
           style={columnWidthStyle}
         />
       ))}
-    </Animated.View>
+    </View>
   );
 }
 
