@@ -1,12 +1,14 @@
 import { cloneElement, type ReactElement, useRef } from 'react';
-import { View, type ViewProps } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import type { FlexProps } from '../../contexts';
 import {
   FlexLayoutProvider,
   SharedProvider,
   useFlexLayoutContext,
-  useFlexOrderUpdater
+  useFlexOrderUpdater,
+  useMeasurementsContext
 } from '../../contexts';
 import type { ReorderStrategy, SharedProps } from '../../types';
 import {
@@ -56,12 +58,32 @@ function SortableFlexInner({
   reorderStrategy,
   viewProps
 }: SortableFlexInnerProps) {
+  const { canSwitchToAbsoluteLayout, containerHeight } =
+    useMeasurementsContext();
   const { flexDirection, stretch } = useFlexLayoutContext();
 
   useFlexOrderUpdater(reorderStrategy);
 
+  const animatedContainerStyle = useAnimatedStyle(() => {
+    if (containerHeight.value === -1) {
+      return {};
+    }
+    const style: ViewStyle = { height: containerHeight.value };
+    if (canSwitchToAbsoluteLayout) {
+      style.justifyContent = 'flex-start';
+      style.alignItems = 'flex-start';
+    }
+    return style;
+  });
+
   return (
-    <View {...viewProps} style={viewProps.style}>
+    <Animated.View
+      {...viewProps}
+      style={[
+        viewProps.style,
+        animatedContainerStyle,
+        { backgroundColor: 'green' }
+      ]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           itemKey={key}
@@ -75,7 +97,7 @@ function SortableFlexInner({
           })}
         </DraggableView>
       ))}
-    </View>
+    </Animated.View>
   );
 }
 
