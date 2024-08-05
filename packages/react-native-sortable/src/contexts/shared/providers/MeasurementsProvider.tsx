@@ -18,6 +18,7 @@ import {
   clearAnimatedInterval,
   clearAnimatedTimeout,
   maybeUpdateValue,
+  setAnimatedInterval,
   setAnimatedTimeout
 } from '../../../utils';
 import { createEnhancedContext } from '../../utils';
@@ -75,7 +76,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       if (height !== -1 && !canSwitchToAbsoluteLayout.value) {
         // Start the measurement interval only after the containerHeight
         // is set for the first time
-        measurementIntervalId.value = setAnimatedTimeout(() => {
+        measurementIntervalId.value = setAnimatedInterval(() => {
           const measuredHeight = measure(helperContainerRef)?.height ?? -1;
           if (measuredHeight > 0) {
             canSwitchToAbsoluteLayout.value = true;
