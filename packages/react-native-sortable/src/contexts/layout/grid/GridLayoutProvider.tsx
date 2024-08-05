@@ -29,12 +29,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   columnCount,
   columnGap
 }) => {
-  const {
-    containerHeight,
-    containerWidth,
-    itemDimensions,
-    overrideItemDimensions
-  } = useMeasurementsContext();
+  const { containerHeight, containerWidth, itemDimensions } =
+    useMeasurementsContext();
   const { indexToKey, itemPositions } = usePositionsContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
@@ -48,12 +44,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
     ({ width }) => {
       if (width !== -1) {
         const colWidth = width / columnCount + columnGap / 2;
-        overrideItemDimensions.value = Object.fromEntries(
-          Object.keys(itemDimensions.value).map(key => [
-            key,
-            { width: colWidth }
-          ])
-        );
         columnWidth.value = colWidth;
       }
     },

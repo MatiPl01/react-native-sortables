@@ -1,5 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 import { SortableFlexCard, SortableGridCard } from '@/components';
+import AutoScrollScrollViewExampleScreen from '@/examples/AutoScrollScrollViewExampleScreen';
 import * as SortableFlex from '@/examples/SortableFlex';
 import * as SortableGrid from '@/examples/SortableGrid';
 
@@ -13,6 +14,10 @@ const routes: Routes = {
       PropsExample: {
         Component: SortableGrid.PropsExample,
         name: 'SortableGrid Properties'
+      },
+      AutoScrollScrollView: {
+        Component: AutoScrollScrollViewExampleScreen,
+        name: 'AutoScrollScrollView'
       }
     }
   },

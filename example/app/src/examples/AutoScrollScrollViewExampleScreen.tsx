@@ -4,6 +4,8 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortable';
 import { SortableGrid } from 'react-native-sortable';
 
+import { colors } from '@/theme';
+
 function createCards(count: number) {
   return Array.from({ length: count }, (_, i) => ({
     description: 'This is a card',
@@ -34,6 +36,7 @@ export default function AutoScrollScrollViewExampleScreen() {
     activeItemScale: 1.15,
     activeItemShadowOpacity: 0.1,
     columnGap: 12,
+    columns: 2,
     inactiveItemOpacity: 0.5,
     renderItem,
     rowGap: 12,
@@ -47,11 +50,11 @@ export default function AutoScrollScrollViewExampleScreen() {
       <View style={styles.section}>
         <Text style={styles.title}>Before SortableGrid</Text>
       </View>
-      <SortableGrid columns={3} data={MANY_CARDS} {...sharedProps} />
+      <SortableGrid data={MANY_CARDS} {...sharedProps} />
       <View style={styles.section}>
         <Text style={styles.title}>Between SortableGrids</Text>
       </View>
-      <SortableGrid columns={2} data={FEW_CARDS} {...sharedProps} />
+      <SortableGrid data={FEW_CARDS} {...sharedProps} />
       <View style={styles.section}>
         <Text style={styles.title}>After SortableGrid</Text>
       </View>
@@ -74,6 +77,7 @@ const styles = StyleSheet.create({
     padding: 20
   },
   description: {
+    color: colors.foreground1,
     fontSize: 14
   },
   section: {
@@ -87,6 +91,7 @@ const styles = StyleSheet.create({
     marginVertical: 12
   },
   title: {
+    color: colors.foreground1,
     fontSize: 20,
     fontWeight: 'bold'
   }
