@@ -1,35 +1,39 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import type { LayoutChangeEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, {
-  type AnimatedRef,
   measure,
-  runOnUI,
   type SharedValue,
+  useAnimatedReaction,
+  useAnimatedRef,
+  useAnimatedStyle,
   useSharedValue
 } from 'react-native-reanimated';
 
-import { useStableCallback } from '../../../hooks';
+import { OFFSET_EPS } from '../../../constants';
+import { useUIStableCallback } from '../../../hooks';
 import type { Dimensions } from '../../../types';
+import type { AnimatedIntervalID, AnimatedTimeoutID } from '../../../utils';
 import {
-  type AnimatedTimeoutID,
   areDimensionsDifferent,
+  clearAnimatedInterval,
   clearAnimatedTimeout,
+  maybeUpdateValue,
+  setAnimatedInterval,
   setAnimatedTimeout
 } from '../../../utils';
 import { createEnhancedContext } from '../../utils';
 import { useDragContext } from './DragProvider';
 
 type MeasurementsContextType = {
-  initialMeasurementsCompleted: SharedValue<boolean>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   touchedItemWidth: SharedValue<number>;
   touchedItemHeight: SharedValue<number>;
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
   containerHeight: SharedValue<number>;
   containerWidth: SharedValue<number>;
-  measureItem: (key: string, ref: AnimatedRef<Animated.View>) => void;
-  removeItem: (key: string) => void;
+  canSwitchToAbsoluteLayout: SharedValue<boolean>;
+  handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
+  handleItemRemoval: (key: string) => void;
   updateTouchedItemDimensions: (key: string) => void;
 };
 
@@ -46,11 +50,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const { touchedItemKey } = useDragContext();
 
   const measuredItemsCount = useSharedValue(0);
-  const initialMeasurementsCompleted = useSharedValue(false);
+  const initialItemMeasurementsCompleted = useSharedValue(false);
   const updateTimeoutId = useSharedValue<AnimatedTimeoutID>(-1);
-  const itemRefs = useSharedValue<Record<string, AnimatedRef<Animated.View>>>(
-    {}
-  );
+
+  const helperContainerRef = useAnimatedRef<Animated.View>();
+  const measurementIntervalId = useSharedValue<AnimatedIntervalID>(-1);
 
   const touchedItemWidth = useSharedValue<number>(-1);
   const touchedItemHeight = useSharedValue<number>(-1);
@@ -60,18 +64,39 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   >({});
   const containerWidth = useSharedValue(-1);
   const containerHeight = useSharedValue(-1);
+  const canSwitchToAbsoluteLayout = useSharedValue(false);
 
-  const handleItemMeasurement = useCallback(
-    (key: string, ref: AnimatedRef<Animated.View>): boolean => {
+  // Use this handler to measure the applied container height
+  // (onLayout was very flaky, it was sometimes not called at all
+  // after applying the animated style with the containerHeight to
+  // the helper container)
+  useAnimatedReaction(
+    () => containerHeight.value,
+    height => {
+      if (height !== -1 && !canSwitchToAbsoluteLayout.value) {
+        // Start the measurement interval only after the containerHeight
+        // is set for the first time
+        measurementIntervalId.value = setAnimatedInterval(() => {
+          const measuredHeight = measure(helperContainerRef)?.height ?? -1;
+          if (measuredHeight > 0) {
+            canSwitchToAbsoluteLayout.value = true;
+            clearAnimatedInterval(measurementIntervalId.value);
+          }
+        }, 10);
+      }
+    }
+  );
+
+  const handleItemMeasurement = useUIStableCallback(
+    (key: string, dimensions: Dimensions) => {
       'worklet';
-      const dimensions = measure(ref);
       const storedDimensions = itemDimensions.value[key];
+
       if (
-        !dimensions ||
-        (storedDimensions &&
-          !areDimensionsDifferent(storedDimensions, dimensions, 0.1))
+        storedDimensions &&
+        !areDimensionsDifferent(storedDimensions, dimensions, 0.1)
       ) {
-        return false;
+        return;
       }
 
       if (!itemDimensions.value[key]) {
@@ -84,57 +109,40 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
         touchedItemHeight.value = dimensions.height;
       }
 
-      return true;
-    },
-    [
-      itemDimensions,
-      measuredItemsCount,
-      touchedItemWidth,
-      touchedItemHeight,
-      touchedItemKey
-    ]
-  );
-
-  const measureItem = useStableCallback(
-    (key: string, ref: AnimatedRef<Animated.View>) => {
-      runOnUI(() => {
-        itemRefs.value[key] = ref;
-        const isUpdated = handleItemMeasurement(key, ref);
-        if (!isUpdated) {
-          return;
-        }
-
-        // Update the array of item dimensions only after all items have been
-        // measured to reduce the number of times animated reactions are triggered
-        if (measuredItemsCount.value === itemsCount) {
-          clearAnimatedTimeout(updateTimeoutId.value);
+      // Update the array of item dimensions only after all items have been
+      // measured to reduce the number of times animated reactions are triggered
+      if (measuredItemsCount.value === itemsCount) {
+        // If this is the first time all items have been measured, update
+        // dimensions immediately to avoid unnecessary delays
+        if (!initialItemMeasurementsCompleted.value) {
+          initialItemMeasurementsCompleted.value = true;
+          itemDimensions.value = { ...itemDimensions.value };
+        } else {
+          // In all other cases, debounce the update in case multiple items
+          // change their size at the same time
+          if (updateTimeoutId.value !== -1) {
+            clearAnimatedTimeout(updateTimeoutId.value);
+          }
           updateTimeoutId.value = setAnimatedTimeout(() => {
             itemDimensions.value = { ...itemDimensions.value };
-            initialMeasurementsCompleted.value = true;
             updateTimeoutId.value = -1;
           }, 100);
         }
-      })();
+      }
     }
   );
 
-  const removeItem = useStableCallback((key: string) => {
+  const handleItemRemoval = useUIStableCallback((key: string) => {
     'worklet';
-    runOnUI(() => {
-      delete itemDimensions.value[key];
-      measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
-    })();
+    delete itemDimensions.value[key];
+    measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
   });
 
-  const measureContainer = useCallback(
-    ({
-      nativeEvent: {
-        layout: { width }
-      }
-    }: LayoutChangeEvent) => {
-      containerWidth.value = width;
-    },
-    [containerWidth]
+  const handleContainerWidthMeasurement = useUIStableCallback(
+    (width: number) => {
+      'worklet';
+      maybeUpdateValue(containerWidth, width, OFFSET_EPS);
+    }
   );
 
   const updateTouchedItemDimensions = useCallback(
@@ -147,20 +155,38 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     [itemDimensions, touchedItemWidth, touchedItemHeight]
   );
 
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    height: containerHeight.value === -1 ? undefined : containerHeight.value
+  }));
+
   return {
     children: (
-      <Animated.View style={styles.container} onLayout={measureContainer}>
+      <Animated.View
+        style={[
+          styles.container,
+          animatedContainerStyle,
+          { backgroundColor: 'red' }
+        ]}
+        onLayout={({ nativeEvent: { layout } }) =>
+          handleContainerWidthMeasurement(layout.width)
+        }>
+        {/* Helper component used to ensure that the calculated container height
+        was reflected in the calculated layout and applied to the container */}
+        <Animated.View
+          ref={helperContainerRef}
+          style={[styles.helperContainer, animatedContainerStyle]}
+        />
         {children}
       </Animated.View>
     ),
     value: {
+      canSwitchToAbsoluteLayout,
       containerHeight,
       containerWidth,
-      initialMeasurementsCompleted,
+      handleItemMeasurement,
+      handleItemRemoval,
       itemDimensions,
-      measureItem,
       overrideItemDimensions,
-      removeItem,
       touchedItemHeight,
       touchedItemWidth,
       updateTouchedItemDimensions
@@ -171,6 +197,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
 const styles = StyleSheet.create({
   container: {
     width: '100%'
+  },
+  helperContainer: {
+    position: 'absolute'
   }
 });
 

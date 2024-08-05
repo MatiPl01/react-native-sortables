@@ -58,22 +58,32 @@ function SortableFlexInner({
   reorderStrategy,
   viewProps
 }: SortableFlexInnerProps) {
-  const { containerHeight } = useMeasurementsContext();
+  const { canSwitchToAbsoluteLayout, containerHeight } =
+    useMeasurementsContext();
   const { flexDirection, stretch } = useFlexLayoutContext();
 
   useFlexOrderUpdater(reorderStrategy);
 
-  const animatedContainerHeightStyle = useAnimatedStyle(() => ({
-    height:
-      containerHeight.value === -1
-        ? (viewProps?.style as ViewStyle)?.height
-        : containerHeight.value
-  }));
+  const animatedContainerStyle = useAnimatedStyle(() => {
+    if (containerHeight.value === -1) {
+      return {};
+    }
+    const style: ViewStyle = { height: containerHeight.value };
+    if (canSwitchToAbsoluteLayout) {
+      style.justifyContent = 'flex-start';
+      style.alignItems = 'flex-start';
+    }
+    return style;
+  });
 
   return (
     <Animated.View
       {...viewProps}
-      style={[viewProps.style, animatedContainerHeightStyle]}>
+      style={[
+        viewProps.style,
+        animatedContainerStyle,
+        { backgroundColor: 'green' }
+      ]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           itemKey={key}

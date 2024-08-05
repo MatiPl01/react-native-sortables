@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import type { ViewProps, ViewStyle } from 'react-native';
-import { StyleSheet } from 'react-native';
+import { Platform, type ViewProps, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
@@ -39,9 +38,10 @@ export default function DraggableView({
   ...viewProps
 }: DraggableViewProps) {
   const {
-    measureItem,
+    canSwitchToAbsoluteLayout,
+    handleItemMeasurement,
+    handleItemRemoval,
     overrideItemDimensions,
-    removeItem,
     updateTouchedItemDimensions
   } = useMeasurementsContext();
   const {
@@ -65,8 +65,8 @@ export default function DraggableView({
   );
 
   useEffect(() => {
-    return () => removeItem(key);
-  }, [key, removeItem]);
+    return () => handleItemRemoval(key);
+  }, [key, handleItemRemoval]);
 
   const onDragEnd = useCallback(() => {
     'worklet';
@@ -133,12 +133,18 @@ export default function DraggableView({
   );
 
   const animatedStyle = useAnimatedStyle(() => {
+    if (!canSwitchToAbsoluteLayout.value) {
+      return RELATIVE_STYLE;
+    }
+
     const x = position.x.value;
     const y = position.y.value;
 
     if (x === null || y === null) {
       return RELATIVE_STYLE;
     }
+
+    console.log(Platform.OS, key, x, y);
 
     return {
       position: 'absolute',
@@ -152,8 +158,13 @@ export default function DraggableView({
     <Animated.View
       ref={viewRef}
       {...viewProps}
-      style={[styles.draggableView, style, animatedStyle]}
-      onLayout={() => measureItem(key, viewRef)}>
+      style={[style, animatedStyle]}
+      onLayout={({ nativeEvent: { layout } }) =>
+        handleItemMeasurement(key, {
+          height: layout.height,
+          width: layout.width
+        })
+      }>
       <GestureDetector gesture={panGesture}>
         <ItemDecoration itemKey={key} pressProgress={pressProgress}>
           {children}
@@ -162,10 +173,3 @@ export default function DraggableView({
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  draggableView: {
-    left: 0,
-    top: 0
-  }
-});
