@@ -60,18 +60,6 @@ function SortableFlexInner({
 
   useFlexOrderUpdater(reorderStrategy);
 
-  // const animatedContainerHeightStyle = useAnimatedStyle(() => {
-  //   console.log(
-  //     '>>> ',
-  //     containerHeight.value === -1
-  //       ? (viewProps?.style as ViewStyle)?.height
-  //       : containerHeight.value
-  //   );
-  //   return {
-  //     height: containerHeight.value
-  //   };
-  // });
-
   return (
     <View {...viewProps} style={viewProps.style}>
       {childrenArray.map(([key, child]) => (

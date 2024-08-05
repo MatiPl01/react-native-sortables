@@ -2,8 +2,7 @@ import { type PropsWithChildren } from 'react';
 import {
   type SharedValue,
   useAnimatedReaction,
-  useSharedValue,
-  withTiming
+  useSharedValue
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
@@ -94,14 +93,10 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
       ) {
         rowOffsets.value = offsets;
         const newHeight = offsets[offsets.length - 1] ?? 0;
-        if (containerHeight.value === -1) {
-          containerHeight.value = newHeight;
-        } else {
-          containerHeight.value = withTiming(newHeight);
-        }
+        containerHeight.value = newHeight - rowGap;
       }
     },
-    [columns]
+    [columns, rowGap]
   );
 
   // ITEM POSITIONS UPDATER

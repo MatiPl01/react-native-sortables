@@ -23,7 +23,6 @@ const ACTIVE_ITEM = DATA[ACTIVE_INDEX];
 
 const SortableFlexCard: RouteCardComponent = props => {
   // const data = useItemOrderChange(DATA, ACTIVE_INDEX);
-  return null;
 
   return (
     <RouteCard {...props}>

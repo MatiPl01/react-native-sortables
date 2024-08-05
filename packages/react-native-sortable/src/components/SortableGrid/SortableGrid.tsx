@@ -111,10 +111,6 @@ function SortableGridInner<I>({
     [columns]
   );
 
-  // const animatedContainerHeightStyle = useAnimatedStyle(() => ({
-  //   height: containerHeight.value === -1 ? 'auto' : containerHeight.value
-  // }));
-
   return (
     <View style={[styles.gridContainer, containerSpacingStyle]}>
       {zipArrays(data, itemKeys).map(([item, key]) => (
