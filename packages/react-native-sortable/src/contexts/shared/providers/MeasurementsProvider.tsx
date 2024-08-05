@@ -1,24 +1,27 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
+  measure,
   type SharedValue,
+  useAnimatedReaction,
+  useAnimatedRef,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
-import { useStableCallback, useUIStableCallback } from '../../../hooks';
+import { OFFSET_EPS } from '../../../constants';
+import { useUIStableCallback } from '../../../hooks';
 import type { Dimensions } from '../../../types';
+import type { AnimatedIntervalID, AnimatedTimeoutID } from '../../../utils';
 import {
-  type AnimatedTimeoutID,
   areDimensionsDifferent,
+  clearAnimatedInterval,
   clearAnimatedTimeout,
   maybeUpdateValue,
   setAnimatedTimeout
 } from '../../../utils';
 import { createEnhancedContext } from '../../utils';
 import { useDragContext } from './DragProvider';
-import { OFFSET_EPS } from '../../../constants';
 
 type MeasurementsContextType = {
   itemDimensions: SharedValue<Record<string, Dimensions>>;
@@ -47,8 +50,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
 
   const measuredItemsCount = useSharedValue(0);
   const initialItemMeasurementsCompleted = useSharedValue(false);
-  const containerHeightApplied = useSharedValue(false);
   const updateTimeoutId = useSharedValue<AnimatedTimeoutID>(-1);
+
+  const helperContainerRef = useAnimatedRef<Animated.View>();
+  const measurementIntervalId = useSharedValue<AnimatedIntervalID>(-1);
 
   const touchedItemWidth = useSharedValue<number>(-1);
   const touchedItemHeight = useSharedValue<number>(-1);
@@ -58,8 +63,28 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   >({});
   const containerWidth = useSharedValue(-1);
   const containerHeight = useSharedValue(-1);
-  const canSwitchToAbsoluteLayout = useDerivedValue(() => containerHeightApplied.value && initialItemMeasurementsCompleted.value);
+  const canSwitchToAbsoluteLayout = useSharedValue(false);
 
+  // Use this handler to measure the applied container height
+  // (onLayout was very flaky, it was sometimes not called at all
+  // after applying the animated style with the containerHeight to
+  // the helper container)
+  useAnimatedReaction(
+    () => containerHeight.value,
+    height => {
+      if (height !== -1 && !canSwitchToAbsoluteLayout.value) {
+        // Start the measurement interval only after the containerHeight
+        // is set for the first time
+        measurementIntervalId.value = setAnimatedTimeout(() => {
+          const measuredHeight = measure(helperContainerRef)?.height ?? -1;
+          if (measuredHeight > 0) {
+            canSwitchToAbsoluteLayout.value = true;
+            clearAnimatedInterval(measurementIntervalId.value);
+          }
+        }, 10);
+      }
+    }
+  );
 
   const handleItemMeasurement = useUIStableCallback(
     (key: string, dimensions: Dimensions) => {
@@ -119,16 +144,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     }
   );
 
-  const handleHelperContainerHeightMeasurement = useStableCallback(
-    (height: number) => {
-      'worklet';
-      console.log({ height, containerHeight: containerHeight.value });
-      if (height === containerHeight.value) {
-        containerHeightApplied.value = true;
-      }
-    }
-  );
-
   const updateTouchedItemDimensions = useCallback(
     (key: string) => {
       'worklet';
@@ -155,27 +170,22 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
           handleContainerWidthMeasurement(layout.width)
         }>
         {/* Helper component used to ensure that the calculated container height
-        used in the animated style was applied and items can be absolutely positioned
-        (onLayout on the real container is not called again as the calculated height
-        is (at least, should be) as the height determined by the total height of its
-        content, so we have to use a dummy component) */}
+        was reflected in the calculated layout and applied to the container */}
         <Animated.View
-          style={[styles.helperContainer, animatedContainerStyle, { width: 10, backgroundColor: 'blue'}]}
-          onLayout={({ nativeEvent: { layout } }) =>
-            handleHelperContainerHeightMeasurement(layout.height)
-          }
+          ref={helperContainerRef}
+          style={[styles.helperContainer, animatedContainerStyle]}
         />
         {children}
       </Animated.View>
     ),
     value: {
+      canSwitchToAbsoluteLayout,
       containerHeight,
       containerWidth,
-      itemDimensions,
       handleItemMeasurement,
-      overrideItemDimensions,
-      canSwitchToAbsoluteLayout,
       handleItemRemoval,
+      itemDimensions,
+      overrideItemDimensions,
       touchedItemHeight,
       touchedItemWidth,
       updateTouchedItemDimensions
@@ -185,10 +195,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: '100%'
   },
   helperContainer: {
-    position: 'absolute',
+    position: 'absolute'
   }
 });
 
