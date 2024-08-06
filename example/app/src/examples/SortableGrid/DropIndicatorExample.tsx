@@ -8,6 +8,7 @@ import { GridCard } from '@/components/items';
 import { getItems } from '@/utils';
 
 const DATA = getItems(10);
+const COLUMNS = 5;
 
 export default function DropIndicatorExample() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
@@ -18,7 +19,13 @@ export default function DropIndicatorExample() {
   return (
     <ScrollView>
       <Group>
-        <SortableGrid data={DATA} renderItem={renderItem} showDropIndicator />
+        <SortableGrid
+          columns={COLUMNS}
+          data={DATA}
+          renderItem={renderItem}
+          rowGap={20}
+          showDropIndicator
+        />
       </Group>
     </ScrollView>
   );

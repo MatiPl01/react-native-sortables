@@ -11,7 +11,7 @@ import type { RouteCardComponent } from './RouteCard';
 import RouteCard from './RouteCard';
 
 const DATA = getItems(10, '');
-const COLUMN_COUNT = 5;
+const COLUMNS = 5;
 
 const ACTIVE_INDEX = 5;
 const ACTIVE_ITEM = DATA[ACTIVE_INDEX];
@@ -28,7 +28,7 @@ const SortableGridCard: RouteCardComponent = props => {
     <RouteCard {...props}>
       <SortableGrid
         columnGap={spacing.xxs}
-        columns={COLUMN_COUNT}
+        columns={COLUMNS}
         data={data}
         dragEnabled={false}
         renderItem={renderItem}
