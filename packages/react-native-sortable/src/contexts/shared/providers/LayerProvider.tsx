@@ -1,4 +1,5 @@
 import { type PropsWithChildren, useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 
 import { createEnhancedContext } from '../../utils';
@@ -37,7 +38,8 @@ const { LayerProvider, useLayerContext } = createEnhancedContext(
 
   return {
     children: (
-      <Animated.View style={{ zIndex: disabled ? 0 : zIndex }}>
+      <Animated.View
+        style={[styles.container, { zIndex: disabled ? 0 : zIndex }]}>
         {children}
       </Animated.View>
     ),
@@ -45,6 +47,12 @@ const { LayerProvider, useLayerContext } = createEnhancedContext(
       updateLayer
     }
   };
+});
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%'
+  }
 });
 
 export { LayerProvider, useLayerContext };

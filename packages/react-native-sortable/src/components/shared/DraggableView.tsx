@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Platform, type ViewProps, type ViewStyle } from 'react-native';
+import { type ViewProps, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
@@ -143,8 +143,6 @@ export default function DraggableView({
     if (x === null || y === null) {
       return RELATIVE_STYLE;
     }
-
-    console.log(Platform.OS, key, x, y);
 
     return {
       position: 'absolute',

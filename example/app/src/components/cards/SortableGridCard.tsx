@@ -1,27 +1,26 @@
 import { useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortable';
 import { SortableGrid } from 'react-native-sortable';
 
-import { colors, radius, spacing } from '@/theme';
+import { GridCard } from '@/components/items';
+import { useItemOrderChange } from '@/hooks';
+import { spacing } from '@/theme';
+import { getItems } from '@/utils';
 
 import type { RouteCardComponent } from './RouteCard';
 import RouteCard from './RouteCard';
 
-const DATA = new Array(12).fill(null).map((_, index) => `${index + 1}`);
+const DATA = getItems(10, '');
+const COLUMN_COUNT = 5;
 
-const ACTIVE_INDEX = 6;
+const ACTIVE_INDEX = 5;
 const ACTIVE_ITEM = DATA[ACTIVE_INDEX];
 
 const SortableGridCard: RouteCardComponent = props => {
-  // const data = useItemOrderChange(DATA, ACTIVE_INDEX);
+  const data = useItemOrderChange(DATA, ACTIVE_INDEX);
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <View style={[styles.cell, item === ACTIVE_ITEM && styles.activeCell]}>
-        <Text style={styles.text}>{item}</Text>
-      </View>
-    ),
+    ({ item }) => <GridCard active={item === ACTIVE_ITEM}>{item}</GridCard>,
     []
   );
 
@@ -29,8 +28,8 @@ const SortableGridCard: RouteCardComponent = props => {
     <RouteCard {...props}>
       <SortableGrid
         columnGap={spacing.xxs}
-        columns={6}
-        data={DATA}
+        columns={COLUMN_COUNT}
+        data={data}
         dragEnabled={false}
         renderItem={renderItem}
         rowGap={spacing.xxs}
@@ -38,23 +37,5 @@ const SortableGridCard: RouteCardComponent = props => {
     </RouteCard>
   );
 };
-
-const styles = StyleSheet.create({
-  activeCell: {
-    backgroundColor: colors.secondary
-  },
-  cell: {
-    alignItems: 'center',
-    aspectRatio: 1,
-    backgroundColor: colors.primary,
-    borderRadius: radius.sm,
-    justifyContent: 'center'
-  },
-  text: {
-    color: colors.background1,
-    fontSize: 12,
-    fontWeight: 'bold'
-  }
-});
 
 export default SortableGridCard;

@@ -10,9 +10,13 @@ const routes: Routes = {
     CardComponent: SortableGridCard,
     name: 'SortableGrid',
     routes: {
-      PropsExample: {
+      Props: {
         Component: SortableGrid.PropsExample,
         name: 'SortableGrid Properties'
+      },
+      DropIndicator: {
+        Component: SortableGrid.DropIndicatorExample,
+        name: 'Drop Indicator'
       }
     }
   },
@@ -20,9 +24,13 @@ const routes: Routes = {
     CardComponent: SortableFlexCard,
     name: 'SortableFlex',
     routes: {
-      PropsExample: {
+      Props: {
         Component: SortableFlex.PropsExample,
         name: 'SortableFlex Properties'
+      },
+      DropIndicator: {
+        Component: SortableFlex.DropIndicatorExample,
+        name: 'Drop Indicator'
       }
     }
   }
