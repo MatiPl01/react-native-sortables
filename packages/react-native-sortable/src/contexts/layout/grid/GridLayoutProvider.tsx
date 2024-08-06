@@ -93,7 +93,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
       ) {
         rowOffsets.value = offsets;
         const newHeight = offsets[offsets.length - 1] ?? 0;
-        containerHeight.value = newHeight - rowGap;
+        containerHeight.value = newHeight;
       }
     },
     [columns, rowGap]

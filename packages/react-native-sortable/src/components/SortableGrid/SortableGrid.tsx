@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { ViewProps, ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 
 import {
@@ -135,15 +135,15 @@ type SortableGridItemProps<I> = {
   item: I;
   renderItem: SortableGridRenderItem<I>;
   style: ViewStyle;
-} & ViewProps;
+};
 
 const SortableGridItem = typedMemo(function <I>({
   columnGap,
   item,
+  itemKey,
   renderItem,
   rowGap,
-  style,
-  ...rest
+  style
 }: SortableGridItemProps<I>) {
   const itemSpacingStyle = useMemo(
     () => ({
@@ -156,9 +156,9 @@ const SortableGridItem = typedMemo(function <I>({
 
   return (
     <DraggableView
-      key={rest.itemKey}
-      style={[itemSpacingStyle, style]}
-      {...rest}>
+      itemKey={itemKey}
+      key={itemKey}
+      style={[itemSpacingStyle, style]}>
       {renderItem({ item })}
     </DraggableView>
   );
