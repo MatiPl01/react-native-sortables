@@ -22,7 +22,8 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderWidth: 1,
     justifyContent: 'center',
-    marginHorizontal: spacing.xs,
-    marginVertical: spacing.sm
+    marginHorizontal: spacing.sm,
+    marginVertical: spacing.sm,
+    padding: spacing.sm
   }
 });

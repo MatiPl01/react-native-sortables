@@ -13,6 +13,7 @@ import { useDragContext } from '../../contexts';
 type ItemDecorationProps = {
   itemKey: string;
   pressProgress: SharedValue<number>;
+  onLayout?: ViewProps['onLayout'];
 } & ViewProps;
 
 export default function ItemDecoration({

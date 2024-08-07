@@ -32,10 +32,7 @@ const SortableFlexCard: RouteCardComponent = props => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
     columnGap: spacing.xs,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     rowGap: spacing.xxs
   }
 });

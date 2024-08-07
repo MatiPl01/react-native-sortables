@@ -1,8 +1,13 @@
 import type { ComponentType } from 'react';
+import type { ViewProps } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 
 import type { DropIndicatorComponentProps } from '../components';
 import type { AnimatableValues, Prettify } from './utils';
+
+/**
+ * SHARED PROPS
+ */
 
 export type ActiveItemDecorationSettings = AnimatableValues<{
   activeItemScale: number;
@@ -75,3 +80,35 @@ export type SharedProps = Prettify<
     Partial<DropIndicatorSettings> &
     SortableCallbacks
 >;
+
+/**
+ * SORTABLE GRID PROPS
+ */
+export type SortableGridLayoutSettings = {
+  columns: number;
+} & AnimatableValues<{
+  rowGap: number;
+  columnGap: number;
+}>;
+
+export type SortableGridRenderItemInfo<I> = {
+  item: I;
+};
+
+export type SortableGridRenderItem<I> = (
+  info: SortableGridRenderItemInfo<I>
+) => JSX.Element;
+
+export type SortableGridProps<I> = Prettify<
+  {
+    data: Array<I>;
+    renderItem: SortableGridRenderItem<I>;
+    keyExtractor?: (item: I, index: number) => string;
+  } & Partial<SortableGridLayoutSettings> &
+    SharedProps
+>;
+
+/**
+ * SORTABLE FLEX PROPS
+ */
+export type SortableFlexProps = SharedProps & ViewProps;

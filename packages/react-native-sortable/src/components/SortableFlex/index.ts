@@ -1,4 +1,1 @@
-export {
-  default as SortableFlex,
-  type SortableFlexProps
-} from './SortableFlex';
+export { default as SortableFlex } from './SortableFlex';

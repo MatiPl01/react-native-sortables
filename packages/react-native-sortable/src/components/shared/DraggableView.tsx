@@ -21,6 +21,7 @@ import {
   useItemZIndex,
   useMeasurementsContext
 } from '../../contexts';
+import type { AnimatedViewStyle } from '../../types/reanimated';
 import ItemDecoration from './ItemDecoration';
 
 const RELATIVE_STYLE: ViewStyle = { position: 'relative' };
@@ -28,7 +29,9 @@ const RELATIVE_STYLE: ViewStyle = { position: 'relative' };
 type DraggableViewProps = {
   itemKey: string;
   reverseXAxis?: boolean;
-} & ViewProps;
+} & {
+  style?: AnimatedViewStyle;
+} & Omit<ViewProps, 'style'>;
 
 export default function DraggableView({
   children,
@@ -39,9 +42,11 @@ export default function DraggableView({
 }: DraggableViewProps) {
   const {
     canSwitchToAbsoluteLayout,
+    containerHeight,
     handleItemMeasurement,
     handleItemRemoval,
     overrideItemDimensions,
+    tryMeasureContainerHeight,
     updateTouchedItemDimensions
   } = useMeasurementsContext();
   const {
@@ -85,6 +90,14 @@ export default function DraggableView({
             return;
           }
 
+          // This should never happen, but just in case the container height
+          // was not measured withing the specified interval and onLayout
+          // was not called, we will try to measure it again after the item
+          // is touched
+          if (containerHeight.value === -1) {
+            tryMeasureContainerHeight();
+          }
+
           handleTouchStart(e, key);
           updateTouchedItemDimensions(key);
 
@@ -122,11 +135,13 @@ export default function DraggableView({
       activationProgress,
       touchedItemKey,
       pressProgress,
+      containerHeight,
       inactiveAnimationProgress,
       handleTouchStart,
       handleDragUpdate,
       handleDragStart,
       onDragEnd,
+      tryMeasureContainerHeight,
       updateStartScrollOffset,
       updateTouchedItemDimensions
     ]
@@ -153,18 +168,19 @@ export default function DraggableView({
   });
 
   return (
-    <Animated.View
-      ref={viewRef}
-      {...viewProps}
-      style={[style, animatedStyle]}
-      onLayout={({ nativeEvent: { layout } }) =>
-        handleItemMeasurement(key, {
-          height: layout.height,
-          width: layout.width
-        })
-      }>
+    <Animated.View ref={viewRef} {...viewProps} style={[style, animatedStyle]}>
       <GestureDetector gesture={panGesture}>
-        <ItemDecoration itemKey={key} pressProgress={pressProgress}>
+        <ItemDecoration
+          itemKey={key}
+          pressProgress={pressProgress}
+          // Keep onLayout the closest to the children to measure the real item size
+          // (without paddings or other style changes made to the wrapper component)
+          onLayout={({ nativeEvent: { layout } }) =>
+            handleItemMeasurement(key, {
+              height: layout.height,
+              width: layout.width
+            })
+          }>
           {children}
         </ItemDecoration>
       </GestureDetector>
