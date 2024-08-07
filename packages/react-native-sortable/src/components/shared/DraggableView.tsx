@@ -155,18 +155,19 @@ export default function DraggableView({
   });
 
   return (
-    <Animated.View
-      ref={viewRef}
-      {...viewProps}
-      style={[style, animatedStyle]}
-      onLayout={({ nativeEvent: { layout } }) =>
-        handleItemMeasurement(key, {
-          height: layout.height,
-          width: layout.width
-        })
-      }>
+    <Animated.View ref={viewRef} {...viewProps} style={[style, animatedStyle]}>
       <GestureDetector gesture={panGesture}>
-        <ItemDecoration itemKey={key} pressProgress={pressProgress}>
+        <ItemDecoration
+          itemKey={key}
+          pressProgress={pressProgress}
+          // Keep onLayout the closest to the children to measure the real item size
+          // (without paddings or other style changes made to the wrapper component)
+          onLayout={({ nativeEvent: { layout } }) =>
+            handleItemMeasurement(key, {
+              height: layout.height,
+              width: layout.width
+            })
+          }>
           {children}
         </ItemDecoration>
       </GestureDetector>
