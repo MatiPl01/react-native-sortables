@@ -54,10 +54,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs
   },
   container: {
-    alignItems: 'center',
     columnGap: spacing.xs,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     rowGap: spacing.xxs
   }
 });
