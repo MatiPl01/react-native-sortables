@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { ViewProps, ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 
 import {
@@ -119,13 +119,13 @@ type SortableGridItemProps<I> = {
   item: I;
   renderItem: SortableGridRenderItem<I>;
   style: ViewStyle;
-} & ViewProps;
+};
 
 const SortableGridItem = typedMemo(function <I>({
   item,
+  itemKey,
   renderItem,
-  style,
-  ...rest
+  style
 }: SortableGridItemProps<I>) {
   return (
     <DraggableView itemKey={itemKey} key={itemKey} style={style}>
