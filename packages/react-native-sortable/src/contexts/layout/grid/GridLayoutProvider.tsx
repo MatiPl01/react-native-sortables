@@ -80,7 +80,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
 
         offsets[rowIndex + 1] = Math.max(
           offsets[rowIndex + 1] ?? 0,
-          (offsets[rowIndex] ?? 0) + itemHeight
+          (offsets[rowIndex] ?? 0) + itemHeight + rowGap
         );
       }
       // Update row offsets only if they have changed
