@@ -162,11 +162,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   return {
     children: (
       <Animated.View
-        style={[
-          styles.container,
-          animatedContainerStyle,
-          { backgroundColor: 'red' }
-        ]}
+        style={[styles.container, animatedContainerStyle]}
         onLayout={({ nativeEvent: { layout } }) =>
           handleContainerWidthMeasurement(layout.width)
         }>

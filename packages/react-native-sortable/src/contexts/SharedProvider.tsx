@@ -26,7 +26,6 @@ type SharedProviderProps = PropsWithChildren<
     itemKeys: Array<string>;
     dragEnabled: boolean;
     hapticsEnabled: boolean;
-    itemWrapperStyle?: ViewStyle;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Platform, type ViewProps, type ViewStyle } from 'react-native';
+import { type ViewProps, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated, {
   useAnimatedRef,
   useAnimatedStyle,
@@ -28,7 +29,9 @@ const RELATIVE_STYLE: ViewStyle = { position: 'relative' };
 type DraggableViewProps = {
   itemKey: string;
   reverseXAxis?: boolean;
-} & ViewProps;
+} & {
+  style?: AnimatedStyle<ViewStyle> | Array<AnimatedStyle<ViewStyle>>;
+} & Omit<ViewProps, 'style'>;
 
 export default function DraggableView({
   children,
@@ -143,8 +146,6 @@ export default function DraggableView({
     if (x === null || y === null) {
       return RELATIVE_STYLE;
     }
-
-    console.log(Platform.OS, key, x, y);
 
     return {
       position: 'absolute',
