@@ -19,16 +19,16 @@ type GridLayoutContextType = {
 
 type GridLayoutProviderProps = PropsWithChildren<{
   columns: number;
-  columnGap: number;
-  rowGap: number;
+  rowGap: SharedValue<number>;
+  columnGap: SharedValue<number>;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   'GridLayout'
 )<GridLayoutContextType, GridLayoutProviderProps>(({
-  columnGap,
+  columnGap: columnGapValue,
   columns,
-  rowGap
+  rowGap: rowGapValue
 }) => {
   const {
     containerHeight,
@@ -44,9 +44,10 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   // TARGET COLUMN WIDTH UPDATER
   useAnimatedReaction(
     () => ({
+      columnGap: columnGapValue.value,
       width: containerWidth.value
     }),
-    ({ width }) => {
+    ({ columnGap, width }) => {
       if (width !== -1) {
         const colWidth = (width + columnGap) / columns;
         overrideItemDimensions.value = Object.fromEntries(
@@ -58,16 +59,17 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
         columnWidth.value = colWidth;
       }
     },
-    [columns, columnGap]
+    [columns]
   );
 
   // ROW OFFSETS UPDATER
   useAnimatedReaction(
     () => ({
       dimensions: itemDimensions.value,
-      idxToKey: indexToKey.value
+      idxToKey: indexToKey.value,
+      rowGap: rowGapValue.value
     }),
-    ({ dimensions, idxToKey }) => {
+    ({ dimensions, idxToKey, rowGap }) => {
       const offsets = [0];
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
         const rowIndex = getRowIndex(parseInt(itemIndex), columns);
@@ -96,7 +98,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
         containerHeight.value = newHeight - rowGap;
       }
     },
-    [columns, rowGap]
+    [columns]
   );
 
   // ITEM POSITIONS UPDATER

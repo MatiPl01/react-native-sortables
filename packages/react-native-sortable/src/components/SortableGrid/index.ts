@@ -1,5 +1,1 @@
-export {
-  default as SortableGrid,
-  type SortableGridProps
-} from './SortableGrid';
-export * from './types';
+export { default as SortableGrid } from './SortableGrid';

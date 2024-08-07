@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortable';
 import { SortableGrid } from 'react-native-sortable';
 
+import { useItemOrderChange } from '@/hooks';
 import { colors, radius, spacing } from '@/theme';
 
 import type { RouteCardComponent } from './RouteCard';
@@ -14,7 +15,7 @@ const ACTIVE_INDEX = 6;
 const ACTIVE_ITEM = DATA[ACTIVE_INDEX];
 
 const SortableGridCard: RouteCardComponent = props => {
-  // const data = useItemOrderChange(DATA, ACTIVE_INDEX);
+  const data = useItemOrderChange(DATA, ACTIVE_INDEX);
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
@@ -30,7 +31,7 @@ const SortableGridCard: RouteCardComponent = props => {
       <SortableGrid
         columnGap={spacing.xxs}
         columns={6}
-        data={DATA}
+        data={data}
         dragEnabled={false}
         renderItem={renderItem}
         rowGap={spacing.xxs}
