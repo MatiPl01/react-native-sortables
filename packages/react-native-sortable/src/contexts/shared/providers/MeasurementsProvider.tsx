@@ -24,6 +24,9 @@ import {
 import { createEnhancedContext } from '../../utils';
 import { useDragContext } from './DragProvider';
 
+const MEASUREMENT_RETRY_INTERVAL = 100;
+const MAX_MEASUREMENT_RETRIES = Math.floor(2000 / MEASUREMENT_RETRY_INTERVAL); // try to measure for 2 seconds
+
 type MeasurementsContextType = {
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   touchedItemWidth: SharedValue<number>;
@@ -35,6 +38,7 @@ type MeasurementsContextType = {
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
   updateTouchedItemDimensions: (key: string) => void;
+  tryMeasureContainerHeight: () => void;
 };
 
 type MeasurementsProviderProps = PropsWithChildren<{
@@ -55,6 +59,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
 
   const helperContainerRef = useAnimatedRef<Animated.View>();
   const measurementIntervalId = useSharedValue<AnimatedIntervalID>(-1);
+  const measurementRetryCount = useSharedValue(0);
 
   const touchedItemWidth = useSharedValue<number>(-1);
   const touchedItemHeight = useSharedValue<number>(-1);
@@ -65,27 +70,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const containerWidth = useSharedValue(-1);
   const containerHeight = useSharedValue(-1);
   const canSwitchToAbsoluteLayout = useSharedValue(false);
-
-  // Use this handler to measure the applied container height
-  // (onLayout was very flaky, it was sometimes not called at all
-  // after applying the animated style with the containerHeight to
-  // the helper container)
-  useAnimatedReaction(
-    () => containerHeight.value,
-    height => {
-      if (height !== -1 && !canSwitchToAbsoluteLayout.value) {
-        // Start the measurement interval only after the containerHeight
-        // is set for the first time
-        measurementIntervalId.value = setAnimatedInterval(() => {
-          const measuredHeight = measure(helperContainerRef)?.height ?? -1;
-          if (measuredHeight > 0) {
-            canSwitchToAbsoluteLayout.value = true;
-            clearAnimatedInterval(measurementIntervalId.value);
-          }
-        }, 10);
-      }
-    }
-  );
 
   const handleItemMeasurement = useUIStableCallback(
     (key: string, dimensions: Dimensions) => {
@@ -155,6 +139,57 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     [itemDimensions, touchedItemWidth, touchedItemHeight]
   );
 
+  const maybeSwitchToAbsoluteLayout = useCallback(
+    (measuredHeight: number) => {
+      'worklet';
+      if (measuredHeight > 0) {
+        clearAnimatedInterval(measurementIntervalId.value);
+        canSwitchToAbsoluteLayout.value = true;
+      }
+    },
+    [canSwitchToAbsoluteLayout, measurementIntervalId]
+  );
+
+  const tryMeasureContainerHeight = useCallback(() => {
+    'worklet';
+    measurementRetryCount.value = 0;
+    clearAnimatedInterval(measurementIntervalId.value);
+    measurementIntervalId.value = setAnimatedInterval(() => {
+      const measuredHeight = measure(helperContainerRef)?.height ?? -1;
+      maybeSwitchToAbsoluteLayout(measuredHeight);
+      if (measurementRetryCount.value >= MAX_MEASUREMENT_RETRIES) {
+        clearAnimatedInterval(measurementIntervalId.value);
+      } else {
+        measurementRetryCount.value += 1;
+      }
+    }, MEASUREMENT_RETRY_INTERVAL);
+  }, [
+    helperContainerRef,
+    measurementIntervalId,
+    measurementRetryCount,
+    maybeSwitchToAbsoluteLayout
+  ]);
+
+  const handleHelperContainerHeightMeasurement = useUIStableCallback(
+    (height: number) => {
+      'worklet';
+      maybeSwitchToAbsoluteLayout(height);
+    }
+  );
+
+  // Use this handler to measure the applied container height
+  // (onLayout was very flaky, it was sometimes not called at all
+  // after applying the animated style with the containerHeight to
+  // the helper container)
+  useAnimatedReaction(
+    () => containerHeight.value,
+    height => {
+      if (height !== -1 && !canSwitchToAbsoluteLayout.value) {
+        tryMeasureContainerHeight();
+      }
+    }
+  );
+
   const animatedContainerStyle = useAnimatedStyle(() => ({
     height: containerHeight.value === -1 ? undefined : containerHeight.value
   }));
@@ -171,6 +206,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
         <Animated.View
           ref={helperContainerRef}
           style={[styles.helperContainer, animatedContainerStyle]}
+          onLayout={({ nativeEvent: { layout } }) =>
+            handleHelperContainerHeightMeasurement(layout.height)
+          }
         />
         {children}
       </Animated.View>
@@ -185,6 +223,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       overrideItemDimensions,
       touchedItemHeight,
       touchedItemWidth,
+      tryMeasureContainerHeight,
       updateTouchedItemDimensions
     }
   };

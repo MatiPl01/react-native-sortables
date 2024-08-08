@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import type { ViewProps } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 
 import type { DropIndicatorComponentProps } from '../components';
@@ -37,6 +37,7 @@ export type AutoScrollSettings = {
 export type DropIndicatorSettings = {
   DropIndicatorComponent: ComponentType<DropIndicatorComponentProps>;
   showDropIndicator: boolean;
+  dropIndicatorStyle: ViewStyle;
 };
 
 export type DragStartParams = {

@@ -9,7 +9,7 @@ import type {
 } from 'react-native-sortable';
 import { SortableGrid } from 'react-native-sortable';
 
-import { AnimatedText } from '@/components/misc';
+import { AnimatedText } from '@/components';
 
 const CARDS = Array.from({ length: 6 }, (_, i) => ({
   key: `key${i}`,

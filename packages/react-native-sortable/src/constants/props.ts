@@ -10,6 +10,8 @@ import type {
 } from '../types';
 import { defaultKeyExtractor } from '../utils';
 
+export const STYLE_PROPS = ['style', 'dropIndicatorStyle'] as const;
+
 /**
  * DEFAULT SHARED PROPS
  */
@@ -27,6 +29,14 @@ export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
   dragEnabled: true,
+  dropIndicatorStyle: {
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderColor: 'black',
+    borderRadius: 10,
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    flex: 1
+  },
   enableActiveItemSnap: true,
   hapticsEnabled: false,
   inactiveItemOpacity: 0.5,

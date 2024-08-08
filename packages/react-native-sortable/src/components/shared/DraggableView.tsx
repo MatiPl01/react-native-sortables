@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { type ViewProps, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated, {
   useAnimatedRef,
   useAnimatedStyle,
@@ -22,6 +21,7 @@ import {
   useItemZIndex,
   useMeasurementsContext
 } from '../../contexts';
+import type { AnimatedViewStyle } from '../../types/reanimated';
 import ItemDecoration from './ItemDecoration';
 
 const RELATIVE_STYLE: ViewStyle = { position: 'relative' };
@@ -30,7 +30,7 @@ type DraggableViewProps = {
   itemKey: string;
   reverseXAxis?: boolean;
 } & {
-  style?: AnimatedStyle<ViewStyle> | Array<AnimatedStyle<ViewStyle>>;
+  style?: AnimatedViewStyle;
 } & Omit<ViewProps, 'style'>;
 
 export default function DraggableView({
@@ -42,9 +42,11 @@ export default function DraggableView({
 }: DraggableViewProps) {
   const {
     canSwitchToAbsoluteLayout,
+    containerHeight,
     handleItemMeasurement,
     handleItemRemoval,
     overrideItemDimensions,
+    tryMeasureContainerHeight,
     updateTouchedItemDimensions
   } = useMeasurementsContext();
   const {
@@ -88,6 +90,14 @@ export default function DraggableView({
             return;
           }
 
+          // This should never happen, but just in case the container height
+          // was not measured withing the specified interval and onLayout
+          // was not called, we will try to measure it again after the item
+          // is touched
+          if (containerHeight.value === -1) {
+            tryMeasureContainerHeight();
+          }
+
           handleTouchStart(e, key);
           updateTouchedItemDimensions(key);
 
@@ -125,11 +135,13 @@ export default function DraggableView({
       activationProgress,
       touchedItemKey,
       pressProgress,
+      containerHeight,
       inactiveAnimationProgress,
       handleTouchStart,
       handleDragUpdate,
       handleDragStart,
       onDragEnd,
+      tryMeasureContainerHeight,
       updateStartScrollOffset,
       updateTouchedItemDimensions
     ]

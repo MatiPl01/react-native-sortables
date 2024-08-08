@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
-import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
-import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../../constants';
@@ -12,6 +10,7 @@ import {
 } from '../../contexts';
 import { useAnimatableValue } from '../../hooks';
 import type { SortableGridProps, SortableGridRenderItem } from '../../types';
+import type { AnimatedViewStyle } from '../../types/reanimated';
 import {
   defaultKeyExtractor,
   getPropsWithDefaults,
@@ -76,8 +75,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
 type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
-  itemStyle: AnimatedStyle<ViewStyle> | Array<AnimatedStyle<ViewStyle>>;
-  style: AnimatedStyle<ViewStyle>;
+  itemStyle: AnimatedViewStyle;
+  style: AnimatedViewStyle;
 } & Required<
   Pick<
     SortableGridProps<I>,
@@ -115,7 +114,7 @@ type SortableGridItemProps<I> = {
   itemKey: string;
   item: I;
   renderItem: SortableGridRenderItem<I>;
-  style: AnimatedStyle<ViewStyle> | Array<AnimatedStyle<ViewStyle>>;
+  style: AnimatedViewStyle;
 };
 
 const SortableGridItem = typedMemo(function <I>({
