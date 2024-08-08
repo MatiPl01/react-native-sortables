@@ -23,7 +23,7 @@
     "react-native": "0.74.4",
     "react-native-builder-bob": "^0.23.2",
     "react-native-gesture-handler": "^2.17.1",
-    "react-native-reanimated": "^3.14.0",
+    "react-native-reanimated": "^3.15.0",
     "react-test-renderer": "^18.3.1",
     "semantic-release": "^24.0.0",
     "typescript": "5.3.3"
