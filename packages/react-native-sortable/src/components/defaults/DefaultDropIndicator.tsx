@@ -1,4 +1,3 @@
-import { StyleSheet } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle
@@ -7,7 +6,8 @@ import Animated, {
 import type { DropIndicatorComponentProps } from '../shared';
 
 export default function DefaultDropIndicator({
-  activationProgress
+  activationProgress,
+  style
 }: DropIndicatorComponentProps): JSX.Element {
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: activationProgress.value,
@@ -22,16 +22,5 @@ export default function DefaultDropIndicator({
     ]
   }));
 
-  return <Animated.View style={[styles.indicator, animatedStyle]} />;
+  return <Animated.View style={[style, animatedStyle]} />;
 }
-
-const styles = StyleSheet.create({
-  indicator: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    borderColor: 'black',
-    borderRadius: 10,
-    borderStyle: 'dashed',
-    borderWidth: 2,
-    flex: 1
-  }
-});

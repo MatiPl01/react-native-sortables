@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { SortableFlex } from 'react-native-sortable';
 
-import { FlexCell } from '@/components/items';
+import { FlexCell } from '@/components';
 import { useItemOrderChange } from '@/hooks';
 import { spacing } from '@/theme';
 import { getCategories } from '@/utils';

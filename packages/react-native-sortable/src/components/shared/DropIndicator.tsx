@@ -7,6 +7,7 @@ import Animated, {
   Easing,
   useAnimatedReaction,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
@@ -23,18 +24,23 @@ export type DropIndicatorComponentProps = {
   touchedItemKey: SharedValue<null | string>;
   dropIndex: SharedValue<number>;
   dropPosition: SharedValue<Vector>;
+  orderedItemKeys: SharedValue<Array<string>>;
+  style: ViewStyle;
 };
 
 type DropIndicatorProps = {
   DropIndicatorComponent: ComponentType<DropIndicatorComponentProps>;
-  style?: ViewStyle;
+  style: ViewStyle;
 };
 
 function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const { touchedItemHeight, touchedItemWidth } = useMeasurementsContext();
   const { activationProgress, activeItemDropped, touchedItemKey } =
     useDragContext();
-  const { itemPositions, keyToIndex } = usePositionsContext();
+  const { indexToKey, itemPositions, keyToIndex } = usePositionsContext();
+
+  // Clone the array in order to prevent user from mutating the internal state
+  const orderedItemKeys = useDerivedValue(() => [...indexToKey.value]);
 
   const { x, y } = useItemPosition(touchedItemKey, {
     easing: Easing.out(Easing.ease),
@@ -79,11 +85,13 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   });
 
   return (
-    <Animated.View style={[styles.container, animatedStyle, style]}>
+    <Animated.View style={[styles.container, animatedStyle]}>
       <DropIndicatorComponent
         activationProgress={activationProgress}
         dropIndex={dropIndex}
         dropPosition={dropPosition}
+        orderedItemKeys={orderedItemKeys}
+        style={style}
         touchedItemKey={touchedItemKey}
       />
     </Animated.View>

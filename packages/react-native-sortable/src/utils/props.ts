@@ -2,13 +2,14 @@
 
 import { StyleSheet, type ViewStyle } from 'react-native';
 
-import { DEFAULT_SHARED_PROPS } from '../constants/props';
+import { DEFAULT_SHARED_PROPS, STYLE_PROPS } from '../constants/props';
 import type { SharedProps } from '../types';
 
-const hasStyleProp = <P extends Record<string, any>>(
+const hasStyleProp = <K extends string, P extends Record<string, any>>(
+  styleKey: K,
   props: P
-): props is { style: Array<ViewStyle> | ViewStyle } & P => {
-  return 'style' in props;
+): props is { [key in K]: ViewStyle } & P => {
+  return styleKey in props;
 };
 
 export const getPropsWithDefaults = <
@@ -28,14 +29,20 @@ export const getPropsWithDefaults = <
   };
 
   // merge styles from props and defaults
-  if (hasStyleProp(propsWithDefaults)) {
-    const style = StyleSheet.flatten(
-      [
-        hasStyleProp(componentDefaultProps) && componentDefaultProps.style,
-        hasStyleProp(props) && props.style
-      ].filter(Boolean)
-    );
-    propsWithDefaults.style = style;
+  for (const styleKey of STYLE_PROPS) {
+    if (hasStyleProp(styleKey, propsWithDefaults)) {
+      const style = StyleSheet.flatten(
+        [
+          hasStyleProp(styleKey, DEFAULT_SHARED_PROPS) &&
+            DEFAULT_SHARED_PROPS[styleKey],
+          hasStyleProp(styleKey, componentDefaultProps) &&
+            componentDefaultProps[styleKey],
+          hasStyleProp(styleKey, props) && props[styleKey]
+        ].filter(Boolean)
+      );
+
+      propsWithDefaults[styleKey] = style;
+    }
   }
 
   const sharedProps: Record<string, any> = {};
