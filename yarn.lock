@@ -810,7 +810,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-class-properties@npm:^7.24.7":
+"@babel/plugin-transform-class-properties@npm:^7.0.0-0, @babel/plugin-transform-class-properties@npm:^7.24.7":
   version: 7.24.7
   resolution: "@babel/plugin-transform-class-properties@npm:7.24.7"
   dependencies:
@@ -835,7 +835,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-classes@npm:^7.0.0, @babel/plugin-transform-classes@npm:^7.25.0":
+"@babel/plugin-transform-classes@npm:^7.0.0, @babel/plugin-transform-classes@npm:^7.0.0-0, @babel/plugin-transform-classes@npm:^7.25.0":
   version: 7.25.0
   resolution: "@babel/plugin-transform-classes@npm:7.25.0"
   dependencies:
@@ -1429,7 +1429,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-unicode-regex@npm:^7.0.0, @babel/plugin-transform-unicode-regex@npm:^7.24.7":
+"@babel/plugin-transform-unicode-regex@npm:^7.0.0, @babel/plugin-transform-unicode-regex@npm:^7.0.0-0, @babel/plugin-transform-unicode-regex@npm:^7.24.7":
   version: 7.24.7
   resolution: "@babel/plugin-transform-unicode-regex@npm:7.24.7"
   dependencies:
@@ -6413,7 +6413,7 @@ __metadata:
     react: "npm:^18.3.1"
     react-native: "npm:0.74.4"
     react-native-gesture-handler: "npm:^2.17.1"
-    react-native-reanimated: "npm:^3.14.0"
+    react-native-reanimated: "npm:^3.15.0"
     react-native-safe-area-context: "npm:^4.10.3"
     react-native-screens: "npm:3.32.0"
     react-native-sortable: "workspace:*"
@@ -11512,15 +11512,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:^3.14.0":
-  version: 3.14.0
-  resolution: "react-native-reanimated@npm:3.14.0"
+"react-native-reanimated@npm:^3.15.0":
+  version: 3.15.0
+  resolution: "react-native-reanimated@npm:3.15.0"
   dependencies:
     "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
+    "@babel/plugin-transform-class-properties": "npm:^7.0.0-0"
+    "@babel/plugin-transform-classes": "npm:^7.0.0-0"
     "@babel/plugin-transform-nullish-coalescing-operator": "npm:^7.0.0-0"
     "@babel/plugin-transform-optional-chaining": "npm:^7.0.0-0"
     "@babel/plugin-transform-shorthand-properties": "npm:^7.0.0-0"
     "@babel/plugin-transform-template-literals": "npm:^7.0.0-0"
+    "@babel/plugin-transform-unicode-regex": "npm:^7.0.0-0"
     "@babel/preset-typescript": "npm:^7.16.7"
     convert-source-map: "npm:^2.0.0"
     invariant: "npm:^2.2.4"
@@ -11528,7 +11531,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10c0/a62ba3e4475c474bc7359d5175f192e86bbe86378a61041247b81beec6e93b4806cd8a5a8a61d1458d56eeef991803e5a128db69d260fa53d78050216b17d014
+  checksum: 10c0/86420a616ed7d80404847b584c9fa8f31b516f05401274f32eee908727bcf3fdfa0f09e0b195cd1d11cd0efaa4264ee42d47e2d2000bdab6626f53a795edb6a8
   languageName: node
   linkType: hard
 
@@ -11601,7 +11604,7 @@ __metadata:
     react-native-builder-bob: "npm:^0.23.2"
     react-native-gesture-handler: "npm:^2.17.1"
     react-native-haptic-feedback: "npm:>=2.0.0"
-    react-native-reanimated: "npm:^3.14.0"
+    react-native-reanimated: "npm:^3.15.0"
     react-test-renderer: "npm:^18.3.1"
     semantic-release: "npm:^24.0.0"
     typescript: "npm:5.3.3"
