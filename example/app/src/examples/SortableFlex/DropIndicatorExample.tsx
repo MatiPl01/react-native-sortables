@@ -22,7 +22,7 @@ export default function DropIndicatorExample() {
       </Section>
 
       <Section
-        description='With custom style that changes border radius of the default one'
+        description='With custom style that changes border radius of the default drop indicator'
         title='Default drop indicator'>
         <SortableFlex
           dropIndicatorStyle={styles.dropIndicatorStyle}
