@@ -7,5 +7,5 @@
       "react-native-sortable": ["../../packages/react-native-sortable/src"]
     }
   },
-  "include": ["src", "jest.config.ts", "__tests__"]
+  "include": ["src", "index.ts", "jest.config.ts", "__tests__"]
 }
