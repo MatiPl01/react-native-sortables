@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { ScrollView } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortable';
-import { SortableGrid } from 'react-native-sortable';
+import { SortableGrid, SortableLayer } from 'react-native-sortable';
 
 import { GridCard, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';
@@ -18,7 +18,7 @@ export default function DropIndicatorExample() {
 
   return (
     <ScrollView>
-      <Stagger>
+      <Stagger ParentComponent={SortableLayer}>
         <Section title='Without drop indicator'>
           <SortableGrid
             columnGap={6}

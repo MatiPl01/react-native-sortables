@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import { SortableFlex } from 'react-native-sortable';
+import { SortableFlex, SortableLayer } from 'react-native-sortable';
 
 import { FlexCell, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';
@@ -11,7 +11,7 @@ const DATA = getCategories(9);
 export default function DropIndicatorExample() {
   return (
     <ScrollView>
-      <Stagger>
+      <Stagger ParentComponent={SortableLayer}>
         <Section title='Without drop indicator'>
           <SortableFlex style={styles.sortableFlex}>
             {DATA.map(item => (

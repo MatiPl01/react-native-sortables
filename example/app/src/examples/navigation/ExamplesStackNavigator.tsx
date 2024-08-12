@@ -33,6 +33,7 @@ const BackButton = memo(function BackButton() {
 
   return (
     <TouchableOpacity
+      hitSlop={spacing.md}
       style={styles.backButton}
       onPress={() => {
         navigation.goBack();

@@ -12,7 +12,7 @@ const routes: Routes = {
     routes: {
       Props: {
         Component: SortableGrid.PropsExample,
-        name: 'SortableGrid Properties'
+        name: 'Properties'
       },
       DropIndicator: {
         Component: SortableGrid.DropIndicatorExample,
@@ -30,7 +30,7 @@ const routes: Routes = {
     routes: {
       Props: {
         Component: SortableFlex.PropsExample,
-        name: 'SortableFlex Properties'
+        name: 'Properties'
       },
       DropIndicator: {
         Component: SortableFlex.DropIndicatorExample,
