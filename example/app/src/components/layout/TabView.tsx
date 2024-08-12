@@ -61,7 +61,8 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: colors.white,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm
+    paddingVertical: spacing.sm,
+    zIndex: 1
   }
 });
 
