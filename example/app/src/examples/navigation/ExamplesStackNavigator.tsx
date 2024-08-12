@@ -6,7 +6,7 @@ import { memo } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInLeft, FadeInRight } from 'react-native-reanimated';
 
-import { RouteCard } from '@/components';
+import { RouteCard, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
 
 import exampleRoutes from './routes';
@@ -33,6 +33,7 @@ const BackButton = memo(function BackButton() {
 
   return (
     <TouchableOpacity
+      hitSlop={spacing.md}
       style={styles.backButton}
       onPress={() => {
         navigation.goBack();
@@ -69,11 +70,13 @@ function createRoutesScreen(routes: Routes, path: string): React.ComponentType {
       <ScrollView
         contentContainerStyle={styles.scrollViewContent}
         style={styles.scrollView}>
-        {Object.entries(routes).map(
-          ([key, { CardComponent = RouteCard, name }]) => (
-            <CardComponent key={key} route={`${path}/${key}`} title={name} />
-          )
-        )}
+        <Stagger>
+          {Object.entries(routes).map(
+            ([key, { CardComponent = RouteCard, name }]) => (
+              <CardComponent key={key} route={`${path}/${key}`} title={name} />
+            )
+          )}
+        </Stagger>
       </ScrollView>
     );
   }

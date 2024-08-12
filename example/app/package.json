@@ -4,6 +4,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-native-fontawesome": "^0.3.2",
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A1.7.0#~/.yarn/patches/@shopify-flash-list-npm-1.7.0-8b9f270a18.patch",
