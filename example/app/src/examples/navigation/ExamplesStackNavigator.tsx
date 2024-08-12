@@ -94,7 +94,10 @@ function createNavigationScreens(
       component={createRoutesScreen(routes, path)}
       key={path}
       name={path}
-      options={{ title: parentName ?? getScreenTitle(path) }}
+      options={{
+        contentStyle: styles.content,
+        title: parentName ?? getScreenTitle(path)
+      }}
     />,
     // Create screens for all nested routes or components
     ...Object.entries(routes).flatMap(([key, value]) => {
@@ -107,7 +110,7 @@ function createNavigationScreens(
           component={value.Component}
           key={key}
           name={newPath}
-          options={{ title: value.name }}
+          options={{ contentStyle: styles.content, title: value.name }}
         />
       );
     })
@@ -124,8 +127,10 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 16
   },
+  content: {
+    backgroundColor: colors.background3
+  },
   scrollView: {
-    backgroundColor: colors.background3,
     flex: 1,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xl
