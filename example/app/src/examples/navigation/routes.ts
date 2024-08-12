@@ -17,6 +17,10 @@ const routes: Routes = {
       DropIndicator: {
         Component: SortableGrid.DropIndicatorExample,
         name: 'Drop Indicator'
+      },
+      AutoScroll: {
+        Component: SortableGrid.AutoScrollExample,
+        name: 'Auto Scroll'
       }
     }
   },
@@ -31,6 +35,10 @@ const routes: Routes = {
       DropIndicator: {
         Component: SortableFlex.DropIndicatorExample,
         name: 'Drop Indicator'
+      },
+      AutoScroll: {
+        Component: SortableFlex.AutoScrollExample,
+        name: 'Auto Scroll'
       }
     }
   }

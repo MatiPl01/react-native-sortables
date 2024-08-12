@@ -44,7 +44,7 @@ export default function CustomDropIndicator({
     ({ count, index, show }, prev) => {
       if (show !== prev?.show) {
         scale.value = withSpring(+show);
-      } else if (index !== prev?.index) {
+      } else if (show && index !== prev?.index) {
         colorIndex.value = withTiming(index % count);
         scale.value = withSequence(
           withTiming(0.75, { duration: 100 }),

@@ -7,4 +7,5 @@ type Enumerate<
 
 export type Range<Min extends number, Max extends number> =
   | Exclude<Enumerate<Max>, Enumerate<Min>>
+  | Max
   | Min;
