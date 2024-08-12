@@ -5,7 +5,7 @@
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
     "@babel/runtime": "^7.24.7",
-    "@react-native/babel-preset": "0.74.86",
+    "@react-native/babel-preset": "0.74.87",
     "@react-native/metro-config": "0.74.86",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.0",
