@@ -142,12 +142,12 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const maybeSwitchToAbsoluteLayout = useCallback(
     (measuredHeight: number) => {
       'worklet';
-      if (measuredHeight > 0) {
+      if (measuredHeight > 0 || measuredHeight === containerHeight.value) {
         clearAnimatedInterval(measurementIntervalId.value);
         canSwitchToAbsoluteLayout.value = true;
       }
     },
-    [canSwitchToAbsoluteLayout, measurementIntervalId]
+    [canSwitchToAbsoluteLayout, measurementIntervalId, containerHeight]
   );
 
   const tryMeasureContainerHeight = useCallback(() => {

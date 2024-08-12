@@ -1,11 +1,10 @@
 import type { PropsWithChildren, ReactElement } from 'react';
 import { Children, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, { FadeInDown, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, FadeOut } from 'react-native-reanimated';
 
 import { TabSelector } from '@/components/inputs';
-import { spacing } from '@/theme';
-import { flex } from '@/theme/layout';
+import { colors, flex, spacing } from '@/theme';
 
 type TabProps = PropsWithChildren<{
   name: string;
@@ -45,22 +44,24 @@ const TabView: TabViewComponent = ({ children }: TabViewProps) => {
   }
 
   return (
-    <View style={styles.container}>
-      <TabSelector
-        selectedTab={selectedTab}
-        tabs={tabsNames}
-        onSelectTab={setSelectedTab}
-      />
+    <Animated.View entering={FadeIn} style={flex.fill}>
+      <View style={styles.tabBar}>
+        <TabSelector
+          selectedTab={selectedTab}
+          tabs={tabsNames}
+          onSelectTab={setSelectedTab}
+        />
+      </View>
       {childrenArray[tabsNames.indexOf(selectedTab)]}
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    gap: spacing.md,
-    paddingTop: spacing.md
+  tabBar: {
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm
   }
 });
 
