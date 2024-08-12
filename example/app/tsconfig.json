@@ -6,5 +6,6 @@
       "@/*": ["src/*"],
       "react-native-sortable": ["../../packages/react-native-sortable/src"]
     }
-  }
+  },
+  "include": ["src", "jest.config.ts", "__tests__"]
 }
