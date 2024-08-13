@@ -9,17 +9,24 @@ type GroupProps = PropsWithChildren<{
 }>;
 
 export default function Group({ children, style }: GroupProps) {
-  return <View style={[styles.group, style]}>{children}</View>;
+  return (
+    <View style={styles.container}>
+      <View style={[styles.group, style]}>{children}</View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm
+  },
   group: {
     alignItems: 'center',
     backgroundColor: colors.background1,
     borderRadius: radius.md,
     justifyContent: 'center',
-    marginHorizontal: spacing.sm,
-    marginVertical: spacing.sm,
+
     padding: spacing.sm
   }
 });
