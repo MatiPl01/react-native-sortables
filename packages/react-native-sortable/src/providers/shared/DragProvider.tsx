@@ -4,33 +4,23 @@ import type {
   GestureUpdateEvent,
   PanGestureHandlerEventPayload
 } from 'react-native-gesture-handler';
-import type { SharedValue } from 'react-native-reanimated';
-import { useSharedValue, withTiming } from 'react-native-reanimated';
-
-import { TIME_TO_ACTIVATE_PAN } from '../../../constants';
 import {
-  useAnimatableValue,
-  useHaptics,
-  useJSStableCallback
-} from '../../../hooks';
-import type {
-  ActiveItemDecorationSettings,
-  AnimatedValues,
-  SortableCallbacks,
-  Vector
-} from '../../../types';
-import { createEnhancedContext } from '../../utils';
+  useAnimatedReaction,
+  useDerivedValue,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated';
+
+import { TIME_TO_ACTIVATE_PAN } from '../../constants';
+import { useHaptics, useJSStableCallback } from '../../hooks';
+import type { SortableCallbacks } from '../../types';
+import { getOffsetDistance } from '../../utils';
+import { createProvider } from '../utils';
+import { useAutoScrollContext } from './AutoScrollProvider';
+import { useCommonValuesContext } from './CommonValuesProvider';
 import { LayerState, useLayerContext } from './LayerProvider';
-import { usePositionsContext } from './PositionsProvider';
 
 type DragContextType = {
-  enabled: boolean;
-  activeItemKey: SharedValue<null | string>;
-  touchedItemKey: SharedValue<null | string>;
-  activationProgress: SharedValue<number>;
-  inactiveAnimationProgress: SharedValue<number>;
-  activeItemTranslation: SharedValue<Vector | null>;
-  activeItemDropped: SharedValue<boolean>;
   handleTouchStart: (e: GestureTouchEvent, key: string) => void;
   handleDragStart: (key: string) => void;
   handleDragUpdate: (
@@ -44,55 +34,51 @@ type DragContextType = {
     toIndex: number,
     newOrder: Array<string>
   ) => void;
-} & AnimatedValues<ActiveItemDecorationSettings>;
+};
 
 type DragProviderProps = PropsWithChildren<
   {
-    dragEnabled: boolean;
     hapticsEnabled: boolean;
-  } & ActiveItemDecorationSettings &
-    SortableCallbacks
+  } & SortableCallbacks
 >;
 
-const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
-  DragContextType,
-  DragProviderProps
->(({
-  activeItemOpacity: activeItemOpacityProp,
-  activeItemScale: activeItemScaleProp,
-  activeItemShadowOpacity: activeItemShadowOpacityProp,
-  dragEnabled,
-  hapticsEnabled,
-  inactiveItemOpacity: inactiveItemOpacityProp,
-  inactiveItemScale: inactiveItemScaleProp,
-  onDragEnd,
-  onDragStart,
-  onOrderChange
-}) => {
+const { DragProvider, useDragContext } = createProvider('Drag')<
+  DragProviderProps,
+  DragContextType
+>(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange }) => {
   const {
+    activationProgress,
+    activeItemDropped,
+    activeItemKey,
+    activeItemTranslation,
+    enableActiveItemSnap,
+    inactiveAnimationProgress,
     indexToKey,
     itemPositions,
     keyToIndex,
     relativeTouchPosition,
-    touchStartPosition
-  } = usePositionsContext();
+    snapOffsetX,
+    snapOffsetY,
+    touchStartPosition,
+    touchedItemHeight,
+    touchedItemKey,
+    touchedItemPosition,
+    touchedItemWidth
+  } = useCommonValuesContext();
   const { updateLayer } = useLayerContext() ?? {};
+  const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
-  const activeItemScale = useAnimatableValue(activeItemScaleProp);
-  const activeItemOpacity = useAnimatableValue(activeItemOpacityProp);
-  const activeItemShadowOpacity = useAnimatableValue(
-    activeItemShadowOpacityProp
-  );
-  const inactiveItemScale = useAnimatableValue(inactiveItemScaleProp);
-  const inactiveItemOpacity = useAnimatableValue(inactiveItemOpacityProp);
-  const activeItemTranslation = useSharedValue<Vector | null>(null);
+  const haptics = useHaptics(hapticsEnabled);
 
-  const activeItemKey = useSharedValue<null | string>(null);
-  const touchedItemKey = useSharedValue<null | string>(null);
-  const activationProgress = useSharedValue(0);
-  const inactiveAnimationProgress = useSharedValue(0);
-  const activeItemDropped = useSharedValue(true);
   const dragStartIndex = useSharedValue(-1);
+  const targetDeltaX = useSharedValue(0);
+  const targetDeltaY = useSharedValue(0);
+  const deltaX = useDerivedValue(
+    () => targetDeltaX.value * activationProgress.value
+  );
+  const deltaY = useDerivedValue(
+    () => targetDeltaY.value * activationProgress.value
+  );
 
   // Create stable callbacks to avoid re-rendering when the callback
   // function is not memoized
@@ -100,7 +86,62 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
   const stableOnDragEnd = useJSStableCallback(onDragEnd);
   const stableOnOrderChange = useJSStableCallback(onOrderChange);
 
-  const haptics = useHaptics(hapticsEnabled);
+  /**
+   * ACTIVE ITEM SNAP UPDATERS
+   */
+
+  useAnimatedReaction(
+    () => ({
+      enableSnap: enableActiveItemSnap.value,
+      height: touchedItemHeight.value,
+      oX: snapOffsetX.value,
+      oY: snapOffsetY.value,
+      touchPosition: relativeTouchPosition.value,
+      width: touchedItemWidth.value
+    }),
+    ({ enableSnap, height, oX, oY, touchPosition, width }) => {
+      if (!enableSnap || !height || !width || !touchPosition) {
+        targetDeltaX.value = 0;
+        targetDeltaY.value = 0;
+        return;
+      }
+
+      targetDeltaX.value = getOffsetDistance(oX, width) - touchPosition.x;
+      targetDeltaY.value = getOffsetDistance(oY, height) - touchPosition.y;
+    }
+  );
+
+  useAnimatedReaction(
+    () => ({
+      dX: deltaX.value,
+      dY: deltaY.value,
+      enableSnap: enableActiveItemSnap.value,
+      scrollOffsetY:
+        dragStartScrollOffset?.value === -1
+          ? 0
+          : (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0),
+      startPosition: touchStartPosition.value,
+      translation: activeItemTranslation.value
+    }),
+    ({ dX, dY, enableSnap, scrollOffsetY, startPosition, translation }) => {
+      if (!startPosition) {
+        touchedItemPosition.value = null;
+        return;
+      }
+      touchedItemPosition.value = {
+        x: startPosition.x + (translation?.x ?? 0) - (enableSnap ? dX : 0),
+        y:
+          startPosition.y +
+          (translation?.y ?? 0) -
+          (enableSnap ? dY : 0) +
+          scrollOffsetY
+      };
+    }
+  );
+
+  /**
+   * DRAG HANDLERS
+   */
 
   const handleTouchStart = useCallback(
     (e: GestureTouchEvent, key: string) => {
@@ -240,23 +281,11 @@ const { DragProvider, useDragContext } = createEnhancedContext('Drag')<
 
   return {
     value: {
-      activationProgress,
-      activeItemDropped,
-      activeItemKey,
-      activeItemOpacity,
-      activeItemScale,
-      activeItemShadowOpacity,
-      activeItemTranslation,
-      enabled: dragEnabled,
       handleDragEnd,
       handleDragStart,
       handleDragUpdate,
       handleOrderChange,
-      handleTouchStart,
-      inactiveAnimationProgress,
-      inactiveItemOpacity,
-      inactiveItemScale,
-      touchedItemKey
+      handleTouchStart
     }
   };
 });

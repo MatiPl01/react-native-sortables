@@ -3,14 +3,14 @@ import type { ViewProps, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../../constants';
-import type { FlexProps } from '../../contexts';
+import type { FlexProps } from '../../providers';
 import {
   FlexLayoutProvider,
   SharedProvider,
+  useCommonValuesContext,
   useFlexLayoutContext,
-  useFlexOrderUpdater,
-  useMeasurementsContext
-} from '../../contexts';
+  useFlexOrderUpdater
+} from '../../providers';
 import type { ReorderStrategy, SortableFlexProps } from '../../types';
 import {
   areArraysDifferent,
@@ -58,7 +58,7 @@ function SortableFlexInner({
   viewProps
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout, containerHeight } =
-    useMeasurementsContext();
+    useCommonValuesContext();
   const { flexDirection, stretch } = useFlexLayoutContext();
 
   useFlexOrderUpdater(reorderStrategy);

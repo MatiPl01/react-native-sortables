@@ -2,7 +2,7 @@ import { type PropsWithChildren, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 
-import { createEnhancedContext } from '../../utils';
+import { createProvider } from '../utils';
 
 export enum LayerState {
   Focused = 2,
@@ -18,10 +18,9 @@ type LayerProviderProps = PropsWithChildren<{
   disabled?: boolean;
 }>;
 
-const { LayerProvider, useLayerContext } = createEnhancedContext(
-  'Layer',
-  false
-)<LayerProviderContextType, LayerProviderProps>(({ children, disabled }) => {
+const { LayerProvider, useLayerContext } = createProvider('Layer', {
+  guarded: false
+})<LayerProviderProps, LayerProviderContextType>(({ children, disabled }) => {
   const { updateLayer: updateParentLayer } = (useLayerContext() ??
     {}) as Partial<LayerProviderContextType>;
 

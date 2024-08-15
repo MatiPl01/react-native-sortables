@@ -28,7 +28,6 @@ export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
   autoScrollActivationOffset: 40,
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
-  dragEnabled: true,
   dropIndicatorStyle: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     borderColor: 'black',
@@ -48,7 +47,8 @@ export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
   scrollableRef: undefined,
   showDropIndicator: false,
   snapOffsetX: '50%',
-  snapOffsetY: '50%'
+  snapOffsetY: '50%',
+  sortEnabled: true
 };
 
 /**

@@ -3,12 +3,12 @@ import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../../constants';
+import { useAnimatableValue } from '../../hooks';
 import {
   GridLayoutProvider,
   SharedProvider,
   useGridOrderUpdater
-} from '../../contexts';
-import { useAnimatableValue } from '../../hooks';
+} from '../../providers';
 import type { SortableGridProps, SortableGridRenderItem } from '../../types';
 import type { AnimatedViewStyle } from '../../types/reanimated';
 import {

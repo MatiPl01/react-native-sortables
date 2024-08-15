@@ -16,11 +16,12 @@ import {
 } from '../../constants';
 import {
   useAutoScrollContext,
+  useCommonValuesContext,
   useDragContext,
   useItemPosition,
   useItemZIndex,
   useMeasurementsContext
-} from '../../contexts';
+} from '../../providers';
 import type { AnimatedViewStyle } from '../../types/reanimated';
 import ItemDecoration from './ItemDecoration';
 
@@ -41,24 +42,21 @@ export default function DraggableView({
   ...viewProps
 }: DraggableViewProps) {
   const {
+    activationProgress,
     canSwitchToAbsoluteLayout,
     containerHeight,
+    inactiveAnimationProgress,
+    overrideItemDimensions,
+    touchedItemKey
+  } = useCommonValuesContext();
+  const {
     handleItemMeasurement,
     handleItemRemoval,
-    overrideItemDimensions,
     tryMeasureContainerHeight,
     updateTouchedItemDimensions
   } = useMeasurementsContext();
-  const {
-    activationProgress,
-    enabled,
-    handleDragEnd,
-    handleDragStart,
-    handleDragUpdate,
-    handleTouchStart,
-    inactiveAnimationProgress,
-    touchedItemKey
-  } = useDragContext();
+  const { handleDragEnd, handleDragStart, handleDragUpdate, handleTouchStart } =
+    useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
   const viewRef = useAnimatedRef<Animated.View>();
   const pressProgress = useSharedValue(0);
@@ -108,9 +106,9 @@ export default function DraggableView({
                 duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
               })
             );
-          pressProgress.value = animate();
-          activationProgress.value = animate();
           inactiveAnimationProgress.value = animate();
+          activationProgress.value = animate();
+          pressProgress.value = animate();
         })
         .onStart(() => {
           if (touchedItemKey.value === null) {
@@ -126,11 +124,9 @@ export default function DraggableView({
           handleDragUpdate(e, reverseXAxis);
         })
         .onFinalize(onDragEnd)
-        .onTouchesCancelled(onDragEnd)
-        .enabled(enabled),
+        .onTouchesCancelled(onDragEnd),
     [
       key,
-      enabled,
       reverseXAxis,
       activationProgress,
       touchedItemKey,

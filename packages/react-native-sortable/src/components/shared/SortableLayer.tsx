@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import type { ViewProps } from 'react-native';
 
-import { LayerProvider } from '../../contexts';
+import { LayerProvider } from '../../providers';
 
 type SortableLayerProps = PropsWithChildren<{ disabled?: boolean } & ViewProps>;
 

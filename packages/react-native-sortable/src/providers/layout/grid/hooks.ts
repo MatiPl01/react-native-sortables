@@ -1,10 +1,6 @@
 import type { ReorderStrategy } from '../../../types';
 import { reorderItems } from '../../../utils';
-import {
-  useMeasurementsContext,
-  useOrderUpdater,
-  usePositionsContext
-} from '../../shared';
+import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useGridLayoutContext } from './GridLayoutProvider';
 import { getColumnIndex, getRowIndex } from './utils';
 
@@ -12,8 +8,7 @@ export function useGridOrderUpdater(
   numColumns: number,
   strategy: ReorderStrategy
 ): void {
-  const { containerHeight } = useMeasurementsContext();
-  const { indexToKey } = usePositionsContext();
+  const { containerHeight, indexToKey } = useCommonValuesContext();
   const { rowOffsets } = useGridLayoutContext();
 
   useOrderUpdater(

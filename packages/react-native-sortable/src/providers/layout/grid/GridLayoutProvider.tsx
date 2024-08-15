@@ -8,8 +8,8 @@ import {
 import { OFFSET_EPS } from '../../../constants';
 import type { Vector } from '../../../types';
 import { areArraysDifferent, areVectorsDifferent } from '../../../utils';
-import { useMeasurementsContext, usePositionsContext } from '../../shared';
-import { createEnhancedContext } from '../../utils';
+import { useCommonValuesContext } from '../../shared';
+import { createProvider } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
 
 type GridLayoutContextType = {
@@ -23,9 +23,9 @@ type GridLayoutProviderProps = PropsWithChildren<{
   columnGap: SharedValue<number>;
 }>;
 
-const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
+const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   'GridLayout'
-)<GridLayoutContextType, GridLayoutProviderProps>(({
+)<GridLayoutProviderProps, GridLayoutContextType>(({
   columnGap: columnGapValue,
   columns,
   rowGap: rowGapValue
@@ -33,10 +33,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createEnhancedContext(
   const {
     containerHeight,
     containerWidth,
+    indexToKey,
     itemDimensions,
+    itemPositions,
     overrideItemDimensions
-  } = useMeasurementsContext();
-  const { indexToKey, itemPositions } = usePositionsContext();
+  } = useCommonValuesContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
   const columnWidth = useSharedValue(-1);

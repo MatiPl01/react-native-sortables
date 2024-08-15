@@ -9,11 +9,8 @@ import {
 
 import { useAnimatableValue } from '../../hooks';
 import type { Animatable, Dimensions, Maybe, Vector } from '../../types';
-import {
-  useDragContext,
-  useMeasurementsContext,
-  usePositionsContext
-} from './providers';
+import { useCommonValuesContext } from './CommonValuesProvider';
+import { useDragContext } from './DragProvider';
 
 type UseItemPositionOptions = {
   ignoreActive?: boolean;
@@ -32,8 +29,8 @@ export function useItemPosition(
   x: SharedValue<null | number>;
   y: SharedValue<null | number>;
 } {
-  const { itemPositions, touchedItemPosition } = usePositionsContext();
-  const { touchedItemKey } = useDragContext();
+  const { itemPositions, touchedItemKey, touchedItemPosition } =
+    useCommonValuesContext();
 
   const itemKey = useAnimatableValue(key);
   const x = useSharedValue<null | number>(null);
@@ -97,7 +94,7 @@ export function useItemDimensions(key: Animatable<null | string>): {
   width: SharedValue<number>;
   height: SharedValue<number>;
 } {
-  const { itemDimensions, overrideItemDimensions } = useMeasurementsContext();
+  const { itemDimensions, overrideItemDimensions } = useCommonValuesContext();
 
   const itemKey = useAnimatableValue(key);
   const width = useSharedValue(0);
@@ -133,8 +130,7 @@ export function useItemZIndex(
     y: SharedValue<null | number>;
   }
 ): SharedValue<number> {
-  const { itemPositions } = usePositionsContext();
-  const { touchedItemKey } = useDragContext();
+  const { itemPositions, touchedItemKey } = useCommonValuesContext();
 
   const zIndex = useSharedValue(0);
 
@@ -174,9 +170,9 @@ export function useOrderUpdater(
   }) => Maybe<Array<string>>,
   deps?: Array<unknown>
 ) {
-  const { keyToIndex, touchedItemPosition } = usePositionsContext();
-  const { itemDimensions } = useMeasurementsContext();
-  const { activeItemKey, handleOrderChange } = useDragContext();
+  const { activeItemKey, itemDimensions, keyToIndex, touchedItemPosition } =
+    useCommonValuesContext();
+  const { handleOrderChange } = useDragContext();
 
   useAnimatedReaction(
     () => ({

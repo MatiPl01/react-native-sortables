@@ -1,15 +1,11 @@
 import type { Coordinate, Dimension, ReorderStrategy } from '../../../types';
 import { reorderItems } from '../../../utils';
-import {
-  useMeasurementsContext,
-  useOrderUpdater,
-  usePositionsContext
-} from '../../shared';
+import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
 
 export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
-  const { itemDimensions } = useMeasurementsContext();
-  const { indexToKey, itemPositions, keyToIndex } = usePositionsContext();
+  const { indexToKey, itemDimensions, itemPositions, keyToIndex } =
+    useCommonValuesContext();
   const { crossAxisGroupOffsets, flexDirection, itemGroups, keyToGroup } =
     useFlexLayoutContext();
 

@@ -19,7 +19,7 @@ const SortableFlexCard: RouteCardComponent = props => {
 
   return (
     <RouteCard {...props}>
-      <SortableFlex dragEnabled={false} style={styles.container}>
+      <SortableFlex sortEnabled={false} style={styles.container}>
         {data.map(item => (
           <FlexCell active={item === ACTIVE_ITEM} key={item}>
             {item}

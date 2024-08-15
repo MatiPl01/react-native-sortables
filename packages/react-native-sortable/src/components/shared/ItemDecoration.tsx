@@ -8,7 +8,7 @@ import Animated, {
   useDerivedValue
 } from 'react-native-reanimated';
 
-import { useDragContext } from '../../contexts';
+import { useCommonValuesContext } from '../../providers';
 
 type ItemDecorationProps = {
   itemKey: string;
@@ -29,7 +29,7 @@ export default function ItemDecoration({
     inactiveItemOpacity,
     inactiveItemScale,
     touchedItemKey
-  } = useDragContext();
+  } = useCommonValuesContext();
 
   const resultingProgress = useDerivedValue(() =>
     touchedItemKey.value === itemKey || pressProgress.value > 0
