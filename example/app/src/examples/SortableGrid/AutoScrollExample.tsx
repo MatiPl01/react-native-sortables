@@ -5,7 +5,7 @@ import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import { SortableGrid } from 'react-native-sortable';
 
-import { GridCard, Group, Section } from '@/components';
+import { GridCard, Group, Section, TabView } from '@/components';
 import { colors, spacing } from '@/theme';
 import { getItems } from '@/utils';
 
@@ -15,7 +15,19 @@ const FEW_ITEMS = getItems(6);
 const LIST_ITEM_SECTIONS = ['List item 1', 'List item 2', 'List item 3'];
 
 export default function AutoScrollExample() {
-  return <ScrollViewExample />;
+  return (
+    <TabView>
+      <TabView.Tab name='ScrollView'>
+        <ScrollViewExample />
+      </TabView.Tab>
+      <TabView.Tab name='FlatList'>
+        <FlatListExample />
+      </TabView.Tab>
+      <TabView.Tab name='FlashList'>
+        <FlashListExample />
+      </TabView.Tab>
+    </TabView>
+  );
 }
 
 function ScrollViewExample() {
@@ -29,14 +41,14 @@ function ScrollViewExample() {
       <Group>
         <ManyCards scrollableRef={scrollableRef} />
       </Group>
-      {/* <SeparatorSection />
+      <SeparatorSection />
       <Group>
         <FewCards scrollableRef={scrollableRef} />
       </Group>
       <SeparatorSection />
       <Group>
         <ManyCards scrollableRef={scrollableRef} />
-      </Group> */}
+      </Group>
     </Animated.ScrollView>
   );
 }
@@ -138,8 +150,6 @@ function SeparatorSection() {
 
 const styles = StyleSheet.create({
   scrollable: {
-    backgroundColor: 'red',
-    flex: 1,
     overflow: 'visible'
   },
   section: {

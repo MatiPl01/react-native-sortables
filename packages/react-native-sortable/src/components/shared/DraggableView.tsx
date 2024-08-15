@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { type ViewProps, type ViewStyle } from 'react-native';
+import type {
+  GestureTouchEvent,
+  GestureUpdateEvent,
+  PanGestureHandlerEventPayload
+} from 'react-native-gesture-handler';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
@@ -51,6 +56,7 @@ export default function DraggableView({
   } = useMeasurementsContext();
   const {
     activationProgress,
+    activeItemKey,
     enabled,
     handleDragEnd,
     handleDragStart,
@@ -73,78 +79,113 @@ export default function DraggableView({
     return () => handleItemRemoval(key);
   }, [key, handleItemRemoval]);
 
+  const onDragStart = useCallback(() => {
+    'worklet';
+    console.log('onDragStart', touchedItemKey.value, activeItemKey.value);
+    if (activeItemKey.value !== null || touchedItemKey.value === null) {
+      return;
+    }
+    console.log('onDragStart after check');
+    updateStartScrollOffset?.();
+    handleDragStart(key);
+  }, [
+    key,
+    touchedItemKey,
+    handleDragStart,
+    updateStartScrollOffset,
+    activeItemKey
+  ]);
+
   const onDragEnd = useCallback(() => {
     'worklet';
+    console.log('onDragEnd');
     pressProgress.value = withTiming(0, { duration: TIME_TO_ACTIVATE_PAN });
     updateStartScrollOffset?.(-1);
     handleDragEnd(key);
   }, [key, pressProgress, handleDragEnd, updateStartScrollOffset]);
 
+  const onTouchesDown = useCallback(
+    (e: GestureTouchEvent) => {
+      'worklet';
+      console.log('onTouchesDown', touchedItemKey.value);
+      // Ignore touch if another item is already being touched/activated
+      if (touchedItemKey.value !== null) {
+        return;
+      }
+      console.log('onTouchesDown after check');
+      // This should never happen, but just in case the container height
+      // was not measured withing the specified interval and onLayout
+      // was not called, we will try to measure it again after the item
+      // is touched
+      if (containerHeight.value === -1) {
+        tryMeasureContainerHeight();
+      }
+
+      handleTouchStart(e, key);
+      updateTouchedItemDimensions(key);
+
+      const animate = () =>
+        withDelay(
+          ACTIVATE_PAN_ANIMATION_DELAY,
+          withTiming(1, {
+            duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
+          })
+        );
+
+      // onStart wasn't sometimes called (seems to be a bug in gesture handler)
+      // so we will call onDragStart manually after the animation is finished
+      // (if the press animation was not cancelled)
+      pressProgress.value = animate();
+      inactiveAnimationProgress.value = animate();
+      activationProgress.value = animate();
+    },
+    [
+      key,
+      touchedItemKey,
+      containerHeight,
+      tryMeasureContainerHeight,
+      handleTouchStart,
+      updateTouchedItemDimensions,
+      pressProgress,
+      inactiveAnimationProgress,
+      activationProgress
+    ]
+  );
+
+  const onUpdate = useCallback(
+    (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
+      'worklet';
+      console.log('onUpdate', touchedItemKey.value);
+      if (touchedItemKey.value !== key) {
+        return;
+      }
+      console.log('onUpdate after check');
+      handleDragUpdate(e, reverseXAxis);
+    },
+    [key, touchedItemKey, handleDragUpdate, reverseXAxis]
+  );
+
   const panGesture = useMemo(
     () =>
       Gesture.Pan()
         .activateAfterLongPress(TIME_TO_ACTIVATE_PAN)
-        .onTouchesDown(e => {
-          // Ignore touch if another item is already being touched/activated
-          if (touchedItemKey.value !== null) {
-            return;
-          }
-
-          // This should never happen, but just in case the container height
-          // was not measured withing the specified interval and onLayout
-          // was not called, we will try to measure it again after the item
-          // is touched
-          if (containerHeight.value === -1) {
-            tryMeasureContainerHeight();
-          }
-
-          handleTouchStart(e, key);
-          updateTouchedItemDimensions(key);
-
-          const animate = () =>
-            withDelay(
-              ACTIVATE_PAN_ANIMATION_DELAY,
-              withTiming(1, {
-                duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
-              })
-            );
-          pressProgress.value = animate();
-          activationProgress.value = animate();
-          inactiveAnimationProgress.value = animate();
-        })
-        .onStart(() => {
-          if (touchedItemKey.value === null) {
-            return;
-          }
-          updateStartScrollOffset?.();
-          handleDragStart(key);
-        })
-        .onUpdate(e => {
-          if (touchedItemKey.value !== key) {
-            return;
-          }
-          handleDragUpdate(e, reverseXAxis);
-        })
+        .shouldCancelWhenOutside(true)
+        .onTouchesDown(onTouchesDown)
+        .onStart(onDragStart)
+        .onUpdate(onUpdate)
         .onFinalize(onDragEnd)
         .onTouchesCancelled(onDragEnd)
+        .onTouchesMove(() => {
+          console.log('onTouchesMove', touchedItemKey.value);
+        })
+        .onEnd(() => {
+          console.log('onEnd', touchedItemKey.value);
+        })
+        .onBegin(() => {
+          console.log('onBegin', touchedItemKey.value);
+        })
         .enabled(enabled),
-    [
-      key,
-      enabled,
-      reverseXAxis,
-      activationProgress,
-      touchedItemKey,
-      pressProgress,
-      containerHeight,
-      inactiveAnimationProgress,
-      handleTouchStart,
-      handleDragUpdate,
-      handleDragStart,
-      onDragEnd,
-      tryMeasureContainerHeight,
-      updateStartScrollOffset,
-      updateTouchedItemDimensions
-    ]
+    [enabled, onTouchesDown, onDragStart, onUpdate, onDragEnd]
   );
 
   const animatedStyle = useAnimatedStyle(() => {

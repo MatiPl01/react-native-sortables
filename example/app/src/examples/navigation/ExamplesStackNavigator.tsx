@@ -36,6 +36,7 @@ const BackButton = memo(function BackButton() {
       hitSlop={spacing.md}
       style={styles.backButton}
       onPress={() => {
+        console.log('goBack');
         navigation.goBack();
       }}>
       <FontAwesomeIcon color={colors.primary} icon={faChevronLeft} />

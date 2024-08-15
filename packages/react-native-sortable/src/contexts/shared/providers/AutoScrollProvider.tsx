@@ -89,6 +89,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
       return;
     }
 
+    // console.log('scrollTo', nextOffset);
     scrollTo(scrollableRef, 0, nextOffset, false);
   }, false);
 
@@ -112,6 +113,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
       ) {
         return;
       }
+      // console.log('toggleFrameCallback', shouldBeEnabled);
       runOnJS(toggleFrameCallback)(shouldBeEnabled);
       isFrameCallbackActive.value = shouldBeEnabled;
     }
@@ -163,11 +165,13 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
 
       // Scroll up
       if (topDistance > 0 && topOverflow > 0) {
+        // console.log('scroll up', topOverflow, topDistance);
         targetScrollOffset.value =
           scrollOffset.value - Math.min(topOverflow, topDistance);
       }
       // Scroll down
       else if (bottomDistance > 0 && bottomOverflow > 0) {
+        // console.log('scroll down', topOverflow, topDistance);
         targetScrollOffset.value =
           scrollOffset.value + Math.min(bottomOverflow, bottomDistance);
       }
