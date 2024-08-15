@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { type ViewProps, type ViewStyle } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, State } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
   useAnimatedStyle,
@@ -43,10 +43,12 @@ export default function DraggableView({
 }: DraggableViewProps) {
   const {
     activationProgress,
+    activeItemKey,
     canSwitchToAbsoluteLayout,
     containerHeight,
     inactiveAnimationProgress,
     overrideItemDimensions,
+    touchStartPosition,
     touchedItemKey
   } = useCommonValuesContext();
   const {
@@ -60,6 +62,7 @@ export default function DraggableView({
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
   const viewRef = useAnimatedRef<Animated.View>();
   const pressProgress = useSharedValue(0);
+  const absoluteTouchStartPosition = useSharedValue({ x: 0, y: 0 });
 
   const position = useItemPosition(key);
   const zIndex = useItemZIndex(key, pressProgress, position);
@@ -73,6 +76,7 @@ export default function DraggableView({
 
   const onDragEnd = useCallback(() => {
     'worklet';
+    console.log('onDragEnd');
     pressProgress.value = withTiming(0, { duration: TIME_TO_ACTIVATE_PAN });
     updateStartScrollOffset?.(-1);
     handleDragEnd(key);
@@ -80,11 +84,16 @@ export default function DraggableView({
 
   const panGesture = useMemo(
     () =>
-      Gesture.Pan()
-        .activateAfterLongPress(TIME_TO_ACTIVATE_PAN)
-        .onTouchesDown(e => {
+      Gesture.Manual()
+        .onTouchesDown((e, manager) => {
+          const firstTouch = e.allTouches[0];
+          if (!firstTouch) {
+            return;
+          }
+
           // Ignore touch if another item is already being touched/activated
           if (touchedItemKey.value !== null) {
+            manager.fail();
             return;
           }
 
@@ -99,41 +108,102 @@ export default function DraggableView({
           handleTouchStart(e, key);
           updateTouchedItemDimensions(key);
 
-          const animate = () =>
+          const animate = (callback?: (finished?: boolean) => void) =>
             withDelay(
               ACTIVATE_PAN_ANIMATION_DELAY,
-              withTiming(1, {
-                duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
-              })
+              withTiming(
+                1,
+                {
+                  duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
+                },
+                callback
+              )
             );
+
           inactiveAnimationProgress.value = animate();
           activationProgress.value = animate();
-          pressProgress.value = animate();
+          pressProgress.value = animate(finished => {
+            if (
+              finished &&
+              e.state !== State.CANCELLED &&
+              e.state !== State.END &&
+              touchedItemKey.value === key
+            ) {
+              absoluteTouchStartPosition.value = {
+                x: firstTouch.absoluteX,
+                y: firstTouch.absoluteY
+              };
+              manager.activate();
+              updateStartScrollOffset?.();
+              handleDragStart(key);
+            }
+          });
         })
-        .onStart(() => {
-          if (touchedItemKey.value === null) {
+        .onTouchesCancelled((_, manager) => {
+          console.log('onTouchesCancelled');
+          manager.fail();
+        })
+        .onTouchesUp((_, manager) => {
+          console.log('onTouchesUp');
+          manager.end();
+        })
+        .onTouchesMove((e, manager) => {
+          console.log('onTouchesMove', e.state);
+
+          const firstTouch = e.allTouches[0];
+          const startPosition = absoluteTouchStartPosition.value;
+          if (!firstTouch || !startPosition) {
             return;
           }
-          updateStartScrollOffset?.();
-          handleDragStart(key);
-        })
-        .onUpdate(e => {
-          if (touchedItemKey.value !== key) {
+
+          const dX = firstTouch.absoluteX - startPosition.x;
+          const dY = firstTouch.absoluteY - startPosition.y;
+
+          if (e.state !== State.ACTIVE && e.state !== State.BEGAN) {
+            if (dX ** 2 + dY ** 2 >= 9) {
+              console.log('manager.fail()', e, dX, dY);
+              manager.fail();
+            } else if (touchStartPosition.value) {
+              absoluteTouchStartPosition.value = {
+                x: firstTouch.absoluteX,
+                y: firstTouch.absoluteY
+              };
+              touchStartPosition.value = {
+                x: touchStartPosition.value.x + dX,
+                y: touchStartPosition.value.y + dY
+              };
+            }
+          }
+
+          if (activeItemKey.value !== key) {
+            console.log(
+              'activeItemKey.value !== key',
+              activeItemKey.value,
+              key
+            );
+            manager.fail();
             return;
           }
-          handleDragUpdate(e, reverseXAxis);
+
+          console.log({
+            start: startPosition,
+            x: firstTouch.x,
+            y: firstTouch.y
+          });
+
+          handleDragUpdate({ x: dX, y: dY }, reverseXAxis);
         })
-        .onFinalize(onDragEnd)
-        .onTouchesCancelled(onDragEnd),
+        .onFinalize(onDragEnd),
     [
       key,
       reverseXAxis,
       activationProgress,
-      touchedItemKey,
       pressProgress,
+      absoluteTouchStartPosition,
       containerHeight,
       inactiveAnimationProgress,
       handleTouchStart,
+      touchedItemKey,
       handleDragUpdate,
       handleDragStart,
       onDragEnd,

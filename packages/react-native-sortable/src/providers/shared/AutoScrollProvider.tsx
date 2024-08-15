@@ -115,7 +115,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       ) {
         return;
       }
-      // console.log('toggleFrameCallback', shouldBeEnabled);
+      targetScrollOffset.value = -1;
       runOnJS(toggleFrameCallback)(shouldBeEnabled);
       isFrameCallbackActive.value = shouldBeEnabled;
     }

@@ -1,9 +1,5 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import type {
-  GestureTouchEvent,
-  GestureUpdateEvent,
-  PanGestureHandlerEventPayload
-} from 'react-native-gesture-handler';
+import { type GestureTouchEvent } from 'react-native-gesture-handler';
 import {
   useAnimatedReaction,
   useDerivedValue,
@@ -13,7 +9,7 @@ import {
 
 import { TIME_TO_ACTIVATE_PAN } from '../../constants';
 import { useHaptics, useJSStableCallback } from '../../hooks';
-import type { SortableCallbacks } from '../../types';
+import type { SortableCallbacks, Vector } from '../../types';
 import { getOffsetDistance } from '../../utils';
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
@@ -23,10 +19,7 @@ import { LayerState, useLayerContext } from './LayerProvider';
 type DragContextType = {
   handleTouchStart: (e: GestureTouchEvent, key: string) => void;
   handleDragStart: (key: string) => void;
-  handleDragUpdate: (
-    e: GestureUpdateEvent<PanGestureHandlerEventPayload>,
-    reverseXAxis?: boolean
-  ) => void;
+  handleDragUpdate: (translation: Vector, reverseXAxis?: boolean) => void;
   handleDragEnd: (key: string) => void;
   handleOrderChange: (
     key: string,
@@ -245,14 +238,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   );
 
   const handleDragUpdate = useCallback(
-    (
-      e: GestureUpdateEvent<PanGestureHandlerEventPayload>,
-      reverseXAxis?: boolean
-    ) => {
+    (translation: Vector, reverseXAxis?: boolean) => {
       'worklet';
       activeItemTranslation.value = {
-        x: (reverseXAxis ? -1 : 1) * e.translationX,
-        y: e.translationY
+        x: (reverseXAxis ? -1 : 1) * translation.x,
+        y: translation.y
       };
     },
     [activeItemTranslation]
