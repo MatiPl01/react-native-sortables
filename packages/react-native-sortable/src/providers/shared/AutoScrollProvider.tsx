@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback } from 'react';
+import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   measure,
@@ -11,13 +11,11 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '../../../constants';
-import { useAnimatableValue } from '../../../hooks';
-import type { AutoScrollSettings } from '../../../types';
-import { createEnhancedContext } from '../../utils';
-import { useDragContext } from './DragProvider';
-import { useMeasurementsContext } from './MeasurementsProvider';
-import { usePositionsContext } from './PositionsProvider';
+import { OFFSET_EPS } from '../../constants';
+import { useAnimatableValue } from '../../hooks';
+import type { AutoScrollSettings } from '../../types';
+import { createProvider } from '../utils';
+import { useCommonValuesContext } from './CommonValuesProvider';
 
 type AutoScrollContextType = {
   scrollOffset: SharedValue<number>;
@@ -25,21 +23,23 @@ type AutoScrollContextType = {
   updateStartScrollOffset: (providedOffset?: number) => void;
 };
 
-type AutoScrollProviderProps = PropsWithChildren<AutoScrollSettings>;
-
-const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
+const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   'AutoScroll',
-  false
-)<AutoScrollContextType, AutoScrollProviderProps>(({
+  { guarded: false }
+)<AutoScrollSettings, AutoScrollContextType>(({
   autoScrollActivationOffset,
   autoScrollEnabled,
   autoScrollSpeed,
   scrollableRef
 }) => {
-  const { touchedItemPosition } = usePositionsContext();
-  const { containerRef, itemDimensions } = useMeasurementsContext();
-  const { activationProgress, activeItemKey, touchedItemKey } =
-    useDragContext();
+  const {
+    activationProgress,
+    activeItemKey,
+    containerRef,
+    itemDimensions,
+    touchedItemKey,
+    touchedItemPosition
+  } = useCommonValuesContext();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);

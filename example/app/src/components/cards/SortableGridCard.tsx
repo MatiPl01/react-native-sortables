@@ -30,9 +30,9 @@ const SortableGridCard: RouteCardComponent = props => {
         columnGap={spacing.xxs}
         columns={COLUMNS}
         data={data}
-        dragEnabled={false}
         renderItem={renderItem}
         rowGap={spacing.xxs}
+        sortEnabled={false}
       />
     </RouteCard>
   );

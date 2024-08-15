@@ -1,19 +1,17 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
-  type AnimatedRef,
   measure,
-  type SharedValue,
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
   useSharedValue
 } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '../../../constants';
-import { useUIStableCallback } from '../../../hooks';
-import type { Dimensions } from '../../../types';
-import type { AnimatedIntervalID, AnimatedTimeoutID } from '../../../utils';
+import { OFFSET_EPS } from '../../constants';
+import { useUIStableCallback } from '../../hooks';
+import type { Dimensions } from '../../types';
+import type { AnimatedIntervalID, AnimatedTimeoutID } from '../../utils';
 import {
   areDimensionsDifferent,
   clearAnimatedInterval,
@@ -21,22 +19,14 @@ import {
   maybeUpdateValue,
   setAnimatedInterval,
   setAnimatedTimeout
-} from '../../../utils';
-import { createEnhancedContext } from '../../utils';
-import { useDragContext } from './DragProvider';
+} from '../../utils';
+import { createProvider } from '../utils';
+import { useCommonValuesContext } from './CommonValuesProvider';
 
 const MEASUREMENT_RETRY_INTERVAL = 100;
 const MAX_MEASUREMENT_RETRIES = Math.floor(2000 / MEASUREMENT_RETRY_INTERVAL); // try to measure for 2 seconds
 
 type MeasurementsContextType = {
-  itemDimensions: SharedValue<Record<string, Dimensions>>;
-  touchedItemWidth: SharedValue<number>;
-  touchedItemHeight: SharedValue<number>;
-  overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
-  containerHeight: SharedValue<number>;
-  containerWidth: SharedValue<number>;
-  canSwitchToAbsoluteLayout: SharedValue<boolean>;
-  containerRef: AnimatedRef<Animated.View>;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
   updateTouchedItemDimensions: (key: string) => void;
@@ -47,13 +37,22 @@ type MeasurementsProviderProps = PropsWithChildren<{
   itemsCount: number;
 }>;
 
-const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
+const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<MeasurementsContextType, MeasurementsProviderProps>(({
+)<MeasurementsProviderProps, MeasurementsContextType>(({
   children,
   itemsCount
 }) => {
-  const { touchedItemKey } = useDragContext();
+  const {
+    canSwitchToAbsoluteLayout,
+    containerHeight,
+    containerRef,
+    containerWidth,
+    itemDimensions,
+    touchedItemHeight,
+    touchedItemKey,
+    touchedItemWidth
+  } = useCommonValuesContext();
 
   const measuredItemsCount = useSharedValue(0);
   const initialItemMeasurementsCompleted = useSharedValue(false);
@@ -62,17 +61,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const helperContainerRef = useAnimatedRef<Animated.View>();
   const measurementIntervalId = useSharedValue<AnimatedIntervalID>(-1);
   const measurementRetryCount = useSharedValue(0);
-
-  const containerRef = useAnimatedRef<Animated.View>();
-  const touchedItemWidth = useSharedValue<number>(-1);
-  const touchedItemHeight = useSharedValue<number>(-1);
-  const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
-  const overrideItemDimensions = useSharedValue<
-    Record<string, Partial<Dimensions>>
-  >({});
-  const containerWidth = useSharedValue(-1);
-  const containerHeight = useSharedValue(-1);
-  const canSwitchToAbsoluteLayout = useSharedValue(false);
 
   useEffect(() => {
     return () => {
@@ -146,7 +134,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       touchedItemWidth.value = dimensions?.width ?? -1;
       touchedItemHeight.value = dimensions?.height ?? -1;
     },
-    [itemDimensions, touchedItemWidth, touchedItemHeight]
+    [itemDimensions, touchedItemHeight, touchedItemWidth]
   );
 
   const maybeSwitchToAbsoluteLayout = useCallback(
@@ -225,16 +213,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
       </Animated.View>
     ),
     value: {
-      canSwitchToAbsoluteLayout,
-      containerHeight,
-      containerRef,
-      containerWidth,
       handleItemMeasurement,
       handleItemRemoval,
-      itemDimensions,
-      overrideItemDimensions,
-      touchedItemHeight,
-      touchedItemWidth,
       tryMeasureContainerHeight,
       updateTouchedItemDimensions
     }

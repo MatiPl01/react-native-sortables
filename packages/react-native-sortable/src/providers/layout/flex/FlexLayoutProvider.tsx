@@ -5,8 +5,8 @@ import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
 import type { Dimensions } from '../../../types';
-import { useMeasurementsContext, usePositionsContext } from '../../shared';
-import { createEnhancedContext } from '../../utils';
+import { useCommonValuesContext } from '../../shared';
+import { createProvider } from '../../utils';
 import type { FlexDirection, FlexProps } from './types';
 import {
   areDimensionsCorrect,
@@ -26,9 +26,9 @@ type FlexLayoutContextType = {
 
 type FlexLayoutProviderProps = PropsWithChildren<FlexProps>;
 
-const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
+const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
-)<FlexLayoutContextType, FlexLayoutProviderProps>(({
+)<FlexLayoutProviderProps, FlexLayoutContextType>(({
   alignContent = 'flex-start',
   alignItems = 'stretch',
   children,
@@ -47,10 +47,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createEnhancedContext(
   const {
     containerHeight,
     containerWidth,
+    indexToKey,
     itemDimensions,
+    itemPositions,
     overrideItemDimensions
-  } = useMeasurementsContext();
-  const { indexToKey, itemPositions } = usePositionsContext();
+  } = useCommonValuesContext();
 
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
   const keyToGroup = useSharedValue<Record<string, number>>({});

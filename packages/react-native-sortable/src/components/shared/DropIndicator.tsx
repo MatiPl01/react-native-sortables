@@ -12,11 +12,9 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import {
-  useDragContext,
-  useItemPosition,
-  useMeasurementsContext,
-  usePositionsContext
-} from '../../contexts/shared/providers';
+  useCommonValuesContext,
+  useItemPosition
+} from '../../providers/shared';
 import type { Vector } from '../../types';
 
 export type DropIndicatorComponentProps = {
@@ -34,10 +32,16 @@ type DropIndicatorProps = {
 };
 
 function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
-  const { touchedItemHeight, touchedItemWidth } = useMeasurementsContext();
-  const { activationProgress, activeItemDropped, touchedItemKey } =
-    useDragContext();
-  const { indexToKey, itemPositions, keyToIndex } = usePositionsContext();
+  const {
+    activationProgress,
+    activeItemDropped,
+    indexToKey,
+    itemPositions,
+    keyToIndex,
+    touchedItemHeight,
+    touchedItemKey,
+    touchedItemWidth
+  } = useCommonValuesContext();
 
   // Clone the array in order to prevent user from mutating the internal state
   const orderedItemKeys = useDerivedValue(() => [...indexToKey.value]);
