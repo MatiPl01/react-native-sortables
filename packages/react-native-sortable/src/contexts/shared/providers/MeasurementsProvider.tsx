@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback } from 'react';
+import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
   type AnimatedRef,
@@ -73,6 +73,13 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const containerWidth = useSharedValue(-1);
   const containerHeight = useSharedValue(-1);
   const canSwitchToAbsoluteLayout = useSharedValue(false);
+
+  useEffect(() => {
+    return () => {
+      clearAnimatedInterval(measurementIntervalId.value);
+      clearAnimatedTimeout(updateTimeoutId.value);
+    };
+  }, [measurementIntervalId, updateTimeoutId]);
 
   const handleItemMeasurement = useUIStableCallback(
     (key: string, dimensions: Dimensions) => {
