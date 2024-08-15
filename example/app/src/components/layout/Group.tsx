@@ -14,10 +14,8 @@ export default function Group({ children, style }: GroupProps) {
 
 const styles = StyleSheet.create({
   group: {
-    alignItems: 'center',
     backgroundColor: colors.background1,
     borderRadius: radius.md,
-    justifyContent: 'center',
     marginHorizontal: spacing.sm,
     marginVertical: spacing.sm,
     padding: spacing.sm
