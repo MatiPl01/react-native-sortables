@@ -99,18 +99,13 @@ export default function DraggableView({
           handleTouchStart(e, key);
           updateTouchedItemDimensions(key);
 
-          const animate = (callback?: (finished?: boolean) => void) =>
+          const animate = () =>
             withDelay(
               ACTIVATE_PAN_ANIMATION_DELAY,
-              withTiming(
-                1,
-                {
-                  duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
-                },
-                callback
-              )
+              withTiming(1, {
+                duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
+              })
             );
-
           inactiveAnimationProgress.value = animate();
           activationProgress.value = animate();
           pressProgress.value = animate();
