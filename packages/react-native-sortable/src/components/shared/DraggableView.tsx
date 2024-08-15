@@ -1,23 +1,16 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { type ViewProps, type ViewStyle } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
-  useSharedValue,
-  withDelay,
-  withTiming
+  useSharedValue
 } from 'react-native-reanimated';
 
 import {
-  ACTIVATE_PAN_ANIMATION_DELAY,
-  TIME_TO_ACTIVATE_PAN
-} from '../../constants';
-import {
-  useAutoScrollContext,
   useCommonValuesContext,
-  useDragContext,
+  useItemPanGesture,
   useItemPosition,
   useItemZIndex,
   useMeasurementsContext
@@ -41,23 +34,10 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const {
-    activationProgress,
-    canSwitchToAbsoluteLayout,
-    containerHeight,
-    inactiveAnimationProgress,
-    overrideItemDimensions,
-    touchedItemKey
-  } = useCommonValuesContext();
-  const {
-    handleItemMeasurement,
-    handleItemRemoval,
-    tryMeasureContainerHeight,
-    updateTouchedItemDimensions
-  } = useMeasurementsContext();
-  const { handleDragEnd, handleDragStart, handleDragUpdate, handleTouchStart } =
-    useDragContext();
-  const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
+  const { canSwitchToAbsoluteLayout, overrideItemDimensions } =
+    useCommonValuesContext();
+  const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
+
   const viewRef = useAnimatedRef<Animated.View>();
   const pressProgress = useSharedValue(0);
 
@@ -66,82 +46,11 @@ export default function DraggableView({
   const overriddenDimensions = useDerivedValue(
     () => overrideItemDimensions.value[key]
   );
+  const panGesture = useItemPanGesture(key, pressProgress, reverseXAxis);
 
   useEffect(() => {
     return () => handleItemRemoval(key);
   }, [key, handleItemRemoval]);
-
-  const onDragEnd = useCallback(() => {
-    'worklet';
-    pressProgress.value = withTiming(0, { duration: TIME_TO_ACTIVATE_PAN });
-    updateStartScrollOffset?.(-1);
-    handleDragEnd(key);
-  }, [key, pressProgress, handleDragEnd, updateStartScrollOffset]);
-
-  const panGesture = useMemo(
-    () =>
-      Gesture.Pan()
-        .activateAfterLongPress(TIME_TO_ACTIVATE_PAN)
-        .onTouchesDown(e => {
-          // Ignore touch if another item is already being touched/activated
-          if (touchedItemKey.value !== null) {
-            return;
-          }
-
-          // This should never happen, but just in case the container height
-          // was not measured withing the specified interval and onLayout
-          // was not called, we will try to measure it again after the item
-          // is touched
-          if (containerHeight.value === -1) {
-            tryMeasureContainerHeight();
-          }
-
-          handleTouchStart(e, key);
-          updateTouchedItemDimensions(key);
-
-          const animate = () =>
-            withDelay(
-              ACTIVATE_PAN_ANIMATION_DELAY,
-              withTiming(1, {
-                duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
-              })
-            );
-          inactiveAnimationProgress.value = animate();
-          activationProgress.value = animate();
-          pressProgress.value = animate();
-        })
-        .onStart(() => {
-          if (touchedItemKey.value === null) {
-            return;
-          }
-          updateStartScrollOffset?.();
-          handleDragStart(key);
-        })
-        .onUpdate(e => {
-          if (touchedItemKey.value !== key) {
-            return;
-          }
-          handleDragUpdate(e, reverseXAxis);
-        })
-        .onFinalize(onDragEnd)
-        .onTouchesCancelled(onDragEnd),
-    [
-      key,
-      reverseXAxis,
-      activationProgress,
-      touchedItemKey,
-      pressProgress,
-      containerHeight,
-      inactiveAnimationProgress,
-      handleTouchStart,
-      handleDragUpdate,
-      handleDragStart,
-      onDragEnd,
-      tryMeasureContainerHeight,
-      updateStartScrollOffset,
-      updateTouchedItemDimensions
-    ]
-  );
 
   const animatedStyle = useAnimatedStyle(() => {
     if (!canSwitchToAbsoluteLayout.value) {
