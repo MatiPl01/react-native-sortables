@@ -1,12 +1,10 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import { View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   measure,
   runOnJS,
   scrollTo,
   useAnimatedReaction,
-  useAnimatedRef,
   useDerivedValue,
   useFrameCallback,
   useScrollViewOffset,
@@ -36,18 +34,17 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   autoScrollActivationOffset,
   autoScrollEnabled,
   autoScrollSpeed,
-  children,
   scrollableRef
 }) => {
   const { touchedItemPosition } = usePositionsContext();
-  const { itemDimensions } = useMeasurementsContext();
-  const { activeItemKey } = useDragContext();
+  const { containerRef, itemDimensions } = useMeasurementsContext();
+  const { activationProgress, activeItemKey, touchedItemKey } =
+    useDragContext();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);
   const targetScrollOffset = useSharedValue(-1);
   const dragStartScrollOffset = useAnimatableValue(-1);
-  const containerRef = useAnimatedRef<View>();
 
   const activeItemHeight = useDerivedValue(() => {
     const key = activeItemKey.value;
@@ -65,10 +62,15 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   const enabled = useAnimatableValue(autoScrollEnabled);
   const speed = useAnimatableValue(autoScrollSpeed);
 
+  const isFrameCallbackActive = useSharedValue(false);
+
   // SMOOTH SCROLL POSITION UPDATER
   // Updates the scroll position smoothly
   // (quickly at first, then slower if the remaining distance is small)
   const frameCallback = useFrameCallback(() => {
+    if (!isFrameCallbackActive.value) {
+      return;
+    }
     const currentOffset = scrollOffset.value;
     const targetOffset = targetScrollOffset.value;
     const diff = targetOffset - currentOffset;
@@ -80,21 +82,42 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
 
     const direction = diff > 0 ? 1 : -1;
     const step = speed.value * direction * Math.sqrt(Math.abs(diff));
-    const nextOffset = currentOffset + step;
+    const nextOffset =
+      targetOffset > currentOffset
+        ? Math.min(currentOffset + step, targetOffset)
+        : Math.max(currentOffset + step, targetOffset);
+
+    if (Math.abs(nextOffset - currentOffset) < OFFSET_EPS) {
+      targetScrollOffset.value = -1;
+      return;
+    }
 
     scrollTo(scrollableRef, 0, nextOffset, false);
-  });
+  }, false);
 
   const toggleFrameCallback = useCallback(
     (isEnabled: boolean) => frameCallback.setActive(isEnabled),
     [frameCallback]
   );
 
-  // Enable/disable frame callback based on the auto scroll state
+  // Enable/disable frame callback
   useAnimatedReaction(
-    () => enabled.value,
-    isEnabled => {
-      runOnJS(toggleFrameCallback)(isEnabled);
+    () => ({
+      isEnabled: enabled.value,
+      itemKey: touchedItemKey.value,
+      progress: activationProgress.value
+    }),
+    ({ isEnabled, itemKey, progress }) => {
+      const shouldBeEnabled = isEnabled && itemKey !== null;
+      if (
+        isFrameCallbackActive.value === shouldBeEnabled ||
+        (itemKey !== null && progress < 0.5)
+      ) {
+        return;
+      }
+      // console.log('toggleFrameCallback', shouldBeEnabled);
+      runOnJS(toggleFrameCallback)(shouldBeEnabled);
+      isFrameCallbackActive.value = shouldBeEnabled;
     }
   );
 
@@ -144,11 +167,17 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
 
       // Scroll up
       if (topDistance > 0 && topOverflow > 0) {
-        targetScrollOffset.value =
-          scrollOffset.value - Math.min(topOverflow, topDistance);
+        targetScrollOffset.value = Math.max(
+          0,
+          scrollOffset.value - Math.min(topOverflow, topDistance)
+        );
       }
       // Scroll down
       else if (bottomDistance > 0 && bottomOverflow > 0) {
+        // Unfortunately, we don't have enough information to get the
+        // height of the scrollable content, so we cannot limit the target
+        // scroll offset to the maximum scrollable offset (as we do for
+        // the minimum scroll offset while scrolling up).
         targetScrollOffset.value =
           scrollOffset.value + Math.min(bottomOverflow, bottomDistance);
       }
@@ -164,11 +193,6 @@ const { AutoScrollProvider, useAutoScrollContext } = createEnhancedContext(
   );
 
   return {
-    children: (
-      <View collapsable={false} ref={containerRef}>
-        {children}
-      </View>
-    ),
     value: {
       dragStartScrollOffset,
       scrollOffset,

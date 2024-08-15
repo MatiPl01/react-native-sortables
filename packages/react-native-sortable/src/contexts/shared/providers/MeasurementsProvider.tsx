@@ -1,6 +1,7 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
+  type AnimatedRef,
   measure,
   type SharedValue,
   useAnimatedReaction,
@@ -35,6 +36,7 @@ type MeasurementsContextType = {
   containerHeight: SharedValue<number>;
   containerWidth: SharedValue<number>;
   canSwitchToAbsoluteLayout: SharedValue<boolean>;
+  containerRef: AnimatedRef<Animated.View>;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
   updateTouchedItemDimensions: (key: string) => void;
@@ -61,6 +63,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   const measurementIntervalId = useSharedValue<AnimatedIntervalID>(-1);
   const measurementRetryCount = useSharedValue(0);
 
+  const containerRef = useAnimatedRef<Animated.View>();
   const touchedItemWidth = useSharedValue<number>(-1);
   const touchedItemHeight = useSharedValue<number>(-1);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
@@ -204,12 +207,13 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
   return {
     children: (
       <Animated.View
+        ref={containerRef}
         style={[styles.container, animatedContainerStyle]}
         onLayout={({ nativeEvent: { layout } }) =>
           handleContainerWidthMeasurement(layout.width)
         }>
         {/* Helper component used to ensure that the calculated container height
-        was reflected in the calculated layout and applied to the container */}
+        was reflected in layout and is applied to the container */}
         <Animated.View
           ref={helperContainerRef}
           style={[styles.helperContainer, animatedContainerStyle]}
@@ -223,6 +227,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createEnhancedContext(
     value: {
       canSwitchToAbsoluteLayout,
       containerHeight,
+      containerRef,
       containerWidth,
       handleItemMeasurement,
       handleItemRemoval,
