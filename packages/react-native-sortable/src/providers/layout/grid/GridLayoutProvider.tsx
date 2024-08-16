@@ -6,7 +6,7 @@ import {
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
-import type { Vector } from '../../../types';
+import type { Dimensions, Vector } from '../../../types';
 import { areArraysDifferent, areVectorsDifferent } from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
@@ -51,12 +51,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     ({ columnGap, width }) => {
       if (width !== -1) {
         const colWidth = (width + columnGap) / columns;
-        overrideItemDimensions.value = Object.fromEntries(
-          Object.keys(itemDimensions.value).map(key => [
-            key,
-            { width: colWidth }
-          ])
-        );
         columnWidth.value = colWidth;
       }
     },
@@ -114,6 +108,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         return;
       }
       const positions: Record<string, Vector> = {};
+      const overriddenDimensions: Record<string, Partial<Dimensions>> = {};
+      let overriddenDimensionsChanged = false;
 
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
         const rowIndex = getRowIndex(parseInt(itemIndex), columns);
@@ -137,9 +133,26 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           areVectorsDifferent(currentPosition, calculatedPosition)
             ? calculatedPosition
             : currentPosition;
+
+        // Override item dimensions if they are not yet overridden
+        // or the column width has changed
+        const currentOverriddenDimensions = overrideItemDimensions.value;
+        if (currentOverriddenDimensions[key]?.width !== colWidth) {
+          overriddenDimensionsChanged = true;
+          overriddenDimensions[key] = {
+            width: colWidth
+          };
+        } else {
+          // Re-use existing overridden dimensions if they are the same
+          // to prevent unnecessary reaction triggers in item components
+          overriddenDimensions[key] = currentOverriddenDimensions[key]!;
+        }
       }
 
       itemPositions.value = positions;
+      if (overriddenDimensionsChanged) {
+        overrideItemDimensions.value = overriddenDimensions;
+      }
     },
     [columns]
   );

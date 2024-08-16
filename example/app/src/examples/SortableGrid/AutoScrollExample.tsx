@@ -142,7 +142,7 @@ function FewCards({ scrollableRef }: CardsSectionProps) {
 
 function SeparatorSection() {
   return (
-    <Group style={styles.section}>
+    <Group style={styles.section} center>
       <Text style={styles.title}>Between SortableGrid components</Text>
     </Group>
   );
@@ -153,9 +153,7 @@ const styles = StyleSheet.create({
     overflow: 'visible'
   },
   section: {
-    alignItems: 'center',
-    height: 100,
-    justifyContent: 'center'
+    height: 100
   },
   title: {
     color: colors.foreground3,

@@ -21,6 +21,10 @@ const routes: Routes = {
       AutoScroll: {
         Component: SortableGrid.AutoScrollExample,
         name: 'Auto Scroll'
+      },
+      DataChange: {
+        Component: SortableGrid.DataChangeExample,
+        name: 'Data Change'
       }
     }
   },
@@ -39,6 +43,10 @@ const routes: Routes = {
       AutoScroll: {
         Component: SortableFlex.AutoScrollExample,
         name: 'Auto Scroll'
+      },
+      DataChange: {
+        Component: SortableFlex.DataChangeExample,
+        name: 'Data Change'
       }
     }
   }
