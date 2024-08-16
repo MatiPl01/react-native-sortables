@@ -1,12 +1,19 @@
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import {
   SortableGrid,
   type SortableGridRenderItem
 } from 'react-native-sortable';
 
-import { Button, GridCard, Group, Section, Stagger } from '@/components';
+import {
+  Button,
+  GridCard,
+  Group,
+  Section,
+  Stagger,
+  Touchable
+} from '@/components';
 import { colors, flex, spacing } from '@/theme';
 import { getItems } from '@/utils';
 
@@ -84,12 +91,9 @@ export default function DataChangeExample() {
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
-      <Pressable
-        onPress={() => {
-          onRemoveItem(item);
-        }}>
+      <Touchable onTap={() => onRemoveItem(item)}>
         <GridCard>{item}</GridCard>
-      </Pressable>
+      </Touchable>
     ),
     [onRemoveItem]
   );
@@ -116,6 +120,12 @@ export default function DataChangeExample() {
       title: 'Change order of items'
     }
   ];
+
+  console.log('DataChangeExample render');
+
+  // You can use this as well if you prefer, similarly to the
+  // SortableFlex example
+  // const onDragEnd = useDragEndHandler(data, setData);
 
   return (
     // Need to set flex: 1 for the ScrollView parent component in order
@@ -147,7 +157,7 @@ export default function DataChangeExample() {
             renderItem={renderItem}
             rowGap={spacing.xs}
             scrollableRef={scrollableRef}
-            onOrderChange={({ data: newData }) => setData(newData)}
+            onDragEnd={({ data: newData }) => setData(newData)}
           />
 
           <Group withMargin={false} bordered center>

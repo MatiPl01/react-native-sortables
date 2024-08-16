@@ -88,6 +88,14 @@ export type SharedProps = Simplify<
 /**
  * SORTABLE GRID PROPS
  */
+export type SortableGridDragEndParams<I> = {
+  data: Array<I>;
+} & DragEndParams;
+
+export type SortableGridDragEndCallback<I> = (
+  params: SortableGridDragEndParams<I>
+) => void;
+
 export type SortableGridLayoutSettings = {
   columns: number;
 } & AnimatableValues<{
@@ -108,10 +116,8 @@ export type SortableGridProps<I> = Simplify<
     data: Array<I>;
     renderItem: SortableGridRenderItem<I>;
     keyExtractor?: (item: I, index: number) => string;
-    onOrderChange?: (
-      params: Simplify<{ data: Array<I> } & OrderChangeParams>
-    ) => void;
-  } & Omit<SharedProps, 'onOrderChange'> &
+    onDragEnd?: SortableGridDragEndCallback<I>;
+  } & Omit<SharedProps, 'onDragEnd'> &
     Partial<SortableGridLayoutSettings>
 >;
 
