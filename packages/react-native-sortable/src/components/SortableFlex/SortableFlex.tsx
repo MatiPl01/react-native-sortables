@@ -11,7 +11,7 @@ import {
   useFlexLayoutContext,
   useFlexOrderUpdater
 } from '../../providers';
-import type { ReorderStrategy, SortableFlexProps } from '../../types';
+import type { SortableFlexProps } from '../../types';
 import {
   areArraysDifferent,
   getPropsWithDefaults,
@@ -20,10 +20,10 @@ import {
 import { DraggableView } from '../shared';
 
 function SortableFlex(props: SortableFlexProps) {
-  const {
-    rest: viewProps,
-    sharedProps: { reorderStrategy, ...providerProps }
-  } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
+  const { rest: viewProps, sharedProps } = getPropsWithDefaults(
+    props,
+    DEFAULT_SORTABLE_FLEX_PROPS
+  );
 
   const childrenArray = validateChildren(viewProps.children);
   const itemKeysRef = useRef<Array<string>>([]);
@@ -34,11 +34,10 @@ function SortableFlex(props: SortableFlexProps) {
   }
 
   return (
-    <SharedProvider {...providerProps} itemKeys={itemKeysRef.current}>
+    <SharedProvider {...sharedProps} itemKeys={itemKeysRef.current}>
       <FlexLayoutProvider {...((viewProps.style as FlexProps) ?? {})}>
         <SortableFlexInner
           childrenArray={childrenArray}
-          reorderStrategy={reorderStrategy}
           viewProps={viewProps}
         />
       </FlexLayoutProvider>
@@ -49,19 +48,17 @@ function SortableFlex(props: SortableFlexProps) {
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
   viewProps: ViewProps;
-  reorderStrategy: ReorderStrategy;
 };
 
 function SortableFlexInner({
   childrenArray,
-  reorderStrategy,
   viewProps
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout, containerHeight } =
     useCommonValuesContext();
   const { flexDirection, stretch } = useFlexLayoutContext();
 
-  useFlexOrderUpdater(reorderStrategy);
+  useFlexOrderUpdater();
 
   const animatedContainerStyle = useAnimatedStyle(() => {
     if (containerHeight.value === -1) {

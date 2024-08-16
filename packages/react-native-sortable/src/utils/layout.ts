@@ -20,65 +20,65 @@ export const getOffsetDistance = (
   return distance * percentage;
 };
 
-const reorderInsert = (
-  indexToKey: Array<string>,
+const reorderInsert = <T>(
+  array: Array<T>,
   fromIndex: number,
   toIndex: number
-): Array<string> => {
+): Array<T> => {
   'worklet';
-  const activeKey = indexToKey[fromIndex];
+  const activeItem = array[fromIndex];
 
-  if (activeKey === undefined) {
-    return indexToKey;
+  if (activeItem === undefined) {
+    return array;
   }
 
   if (toIndex < fromIndex) {
     return [
-      ...indexToKey.slice(0, toIndex),
-      activeKey,
-      ...indexToKey.slice(toIndex, fromIndex),
-      ...indexToKey.slice(fromIndex + 1)
+      ...array.slice(0, toIndex),
+      activeItem,
+      ...array.slice(toIndex, fromIndex),
+      ...array.slice(fromIndex + 1)
     ];
   }
   return [
-    ...indexToKey.slice(0, fromIndex),
-    ...indexToKey.slice(fromIndex + 1, toIndex + 1),
-    activeKey,
-    ...indexToKey.slice(toIndex + 1)
+    ...array.slice(0, fromIndex),
+    ...array.slice(fromIndex + 1, toIndex + 1),
+    activeItem,
+    ...array.slice(toIndex + 1)
   ];
 };
 
-const reorderSwap = (
-  indexToKey: Array<string>,
+const reorderSwap = <T>(
+  array: Array<T>,
   fromIndex: number,
   toIndex: number
-): Array<string> => {
+): Array<T> => {
   'worklet';
-  const fromKey = indexToKey[fromIndex];
-  const toKey = indexToKey[toIndex];
+  const draggedItem = array[fromIndex];
+  const swappedItem = array[toIndex];
 
-  if (fromKey === undefined || toKey === undefined) {
-    return indexToKey;
+  if (draggedItem === undefined || swappedItem === undefined) {
+    return array;
   }
 
-  const result = [...indexToKey];
-  result[fromIndex] = toKey;
-  result[toIndex] = fromKey;
+  const result = [...array];
+  result[fromIndex] = swappedItem;
+  result[toIndex] = draggedItem;
   return result;
 };
 
-export const reorderItems = (
-  indexToKey: Array<string>,
+export const reorderItems = <T>(
+  array: Array<T>,
   fromIndex: number,
   toIndex: number,
   strategy: ReorderStrategy
-): Array<string> => {
+): Array<T> => {
   'worklet';
 
   switch (strategy) {
     case 'insert':
-      return reorderInsert(indexToKey, fromIndex, toIndex);
+      return reorderInsert(array, fromIndex, toIndex);
     case 'swap':
-      return reorderSwap(indexToKey, fromIndex, toIndex);
+      return reorderSwap(array, fromIndex, toIndex);
   }
 };

@@ -29,15 +29,15 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       renderItem,
       rowGap
     },
-    sharedProps: { reorderStrategy, ...providerProps }
+    sharedProps
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_GRID_PROPS);
 
   const columnGapValue = useAnimatableValue(columnGap);
   const rowGapValue = useAnimatableValue(rowGap);
 
   const itemKeys = useMemo(
-    () => data.map((item, index) => `${keyExtractor(item, index)}-${columns}`),
-    [data, columns, keyExtractor]
+    () => data.map((item, index) => keyExtractor(item, index)),
+    [data, keyExtractor]
   );
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
@@ -51,7 +51,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   }));
 
   return (
-    <SharedProvider {...providerProps} itemKeys={itemKeys} key={columns}>
+    <SharedProvider {...sharedProps} itemKeys={itemKeys} key={columns}>
       <GridLayoutProvider
         columnGap={columnGapValue}
         columns={columns}
@@ -61,7 +61,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           data={data}
           itemKeys={itemKeys}
           renderItem={renderItem}
-          reorderStrategy={reorderStrategy}
           style={animatedContainerStyle}
           itemStyle={[
             { flexBasis: `${100 / columns}%` },
@@ -77,23 +76,17 @@ type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
   itemStyle: AnimatedViewStyle;
   style: AnimatedViewStyle;
-} & Required<
-  Pick<
-    SortableGridProps<I>,
-    'columns' | 'data' | 'renderItem' | 'reorderStrategy'
-  >
->;
+} & Required<Pick<SortableGridProps<I>, 'columns' | 'data' | 'renderItem'>>;
 
 function SortableGridInner<I>({
   columns,
   data,
   itemKeys,
   itemStyle,
-  reorderStrategy,
   style,
   ...rest
 }: SortableGridInnerProps<I>) {
-  useGridOrderUpdater(columns, reorderStrategy);
+  useGridOrderUpdater(columns);
 
   return (
     <Animated.View style={[styles.gridContainer, style]}>

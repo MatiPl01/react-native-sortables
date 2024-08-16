@@ -1,18 +1,14 @@
-import type { ReorderStrategy } from '../../../types';
 import { reorderItems } from '../../../utils';
 import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useGridLayoutContext } from './GridLayoutProvider';
 import { getColumnIndex, getRowIndex } from './utils';
 
-export function useGridOrderUpdater(
-  numColumns: number,
-  strategy: ReorderStrategy
-): void {
+export function useGridOrderUpdater(numColumns: number): void {
   const { containerHeight, indexToKey } = useCommonValuesContext();
   const { rowOffsets } = useGridLayoutContext();
 
   useOrderUpdater(
-    ({ activeIndex, centerPosition: { x, y }, dimensions }) => {
+    ({ activeIndex, centerPosition: { x, y }, dimensions, strategy }) => {
       'worklet';
       const itemsCount = indexToKey.value.length;
       const rowIndex = getRowIndex(activeIndex, numColumns);
@@ -60,7 +56,6 @@ export function useGridOrderUpdater(
 
       // return the new order of items
       return reorderItems(indexToKey.value, activeIndex, newIndex, strategy);
-    },
-    [strategy]
+    }
   );
 }

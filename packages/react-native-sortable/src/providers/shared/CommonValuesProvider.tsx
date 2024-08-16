@@ -13,6 +13,7 @@ import type {
   ActiveItemSnapSettings,
   AnimatedValues,
   Dimensions,
+  ReorderStrategy,
   Vector
 } from '../../types';
 import { areArraysDifferent } from '../../utils';
@@ -28,6 +29,7 @@ type CommonValuesContextType = {
   // ORDER
   indexToKey: SharedValue<Array<string>>;
   keyToIndex: SharedValue<Record<string, number>>;
+  reorderStrategy: SharedValue<ReorderStrategy>;
 
   // POSITIONs
   itemPositions: SharedValue<Record<string, Vector>>;
@@ -62,6 +64,7 @@ type CommonValuesProviderProps = PropsWithChildren<
   {
     sortEnabled: boolean;
     itemKeys: Array<string>;
+    reorderStrategy: ReorderStrategy;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings
 >;
@@ -76,6 +79,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   inactiveItemOpacity: _inactiveItemOpacity,
   inactiveItemScale: _inactiveItemScale,
   itemKeys,
+  reorderStrategy: _reorderStrategy,
   snapOffsetX: _snapOffsetX,
   snapOffsetY: _snapOffsetY,
   sortEnabled: _sortEnabled
@@ -87,6 +91,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const keyToIndex = useDerivedValue(() =>
     Object.fromEntries(indexToKey.value.map((key, index) => [key, index]))
   );
+  const reorderStrategy = useDerivedValue(() => _reorderStrategy);
 
   // POSITIONs
   const itemPositions = useSharedValue<Record<string, Vector>>({});
@@ -159,6 +164,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       keyToIndex,
       overrideItemDimensions,
       relativeTouchPosition,
+      reorderStrategy,
       snapOffsetX,
       snapOffsetY,
       sortEnabled,

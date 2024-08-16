@@ -147,6 +147,7 @@ export default function DataChangeExample() {
             renderItem={renderItem}
             rowGap={spacing.xs}
             scrollableRef={scrollableRef}
+            onOrderChange={({ data: newData }) => setData(newData)}
           />
 
           <Group withMargin={false} bordered center>
