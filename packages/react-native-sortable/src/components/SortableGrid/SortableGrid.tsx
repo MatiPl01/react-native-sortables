@@ -1,19 +1,28 @@
 import { useMemo } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../../constants';
-import { useAnimatableValue } from '../../hooks';
+import {
+  isInternalFunction,
+  useAnimatableValue,
+  useStableCallback
+} from '../../hooks';
 import {
   GridLayoutProvider,
   SharedProvider,
   useGridOrderUpdater
 } from '../../providers';
-import type { SortableGridProps, SortableGridRenderItem } from '../../types';
-import type { AnimatedViewStyle } from '../../types/reanimated';
+import type {
+  DragEndCallback,
+  SortableGridProps,
+  SortableGridRenderItem
+} from '../../types';
 import {
   defaultKeyExtractor,
   getPropsWithDefaults,
+  reorderOnDragEnd,
   typedMemo,
   zipArrays
 } from '../../utils';
@@ -29,16 +38,32 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       renderItem,
       rowGap
     },
-    sharedProps: { reorderStrategy, ...providerProps }
+    sharedProps: { onDragEnd: _onDragEnd, ...sharedProps }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_GRID_PROPS);
 
   const columnGapValue = useAnimatableValue(columnGap);
   const rowGapValue = useAnimatableValue(rowGap);
 
   const itemKeys = useMemo(
-    () => data.map((item, index) => `${keyExtractor(item, index)}-${columns}`),
-    [data, columns, keyExtractor]
+    () => data.map((item, index) => keyExtractor(item, index)),
+    [data, keyExtractor]
   );
+
+  const onDragEnd = useStableCallback<DragEndCallback>(params => {
+    if (!_onDragEnd) {
+      return;
+    }
+    // For cases when user provides onOrderChange created via a helper
+    // useOrderChangeHandler hook
+    if (isInternalFunction(_onDragEnd, 'DragEndCallback')) {
+      return (_onDragEnd as DragEndCallback)(params);
+    }
+    // Add the data property for the sortable grid if a custom user callback is provided
+    _onDragEnd({
+      ...params,
+      data: reorderOnDragEnd(data, params, true)
+    });
+  });
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     marginHorizontal: -columnGapValue.value / 2,
@@ -50,8 +75,17 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     paddingVertical: rowGapValue.value / 2
   }));
 
+  const itemStyle = useMemo<StyleProp<ViewStyle>>(
+    () => [{ flexBasis: `${100 / columns}%` }, animatedItemWrapperStyle],
+    [animatedItemWrapperStyle, columns]
+  );
+
   return (
-    <SharedProvider {...providerProps} itemKeys={itemKeys} key={columns}>
+    <SharedProvider
+      {...sharedProps}
+      itemKeys={itemKeys}
+      key={columns}
+      onDragEnd={onDragEnd}>
       <GridLayoutProvider
         columnGap={columnGapValue}
         columns={columns}
@@ -60,13 +94,9 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           columns={columns}
           data={data}
           itemKeys={itemKeys}
+          itemStyle={itemStyle}
           renderItem={renderItem}
-          reorderStrategy={reorderStrategy}
           style={animatedContainerStyle}
-          itemStyle={[
-            { flexBasis: `${100 / columns}%` },
-            animatedItemWrapperStyle
-          ]}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -75,25 +105,19 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
 type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
-  itemStyle: AnimatedViewStyle;
-  style: AnimatedViewStyle;
-} & Required<
-  Pick<
-    SortableGridProps<I>,
-    'columns' | 'data' | 'renderItem' | 'reorderStrategy'
-  >
->;
+  itemStyle: StyleProp<ViewStyle>;
+  style: StyleProp<ViewStyle>;
+} & Required<Pick<SortableGridProps<I>, 'columns' | 'data' | 'renderItem'>>;
 
 function SortableGridInner<I>({
   columns,
   data,
   itemKeys,
   itemStyle,
-  reorderStrategy,
   style,
   ...rest
 }: SortableGridInnerProps<I>) {
-  useGridOrderUpdater(columns, reorderStrategy);
+  useGridOrderUpdater(columns);
 
   return (
     <Animated.View style={[styles.gridContainer, style]}>
@@ -114,7 +138,7 @@ type SortableGridItemProps<I> = {
   itemKey: string;
   item: I;
   renderItem: SortableGridRenderItem<I>;
-  style: AnimatedViewStyle;
+  style: StyleProp<ViewStyle>;
 };
 
 const SortableGridItem = typedMemo(function <I>({

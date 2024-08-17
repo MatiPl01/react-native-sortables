@@ -3,7 +3,7 @@ import type { ViewProps, ViewStyle } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 
 import type { DropIndicatorComponentProps } from '../components';
-import type { AnimatableValues, Prettify } from './utils';
+import type { AnimatableValues, Simplify } from './utils';
 
 /**
  * SHARED PROPS
@@ -43,12 +43,14 @@ export type DropIndicatorSettings = {
 export type DragStartParams = {
   key: string;
   fromIndex: number;
+  reorderStrategy: ReorderStrategy;
 };
 
 export type DragEndParams = {
   key: string;
   fromIndex: number;
   toIndex: number;
+  reorderStrategy: ReorderStrategy;
 };
 
 export type OrderChangeParams = {
@@ -56,6 +58,7 @@ export type OrderChangeParams = {
   fromIndex: number;
   toIndex: number;
   key: string;
+  reorderStrategy: ReorderStrategy;
 };
 
 export type DragStartCallback = (params: DragStartParams) => void;
@@ -70,7 +73,7 @@ export type SortableCallbacks = {
 
 export type ReorderStrategy = 'insert' | 'swap';
 
-export type SharedProps = Prettify<
+export type SharedProps = Simplify<
   {
     sortEnabled?: boolean;
     hapticsEnabled?: boolean;
@@ -85,6 +88,14 @@ export type SharedProps = Prettify<
 /**
  * SORTABLE GRID PROPS
  */
+export type SortableGridDragEndParams<I> = {
+  data: Array<I>;
+} & DragEndParams;
+
+export type SortableGridDragEndCallback<I> = (
+  params: SortableGridDragEndParams<I>
+) => void;
+
 export type SortableGridLayoutSettings = {
   columns: number;
 } & AnimatableValues<{
@@ -100,13 +111,14 @@ export type SortableGridRenderItem<I> = (
   info: SortableGridRenderItemInfo<I>
 ) => JSX.Element;
 
-export type SortableGridProps<I> = Prettify<
+export type SortableGridProps<I> = Simplify<
   {
     data: Array<I>;
     renderItem: SortableGridRenderItem<I>;
     keyExtractor?: (item: I, index: number) => string;
-  } & Partial<SortableGridLayoutSettings> &
-    SharedProps
+    onDragEnd?: SortableGridDragEndCallback<I>;
+  } & Omit<SharedProps, 'onDragEnd'> &
+    Partial<SortableGridLayoutSettings>
 >;
 
 /**

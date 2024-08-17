@@ -1,6 +1,11 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
-import type { Dimensions, Maybe, Vector } from '../../../types';
+import type {
+  Dimensions,
+  Maybe,
+  ReorderStrategy,
+  Vector
+} from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
@@ -11,19 +16,26 @@ export default function useOrderUpdater(
     dimensions: Dimensions;
     position: Vector;
     centerPosition: Vector;
+    strategy: ReorderStrategy;
   }) => Maybe<Array<string>>,
   deps?: Array<unknown>
 ) {
-  const { activeItemKey, itemDimensions, keyToIndex, touchedItemPosition } =
-    useCommonValuesContext();
+  const {
+    activeItemKey,
+    itemDimensions,
+    keyToIndex,
+    reorderStrategy,
+    touchedItemPosition
+  } = useCommonValuesContext();
   const { handleOrderChange } = useDragContext();
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
-      activePosition: touchedItemPosition.value
+      activePosition: touchedItemPosition.value,
+      strategy: reorderStrategy.value
     }),
-    ({ activeKey, activePosition }) => {
+    ({ activeKey, activePosition, strategy }) => {
       if (activeKey === null || activePosition === null) {
         return;
       }
@@ -50,7 +62,8 @@ export default function useOrderUpdater(
         activeKey,
         centerPosition,
         dimensions,
-        position: activePosition
+        position: activePosition,
+        strategy
       });
 
       if (newOrder) {
@@ -58,7 +71,8 @@ export default function useOrderUpdater(
           activeKey,
           activeIndex,
           newOrder.indexOf(activeKey),
-          newOrder
+          newOrder,
+          strategy
         );
       }
     },

@@ -26,6 +26,7 @@ export default function useItemPanGesture(
     activeItemKey,
     containerHeight,
     inactiveAnimationProgress,
+    reorderStrategy,
     touchStartPosition,
     touchedItemKey
   } = useCommonValuesContext();
@@ -40,6 +41,7 @@ export default function useItemPanGesture(
   return useMemo(
     () =>
       Gesture.Manual()
+        .manualActivation(true)
         .onTouchesDown((e, manager) => {
           const firstTouch = e.allTouches[0];
           if (!firstTouch) {
@@ -90,7 +92,7 @@ export default function useItemPanGesture(
               };
               manager.activate();
               updateStartScrollOffset?.();
-              handleDragStart(key);
+              handleDragStart(key, reorderStrategy.value);
             }
           });
         })
@@ -140,11 +142,12 @@ export default function useItemPanGesture(
             duration: TIME_TO_ACTIVATE_PAN
           });
           updateStartScrollOffset?.(-1);
-          handleDragEnd(key);
+          handleDragEnd(key, reorderStrategy.value);
         }),
     [
       key,
       reverseXAxis,
+      reorderStrategy,
       activationProgress,
       pressProgress,
       absoluteTouchStartPosition,

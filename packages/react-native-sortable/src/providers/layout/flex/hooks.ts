@@ -1,9 +1,9 @@
-import type { Coordinate, Dimension, ReorderStrategy } from '../../../types';
+import type { Coordinate, Dimension } from '../../../types';
 import { reorderItems } from '../../../utils';
 import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
 
-export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
+export function useFlexOrderUpdater(): void {
   const { indexToKey, itemDimensions, itemPositions, keyToIndex } =
     useCommonValuesContext();
   const { crossAxisGroupOffsets, flexDirection, itemGroups, keyToGroup } =
@@ -22,7 +22,7 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
   }
 
   useOrderUpdater(
-    ({ activeIndex, activeKey, centerPosition, position }) => {
+    ({ activeIndex, activeKey, centerPosition, position, strategy }) => {
       'worklet';
       let groupIndex = keyToGroup.value[activeKey];
       if (groupIndex === undefined) {
@@ -107,6 +107,6 @@ export function useFlexOrderUpdater(strategy: ReorderStrategy): void {
         strategy
       );
     },
-    [mainCoordinate, crossCoordinate, mainDimension, crossDimension, strategy]
+    [mainCoordinate, crossCoordinate, mainDimension, crossDimension]
   );
 }

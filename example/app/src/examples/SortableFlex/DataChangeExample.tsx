@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import { SortableFlex } from 'react-native-sortable';
+import { SortableFlex, useDragEndHandler } from 'react-native-sortable';
 
 import { Button, FlexCell, Group, Section, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
@@ -12,6 +12,8 @@ const AVAILABLE_DATA = getCategories(20);
 export default function DataChangeExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
   const [data, setData] = useState(AVAILABLE_DATA.slice(0, 10));
+
+  const onDragEnd = useDragEndHandler(data, setData);
 
   const getNewItemName = useCallback(() => {
     if (data.length >= AVAILABLE_DATA.length) {
@@ -126,9 +128,10 @@ export default function DataChangeExample() {
 
           <SortableFlex
             scrollableRef={scrollableRef}
-            style={styles.sortableFlex}>
+            style={styles.sortableFlex}
+            onDragEnd={onDragEnd}>
             {data.map(item => (
-              <Pressable key={item} onPress={() => onRemoveItem(item)}>
+              <Pressable key={item} onPress={onRemoveItem.bind(null, item)}>
                 <FlexCell size='large'>{item}</FlexCell>
               </Pressable>
             ))}

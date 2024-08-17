@@ -9,6 +9,7 @@ import type {
   AutoScrollSettings,
   DropIndicatorSettings,
   PartialBy,
+  ReorderStrategy,
   SortableCallbacks
 } from '../types';
 import {
@@ -25,6 +26,7 @@ type SharedProviderProps = PropsWithChildren<
     itemKeys: Array<string>;
     sortEnabled: boolean;
     hapticsEnabled: boolean;
+    reorderStrategy: ReorderStrategy;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &

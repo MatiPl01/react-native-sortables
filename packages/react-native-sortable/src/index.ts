@@ -2,6 +2,7 @@
 
 export type { DropIndicatorComponentProps } from './components';
 export { SortableFlex, SortableGrid, SortableLayer } from './components';
+export { useDragEndHandler } from './hooks';
 export type {
   DragEndCallback,
   DragEndParams,
@@ -11,6 +12,8 @@ export type {
   OrderChangeParams,
   ReorderStrategy,
   SortableFlexProps,
+  SortableGridDragEndCallback,
+  SortableGridDragEndParams,
   SortableGridProps,
   SortableGridRenderItem
 } from './types';

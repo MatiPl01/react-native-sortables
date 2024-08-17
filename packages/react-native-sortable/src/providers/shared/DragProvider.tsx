@@ -9,7 +9,7 @@ import {
 
 import { TIME_TO_ACTIVATE_PAN } from '../../constants';
 import { useHaptics, useJSStableCallback } from '../../hooks';
-import type { SortableCallbacks, Vector } from '../../types';
+import type { ReorderStrategy, SortableCallbacks, Vector } from '../../types';
 import { getOffsetDistance } from '../../utils';
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
@@ -18,14 +18,15 @@ import { LayerState, useLayerContext } from './LayerProvider';
 
 type DragContextType = {
   handleTouchStart: (e: GestureTouchEvent, key: string) => void;
-  handleDragStart: (key: string) => void;
+  handleDragStart: (key: string, reorderStrategy: ReorderStrategy) => void;
   handleDragUpdate: (translation: Vector, reverseXAxis?: boolean) => void;
-  handleDragEnd: (key: string) => void;
+  handleDragEnd: (key: string, reorderStrategy: ReorderStrategy) => void;
   handleOrderChange: (
     key: string,
     fromIndex: number,
     toIndex: number,
-    newOrder: Array<string>
+    newOrder: Array<string>,
+    reorderStrategy: ReorderStrategy
   ) => void;
 };
 
@@ -166,7 +167,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   );
 
   const handleDragStart = useCallback(
-    (key: string) => {
+    (key: string, reorderStrategy: ReorderStrategy) => {
       'worklet';
       activeItemKey.value = key;
       activeItemDropped.value = false;
@@ -175,7 +176,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       haptics.medium();
       stableOnDragStart({
         fromIndex: dragStartIndex.value,
-        key
+        key,
+        reorderStrategy
       });
     },
     [
@@ -189,7 +191,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   );
 
   const handleDragEnd = useCallback(
-    (key: string) => {
+    (key: string, reorderStrategy: ReorderStrategy) => {
       'worklet';
       const delayed = (callback?: (finished: boolean | undefined) => void) =>
         withTiming(0, { duration: TIME_TO_ACTIVATE_PAN }, callback);
@@ -215,6 +217,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         stableOnDragEnd({
           fromIndex: dragStartIndex.value,
           key,
+          reorderStrategy,
           toIndex: keyToIndex.value[key]!
         });
         dragStartIndex.value = -1;
@@ -253,7 +256,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       key: string,
       fromIndex: number,
       toIndex: number,
-      newOrder: Array<string>
+      newOrder: Array<string>,
+      reorderStrategy: ReorderStrategy
     ) => {
       'worklet';
       indexToKey.value = newOrder;
@@ -263,6 +267,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         fromIndex,
         key,
         newOrder,
+        reorderStrategy,
         toIndex
       });
     },

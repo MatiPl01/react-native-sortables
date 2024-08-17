@@ -19,7 +19,7 @@ export const getPropsWithDefaults = <
   props: P,
   componentDefaultProps: D
 ): {
-  sharedProps: Required<SharedProps>;
+  sharedProps: Required<{ [K in keyof SharedProps]: P[K] }>;
   rest: Omit<D & Omit<P, keyof D>, keyof SharedProps>;
 } => {
   const propsWithDefaults = {
@@ -59,6 +59,6 @@ export const getPropsWithDefaults = <
 
   return {
     rest: rest as Omit<D & Omit<P, keyof D>, keyof SharedProps>,
-    sharedProps: sharedProps as Required<SharedProps>
+    sharedProps: sharedProps as Required<{ [K in keyof SharedProps]: P[K] }>
   };
 };

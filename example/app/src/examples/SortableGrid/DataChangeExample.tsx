@@ -84,10 +84,7 @@ export default function DataChangeExample() {
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
-      <Pressable
-        onPress={() => {
-          onRemoveItem(item);
-        }}>
+      <Pressable onPress={onRemoveItem.bind(null, item)}>
         <GridCard>{item}</GridCard>
       </Pressable>
     ),
@@ -116,6 +113,10 @@ export default function DataChangeExample() {
       title: 'Change order of items'
     }
   ];
+
+  // You can use this as well if you prefer, similarly to the
+  // SortableFlex example
+  // const onDragEnd = useDragEndHandler(data, setData);
 
   return (
     // Need to set flex: 1 for the ScrollView parent component in order
@@ -147,6 +148,7 @@ export default function DataChangeExample() {
             renderItem={renderItem}
             rowGap={spacing.xs}
             scrollableRef={scrollableRef}
+            onDragEnd={({ data: newData }) => setData(newData)}
           />
 
           <Group withMargin={false} bordered center>

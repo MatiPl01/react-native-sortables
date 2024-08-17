@@ -4,7 +4,7 @@ import type { SharedValue } from 'react-native-reanimated';
 
 export type AnyFunction = (...args: Array<any>) => any;
 
-export type Prettify<T> = {
+export type Simplify<T> = {
   [K in keyof T]: T[K];
   // eslint-disable-next-line @typescript-eslint/ban-types
 } & {};
