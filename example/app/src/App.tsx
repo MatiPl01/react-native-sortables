@@ -24,8 +24,6 @@ export default function App() {
           ? (JSON.parse(savedStateString) as NavigationState)
           : undefined;
 
-        console.log({ state });
-
         if (state !== undefined) {
           setNavigationState(state);
         }

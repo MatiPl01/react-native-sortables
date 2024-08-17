@@ -25,6 +25,10 @@ const routes: Routes = {
       DataChange: {
         Component: SortableGrid.DataChangeExample,
         name: 'Data Change'
+      },
+      LayoutAnimations: {
+        Component: SortableGrid.LayoutAnimations,
+        name: 'Layout Animations'
       }
     }
   },
@@ -47,6 +51,10 @@ const routes: Routes = {
       DataChange: {
         Component: SortableFlex.DataChangeExample,
         name: 'Data Change'
+      },
+      LayoutAnimations: {
+        Component: SortableFlex.LayoutAnimations,
+        name: 'Layout Animations'
       }
     }
   }
