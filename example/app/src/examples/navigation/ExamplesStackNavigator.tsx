@@ -2,7 +2,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInLeft, FadeInRight } from 'react-native-reanimated';
 
@@ -11,16 +11,27 @@ import { colors, flex, spacing } from '@/theme';
 
 import exampleRoutes from './routes';
 import type { Routes } from './types';
-import { getScreenTitle, hasRoutes } from './utils';
+import { getScreenTitle, hasRoutes, removeScreenHash } from './utils';
+
+const ROOT_SCREEN_PATH = 'Examples';
 
 const StackNavigator =
   createNativeStackNavigator<Record<string, React.ComponentType>>();
 
 const BackButton = memo(function BackButton() {
+  const [isVisible, setIsVisible] = useState(false);
   const navigation = useNavigation();
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', e => {
+      setIsVisible(removeScreenHash(e.target) !== ROOT_SCREEN_PATH);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   const state = navigation.getState();
-  if (!state) {
+  if (!state || !isVisible) {
     return null;
   }
 
@@ -57,7 +68,7 @@ function createStackNavigator(routes: Routes): React.ComponentType {
           screenOptions={{
             headerLeft: () => <BackButton />
           }}>
-          {createNavigationScreens(routes, 'Examples')}
+          {createNavigationScreens(routes, ROOT_SCREEN_PATH)}
         </StackNavigator.Navigator>
       </View>
     );
