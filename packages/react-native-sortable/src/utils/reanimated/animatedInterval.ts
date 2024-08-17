@@ -38,8 +38,11 @@ export function setAnimatedInterval<F extends AnyFunction>(
   return currentId;
 }
 
-export function clearAnimatedInterval(handle: AnimatedIntervalID): void {
+export function clearAnimatedInterval(handle: AnimatedIntervalID | null): void {
   'worklet';
+  if (handle === null) {
+    return;
+  }
   RUNNING_INTERVALS.modify(runningIntervals => {
     'worklet';
     delete runningIntervals[handle];

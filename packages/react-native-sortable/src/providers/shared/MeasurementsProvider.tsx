@@ -5,7 +5,8 @@ import Animated, {
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
-  useSharedValue
+  useSharedValue,
+  withTiming
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../constants';
@@ -44,22 +45,25 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   itemsCount
 }) => {
   const {
+    activeItemDropped,
+    activeItemKey,
+    animateContainerHeight,
     canSwitchToAbsoluteLayout,
     containerHeight,
     containerRef,
     containerWidth,
     itemDimensions,
-    touchedItemHeight,
-    touchedItemKey,
-    touchedItemWidth
+    targetContainerHeight,
+    touchedItemDimensions,
+    touchedItemKey
   } = useCommonValuesContext();
 
   const measuredItemsCount = useSharedValue(0);
   const initialItemMeasurementsCompleted = useSharedValue(false);
-  const updateTimeoutId = useSharedValue<AnimatedTimeoutID>(-1);
+  const updateTimeoutId = useSharedValue<AnimatedTimeoutID | null>(null);
 
   const helperContainerRef = useAnimatedRef<Animated.View>();
-  const measurementIntervalId = useSharedValue<AnimatedIntervalID>(-1);
+  const measurementIntervalId = useSharedValue<AnimatedIntervalID | null>(null);
   const measurementRetryCount = useSharedValue(0);
 
   useEffect(() => {
@@ -87,8 +91,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
       itemDimensions.value[key] = dimensions;
       if (touchedItemKey.value === key) {
-        touchedItemWidth.value = dimensions.width;
-        touchedItemHeight.value = dimensions.height;
+        touchedItemDimensions.value = dimensions;
       }
 
       // Update the array of item dimensions only after all items have been
@@ -102,12 +105,12 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         } else {
           // In all other cases, debounce the update in case multiple items
           // change their size at the same time
-          if (updateTimeoutId.value !== -1) {
+          if (updateTimeoutId.value !== null) {
             clearAnimatedTimeout(updateTimeoutId.value);
           }
           updateTimeoutId.value = setAnimatedTimeout(() => {
             itemDimensions.value = { ...itemDimensions.value };
-            updateTimeoutId.value = -1;
+            updateTimeoutId.value = null;
           }, 100);
         }
       }
@@ -131,10 +134,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     (key: string) => {
       'worklet';
       const dimensions = itemDimensions.value[key] ?? null;
-      touchedItemWidth.value = dimensions?.width ?? -1;
-      touchedItemHeight.value = dimensions?.height ?? -1;
+      touchedItemDimensions.value = dimensions;
     },
-    [itemDimensions, touchedItemHeight, touchedItemWidth]
+    [itemDimensions, touchedItemDimensions]
   );
 
   const maybeSwitchToAbsoluteLayout = useCallback(
@@ -153,7 +155,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     measurementRetryCount.value = 0;
     clearAnimatedInterval(measurementIntervalId.value);
     measurementIntervalId.value = setAnimatedInterval(() => {
-      const measuredHeight = measure(helperContainerRef)?.height ?? -1;
+      const measuredHeight = measure(helperContainerRef)?.height ?? null;
+      if (measuredHeight === null) {
+        return;
+      }
       maybeSwitchToAbsoluteLayout(measuredHeight);
       if (measurementRetryCount.value >= MAX_MEASUREMENT_RETRIES) {
         clearAnimatedInterval(measurementIntervalId.value);
@@ -175,6 +180,20 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     }
   );
 
+  // CONTAINER HEIGHT UPDATER
+  useAnimatedReaction(
+    () => ({
+      animated: animateContainerHeight.value,
+      target: targetContainerHeight.value
+    }),
+    ({ animated, target }) => {
+      if (target !== null) {
+        console.log('target', target, animated);
+        containerHeight.value = animated ? withTiming(target) : target;
+      }
+    }
+  );
+
   // Use this handler to measure the applied container height
   // (onLayout was very flaky, it was sometimes not called at all
   // after applying the animated style with the containerHeight to
@@ -182,14 +201,18 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   useAnimatedReaction(
     () => containerHeight.value,
     height => {
-      if (height !== -1 && !canSwitchToAbsoluteLayout.value) {
+      if (height !== null && !canSwitchToAbsoluteLayout.value) {
         tryMeasureContainerHeight();
       }
     }
   );
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
-    height: containerHeight.value === -1 ? undefined : containerHeight.value
+    height: containerHeight.value ?? undefined,
+    overflow:
+      touchedItemKey.value === null && activeItemDropped.value
+        ? 'hidden'
+        : 'visible'
   }));
 
   return {

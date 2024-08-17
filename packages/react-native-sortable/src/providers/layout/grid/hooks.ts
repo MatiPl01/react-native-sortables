@@ -29,6 +29,7 @@ export function useGridOrderUpdater(numColumns: number): void {
         dy = -1;
       } else if (
         yOffsetBelow !== undefined &&
+        containerHeight.value !== null &&
         yOffsetBelow < containerHeight.value &&
         y > yOffsetBelow
       ) {

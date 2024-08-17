@@ -75,10 +75,13 @@ export type ReorderStrategy = 'insert' | 'swap';
 
 export type SharedProps = Simplify<
   {
-    sortEnabled?: boolean;
-    hapticsEnabled?: boolean;
+    enableHaptics?: boolean;
+  } & AnimatableValues<{
+    enableSort?: boolean;
     reorderStrategy?: ReorderStrategy;
-  } & Partial<ActiveItemDecorationSettings> &
+    animateContainerHeight?: boolean;
+  }> &
+    Partial<ActiveItemDecorationSettings> &
     Partial<ActiveItemSnapSettings> &
     Partial<AutoScrollSettings> &
     Partial<DropIndicatorSettings> &

@@ -32,3 +32,7 @@ export type DefaultProps<
   O extends keyof P = never, // optional props
   E extends keyof P = never // exclude from default props (must be passed by the user)
 > = Omit<RequiredExcept<P, O>, E>;
+
+export type Nullable<T extends object> = {
+  [K in keyof T]: T[K] | null;
+};

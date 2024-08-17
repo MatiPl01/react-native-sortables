@@ -48,7 +48,9 @@ export function setAnimatedTimeout<F extends AnyFunction>(
   return currentId;
 }
 
-export function clearAnimatedTimeout(handle: AnimatedTimeoutID): void {
+export function clearAnimatedTimeout(handle: AnimatedTimeoutID | null): void {
   'worklet';
-  removeFromPendingTimeouts(handle);
+  if (handle !== null) {
+    removeFromPendingTimeouts(handle);
+  }
 }

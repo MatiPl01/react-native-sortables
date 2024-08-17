@@ -38,9 +38,8 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     indexToKey,
     itemPositions,
     keyToIndex,
-    touchedItemHeight,
-    touchedItemKey,
-    touchedItemWidth
+    touchedItemDimensions,
+    touchedItemKey
   } = useCommonValuesContext();
 
   // Clone the array in order to prevent user from mutating the internal state
@@ -81,10 +80,9 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     }
 
     return {
-      height: touchedItemHeight.value,
+      ...touchedItemDimensions.value,
       opacity: 1,
-      transform: [{ translateX }, { translateY }],
-      width: touchedItemWidth.value
+      transform: [{ translateX }, { translateY }]
     };
   });
 

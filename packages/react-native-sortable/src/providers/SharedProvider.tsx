@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
+import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import DropIndicator from '../components/shared/DropIndicator';
 import type {
@@ -24,9 +25,10 @@ import { ContextProviderComposer } from './utils';
 type SharedProviderProps = PropsWithChildren<
   {
     itemKeys: Array<string>;
-    sortEnabled: boolean;
-    hapticsEnabled: boolean;
+    enableSort: boolean;
+    enableHaptics: boolean;
     reorderStrategy: ReorderStrategy;
+    animateContainerHeight: boolean;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
@@ -42,7 +44,7 @@ export default function SharedProvider({
   autoScrollSpeed,
   children,
   dropIndicatorStyle,
-  hapticsEnabled,
+  enableHaptics,
   itemKeys,
   onDragEnd,
   onDragStart,
@@ -64,7 +66,7 @@ export default function SharedProvider({
       />
     ),
     <DragProvider
-      hapticsEnabled={hapticsEnabled}
+      enableHaptics={enableHaptics}
       onDragEnd={onDragEnd}
       onDragStart={onDragStart}
       onOrderChange={onOrderChange}
@@ -79,7 +81,7 @@ export default function SharedProvider({
           style={dropIndicatorStyle}
         />
       )}
-      {children}
+      <LayoutAnimationConfig>{children}</LayoutAnimationConfig>
     </ContextProviderComposer>
   );
 }

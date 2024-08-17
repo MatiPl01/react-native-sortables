@@ -11,6 +11,7 @@ import { useAnimatableValue } from '../../hooks';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
+  AnimatableValues,
   AnimatedValues,
   Dimensions,
   ReorderStrategy,
@@ -30,6 +31,7 @@ type CommonValuesContextType = {
   indexToKey: SharedValue<Array<string>>;
   keyToIndex: SharedValue<Record<string, number>>;
   reorderStrategy: SharedValue<ReorderStrategy>;
+  enableSort: SharedValue<boolean>;
 
   // POSITIONs
   itemPositions: SharedValue<Record<string, Vector>>;
@@ -38,10 +40,10 @@ type CommonValuesContextType = {
   touchedItemPosition: SharedValue<Vector | null>;
 
   // DIMENSIONS
-  containerWidth: SharedValue<number>;
-  containerHeight: SharedValue<number>;
-  touchedItemWidth: SharedValue<number>;
-  touchedItemHeight: SharedValue<number>;
+  containerWidth: SharedValue<null | number>;
+  containerHeight: SharedValue<null | number>;
+  targetContainerHeight: SharedValue<null | number>;
+  touchedItemDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
 
@@ -55,18 +57,21 @@ type CommonValuesContextType = {
 
   // OTHER
   containerRef: AnimatedRef<Animated.View>;
-  sortEnabled: SharedValue<boolean>;
+  animateContainerHeight: SharedValue<boolean>;
   canSwitchToAbsoluteLayout: SharedValue<boolean>;
 } & AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings>;
 
 type CommonValuesProviderProps = PropsWithChildren<
   {
-    sortEnabled: boolean;
     itemKeys: Array<string>;
-    reorderStrategy: ReorderStrategy;
   } & ActiveItemDecorationSettings &
-    ActiveItemSnapSettings
+    ActiveItemSnapSettings &
+    AnimatableValues<{
+      enableSort: boolean;
+      reorderStrategy: ReorderStrategy;
+      animateContainerHeight: boolean;
+    }>
 >;
 
 const { CommonValuesProvider, useCommonValuesContext } = createProvider(
@@ -75,14 +80,15 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   activeItemOpacity: _activeItemOpacity,
   activeItemScale: _activeItemScale,
   activeItemShadowOpacity: _activeItemShadowOpacity,
+  animateContainerHeight: _animateContainerHeight,
   enableActiveItemSnap: _enableActiveItemSnap,
+  enableSort: _enableSort,
   inactiveItemOpacity: _inactiveItemOpacity,
   inactiveItemScale: _inactiveItemScale,
   itemKeys,
   reorderStrategy: _reorderStrategy,
   snapOffsetX: _snapOffsetX,
-  snapOffsetY: _snapOffsetY,
-  sortEnabled: _sortEnabled
+  snapOffsetY: _snapOffsetY
 }) => {
   const prevKeysRef = useRef<Array<string>>([]);
 
@@ -91,7 +97,8 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const keyToIndex = useDerivedValue(() =>
     Object.fromEntries(indexToKey.value.map((key, index) => [key, index]))
   );
-  const reorderStrategy = useDerivedValue(() => _reorderStrategy);
+  const reorderStrategy = useAnimatableValue(_reorderStrategy);
+  const enableSort = useAnimatableValue(_enableSort);
 
   // POSITIONs
   const itemPositions = useSharedValue<Record<string, Vector>>({});
@@ -100,10 +107,10 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const touchedItemPosition = useSharedValue<Vector | null>(null);
 
   // DIMENSIONS
-  const containerWidth = useSharedValue(-1);
-  const containerHeight = useSharedValue(-1);
-  const touchedItemWidth = useSharedValue(-1);
-  const touchedItemHeight = useSharedValue(-1);
+  const containerWidth = useSharedValue<null | number>(null);
+  const containerHeight = useSharedValue<null | number>(null);
+  const targetContainerHeight = useSharedValue<null | number>(null);
+  const touchedItemDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const overrideItemDimensions = useSharedValue<
     Record<string, Partial<Dimensions>>
@@ -131,7 +138,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   // OTHER
   const containerRef = useAnimatedRef<Animated.View>();
-  const sortEnabled = useDerivedValue(() => _sortEnabled);
+  const animateContainerHeight = useAnimatableValue(_animateContainerHeight);
   const canSwitchToAbsoluteLayout = useSharedValue(false);
 
   useEffect(() => {
@@ -150,11 +157,13 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       activeItemScale,
       activeItemShadowOpacity,
       activeItemTranslation,
+      animateContainerHeight,
       canSwitchToAbsoluteLayout,
       containerHeight,
       containerRef,
       containerWidth,
       enableActiveItemSnap,
+      enableSort,
       inactiveAnimationProgress,
       inactiveItemOpacity,
       inactiveItemScale,
@@ -167,12 +176,11 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       reorderStrategy,
       snapOffsetX,
       snapOffsetY,
-      sortEnabled,
+      targetContainerHeight,
       touchStartPosition,
-      touchedItemHeight,
+      touchedItemDimensions,
       touchedItemKey,
-      touchedItemPosition,
-      touchedItemWidth
+      touchedItemPosition
     }
   };
 });

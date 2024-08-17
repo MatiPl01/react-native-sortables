@@ -13,7 +13,7 @@ import { createProvider } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
 
 type GridLayoutContextType = {
-  columnWidth: SharedValue<number>;
+  columnWidth: SharedValue<null | number>;
   rowOffsets: SharedValue<Array<number>>;
 };
 
@@ -31,16 +31,16 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowGap: rowGapValue
 }) => {
   const {
-    containerHeight,
     containerWidth,
     indexToKey,
     itemDimensions,
     itemPositions,
-    overrideItemDimensions
+    overrideItemDimensions,
+    targetContainerHeight
   } = useCommonValuesContext();
 
   const rowOffsets = useSharedValue<Array<number>>([]);
-  const columnWidth = useSharedValue(-1);
+  const columnWidth = useSharedValue<null | number>(null);
 
   // TARGET COLUMN WIDTH UPDATER
   useAnimatedReaction(
@@ -49,7 +49,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       width: containerWidth.value
     }),
     ({ columnGap, width }) => {
-      if (width !== -1) {
+      if (width !== null) {
         const colWidth = (width + columnGap) / columns;
         columnWidth.value = colWidth;
       }
@@ -90,7 +90,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       ) {
         rowOffsets.value = offsets;
         const newHeight = offsets[offsets.length - 1] ?? 0;
-        containerHeight.value = newHeight - rowGap;
+        targetContainerHeight.value = newHeight - rowGap;
       }
     },
     [columns]
@@ -104,7 +104,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       offsets: rowOffsets.value
     }),
     ({ colWidth, idxToKey, offsets }) => {
-      if (colWidth === -1 || offsets.length === 0) {
+      if (colWidth === null || offsets.length === 0) {
         return;
       }
       const positions: Record<string, Vector> = {};

@@ -18,8 +18,8 @@ import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
 type AutoScrollContextType = {
-  scrollOffset: SharedValue<number>;
-  dragStartScrollOffset: SharedValue<number>;
+  scrollOffset: SharedValue<null | number>;
+  dragStartScrollOffset: SharedValue<null | number>;
   updateStartScrollOffset: (providedOffset?: number) => void;
 };
 
@@ -43,12 +43,12 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);
-  const targetScrollOffset = useSharedValue(-1);
-  const dragStartScrollOffset = useAnimatableValue(-1);
+  const targetScrollOffset = useSharedValue<null | number>(null);
+  const dragStartScrollOffset = useAnimatableValue<null | number>(null);
 
   const activeItemHeight = useDerivedValue(() => {
     const key = activeItemKey.value;
-    return key ? (itemDimensions.value[key]?.height ?? -1) : -1;
+    return key ? (itemDimensions.value[key]?.height ?? null) : null;
   });
   const offsetThreshold = useAnimatableValue(
     autoScrollActivationOffset,
@@ -73,10 +73,13 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     }
     const currentOffset = scrollOffset.value;
     const targetOffset = targetScrollOffset.value;
-    const diff = targetOffset - currentOffset;
+    if (targetOffset === null) {
+      return;
+    }
 
-    if (Math.abs(diff) < OFFSET_EPS || targetOffset === -1) {
-      targetScrollOffset.value = -1;
+    const diff = targetOffset - currentOffset;
+    if (Math.abs(diff) < OFFSET_EPS) {
+      targetScrollOffset.value = null;
       return;
     }
 
@@ -88,7 +91,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         : Math.max(currentOffset + step, targetOffset);
 
     if (Math.abs(nextOffset - currentOffset) < OFFSET_EPS) {
-      targetScrollOffset.value = -1;
+      targetScrollOffset.value = null;
       return;
     }
 
@@ -115,7 +118,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       ) {
         return;
       }
-      targetScrollOffset.value = -1;
+      targetScrollOffset.value = null;
       runOnJS(toggleFrameCallback)(shouldBeEnabled);
       isFrameCallbackActive.value = shouldBeEnabled;
     }
@@ -127,7 +130,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     () => {
       if (
         !enabled.value ||
-        activeItemHeight.value === -1 ||
+        activeItemHeight.value === null ||
         !touchedItemPosition.value
       ) {
         return null;

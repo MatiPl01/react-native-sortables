@@ -1,5 +1,5 @@
 import { OFFSET_EPS } from '../../../constants';
-import type { Dimension, Dimensions, Vector } from '../../../types';
+import type { Dimension, Dimensions, Nullable, Vector } from '../../../types';
 import { sum } from '../../../utils';
 import type {
   AlignContent,
@@ -8,9 +8,16 @@ import type {
   JustifyContent
 } from './types';
 
-export const areDimensionsCorrect = (dimensions: Dimensions): boolean => {
+export const areDimensionsCorrect = (
+  dimensions: Nullable<Dimensions>
+): dimensions is Dimensions => {
   'worklet';
-  return dimensions.width >= 0 && dimensions.height >= 0;
+  return (
+    dimensions.width !== null &&
+    dimensions.width >= 0 &&
+    dimensions.height !== null &&
+    dimensions.height >= 0
+  );
 };
 
 export const groupItems = (

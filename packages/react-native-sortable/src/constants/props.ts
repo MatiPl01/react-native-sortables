@@ -25,6 +25,7 @@ export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
   activeItemOpacity: 1,
   activeItemScale: 1.1,
   activeItemShadowOpacity: 0.2,
+  animateContainerHeight: true,
   autoScrollActivationOffset: 40,
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
@@ -37,7 +38,8 @@ export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
     flex: 1
   },
   enableActiveItemSnap: true,
-  hapticsEnabled: false,
+  enableHaptics: false,
+  enableSort: true,
   inactiveItemOpacity: 0.5,
   inactiveItemScale: 1,
   onDragEnd: undefined,
@@ -47,8 +49,7 @@ export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
   scrollableRef: undefined,
   showDropIndicator: false,
   snapOffsetX: '50%',
-  snapOffsetY: '50%',
-  sortEnabled: true
+  snapOffsetY: '50%'
 };
 
 /**

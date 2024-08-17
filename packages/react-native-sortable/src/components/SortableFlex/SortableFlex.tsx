@@ -61,7 +61,7 @@ function SortableFlexInner({
   useFlexOrderUpdater();
 
   const animatedContainerStyle = useAnimatedStyle(() => {
-    if (containerHeight.value === -1) {
+    if (containerHeight.value === null) {
       return {};
     }
     const style: ViewStyle = { height: containerHeight.value };

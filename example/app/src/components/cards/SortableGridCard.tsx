@@ -32,7 +32,7 @@ const SortableGridCard: RouteCardComponent = props => {
         data={data}
         renderItem={renderItem}
         rowGap={spacing.xxs}
-        sortEnabled={false}
+        enableSort={false}
       />
     </RouteCard>
   );

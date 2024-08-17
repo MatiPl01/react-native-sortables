@@ -32,14 +32,14 @@ type DragContextType = {
 
 type DragProviderProps = PropsWithChildren<
   {
-    hapticsEnabled: boolean;
+    enableHaptics: boolean;
   } & SortableCallbacks
 >;
 
 const { DragProvider, useDragContext } = createProvider('Drag')<
   DragProviderProps,
   DragContextType
->(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange }) => {
+>(({ enableHaptics, onDragEnd, onDragStart, onOrderChange }) => {
   const {
     activationProgress,
     activeItemDropped,
@@ -54,17 +54,16 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     snapOffsetX,
     snapOffsetY,
     touchStartPosition,
-    touchedItemHeight,
+    touchedItemDimensions,
     touchedItemKey,
-    touchedItemPosition,
-    touchedItemWidth
+    touchedItemPosition
   } = useCommonValuesContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset } = useAutoScrollContext() ?? {};
 
-  const haptics = useHaptics(hapticsEnabled);
+  const haptics = useHaptics(enableHaptics);
 
-  const dragStartIndex = useSharedValue(-1);
+  const dragStartIndex = useSharedValue<null | number>(null);
   const targetDeltaX = useSharedValue(0);
   const targetDeltaY = useSharedValue(0);
   const deltaX = useDerivedValue(
@@ -87,11 +86,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   useAnimatedReaction(
     () => ({
       enableSnap: enableActiveItemSnap.value,
-      height: touchedItemHeight.value,
       oX: snapOffsetX.value,
       oY: snapOffsetY.value,
       touchPosition: relativeTouchPosition.value,
-      width: touchedItemWidth.value
+      ...touchedItemDimensions.value
     }),
     ({ enableSnap, height, oX, oY, touchPosition, width }) => {
       if (!enableSnap || !height || !width || !touchPosition) {
@@ -111,7 +109,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dY: deltaY.value,
       enableSnap: enableActiveItemSnap.value,
       scrollOffsetY:
-        dragStartScrollOffset?.value === -1
+        dragStartScrollOffset?.value === null
           ? 0
           : (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0),
       startPosition: touchStartPosition.value,
@@ -209,7 +207,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         }
       });
 
-      if (activeItemKey.value !== null) {
+      if (activeItemKey.value !== null && dragStartIndex.value !== null) {
         activeItemKey.value = null;
         updateLayer?.(LayerState.Intermediate);
         haptics.medium();
@@ -220,7 +218,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           reorderStrategy,
           toIndex: keyToIndex.value[key]!
         });
-        dragStartIndex.value = -1;
+        dragStartIndex.value = null;
       }
     },
     [
