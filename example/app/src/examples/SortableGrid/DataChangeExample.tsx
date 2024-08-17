@@ -11,11 +11,11 @@ import { colors, flex, spacing } from '@/theme';
 import { getItems } from '@/utils';
 
 const AVAILABLE_DATA = getItems(18);
-const COLUMNS = 3;
+const COLUMNS = 4;
 
 export default function DataChangeExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
-  const [data, setData] = useState(AVAILABLE_DATA.slice(0, 6));
+  const [data, setData] = useState(AVAILABLE_DATA.slice(0, 12));
 
   const getNewItemName = useCallback(() => {
     if (data.length >= AVAILABLE_DATA.length) {
