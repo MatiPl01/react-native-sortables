@@ -25,6 +25,10 @@ const routes: Routes = {
       DataChange: {
         Component: SortableGrid.DataChangeExample,
         name: 'Data Change'
+      },
+      CallbacksExample: {
+        Component: SortableGrid.CallbacksExample,
+        name: 'Callbacks'
       }
     }
   },
@@ -47,6 +51,10 @@ const routes: Routes = {
       DataChange: {
         Component: SortableFlex.DataChangeExample,
         name: 'Data Change'
+      },
+      CallbacksExample: {
+        Component: SortableFlex.CallbacksExample,
+        name: 'Callbacks'
       }
     }
   }

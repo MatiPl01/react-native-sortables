@@ -5,6 +5,7 @@ import { SortableGrid, SortableLayer } from 'react-native-sortable';
 
 import { GridCard, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';
+import { spacing } from '@/theme';
 import { getItems } from '@/utils';
 
 const DATA = getItems(8);
@@ -21,21 +22,21 @@ export default function DropIndicatorExample() {
       <Stagger ParentComponent={SortableLayer}>
         <Section title='Without drop indicator'>
           <SortableGrid
-            columnGap={6}
+            columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
             renderItem={renderItem}
-            rowGap={6}
+            rowGap={spacing.xs}
           />
         </Section>
 
         <Section title='With default drop indicator'>
           <SortableGrid
-            columnGap={6}
+            columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
             renderItem={renderItem}
-            rowGap={6}
+            rowGap={spacing.xs}
             showDropIndicator
           />
         </Section>
@@ -44,13 +45,13 @@ export default function DropIndicatorExample() {
           description='Looks better without inactive item opacity, so inactiveItemOpacity is set to 1 in this example'
           title='With custom drop indicator component'>
           <SortableGrid
-            columnGap={6}
+            columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
             DropIndicatorComponent={CustomDropIndicator}
             inactiveItemOpacity={1}
             renderItem={renderItem}
-            rowGap={6}
+            rowGap={spacing.xs}
             showDropIndicator
           />
         </Section>
