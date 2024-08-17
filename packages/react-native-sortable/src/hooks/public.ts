@@ -7,7 +7,7 @@ export function useDragEndHandler<I>(
   callback: (data: Array<I>) => void
 ): DragEndCallback {
   function useStableCallback(params: DragEndParams) {
-    callback(reorderOnDragEnd(data, params));
+    callback(reorderOnDragEnd(data, params, true));
   }
   return markAsInternal(useStableCallback, 'DragEndCallback');
 }

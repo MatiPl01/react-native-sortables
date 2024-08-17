@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { type ViewProps, type ViewStyle } from 'react-native';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
@@ -15,7 +15,6 @@ import {
   useItemZIndex,
   useMeasurementsContext
 } from '../../providers';
-import type { AnimatedViewStyle } from '../../types/reanimated';
 import ItemDecoration from './ItemDecoration';
 
 const RELATIVE_STYLE: ViewStyle = { position: 'relative' };
@@ -24,7 +23,7 @@ type DraggableViewProps = {
   itemKey: string;
   reverseXAxis?: boolean;
 } & {
-  style?: AnimatedViewStyle;
+  style?: StyleProp<ViewStyle>;
 } & Omit<ViewProps, 'style'>;
 
 export default function DraggableView({
@@ -46,7 +45,7 @@ export default function DraggableView({
   const overriddenDimensions = useDerivedValue(
     () => overrideItemDimensions.value[key]
   );
-  const panGesture = useItemPanGesture(key, pressProgress, reverseXAxis);
+  const gesture = useItemPanGesture(key, pressProgress, reverseXAxis);
 
   useEffect(() => {
     return () => handleItemRemoval(key);
@@ -74,7 +73,7 @@ export default function DraggableView({
 
   return (
     <Animated.View ref={viewRef} {...viewProps} style={[style, animatedStyle]}>
-      <GestureDetector gesture={panGesture}>
+      <GestureDetector gesture={gesture}>
         <ItemDecoration
           itemKey={key}
           pressProgress={pressProgress}

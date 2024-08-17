@@ -1,19 +1,12 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import {
   SortableGrid,
   type SortableGridRenderItem
 } from 'react-native-sortable';
 
-import {
-  Button,
-  GridCard,
-  Group,
-  Section,
-  Stagger,
-  Touchable
-} from '@/components';
+import { Button, GridCard, Group, Section, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
 import { getItems } from '@/utils';
 
@@ -91,9 +84,9 @@ export default function DataChangeExample() {
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
-      <Touchable onTap={() => onRemoveItem(item)}>
+      <Pressable onPress={onRemoveItem.bind(null, item)}>
         <GridCard>{item}</GridCard>
-      </Touchable>
+      </Pressable>
     ),
     [onRemoveItem]
   );
@@ -120,8 +113,6 @@ export default function DataChangeExample() {
       title: 'Change order of items'
     }
   ];
-
-  console.log('DataChangeExample render');
 
   // You can use this as well if you prefer, similarly to the
   // SortableFlex example

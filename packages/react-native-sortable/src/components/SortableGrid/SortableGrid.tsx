@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
@@ -18,7 +19,6 @@ import type {
   SortableGridProps,
   SortableGridRenderItem
 } from '../../types';
-import type { AnimatedViewStyle } from '../../types/reanimated';
 import {
   defaultKeyExtractor,
   getPropsWithDefaults,
@@ -75,6 +75,11 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     paddingVertical: rowGapValue.value / 2
   }));
 
+  const itemStyle = useMemo<StyleProp<ViewStyle>>(
+    () => [{ flexBasis: `${100 / columns}%` }, animatedItemWrapperStyle],
+    [animatedItemWrapperStyle, columns]
+  );
+
   return (
     <SharedProvider
       {...sharedProps}
@@ -89,12 +94,9 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           columns={columns}
           data={data}
           itemKeys={itemKeys}
+          itemStyle={itemStyle}
           renderItem={renderItem}
           style={animatedContainerStyle}
-          itemStyle={[
-            { flexBasis: `${100 / columns}%` },
-            animatedItemWrapperStyle
-          ]}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -103,8 +105,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
 type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
-  itemStyle: AnimatedViewStyle;
-  style: AnimatedViewStyle;
+  itemStyle: StyleProp<ViewStyle>;
+  style: StyleProp<ViewStyle>;
 } & Required<Pick<SortableGridProps<I>, 'columns' | 'data' | 'renderItem'>>;
 
 function SortableGridInner<I>({
@@ -136,7 +138,7 @@ type SortableGridItemProps<I> = {
   itemKey: string;
   item: I;
   renderItem: SortableGridRenderItem<I>;
-  style: AnimatedViewStyle;
+  style: StyleProp<ViewStyle>;
 };
 
 const SortableGridItem = typedMemo(function <I>({
