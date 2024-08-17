@@ -46,7 +46,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 }) => {
   const {
     activeItemDropped,
-    activeItemKey,
     animateContainerHeight,
     canSwitchToAbsoluteLayout,
     containerHeight,
@@ -188,7 +187,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     }),
     ({ animated, target }) => {
       if (target !== null) {
-        console.log('target', target, animated);
         containerHeight.value = animated ? withTiming(target) : target;
       }
     }

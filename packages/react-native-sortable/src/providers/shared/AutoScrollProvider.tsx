@@ -20,7 +20,7 @@ import { useCommonValuesContext } from './CommonValuesProvider';
 type AutoScrollContextType = {
   scrollOffset: SharedValue<null | number>;
   dragStartScrollOffset: SharedValue<null | number>;
-  updateStartScrollOffset: (providedOffset?: number) => void;
+  updateStartScrollOffset: (providedOffset?: null | number) => void;
 };
 
 const { AutoScrollProvider, useAutoScrollContext } = createProvider(
@@ -188,9 +188,10 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   );
 
   const updateStartScrollOffset = useCallback(
-    (providedOffset?: number) => {
+    (providedOffset?: null | number) => {
       'worklet';
-      dragStartScrollOffset.value = providedOffset ?? scrollOffset.value;
+      dragStartScrollOffset.value =
+        providedOffset === undefined ? scrollOffset.value : providedOffset;
     },
     [dragStartScrollOffset, scrollOffset]
   );

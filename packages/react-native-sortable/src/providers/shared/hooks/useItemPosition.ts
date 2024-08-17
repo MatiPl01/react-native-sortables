@@ -75,10 +75,11 @@ export default function useItemPosition(
 
   useAnimatedReaction(
     () => ({
+      isActive: touchedItemKey.value === itemKey.value,
       position: touchedItemPosition.value
     }),
-    ({ position }) => {
-      if (!ignoreActive && touchedItemKey.value === itemKey.value && position) {
+    ({ isActive, position }) => {
+      if (!ignoreActive && isActive && position) {
         x.value = position.x;
         y.value = position.y;
       }

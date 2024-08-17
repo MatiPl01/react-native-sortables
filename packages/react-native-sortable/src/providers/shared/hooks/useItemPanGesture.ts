@@ -141,7 +141,7 @@ export default function useItemPanGesture(
           pressProgress.value = withTiming(0, {
             duration: TIME_TO_ACTIVATE_PAN
           });
-          updateStartScrollOffset?.(-1);
+          updateStartScrollOffset?.(null);
           handleDragEnd(key, reorderStrategy.value);
         }),
     [
