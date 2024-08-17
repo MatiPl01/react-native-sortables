@@ -8,7 +8,7 @@ import {
   type SortableGridRenderItem
 } from 'react-native-sortable';
 
-import { AnimatedText, GridCard, Section } from '@/components';
+import { AnimatedText, GridCard, Section, Stagger } from '@/components';
 import { flex, spacing } from '@/theme';
 import { formatCallbackParams, getItems } from '@/utils';
 
@@ -45,7 +45,7 @@ export default function CallbacksExample() {
   );
 
   return (
-    <>
+    <Stagger wrapperStye={index => (index === 0 ? flex.fill : {})}>
       <Section title='Callback output' fill>
         <AnimatedText style={flex.fill} text={text} multiline />
       </Section>
@@ -63,6 +63,6 @@ export default function CallbacksExample() {
           onOrderChange={onOrderChange}
         />
       </Section>
-    </>
+    </Stagger>
   );
 }
