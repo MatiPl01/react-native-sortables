@@ -12,7 +12,7 @@ import type { Animatable } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
 type UseItemPositionOptions = {
-  ignoreActive?: boolean;
+  ignoreTouched?: boolean;
   easing?: EasingFunction;
   duration?: number;
 };
@@ -22,7 +22,7 @@ export default function useItemPosition(
   {
     duration = 300,
     easing = Easing.inOut(Easing.ease),
-    ignoreActive = false
+    ignoreTouched = false
   }: UseItemPositionOptions = {}
 ): {
   x: SharedValue<null | number>;
@@ -57,12 +57,12 @@ export default function useItemPosition(
 
   useAnimatedReaction(
     () => ({
-      isActive: touchedItemKey.value === itemKey.value,
+      isTouched: touchedItemKey.value === itemKey.value,
       position:
         itemKey.value !== null ? itemPositions.value[itemKey.value] : null
     }),
-    ({ isActive, position }) => {
-      if (!position || (!ignoreActive && isActive)) {
+    ({ isTouched, position }) => {
+      if (!position || (!ignoreTouched && isTouched)) {
         return;
       }
       x.value =
@@ -70,7 +70,7 @@ export default function useItemPosition(
       y.value =
         y.value === null ? position.y : withTiming(position.y, animationConfig);
     },
-    [ignoreActive, animationConfig]
+    [ignoreTouched, animationConfig]
   );
 
   useAnimatedReaction(
@@ -79,12 +79,12 @@ export default function useItemPosition(
       position: touchedItemPosition.value
     }),
     ({ isActive, position }) => {
-      if (!ignoreActive && isActive && position) {
+      if (!ignoreTouched && isActive && position) {
         x.value = position.x;
         y.value = position.y;
       }
     },
-    [ignoreActive]
+    [ignoreTouched]
   );
 
   return { x, y };

@@ -11,13 +11,13 @@ import Animated, {
 import { useCommonValuesContext } from '../../providers';
 
 type ItemDecorationProps = {
-  itemKey: string;
+  isTouched: SharedValue<boolean>;
   pressProgress: SharedValue<number>;
   onLayout?: ViewProps['onLayout'];
 } & ViewProps;
 
 export default function ItemDecoration({
-  itemKey,
+  isTouched,
   pressProgress,
   ...rest
 }: ItemDecorationProps) {
@@ -27,12 +27,11 @@ export default function ItemDecoration({
     activeItemShadowOpacity,
     inactiveAnimationProgress,
     inactiveItemOpacity,
-    inactiveItemScale,
-    touchedItemKey
+    inactiveItemScale
   } = useCommonValuesContext();
 
   const resultingProgress = useDerivedValue(() =>
-    touchedItemKey.value === itemKey || pressProgress.value > 0
+    isTouched.value || pressProgress.value > 0
       ? pressProgress.value
       : -inactiveAnimationProgress.value
   );

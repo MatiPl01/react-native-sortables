@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Pressable } from 'react-native-gesture-handler';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import { SortableFlex, useDragEndHandler } from 'react-native-sortable';
+import Sortable, { useDragEndHandler } from 'react-native-sortable';
 
 import { Button, FlexCell, Group, Section, Stagger } from '@/components';
 import { colors, flex, radius, spacing } from '@/theme';
@@ -130,18 +129,20 @@ export default function DataChangeExample() {
             <Text style={styles.title}>Above SortableFlex</Text>
           </Group>
 
-          <SortableFlex
+          <Sortable.Flex
             dropIndicatorStyle={styles.dropIndicatorStyle}
             scrollableRef={scrollableRef}
             style={styles.sortableFlex}
             showDropIndicator
             onDragEnd={onDragEnd}>
             {data.map(item => (
-              <Pressable key={item} onPress={onRemoveItem.bind(null, item)}>
+              <Sortable.Pressable
+                key={item}
+                onPress={onRemoveItem.bind(null, item)}>
                 <FlexCell size='large'>{item}</FlexCell>
-              </Pressable>
+              </Sortable.Pressable>
             ))}
-          </SortableFlex>
+          </Sortable.Flex>
 
           <Group withMargin={false} bordered center>
             <Text style={styles.title}>Below SortableFlex</Text>

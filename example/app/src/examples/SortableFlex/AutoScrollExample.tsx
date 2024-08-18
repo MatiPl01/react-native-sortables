@@ -2,7 +2,7 @@ import { AnimatedFlashList, type FlashList } from '@shopify/flash-list';
 import { StyleSheet, Text } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import { SortableFlex } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
 
 import { FlexCell, Group, Section, TabView } from '@/components';
 import { colors, spacing } from '@/theme';
@@ -115,25 +115,25 @@ type CategoriesSectionProps = {
 
 function ManyCategories({ scrollableRef }: CategoriesSectionProps) {
   return (
-    <SortableFlex scrollableRef={scrollableRef} style={styles.sortableFlex}>
+    <Sortable.Flex scrollableRef={scrollableRef} style={styles.sortableFlex}>
       {MANY_CATEGORIES.map(item => (
         <FlexCell key={item} size='large'>
           {item}
         </FlexCell>
       ))}
-    </SortableFlex>
+    </Sortable.Flex>
   );
 }
 
 function FewCategories({ scrollableRef }: CategoriesSectionProps) {
   return (
-    <SortableFlex scrollableRef={scrollableRef} style={styles.sortableFlex}>
+    <Sortable.Flex scrollableRef={scrollableRef} style={styles.sortableFlex}>
       {FEW_CATEGORIES.map(item => (
         <FlexCell key={item} size='large'>
           {item}
         </FlexCell>
       ))}
-    </SortableFlex>
+    </Sortable.Flex>
   );
 }
 

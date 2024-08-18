@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import {
+  ItemContextProvider,
   useCommonValuesContext,
   useItemPanGesture,
   useItemPosition,
@@ -33,11 +34,12 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { canSwitchToAbsoluteLayout, overrideItemDimensions } =
+  const { canSwitchToAbsoluteLayout, overrideItemDimensions, touchedItemKey } =
     useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
   const viewRef = useAnimatedRef<Animated.View>();
+  const isTouched = useDerivedValue(() => touchedItemKey.value === key);
   const pressProgress = useSharedValue(0);
 
   const position = useItemPosition(key);
@@ -75,7 +77,7 @@ export default function DraggableView({
     <Animated.View ref={viewRef} {...viewProps} style={[style, animatedStyle]}>
       <GestureDetector gesture={gesture}>
         <ItemDecoration
-          itemKey={key}
+          isTouched={isTouched}
           pressProgress={pressProgress}
           // Keep onLayout the closest to the children to measure the real item size
           // (without paddings or other style changes made to the wrapper component)
@@ -85,7 +87,14 @@ export default function DraggableView({
               width: layout.width
             })
           }>
-          {children}
+          <ItemContextProvider
+            isTouched={isTouched}
+            itemKey={key}
+            position={position}
+            pressProgress={pressProgress}
+            zIndex={zIndex}>
+            {children}
+          </ItemContextProvider>
         </ItemDecoration>
       </GestureDetector>
     </Animated.View>

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { SortableFlex } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
 
 import { FlexCell } from '@/components';
 import { useItemOrderChange } from '@/hooks';
@@ -19,13 +19,13 @@ const SortableFlexCard: RouteCardComponent = props => {
 
   return (
     <RouteCard {...props}>
-      <SortableFlex enableSort={false} style={styles.container}>
+      <Sortable.Flex enableSort={false} style={styles.container}>
         {data.map(item => (
           <FlexCell active={item === ACTIVE_ITEM} key={item}>
             {item}
           </FlexCell>
         ))}
-      </SortableFlex>
+      </Sortable.Flex>
     </RouteCard>
   );
 };

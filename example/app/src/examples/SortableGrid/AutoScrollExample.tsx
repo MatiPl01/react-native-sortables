@@ -3,7 +3,7 @@ import { AnimatedFlashList } from '@shopify/flash-list';
 import { StyleSheet, Text } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import { SortableGrid } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
 
 import { GridCard, Group, Section, TabView } from '@/components';
 import { colors, spacing } from '@/theme';
@@ -116,7 +116,7 @@ type CardsSectionProps = {
 
 function ManyCards({ scrollableRef }: CardsSectionProps) {
   return (
-    <SortableGrid
+    <Sortable.Grid
       columnGap={spacing.sm}
       columns={3}
       data={MANY_ITEMS}
@@ -129,7 +129,7 @@ function ManyCards({ scrollableRef }: CardsSectionProps) {
 
 function FewCards({ scrollableRef }: CardsSectionProps) {
   return (
-    <SortableGrid
+    <Sortable.Grid
       columnGap={spacing.sm}
       columns={3}
       data={FEW_ITEMS}
