@@ -1,5 +1,7 @@
-import { type PropsWithChildren, useCallback } from 'react';
-import { type LayoutChangeEvent, StyleSheet, View } from 'react-native';
+import type { PropsWithChildren } from 'react';
+import { useCallback } from 'react';
+import type { LayoutChangeEvent, ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
@@ -7,24 +9,24 @@ import { EMPTY_OBJECT } from '../../../constants';
 import type { Dimensions } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import type { FlexDirection, FlexProps } from './types';
 import {
   areDimensionsCorrect,
   calculateLayout,
   getGroupSizes,
-  groupItems
+  groupItems,
+  isDimensionRestricted
 } from './utils';
 
 type FlexLayoutContextType = {
   stretch: boolean;
-  flexDirection: FlexDirection;
+  flexDirection: Required<ViewStyle['flexDirection']>;
   itemGroups: SharedValue<Array<Array<string>>>;
   keyToGroup: SharedValue<Record<string, number>>;
   crossAxisGroupSizes: SharedValue<Array<number>>;
   crossAxisGroupOffsets: SharedValue<Array<number>>;
 };
 
-type FlexLayoutProviderProps = PropsWithChildren<FlexProps>;
+type FlexLayoutProviderProps = PropsWithChildren<ViewStyle>;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
@@ -36,8 +38,10 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   flexDirection = 'row',
   flexWrap = 'nowrap',
   gap = 0,
+  height = 'auto',
   justifyContent = 'flex-start',
-  rowGap: rowGapProp
+  rowGap: rowGapProp,
+  width = '100%'
 }) => {
   const stretch = alignItems === 'stretch';
   const groupBy = flexDirection.startsWith('column') ? 'height' : 'width';
@@ -45,13 +49,16 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const rowGap = rowGapProp ?? gap;
 
   const {
-    containerHeight,
-    containerWidth,
     indexToKey,
     itemDimensions,
     itemPositions,
-    overrideItemDimensions
+    overrideItemDimensions,
+    targetContainerHeight,
+    targetContainerWidth
   } = useCommonValuesContext();
+
+  const measuredHeight = useSharedValue<null | number>(null);
+  const measuredWidth = useSharedValue<null | number>(null);
 
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
   const keyToGroup = useSharedValue<Record<string, number>>({});
@@ -61,15 +68,15 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   // ITEM GROUPS UPDATER
   useAnimatedReaction(
     () => ({
-      containerDimensions: {
-        height: containerHeight.value,
-        width: containerWidth.value
-      },
       dimensions: itemDimensions.value,
-      idxToKey: indexToKey.value
+      idxToKey: indexToKey.value,
+      measuredDimensions: {
+        height: measuredHeight.value,
+        width: measuredWidth.value
+      }
     }),
-    ({ containerDimensions, dimensions, idxToKey }) => {
-      if (!areDimensionsCorrect(containerDimensions)) {
+    ({ dimensions, idxToKey, measuredDimensions }) => {
+      if (!areDimensionsCorrect(measuredDimensions)) {
         return;
       }
 
@@ -79,7 +86,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         dimensions,
         groupBy === 'height' ? rowGap : columnGap,
         groupBy,
-        flexWrap === 'nowrap' ? Infinity : containerDimensions[groupBy]
+        flexWrap === 'nowrap' ? Infinity : measuredDimensions[groupBy]
       );
       if (!groups) return;
 
@@ -89,6 +96,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         dimensions,
         groupBy === 'height' ? 'width' : 'height'
       );
+
+      console.log({ dimensions, groups, sizes });
 
       itemGroups.value = groups;
       crossAxisGroupSizes.value = sizes;
@@ -102,26 +111,37 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       });
       keyToGroup.value = keyToGroupMapping;
     },
-    [groupBy, flexWrap, columnGap, rowGap]
+    [groupBy, flexWrap, columnGap, rowGap, width, height]
   );
 
   // ITEM POSITIONS UPDATER
   useAnimatedReaction(
     () => ({
-      containerDimensions: {
-        height: containerHeight.value,
-        width: containerWidth.value
-      },
       groups: itemGroups.value,
+      restrictedHeight:
+        groupBy === 'height' || isDimensionRestricted(height)
+          ? measuredHeight.value
+          : -1,
+      restrictedWidth:
+        groupBy === 'width' || isDimensionRestricted(width)
+          ? measuredWidth.value
+          : -1,
       sizes: crossAxisGroupSizes.value
     }),
-    ({ containerDimensions, groups, sizes }) => {
+    ({ groups, restrictedHeight, restrictedWidth, sizes }) => {
+      // console.log({ groups, restrictedHeight, restrictedWidth, sizes });
       if (
-        !areDimensionsCorrect(containerDimensions) ||
+        restrictedWidth === null ||
+        restrictedHeight === null ||
         !groups.length ||
         !sizes.length
       ) {
         itemPositions.value = EMPTY_OBJECT;
+        if (groupBy === 'width') {
+          targetContainerHeight.value = 0;
+        } else {
+          targetContainerWidth.value = 0;
+        }
         return;
       }
 
@@ -130,7 +150,10 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         groupBy,
         sizes,
         itemDimensions.value,
-        containerDimensions,
+        {
+          height: restrictedHeight,
+          width: restrictedWidth
+        },
         {
           alignContent,
           alignItems,
@@ -144,6 +167,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       if (result) {
         itemPositions.value = result.itemPositions;
         crossAxisGroupOffsets.value = result.crossAxisGroupOffsets;
+        targetContainerWidth.value = result.containerWidth;
+        targetContainerHeight.value = result.containerHeight;
       }
     },
     [
@@ -201,21 +226,20 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   );
 
   const measureContainer = useCallback(
-    ({
-      nativeEvent: {
-        layout: { height }
-      }
-    }: LayoutChangeEvent) => {
-      // TODO - improve (calculate height if it is not set)
-      containerHeight.value = height;
+    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
+      measuredHeight.value = layout.height;
+      measuredWidth.value = layout.width;
     },
-    [containerHeight]
+    [measuredHeight, measuredWidth]
   );
 
   return {
     children: (
       <>
-        <View style={styles.container} onLayout={measureContainer} />
+        <View
+          style={[styles.container, { backgroundColor: 'red', height, width }]}
+          onLayout={measureContainer}
+        />
         {children}
       </>
     ),

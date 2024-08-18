@@ -8,7 +8,7 @@ import {
 
 import { Button, GridCard, Group, Section, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
-import { getItems } from '@/utils';
+import { areSameArrays, getItems } from '@/utils';
 
 const AVAILABLE_DATA = getItems(18);
 const COLUMNS = 3;
@@ -62,14 +62,17 @@ export default function DataChangeExample() {
 
   const shuffleItems = useCallback(() => {
     setData(prevData => {
+      if (prevData.length < 2) return prevData;
       const shuffledData = [...prevData];
-      for (let i = shuffledData.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledData[i], shuffledData[j]] = [
-          shuffledData[j]!,
-          shuffledData[i]!
-        ];
-      }
+      do {
+        for (let i = shuffledData.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledData[i], shuffledData[j]] = [
+            shuffledData[j]!,
+            shuffledData[i]!
+          ];
+        }
+      } while (areSameArrays(prevData, shuffledData));
       return shuffledData;
     });
   }, []);

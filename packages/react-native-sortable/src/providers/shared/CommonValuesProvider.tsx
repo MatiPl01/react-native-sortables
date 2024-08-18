@@ -42,6 +42,7 @@ type CommonValuesContextType = {
   // DIMENSIONS
   containerWidth: SharedValue<null | number>;
   containerHeight: SharedValue<null | number>;
+  targetContainerWidth: SharedValue<null | number>;
   targetContainerHeight: SharedValue<null | number>;
   touchedItemDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
@@ -109,6 +110,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   // DIMENSIONS
   const containerWidth = useSharedValue<null | number>(null);
   const containerHeight = useSharedValue<null | number>(null);
+  const targetContainerWidth = useSharedValue<null | number>(null);
   const targetContainerHeight = useSharedValue<null | number>(null);
   const touchedItemDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
@@ -177,6 +179,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       snapOffsetX,
       snapOffsetY,
       targetContainerHeight,
+      targetContainerWidth,
       touchStartPosition,
       touchedItemDimensions,
       touchedItemKey,

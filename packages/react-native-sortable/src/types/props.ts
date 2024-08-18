@@ -3,7 +3,7 @@ import type { ViewProps, ViewStyle } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 
 import type { DropIndicatorComponentProps } from '../components';
-import type { AnimatableValues, Simplify } from './utils';
+import type { Animatable, AnimatableValues, Simplify } from './utils';
 
 /**
  * SHARED PROPS
@@ -76,12 +76,11 @@ export type ReorderStrategy = 'insert' | 'swap';
 export type SharedProps = Simplify<
   {
     enableHaptics?: boolean;
-  } & AnimatableValues<{
-    enableSort?: boolean;
-    reorderStrategy?: ReorderStrategy;
-    animateContainerHeight?: boolean;
-  }> &
-    Partial<ActiveItemDecorationSettings> &
+  } & {
+    enableSort?: Animatable<boolean>;
+    reorderStrategy?: Animatable<ReorderStrategy>;
+    animateContainerHeight?: Animatable<boolean>;
+  } & Partial<ActiveItemDecorationSettings> &
     Partial<ActiveItemSnapSettings> &
     Partial<AutoScrollSettings> &
     Partial<DropIndicatorSettings> &

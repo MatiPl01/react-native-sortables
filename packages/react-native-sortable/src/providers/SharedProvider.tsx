@@ -7,6 +7,7 @@ import DropIndicator from '../components/shared/DropIndicator';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
+  AnimatableValues,
   AutoScrollSettings,
   DropIndicatorSettings,
   PartialBy,
@@ -25,13 +26,15 @@ import { ContextProviderComposer } from './utils';
 type SharedProviderProps = PropsWithChildren<
   {
     itemKeys: Array<string>;
-    enableSort: boolean;
     enableHaptics: boolean;
-    reorderStrategy: ReorderStrategy;
-    animateContainerHeight: boolean;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
+    AnimatableValues<{
+      enableSort: boolean;
+      reorderStrategy: ReorderStrategy;
+      animateContainerHeight: boolean;
+    }> &
     DropIndicatorSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
     SortableCallbacks

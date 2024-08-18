@@ -58,7 +58,7 @@ export default function useItemPanGesture(
           // was not measured withing the specified interval and onLayout
           // was not called, we will try to measure it again after the item
           // is touched
-          if (containerHeight.value === -1) {
+          if (containerHeight.value === null) {
             tryMeasureContainerHeight();
           }
 

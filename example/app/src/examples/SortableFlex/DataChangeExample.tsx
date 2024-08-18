@@ -5,7 +5,7 @@ import { SortableFlex, useDragEndHandler } from 'react-native-sortable';
 
 import { Button, FlexCell, Group, Section, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
-import { getCategories } from '@/utils';
+import { areSameArrays, getCategories } from '@/utils';
 
 const AVAILABLE_DATA = getCategories(20);
 
@@ -60,14 +60,17 @@ export default function DataChangeExample() {
 
   const shuffleItems = useCallback(() => {
     setData(prevData => {
+      if (prevData.length < 2) return prevData;
       const shuffledData = [...prevData];
-      for (let i = shuffledData.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledData[i], shuffledData[j]] = [
-          shuffledData[j]!,
-          shuffledData[i]!
-        ];
-      }
+      do {
+        for (let i = shuffledData.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledData[i], shuffledData[j]] = [
+            shuffledData[j]!,
+            shuffledData[i]!
+          ];
+        }
+      } while (areSameArrays(prevData, shuffledData));
       return shuffledData;
     });
   }, []);
@@ -129,6 +132,7 @@ export default function DataChangeExample() {
           <SortableFlex
             scrollableRef={scrollableRef}
             style={styles.sortableFlex}
+            showDropIndicator
             onDragEnd={onDragEnd}>
             {data.map(item => (
               <Pressable key={item} onPress={onRemoveItem.bind(null, item)}>

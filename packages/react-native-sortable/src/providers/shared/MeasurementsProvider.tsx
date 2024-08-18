@@ -1,5 +1,6 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
   measure,
   useAnimatedReaction,
@@ -53,6 +54,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     containerWidth,
     itemDimensions,
     targetContainerHeight,
+    targetContainerWidth,
     touchedItemDimensions,
     touchedItemKey
   } = useCommonValuesContext();
@@ -76,6 +78,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     (key: string, dimensions: Dimensions) => {
       'worklet';
       const storedDimensions = itemDimensions.value[key];
+
+      console.log(key, dimensions);
 
       if (
         storedDimensions &&
@@ -183,12 +187,24 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   useAnimatedReaction(
     () => ({
       animated: animateContainerHeight.value,
-      target: targetContainerHeight.value
+      targetHeight: targetContainerHeight.value,
+      targetWidth: targetContainerWidth.value
     }),
-    ({ animated, target }) => {
-      if (target !== null) {
-        containerHeight.value = animated ? withTiming(target) : target;
-      }
+    ({ animated, targetHeight, targetWidth }) => {
+      const update = (
+        animatedDimension: SharedValue<null | number>,
+        target: null | number
+      ) => {
+        if (target !== null) {
+          animatedDimension.value =
+            !animated || animatedDimension.value === null
+              ? targetHeight
+              : withTiming(target);
+        }
+      };
+
+      update(containerHeight, targetHeight);
+      update(containerWidth, targetWidth);
     }
   );
 
