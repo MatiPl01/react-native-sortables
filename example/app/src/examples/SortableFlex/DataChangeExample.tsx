@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import { SortableFlex, useDragEndHandler } from 'react-native-sortable';
 
 import { Button, FlexCell, Group, Section, Stagger } from '@/components';
-import { colors, flex, spacing } from '@/theme';
+import { colors, flex, radius, spacing } from '@/theme';
 import { areSameArrays, getCategories } from '@/utils';
 
 const AVAILABLE_DATA = getCategories(20);
@@ -130,6 +131,7 @@ export default function DataChangeExample() {
           </Group>
 
           <SortableFlex
+            dropIndicatorStyle={styles.dropIndicatorStyle}
             scrollableRef={scrollableRef}
             style={styles.sortableFlex}
             showDropIndicator
@@ -151,6 +153,9 @@ export default function DataChangeExample() {
 }
 
 const styles = StyleSheet.create({
+  dropIndicatorStyle: {
+    borderRadius: radius.full
+  },
   row: {
     columnGap: spacing.sm,
     flexDirection: 'row',

@@ -151,6 +151,7 @@ export default function DataChangeExample() {
             renderItem={renderItem}
             rowGap={spacing.xs}
             scrollableRef={scrollableRef}
+            showDropIndicator
             onDragEnd={({ data: newData }) => setData(newData)}
           />
 

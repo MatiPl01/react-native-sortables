@@ -97,8 +97,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         groupBy === 'height' ? 'width' : 'height'
       );
 
-      console.log({ dimensions, groups, sizes });
-
       itemGroups.value = groups;
       crossAxisGroupSizes.value = sizes;
 
@@ -129,7 +127,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       sizes: crossAxisGroupSizes.value
     }),
     ({ groups, restrictedHeight, restrictedWidth, sizes }) => {
-      // console.log({ groups, restrictedHeight, restrictedWidth, sizes });
       if (
         restrictedWidth === null ||
         restrictedHeight === null ||
@@ -237,7 +234,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     children: (
       <>
         <View
-          style={[styles.container, { backgroundColor: 'red', height, width }]}
+          style={[styles.container, { height, width }]}
           onLayout={measureContainer}
         />
         {children}

@@ -79,8 +79,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       'worklet';
       const storedDimensions = itemDimensions.value[key];
 
-      console.log(key, dimensions);
-
       if (
         storedDimensions &&
         !areDimensionsDifferent(storedDimensions, dimensions, 0.1)
@@ -202,6 +200,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
               : withTiming(target);
         }
       };
+
+      console.log('update', targetHeight, targetWidth);
 
       update(containerHeight, targetHeight);
       update(containerWidth, targetWidth);

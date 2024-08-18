@@ -58,12 +58,14 @@ export default function DraggableView({
 
     const x = position.x.value;
     const y = position.y.value;
-    console.log('style', canSwitchToAbsoluteLayout.value, x, y);
+
+    if (x === null || y === null) {
+      return RELATIVE_STYLE;
+    }
 
     return {
-      opacity: x === null || y === null ? 0 : 1,
       position: 'absolute',
-      transform: [{ translateX: x ?? 0 }, { translateY: y ?? 0 }],
+      transform: [{ translateX: x }, { translateY: y }],
       zIndex: zIndex.value,
       ...overriddenDimensions.value
     };
