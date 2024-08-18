@@ -1,4 +1,3 @@
-import { OFFSET_EPS } from '../../../constants';
 import type { Dimension, Dimensions, Vector } from '../../../types';
 import { sum } from '../../../utils';
 import type {
@@ -25,21 +24,22 @@ export const groupItems = (
   let currentGroup: Array<string> = [];
   let currentDimension = 0;
 
+  const getCurrentGap = () => (currentGroup.length > 0 ? itemsGap : 0);
+
   for (const key of indexToKey) {
     const itemDimensions = dimensions[key];
     if (!itemDimensions) {
       return null;
     }
     const itemDimension = itemDimensions[limitedDimension];
-    const gap = currentGroup.length > 0 ? itemsGap : 0;
-    if (currentDimension + itemDimension - limit > OFFSET_EPS) {
+    if (currentDimension + itemDimension + getCurrentGap() > limit) {
       groups.push(currentGroup);
       currentGroup = [];
       currentDimension = 0;
     }
 
     currentGroup.push(key);
-    currentDimension += itemDimension + gap;
+    currentDimension += itemDimension + getCurrentGap();
   }
 
   if (currentGroup.length > 0) {
