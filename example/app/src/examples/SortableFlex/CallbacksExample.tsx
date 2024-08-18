@@ -1,11 +1,10 @@
 import { useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import {
+import Sortable, {
   type DragEndCallback,
   type DragStartCallback,
-  type OrderChangeCallback,
-  SortableFlex
+  type OrderChangeCallback
 } from 'react-native-sortable';
 
 import { AnimatedText, FlexCell, Section, Stagger } from '@/components';
@@ -46,7 +45,7 @@ export default function CallbacksExample() {
       <Section
         description='Drag items around to see callbacks output'
         title='SortableFlex'>
-        <SortableFlex
+        <Sortable.Flex
           style={styles.sortableFlex}
           onDragEnd={onDragEnd}
           onDragStart={onDragStart}
@@ -56,7 +55,7 @@ export default function CallbacksExample() {
               {item}
             </FlexCell>
           ))}
-        </SortableFlex>
+        </Sortable.Flex>
       </Section>
     </Stagger>
   );

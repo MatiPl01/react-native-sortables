@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
-import {
+import Sortable, {
   type DragEndCallback,
   type DragStartCallback,
   type OrderChangeCallback,
-  SortableGrid,
   type SortableGridRenderItem
 } from 'react-native-sortable';
 
@@ -52,7 +51,7 @@ export default function CallbacksExample() {
       <Section
         description='Drag items around to see callbacks output'
         title='SortableGrid'>
-        <SortableGrid
+        <Sortable.Grid
           columnGap={spacing.xs}
           columns={COLUMNS}
           data={DATA}

@@ -16,6 +16,7 @@ import type {
   ReorderStrategy,
   Vector
 } from '../../types';
+import { DragActivationState } from '../../types';
 import { areArraysDifferent } from '../../utils';
 import { createProvider } from '../utils';
 
@@ -48,6 +49,7 @@ type CommonValuesContextType = {
   // DRAG STATE
   touchedItemKey: SharedValue<null | string>;
   activeItemKey: SharedValue<null | string>;
+  activationState: SharedValue<DragActivationState>;
   activationProgress: SharedValue<number>;
   inactiveAnimationProgress: SharedValue<number>;
   activeItemTranslation: SharedValue<Vector | null>;
@@ -112,6 +114,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   // DRAG STATE
   const touchedItemKey = useSharedValue<null | string>(null);
   const activeItemKey = useSharedValue<null | string>(null);
+  const activationState = useSharedValue(DragActivationState.INACTIVE);
   const activationProgress = useSharedValue(0);
   const inactiveAnimationProgress = useSharedValue(0);
   const activeItemTranslation = useSharedValue<Vector | null>(null);
@@ -144,6 +147,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   return {
     value: {
       activationProgress,
+      activationState,
       activeItemDropped,
       activeItemKey,
       activeItemOpacity,

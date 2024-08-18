@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { ScrollView } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortable';
-import { SortableGrid, SortableLayer } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
 
 import { GridCard, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';
@@ -19,9 +19,9 @@ export default function DropIndicatorExample() {
 
   return (
     <ScrollView>
-      <Stagger ParentComponent={SortableLayer}>
+      <Stagger ParentComponent={Sortable.Layer}>
         <Section title='Without drop indicator'>
-          <SortableGrid
+          <Sortable.Grid
             columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
@@ -31,7 +31,7 @@ export default function DropIndicatorExample() {
         </Section>
 
         <Section title='With default drop indicator'>
-          <SortableGrid
+          <Sortable.Grid
             columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
@@ -44,7 +44,7 @@ export default function DropIndicatorExample() {
         <Section
           description='Looks better without inactive item opacity, so inactiveItemOpacity is set to 1 in this example'
           title='With custom drop indicator component'>
-          <SortableGrid
+          <Sortable.Grid
             columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
