@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import { SortableFlex, SortableLayer } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
 
 import { FlexCell, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';
@@ -11,21 +11,21 @@ const DATA = getCategories(9);
 export default function DropIndicatorExample() {
   return (
     <ScrollView>
-      <Stagger ParentComponent={SortableLayer}>
+      <Stagger ParentComponent={Sortable.Layer}>
         <Section title='Without drop indicator'>
-          <SortableFlex style={styles.sortableFlex}>
+          <Sortable.Flex style={styles.sortableFlex}>
             {DATA.map(item => (
               <FlexCell key={item} size='large'>
                 {item}
               </FlexCell>
             ))}
-          </SortableFlex>
+          </Sortable.Flex>
         </Section>
 
         <Section
           description='With custom style that changes border radius of the default drop indicator'
           title='Default drop indicator'>
-          <SortableFlex
+          <Sortable.Flex
             dropIndicatorStyle={styles.dropIndicatorStyle}
             style={styles.sortableFlex}
             showDropIndicator>
@@ -34,13 +34,13 @@ export default function DropIndicatorExample() {
                 {item}
               </FlexCell>
             ))}
-          </SortableFlex>
+          </Sortable.Flex>
         </Section>
 
         <Section
           description='Looks better without inactive item opacity, so inactiveItemOpacity is set to 1 in this example'
           title='Custom drop indicator'>
-          <SortableFlex
+          <Sortable.Flex
             DropIndicatorComponent={CustomDropIndicator}
             dropIndicatorStyle={styles.dropIndicatorStyle}
             inactiveItemOpacity={1}
@@ -51,7 +51,7 @@ export default function DropIndicatorExample() {
                 {item}
               </FlexCell>
             ))}
-          </SortableFlex>
+          </Sortable.Flex>
         </Section>
       </Stagger>
     </ScrollView>

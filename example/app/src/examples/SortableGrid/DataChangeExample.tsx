@@ -1,10 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import {
-  SortableGrid,
-  type SortableGridRenderItem
-} from 'react-native-sortable';
+import Sortable, { type SortableGridRenderItem } from 'react-native-sortable';
 
 import { Button, GridCard, Group, Section, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
@@ -141,7 +138,7 @@ export default function DataChangeExample() {
             <Text style={styles.title}>Above SortableGrid</Text>
           </Group>
 
-          <SortableGrid
+          <Sortable.Grid
             columnGap={spacing.sm}
             columns={COLUMNS}
             data={data}

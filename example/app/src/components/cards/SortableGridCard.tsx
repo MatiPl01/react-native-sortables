@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { SortableGridRenderItem } from 'react-native-sortable';
-import { SortableGrid } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
 
 import { GridCard } from '@/components';
 import { useItemOrderChange } from '@/hooks';
@@ -26,7 +26,7 @@ const SortableGridCard: RouteCardComponent = props => {
 
   return (
     <RouteCard {...props}>
-      <SortableGrid
+      <Sortable.Grid
         columnGap={spacing.xxs}
         columns={COLUMNS}
         data={data}

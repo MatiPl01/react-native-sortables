@@ -1,7 +1,8 @@
 /* eslint-disable import/no-unused-modules */
 
+import { SortableFlex, SortableGrid, SortableLayer } from './components';
+
 export type { DropIndicatorComponentProps } from './components';
-export { SortableFlex, SortableGrid, SortableLayer } from './components';
 export { useDragEndHandler } from './hooks';
 export type {
   DragEndCallback,
@@ -17,3 +18,11 @@ export type {
   SortableGridProps,
   SortableGridRenderItem
 } from './types';
+
+const Sortable = {
+  Flex: SortableFlex,
+  Grid: SortableGrid,
+  Layer: SortableLayer
+};
+
+export default Sortable;
