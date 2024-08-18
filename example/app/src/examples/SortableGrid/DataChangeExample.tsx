@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable, { type SortableGridRenderItem } from 'react-native-sortable';
 
@@ -81,9 +81,9 @@ export default function DataChangeExample() {
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
-      <Pressable onPress={onRemoveItem.bind(null, item)}>
+      <Sortable.Pressable onPress={onRemoveItem.bind(null, item)}>
         <GridCard>{item}</GridCard>
-      </Pressable>
+      </Sortable.Pressable>
     ),
     [onRemoveItem]
   );

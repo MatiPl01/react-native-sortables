@@ -89,6 +89,7 @@ export default function DraggableView({
           }>
           <ItemContextProvider
             isTouched={isTouched}
+            itemKey={key}
             position={position}
             pressProgress={pressProgress}
             zIndex={zIndex}>

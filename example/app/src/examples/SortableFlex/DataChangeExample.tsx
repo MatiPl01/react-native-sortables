@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable, { useDragEndHandler } from 'react-native-sortable';
 
@@ -131,9 +131,11 @@ export default function DataChangeExample() {
             style={styles.sortableFlex}
             onDragEnd={onDragEnd}>
             {data.map(item => (
-              <Pressable key={item} onPress={onRemoveItem.bind(null, item)}>
+              <Sortable.Pressable
+                key={item}
+                onPress={onRemoveItem.bind(null, item)}>
                 <FlexCell size='large'>{item}</FlexCell>
-              </Pressable>
+              </Sortable.Pressable>
             ))}
           </Sortable.Flex>
 
