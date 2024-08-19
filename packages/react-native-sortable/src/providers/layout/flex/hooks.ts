@@ -1,112 +1,112 @@
 import type { Coordinate, Dimension } from '../../../types';
-import { reorderItems } from '../../../utils';
 import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
+
+const SWAP_OFFSET = 10;
 
 export function useFlexOrderUpdater(): void {
   const { indexToKey, itemDimensions, itemPositions, keyToIndex } =
     useCommonValuesContext();
-  const { crossAxisGroupOffsets, flexDirection, itemGroups, keyToGroup } =
-    useFlexLayoutContext();
+  const {
+    crossAxisGroupOffsets,
+    crossAxisGroupSizes,
+    flexDirection,
+    itemGroups,
+    keyToGroup
+  } = useFlexLayoutContext();
 
-  let mainCoordinate: Coordinate = 'x';
-  let crossCoordinate: Coordinate = 'y';
-  let mainDimension: Dimension = 'width';
-  let crossDimension: Dimension = 'height';
+  let crossCoordinate: Coordinate,
+    crossDimension: Dimension,
+    mainCoordinate: Coordinate,
+    mainDimension: Dimension;
 
   if (flexDirection.startsWith('column')) {
     mainCoordinate = 'y';
     crossCoordinate = 'x';
     mainDimension = 'height';
     crossDimension = 'width';
+  } else {
+    mainCoordinate = 'x';
+    crossCoordinate = 'y';
+    mainDimension = 'width';
+    crossDimension = 'height';
   }
 
   useOrderUpdater(
-    ({ activeIndex, activeKey, centerPosition, position, strategy }) => {
+    ({ activeIndex, activeKey, centerPosition, strategy }) => {
       'worklet';
-      let groupIndex = keyToGroup.value[activeKey];
-      if (groupIndex === undefined) {
+
+      const activeGroupIndex = keyToGroup.value[activeKey];
+      if (activeGroupIndex === undefined) {
         return;
       }
 
-      // Select the group in which the active item is currently located
-      let offsetBefore = crossAxisGroupOffsets.value[groupIndex];
-      while (
-        offsetBefore !== undefined &&
-        groupIndex >= 0 &&
-        centerPosition[crossCoordinate] < offsetBefore
-      ) {
-        groupIndex -= 1;
-        offsetBefore = crossAxisGroupOffsets.value[groupIndex];
-      }
+      /**
+       * SELECTING THE NEAREST GROUP
+       */
 
-      let offsetAfter = crossAxisGroupOffsets.value[groupIndex + 1];
-      while (
-        offsetAfter !== undefined &&
-        groupIndex < itemGroups.value.length &&
-        centerPosition[crossCoordinate] > offsetAfter
-      ) {
-        groupIndex += 1;
-        offsetAfter = crossAxisGroupOffsets.value[groupIndex + 1];
-      }
+      let selectedGroupIndex = activeGroupIndex;
 
-      // Check if the active item center is overlapping with another item
-      // within the same group
-      let overlappingItemKey: string | undefined;
-      const group = itemGroups.value[groupIndex];
-      if (!group) {
-        return;
-      }
-      for (const key of group) {
-        if (key === activeKey) {
-          continue;
+      // Check if the active item should be moved to the previous group
+      while (selectedGroupIndex > 0) {
+        const currentGroupOffset =
+          crossAxisGroupOffsets.value[selectedGroupIndex];
+        const prevGroupSize = crossAxisGroupSizes.value[selectedGroupIndex - 1];
+        const prevGroupOffset =
+          crossAxisGroupOffsets.value[selectedGroupIndex - 1];
+
+        if (
+          currentGroupOffset === undefined ||
+          prevGroupSize === undefined ||
+          prevGroupOffset === undefined
+        ) {
+          break;
         }
 
-        const otherDimensions = itemDimensions.value[key];
-        if (!otherDimensions) {
-          continue;
-        }
-        const otherPosition = itemPositions.value[key];
-        if (!otherPosition) {
-          continue;
+        const swapOffset = Math.max(
+          currentGroupOffset - SWAP_OFFSET,
+          prevGroupOffset + prevGroupSize / 2
+        );
+
+        if (centerPosition[crossCoordinate] >= swapOffset) {
+          break;
         }
 
-        // Item before the active item in the group
-        if (otherPosition[mainCoordinate] < position[mainCoordinate]) {
-          const otherEnd =
-            otherPosition[mainCoordinate] + otherDimensions[mainDimension];
-          if (otherEnd > centerPosition[mainCoordinate]) {
-            overlappingItemKey = key;
-            break;
-          }
-        }
-
-        // Item after the active item in the group
-        if (otherPosition[mainCoordinate] > position[mainCoordinate]) {
-          const otherStart = otherPosition[mainCoordinate];
-          if (otherStart < centerPosition[mainCoordinate]) {
-            overlappingItemKey = key;
-            break;
-          }
-        }
+        selectedGroupIndex--;
       }
 
-      if (overlappingItemKey === undefined) {
-        return;
-      }
-      const overlappingIndex = keyToIndex.value[overlappingItemKey];
-      if (overlappingIndex === undefined) {
-        return;
+      // Check if the active item should be moved to the next group
+      while (selectedGroupIndex < itemGroups.value.length - 1) {
+        const currentGroupOffset =
+          crossAxisGroupOffsets.value[selectedGroupIndex];
+        const currentGroupSize = crossAxisGroupSizes.value[selectedGroupIndex];
+        const nextGroupSize = crossAxisGroupSizes.value[selectedGroupIndex + 1];
+        const nextGroupOffset =
+          crossAxisGroupOffsets.value[selectedGroupIndex + 1];
+
+        if (
+          currentGroupOffset === undefined ||
+          currentGroupSize === undefined ||
+          nextGroupSize === undefined ||
+          nextGroupOffset === undefined
+        ) {
+          break;
+        }
+
+        const swapOffset = Math.min(
+          currentGroupOffset + currentGroupSize / 2 + SWAP_OFFSET,
+          nextGroupOffset + nextGroupSize / 2
+        );
+
+        if (centerPosition[crossCoordinate] <= swapOffset) {
+          break;
+        }
+
+        selectedGroupIndex++;
       }
 
-      // Return the new order of items
-      return reorderItems(
-        indexToKey.value,
-        activeIndex,
-        overlappingIndex,
-        strategy
-      );
+      console.log('selectedGroupIndex', selectedGroupIndex);
     },
-    [mainCoordinate, crossCoordinate, mainDimension, crossDimension]
+    [crossCoordinate]
   );
 }
