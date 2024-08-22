@@ -3,7 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { useAnimatableValue } from '../../hooks';
-import type { Animatable, Vector } from '../../types';
+import type { Animatable, Maybe, Vector } from '../../types';
+import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
 
 type DebugLineProps = {
@@ -12,20 +13,20 @@ type DebugLineProps = {
   style?: ViewStyle['borderStyle'];
 } & (
   | {
-      from: Animatable<Vector>;
-      to: Animatable<Vector>;
+      from: Animatable<Maybe<Vector>>;
+      to: Animatable<Maybe<Vector>>;
       x?: never;
       y?: never;
     }
   | {
-      x: Animatable<number>;
+      x: Animatable<Maybe<number>>;
       y?: never;
       from?: never;
       to?: never;
     }
   | {
       x?: never;
-      y: Animatable<number>;
+      y: Animatable<Maybe<number>>;
       from?: never;
       to?: never;
     }
@@ -65,19 +66,18 @@ export default function DebugLine({
       angle = Math.atan2(to.y - from.y, to.x - from.x);
       tY = from.y;
       tX = from.x;
-    } else if (x !== undefined) {
+    } else if (isPresent(x)) {
       length = 3 * screenDiagonal;
       angle = Math.PI / 2;
       tY = -screenDiagonal;
       tX = x;
-    } else if (y !== undefined) {
+    } else if (isPresent(y)) {
       length = 3 * screenDiagonal;
       tY = y;
       tX = -screenDiagonal;
     }
 
     return {
-      height: thickness,
       transform: [
         { translateX: tX },
         { translateY: tY },
@@ -85,7 +85,7 @@ export default function DebugLine({
       ],
       width: length
     };
-  }, [thickness, screenDiagonal]);
+  }, [screenDiagonal]);
 
   return (
     // A tricky way to create a dashed/dotted line (render border on both sides and
@@ -93,7 +93,12 @@ export default function DebugLine({
     <Animated.View
       style={[
         styles.container,
-        { opacity, transformOrigin: '0 0' },
+        {
+          height: thickness,
+          marginTop: -thickness / 2,
+          opacity,
+          transformOrigin: '0 0'
+        },
         animatedStyle
       ]}>
       <View

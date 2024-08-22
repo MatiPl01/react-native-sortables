@@ -3,43 +3,48 @@ import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { useAnimatableValue } from '../../hooks';
-import type { Animatable, Vector } from '../../types';
+import type { Animatable, Maybe, Vector } from '../../types';
+import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
 
 type DebugRectProps = {
   backgroundOpacity?: number;
 } & (
   | {
-      from: Animatable<Vector>;
-      to: Animatable<Vector>;
+      from: Animatable<Maybe<Vector>>;
+      to: Animatable<Maybe<Vector>>;
       x?: never;
       y?: never;
       width?: never;
       height?: never;
+      positionOrigin?: never;
     }
   | {
-      x: Animatable<number>;
-      y: Animatable<number>;
+      x: Animatable<Maybe<number>>;
+      y: Animatable<Maybe<number>>;
       from?: never;
       to?: never;
-      width: Animatable<number>;
-      height: Animatable<number>;
+      width: Animatable<Maybe<number>>;
+      height: Animatable<Maybe<number>>;
+      positionOrigin?: `${'left' | 'right'} ${'bottom' | 'top'}`;
     }
   | {
-      x: Animatable<number>;
+      x: Animatable<Maybe<number>>;
       y?: never;
       from?: never;
       to?: never;
-      width: Animatable<number>;
+      width: Animatable<Maybe<number>>;
       height?: never;
+      positionOrigin?: `${'left' | 'right'}`;
     }
   | {
       x?: never;
-      y: Animatable<number>;
+      y: Animatable<Maybe<number>>;
       from?: never;
       to?: never;
       width?: never;
-      height: Animatable<number>;
+      height: Animatable<Maybe<number>>;
+      positionOrigin?: `${'bottom' | 'top'}`;
     }
 ) &
   Pick<
@@ -55,6 +60,7 @@ export default function DebugRect({
   borderWidth = 2,
   from: from_,
   height: _height,
+  positionOrigin,
   to: to_,
   width: _width,
   x: x_,
@@ -75,8 +81,8 @@ export default function DebugRect({
     const x = xValue.value;
     const y = yValue.value;
 
-    let width = widthValue.value;
-    let height = heightValue.value;
+    let width = widthValue.value ?? 0;
+    let height = heightValue.value ?? 0;
     let tX = 0,
       tY = 0;
 
@@ -85,22 +91,32 @@ export default function DebugRect({
       tY = Math.min(from.y, to.y);
       width = Math.abs(to.x - from.x);
       height = Math.abs(to.y - from.y);
-    } else if (x !== undefined && y !== undefined) {
+    } else if (isPresent(x) && isPresent(y)) {
       tX = x;
       tY = y;
-    } else if (x !== undefined) {
+    } else if (isPresent(x)) {
       tX = x;
       tY = -screenDiagonal;
       height = 3 * screenDiagonal;
-    } else if (y !== undefined) {
+    } else if (isPresent(y)) {
       tX = -screenDiagonal;
       tY = y;
       width = 3 * screenDiagonal;
     }
 
+    if (positionOrigin) {
+      const origins = positionOrigin.split(' ');
+      if (origins.includes('right')) {
+        tX -= width;
+      }
+      if (origins.includes('bottom')) {
+        tY -= height;
+      }
+    }
+
     return {
       height,
-      transform: [{ translateX: x ?? tX }, { translateY: y ?? tY }],
+      transform: [{ translateX: tX }, { translateY: tY }],
       width
     };
   }, []);
@@ -109,12 +125,7 @@ export default function DebugRect({
     <Animated.View
       style={[
         styles.container,
-        {
-          borderColor,
-          borderStyle,
-          borderWidth,
-          transformOrigin: '0 0'
-        },
+        { borderColor, borderStyle, borderWidth },
         animatedStyle
       ]}>
       <View
