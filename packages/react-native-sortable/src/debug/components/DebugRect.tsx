@@ -63,7 +63,7 @@ export default function DebugRect({
   height: _height,
   positionOrigin,
   to: to_,
-  visible: _visible,
+  visible: _visible = true,
   width: _width,
   x: x_,
   y: y_

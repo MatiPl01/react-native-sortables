@@ -1,4 +1,3 @@
-import { StyleSheet, View } from 'react-native';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { DebugRect } from '../../debug';
@@ -50,20 +49,13 @@ export default function GridLayoutDebugView({
   const rowsCount = Math.ceil(itemsCount / columns);
 
   return (
-    <View style={styles.container}>
+    <>
       {repeat(rowsCount - 1, (index: number) => (
         <RowGap index={index} key={index} />
       ))}
       {repeat(columns - 1, (index: number) => (
         <ColumnGap index={index} key={index} />
       ))}
-    </View>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    pointerEvents: 'none'
-  }
-});
