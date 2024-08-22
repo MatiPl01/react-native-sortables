@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { useAnimatableValue } from '../../hooks';
 import type { Animatable, Vector } from '../../types';
+import { useScreenDiagonal } from '../hooks';
 
 type DebugLineProps = {
   color?: ViewStyle['borderColor'];
@@ -42,11 +42,7 @@ export default function DebugLine({
   x: x_,
   y: y_
 }: DebugLineProps) {
-  const { height, width } = Dimensions.get('window');
-  const screenDiagonal = useMemo(
-    () => Math.sqrt(width ** 2 + height ** 2),
-    [width, height]
-  );
+  const screenDiagonal = useScreenDiagonal();
 
   const fromValue = useAnimatableValue(from_);
   const toValue = useAnimatableValue(to_);
@@ -76,7 +72,6 @@ export default function DebugLine({
       tX = x;
     } else if (y !== undefined) {
       length = 3 * screenDiagonal;
-      angle = 0;
       tY = y;
       tX = -screenDiagonal;
     }
