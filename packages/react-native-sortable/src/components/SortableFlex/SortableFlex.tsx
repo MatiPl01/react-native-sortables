@@ -18,6 +18,7 @@ import {
   validateChildren
 } from '../../utils';
 import { DraggableView } from '../shared';
+import FlexLayoutDebugView from './FlexLayoutDebugView';
 
 function SortableFlex(props: SortableFlexProps) {
   const { rest: viewProps, sharedProps } = getPropsWithDefaults(
@@ -40,6 +41,8 @@ function SortableFlex(props: SortableFlexProps) {
           childrenArray={childrenArray}
           viewProps={viewProps}
         />
+        {/* TODO: Make this configurable (add a way to toggle debug mode) */}
+        <FlexLayoutDebugView itemsCount={childrenArray.length} />
       </FlexLayoutProvider>
     </SharedProvider>
   );

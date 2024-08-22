@@ -9,6 +9,7 @@ import { useScreenDiagonal } from '../hooks';
 
 type DebugRectProps = {
   backgroundOpacity?: number;
+  visible?: Animatable<boolean>;
 } & (
   | {
       from: Animatable<Maybe<Vector>>;
@@ -62,12 +63,14 @@ export default function DebugRect({
   height: _height,
   positionOrigin,
   to: to_,
+  visible: _visible,
   width: _width,
   x: x_,
   y: y_
 }: DebugRectProps) {
   const screenDiagonal = useScreenDiagonal();
 
+  const visibleValue = useAnimatableValue(_visible);
   const fromValue = useAnimatableValue(from_);
   const toValue = useAnimatableValue(to_);
   const xValue = useAnimatableValue(x_);
@@ -76,6 +79,7 @@ export default function DebugRect({
   const heightValue = useAnimatableValue(_height);
 
   const animatedStyle = useAnimatedStyle(() => {
+    const visible = visibleValue.value;
     const from = fromValue.value;
     const to = toValue.value;
     const x = xValue.value;
@@ -115,6 +119,7 @@ export default function DebugRect({
     }
 
     return {
+      display: visible ? 'flex' : 'none',
       height,
       transform: [{ translateX: tX }, { translateY: tY }],
       width

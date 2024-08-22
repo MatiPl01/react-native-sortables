@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { DebugRect } from '../../debug';
-import { useGridLayoutContext } from '../../providers/layout/grid/GridLayoutProvider';
+import { useGridLayoutContext } from '../../providers';
 import { repeat } from '../../utils';
 
 const COLORS = {
@@ -19,7 +19,7 @@ type GapProps = {
 function RowGap({ index }: GapProps) {
   const { rowGap, rowOffsets } = useGridLayoutContext();
 
-  const y = useDerivedValue(() => rowOffsets.value[index]);
+  const y = useDerivedValue(() => rowOffsets.value[index + 1]);
 
   return (
     <DebugRect {...COLORS.gap} height={rowGap} positionOrigin='bottom' y={y} />
@@ -30,7 +30,7 @@ function ColumnGap({ index }: GapProps) {
   const { columnGap, columnWidth } = useGridLayoutContext();
 
   const x = useDerivedValue(
-    () => (columnWidth.value + columnGap.value) * index
+    () => (columnWidth.value + columnGap.value) * (index + 1)
   );
 
   return (
@@ -51,10 +51,10 @@ export default function GridLayoutDebugView({
 
   return (
     <View style={styles.container}>
-      {repeat(rowsCount + 1, (index: number) => (
+      {repeat(rowsCount - 1, (index: number) => (
         <RowGap index={index} key={index} />
       ))}
-      {repeat(columns + 1, (index: number) => (
+      {repeat(columns - 1, (index: number) => (
         <ColumnGap index={index} key={index} />
       ))}
     </View>

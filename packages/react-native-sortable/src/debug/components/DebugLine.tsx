@@ -8,6 +8,7 @@ import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
 
 type DebugLineProps = {
+  visible?: Animatable<boolean>;
   color?: ViewStyle['borderColor'];
   thickness?: number;
   style?: ViewStyle['borderStyle'];
@@ -40,17 +41,20 @@ export default function DebugLine({
   style = 'dashed',
   thickness = 3,
   to: to_,
+  visible: visible_,
   x: x_,
   y: y_
 }: DebugLineProps) {
   const screenDiagonal = useScreenDiagonal();
 
+  const visibleValue = useAnimatableValue(visible_);
   const fromValue = useAnimatableValue(from_);
   const toValue = useAnimatableValue(to_);
   const xValue = useAnimatableValue(x_);
   const yValue = useAnimatableValue(y_);
 
   const animatedStyle = useAnimatedStyle(() => {
+    const visible = visibleValue.value;
     const from = fromValue.value;
     const to = toValue.value;
     const x = xValue.value;
@@ -78,6 +82,7 @@ export default function DebugLine({
     }
 
     return {
+      display: visible ? 'flex' : 'none',
       transform: [
         { translateX: tX },
         { translateY: tY },

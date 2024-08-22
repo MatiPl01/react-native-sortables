@@ -4,6 +4,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
+import { useAnimatableValue } from '../../../hooks';
 import type { Dimensions } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
@@ -22,6 +23,8 @@ type FlexLayoutContextType = {
   keyToGroup: SharedValue<Record<string, number>>;
   crossAxisGroupSizes: SharedValue<Array<number>>;
   crossAxisGroupOffsets: SharedValue<Array<number>>;
+  rowGap: SharedValue<number>;
+  columnGap: SharedValue<number>;
 };
 
 type FlexLayoutProviderProps = PropsWithChildren<FlexProps>;
@@ -32,17 +35,17 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   alignContent = 'flex-start',
   alignItems = 'stretch',
   children,
-  columnGap: columnGapProp,
+  columnGap: columnGap_,
   flexDirection = 'row',
   flexWrap = 'nowrap',
   gap = 0,
   justifyContent = 'flex-start',
-  rowGap: rowGapProp
+  rowGap: rowGap_
 }) => {
   const stretch = alignItems === 'stretch';
   const groupBy = flexDirection.startsWith('column') ? 'height' : 'width';
-  const columnGap = columnGapProp ?? gap;
-  const rowGap = rowGapProp ?? gap;
+  const columnGap = useAnimatableValue(columnGap_ ?? gap);
+  const rowGap = useAnimatableValue(rowGap_ ?? gap);
 
   const {
     containerHeight,
@@ -66,9 +69,10 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         width: containerWidth.value
       },
       dimensions: itemDimensions.value,
+      groupGap: groupBy === 'height' ? rowGap.value : columnGap.value,
       idxToKey: indexToKey.value
     }),
-    ({ containerDimensions, dimensions, idxToKey }) => {
+    ({ containerDimensions, dimensions, groupGap, idxToKey }) => {
       if (!areDimensionsCorrect(containerDimensions)) {
         return;
       }
@@ -77,7 +81,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       const groups = groupItems(
         idxToKey,
         dimensions,
-        groupBy === 'height' ? rowGap : columnGap,
+        groupGap,
         groupBy,
         flexWrap === 'nowrap' ? Infinity : containerDimensions[groupBy]
       );
@@ -102,7 +106,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       });
       keyToGroup.value = keyToGroupMapping;
     },
-    [groupBy, flexWrap, columnGap, rowGap]
+    [groupBy, flexWrap]
   );
 
   // ITEM POSITIONS UPDATER
@@ -112,10 +116,14 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         height: containerHeight.value,
         width: containerWidth.value
       },
+      gaps: {
+        columnGap: columnGap.value,
+        rowGap: rowGap.value
+      },
       groups: itemGroups.value,
       sizes: crossAxisGroupSizes.value
     }),
-    ({ containerDimensions, groups, sizes }) => {
+    ({ containerDimensions, gaps, groups, sizes }) => {
       if (
         !areDimensionsCorrect(containerDimensions) ||
         !groups.length ||
@@ -132,12 +140,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         itemDimensions.value,
         containerDimensions,
         {
+          ...gaps,
           alignContent,
           alignItems,
-          columnGap,
           flexWrap,
-          justifyContent,
-          rowGap
+          justifyContent
         }
       );
 
@@ -146,15 +153,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         crossAxisGroupOffsets.value = result.crossAxisGroupOffsets;
       }
     },
-    [
-      groupBy,
-      alignContent,
-      alignItems,
-      columnGap,
-      flexWrap,
-      justifyContent,
-      rowGap
-    ]
+    [groupBy, alignContent, alignItems, flexWrap, justifyContent]
   );
 
   // OVERRIDE ITEM DIMENSIONS UPDATER
@@ -220,12 +219,14 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       </>
     ),
     value: {
+      columnGap,
       crossAxisGroupOffsets,
       crossAxisGroupSizes,
       flexDirection,
       itemGroups,
       keyToGroup,
       overrideItemDimensions,
+      rowGap,
       stretch
     }
   };
