@@ -1,0 +1,120 @@
+import { useMemo } from 'react';
+import type { ViewStyle } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+
+import { useAnimatableValue } from '../../hooks';
+import type { Animatable, Vector } from '../../types';
+
+type DebugLineProps = {
+  color?: ViewStyle['borderColor'];
+  thickness?: number;
+  style?: ViewStyle['borderStyle'];
+} & (
+  | {
+      from: Animatable<Vector>;
+      to: Animatable<Vector>;
+      x?: never;
+      y?: never;
+    }
+  | {
+      x: Animatable<number>;
+      y?: never;
+      from?: never;
+      to?: never;
+    }
+  | {
+      x?: never;
+      y: Animatable<number>;
+      from?: never;
+      to?: never;
+    }
+) &
+  Pick<ViewStyle, 'opacity'>;
+
+export default function DebugLine({
+  color = 'black',
+  from: from_,
+  opacity = 1,
+  style = 'dashed',
+  thickness = 3,
+  to: to_,
+  x: x_,
+  y: y_
+}: DebugLineProps) {
+  const { height, width } = Dimensions.get('window');
+  const screenDiagonal = useMemo(
+    () => Math.sqrt(width ** 2 + height ** 2),
+    [width, height]
+  );
+
+  const fromValue = useAnimatableValue(from_);
+  const toValue = useAnimatableValue(to_);
+  const xValue = useAnimatableValue(x_);
+  const yValue = useAnimatableValue(y_);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const from = fromValue.value;
+    const to = toValue.value;
+    const x = xValue.value;
+    const y = yValue.value;
+
+    let angle = 0,
+      length,
+      tX = 0,
+      tY = 0;
+
+    if (from && to) {
+      length = Math.sqrt((to.x - from.x) ** 2 + (to.y - from.y) ** 2);
+      angle = Math.atan2(to.y - from.y, to.x - from.x);
+      tY = from.y;
+      tX = from.x;
+    } else if (x !== undefined) {
+      length = 3 * screenDiagonal;
+      angle = Math.PI / 2;
+      tY = -screenDiagonal;
+      tX = x;
+    } else if (y !== undefined) {
+      length = 3 * screenDiagonal;
+      angle = 0;
+      tY = y;
+      tX = -screenDiagonal;
+    }
+
+    return {
+      height: thickness,
+      transform: [
+        { translateX: tX },
+        { translateY: tY },
+        { rotate: `${angle}rad` }
+      ],
+      width: length
+    };
+  }, [thickness, screenDiagonal]);
+
+  return (
+    // A tricky way to create a dashed/dotted line (render border on both sides and
+    // hide one side with overflow hidden)
+    <Animated.View
+      style={[
+        styles.container,
+        { opacity, transformOrigin: '0 0' },
+        animatedStyle
+      ]}>
+      <View
+        style={{
+          borderColor: color,
+          borderStyle: style,
+          borderWidth: thickness
+        }}
+      />
+    </Animated.View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+    position: 'absolute'
+  }
+});
