@@ -15,7 +15,7 @@ export default function useOrderUpdater(
     activeIndex: number;
     dimensions: Dimensions;
     position: Vector;
-    centerPosition: Vector;
+    touchPosition: Vector;
     strategy: ReorderStrategy;
   }) => Maybe<Array<string>>,
   deps?: Array<unknown>
@@ -24,6 +24,7 @@ export default function useOrderUpdater(
     activeItemKey,
     itemDimensions,
     keyToIndex,
+    relativeTouchOffset,
     reorderStrategy,
     touchedItemPosition
   } = useCommonValuesContext();
@@ -33,10 +34,15 @@ export default function useOrderUpdater(
     () => ({
       activeKey: activeItemKey.value,
       activePosition: touchedItemPosition.value,
-      strategy: reorderStrategy.value
+      strategy: reorderStrategy.value,
+      touchOffset: relativeTouchOffset.value
     }),
-    ({ activeKey, activePosition, strategy }) => {
-      if (activeKey === null || activePosition === null) {
+    ({ activeKey, activePosition, strategy, touchOffset }) => {
+      if (
+        activeKey === null ||
+        activePosition === null ||
+        touchOffset === null
+      ) {
         return;
       }
       const dimensions = itemDimensions.value[activeKey];
@@ -44,26 +50,23 @@ export default function useOrderUpdater(
         return;
       }
 
-      const centerY = activePosition.y + dimensions.height / 2;
-      const centerX = activePosition.x + dimensions.width / 2;
       const activeIndex = keyToIndex.value[activeKey];
-
       if (activeIndex === undefined) {
         return;
       }
 
-      const centerPosition = {
-        x: centerX,
-        y: centerY
+      const touchPosition = {
+        x: activePosition.x + touchOffset.x,
+        y: activePosition.y + touchOffset.y
       };
 
       const newOrder = callback({
         activeIndex,
         activeKey,
-        centerPosition,
         dimensions,
         position: activePosition,
-        strategy
+        strategy,
+        touchPosition
       });
 
       if (newOrder) {

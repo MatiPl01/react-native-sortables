@@ -4,15 +4,11 @@ import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../../constants';
-import {
-  isInternalFunction,
-  useAnimatableValue,
-  useStableCallback
-} from '../../hooks';
+import { isInternalFunction, useStableCallback } from '../../hooks';
 import {
   GridLayoutProvider,
   SharedProvider,
-  useGridOrderUpdater
+  useGridLayoutContext
 } from '../../providers';
 import type {
   DragEndCallback,
@@ -41,9 +37,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     sharedProps: { onDragEnd: _onDragEnd, ...sharedProps }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_GRID_PROPS);
 
-  const columnGapValue = useAnimatableValue(columnGap);
-  const rowGapValue = useAnimatableValue(rowGap);
-
   const itemKeys = useMemo(
     () => data.map((item, index) => keyExtractor(item, index)),
     [data, keyExtractor]
@@ -65,21 +58,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     });
   });
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    marginHorizontal: -columnGapValue.value / 2,
-    marginVertical: -rowGapValue.value / 2
-  }));
-
-  const animatedItemWrapperStyle = useAnimatedStyle(() => ({
-    paddingHorizontal: columnGapValue.value / 2,
-    paddingVertical: rowGapValue.value / 2
-  }));
-
-  const itemStyle = useMemo<StyleProp<ViewStyle>>(
-    () => [{ flexBasis: `${100 / columns}%` }, animatedItemWrapperStyle],
-    [animatedItemWrapperStyle, columns]
-  );
-
   return (
     <SharedProvider
       {...sharedProps}
@@ -87,16 +65,14 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       key={columns}
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
-        columnGap={columnGapValue}
+        columnGap={columnGap}
         columns={columns}
-        rowGap={rowGapValue}>
+        rowGap={rowGap}>
         <SortableGridInner
           columns={columns}
           data={data}
           itemKeys={itemKeys}
-          itemStyle={itemStyle}
           renderItem={renderItem}
-          style={animatedContainerStyle}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -105,22 +81,33 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
 type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
-  itemStyle: StyleProp<ViewStyle>;
-  style: StyleProp<ViewStyle>;
 } & Required<Pick<SortableGridProps<I>, 'columns' | 'data' | 'renderItem'>>;
 
 function SortableGridInner<I>({
   columns,
   data,
   itemKeys,
-  itemStyle,
-  style,
   ...rest
 }: SortableGridInnerProps<I>) {
-  useGridOrderUpdater(columns);
+  const { columnGap, rowGap } = useGridLayoutContext();
+
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    marginHorizontal: -columnGap.value / 2,
+    marginVertical: -rowGap.value / 2
+  }));
+
+  const animatedItemWrapperStyle = useAnimatedStyle(() => ({
+    paddingHorizontal: columnGap.value / 2,
+    paddingVertical: rowGap.value / 2
+  }));
+
+  const itemStyle = useMemo<StyleProp<ViewStyle>>(
+    () => [{ flexBasis: `${100 / columns}%` }, animatedItemWrapperStyle],
+    [animatedItemWrapperStyle, columns]
+  );
 
   return (
-    <Animated.View style={[styles.gridContainer, style]}>
+    <Animated.View style={[styles.gridContainer, animatedContainerStyle]}>
       {zipArrays(data, itemKeys).map(([item, key]) => (
         <SortableGridItem
           item={item}

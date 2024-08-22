@@ -105,7 +105,40 @@ export function useFlexOrderUpdater(): void {
         selectedGroupIndex++;
       }
 
-      console.log('selectedGroupIndex', selectedGroupIndex);
+      /**
+       * SELECTING THE NEAREST ITEM WITHIN THE SELECTED GROUP
+       */
+
+      const selectedGroup = itemGroups.value[selectedGroupIndex];
+      if (!selectedGroup) {
+        return;
+      }
+      // If the selected group changes, we always have to select the item index.
+      // We will select the index at which the active item will be the closest
+      // to the absolutely positioned dragged active item.
+      if (selectedGroupIndex !== activeGroupIndex) {
+        const closestIndex = 0;
+        const closestDistance = Infinity;
+
+        for (const key of selectedGroup) {
+          const index = keyToIndex.value[key];
+          if (index === undefined) {
+            continue;
+          }
+
+          const position = itemPositions.value[key];
+          if (!position) {
+            continue;
+          }
+
+          const distance = Math.abs(
+            position[mainCoordinate] - centerPosition[mainCoordinate]
+          );
+          if (distance < closestDistance) {
+            closestIndex = index;
+          }
+        }
+      }
     },
     [crossCoordinate]
   );

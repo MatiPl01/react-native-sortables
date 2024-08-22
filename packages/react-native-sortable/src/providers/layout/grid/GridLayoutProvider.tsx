@@ -6,29 +6,37 @@ import {
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
-import type { Dimensions, Vector } from '../../../types';
+import { useAnimatableValue } from '../../../hooks';
+import type { Animatable, Dimensions, Vector } from '../../../types';
 import { areArraysDifferent, areVectorsDifferent } from '../../../utils';
-import { useCommonValuesContext } from '../../shared';
+import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { createProvider } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
 
+const DEBUG = false; // TODO - maybe move to constants
+
+const SWAP_OFFSET = 10;
+
 type GridLayoutContextType = {
-  columnWidth: SharedValue<number>;
+  columnWidth: SharedValue<null | number>;
   rowOffsets: SharedValue<Array<number>>;
+  rowGap: SharedValue<number>;
+  columnGap: SharedValue<number>;
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{
   columns: number;
-  rowGap: SharedValue<number>;
-  columnGap: SharedValue<number>;
+  rowGap: Animatable<number>;
+  columnGap: Animatable<number>;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   'GridLayout'
 )<GridLayoutProviderProps, GridLayoutContextType>(({
-  columnGap: columnGapValue,
+  children,
+  columnGap: columnGap_,
   columns,
-  rowGap: rowGapValue
+  rowGap: rowGap_
 }) => {
   const {
     containerHeight,
@@ -39,18 +47,21 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     overrideItemDimensions
   } = useCommonValuesContext();
 
+  const columnGap = useAnimatableValue(columnGap_);
+  const rowGap = useAnimatableValue(rowGap_);
+
   const rowOffsets = useSharedValue<Array<number>>([]);
-  const columnWidth = useSharedValue(-1);
+  const columnWidth = useSharedValue<null | number>(null);
 
   // TARGET COLUMN WIDTH UPDATER
   useAnimatedReaction(
     () => ({
-      columnGap: columnGapValue.value,
+      gap: columnGap.value,
       width: containerWidth.value
     }),
-    ({ columnGap, width }) => {
+    ({ gap, width }) => {
       if (width !== -1) {
-        const colWidth = (width + columnGap) / columns;
+        const colWidth = (width + gap) / columns;
         columnWidth.value = colWidth;
       }
     },
@@ -61,10 +72,10 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   useAnimatedReaction(
     () => ({
       dimensions: itemDimensions.value,
-      idxToKey: indexToKey.value,
-      rowGap: rowGapValue.value
+      gap: rowGap.value,
+      idxToKey: indexToKey.value
     }),
-    ({ dimensions, idxToKey, rowGap }) => {
+    ({ dimensions, gap, idxToKey }) => {
       const offsets = [0];
       for (const [itemIndex, key] of Object.entries(idxToKey)) {
         const rowIndex = getRowIndex(parseInt(itemIndex), columns);
@@ -77,7 +88,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
         offsets[rowIndex + 1] = Math.max(
           offsets[rowIndex + 1] ?? 0,
-          (offsets[rowIndex] ?? 0) + itemHeight + rowGap
+          (offsets[rowIndex] ?? 0) + itemHeight + gap
         );
       }
       // Update row offsets only if they have changed
@@ -90,7 +101,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       ) {
         rowOffsets.value = offsets;
         const newHeight = offsets[offsets.length - 1] ?? 0;
-        containerHeight.value = newHeight - rowGap;
+        containerHeight.value = newHeight - gap;
       }
     },
     [columns]
@@ -104,7 +115,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       offsets: rowOffsets.value
     }),
     ({ colWidth, idxToKey, offsets }) => {
-      if (colWidth === -1 || offsets.length === 0) {
+      if (colWidth === null || offsets.length === 0) {
         return;
       }
       const positions: Record<string, Vector> = {};
@@ -157,9 +168,91 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     [columns]
   );
 
+  // ITEMS ORDER UPDATER
+  useOrderUpdater(
+    ({ activeIndex, dimensions, strategy, touchPosition: { x, y } }) => {
+      'worklet';
+      if (columnWidth.value === null) {
+        return;
+      }
+
+      const itemsCount = indexToKey.value.length;
+      const rowIndex = getRowIndex(activeIndex, columns);
+      const columnIndex = getColumnIndex(activeIndex, columns);
+
+      // Get active item bounding box
+      const yOffsetAbove = rowOffsets.value[rowIndex] ?? 0;
+      const yOffsetBelow = (rowOffsets.value[rowIndex + 1] ?? 0) - rowGap.value;
+      const xOffsetLeft = columnIndex * dimensions.width;
+      const xOffsetRight = (columnIndex + 1) * dimensions.width;
+
+      // const rowHeightAbove =
+      //   rowIndex > 0
+      //     ? yOffsetAbove - (rowOffsets.value[rowIndex - 1] ?? 0) - rowGap.value
+      //     : 0;
+      // const rowHeightBelow =
+      //   rowIndex < rowOffsets.value.length - 1 && yOffsetBelow !== undefined
+      //     ? (rowOffsets.value[rowIndex + 1] ?? 0) - yOffsetBelow - rowGap.value
+      //     : 0;
+
+      // const ignoreRangeX = Math.min(
+      //   Math.max(SWAP_OFFSET, columnGap.value),
+      //   columnGap.value + columnWidth.value / 2
+      // );
+      // const ignoreRangeTop = Math.min(
+      //   Math.max(SWAP_OFFSET, rowGap.value),
+      //   rowGap.value + rowHeightAbove / 2
+      // );
+      // const ignoreRangeBottom = Math.min(
+      //   Math.max(SWAP_OFFSET, rowGap.value),
+      //   rowGap.value + rowHeightBelow / 2
+      // );
+
+      // // Check if should swap the active item with the item above or below
+      // let dy = 0;
+      // if (yOffsetAbove > 0 && y <= yOffsetAbove - ignoreRangeTop) {
+      //   dy = -1;
+      // } else if (
+      //   yOffsetBelow !== undefined &&
+      //   yOffsetBelow < containerHeight.value &&
+      //   y >= yOffsetBelow + ignoreRangeBottom
+      // ) {
+      //   dy = 1;
+      // }
+
+      // console.log({ dy, ignoreRangeBottom });
+
+      // // Check if should swap the active item with the item on the left or right
+      // const dx = 0;
+      // // if (xOffsetLeft > 0 && x <= xOffsetLeft - ignoreRangeX) {
+      // //   dx = -1;
+      // // } else if (
+      // //   columnIndex < columns - 1 &&
+      // //   activeIndex < itemsCount &&
+      // //   x >= xOffsetRight + ignoreRangeX
+      // // ) {
+      // //   dx = 1;
+      // // }
+
+      // const indexOffset = dy * columns + dx;
+      // // Swap the active item with the item at the new index
+      // const newIndex = activeIndex + indexOffset;
+      // if (newIndex === activeIndex || newIndex < 0 || newIndex >= itemsCount) {
+      //   return;
+      // }
+
+      // // return the new order of items
+      // return reorderItems(indexToKey.value, activeIndex, newIndex, strategy);
+    },
+    [columns]
+  );
+
   return {
+    children: DEBUG ? <>{children}</> : children,
     value: {
+      columnGap,
       columnWidth,
+      rowGap,
       rowOffsets
     }
   };

@@ -35,7 +35,7 @@ type CommonValuesContextType = {
   // POSITIONs
   itemPositions: SharedValue<Record<string, Vector>>;
   touchStartPosition: SharedValue<Vector | null>;
-  relativeTouchPosition: SharedValue<Vector | null>;
+  relativeTouchOffset: SharedValue<Vector | null>;
   touchedItemPosition: SharedValue<Vector | null>;
 
   // DIMENSIONS
@@ -52,7 +52,7 @@ type CommonValuesContextType = {
   activationState: SharedValue<DragActivationState>;
   activationProgress: SharedValue<number>;
   inactiveAnimationProgress: SharedValue<number>;
-  activeItemTranslation: SharedValue<Vector | null>;
+  touchedItemTranslation: SharedValue<Vector | null>;
   activeItemDropped: SharedValue<boolean>;
 
   // OTHER
@@ -98,7 +98,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   // POSITIONs
   const itemPositions = useSharedValue<Record<string, Vector>>({});
   const touchStartPosition = useSharedValue<Vector | null>(null);
-  const relativeTouchPosition = useSharedValue<Vector | null>(null);
+  const relativeTouchOffset = useSharedValue<Vector | null>(null);
   const touchedItemPosition = useSharedValue<Vector | null>(null);
 
   // DIMENSIONS
@@ -117,7 +117,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const activationState = useSharedValue(DragActivationState.INACTIVE);
   const activationProgress = useSharedValue(0);
   const inactiveAnimationProgress = useSharedValue(0);
-  const activeItemTranslation = useSharedValue<Vector | null>(null);
+  const touchedItemTranslation = useSharedValue<Vector | null>(null);
   const activeItemDropped = useSharedValue(true);
 
   // ACTIVE ITEM DECORATION
@@ -153,7 +153,6 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       activeItemOpacity,
       activeItemScale,
       activeItemShadowOpacity,
-      activeItemTranslation,
       canSwitchToAbsoluteLayout,
       containerHeight,
       containerRef,
@@ -167,7 +166,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemPositions,
       keyToIndex,
       overrideItemDimensions,
-      relativeTouchPosition,
+      relativeTouchOffset,
       reorderStrategy,
       snapOffsetX,
       snapOffsetY,
@@ -176,6 +175,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       touchedItemHeight,
       touchedItemKey,
       touchedItemPosition,
+      touchedItemTranslation,
       touchedItemWidth
     }
   };

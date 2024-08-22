@@ -62,19 +62,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationState,
     activeItemDropped,
     activeItemKey,
-    activeItemTranslation,
     enableActiveItemSnap,
     inactiveAnimationProgress,
     indexToKey,
     itemPositions,
     keyToIndex,
-    relativeTouchPosition,
+    relativeTouchOffset,
     snapOffsetX,
     snapOffsetY,
     touchStartPosition,
     touchedItemHeight,
     touchedItemKey,
     touchedItemPosition,
+    touchedItemTranslation,
     touchedItemWidth
   } = useCommonValuesContext();
   const { updateLayer } = useLayerContext() ?? {};
@@ -111,18 +111,18 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       height: touchedItemHeight.value,
       oX: snapOffsetX.value,
       oY: snapOffsetY.value,
-      touchPosition: relativeTouchPosition.value,
+      touchOffset: relativeTouchOffset.value,
       width: touchedItemWidth.value
     }),
-    ({ enableSnap, height, oX, oY, touchPosition, width }) => {
-      if (!enableSnap || !height || !width || !touchPosition) {
+    ({ enableSnap, height, oX, oY, touchOffset, width }) => {
+      if (!enableSnap || !height || !width || !touchOffset) {
         targetDeltaX.value = 0;
         targetDeltaY.value = 0;
         return;
       }
 
-      targetDeltaX.value = getOffsetDistance(oX, width) - touchPosition.x;
-      targetDeltaY.value = getOffsetDistance(oY, height) - touchPosition.y;
+      targetDeltaX.value = getOffsetDistance(oX, width) - touchOffset.x;
+      targetDeltaY.value = getOffsetDistance(oY, height) - touchOffset.y;
     }
   );
 
@@ -136,7 +136,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           ? 0
           : (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0),
       startPosition: touchStartPosition.value,
-      translation: activeItemTranslation.value
+      translation: touchedItemTranslation.value
     }),
     ({ dX, dY, enableSnap, scrollOffsetY, startPosition, translation }) => {
       if (!startPosition) {
@@ -207,7 +207,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       if (itemPosition) {
         touchStartPosition.value = itemPosition;
         const touch = e.allTouches[0];
-        relativeTouchPosition.value = touch
+        relativeTouchOffset.value = touch
           ? {
               x: touch.x,
               y: touch.y
@@ -256,7 +256,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       touchStartPosition,
       absoluteTouchStartPosition,
       itemPositions,
-      relativeTouchPosition,
+      relativeTouchOffset,
       updateLayer,
       updateStartScrollOffset,
       handleDragStart
@@ -272,8 +272,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       clearAnimatedTimeout(activationTimeoutId.value);
       touchedItemKey.value = null;
       touchStartPosition.value = null;
-      relativeTouchPosition.value = null;
-      activeItemTranslation.value = null;
+      relativeTouchOffset.value = null;
+      touchedItemTranslation.value = null;
       activationState.value = DragActivationState.INACTIVE;
 
       inactiveAnimationProgress.value = delayed();
@@ -301,9 +301,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     [
       touchedItemKey,
       touchStartPosition,
-      relativeTouchPosition,
+      relativeTouchOffset,
       activationTimeoutId,
-      activeItemTranslation,
+      touchedItemTranslation,
       activeItemDropped,
       activeItemKey,
       activationProgress,
@@ -347,12 +347,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         };
       }
 
-      activeItemTranslation.value = {
+      touchedItemTranslation.value = {
         x: (reverseXAxis ? -1 : 1) * dX,
         y: dY
       };
     },
-    [activeItemTranslation, absoluteTouchStartPosition, touchStartPosition]
+    [touchedItemTranslation, absoluteTouchStartPosition, touchStartPosition]
   );
 
   const handleOrderChange = useCallback(
