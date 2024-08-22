@@ -27,6 +27,7 @@ import {
   zipArrays
 } from '../../utils';
 import { DraggableView } from '../shared';
+import GridLayoutDebugView from './GridLayoutDebugView';
 
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
@@ -98,6 +99,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           renderItem={renderItem}
           style={animatedContainerStyle}
         />
+        <GridLayoutDebugView columns={columns} itemsCount={data.length} />
       </GridLayoutProvider>
     </SharedProvider>
   );
