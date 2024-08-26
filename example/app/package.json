@@ -21,7 +21,7 @@
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
     "@babel/runtime": "^7.24.7",
-    "@react-native/babel-preset": "0.74.86",
+    "@react-native/babel-preset": "0.75.2",
     "@react-native/metro-config": "0.74.86",
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/react-native": "^12.5.1",
