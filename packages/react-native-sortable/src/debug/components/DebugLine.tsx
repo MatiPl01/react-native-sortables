@@ -54,7 +54,7 @@ export default function DebugLine({
   const yValue = useAnimatableValue(y_);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const visible = visibleValue.value;
+    const visible = visibleValue.value ?? true;
     const from = fromValue.value;
     const to = toValue.value;
     const x = xValue.value;
