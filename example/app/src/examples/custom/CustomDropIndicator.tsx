@@ -18,13 +18,13 @@ export default function CustomDropIndicator({
   style,
   touchedItemKey
 }: DropIndicatorComponentProps) {
-  const itemCount = useDerivedValue(() => orderedItemKeys.value.length);
+  const itemsCount = useDerivedValue(() => orderedItemKeys.value.length);
   const indexes = useDerivedValue(() =>
-    Array.from({ length: itemCount.value }, (_, i) => i)
+    Array.from({ length: itemsCount.value }, (_, i) => i)
   );
   const colors = useDerivedValue(() =>
-    new Array(itemCount.value).fill(null).map((_, i) => {
-      const hue = (360 / itemCount.value) * i;
+    new Array(itemsCount.value).fill(null).map((_, i) => {
+      const hue = (360 / itemsCount.value) * i;
       return `hsl(${hue}, 100%, 50%)`;
     })
   );
@@ -37,7 +37,7 @@ export default function CustomDropIndicator({
 
   useAnimatedReaction(
     () => ({
-      count: itemCount.value,
+      count: itemsCount.value,
       index: dropIndex.value,
       show: showIndicator.value
     }),

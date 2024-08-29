@@ -1,3 +1,3 @@
 export * from './shared';
-export * from './SortableFlex';
-export * from './SortableGrid';
+export { default as SortableFlex } from './SortableFlex';
+export { default as SortableGrid } from './SortableGrid';

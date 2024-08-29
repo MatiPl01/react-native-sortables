@@ -24,12 +24,12 @@ type DebugProviderContextType = {
   useDebugLine: () => DebugLineUpdater;
   useDebugRect: () => DebugRectUpdater;
   useDebugCross: () => DebugCrossUpdater;
-  useDebugLines: <K extends string>(
-    ...keys: Array<K>
-  ) => Record<K, DebugLineUpdater>;
-  useDebugRects: <K extends string>(
-    ...keys: Array<K>
-  ) => Record<K, DebugRectUpdater>;
+  useDebugLines: <K extends number | string>(
+    keysOrCount: K extends string ? Array<K> : number
+  ) => { [key in K]: DebugLineUpdater };
+  useDebugRects: <K extends number | string>(
+    keysOrCount: K extends string ? Array<K> : number
+  ) => { [key in K]: DebugRectUpdater };
   useObserver: (observer: (views: DebugViews) => void) => void;
 };
 
@@ -51,18 +51,21 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
     <T extends DebugComponentType>(type: T): DebugComponentUpdater<T> => {
       const props = makeMutable({ visible: false });
       return {
+        hide() {
+          'worklet';
+          props.value = { ...props.value, visible: false };
+        },
         props,
-        type,
-        update(newProps: DebugComponentUpdater<T>['update']) {
+        set(newProps: DebugComponentUpdater<T>['set']) {
           'worklet';
           if (typeof newProps === 'function') {
-            props.value = newProps(
-              props.value
-            ) as unknown as typeof props.value;
+            const prevProps = props.value;
+            props.value = (newProps as <P>(prevProps: P) => P)(prevProps);
           } else {
             props.value = newProps;
           }
-        }
+        },
+        type
       } as unknown as DebugComponentUpdater<T>;
     },
     []
@@ -115,21 +118,27 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
   const useDebugComponents = useCallback(
     <T extends DebugComponentType, K extends string>(
       type: T,
-      resultKeys: Array<K>
+      keysOrCount: K extends string ? Array<K> : number
     ): Record<K, DebugComponentUpdater<T>> => {
+      const count =
+        typeof keysOrCount === 'number' ? keysOrCount : keysOrCount.length;
       const keys = useMemo(
-        () => resultKeys.map(() => debugIdRef.current++),
+        () => Array.from({ length: count }, () => debugIdRef.current++),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [...resultKeys]
+        [...(typeof keysOrCount === 'number' ? [keysOrCount] : keysOrCount)]
       );
       const updaters = useMemo(
-        () =>
-          Object.fromEntries(
-            zipArrays(keys, resultKeys).map(([key, resultKey]) => [
+        () => {
+          if (typeof keysOrCount === 'number') {
+            return keys.map(key => addUpdater(key, createUpdater(type)));
+          }
+          return Object.fromEntries(
+            zipArrays(keys, keysOrCount).map(([key, resultKey]) => [
               resultKey,
               addUpdater(key, createUpdater(type))
             ])
-          ),
+          );
+        },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [keys, type]
       );
@@ -161,14 +170,16 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
   );
 
   const useDebugLines = useCallback(
-    <K extends string>(...keys: Array<K>) =>
-      useDebugComponents(DebugComponentType.Line, keys),
+    <K extends number | string>(
+      keysOrCount: K extends string ? Array<K> : number
+    ) => useDebugComponents(DebugComponentType.Line, keysOrCount),
     [useDebugComponents]
   );
 
   const useDebugRects = useCallback(
-    <K extends string>(...keys: Array<K>) =>
-      useDebugComponents(DebugComponentType.Rect, keys),
+    <K extends number | string>(
+      keysOrCount: K extends string ? Array<K> : number
+    ) => useDebugComponents(DebugComponentType.Rect, keysOrCount),
     [useDebugComponents]
   );
 

@@ -1,8 +1,6 @@
 import { memo, useState } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { UnAnimatableValues } from '../../types';
-import { useSplitSharedValue } from '../../utils';
 import type {
   DebugCrossProps,
   DebugLineProps,
@@ -23,32 +21,30 @@ const DebugOutlet = memo(function DebugOutlet() {
       {Object.entries(debugViews).map(([key, { props, type }]) => {
         switch (type) {
           case DebugComponentType.Cross:
-            return <WrappedDebugCross key={key} props={props} />;
+            return (
+              <DebugCross
+                key={key}
+                props={props as SharedValue<DebugCrossProps>}
+              />
+            );
           case DebugComponentType.Line:
-            return <WrappedDebugLine key={key} props={props} />;
+            return (
+              <DebugLine
+                key={key}
+                props={props as SharedValue<DebugLineProps>}
+              />
+            );
           case DebugComponentType.Rect:
-            return <WrappedDebugRect key={key} props={props} />;
+            return (
+              <DebugRect
+                key={key}
+                props={props as SharedValue<DebugRectProps>}
+              />
+            );
         }
       })}
     </>
   );
 });
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Wrapped<P extends Record<string, any>> = {
-  props: SharedValue<Partial<UnAnimatableValues<P>>>;
-};
-
-function WrappedDebugLine({ props }: Wrapped<DebugLineProps>) {
-  return <DebugLine {...(useSplitSharedValue(props) as DebugLineProps)} />;
-}
-
-function WrappedDebugRect({ props }: Wrapped<DebugRectProps>) {
-  return <DebugRect {...(useSplitSharedValue(props) as DebugRectProps)} />;
-}
-
-function WrappedDebugCross({ props }: Wrapped<DebugCrossProps>) {
-  return <DebugCross {...(useSplitSharedValue(props) as DebugCrossProps)} />;
-}
 
 export default DebugOutlet;

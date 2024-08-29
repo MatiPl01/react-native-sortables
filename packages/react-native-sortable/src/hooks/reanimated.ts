@@ -7,15 +7,10 @@ import {
   runOnJS,
   runOnUI,
   type SharedValue,
-  useAnimatedStyle,
   useDerivedValue
 } from 'react-native-reanimated';
-import type {
-  DefaultStyle,
-  DependencyList
-} from 'react-native-reanimated/lib/typescript/hook/commonTypes';
 
-import type { Animatable, AnimatableValues, AnyFunction } from '../types';
+import type { Animatable, AnyFunction } from '../types';
 import { noop } from '../utils';
 import { useStableCallback } from './callbacks';
 
@@ -52,21 +47,5 @@ export function useJSStableCallback<C extends AnyFunction>(callback?: C) {
       if (hasCallback) runOnJS(stableCallback)(...args);
     },
     [stableCallback, hasCallback]
-  );
-}
-
-export function useAnimatableStyle<S extends DefaultStyle>(
-  style: AnimatableValues<S>,
-  dependencies?: DependencyList | null
-) {
-  return useAnimatedStyle(
-    () =>
-      Object.fromEntries(
-        Object.entries(style).map(([key, value]) => [
-          key,
-          isSharedValue(value) ? value.value : value
-        ])
-      ),
-    dependencies
   );
 }

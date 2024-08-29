@@ -53,8 +53,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
-  const debugRects = debugContext?.useDebugRects('top', 'bottom');
-  const debugLines = debugContext?.useDebugLines('top', 'bottom');
+  const debugRects = debugContext?.useDebugRects(['top', 'bottom']);
+  const debugLines = debugContext?.useDebugLines(['top', 'bottom']);
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);
@@ -156,10 +156,10 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     },
     props => {
       const hideDebugViews = () => {
-        debugRects?.top?.update({ visible: false });
-        debugRects?.bottom?.update({ visible: false });
-        debugLines?.top?.update({ visible: false });
-        debugLines?.bottom?.update({ visible: false });
+        debugRects?.top?.hide();
+        debugRects?.bottom?.hide();
+        debugLines?.top?.hide();
+        debugLines?.bottom?.hide();
       };
 
       if (!props) {
@@ -190,12 +190,12 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         cY + itemBottomOffset - (sY + sH - threshold.bottom);
 
       if (debugRects) {
-        debugRects.top?.update({
+        debugRects.top?.set({
           ...DEBUG_COLORS.rect,
           height: threshold.top,
           y: sY - cY
         });
-        debugRects.bottom?.update({
+        debugRects.bottom?.set({
           ...DEBUG_COLORS.rect,
           height: threshold.bottom,
           positionOrigin: 'bottom',
@@ -203,11 +203,11 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         });
       }
       if (debugLines) {
-        debugLines.top?.update({
+        debugLines.top?.set({
           ...DEBUG_COLORS.line,
           y: itemTopOffset
         });
-        debugLines.bottom?.update({
+        debugLines.bottom?.set({
           ...DEBUG_COLORS.line,
           y: itemBottomOffset
         });

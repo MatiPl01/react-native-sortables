@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { UnAnimatableValues } from '../types';
 import type {
   DebugCrossProps,
   DebugLineProps,
@@ -14,18 +14,15 @@ export enum DebugComponentType {
   Rect = 'rect'
 }
 
+export type WrappedProps<P> = { props: SharedValue<P> };
+
 type CreateDebugComponentUpdater<
   T extends DebugComponentType,
   P extends Record<string, any>
 > = {
-  props: SharedValue<Partial<UnAnimatableValues<P>>>;
-  update: (
-    props:
-      | ((
-          prevProps: Partial<UnAnimatableValues<P>>
-        ) => Partial<UnAnimatableValues<P>>)
-      | Partial<UnAnimatableValues<P>>
-  ) => void;
+  props: SharedValue<P>;
+  hide: () => void;
+  set: (props: ((prevProps: P) => P) | P) => void;
   type: T;
 };
 

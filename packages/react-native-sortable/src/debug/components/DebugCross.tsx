@@ -1,53 +1,40 @@
 /* eslint-disable import/no-unused-modules */
-import { isSharedValue, useDerivedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import { useDerivedValue } from 'react-native-reanimated';
 
-import type { Animatable, Maybe, Vector } from '../../types';
+import type { Maybe, Vector } from '../../types';
+import type { WrappedProps } from '../types';
 import type { DebugLineProps } from './DebugLine';
 import DebugLine from './DebugLine';
 
 export type DebugCrossProps = (
   | {
-      x: Animatable<Maybe<number>>;
-      y: Animatable<Maybe<number>>;
+      x: Maybe<number>;
+      y: Maybe<number>;
       position?: never;
     }
   | {
       x?: never;
       y?: never;
-      position: Animatable<Maybe<Vector>>;
+      position: Maybe<Vector>;
     }
 ) &
   Pick<DebugLineProps, 'color' | 'opacity' | 'style' | 'thickness' | 'visible'>;
 
-export default function DebugCross({
-  position,
-  x: x_,
-  y: y_,
-  ...lineProps
-}: DebugCrossProps) {
-  const x = useDerivedValue(() =>
-    position
-      ? isSharedValue(position)
-        ? position.value?.x
-        : position.x
-      : isSharedValue(x_)
-        ? x_.value
-        : x_
-  );
-  const y = useDerivedValue(() =>
-    position
-      ? isSharedValue(position)
-        ? position.value?.y
-        : position.y
-      : isSharedValue(y_)
-        ? y_.value
-        : y_
-  );
+export default function DebugCross({ props }: WrappedProps<DebugCrossProps>) {
+  const horizontalLineProps = useDerivedValue(() => ({
+    ...props.value,
+    y: props.value.position?.y ?? props.value.y
+  }));
+  const verticalLineProps = useDerivedValue(() => ({
+    ...props.value,
+    x: props.value.position?.x ?? props.value.x
+  }));
 
   return (
     <>
-      <DebugLine x={x} {...lineProps} />
-      <DebugLine y={y} {...lineProps} />
+      <DebugLine props={horizontalLineProps as SharedValue<DebugLineProps>} />
+      <DebugLine props={verticalLineProps as SharedValue<DebugLineProps>} />
     </>
   );
 }

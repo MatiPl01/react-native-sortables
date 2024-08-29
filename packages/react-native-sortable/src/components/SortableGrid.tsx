@@ -3,18 +3,18 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { DEFAULT_SORTABLE_GRID_PROPS } from '../../constants';
-import { useAnimatableValue, useStableCallback } from '../../hooks';
+import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
+import { useAnimatableValue, useStableCallback } from '../hooks';
 import {
   GridLayoutProvider,
   SharedProvider,
   useGridOrderUpdater
-} from '../../providers';
+} from '../providers';
 import type {
   DragEndCallback,
   SortableGridProps,
   SortableGridRenderItem
-} from '../../types';
+} from '../types';
 import {
   defaultKeyExtractor,
   getPropsWithDefaults,
@@ -22,8 +22,8 @@ import {
   reorderOnDragEnd,
   typedMemo,
   zipArrays
-} from '../../utils';
-import { DraggableView } from '../shared';
+} from '../utils';
+import { DraggableView } from './shared';
 
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
@@ -86,6 +86,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       <GridLayoutProvider
         columnGap={columnGapValue}
         columns={columns}
+        itemsCount={data.length}
         rowGap={rowGapValue}>
         <SortableGridInner
           columns={columns}
