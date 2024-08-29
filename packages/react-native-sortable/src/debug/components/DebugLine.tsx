@@ -66,11 +66,10 @@ export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
     return {
       display: visible ? 'flex' : 'none',
       height: thickness,
-      marginTop: -thickness / 2,
       opacity: props.value.opacity,
       transform: [
-        { translateX: tX },
-        { translateY: tY },
+        { translateX: tX + (Math.sin(angle) * thickness) / 2 },
+        { translateY: tY - (Math.cos(angle) * thickness) / 2 },
         { rotate: `${angle}rad` }
       ],
       width: length

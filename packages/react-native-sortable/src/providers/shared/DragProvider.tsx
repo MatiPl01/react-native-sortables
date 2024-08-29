@@ -198,9 +198,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: itemPosition.x + touch.x - (snap?.x ?? 0),
         y: itemPosition.y + touch.y - (snap?.y ?? 0)
       };
-      if (debugCross) {
-        debugCross.set({ color: '#00007e', position: touchPosition.value });
-      }
+      debugCross?.set({ color: '#00007e', position: touchPosition.value });
     }
   );
 
