@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useState } from 'react';
 import {
-  cancelAnimation,
   makeMutable,
   runOnJS,
   type SharedValue,
@@ -38,12 +37,6 @@ export function useSplitSharedValue<T extends Record<string, any>>(
           newState[key] = makeMutable(v[key]);
         }
       }
-      for (const key in state) {
-        if (v[key] === undefined) {
-          cancelAnimation(state[key]);
-          delete newState[key];
-        }
-      }
       setState(newState);
     },
     [state]
@@ -59,13 +52,8 @@ export function useSplitSharedValue<T extends Record<string, any>>(
           stateChanged = true;
         }
       }
-      // remove old props
-      for (const key in state) {
-        if (v[key] === undefined) {
-          stateChanged = true;
-        }
-      }
 
+      // Update state when new props appear for the first time
       if (stateChanged) {
         runOnJS(updateState)(v);
       }

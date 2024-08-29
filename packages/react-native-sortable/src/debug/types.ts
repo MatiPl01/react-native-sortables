@@ -19,7 +19,13 @@ type CreateDebugComponentUpdater<
   P extends Record<string, any>
 > = {
   props: SharedValue<Partial<UnAnimatableValues<P>>>;
-  update: (props: Partial<UnAnimatableValues<P>>) => void;
+  update: (
+    props:
+      | ((
+          prevProps: Partial<UnAnimatableValues<P>>
+        ) => Partial<UnAnimatableValues<P>>)
+      | Partial<UnAnimatableValues<P>>
+  ) => void;
   type: T;
 };
 

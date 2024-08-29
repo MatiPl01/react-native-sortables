@@ -47,17 +47,26 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
     observersRef.current().forEach(observer => observer(views));
   });
 
-  const createUpdater = useCallback(<T extends DebugComponentType>(type: T) => {
-    const props = makeMutable({ visible: false });
-    return {
-      props,
-      type,
-      update(newProps: typeof props.value) {
-        'worklet';
-        props.value = newProps;
-      }
-    } as unknown as DebugComponentUpdater<T>;
-  }, []);
+  const createUpdater = useCallback(
+    <T extends DebugComponentType>(type: T): DebugComponentUpdater<T> => {
+      const props = makeMutable({ visible: false });
+      return {
+        props,
+        type,
+        update(newProps: DebugComponentUpdater<T>['update']) {
+          'worklet';
+          if (typeof newProps === 'function') {
+            props.value = newProps(
+              props.value
+            ) as unknown as typeof props.value;
+          } else {
+            props.value = newProps;
+          }
+        }
+      } as unknown as DebugComponentUpdater<T>;
+    },
+    []
+  );
 
   const addUpdater = useCallback(
     <U extends DebugComponentUpdater<DebugComponentType>>(

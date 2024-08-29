@@ -1,8 +1,8 @@
 import type { ViewStyle } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { useAnimatableValue } from '../../hooks';
+import { useAnimatableStyle, useAnimatableValue } from '../../hooks';
 import type { Animatable, Maybe, Vector } from '../../types';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
@@ -61,7 +61,7 @@ export default function DebugRect({
   borderWidth = 2,
   from: from_,
   height: _height,
-  positionOrigin,
+  positionOrigin: positionOrigin_,
   to: to_,
   visible: _visible = true,
   width: _width,
@@ -77,13 +77,15 @@ export default function DebugRect({
   const yValue = useAnimatableValue(y_);
   const widthValue = useAnimatableValue(_width);
   const heightValue = useAnimatableValue(_height);
+  const positionOrigin = useAnimatableValue(positionOrigin_);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const visible = visibleValue.value;
+    let visible = visibleValue.value ?? true;
     const from = fromValue.value;
     const to = toValue.value;
     const x = xValue.value;
     const y = yValue.value;
+    const origin = positionOrigin.value;
 
     let width = widthValue.value ?? 0;
     let height = heightValue.value ?? 0;
@@ -106,10 +108,12 @@ export default function DebugRect({
       tX = -screenDiagonal;
       tY = y;
       width = 3 * screenDiagonal;
+    } else {
+      visible = false;
     }
 
-    if (positionOrigin) {
-      const origins = positionOrigin.split(' ');
+    if (origin) {
+      const origins = origin.split(' ');
       if (origins.includes('right')) {
         tX -= width;
       }
@@ -126,19 +130,21 @@ export default function DebugRect({
     };
   }, []);
 
+  const animatedBorderStyle = useAnimatableStyle({
+    borderColor,
+    borderStyle,
+    borderWidth
+  });
+
+  const animatedInnerStyle = useAnimatableStyle({
+    backgroundColor,
+    opacity: backgroundOpacity
+  });
+
   return (
     <Animated.View
-      style={[
-        styles.container,
-        { borderColor, borderStyle, borderWidth },
-        animatedStyle
-      ]}>
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor, opacity: backgroundOpacity }
-        ]}
-      />
+      style={[styles.container, animatedBorderStyle, animatedStyle]}>
+      <Animated.View style={[StyleSheet.absoluteFill, animatedInnerStyle]} />
     </Animated.View>
   );
 }
