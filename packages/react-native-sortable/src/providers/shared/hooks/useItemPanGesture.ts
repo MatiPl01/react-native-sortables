@@ -13,11 +13,11 @@ export default function useItemPanGesture(
   pressProgress: SharedValue<number>,
   reverseXAxis = false
 ) {
-  const { activeItemKey, containerHeight, reorderStrategy, touchedItemKey } =
+  const { containerHeight, reorderStrategy, touchedItemKey } =
     useCommonValuesContext();
   const { tryMeasureContainerHeight, updateTouchedItemDimensions } =
     useMeasurementsContext();
-  const { handleDragEnd, handleDragUpdate, handleTouchStart } =
+  const { handleDragEnd, handleTouchStart, handleTouchesMove } =
     useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
 
@@ -54,11 +54,7 @@ export default function useItemPanGesture(
           manager.end();
         })
         .onTouchesMove((e, manager) => {
-          if (activeItemKey.value !== key) {
-            manager.fail();
-            return;
-          }
-          handleDragUpdate(e, reverseXAxis);
+          handleTouchesMove(e, reverseXAxis, manager.fail);
         })
         .onFinalize(() => {
           pressProgress.value = withTiming(0, {
@@ -74,9 +70,8 @@ export default function useItemPanGesture(
       pressProgress,
       containerHeight,
       touchedItemKey,
-      activeItemKey,
       handleTouchStart,
-      handleDragUpdate,
+      handleTouchesMove,
       handleDragEnd,
       tryMeasureContainerHeight,
       updateStartScrollOffset,

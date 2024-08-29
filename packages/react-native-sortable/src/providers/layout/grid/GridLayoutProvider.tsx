@@ -6,12 +6,20 @@ import {
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
+import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
 import type { Animatable, Dimensions, Vector } from '../../../types';
 import { areArraysDifferent, areVectorsDifferent } from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
+
+const DEBUG_COLORS = {
+  gap: {
+    backgroundColor: '#ffa500',
+    borderColor: '#825500'
+  }
+};
 
 type GridLayoutContextType = {
   columnWidth: SharedValue<number>;
@@ -21,6 +29,7 @@ type GridLayoutContextType = {
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{
+  itemsCount: number;
   columns: number;
   rowGap: Animatable<number>;
   columnGap: Animatable<number>;
@@ -31,6 +40,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 )<GridLayoutProviderProps, GridLayoutContextType>(({
   columnGap: columnGap_,
   columns,
+  itemsCount,
   rowGap: rowGap_
 }) => {
   const {
@@ -41,6 +51,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     itemPositions,
     overrideItemDimensions
   } = useCommonValuesContext();
+  const debugContext = useDebugContext();
+
+  const rowOffsetDebugRects = debugContext?.useDebugRects(
+    Math.ceil(itemsCount / columns) - 1
+  );
+  const columnGapDebugRects = debugContext?.useDebugRects(columns - 1);
 
   const columnGap = useAnimatableValue(columnGap_);
   const rowGap = useAnimatableValue(rowGap_);
@@ -58,9 +74,19 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       if (width !== -1) {
         const colWidth = (width + gap) / columns - gap;
         columnWidth.value = colWidth;
+
+        if (columnGapDebugRects) {
+          for (let i = 0; i < columns - 1; i++) {
+            columnGapDebugRects[i]?.set({
+              ...DEBUG_COLORS.gap,
+              width: gap,
+              x: colWidth * (i + 1) + gap * i
+            });
+          }
+        }
       }
     },
-    [columns]
+    [columns, columnGapDebugRects]
   );
 
   // ROW OFFSETS UPDATER
@@ -81,10 +107,19 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           return;
         }
 
-        offsets[rowIndex + 1] = Math.max(
+        const offset = (offsets[rowIndex + 1] = Math.max(
           offsets[rowIndex + 1] ?? 0,
           (offsets[rowIndex] ?? 0) + itemHeight + gap
-        );
+        ));
+
+        if (rowOffsetDebugRects?.[rowIndex]) {
+          rowOffsetDebugRects[rowIndex]?.set({
+            ...DEBUG_COLORS.gap,
+            height: gap,
+            positionOrigin: 'bottom',
+            y: offset
+          });
+        }
       }
       // Update row offsets only if they have changed
       if (
@@ -99,7 +134,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         containerHeight.value = newHeight - gap;
       }
     },
-    [columns]
+    [columns, rowOffsetDebugRects]
   );
 
   // ITEM POSITIONS UPDATER

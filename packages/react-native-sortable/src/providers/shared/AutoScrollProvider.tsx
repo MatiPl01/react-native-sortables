@@ -12,10 +12,21 @@ import {
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../constants';
+import { useDebugContext } from '../../debug';
 import { useAnimatableValue } from '../../hooks';
 import type { AutoScrollSettings } from '../../types';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
+
+const DEBUG_COLORS = {
+  line: {
+    color: '#DA31C5'
+  },
+  rect: {
+    backgroundColor: '#CE00B5',
+    borderColor: '#4E0044'
+  }
+};
 
 type AutoScrollContextType = {
   scrollOffset: SharedValue<number>;
@@ -40,6 +51,10 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     touchedItemKey,
     touchedItemPosition
   } = useCommonValuesContext();
+  const debugContext = useDebugContext();
+
+  const debugRects = debugContext?.useDebugRects(['top', 'bottom']);
+  const debugLines = debugContext?.useDebugLines(['top', 'bottom']);
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);
@@ -140,7 +155,15 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       };
     },
     props => {
+      const hideDebugViews = () => {
+        debugRects?.top?.hide();
+        debugRects?.bottom?.hide();
+        debugLines?.top?.hide();
+        debugLines?.bottom?.hide();
+      };
+
       if (!props) {
+        hideDebugViews();
         return;
       }
 
@@ -148,6 +171,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       const containerMeasurements = measure(containerRef);
 
       if (!scrollableMeasurements || !containerMeasurements) {
+        hideDebugViews();
         return;
       }
 
@@ -164,6 +188,30 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       const topOverflow = sY + threshold.top - (cY + itemTopOffset);
       const bottomOverflow =
         cY + itemBottomOffset - (sY + sH - threshold.bottom);
+
+      if (debugRects) {
+        debugRects.top?.set({
+          ...DEBUG_COLORS.rect,
+          height: threshold.top,
+          y: sY - cY
+        });
+        debugRects.bottom?.set({
+          ...DEBUG_COLORS.rect,
+          height: threshold.bottom,
+          positionOrigin: 'bottom',
+          y: sY - cY + sH
+        });
+      }
+      if (debugLines) {
+        debugLines.top?.set({
+          ...DEBUG_COLORS.line,
+          y: itemTopOffset
+        });
+        debugLines.bottom?.set({
+          ...DEBUG_COLORS.line,
+          y: itemBottomOffset
+        });
+      }
 
       // Scroll up
       if (topDistance > 0 && topOverflow > 0) {

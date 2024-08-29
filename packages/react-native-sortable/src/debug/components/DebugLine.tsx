@@ -1,64 +1,44 @@
 import type { ViewStyle } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { useAnimatableValue } from '../../hooks';
-import type { Animatable, Maybe, Vector } from '../../types';
+import type { Maybe, Vector } from '../../types';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
+import type { WrappedProps } from '../types';
 
-type DebugLineProps = {
-  visible?: Animatable<boolean>;
+export type DebugLineProps = {
+  visible?: boolean;
   color?: ViewStyle['borderColor'];
   thickness?: number;
   style?: ViewStyle['borderStyle'];
+  opacity?: number;
 } & (
   | {
-      from: Animatable<Maybe<Vector>>;
-      to: Animatable<Maybe<Vector>>;
+      from: Maybe<Vector>;
+      to: Maybe<Vector>;
       x?: never;
       y?: never;
     }
   | {
-      x: Animatable<Maybe<number>>;
+      x: Maybe<number>;
       y?: never;
       from?: never;
       to?: never;
     }
   | {
       x?: never;
-      y: Animatable<Maybe<number>>;
+      y: Maybe<number>;
       from?: never;
       to?: never;
     }
-) &
-  Pick<ViewStyle, 'opacity'>;
+);
 
-export default function DebugLine({
-  color = 'black',
-  from: from_,
-  opacity = 1,
-  style = 'dashed',
-  thickness = 3,
-  to: to_,
-  visible: visible_,
-  x: x_,
-  y: y_
-}: DebugLineProps) {
+export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
   const screenDiagonal = useScreenDiagonal();
 
-  const visibleValue = useAnimatableValue(visible_);
-  const fromValue = useAnimatableValue(from_);
-  const toValue = useAnimatableValue(to_);
-  const xValue = useAnimatableValue(x_);
-  const yValue = useAnimatableValue(y_);
-
   const animatedStyle = useAnimatedStyle(() => {
-    const visible = visibleValue.value;
-    const from = fromValue.value;
-    const to = toValue.value;
-    const x = xValue.value;
-    const y = yValue.value;
+    const { from, thickness = 3, to, visible = true, x, y } = props.value;
 
     let angle = 0,
       length,
@@ -79,10 +59,15 @@ export default function DebugLine({
       length = 3 * screenDiagonal;
       tY = y;
       tX = -screenDiagonal;
+    } else {
+      return { display: 'none' };
     }
 
     return {
       display: visible ? 'flex' : 'none',
+      height: thickness,
+      marginTop: -thickness / 2,
+      opacity: props.value.opacity,
       transform: [
         { translateX: tX },
         { translateY: tY },
@@ -92,27 +77,21 @@ export default function DebugLine({
     };
   }, [screenDiagonal]);
 
+  const animatedInnerStyle = useAnimatedStyle(() => {
+    const { color = 'black', style = 'dashed', thickness = 3 } = props.value;
+
+    return {
+      borderColor: color,
+      borderStyle: style,
+      borderWidth: thickness
+    };
+  });
+
   return (
     // A tricky way to create a dashed/dotted line (render border on both sides and
     // hide one side with overflow hidden)
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          height: thickness,
-          marginTop: -thickness / 2,
-          opacity,
-          transformOrigin: '0 0'
-        },
-        animatedStyle
-      ]}>
-      <View
-        style={{
-          borderColor: color,
-          borderStyle: style,
-          borderWidth: thickness
-        }}
-      />
+    <Animated.View style={[styles.container, animatedStyle]}>
+      <Animated.View style={animatedInnerStyle} />
     </Animated.View>
   );
 }
@@ -120,6 +99,7 @@ export default function DebugLine({
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    position: 'absolute'
+    position: 'absolute',
+    transformOrigin: '0 0'
   }
 });

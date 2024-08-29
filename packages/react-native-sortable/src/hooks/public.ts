@@ -1,6 +1,5 @@
 import type { DragEndCallback, DragEndParams } from '../types';
-import { reorderOnDragEnd } from '../utils';
-import { markAsInternal } from './helpers';
+import { markAsInternal, reorderOnDragEnd } from '../utils';
 
 export function useDragEndHandler<I>(
   data: Array<I>,

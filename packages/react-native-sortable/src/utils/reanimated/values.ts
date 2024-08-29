@@ -1,4 +1,4 @@
-import type { SharedValue } from 'react-native-reanimated';
+import { type SharedValue } from 'react-native-reanimated';
 
 export function maybeUpdateValue(
   target: SharedValue<number>,

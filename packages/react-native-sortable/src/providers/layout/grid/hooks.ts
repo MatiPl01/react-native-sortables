@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unused-modules */
 import { reorderItems } from '../../../utils';
 import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useGridLayoutContext } from './GridLayoutProvider';
@@ -8,7 +9,7 @@ export function useGridOrderUpdater(numColumns: number): void {
   const { rowOffsets } = useGridLayoutContext();
 
   useOrderUpdater(
-    ({ activeIndex, centerPosition: { x, y }, dimensions, strategy }) => {
+    ({ activeIndex, dimensions, strategy, touchPosition: { x, y } }) => {
       'worklet';
       const itemsCount = indexToKey.value.length;
       const rowIndex = getRowIndex(activeIndex, numColumns);

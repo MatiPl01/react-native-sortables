@@ -2,23 +2,22 @@ import { cloneElement, type ReactElement, useRef } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { DEFAULT_SORTABLE_FLEX_PROPS } from '../../constants';
-import type { FlexProps } from '../../providers';
+import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
+import type { FlexProps } from '../providers';
 import {
   FlexLayoutProvider,
   SharedProvider,
   useCommonValuesContext,
   useFlexLayoutContext,
   useFlexOrderUpdater
-} from '../../providers';
-import type { SortableFlexProps } from '../../types';
+} from '../providers';
+import type { SortableFlexProps } from '../types';
 import {
   areArraysDifferent,
   getPropsWithDefaults,
   validateChildren
-} from '../../utils';
-import { DraggableView } from '../shared';
-import FlexLayoutDebugView from './FlexLayoutDebugView';
+} from '../utils';
+import { DraggableView } from './shared';
 
 function SortableFlex(props: SortableFlexProps) {
   const { rest: viewProps, sharedProps } = getPropsWithDefaults(
@@ -41,8 +40,6 @@ function SortableFlex(props: SortableFlexProps) {
           childrenArray={childrenArray}
           viewProps={viewProps}
         />
-        {/* TODO: Make this configurable (add a way to toggle debug mode) */}
-        <FlexLayoutDebugView itemsCount={childrenArray.length} />
       </FlexLayoutProvider>
     </SharedProvider>
   );

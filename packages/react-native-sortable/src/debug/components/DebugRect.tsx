@@ -1,19 +1,19 @@
 import type { ViewStyle } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { useAnimatableValue } from '../../hooks';
-import type { Animatable, Maybe, Vector } from '../../types';
+import type { Maybe, Vector } from '../../types';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
+import type { WrappedProps } from '../types';
 
-type DebugRectProps = {
+export type DebugRectProps = {
   backgroundOpacity?: number;
-  visible?: Animatable<boolean>;
+  visible?: boolean;
 } & (
   | {
-      from: Animatable<Maybe<Vector>>;
-      to: Animatable<Maybe<Vector>>;
+      from: Maybe<Vector>;
+      to: Maybe<Vector>;
       x?: never;
       y?: never;
       width?: never;
@@ -21,30 +21,30 @@ type DebugRectProps = {
       positionOrigin?: never;
     }
   | {
-      x: Animatable<Maybe<number>>;
-      y: Animatable<Maybe<number>>;
+      x: Maybe<number>;
+      y: Maybe<number>;
       from?: never;
       to?: never;
-      width: Animatable<Maybe<number>>;
-      height: Animatable<Maybe<number>>;
+      width: Maybe<number>;
+      height: Maybe<number>;
       positionOrigin?: `${'left' | 'right'} ${'bottom' | 'top'}`;
     }
   | {
-      x: Animatable<Maybe<number>>;
+      x: Maybe<number>;
       y?: never;
       from?: never;
       to?: never;
-      width: Animatable<Maybe<number>>;
+      width: Maybe<number>;
       height?: never;
       positionOrigin?: `${'left' | 'right'}`;
     }
   | {
       x?: never;
-      y: Animatable<Maybe<number>>;
+      y: Maybe<number>;
       from?: never;
       to?: never;
       width?: never;
-      height: Animatable<Maybe<number>>;
+      height: Maybe<number>;
       positionOrigin?: `${'bottom' | 'top'}`;
     }
 ) &
@@ -53,40 +53,22 @@ type DebugRectProps = {
     'backgroundColor' | 'borderColor' | 'borderStyle' | 'borderWidth'
   >;
 
-export default function DebugRect({
-  backgroundColor = 'rgba(0, 0, 0, 0.5)',
-  backgroundOpacity = 0.5,
-  borderColor = 'black',
-  borderStyle = 'dashed',
-  borderWidth = 2,
-  from: from_,
-  height: _height,
-  positionOrigin,
-  to: to_,
-  visible: _visible = true,
-  width: _width,
-  x: x_,
-  y: y_
-}: DebugRectProps) {
+export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
   const screenDiagonal = useScreenDiagonal();
 
-  const visibleValue = useAnimatableValue(_visible);
-  const fromValue = useAnimatableValue(from_);
-  const toValue = useAnimatableValue(to_);
-  const xValue = useAnimatableValue(x_);
-  const yValue = useAnimatableValue(y_);
-  const widthValue = useAnimatableValue(_width);
-  const heightValue = useAnimatableValue(_height);
-
   const animatedStyle = useAnimatedStyle(() => {
-    const visible = visibleValue.value;
-    const from = fromValue.value;
-    const to = toValue.value;
-    const x = xValue.value;
-    const y = yValue.value;
-
-    let width = widthValue.value ?? 0;
-    let height = heightValue.value ?? 0;
+    let { height = 0, width = 0 } = props.value;
+    const {
+      borderColor = 'black',
+      borderStyle = 'dashed',
+      borderWidth = 2,
+      from,
+      positionOrigin: origin,
+      to,
+      visible = true,
+      x,
+      y
+    } = props.value;
     let tX = 0,
       tY = 0;
 
@@ -106,19 +88,24 @@ export default function DebugRect({
       tX = -screenDiagonal;
       tY = y;
       width = 3 * screenDiagonal;
+    } else {
+      return { display: 'none' };
     }
 
-    if (positionOrigin) {
-      const origins = positionOrigin.split(' ');
+    if (origin) {
+      const origins = origin.split(' ');
       if (origins.includes('right')) {
-        tX -= width;
+        tX -= width ?? 0;
       }
       if (origins.includes('bottom')) {
-        tY -= height;
+        tY -= height ?? 0;
       }
     }
 
     return {
+      borderColor,
+      borderStyle,
+      borderWidth,
       display: visible ? 'flex' : 'none',
       height,
       transform: [{ translateX: tX }, { translateY: tY }],
@@ -126,19 +113,18 @@ export default function DebugRect({
     };
   }, []);
 
+  const animatedInnerStyle = useAnimatedStyle(() => {
+    const { backgroundColor = 'black', backgroundOpacity = 0.5 } = props.value;
+
+    return {
+      backgroundColor,
+      opacity: backgroundOpacity
+    };
+  });
+
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        { borderColor, borderStyle, borderWidth },
-        animatedStyle
-      ]}>
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor, opacity: backgroundOpacity }
-        ]}
-      />
+    <Animated.View style={[styles.container, animatedStyle]}>
+      <Animated.View style={[StyleSheet.absoluteFill, animatedInnerStyle]} />
     </Animated.View>
   );
 }
