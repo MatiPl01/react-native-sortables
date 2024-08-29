@@ -21,15 +21,17 @@ import type {
 import { DebugComponentType } from '../types';
 
 type DebugProviderContextType = {
+  // Overloaded signatures for useDebugLines
+  useDebugLines<K extends string>(keys: Array<K>): Record<K, DebugLineUpdater>;
+  useDebugLines(count: number): Array<DebugLineUpdater>;
+
+  // Overloaded signatures for useDebugRects
+  useDebugRects<K extends string>(keys: Array<K>): Record<K, DebugRectUpdater>;
+  useDebugRects(count: number): Array<DebugRectUpdater>;
+
   useDebugLine: () => DebugLineUpdater;
   useDebugRect: () => DebugRectUpdater;
   useDebugCross: () => DebugCrossUpdater;
-  useDebugLines: <K extends number | string>(
-    keysOrCount: K extends string ? Array<K> : number
-  ) => { [key in K]: DebugLineUpdater };
-  useDebugRects: <K extends number | string>(
-    keysOrCount: K extends string ? Array<K> : number
-  ) => { [key in K]: DebugRectUpdater };
   useObserver: (observer: (views: DebugViews) => void) => void;
 };
 
@@ -116,10 +118,10 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
   );
 
   const useDebugComponents = useCallback(
-    <T extends DebugComponentType, K extends string>(
+    <T extends DebugComponentType>(
       type: T,
-      keysOrCount: K extends string ? Array<K> : number
-    ): Record<K, DebugComponentUpdater<T>> => {
+      keysOrCount: Array<string> | number
+    ) => {
       const count =
         typeof keysOrCount === 'number' ? keysOrCount : keysOrCount.length;
       const keys = useMemo(
@@ -149,7 +151,7 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
         };
       }, [keys]);
 
-      return updaters as Record<K, DebugComponentUpdater<T>>;
+      return updaters;
     },
     [removeUpdater, createUpdater, addUpdater]
   );
@@ -170,16 +172,14 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
   );
 
   const useDebugLines = useCallback(
-    <K extends number | string>(
-      keysOrCount: K extends string ? Array<K> : number
-    ) => useDebugComponents(DebugComponentType.Line, keysOrCount),
+    (keysOrCount: Array<string> | number) =>
+      useDebugComponents(DebugComponentType.Line, keysOrCount),
     [useDebugComponents]
   );
 
   const useDebugRects = useCallback(
-    <K extends number | string>(
-      keysOrCount: K extends string ? Array<K> : number
-    ) => useDebugComponents(DebugComponentType.Rect, keysOrCount),
+    (keysOrCount: Array<string> | number) =>
+      useDebugComponents(DebugComponentType.Rect, keysOrCount),
     [useDebugComponents]
   );
 
@@ -199,9 +199,9 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
     value: {
       useDebugCross,
       useDebugLine,
-      useDebugLines,
+      useDebugLines: useDebugLines as DebugProviderContextType['useDebugLines'],
       useDebugRect,
-      useDebugRects,
+      useDebugRects: useDebugRects as DebugProviderContextType['useDebugRects'],
       useObserver
     }
   };

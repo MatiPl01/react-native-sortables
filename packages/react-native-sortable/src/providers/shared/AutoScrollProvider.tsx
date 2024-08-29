@@ -19,13 +19,8 @@ import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
 const DEBUG_COLORS = {
-  line: {
-    color: '#DA31C5'
-  },
-  rect: {
-    backgroundColor: '#CE00B5',
-    borderColor: '#4E0044'
-  }
+  backgroundColor: '#CE00B5',
+  borderColor: '#4E0044'
 };
 
 type AutoScrollContextType = {
@@ -190,25 +185,25 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         cY + itemBottomOffset - (sY + sH - threshold.bottom);
 
       if (debugRects) {
-        debugRects.top?.set({
-          ...DEBUG_COLORS.rect,
+        debugRects.top.set({
+          ...DEBUG_COLORS,
           height: threshold.top,
           y: sY - cY
         });
-        debugRects.bottom?.set({
-          ...DEBUG_COLORS.rect,
+        debugRects.bottom.set({
+          ...DEBUG_COLORS,
           height: threshold.bottom,
           positionOrigin: 'bottom',
           y: sY - cY + sH
         });
       }
       if (debugLines) {
-        debugLines.top?.set({
-          ...DEBUG_COLORS.line,
+        debugLines.top.set({
+          color: DEBUG_COLORS.backgroundColor,
           y: itemTopOffset
         });
-        debugLines.bottom?.set({
-          ...DEBUG_COLORS.line,
+        debugLines.bottom.set({
+          color: DEBUG_COLORS.backgroundColor,
           y: itemBottomOffset
         });
       }
