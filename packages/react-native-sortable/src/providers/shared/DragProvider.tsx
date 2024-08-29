@@ -16,6 +16,7 @@ import {
   ACTIVATION_FAIL_OFFSET,
   TIME_TO_ACTIVATE_PAN
 } from '../../constants';
+import { useDebugContext } from '../../debug';
 import { useHaptics, useJSStableCallback } from '../../hooks';
 import type { ReorderStrategy, SortableCallbacks, Vector } from '../../types';
 import { DragActivationState } from '../../types';
@@ -83,6 +84,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
+  const debugContext = useDebugContext();
+
+  const debugCross = debugContext?.useDebugCross();
 
   const haptics = useHaptics(hapticsEnabled);
 
@@ -186,6 +190,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     ({ itemPosition, snap, touch }) => {
       if (!itemPosition || !touch) {
         touchPosition.value = null;
+        debugCross?.update({ visible: false });
         return;
       }
 
@@ -193,6 +198,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: itemPosition.x + touch.x - (snap?.x ?? 0),
         y: itemPosition.y + touch.y - (snap?.y ?? 0)
       };
+      if (debugCross) {
+        debugCross.update({ color: 'red', position: touchPosition.value });
+      }
     }
   );
 

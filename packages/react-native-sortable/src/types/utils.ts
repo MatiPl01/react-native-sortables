@@ -15,6 +15,10 @@ export type Animatable<V> = SharedValue<V> | V;
 
 export type UnAnimatable<V> = V extends SharedValue<infer U> ? U : V;
 
+export type UnAnimatableValues<T extends Record<string, any>> = {
+  [K in keyof T]: UnAnimatable<T[K]>;
+};
+
 export type AnimatableValues<T extends Record<string, any>> = {
   [K in keyof T]: Animatable<UnAnimatable<T[K]>>;
 };

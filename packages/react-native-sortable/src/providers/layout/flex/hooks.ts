@@ -22,7 +22,7 @@ export function useFlexOrderUpdater(): void {
   }
 
   useOrderUpdater(
-    ({ activeIndex, activeKey, centerPosition, position, strategy }) => {
+    ({ activeIndex, activeKey, position, strategy, touchPosition }) => {
       'worklet';
       let groupIndex = keyToGroup.value[activeKey];
       if (groupIndex === undefined) {
@@ -34,7 +34,7 @@ export function useFlexOrderUpdater(): void {
       while (
         offsetBefore !== undefined &&
         groupIndex >= 0 &&
-        centerPosition[crossCoordinate] < offsetBefore
+        touchPosition[crossCoordinate] < offsetBefore
       ) {
         groupIndex -= 1;
         offsetBefore = crossAxisGroupOffsets.value[groupIndex];
@@ -44,7 +44,7 @@ export function useFlexOrderUpdater(): void {
       while (
         offsetAfter !== undefined &&
         groupIndex < itemGroups.value.length &&
-        centerPosition[crossCoordinate] > offsetAfter
+        touchPosition[crossCoordinate] > offsetAfter
       ) {
         groupIndex += 1;
         offsetAfter = crossAxisGroupOffsets.value[groupIndex + 1];
@@ -75,7 +75,7 @@ export function useFlexOrderUpdater(): void {
         if (otherPosition[mainCoordinate] < position[mainCoordinate]) {
           const otherEnd =
             otherPosition[mainCoordinate] + otherDimensions[mainDimension];
-          if (otherEnd > centerPosition[mainCoordinate]) {
+          if (otherEnd > touchPosition[mainCoordinate]) {
             overlappingItemKey = key;
             break;
           }
@@ -84,7 +84,7 @@ export function useFlexOrderUpdater(): void {
         // Item after the active item in the group
         if (otherPosition[mainCoordinate] > position[mainCoordinate]) {
           const otherStart = otherPosition[mainCoordinate];
-          if (otherStart < centerPosition[mainCoordinate]) {
+          if (otherStart < touchPosition[mainCoordinate]) {
             overlappingItemKey = key;
             break;
           }

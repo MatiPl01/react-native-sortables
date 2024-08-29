@@ -1,17 +1,18 @@
 import type { ViewStyle } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { useAnimatableValue } from '../../hooks';
+import { useAnimatableStyle, useAnimatableValue } from '../../hooks';
 import type { Animatable, Maybe, Vector } from '../../types';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
 
-type DebugLineProps = {
+export type DebugLineProps = {
   visible?: Animatable<boolean>;
-  color?: ViewStyle['borderColor'];
-  thickness?: number;
-  style?: ViewStyle['borderStyle'];
+  color?: Animatable<ViewStyle['borderColor']>;
+  thickness?: Animatable<number>;
+  style?: Animatable<ViewStyle['borderStyle']>;
+  opacity?: Animatable<number>;
 } & (
   | {
       from: Animatable<Maybe<Vector>>;
@@ -31,8 +32,7 @@ type DebugLineProps = {
       from?: never;
       to?: never;
     }
-) &
-  Pick<ViewStyle, 'opacity'>;
+);
 
 export default function DebugLine({
   color = 'black',
@@ -54,7 +54,7 @@ export default function DebugLine({
   const yValue = useAnimatableValue(y_);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const visible = visibleValue.value ?? true;
+    let visible = visibleValue.value ?? true;
     const from = fromValue.value;
     const to = toValue.value;
     const x = xValue.value;
@@ -79,6 +79,8 @@ export default function DebugLine({
       length = 3 * screenDiagonal;
       tY = y;
       tX = -screenDiagonal;
+    } else {
+      visible = false;
     }
 
     return {
@@ -91,6 +93,12 @@ export default function DebugLine({
       width: length
     };
   }, [screenDiagonal]);
+
+  const animatedInnerStyle = useAnimatableStyle({
+    borderColor: color,
+    borderStyle: style,
+    borderWidth: thickness
+  });
 
   return (
     // A tricky way to create a dashed/dotted line (render border on both sides and
@@ -106,13 +114,7 @@ export default function DebugLine({
         },
         animatedStyle
       ]}>
-      <View
-        style={{
-          borderColor: color,
-          borderStyle: style,
-          borderWidth: thickness
-        }}
-      />
+      <Animated.View style={animatedInnerStyle} />
     </Animated.View>
   );
 }

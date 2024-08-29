@@ -7,7 +7,7 @@ import type { Animatable, Maybe, Vector } from '../../types';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
 
-type DebugRectProps = {
+export type DebugRectProps = {
   backgroundOpacity?: number;
   visible?: Animatable<boolean>;
 } & (

@@ -4,11 +4,7 @@ import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../../constants';
-import {
-  isInternalFunction,
-  useAnimatableValue,
-  useStableCallback
-} from '../../hooks';
+import { useAnimatableValue, useStableCallback } from '../../hooks';
 import {
   GridLayoutProvider,
   SharedProvider,
@@ -22,12 +18,12 @@ import type {
 import {
   defaultKeyExtractor,
   getPropsWithDefaults,
+  isInternalFunction,
   reorderOnDragEnd,
   typedMemo,
   zipArrays
 } from '../../utils';
 import { DraggableView } from '../shared';
-import GridLayoutDebugView from './GridLayoutDebugView';
 
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
@@ -99,7 +95,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           renderItem={renderItem}
           style={animatedContainerStyle}
         />
-        <GridLayoutDebugView columns={columns} itemsCount={data.length} />
       </GridLayoutProvider>
     </SharedProvider>
   );

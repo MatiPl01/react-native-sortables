@@ -3,6 +3,7 @@ import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
 
 import DropIndicator from '../components/shared/DropIndicator';
+import { DebugOutlet, DebugProvider } from '../debug';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
@@ -20,6 +21,8 @@ import {
   MeasurementsProvider
 } from './shared';
 import { ContextProviderComposer } from './utils';
+
+const DEBUG = true; // TODO - make this configurable and dev-only
 
 type SharedProviderProps = PropsWithChildren<
   {
@@ -52,6 +55,7 @@ export default function SharedProvider({
   ...rest
 }: SharedProviderProps) {
   const providers = [
+    DEBUG ? <DebugProvider /> : null,
     <LayerProvider />,
     <CommonValuesProvider itemKeys={itemKeys} {...rest} />,
     <MeasurementsProvider itemsCount={itemKeys.length} />,
@@ -80,6 +84,7 @@ export default function SharedProvider({
         />
       )}
       {children}
+      {DEBUG && <DebugOutlet />}
     </ContextProviderComposer>
   );
 }
