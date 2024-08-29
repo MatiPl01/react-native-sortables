@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules */
 import type { SharedValue } from 'react-native-reanimated';
 import { useDerivedValue } from 'react-native-reanimated';
 
