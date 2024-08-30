@@ -318,21 +318,25 @@ export const updateDebugCrossAxisGapRects = (
   'worklet';
   if (groupBy === 'height') {
     zipArrays(rects, crossAxisGroupOffsets).forEach(([rect, offset]) => {
-      rect.set({
-        ...DEBUG_COLORS,
-        positionOrigin: 'right',
-        width: gaps.columnGap,
-        x: offset
-      });
+      if (offset > 0) {
+        rect.set({
+          ...DEBUG_COLORS,
+          positionOrigin: 'right',
+          width: gaps.columnGap,
+          x: offset
+        });
+      }
     });
   } else {
     zipArrays(rects, crossAxisGroupOffsets).forEach(([rect, offset]) => {
-      rect.set({
-        ...DEBUG_COLORS,
-        height: gaps.rowGap,
-        positionOrigin: 'bottom',
-        y: offset
-      });
+      if (offset > 0) {
+        rect.set({
+          ...DEBUG_COLORS,
+          height: gaps.rowGap,
+          positionOrigin: 'bottom',
+          y: offset
+        });
+      }
     });
   }
   rects.slice(crossAxisGroupOffsets.length).forEach(rect => rect.hide());

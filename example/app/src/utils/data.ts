@@ -20,10 +20,20 @@ const CATEGORIES = [
   'engineering',
   'medicine',
   'law',
-  'business'
+  'business',
+  'education',
+  'sociology',
+  'anthropology',
+  'archaeology',
+  'linguistics',
+  'religion',
+  'mythology',
+  'technology',
+  'environment',
+  'health'
 ];
 
-export function getCategories(count: Range<1, 20>): Array<string> {
+export function getCategories(count: Range<1, 30>): Array<string> {
   return CATEGORIES.slice(0, count);
 }
 

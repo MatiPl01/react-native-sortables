@@ -22,14 +22,13 @@ import {
 } from './shared';
 import { ContextProviderComposer } from './utils';
 
-const DEBUG = true; // TODO - make this configurable and dev-only
-
 type SharedProviderProps = PropsWithChildren<
   {
     itemKeys: Array<string>;
     sortEnabled: boolean;
     hapticsEnabled: boolean;
     reorderStrategy: ReorderStrategy;
+    debug: boolean;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
@@ -44,6 +43,7 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollSpeed,
   children,
+  debug,
   dropIndicatorStyle,
   hapticsEnabled,
   itemKeys,
@@ -55,10 +55,16 @@ export default function SharedProvider({
   ...rest
 }: SharedProviderProps) {
   const providers = [
-    DEBUG ? <DebugProvider /> : null,
+    // Provider used for layout debugging
+    debug ? <DebugProvider /> : null,
+    // Provider used for zIndex management when item is pressed or dragged
     <LayerProvider />,
+    // Provider used for shared values between all providers below
     <CommonValuesProvider itemKeys={itemKeys} {...rest} />,
+    // Provider used for measurements of items and the container
     <MeasurementsProvider itemsCount={itemKeys.length} />,
+    // Provider used for auto-scrolling when dragging an item near the
+    // edge of the container
     scrollableRef && (
       <AutoScrollProvider
         autoScrollActivationOffset={autoScrollActivationOffset}
@@ -67,6 +73,7 @@ export default function SharedProvider({
         scrollableRef={scrollableRef}
       />
     ),
+    // Provider used for dragging and item swapping logic
     <DragProvider
       hapticsEnabled={hapticsEnabled}
       onDragEnd={onDragEnd}
@@ -84,7 +91,7 @@ export default function SharedProvider({
         />
       )}
       {children}
-      {DEBUG && <DebugOutlet />}
+      {debug && <DebugOutlet />}
     </ContextProviderComposer>
   );
 }

@@ -28,6 +28,7 @@ export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
   autoScrollActivationOffset: 40,
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
+  debug: false,
   dropIndicatorStyle: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     borderColor: 'black',

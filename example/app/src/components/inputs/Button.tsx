@@ -1,19 +1,26 @@
+import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius, spacing, text } from '@/theme';
 import { lighten } from '@/utils';
 
 type ButtonProps = {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 
-export default function Button({ disabled, onPress, title }: ButtonProps) {
+export default function Button({
+  disabled,
+  onPress,
+  style,
+  title
+}: ButtonProps) {
   return (
     <TouchableOpacity
       disabled={disabled}
-      style={[styles.button, disabled && styles.disabled]}
+      style={[styles.button, disabled && styles.disabled, style]}
       onPress={onPress}>
       <Text style={styles.text}>{title}</Text>
     </TouchableOpacity>
@@ -31,8 +38,7 @@ const styles = StyleSheet.create({
     backgroundColor: lighten(colors.primary, 25)
   },
   text: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: 'bold'
+    ...text.label2,
+    color: colors.white
   }
 });
