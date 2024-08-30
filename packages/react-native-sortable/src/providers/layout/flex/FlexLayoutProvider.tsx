@@ -4,6 +4,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
+import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
 import type { Dimensions } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
@@ -13,7 +14,9 @@ import {
   areDimensionsCorrect,
   calculateLayout,
   getGroupSizes,
-  groupItems
+  groupItems,
+  updateDebugCrossAxisGapRects,
+  updateDebugMainAxisGapRects
 } from './utils';
 
 type FlexLayoutContextType = {
@@ -27,7 +30,9 @@ type FlexLayoutContextType = {
   columnGap: SharedValue<number>;
 };
 
-type FlexLayoutProviderProps = PropsWithChildren<FlexProps>;
+type FlexLayoutProviderProps = PropsWithChildren<
+  { itemsCount: number } & FlexProps
+>;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
@@ -39,6 +44,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   flexDirection = 'row',
   flexWrap = 'nowrap',
   gap = 0,
+  itemsCount,
   justifyContent = 'flex-start',
   rowGap: rowGap_
 }) => {
@@ -55,6 +61,14 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     itemPositions,
     overrideItemDimensions
   } = useCommonValuesContext();
+  const debugContext = useDebugContext();
+
+  // Because the number of groups can dynamically change after order change
+  // and we can't see that in the React runtime, we are creating debug
+  // rects for the maximum number of groups that can be displayed (which
+  // is the number of items minus 1 in the worst case for just a single group)
+  const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
+  const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
 
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
   const keyToGroup = useSharedValue<Record<string, number>>({});
@@ -151,9 +165,37 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       if (result) {
         itemPositions.value = result.itemPositions;
         crossAxisGroupOffsets.value = result.crossAxisGroupOffsets;
+
+        if (debugMainAxisGapRects) {
+          updateDebugMainAxisGapRects(
+            debugMainAxisGapRects,
+            groupBy,
+            keyToGroup.value,
+            result.itemPositions,
+            crossAxisGroupSizes.value,
+            result.crossAxisGroupOffsets,
+            gaps
+          );
+        }
+        if (debugCrossAxisGapRects) {
+          updateDebugCrossAxisGapRects(
+            debugCrossAxisGapRects,
+            groupBy,
+            result.crossAxisGroupOffsets,
+            gaps
+          );
+        }
       }
     },
-    [groupBy, alignContent, alignItems, flexWrap, justifyContent]
+    [
+      groupBy,
+      alignContent,
+      alignItems,
+      flexWrap,
+      justifyContent,
+      debugMainAxisGapRects,
+      debugCrossAxisGapRects
+    ]
   );
 
   // OVERRIDE ITEM DIMENSIONS UPDATER
