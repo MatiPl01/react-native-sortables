@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 
 import type {
@@ -14,7 +14,11 @@ const DebugOutlet = memo(function DebugOutlet() {
   const [debugViews, setDebugViews] = useState<DebugViews>({});
   const { useObserver } = useDebugContext() ?? {};
 
-  useObserver?.(setDebugViews);
+  const observer = useCallback((views: DebugViews) => {
+    setDebugViews(views);
+  }, []);
+
+  useObserver?.(observer);
 
   return (
     <>

@@ -1,5 +1,9 @@
+import type {
+  DebugComponentType,
+  DebugComponentUpdater
+} from '../../../debug/types';
 import type { Dimension, Dimensions, Vector } from '../../../types';
-import { sum } from '../../../utils';
+import { sum, zipArrays } from '../../../utils';
 import type {
   AlignContent,
   AlignItems,
@@ -248,4 +252,92 @@ export const calculateLayout = (
   }
 
   return { crossAxisGroupOffsets, itemPositions: positions };
+};
+
+const DEBUG_COLORS = {
+  backgroundColor: '#ffa500',
+  borderColor: '#825500'
+};
+
+export const updateDebugMainAxisGapRects = (
+  rects: Array<DebugComponentUpdater<DebugComponentType.Rect>>,
+  groupBy: Dimension,
+  keyToGroup: Record<string, number>,
+  itemPositions: Record<string, Vector>,
+  crossAxisGroupSizes: Array<number>,
+  crossAxisGroupOffsets: Array<number>,
+  gaps: { rowGap: number; columnGap: number }
+) => {
+  'worklet';
+
+  if (groupBy === 'width') {
+    zipArrays(rects, Object.entries(keyToGroup)).forEach(
+      ([rect, [key, groupIndex]]) => {
+        const y1 = crossAxisGroupOffsets[groupIndex] ?? 0;
+        const y2 = y1 + (crossAxisGroupSizes[groupIndex] ?? 0);
+        const x1 = itemPositions[key]?.x ?? 0;
+
+        if (x1 <= 0) {
+          rect.hide();
+        } else {
+          rect.set({
+            ...DEBUG_COLORS,
+            from: { x: x1 - gaps.columnGap, y: y1 },
+            to: { x: x1, y: y2 }
+          });
+        }
+      }
+    );
+  } else {
+    zipArrays(rects, Object.entries(keyToGroup)).forEach(
+      ([rect, [key, groupIndex]]) => {
+        const x1 = crossAxisGroupOffsets[groupIndex] ?? 0;
+        const x2 = x1 + (crossAxisGroupSizes[groupIndex] ?? 0);
+        const y1 = itemPositions[key]?.y ?? 0;
+
+        if (y1 <= 0) {
+          rect.hide();
+        } else {
+          rect.set({
+            ...DEBUG_COLORS,
+            from: { x: x1, y: y1 - gaps.rowGap },
+            to: { x: x2, y: y1 }
+          });
+        }
+      }
+    );
+  }
+};
+
+export const updateDebugCrossAxisGapRects = (
+  rects: Array<DebugComponentUpdater<DebugComponentType.Rect>>,
+  groupBy: Dimension,
+  crossAxisGroupOffsets: Array<number>,
+  gaps: { rowGap: number; columnGap: number }
+) => {
+  'worklet';
+  if (groupBy === 'height') {
+    zipArrays(rects, crossAxisGroupOffsets).forEach(([rect, offset]) => {
+      if (offset > 0) {
+        rect.set({
+          ...DEBUG_COLORS,
+          positionOrigin: 'right',
+          width: gaps.columnGap,
+          x: offset
+        });
+      }
+    });
+  } else {
+    zipArrays(rects, crossAxisGroupOffsets).forEach(([rect, offset]) => {
+      if (offset > 0) {
+        rect.set({
+          ...DEBUG_COLORS,
+          height: gaps.rowGap,
+          positionOrigin: 'bottom',
+          y: offset
+        });
+      }
+    });
+  }
+  rects.slice(crossAxisGroupOffsets.length).forEach(rect => rect.hide());
 };

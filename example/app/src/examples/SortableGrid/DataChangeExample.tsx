@@ -4,7 +4,7 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable, { type SortableGridRenderItem } from 'react-native-sortable';
 
 import { Button, GridCard, Group, Section, Stagger } from '@/components';
-import { colors, flex, spacing } from '@/theme';
+import { colors, flex, spacing, text } from '@/theme';
 import { getItems } from '@/utils';
 
 const AVAILABLE_DATA = getItems(18);
@@ -133,7 +133,7 @@ export default function DataChangeExample() {
         <Animated.ScrollView
           contentContainerStyle={styles.scrollViewContent}
           ref={scrollableRef}
-          style={styles.scrollView}>
+          style={flex.fill}>
           <Group withMargin={false} bordered center>
             <Text style={styles.title}>Above SortableGrid</Text>
           </Group>
@@ -164,9 +164,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     rowGap: spacing.xs
   },
-  scrollView: {
-    flex: 1
-  },
   scrollViewContent: {
     gap: spacing.sm,
     padding: spacing.sm
@@ -177,8 +174,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.none
   },
   title: {
-    color: colors.foreground3,
-    fontSize: 16,
-    fontWeight: 'bold'
+    ...text.subHeading2,
+    color: colors.foreground3
   }
 });

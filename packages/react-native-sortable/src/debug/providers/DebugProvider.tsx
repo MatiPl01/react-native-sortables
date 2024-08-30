@@ -3,14 +3,14 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef
+  useRef,
+  useState
 } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { cancelAnimation, makeMutable } from 'react-native-reanimated';
 
 import { useDebouncedStableCallback } from '../../hooks';
 import { createProvider } from '../../providers/utils';
-import { zipArrays } from '../../utils';
 import type {
   DebugComponentUpdater,
   DebugCrossUpdater,
@@ -42,11 +42,15 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
 })<DebugProviderProps, DebugProviderContextType>(() => {
   const debugIdRef = useRef(0);
   const debugViewsRef = useRef<DebugViews>({});
-  const observersRef = useRef(() => new Set<(views: DebugViews) => void>());
+  const observersRef = useRef(new Set<(views: DebugViews) => void>());
+
+  const getNextKey = useCallback(() => debugIdRef.current++, []);
 
   const notifyObservers = useDebouncedStableCallback(() => {
     const views = debugViewsRef.current;
-    observersRef.current().forEach(observer => observer(views));
+    for (const observer of observersRef.current) {
+      observer({ ...views });
+    }
   });
 
   const createUpdater = useCallback(
@@ -100,7 +104,7 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
 
   const useDebugComponent = useCallback(
     <T extends DebugComponentType>(type: T) => {
-      const key = useMemo(() => debugIdRef.current++, []);
+      const key = useMemo(getNextKey, []);
       const updater = useMemo(
         () => addUpdater(key, createUpdater(type)),
         [type, key]
@@ -114,7 +118,7 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
 
       return updater;
     },
-    [removeUpdater, createUpdater, addUpdater]
+    [removeUpdater, createUpdater, addUpdater, getNextKey]
   );
 
   const useDebugComponents = useCallback(
@@ -122,38 +126,61 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
       type: T,
       keysOrCount: Array<string> | number
     ) => {
-      const count =
-        typeof keysOrCount === 'number' ? keysOrCount : keysOrCount.length;
-      const keys = useMemo(
-        () => Array.from({ length: count }, () => debugIdRef.current++),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [...(typeof keysOrCount === 'number' ? [keysOrCount] : keysOrCount)]
+      const isNumber = typeof keysOrCount === 'number';
+      const [keys] = useState(
+        isNumber ? ([] as Array<number>) : ({} as Record<string, number>)
       );
-      const updaters = useMemo(
-        () => {
-          if (typeof keysOrCount === 'number') {
-            return keys.map(key => addUpdater(key, createUpdater(type)));
-          }
-          return Object.fromEntries(
-            zipArrays(keys, keysOrCount).map(([key, resultKey]) => [
-              resultKey,
-              addUpdater(key, createUpdater(type))
-            ])
-          );
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [keys, type]
+      const [updaters] = useState(() =>
+        isNumber
+          ? ([] as Array<DebugComponentUpdater<DebugComponentType>>)
+          : ({} as Record<string, DebugComponentUpdater<DebugComponentType>>)
       );
 
       useEffect(() => {
         return () => {
-          keys.forEach(removeUpdater);
+          for (const key of Object.values(keys)) {
+            removeUpdater(key);
+          }
         };
       }, [keys]);
 
-      return updaters;
+      if (isNumber && Array.isArray(keys) && Array.isArray(updaters)) {
+        if (keys.length < keysOrCount) {
+          for (let i = keys.length; i < keysOrCount; i++) {
+            const key = getNextKey();
+            keys.push(key);
+            updaters.push(addUpdater(key, createUpdater(type)));
+          }
+        } else {
+          const removedKeys = keys.splice(keysOrCount);
+          updaters.splice(keysOrCount);
+          removedKeys.forEach(removeUpdater);
+        }
+      } else if (
+        !isNumber &&
+        !Array.isArray(keys) &&
+        !Array.isArray(updaters)
+      ) {
+        const resultKeySet = new Set(keysOrCount);
+        for (const [resultKey, key] of Object.entries(keys)) {
+          if (!resultKeySet.has(resultKey)) {
+            removeUpdater(key);
+            delete keys[resultKey];
+            delete updaters[resultKey];
+          }
+        }
+        for (const resultKey of keysOrCount) {
+          if (!updaters[resultKey]) {
+            const key = getNextKey();
+            keys[resultKey] = key;
+            updaters[resultKey] = addUpdater(key, createUpdater(type));
+          }
+        }
+      }
+
+      return Array.isArray(updaters) ? [...updaters] : { ...updaters };
     },
-    [removeUpdater, createUpdater, addUpdater]
+    [removeUpdater, createUpdater, addUpdater, getNextKey]
   );
 
   const useDebugLine = useCallback(
@@ -185,7 +212,7 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
 
   const useObserver = useCallback((observer: (views: DebugViews) => void) => {
     useEffect(() => {
-      const observers = observersRef.current();
+      const observers = observersRef.current;
       observers.add(observer);
       // Notify the observer immediately after adding it
       observer(debugViewsRef.current);

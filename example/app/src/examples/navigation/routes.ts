@@ -29,6 +29,10 @@ const routes: Routes = {
       CallbacksExample: {
         Component: SortableGrid.CallbacksExample,
         name: 'Callbacks'
+      },
+      DebugExample: {
+        Component: SortableGrid.DebugExample,
+        name: 'Debug'
       }
     }
   },
@@ -55,6 +59,10 @@ const routes: Routes = {
       CallbacksExample: {
         Component: SortableFlex.CallbacksExample,
         name: 'Callbacks'
+      },
+      DebugExample: {
+        Component: SortableFlex.DebugExample,
+        name: 'Debug'
       }
     }
   }

@@ -15,10 +15,8 @@ import { createProvider } from '../../utils';
 import { getColumnIndex, getRowIndex } from './utils';
 
 const DEBUG_COLORS = {
-  gap: {
-    backgroundColor: '#ffa500',
-    borderColor: '#825500'
-  }
+  backgroundColor: '#ffa500',
+  borderColor: '#825500'
 };
 
 type GridLayoutContextType = {
@@ -53,10 +51,10 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
-  const rowOffsetDebugRects = debugContext?.useDebugRects(
+  const debugRowGapRects = debugContext?.useDebugRects(
     Math.ceil(itemsCount / columns) - 1
   );
-  const columnGapDebugRects = debugContext?.useDebugRects(columns - 1);
+  const debugColumnGapRects = debugContext?.useDebugRects(columns - 1);
 
   const columnGap = useAnimatableValue(columnGap_);
   const rowGap = useAnimatableValue(rowGap_);
@@ -75,10 +73,10 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         const colWidth = (width + gap) / columns - gap;
         columnWidth.value = colWidth;
 
-        if (columnGapDebugRects) {
+        if (debugColumnGapRects) {
           for (let i = 0; i < columns - 1; i++) {
-            columnGapDebugRects[i]?.set({
-              ...DEBUG_COLORS.gap,
+            debugColumnGapRects[i]?.set({
+              ...DEBUG_COLORS,
               width: gap,
               x: colWidth * (i + 1) + gap * i
             });
@@ -86,7 +84,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         }
       }
     },
-    [columns, columnGapDebugRects]
+    [columns, debugColumnGapRects]
   );
 
   // ROW OFFSETS UPDATER
@@ -112,9 +110,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           (offsets[rowIndex] ?? 0) + itemHeight + gap
         ));
 
-        if (rowOffsetDebugRects?.[rowIndex]) {
-          rowOffsetDebugRects[rowIndex]?.set({
-            ...DEBUG_COLORS.gap,
+        if (debugRowGapRects?.[rowIndex]) {
+          debugRowGapRects[rowIndex]?.set({
+            ...DEBUG_COLORS,
             height: gap,
             positionOrigin: 'bottom',
             y: offset
@@ -134,7 +132,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         containerHeight.value = newHeight - gap;
       }
     },
-    [columns, rowOffsetDebugRects]
+    [columns, debugRowGapRects]
   );
 
   // ITEM POSITIONS UPDATER

@@ -78,6 +78,7 @@ export type SharedProps = Simplify<
     sortEnabled?: boolean;
     hapticsEnabled?: boolean;
     reorderStrategy?: ReorderStrategy;
+    debug?: boolean;
   } & Partial<ActiveItemDecorationSettings> &
     Partial<ActiveItemSnapSettings> &
     Partial<AutoScrollSettings> &
