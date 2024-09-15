@@ -29,6 +29,7 @@ import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { LayerState, useLayerContext } from './LayerProvider';
+import { useMeasurementsContext } from './MeasurementsProvider';
 
 type DragContextType = {
   handleTouchStart: (
@@ -68,6 +69,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationState,
     activeItemDropped,
     activeItemKey,
+    containerHeight,
     enableActiveItemSnap,
     inactiveAnimationProgress,
     indexToKey,
@@ -81,6 +83,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     touchedItemPosition,
     touchedItemWidth
   } = useCommonValuesContext();
+  const { tryMeasureContainerHeight, updateTouchedItemDimensions } =
+    useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
@@ -310,20 +314,32 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       touchedItemKey.value = key;
       activationProgress.value = 0;
       activationState.value = DragActivationState.TOUCHED;
-      updateLayer?.(LayerState.Focused);
+      startTouch.value = firstTouch;
 
-      const animate = (callback?: (finished?: boolean) => void) =>
-        withTiming(
-          1,
-          { duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY },
-          callback
-        );
+      // This should never happen, but just in case the container height
+      // was not measured within the specified interval and onLayout
+      // was not called, we will try to measure it again after the item
+      // is touched
+      if (containerHeight.value === -1) {
+        tryMeasureContainerHeight();
+      }
 
       clearAnimatedTimeout(activationTimeoutId.value);
       // Start handling touch after a delay to prevent accidental activation
       // e.g. while scrolling the ScrollView
       activationTimeoutId.value = setAnimatedTimeout(() => {
-        startTouch.value = firstTouch;
+        updateTouchedItemDimensions(key);
+        updateLayer?.(LayerState.Focused);
+
+        const animate = (callback?: (finished?: boolean) => void) =>
+          withTiming(
+            1,
+            {
+              duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
+            },
+            callback
+          );
+
         touchStartItemPosition.value = itemPositions.value[key] ?? null;
         activationState.value = DragActivationState.ACTIVATING;
         inactiveAnimationProgress.value = animate();
@@ -348,6 +364,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       startTouch,
       touchedItemKey,
       itemPositions,
+      containerHeight,
       activationTimeoutId,
       touchStartItemPosition,
       activationState,
@@ -355,7 +372,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveAnimationProgress,
       updateLayer,
       handleDragStart,
-      handleDragEnd
+      handleDragEnd,
+      tryMeasureContainerHeight,
+      updateTouchedItemDimensions
     ]
   );
 
