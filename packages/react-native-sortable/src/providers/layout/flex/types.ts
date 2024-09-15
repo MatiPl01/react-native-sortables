@@ -1,3 +1,5 @@
+import type { SharedValue } from 'react-native-reanimated';
+
 export type JustifyContent =
   | 'center'
   | 'flex-end'
@@ -15,7 +17,10 @@ export type AlignContent =
   | 'stretch';
 export type AlignItems = 'center' | 'flex-end' | 'flex-start' | 'stretch';
 export type FlexWrap = 'nowrap' | 'wrap' | 'wrap-reverse';
-export type FlexDirection = 'column' | 'column-reverse' | 'row' | 'row-reverse';
+
+export type RowFlexDirection = 'row' | 'row-reverse';
+export type ColumnFlexDirection = 'column' | 'column-reverse';
+export type FlexDirection = ColumnFlexDirection | RowFlexDirection;
 
 export type FlexProps = Partial<{
   justifyContent: JustifyContent;
@@ -27,3 +32,32 @@ export type FlexProps = Partial<{
   columnGap: number;
   gap: number;
 }>;
+
+type SharedFLexAxisParams = {
+  gaps: {
+    main: SharedValue<number>;
+    cross: SharedValue<number>;
+  };
+};
+
+export type FlexRowAxisParams = {
+  coordinates: {
+    main: 'x';
+    cross: 'y';
+  };
+  dimensions: {
+    main: 'width';
+    cross: 'height';
+  };
+} & SharedFLexAxisParams;
+
+export type FlexColumnAxisParams = {
+  coordinates: {
+    main: 'y';
+    cross: 'x';
+  };
+  dimensions: {
+    main: 'height';
+    cross: 'width';
+  };
+} & SharedFLexAxisParams;

@@ -114,7 +114,7 @@ const alignHelper = (
 
   const offsets = [startOffset];
 
-  for (let i = 0; i < sizes.length - 1; i++) {
+  for (let i = 0; i < sizes.length; i++) {
     offsets.push((startOffset += (sizes[i] ?? 0) + adjustedGap));
   }
 
@@ -317,8 +317,8 @@ export const updateDebugCrossAxisGapRects = (
 ) => {
   'worklet';
   if (groupBy === 'height') {
-    zipArrays(rects, crossAxisGroupOffsets).forEach(([rect, offset]) => {
-      if (offset > 0) {
+    zipArrays(rects, crossAxisGroupOffsets).forEach(([rect, offset], index) => {
+      if (offset > 0 && index < crossAxisGroupOffsets.length - 1) {
         rect.set({
           ...DEBUG_COLORS,
           positionOrigin: 'right',
@@ -328,8 +328,8 @@ export const updateDebugCrossAxisGapRects = (
       }
     });
   } else {
-    zipArrays(rects, crossAxisGroupOffsets).forEach(([rect, offset]) => {
-      if (offset > 0) {
+    zipArrays(rects, crossAxisGroupOffsets).forEach(([rect, offset], index) => {
+      if (offset > 0 && index < crossAxisGroupOffsets.length - 1) {
         rect.set({
           ...DEBUG_COLORS,
           height: gaps.rowGap,

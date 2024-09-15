@@ -1,12 +1,11 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
+import { MIN_EXTRA_SWAP_OFFSET } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import { reorderItems } from '../../../utils';
 import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useGridLayoutContext } from './GridLayoutProvider';
 import { getColumnIndex, getRowIndex } from './utils';
-
-const MIN_ADDITIONAL_OFFSET = 5;
 
 const DEBUG_COLORS = {
   backgroundColor: '#1111ef',
@@ -54,7 +53,7 @@ export function useGridOrderUpdater(numColumns: number): void {
 
       // Horizontal bounds
       const additionalOffsetX = Math.min(
-        rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
+        rowGap.value / 2 + MIN_EXTRA_SWAP_OFFSET,
         rowGap.value + columnWidth.value / 2
       );
       const leftBound = columnOffsetLeft - additionalOffsetX;
@@ -66,7 +65,7 @@ export function useGridOrderUpdater(numColumns: number): void {
           ? rowOffsetAbove - rowOffsets.value[rowIndex - 1]! - rowGap.value
           : 0;
       const additionalOffsetTop = Math.min(
-        rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
+        rowGap.value / 2 + MIN_EXTRA_SWAP_OFFSET,
         rowGap.value + rowAboveHeight / 2
       );
       const topBound = rowOffsetAbove - additionalOffsetTop;
@@ -77,12 +76,13 @@ export function useGridOrderUpdater(numColumns: number): void {
           ? rowOffsets.value[rowIndex + 2]! - rowOffsetBelow - rowGap.value
           : 0;
       const additionalOffsetBottom = Math.min(
-        rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
+        rowGap.value / 2 + MIN_EXTRA_SWAP_OFFSET,
         rowGap.value + rowBelowHeight / 2
       );
       const bottomBound =
         rowOffsetBelow - rowGap.value + additionalOffsetBottom;
 
+      // FOR DEBUGGING PURPOSES
       if (debugRects) {
         debugRects.top.set({
           ...DEBUG_COLORS,
