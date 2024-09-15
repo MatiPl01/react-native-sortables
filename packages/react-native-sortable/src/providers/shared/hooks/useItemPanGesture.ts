@@ -6,17 +6,13 @@ import { TIME_TO_ACTIVATE_PAN } from '../../../constants';
 import { useAutoScrollContext } from '../AutoScrollProvider';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
-import { useMeasurementsContext } from '../MeasurementsProvider';
 
 export default function useItemPanGesture(
   key: string,
   pressProgress: SharedValue<number>,
   reverseXAxis = false
 ) {
-  const { containerHeight, reorderStrategy, touchedItemKey } =
-    useCommonValuesContext();
-  const { tryMeasureContainerHeight, updateTouchedItemDimensions } =
-    useMeasurementsContext();
+  const { reorderStrategy, touchedItemKey } = useCommonValuesContext();
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
     useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
@@ -31,13 +27,7 @@ export default function useItemPanGesture(
             manager.fail();
             return;
           }
-          // This should never happen, but just in case the container height
-          // was not measured withing the specified interval and onLayout
-          // was not called, we will try to measure it again after the item
-          // is touched
-          if (containerHeight.value === -1) {
-            tryMeasureContainerHeight();
-          }
+
           handleTouchStart(
             e,
             key,
@@ -45,7 +35,6 @@ export default function useItemPanGesture(
             pressProgress,
             manager.activate
           );
-          updateTouchedItemDimensions(key);
         })
         .onTouchesCancelled((_, manager) => {
           manager.fail();
@@ -68,14 +57,11 @@ export default function useItemPanGesture(
       reverseXAxis,
       reorderStrategy,
       pressProgress,
-      containerHeight,
       touchedItemKey,
       handleTouchStart,
       handleTouchesMove,
       handleDragEnd,
-      tryMeasureContainerHeight,
-      updateStartScrollOffset,
-      updateTouchedItemDimensions
+      updateStartScrollOffset
     ]
   );
 }
