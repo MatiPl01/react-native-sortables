@@ -5,7 +5,6 @@ import {
   runOnJS,
   scrollTo,
   useAnimatedReaction,
-  useDerivedValue,
   useFrameCallback,
   useScrollViewOffset,
   useSharedValue
@@ -40,9 +39,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
 }) => {
   const {
     activationProgress,
-    activeItemKey,
     containerRef,
-    itemDimensions,
+    touchedItemHeight,
     touchedItemKey,
     touchedItemPosition
   } = useCommonValuesContext();
@@ -56,10 +54,6 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   const targetScrollOffset = useSharedValue(-1);
   const dragStartScrollOffset = useAnimatableValue(-1);
 
-  const activeItemHeight = useDerivedValue(() => {
-    const key = activeItemKey.value;
-    return key ? (itemDimensions.value[key]?.height ?? -1) : -1;
-  });
   const offsetThreshold = useAnimatableValue(
     autoScrollActivationOffset,
     (v): { top: number; bottom: number } => {
@@ -137,14 +131,14 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     () => {
       if (
         !enabled.value ||
-        activeItemHeight.value === -1 ||
+        touchedItemHeight.value === -1 ||
         !touchedItemPosition.value
       ) {
         return null;
       }
 
       return {
-        itemHeight: activeItemHeight.value,
+        itemHeight: touchedItemHeight.value,
         itemOffset: touchedItemPosition.value.y,
         threshold: offsetThreshold.value
       };

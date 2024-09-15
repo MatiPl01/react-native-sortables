@@ -123,12 +123,15 @@ export function useGridOrderUpdater(numColumns: number): void {
       }
 
       const indexOffset = dy * numColumns + dx;
-      // Swap the active item with the item at the new index
-      const newIndex = activeIndex + indexOffset;
-      if (newIndex === activeIndex || newIndex < 0 || newIndex >= itemsCount) {
+      let newIndex = activeIndex + indexOffset;
+      // Adjust the index to be within the bounds
+      if (newIndex < 0 || newIndex >= itemsCount) {
+        newIndex -=
+          numColumns * Math.ceil((newIndex - itemsCount + 1) / numColumns);
+      }
+      if (newIndex === activeIndex) {
         return;
       }
-
       // return the new order of items
       return reorderItems(indexToKey.value, activeIndex, newIndex, strategy);
     },

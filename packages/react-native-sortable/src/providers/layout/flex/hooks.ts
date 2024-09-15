@@ -1,13 +1,39 @@
+import { useAnimatedReaction } from 'react-native-reanimated';
+
+import { useDebugContext } from '../../../debug';
 import type { Coordinate, Dimension } from '../../../types';
 import { reorderItems } from '../../../utils';
 import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
 
 export function useFlexOrderUpdater(): void {
-  const { indexToKey, itemDimensions, itemPositions, keyToIndex } =
-    useCommonValuesContext();
+  const {
+    activeItemKey,
+    indexToKey,
+    itemDimensions,
+    itemPositions,
+    keyToIndex
+  } = useCommonValuesContext();
   const { crossAxisGroupOffsets, flexDirection, itemGroups, keyToGroup } =
     useFlexLayoutContext();
+
+  const debugContext = useDebugContext();
+
+  const debugRects = debugContext?.useDebugRects([
+    'top',
+    'bottom',
+    'left',
+    'right'
+  ]);
+
+  useAnimatedReaction(
+    () => activeItemKey.value,
+    () => {
+      if (debugRects && activeItemKey.value === null) {
+        Object.values(debugRects).forEach(rect => rect.hide());
+      }
+    }
+  );
 
   let mainCoordinate: Coordinate = 'x';
   let crossCoordinate: Coordinate = 'y';
