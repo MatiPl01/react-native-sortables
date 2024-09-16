@@ -2,7 +2,7 @@ import type {
   DebugComponentType,
   DebugComponentUpdater
 } from '../../../debug/types';
-import type { Dimension, Dimensions, Vector } from '../../../types';
+import type { Coordinate, Dimension, Dimensions, Vector } from '../../../types';
 import { sum, zipArrays } from '../../../utils';
 import type {
   AlignContent,
@@ -339,5 +339,5 @@ export const updateDebugCrossAxisGapRects = (
       }
     });
   }
-  rects.slice(crossAxisGroupOffsets.length).forEach(rect => rect.hide());
+  rects.slice(crossAxisGroupOffsets.length - 1).forEach(rect => rect.hide());
 };

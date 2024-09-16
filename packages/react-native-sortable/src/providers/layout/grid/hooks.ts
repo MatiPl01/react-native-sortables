@@ -51,7 +51,7 @@ export function useGridOrderUpdater(numColumns: number): void {
         columnIndex * (columnWidth.value + columnGap.value);
       const columnOffsetRight = columnOffsetLeft + columnWidth.value;
 
-      // Horizontal bounds
+      // HORIZONTAL BOUNDS
       const additionalOffsetX = Math.min(
         rowGap.value / 2 + MIN_EXTRA_SWAP_OFFSET,
         rowGap.value + columnWidth.value / 2
@@ -59,6 +59,7 @@ export function useGridOrderUpdater(numColumns: number): void {
       const leftBound = columnOffsetLeft - additionalOffsetX;
       const rightBound = columnOffsetRight + additionalOffsetX;
 
+      // VERTICAL BOUNDS
       // Top bound
       const rowAboveHeight =
         rowOffsets.value[rowIndex - 1] !== undefined
@@ -106,7 +107,7 @@ export function useGridOrderUpdater(numColumns: number): void {
         });
       }
 
-      // Check if the center of the active item is over the top or bottom edge of the container
+      // Check if touch y position is over the top or the bottom bound
       let dy = 0;
       if (topBound > 0 && y < topBound) {
         dy = -1;
@@ -114,7 +115,7 @@ export function useGridOrderUpdater(numColumns: number): void {
         dy = 1;
       }
 
-      // Check if the center of the active item is over the left or right edge of the container
+      // Check if touch x position is over the left or the right bound
       let dx = 0;
       if (leftBound > 0 && x < leftBound) {
         dx = -1;

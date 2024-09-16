@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { MIN_EXTRA_SWAP_OFFSET } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type { Coordinate, Dimension } from '../../../types';
+import { reorderItems } from '../../../utils';
 import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
 import type {
@@ -69,18 +70,9 @@ function useAxisParams<T extends FlexDirection>(
   );
 }
 
-export function useFlexOrderUpdater(): void {
-  const {
-    activeItemKey,
-    indexToKey,
-    itemDimensions,
-    itemPositions,
-    keyToIndex
-  } = useCommonValuesContext();
-  const { crossAxisGroupOffsets, flexDirection, itemGroups, keyToGroup } =
-    useFlexLayoutContext();
-  const { coordinates, dimensions, gaps } = useAxisParams(flexDirection);
-
+function useSwapDebugRectsUpdater() {
+  'worklet';
+  const { activeItemKey } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
   const debugRects = debugContext?.useDebugRects([
@@ -99,6 +91,124 @@ export function useFlexOrderUpdater(): void {
     }
   );
 
+  const updater = useCallback(
+    (
+      coordinates: { main: Coordinate; cross: Coordinate },
+      gaps: { main: SharedValue<number>; cross: SharedValue<number> },
+      offsets: {
+        main: { before: number; after: number };
+        cross: { before: number; after: number };
+      },
+      bounds: {
+        main: { before: number | undefined; after: number | undefined };
+        cross: { before: number; after: number };
+      }
+    ) => {
+      'worklet';
+      if (!debugRects) {
+        return;
+      }
+
+      // For row direction
+      if (coordinates.main === 'x' && coordinates.cross === 'y') {
+        debugRects.crossBefore.set({
+          ...DEBUG_COLORS,
+          from: { x: offsets.main.before, y: bounds.cross.before },
+          to: { x: offsets.main.after, y: offsets.cross.before }
+        });
+        debugRects.crossAfter.set({
+          ...DEBUG_COLORS,
+          from: {
+            x: offsets.main.before,
+            y: offsets.cross.after - gaps.cross.value
+          },
+          to: { x: offsets.main.after, y: bounds.cross.after }
+        });
+
+        if (bounds.main.before !== undefined) {
+          debugRects.mainBefore.set({
+            ...DEBUG_COLORS,
+            from: { x: bounds.main.before, y: bounds.cross.before },
+            to: {
+              x: Math.max(offsets.main.before, bounds.main.before),
+              y: bounds.cross.after
+            }
+          });
+        } else {
+          debugRects.mainBefore.hide();
+        }
+
+        if (bounds.main.after !== undefined) {
+          debugRects.mainAfter.set({
+            ...DEBUG_COLORS,
+            from: {
+              x: Math.min(offsets.main.after, bounds.main.after),
+              y: bounds.cross.before
+            },
+            to: { x: bounds.main.after, y: bounds.cross.after }
+          });
+        } else {
+          debugRects.mainAfter.hide();
+        }
+      }
+      // For column direction
+      else if (coordinates.main === 'y' && coordinates.cross === 'x') {
+        debugRects.crossBefore.set({
+          ...DEBUG_COLORS,
+          from: { x: bounds.cross.before, y: offsets.main.before },
+          to: { x: offsets.cross.before, y: offsets.main.after }
+        });
+        debugRects.crossAfter.set({
+          ...DEBUG_COLORS,
+          from: {
+            x: offsets.cross.after - gaps.cross.value,
+            y: offsets.main.before
+          },
+          to: { x: bounds.cross.after, y: offsets.main.after }
+        });
+
+        if (bounds.main.before !== undefined) {
+          debugRects.mainBefore.set({
+            ...DEBUG_COLORS,
+            from: { x: bounds.cross.before, y: bounds.main.before },
+            to: {
+              x: bounds.cross.after,
+              y: Math.max(offsets.main.before, bounds.main.before)
+            }
+          });
+        } else {
+          debugRects.mainBefore.hide();
+        }
+
+        if (bounds.main.after !== undefined) {
+          debugRects.mainAfter.set({
+            ...DEBUG_COLORS,
+            from: {
+              x: bounds.cross.before,
+              y: Math.min(offsets.main.after, bounds.main.after)
+            },
+            to: { x: bounds.cross.after, y: bounds.main.after }
+          });
+        } else {
+          debugRects.mainAfter.hide();
+        }
+      }
+    },
+    [debugRects]
+  );
+
+  return debugRects ? updater : null;
+}
+
+export function useFlexOrderUpdater(): void {
+  const { indexToKey, itemDimensions, itemPositions } =
+    useCommonValuesContext();
+  const { crossAxisGroupOffsets, flexDirection, keyToGroup } =
+    useFlexLayoutContext();
+  const { coordinates, dimensions, gaps } = useAxisParams(flexDirection);
+
+  const updateDebugRects = useSwapDebugRectsUpdater();
+
   useOrderUpdater(
     ({ activeIndex, activeKey, position, strategy, touchPosition }) => {
       'worklet';
@@ -107,13 +217,22 @@ export function useFlexOrderUpdater(): void {
         return;
       }
 
-      // Get active item cross axis bounds
+      // Get active item bounding box
       const crossOffsetBefore = crossAxisGroupOffsets.value[groupIndex];
       const crossOffsetAfter = crossAxisGroupOffsets.value[groupIndex + 1];
       if (crossOffsetBefore === undefined || crossOffsetAfter === undefined) {
         return;
       }
+      const mainOffsetBefore =
+        itemPositions.value[activeKey]?.[coordinates.main];
+      const activeItemMainSize =
+        itemDimensions.value[activeKey]?.[dimensions.main];
+      if (mainOffsetBefore === undefined || activeItemMainSize === undefined) {
+        return;
+      }
+      const mainOffsetAfter = mainOffsetBefore + activeItemMainSize;
 
+      // CROSS AXIS
       // Cross axis before bound
       const groupBeforeSize =
         crossAxisGroupOffsets.value[groupIndex - 1] !== undefined
@@ -141,119 +260,144 @@ export function useFlexOrderUpdater(): void {
       const crossAfterBound =
         crossOffsetAfter - gaps.cross.value + additionalCrossOffsetAfter;
 
-      // FOR DEBUGGING PURPOSES
-      if (debugRects) {
-        // For row direction
-        if (coordinates.main === 'x' && coordinates.cross === 'y') {
-          debugRects.crossBefore.set({
-            ...DEBUG_COLORS,
-            from: { x: 0, y: crossBeforeBound },
-            to: { x: 1000, y: crossOffsetBefore }
-          });
-          debugRects.crossAfter.set({
-            ...DEBUG_COLORS,
-            from: { x: 0, y: crossOffsetAfter - gaps.cross.value },
-            to: { x: 1000, y: crossAfterBound }
-          });
+      // MAIN AXIS
+      const itemBeforeKey = indexToKey.value[activeIndex - 1];
+      const itemAfterKey = indexToKey.value[activeIndex + 1];
+      let mainBeforeBound: number | undefined;
+      let mainAfterBound: number | undefined;
+
+      // Main axis before bound
+      if (
+        itemBeforeKey !== undefined &&
+        keyToGroup.value[itemBeforeKey] === groupIndex
+      ) {
+        const itemBeforeMainPosition =
+          itemPositions.value[itemBeforeKey]?.[coordinates.main];
+        const activeItemLayoutMainPosition =
+          itemPositions.value[activeKey]?.[coordinates.main];
+        const itemBeforeMainSize =
+          itemDimensions.value[itemBeforeKey]?.[dimensions.main];
+
+        if (
+          itemBeforeMainPosition === undefined ||
+          activeItemLayoutMainPosition === undefined ||
+          itemBeforeMainSize === undefined
+        ) {
+          return;
         }
-        // For column direction
-        else if (coordinates.main === 'y' && coordinates.cross === 'x') {
-          debugRects.crossBefore.set({
-            ...DEBUG_COLORS,
-            from: { x: crossBeforeBound, y: 0 },
-            to: { x: crossOffsetBefore, y: 1000 }
-          });
-          debugRects.crossAfter.set({
-            ...DEBUG_COLORS,
-            from: { x: crossOffsetAfter - gaps.cross.value, y: 0 },
-            to: { x: crossAfterBound, y: 1000 }
-          });
-        }
-        // debugRects.crossAfter.set({
-        //   ...DEBUG_COLORS,
-        //   from: { [crossCoordinate]: crossAfterBound, [mainCoordinate]: 0 },
-        //   to: { [crossCoordinate]: crossAfterBound, [mainCoordinate]: 1000 }
-        // });
+
+        const additionalMainOffsetBefore = Math.min(
+          gaps.main.value / 2 + MIN_EXTRA_SWAP_OFFSET,
+          gaps.main.value + itemBeforeMainSize / 2
+        );
+        mainBeforeBound =
+          (itemBeforeMainPosition +
+            activeItemLayoutMainPosition +
+            activeItemMainSize) /
+            2 -
+          additionalMainOffsetBefore;
       }
 
-      // // Select the group in which the active item is currently located
-      // let offsetBefore = crossAxisGroupOffsets.value[groupIndex];
-      // while (
-      //   offsetBefore !== undefined &&
-      //   groupIndex >= 0 &&
-      //   touchPosition[crossCoordinate] < offsetBefore
+      // Main axis after bound
+      if (
+        itemAfterKey !== undefined &&
+        keyToGroup.value[itemAfterKey] === groupIndex
+      ) {
+        const itemAfterMainPosition =
+          itemPositions.value[itemAfterKey]?.[coordinates.main];
+        const activeItemLayoutMainPosition =
+          itemPositions.value[activeKey]?.[coordinates.main];
+        const itemAfterMainSize =
+          itemDimensions.value[itemAfterKey]?.[dimensions.main];
+
+        if (
+          itemAfterMainPosition === undefined ||
+          activeItemLayoutMainPosition === undefined ||
+          itemAfterMainSize === undefined
+        ) {
+          return;
+        }
+
+        const additionalMainOffsetAfter = Math.min(
+          gaps.main.value / 2 + MIN_EXTRA_SWAP_OFFSET,
+          gaps.main.value + itemAfterMainSize / 2
+        );
+        mainAfterBound =
+          (itemAfterMainPosition +
+            activeItemLayoutMainPosition +
+            itemAfterMainSize) /
+            2 +
+          additionalMainOffsetAfter;
+      }
+
+      // FOR DEBUGGING PURPOSES
+      if (updateDebugRects) {
+        updateDebugRects(
+          coordinates,
+          gaps,
+          {
+            cross: {
+              after: crossOffsetAfter,
+              before: crossOffsetBefore
+            },
+            main: {
+              after: mainOffsetAfter,
+              before: mainOffsetBefore
+            }
+          },
+          {
+            cross: {
+              after: crossAfterBound,
+              before: crossBeforeBound
+            },
+            main: {
+              after: mainAfterBound,
+              before: mainBeforeBound
+            }
+          }
+        );
+      }
+
+      // Check if touch cross axis position is over the top or the
+      // bottom bound
+      // let dy = 0;
+      // if (
+      //   crossBeforeBound > 0 &&
+      //   touchPosition[coordinates.cross] < crossBeforeBound
       // ) {
-      //   groupIndex -= 1;
-      //   offsetBefore = crossAxisGroupOffsets.value[groupIndex];
-      // }
-
-      // let offsetAfter = crossAxisGroupOffsets.value[groupIndex + 1];
-      // while (
-      //   offsetAfter !== undefined &&
-      //   groupIndex < itemGroups.value.length &&
-      //   touchPosition[crossCoordinate] > offsetAfter
+      //   dy = -1;
+      // } else if (
+      //   crossAfterBound < 0 &&
+      //   touchPosition[coordinates.cross] > crossAfterBound
       // ) {
-      //   groupIndex += 1;
-      //   offsetAfter = crossAxisGroupOffsets.value[groupIndex + 1];
+      //   dy = 1;
       // }
 
-      // // Check if the active item center is overlapping with another item
-      // // within the same group
-      // let overlappingItemKey: string | undefined;
-      // const group = itemGroups.value[groupIndex];
-      // if (!group) {
-      //   return;
-      // }
-      // for (const key of group) {
-      //   if (key === activeKey) {
-      //     continue;
-      //   }
+      // Check if touch main axis position is over the left or the
+      // right edge bound
+      let dx = 0;
+      if (
+        mainBeforeBound !== undefined &&
+        touchPosition[coordinates.main] < mainBeforeBound
+      ) {
+        dx = -1;
+      } else if (
+        mainAfterBound !== undefined &&
+        touchPosition[coordinates.main] > mainAfterBound
+      ) {
+        dx = 1;
+      }
 
-      //   const otherDimensions = itemDimensions.value[key];
-      //   if (!otherDimensions) {
-      //     continue;
-      //   }
-      //   const otherPosition = itemPositions.value[key];
-      //   if (!otherPosition) {
-      //     continue;
-      //   }
+      if (dx === 0) {
+        return;
+      }
 
-      //   // Item before the active item in the group
-      //   if (otherPosition[mainCoordinate] < position[mainCoordinate]) {
-      //     const otherEnd =
-      //       otherPosition[mainCoordinate] + otherDimensions[mainDimension];
-      //     if (otherEnd > touchPosition[mainCoordinate]) {
-      //       overlappingItemKey = key;
-      //       break;
-      //     }
-      //   }
-
-      //   // Item after the active item in the group
-      //   if (otherPosition[mainCoordinate] > position[mainCoordinate]) {
-      //     const otherStart = otherPosition[mainCoordinate];
-      //     if (otherStart < touchPosition[mainCoordinate]) {
-      //       overlappingItemKey = key;
-      //       break;
-      //     }
-      //   }
-      // }
-
-      // if (overlappingItemKey === undefined) {
-      //   return;
-      // }
-      // const overlappingIndex = keyToIndex.value[overlappingItemKey];
-      // if (overlappingIndex === undefined) {
-      //   return;
-      // }
-
-      // // Return the new order of items
-      // return reorderItems(
-      //   indexToKey.value,
-      //   activeIndex,
-      //   overlappingIndex,
-      //   strategy
-      // );
-      return;
+      return reorderItems(
+        indexToKey.value,
+        activeIndex,
+        activeIndex + dx,
+        strategy
+      );
     },
     [flexDirection]
   );
