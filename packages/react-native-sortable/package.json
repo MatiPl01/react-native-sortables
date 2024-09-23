@@ -44,7 +44,7 @@
   "main": "dist/commonjs/index",
   "module": "dist/module/index",
   "optionalDependencies": {
-    "react-native-haptic-feedback": ">=2.0.0"
+    "react-native-haptic-feedback": ">=2.3.3"
   },
   "peerDependencies": {
     "react": "*",
