@@ -72,7 +72,12 @@ export default function DataChangeExample() {
   }, []);
 
   const sortItems = useCallback(() => {
-    setData(prevData => [...prevData].sort());
+    setData(prevData =>
+      [...prevData].sort(
+        (a, b) =>
+          parseInt(a.split(' ')[1] ?? '') - parseInt(b.split(' ')[1] ?? '')
+      )
+    );
   }, []);
 
   const onRemoveItem = useCallback((item: string) => {

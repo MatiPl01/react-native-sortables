@@ -82,7 +82,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       {...sharedProps}
       itemKeys={itemKeys}
       key={columns}
-      debug
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
         columnGap={columnGapValue}

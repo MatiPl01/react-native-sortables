@@ -14,7 +14,6 @@ export default function useOrderUpdater(
     activeKey: string;
     activeIndex: number;
     dimensions: Dimensions;
-    position: Vector;
     touchPosition: Vector;
     strategy: ReorderStrategy;
   }) => Maybe<Array<string>>,
@@ -25,26 +24,18 @@ export default function useOrderUpdater(
     itemDimensions,
     keyToIndex,
     reorderStrategy,
-    touchPosition,
-    touchedItemPosition
+    touchPosition
   } = useCommonValuesContext();
   const { handleOrderChange } = useDragContext();
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
-      positions: {
-        item: touchedItemPosition.value,
-        touch: touchPosition.value
-      },
-      strategy: reorderStrategy.value
+      strategy: reorderStrategy.value,
+      touchPos: touchPosition.value
     }),
-    ({ activeKey, positions, strategy }) => {
-      if (
-        activeKey === null ||
-        positions.item === null ||
-        positions.touch === null
-      ) {
+    ({ activeKey, strategy, touchPos }) => {
+      if (activeKey === null || touchPos === null) {
         return;
       }
       const dimensions = itemDimensions.value[activeKey];
@@ -61,9 +52,8 @@ export default function useOrderUpdater(
         activeIndex,
         activeKey,
         dimensions,
-        position: positions.item,
         strategy,
-        touchPosition: positions.touch
+        touchPosition: touchPos
       });
 
       if (newOrder) {

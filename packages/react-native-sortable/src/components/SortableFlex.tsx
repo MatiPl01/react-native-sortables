@@ -34,7 +34,7 @@ function SortableFlex(props: SortableFlexProps) {
   }
 
   return (
-    <SharedProvider {...sharedProps} itemKeys={itemKeysRef.current} debug>
+    <SharedProvider {...sharedProps} itemKeys={itemKeysRef.current}>
       <FlexLayoutProvider
         {...((viewProps.style as FlexProps) ?? {})}
         itemsCount={newItemKeys.length}>

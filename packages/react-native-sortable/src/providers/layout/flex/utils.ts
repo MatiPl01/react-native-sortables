@@ -2,7 +2,7 @@ import type {
   DebugComponentType,
   DebugComponentUpdater
 } from '../../../debug/types';
-import type { Coordinate, Dimension, Dimensions, Vector } from '../../../types';
+import type { Dimension, Dimensions, Vector } from '../../../types';
 import { sum, zipArrays } from '../../../utils';
 import type {
   AlignContent,
