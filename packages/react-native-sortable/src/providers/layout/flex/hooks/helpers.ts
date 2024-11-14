@@ -66,7 +66,7 @@ export function useAxisParams<T extends FlexDirection>(
 export function useItemBoundsProviders() {
   const { indexToKey, itemDimensions, itemPositions, keyToIndex } =
     useCommonValuesContext();
-  const { crossAxisGroupOffsets, flexDirection, itemGroups, keyToGroup } =
+  const { crossAxisGroupOffsets, flexDirection, itemGroups } =
     useFlexLayoutContext();
   const { coordinates, dimensions, gaps } = useAxisParams(flexDirection);
 
@@ -172,15 +172,12 @@ export function useItemBoundsProviders() {
         keys: { first: firstKey, last: lastKey }
       } = bounds;
 
-      const beforeOffset = itemPositions.value[itemKey]?.[coordinates.main];
+      // STEP 1: Determine positions and sizes
       const itemSize = itemDimensions.value[itemKey]?.[dimensions.main];
-
-      if (beforeOffset === undefined || itemSize === undefined) {
+      let itemPosition = itemPositions.value[itemKey]?.[coordinates.main];
+      if (itemSize === undefined || itemPosition === undefined) {
         return;
       }
-      const afterOffset = beforeOffset + itemSize;
-
-      // STEP 1: Determine the positions and sizes of neighboring items
       let itemBeforePosition: number | undefined;
       let itemAfterPosition: number | undefined;
       let itemBeforeSize: number | undefined;
@@ -190,51 +187,51 @@ export function useItemBoundsProviders() {
         // Case 1: Item is before the first item in the group
         itemAfterPosition = itemPositions.value[firstKey]?.[coordinates.main];
         itemAfterSize = itemDimensions.value[firstKey]?.[dimensions.main];
+
+        // Calculate the position of the current item as if it was before
+        // the first item in the group
+        if (itemAfterPosition !== undefined) {
+          itemPosition = itemAfterPosition - itemSize - gaps.main.value;
+        }
       } else if (itemIndex > lastIndex) {
         // Case 2: Item is after the last item in the group
         itemBeforePosition = itemPositions.value[lastKey]?.[coordinates.main];
         itemBeforeSize = itemDimensions.value[lastKey]?.[dimensions.main];
+
+        // Calculate the position of the current item as if it was after
+        // the last item in the group
+        if (itemBeforePosition !== undefined && itemBeforeSize !== undefined) {
+          itemPosition = itemBeforePosition + itemBeforeSize + gaps.main.value;
+        }
       } else {
         // Case 3: Item is within the group
         const itemBeforeKey = indexToKey.value[itemIndex - 1];
         const itemAfterKey = indexToKey.value[itemIndex + 1];
+
         // Item before
         if (itemBeforeKey !== undefined) {
           itemBeforeSize =
             itemDimensions.value[itemBeforeKey]?.[dimensions.main];
           if (itemBeforeSize !== undefined) {
             // Position
-            if (keyToGroup.value[itemBeforeKey] === groupIndex) {
-              // If item is in the same group, just get the position
-              itemBeforePosition =
-                itemPositions.value[itemBeforeKey]?.[coordinates.main];
-            } else {
-              // Otherwise, calculate the position of the item as if it
-              // was before the first item in the group
-              itemBeforePosition =
-                beforeOffset - (itemBeforeSize + gaps.main.value);
-            }
+            itemBeforePosition =
+              itemPosition - itemBeforeSize - gaps.main.value;
           }
         }
+
         // Item after
         if (itemAfterKey !== undefined) {
           itemAfterSize = itemDimensions.value[itemAfterKey]?.[dimensions.main];
           if (itemAfterSize !== undefined) {
             // Position
-            if (keyToGroup.value[itemAfterKey] === groupIndex) {
-              // If item is in the same group, just get the position
-              itemAfterPosition =
-                itemPositions.value[itemAfterKey]?.[coordinates.main];
-            } else {
-              // Otherwise, calculate the position of the item as if it
-              // was after the last item in the group
-              itemAfterPosition = afterOffset + gaps.main.value;
-            }
+            itemAfterPosition = itemPosition + itemSize + gaps.main.value;
           }
         }
       }
 
-      // STEP 2: Calculate the bounds of the item
+      // STEP 2: Calculate offsets and bounds of the current item
+      const beforeOffset = itemPosition;
+      const afterOffset = itemPosition + itemSize;
       let beforeBound: number | undefined;
       let afterBound: number | undefined;
 
@@ -244,7 +241,9 @@ export function useItemBoundsProviders() {
           gaps.main.value / 2 + MIN_EXTRA_SWAP_OFFSET,
           gaps.main.value + itemBeforeSize / 2
         );
-        beforeBound = (itemBeforePosition + afterOffset) / 2 - additionalOffset;
+        beforeBound =
+          (itemBeforePosition + itemBeforeSize + beforeOffset) / 2 -
+          additionalOffset;
       }
       // After bound
       if (itemAfterPosition !== undefined && itemAfterSize !== undefined) {
@@ -273,7 +272,6 @@ export function useItemBoundsProviders() {
       getGroupBoundingItems,
       itemDimensions,
       itemPositions,
-      keyToGroup,
       indexToKey
     ]
   );
