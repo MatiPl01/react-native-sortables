@@ -16,10 +16,12 @@ import {
   useItemZIndex,
   useMeasurementsContext
 } from '../../providers';
+import type { LayoutAnimation } from '../../types';
 import ItemDecoration from './ItemDecoration';
 
 const RELATIVE_STYLE: ViewStyle = {
   height: undefined,
+  opacity: 1,
   position: 'relative',
   transform: [],
   width: undefined,
@@ -29,12 +31,16 @@ const RELATIVE_STYLE: ViewStyle = {
 type DraggableViewProps = {
   itemKey: string;
   reverseXAxis?: boolean;
+  entering?: LayoutAnimation;
+  exiting?: LayoutAnimation;
 } & {
   style?: StyleProp<ViewStyle>;
 } & Omit<ViewProps, 'style'>;
 
 export default function DraggableView({
   children,
+  entering,
+  exiting,
   itemKey: key,
   reverseXAxis,
   style,
@@ -68,10 +74,11 @@ export default function DraggableView({
     const y = position.y.value;
 
     if (x === null || y === null) {
-      return RELATIVE_STYLE;
+      return { ...RELATIVE_STYLE, opacity: 0, zIndex: -1 };
     }
 
     return {
+      opacity: 1,
       position: 'absolute',
       transform: [{ translateX: x }, { translateY: y }],
       zIndex: zIndex.value,
@@ -81,28 +88,30 @@ export default function DraggableView({
 
   return (
     <Animated.View ref={viewRef} {...viewProps} style={[style, animatedStyle]}>
-      <GestureDetector gesture={gesture}>
-        <ItemDecoration
-          isTouched={isTouched}
-          pressProgress={pressProgress}
-          // Keep onLayout the closest to the children to measure the real item size
-          // (without paddings or other style changes made to the wrapper component)
-          onLayout={({ nativeEvent: { layout } }) =>
-            handleItemMeasurement(key, {
-              height: layout.height,
-              width: layout.width
-            })
-          }>
-          <ItemContextProvider
+      <Animated.View entering={entering} exiting={exiting}>
+        <GestureDetector gesture={gesture}>
+          <ItemDecoration
             isTouched={isTouched}
-            itemKey={key}
-            position={position}
             pressProgress={pressProgress}
-            zIndex={zIndex}>
-            {children}
-          </ItemContextProvider>
-        </ItemDecoration>
-      </GestureDetector>
+            // Keep onLayout the closest to the children to measure the real item size
+            // (without paddings or other style changes made to the wrapper component)
+            onLayout={({ nativeEvent: { layout } }) =>
+              handleItemMeasurement(key, {
+                height: layout.height,
+                width: layout.width
+              })
+            }>
+            <ItemContextProvider
+              isTouched={isTouched}
+              itemKey={key}
+              position={position}
+              pressProgress={pressProgress}
+              zIndex={zIndex}>
+              {children}
+            </ItemContextProvider>
+          </ItemDecoration>
+        </GestureDetector>
+      </Animated.View>
     </Animated.View>
   );
 }

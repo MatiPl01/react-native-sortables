@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
+import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import DropIndicator from '../components/shared/DropIndicator';
 import { DebugOutlet, DebugProvider } from '../debug';
@@ -56,7 +57,7 @@ export default function SharedProvider({
 }: SharedProviderProps) {
   const providers = [
     // Provider used for layout debugging
-    debug ? <DebugProvider /> : null,
+    debug && <DebugProvider />,
     // Provider used for zIndex management when item is pressed or dragged
     <LayerProvider />,
     // Provider used for shared values between all providers below
@@ -90,7 +91,9 @@ export default function SharedProvider({
           style={dropIndicatorStyle}
         />
       )}
-      {children}
+      <LayoutAnimationConfig skipEntering skipExiting>
+        {children}
+      </LayoutAnimationConfig>
       {debug && <DebugOutlet />}
     </ContextProviderComposer>
   );

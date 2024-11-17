@@ -9,6 +9,7 @@ import type {
   SortableGridProps
 } from '../types';
 import { defaultKeyExtractor } from '../utils';
+import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
 
 export const STYLE_PROPS = ['style', 'dropIndicatorStyle'] as const;
 
@@ -41,6 +42,8 @@ export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
   hapticsEnabled: false,
   inactiveItemOpacity: 0.5,
   inactiveItemScale: 1,
+  itemEntering: SortableItemEntering,
+  itemExiting: SortableItemExiting,
   onDragEnd: undefined,
   onDragStart: undefined,
   onOrderChange: undefined,

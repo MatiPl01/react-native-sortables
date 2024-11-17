@@ -6,6 +6,7 @@ import { SortableFlex, SortableGrid, SortableLayer } from './components';
 import { createSortableTouchable } from './utils';
 
 export type { DropIndicatorComponentProps } from './components';
+export * from './constants/layoutAnimations';
 export { useDragEndHandler } from './hooks';
 export type {
   DragEndCallback,
