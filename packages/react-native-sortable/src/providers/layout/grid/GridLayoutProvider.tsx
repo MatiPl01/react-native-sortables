@@ -5,14 +5,12 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
-import type { Animatable, Dimensions, Vector } from '../../../types';
-import { areArraysDifferent, areVectorsDifferent } from '../../../utils';
+import type { Animatable } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import { getColumnIndex, getRowIndex } from './utils';
+import { calculateLayout } from './utils';
 
 const DEBUG_COLORS = {
   backgroundColor: '#ffa500',
@@ -21,7 +19,6 @@ const DEBUG_COLORS = {
 
 type GridLayoutContextType = {
   columnWidth: SharedValue<number>;
-  rowOffsets: SharedValue<Array<number>>;
   columnGap: SharedValue<number>;
   rowGap: SharedValue<number>;
 };
@@ -69,130 +66,69 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       width: containerWidth.value
     }),
     ({ gap, width }) => {
-      if (width !== -1) {
-        const colWidth = (width + gap) / columns - gap;
-        columnWidth.value = colWidth;
+      if (width === -1) {
+        return;
+      }
+      const colWidth = (width + gap) / columns - gap;
+      columnWidth.value = colWidth;
 
-        if (debugColumnGapRects) {
-          for (let i = 0; i < columns - 1; i++) {
-            debugColumnGapRects[i]?.set({
-              ...DEBUG_COLORS,
-              width: gap,
-              x: colWidth * (i + 1) + gap * i
-            });
-          }
+      // DEBUG ONLY
+      if (debugColumnGapRects) {
+        for (let i = 0; i < columns - 1; i++) {
+          debugColumnGapRects[i]?.set({
+            ...DEBUG_COLORS,
+            width: gap,
+            x: colWidth * (i + 1) + gap * i
+          });
         }
       }
     },
     [columns, debugColumnGapRects]
   );
 
-  // ROW OFFSETS UPDATER
+  // GRID LAYOUT UPDATER
   useAnimatedReaction(
     () => ({
-      dimensions: itemDimensions.value,
-      gap: rowGap.value,
-      idxToKey: indexToKey.value
+      columnWidth: columnWidth.value,
+      gaps: {
+        column: columnGap.value,
+        row: rowGap.value
+      },
+      indexToKey: indexToKey.value,
+      itemDimensions: itemDimensions.value,
+      numColumns: columns
     }),
-    ({ dimensions, gap, idxToKey }) => {
-      const offsets = [0];
-      for (const [itemIndex, key] of Object.entries(idxToKey)) {
-        const rowIndex = getRowIndex(parseInt(itemIndex), columns);
-        const itemHeight = dimensions[key]?.height;
+    props => {
+      const layout = calculateLayout(props);
 
-        // Return if the item height is not yet measured
-        if (itemHeight === undefined) {
-          return;
+      if (layout) {
+        // Update item positions
+        itemPositions.value = layout.itemPositions;
+
+        // Update container height
+        containerHeight.value = layout.containerHeight;
+
+        // Update overridden item dimensions
+        overrideItemDimensions.value = Object.fromEntries(
+          props.indexToKey.map(key => [
+            key,
+            { width: columnWidth.value + props.gaps.column }
+          ])
+        );
+
+        // DEBUG ONLY
+        if (debugRowGapRects) {
+          for (let i = 1; i < layout.rowOffsets.length - 1; i++) {
+            debugRowGapRects[i]?.set({
+              ...DEBUG_COLORS,
+              height: rowGap.value,
+              y: layout.rowOffsets[i]! + columnWidth.value
+            });
+          }
         }
-
-        const offset = (offsets[rowIndex + 1] = Math.max(
-          offsets[rowIndex + 1] ?? 0,
-          (offsets[rowIndex] ?? 0) + itemHeight + gap
-        ));
-
-        if (debugRowGapRects?.[rowIndex]) {
-          debugRowGapRects[rowIndex]?.set({
-            ...DEBUG_COLORS,
-            height: gap,
-            positionOrigin: 'bottom',
-            y: offset
-          });
-        }
-      }
-      // Update row offsets only if they have changed
-      if (
-        areArraysDifferent(
-          offsets,
-          rowOffsets.value,
-          (a, b) => Math.abs(a - b) < OFFSET_EPS
-        )
-      ) {
-        rowOffsets.value = offsets;
-        const newHeight = offsets[offsets.length - 1] ?? 0;
-        containerHeight.value = newHeight - gap;
-      }
-    },
-    [columns, debugRowGapRects]
-  );
-
-  // ITEM POSITIONS UPDATER
-  useAnimatedReaction(
-    () => ({
-      colWidth: columnWidth.value,
-      gap: columnGap.value,
-      idxToKey: indexToKey.value,
-      offsets: rowOffsets.value
-    }),
-    ({ colWidth, gap, idxToKey, offsets }) => {
-      if (colWidth === -1 || offsets.length === 0) {
-        return;
-      }
-      const positions: Record<string, Vector> = {};
-      const overriddenDimensions: Record<string, Partial<Dimensions>> = {};
-      let overriddenDimensionsChanged = false;
-
-      for (const [itemIndex, key] of Object.entries(idxToKey)) {
-        const rowIndex = getRowIndex(parseInt(itemIndex), columns);
-        const colIndex = getColumnIndex(parseInt(itemIndex), columns);
-
-        const y = offsets[rowIndex];
-        if (y === undefined) {
-          return;
-        }
-
-        const currentPosition = itemPositions.value[key];
-        const calculatedPosition = {
-          x: colIndex * (colWidth + gap),
-          y
-        };
-
-        // Re-use existing position object if its properties are the same
-        // (this prevents unnecessary reaction triggers in item components)
-        positions[key] =
-          !currentPosition ||
-          areVectorsDifferent(currentPosition, calculatedPosition)
-            ? calculatedPosition
-            : currentPosition;
-
-        // Override item dimensions if they are not yet overridden
-        // or the column width has changed
-        const currentOverriddenDimensions = overrideItemDimensions.value;
-        const override = colWidth + gap;
-        if (currentOverriddenDimensions[key]?.width !== override) {
-          overriddenDimensionsChanged = true;
-          overriddenDimensions[key] = {
-            width: override
-          };
-        } else {
-          // Re-use existing overridden dimensions if they are the same
-          // to prevent unnecessary reaction triggers in item components
-          overriddenDimensions[key] = currentOverriddenDimensions[key]!;
-        }
-      }
-
-      itemPositions.value = positions;
-      if (overriddenDimensionsChanged) {
-        overrideItemDimensions.value = overriddenDimensions;
+      } else if (Object.keys(itemPositions.value).length > 0) {
+        itemPositions.value = {};
+        containerHeight.value = 0;
       }
     },
     [columns]

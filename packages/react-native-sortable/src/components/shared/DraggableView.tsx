@@ -56,9 +56,6 @@ export default function DraggableView({
 
   const position = useItemPosition(key);
   const zIndex = useItemZIndex(key, pressProgress, position);
-  const overriddenDimensions = useDerivedValue(
-    () => overrideItemDimensions.value[key]
-  );
   const gesture = useItemPanGesture(key, pressProgress, reverseXAxis);
 
   useEffect(() => {
@@ -82,7 +79,7 @@ export default function DraggableView({
       position: 'absolute',
       transform: [{ translateX: x }, { translateY: y }],
       zIndex: zIndex.value,
-      ...overriddenDimensions.value
+      ...overrideItemDimensions.value[key]
     };
   });
 
