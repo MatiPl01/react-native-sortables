@@ -36,7 +36,12 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       renderItem,
       rowGap
     },
-    sharedProps: { entering, exiting, onDragEnd: _onDragEnd, ...sharedProps }
+    sharedProps: {
+      itemEntering,
+      itemExiting,
+      onDragEnd: _onDragEnd,
+      ...sharedProps
+    }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_GRID_PROPS);
 
   const columnGapValue = useAnimatableValue(columnGap);
@@ -92,8 +97,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
         <SortableGridInner
           columns={columns}
           data={data}
-          entering={entering}
-          exiting={exiting}
+          itemEntering={itemEntering}
+          itemExiting={itemExiting}
           itemKeys={itemKeys}
           itemStyle={itemStyle}
           renderItem={renderItem}
@@ -111,17 +116,19 @@ type SortableGridInnerProps<I> = {
 } & Required<
   Pick<
     SortableGridProps<I>,
-    'columns' | 'data' | 'entering' | 'exiting' | 'renderItem'
+    'columns' | 'data' | 'itemEntering' | 'itemExiting' | 'renderItem'
   >
 >;
 
 function SortableGridInner<I>({
   columns,
   data,
+  itemEntering,
+  itemExiting,
   itemKeys,
   itemStyle,
-  style,
-  ...rest
+  renderItem,
+  style
 }: SortableGridInnerProps<I>) {
   useGridOrderUpdater(columns);
 
@@ -129,10 +136,12 @@ function SortableGridInner<I>({
     <Animated.View style={[styles.gridContainer, style]}>
       {zipArrays(data, itemKeys).map(([item, key]) => (
         <SortableGridItem
-          {...rest}
+          entering={itemEntering}
+          exiting={itemExiting}
           item={item}
           itemKey={key}
           key={key}
+          renderItem={renderItem}
           style={itemStyle}
         />
       ))}

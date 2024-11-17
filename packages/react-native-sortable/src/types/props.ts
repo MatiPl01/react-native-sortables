@@ -42,8 +42,8 @@ export type DropIndicatorSettings = {
 };
 
 export type ItemLayoutAnimationSettings = {
-  entering: LayoutAnimation;
-  exiting: LayoutAnimation;
+  itemEntering: LayoutAnimation;
+  itemExiting: LayoutAnimation;
 };
 
 export type DragStartParams = {

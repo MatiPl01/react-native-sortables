@@ -18,7 +18,7 @@ import { DraggableView } from './shared';
 function SortableFlex(props: SortableFlexProps) {
   const {
     rest: viewProps,
-    sharedProps: { entering, exiting, ...sharedProps }
+    sharedProps: { itemEntering, itemExiting, ...sharedProps }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
 
   const childrenArray = validateChildren(viewProps.children);
@@ -32,8 +32,8 @@ function SortableFlex(props: SortableFlexProps) {
         itemsCount={itemKeys.length}>
         <SortableFlexInner
           childrenArray={childrenArray}
-          entering={entering}
-          exiting={exiting}
+          itemEntering={itemEntering}
+          itemExiting={itemExiting}
           viewProps={viewProps}
         />
       </FlexLayoutProvider>
@@ -44,12 +44,13 @@ function SortableFlex(props: SortableFlexProps) {
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
   viewProps: ViewProps;
-} & Required<Pick<SortableFlexProps, 'entering' | 'exiting'>>;
+} & Required<Pick<SortableFlexProps, 'itemEntering' | 'itemExiting'>>;
 
 function SortableFlexInner({
   childrenArray,
-  viewProps,
-  ...rest
+  itemEntering,
+  itemExiting,
+  viewProps
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout, containerHeight } =
     useCommonValuesContext();
@@ -75,7 +76,8 @@ function SortableFlexInner({
       style={[viewProps.style, animatedContainerStyle]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
-          {...rest}
+          entering={itemEntering}
+          exiting={itemExiting}
           itemKey={key}
           key={key}
           // When flexDirection is row-reverse, we need to reverse the x-axis
