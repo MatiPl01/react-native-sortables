@@ -3,6 +3,7 @@ import type { ViewProps, ViewStyle } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 
 import type { DropIndicatorComponentProps } from '../components';
+import type { LayoutAnimation } from './reanimated';
 import type { AnimatableValues, Simplify } from './utils';
 
 /**
@@ -38,6 +39,11 @@ export type DropIndicatorSettings = {
   DropIndicatorComponent: ComponentType<DropIndicatorComponentProps>;
   showDropIndicator: boolean;
   dropIndicatorStyle: ViewStyle;
+};
+
+export type ItemLayoutAnimationSettings = {
+  entering: LayoutAnimation;
+  exiting: LayoutAnimation;
 };
 
 export type DragStartParams = {
@@ -83,6 +89,7 @@ export type SharedProps = Simplify<
     Partial<ActiveItemSnapSettings> &
     Partial<AutoScrollSettings> &
     Partial<DropIndicatorSettings> &
+    Partial<ItemLayoutAnimationSettings> &
     SortableCallbacks
 >;
 

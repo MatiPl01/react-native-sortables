@@ -4,7 +4,7 @@ import { cloneElement, memo } from 'react';
 import type { Maybe } from '../../types';
 
 type ContextProviderComposerProps = PropsWithChildren<{
-  providers: Array<Maybe<JSX.Element>>;
+  providers: Array<Maybe<JSX.Element> | false>;
 }>;
 
 // https://frontendbyte.com/how-to-use-react-context-api-usereducer-hooks/

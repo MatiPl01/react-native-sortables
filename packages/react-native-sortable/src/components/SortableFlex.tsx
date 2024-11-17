@@ -1,4 +1,4 @@
-import { cloneElement, type ReactElement, useRef } from 'react';
+import { cloneElement, type ReactElement } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
@@ -12,34 +12,28 @@ import {
   useFlexOrderUpdater
 } from '../providers';
 import type { SortableFlexProps } from '../types';
-import {
-  areArraysDifferent,
-  getPropsWithDefaults,
-  validateChildren
-} from '../utils';
+import { getPropsWithDefaults, validateChildren } from '../utils';
 import { DraggableView } from './shared';
 
 function SortableFlex(props: SortableFlexProps) {
-  const { rest: viewProps, sharedProps } = getPropsWithDefaults(
-    props,
-    DEFAULT_SORTABLE_FLEX_PROPS
-  );
+  const {
+    rest: viewProps,
+    sharedProps: { entering, exiting, ...sharedProps }
+  } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
 
   const childrenArray = validateChildren(viewProps.children);
-  const itemKeysRef = useRef<Array<string>>([]);
 
-  const newItemKeys = childrenArray.map(([key]) => key);
-  if (areArraysDifferent(itemKeysRef.current, newItemKeys)) {
-    itemKeysRef.current = newItemKeys;
-  }
+  const itemKeys = childrenArray.map(([key]) => key);
 
   return (
-    <SharedProvider {...sharedProps} itemKeys={itemKeysRef.current}>
+    <SharedProvider {...sharedProps} itemKeys={itemKeys}>
       <FlexLayoutProvider
         {...((viewProps.style as FlexProps) ?? {})}
-        itemsCount={newItemKeys.length}>
+        itemsCount={itemKeys.length}>
         <SortableFlexInner
           childrenArray={childrenArray}
+          entering={entering}
+          exiting={exiting}
           viewProps={viewProps}
         />
       </FlexLayoutProvider>
@@ -50,11 +44,12 @@ function SortableFlex(props: SortableFlexProps) {
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
   viewProps: ViewProps;
-};
+} & Required<Pick<SortableFlexProps, 'entering' | 'exiting'>>;
 
 function SortableFlexInner({
   childrenArray,
-  viewProps
+  viewProps,
+  ...rest
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout, containerHeight } =
     useCommonValuesContext();
@@ -80,6 +75,7 @@ function SortableFlexInner({
       style={[viewProps.style, animatedContainerStyle]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
+          {...rest}
           itemKey={key}
           key={key}
           // When flexDirection is row-reverse, we need to reverse the x-axis
