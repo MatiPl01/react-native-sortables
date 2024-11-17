@@ -93,8 +93,8 @@ export default function SharedProvider({
       )}
       <LayoutAnimationConfig skipEntering skipExiting>
         {children}
+        {debug && <DebugOutlet />}
       </LayoutAnimationConfig>
-      {debug && <DebugOutlet />}
     </ContextProviderComposer>
   );
 }

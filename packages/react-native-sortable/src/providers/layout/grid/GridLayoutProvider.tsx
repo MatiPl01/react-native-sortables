@@ -55,8 +55,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
   const columnGap = useAnimatableValue(columnGap_);
   const rowGap = useAnimatableValue(rowGap_);
-
-  const rowOffsets = useSharedValue<Array<number>>([]);
   const columnWidth = useSharedValue(-1);
 
   // TARGET COLUMN WIDTH UPDATER
@@ -118,28 +116,24 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
         // DEBUG ONLY
         if (debugRowGapRects) {
-          for (let i = 1; i < layout.rowOffsets.length - 1; i++) {
+          for (let i = 0; i < layout.rowOffsets.length - 1; i++) {
             debugRowGapRects[i]?.set({
               ...DEBUG_COLORS,
               height: rowGap.value,
-              y: layout.rowOffsets[i]! + columnWidth.value
+              y: layout.rowOffsets[i + 1]! - rowGap.value
             });
           }
         }
-      } else if (Object.keys(itemPositions.value).length > 0) {
-        itemPositions.value = {};
-        containerHeight.value = 0;
       }
     },
-    [columns]
+    [columns, debugRowGapRects]
   );
 
   return {
     value: {
       columnGap,
       columnWidth,
-      rowGap,
-      rowOffsets
+      rowGap
     }
   };
 });
