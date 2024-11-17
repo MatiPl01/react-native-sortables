@@ -18,7 +18,13 @@ import {
 } from '../../providers';
 import ItemDecoration from './ItemDecoration';
 
-const RELATIVE_STYLE: ViewStyle = { position: 'relative' };
+const RELATIVE_STYLE: ViewStyle = {
+  height: undefined,
+  position: 'relative',
+  transform: [],
+  width: undefined,
+  zIndex: 0
+};
 
 type DraggableViewProps = {
   itemKey: string;
