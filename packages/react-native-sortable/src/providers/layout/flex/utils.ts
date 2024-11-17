@@ -36,7 +36,7 @@ export const groupItems = (
       return null;
     }
     const itemDimension = itemDimensions[limitedDimension];
-    if (currentDimension + itemDimension + getCurrentGap() > limit) {
+    if (currentDimension + itemDimension > limit) {
       groups.push(currentGroup);
       currentGroup = [];
       currentDimension = 0;

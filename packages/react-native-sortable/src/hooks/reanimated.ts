@@ -26,7 +26,7 @@ export function useAnimatableValue<V, F extends (value: V) => any>(
   modify?: F
 ): SharedValue<ReturnType<F>> | SharedValue<V> {
   return useDerivedValue(() => {
-    const inputValue = isSharedValue(value) ? value.value : value;
+    const inputValue = isSharedValue<V>(value) ? value.value : value;
     return modify ? modify(inputValue) : inputValue;
   }, [value, modify]);
 }
