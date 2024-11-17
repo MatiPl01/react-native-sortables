@@ -20,6 +20,7 @@ import ItemDecoration from './ItemDecoration';
 
 const RELATIVE_STYLE: ViewStyle = {
   height: undefined,
+  opacity: 1,
   position: 'relative',
   transform: [],
   width: undefined,
@@ -68,10 +69,11 @@ export default function DraggableView({
     const y = position.y.value;
 
     if (x === null || y === null) {
-      return RELATIVE_STYLE;
+      return { ...RELATIVE_STYLE, opacity: 0, zIndex: -1 };
     }
 
     return {
+      opacity: 1,
       position: 'absolute',
       transform: [{ translateX: x }, { translateY: y }],
       zIndex: zIndex.value,
