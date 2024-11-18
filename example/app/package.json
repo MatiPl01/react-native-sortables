@@ -10,7 +10,7 @@
     "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A1.7.0#~/.yarn/patches/@shopify-flash-list-npm-1.7.0-8b9f270a18.patch",
     "react": "^18.3.1",
     "react-native": "^0.76.2",
-    "react-native-gesture-handler": "^2.21.0",
+    "react-native-gesture-handler": "^2.21.1",
     "react-native-reanimated": "^3.16.1",
     "react-native-safe-area-context": "^4.14.0",
     "react-native-screens": "^4.1.0",
