@@ -4,8 +4,6 @@ import type { SharedValue } from 'react-native-reanimated';
 
 export type AnyFunction = (...args: Array<any>) => any;
 
-export type AnyValue = boolean | null | number | object | string | undefined;
-
 export type Simplify<T> = {
   [K in keyof T]: T[K];
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -34,3 +32,5 @@ export type DefaultProps<
   O extends keyof P = never, // optional props
   E extends keyof P = never // exclude from default props (must be passed by the user)
 > = Omit<RequiredExcept<P, O>, E>;
+
+export type NoUndef<T> = T extends undefined ? never : T;

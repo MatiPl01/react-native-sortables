@@ -1,23 +1,14 @@
-import { type PropsWithChildren, useCallback } from 'react';
-import { type LayoutChangeEvent, StyleSheet, View } from 'react-native';
+import { type PropsWithChildren } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
-import { EMPTY_OBJECT } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
 import type { Dimensions } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
 import type { FlexDirection, FlexProps } from './types';
-import {
-  areDimensionsCorrect,
-  calculateLayout,
-  getGroupSizes,
-  groupItems,
-  updateDebugCrossAxisGapRects,
-  updateDebugMainAxisGapRects
-} from './utils';
+import { calculateReferenceSize } from './utils';
 
 type FlexLayoutContextType = {
   stretch: boolean;
@@ -37,19 +28,24 @@ type FlexLayoutProviderProps = PropsWithChildren<
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
 )<FlexLayoutProviderProps, FlexLayoutContextType>(({
-  alignContent = 'flex-start',
-  alignItems = 'stretch',
+  alignContent,
+  alignItems,
   children,
   columnGap: columnGap_,
-  flexDirection = 'row',
-  flexWrap = 'nowrap',
-  gap = 0,
+  flexDirection,
+  flexWrap,
+  gap,
+  height,
   itemsCount,
-  justifyContent = 'flex-start',
-  rowGap: rowGap_
+  justifyContent,
+  maxHeight,
+  maxWidth,
+  minHeight,
+  minWidth,
+  rowGap: rowGap_,
+  width
 }) => {
   const stretch = alignItems === 'stretch';
-  const groupBy = flexDirection.startsWith('column') ? 'height' : 'width';
   const columnGap = useAnimatableValue(columnGap_ ?? gap);
   const rowGap = useAnimatableValue(rowGap_ ?? gap);
 
@@ -59,12 +55,13 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     indexToKey,
     itemDimensions,
     itemPositions,
-    overrideItemDimensions
+    overrideItemDimensions,
+    parentDimensions
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
   // Because the number of groups can dynamically change after order change
-  // and we can't see that in the React runtime, we are creating debug
+  // and we can't detect that in the React runtime, we are creating debug
   // rects for the maximum number of groups that can be displayed (which
   // is the number of items minus 1 in the worst case for just a single group)
   const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
@@ -74,192 +71,203 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const keyToGroup = useSharedValue<Record<string, number>>({});
   const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
   const crossAxisGroupOffsets = useSharedValue<Array<number>>([]);
+  const referenceContainerDimensions = useSharedValue<Partial<Dimensions>>({});
 
-  // ITEM GROUPS UPDATER
+  // REFERENCE CONTAINER DIMENSIONS UPDATER
   useAnimatedReaction(
-    () => ({
-      containerDimensions: {
-        height: containerHeight.value,
-        width: containerWidth.value
-      },
-      dimensions: itemDimensions.value,
-      groupGap: groupBy === 'height' ? rowGap.value : columnGap.value,
-      idxToKey: indexToKey.value
-    }),
-    ({ containerDimensions, dimensions, groupGap, idxToKey }) => {
-      if (!areDimensionsCorrect(containerDimensions)) {
+    () => parentDimensions.value,
+    dims => {
+      if (!dims) {
+        referenceContainerDimensions.value = {};
         return;
       }
 
-      // Group items based on the layout direction
-      const groups = groupItems(
-        idxToKey,
-        dimensions,
-        groupGap,
-        groupBy,
-        flexWrap === 'nowrap' ? Infinity : containerDimensions[groupBy]
-      );
-      if (!groups) return;
+      const { height: parentH, width: parentW } = dims;
+      const h = calculateReferenceSize(minHeight, height, maxHeight, parentH);
+      const w = calculateReferenceSize(minWidth, width, maxWidth, parentW);
 
-      // Calculate group cross axis sizes
-      const sizes = getGroupSizes(
-        groups,
-        dimensions,
-        groupBy === 'height' ? 'width' : 'height'
-      );
-
-      itemGroups.value = groups;
-      crossAxisGroupSizes.value = sizes;
-
-      // Update key to group mapping
-      const keyToGroupMapping: Record<string, number> = {};
-      groups.forEach((group, index) => {
-        group.forEach(key => {
-          keyToGroupMapping[key] = index;
-        });
-      });
-      keyToGroup.value = keyToGroupMapping;
-    },
-    [groupBy, flexWrap]
+      const current = referenceContainerDimensions.value;
+      if (h === current.height || w === current.width) {
+        referenceContainerDimensions.value = { height: h, width: w };
+      }
+    }
   );
 
-  // ITEM POSITIONS UPDATER
-  useAnimatedReaction(
-    () => ({
-      containerDimensions: {
-        height: containerHeight.value,
-        width: containerWidth.value
-      },
-      gaps: {
-        columnGap: columnGap.value,
-        rowGap: rowGap.value
-      },
-      groups: itemGroups.value,
-      sizes: crossAxisGroupSizes.value
-    }),
-    ({ containerDimensions, gaps, groups, sizes }) => {
-      if (
-        !areDimensionsCorrect(containerDimensions) ||
-        !groups.length ||
-        !sizes.length
-      ) {
-        itemPositions.value = EMPTY_OBJECT;
-        return;
-      }
+  // // ITEM GROUPS UPDATER
+  // useAnimatedReaction(
+  //   () => ({
+  //     containerDimensions: {
+  //       height: containerHeight.value,
+  //       width: containerWidth.value
+  //     },
+  //     dimensions: itemDimensions.value,
+  //     groupGap: groupBy === 'height' ? rowGap.value : columnGap.value,
+  //     idxToKey: indexToKey.value
+  //   }),
+  //   ({ containerDimensions, dimensions, groupGap, idxToKey }) => {
+  //     // Group items based on the layout direction
+  //     const groups = groupItems(
+  //       idxToKey,
+  //       dimensions,
+  //       groupGap,
+  //       groupBy,
+  //       flexWrap === 'nowrap' ? Infinity : containerDimensions[groupBy]
+  //     );
+  //     if (!groups) return;
 
-      const result = calculateLayout(
-        groups,
-        groupBy,
-        sizes,
-        itemDimensions.value,
-        containerDimensions,
-        {
-          ...gaps,
-          alignContent,
-          alignItems,
-          flexWrap,
-          justifyContent
-        }
-      );
+  //     // Calculate group cross axis sizes
+  //     const sizes = getGroupSizes(
+  //       groups,
+  //       dimensions,
+  //       groupBy === 'height' ? 'width' : 'height'
+  //     );
 
-      if (result) {
-        itemPositions.value = result.itemPositions;
-        crossAxisGroupOffsets.value = result.crossAxisGroupOffsets;
+  //     itemGroups.value = groups;
+  //     crossAxisGroupSizes.value = sizes;
 
-        if (debugMainAxisGapRects) {
-          updateDebugMainAxisGapRects(
-            debugMainAxisGapRects,
-            groupBy,
-            keyToGroup.value,
-            result.itemPositions,
-            crossAxisGroupSizes.value,
-            result.crossAxisGroupOffsets,
-            gaps
-          );
-        }
-        if (debugCrossAxisGapRects) {
-          updateDebugCrossAxisGapRects(
-            debugCrossAxisGapRects,
-            groupBy,
-            result.crossAxisGroupOffsets,
-            gaps
-          );
-        }
-      }
-    },
-    [
-      groupBy,
-      alignContent,
-      alignItems,
-      flexWrap,
-      justifyContent,
-      debugMainAxisGapRects,
-      debugCrossAxisGapRects
-    ]
-  );
+  //     // Update key to group mapping
+  //     const keyToGroupMapping: Record<string, number> = {};
+  //     groups.forEach((group, index) => {
+  //       group.forEach(key => {
+  //         keyToGroupMapping[key] = index;
+  //       });
+  //     });
+  //     keyToGroup.value = keyToGroupMapping;
+  //   },
+  //   [groupBy, flexWrap]
+  // );
 
-  // OVERRIDE ITEM DIMENSIONS UPDATER
-  useAnimatedReaction(
-    () => ({
-      groupSizes: crossAxisGroupSizes.value,
-      groups: itemGroups.value
-    }),
-    ({ groupSizes, groups }) => {
-      if (!groupSizes.length || !groups.length || !stretch) {
-        return;
-      }
+  // // ITEM POSITIONS UPDATER
+  // useAnimatedReaction(
+  //   () => ({
+  //     containerDimensions: {
+  //       height: containerHeight.value,
+  //       width: containerWidth.value
+  //     },
+  //     gaps: {
+  //       columnGap: columnGap.value,
+  //       rowGap: rowGap.value
+  //     },
+  //     groups: itemGroups.value,
+  //     sizes: crossAxisGroupSizes.value
+  //   }),
+  //   ({ containerDimensions, gaps, groups, sizes }) => {
+  //     if (
+  //       !areDimensionsCorrect(containerDimensions) ||
+  //       !groups.length ||
+  //       !sizes.length
+  //     ) {
+  //       itemPositions.value = EMPTY_OBJECT;
+  //       return;
+  //     }
 
-      const overriddenDimension = groupBy === 'height' ? 'width' : 'height';
-      const overrideDimensions: Record<string, Partial<Dimensions>> = {};
+  //     const result = calculateLayout(
+  //       groups,
+  //       groupBy,
+  //       sizes,
+  //       itemDimensions.value,
+  //       containerDimensions,
+  //       {
+  //         ...gaps,
+  //         alignContent,
+  //         alignItems,
+  //         flexWrap,
+  //         justifyContent
+  //       }
+  //     );
 
-      for (let i = 0; i < groups.length; i++) {
-        const group = groups[i];
-        const groupSize = groupSizes[i];
+  //     if (result) {
+  //       itemPositions.value = result.itemPositions;
+  //       crossAxisGroupOffsets.value = result.crossAxisGroupOffsets;
 
-        if (!group || groupSize === undefined) {
-          return;
-        }
+  //       if (debugMainAxisGapRects) {
+  //         updateDebugMainAxisGapRects(
+  //           debugMainAxisGapRects,
+  //           groupBy,
+  //           keyToGroup.value,
+  //           result.itemPositions,
+  //           crossAxisGroupSizes.value,
+  //           result.crossAxisGroupOffsets,
+  //           gaps
+  //         );
+  //       }
+  //       if (debugCrossAxisGapRects) {
+  //         updateDebugCrossAxisGapRects(
+  //           debugCrossAxisGapRects,
+  //           groupBy,
+  //           result.crossAxisGroupOffsets,
+  //           gaps
+  //         );
+  //       }
+  //     }
+  //   },
+  //   [
+  //     groupBy,
+  //     alignContent,
+  //     alignItems,
+  //     flexWrap,
+  //     justifyContent,
+  //     debugMainAxisGapRects,
+  //     debugCrossAxisGapRects
+  //   ]
+  // );
 
-        for (const key of group) {
-          const currentDimensions = overrideItemDimensions.value[key];
+  // // OVERRIDE ITEM DIMENSIONS UPDATER
+  // useAnimatedReaction(
+  //   () => ({
+  //     groupSizes: crossAxisGroupSizes.value,
+  //     groups: itemGroups.value
+  //   }),
+  //   ({ groupSizes, groups }) => {
+  //     if (!groupSizes.length || !groups.length || !stretch) {
+  //       return;
+  //     }
 
-          if (
-            currentDimensions &&
-            currentDimensions[overriddenDimension] === groupSize
-          ) {
-            overrideDimensions[key] = currentDimensions;
-          } else {
-            overrideDimensions[key] = {
-              [overriddenDimension]: groupSize
-            };
-          }
-        }
-      }
+  //     const overriddenDimension = groupBy === 'height' ? 'width' : 'height';
+  //     const overrideDimensions: Record<string, Partial<Dimensions>> = {};
 
-      overrideItemDimensions.value = overrideDimensions;
-    },
-    [stretch]
-  );
+  //     for (let i = 0; i < groups.length; i++) {
+  //       const group = groups[i];
+  //       const groupSize = groupSizes[i];
 
-  const measureContainer = useCallback(
-    ({
-      nativeEvent: {
-        layout: { height }
-      }
-    }: LayoutChangeEvent) => {
-      // TODO - improve (calculate height if it is not set)
-      containerHeight.value = height;
-    },
-    [containerHeight]
-  );
+  //       if (!group || groupSize === undefined) {
+  //         return;
+  //       }
+
+  //       for (const key of group) {
+  //         const currentDimensions = overrideItemDimensions.value[key];
+
+  //         if (
+  //           currentDimensions &&
+  //           currentDimensions[overriddenDimension] === groupSize
+  //         ) {
+  //           overrideDimensions[key] = currentDimensions;
+  //         } else {
+  //           overrideDimensions[key] = {
+  //             [overriddenDimension]: groupSize
+  //           };
+  //         }
+  //       }
+  //     }
+
+  //     overrideItemDimensions.value = overrideDimensions;
+  //   },
+  //   [stretch]
+  // );
+
+  // const measureContainer = useCallback(
+  //   ({
+  //     nativeEvent: {
+  //       layout: { height }
+  //     }
+  //   }: LayoutChangeEvent) => {
+  //     // TODO - improve (calculate height if it is not set)
+  //     containerHeight.value = height;
+  //   },
+  //   [containerHeight]
+  // );
 
   return {
-    children: (
-      <>
-        <View style={styles.container} onLayout={measureContainer} />
-        {children}
-      </>
-    ),
     value: {
       columnGap,
       crossAxisGroupOffsets,
@@ -272,13 +280,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       stretch
     }
   };
-});
-
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    pointerEvents: 'none'
-  }
 });
 
 export { FlexLayoutProvider, useFlexLayoutContext };

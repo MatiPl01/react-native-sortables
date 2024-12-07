@@ -1,3 +1,5 @@
+import type { DimensionValue } from 'react-native';
+
 import type { Offset, ReorderStrategy } from '../types';
 
 export const getOffsetDistance = (
@@ -81,4 +83,22 @@ export const reorderItems = <T>(
     case 'swap':
       return reorderSwap(array, fromIndex, toIndex);
   }
+};
+
+export const resolveDimensionValue = (
+  value: DimensionValue | undefined,
+  parentDimension: number
+): number | undefined => {
+  'worklet';
+  if (value === undefined || value === null || value === 'auto') {
+    return undefined;
+  }
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const percentage = parseFloat(value) / 100;
+    return parentDimension * percentage;
+  }
+  return undefined;
 };

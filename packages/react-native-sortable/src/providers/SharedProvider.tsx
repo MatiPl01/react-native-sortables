@@ -30,6 +30,7 @@ type SharedProviderProps = PropsWithChildren<
     hapticsEnabled: boolean;
     reorderStrategy: ReorderStrategy;
     debug: boolean;
+    measureParent?: boolean;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
@@ -48,6 +49,7 @@ export default function SharedProvider({
   dropIndicatorStyle,
   hapticsEnabled,
   itemKeys,
+  measureParent,
   onDragEnd,
   onDragStart,
   onOrderChange,
@@ -63,7 +65,10 @@ export default function SharedProvider({
     // Provider used for shared values between all providers below
     <CommonValuesProvider itemKeys={itemKeys} {...rest} />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider itemsCount={itemKeys.length} />,
+    <MeasurementsProvider
+      itemsCount={itemKeys.length}
+      measureParent={measureParent}
+    />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (

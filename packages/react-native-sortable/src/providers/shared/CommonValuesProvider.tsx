@@ -42,6 +42,7 @@ type CommonValuesContextType = {
   containerHeight: SharedValue<number>;
   touchedItemWidth: SharedValue<number>;
   touchedItemHeight: SharedValue<number>;
+  parentDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
 
@@ -103,6 +104,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const containerHeight = useSharedValue(-1);
   const touchedItemWidth = useSharedValue(-1);
   const touchedItemHeight = useSharedValue(-1);
+  const parentDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const overrideItemDimensions = useSharedValue<
     Record<string, Partial<Dimensions>>
@@ -162,6 +164,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemPositions,
       keyToIndex,
       overrideItemDimensions,
+      parentDimensions,
       reorderStrategy,
       snapOffsetX,
       snapOffsetY,

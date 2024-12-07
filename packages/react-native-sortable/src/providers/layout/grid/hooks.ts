@@ -114,11 +114,11 @@ export function useGridOrderUpdater(numColumns: number): void {
         if (bottomBound !== -Infinity) {
           rowIndex++;
         }
-        rowOffsetBelow =
-          rowOffsets[rowIndex + 1] ??
-          rowOffsetAbove +
-            (itemDimensions.value[activeKey]?.height ?? 0) +
-            rowGap.value;
+        const nextRowOffset = rowOffsets[rowIndex + 1];
+        if (!nextRowOffset) {
+          break;
+        }
+        rowOffsetBelow = nextRowOffset;
         const rowBelowHeight =
           rowOffsets[rowIndex + 2] !== undefined && rowOffsetBelow !== undefined
             ? rowOffsets[rowIndex + 2]! - rowOffsetBelow - rowGap.value
@@ -187,9 +187,13 @@ export function useGridOrderUpdater(numColumns: number): void {
       }
 
       // Swap the active item with the item at the new index
+      const limitedRowIndex = Math.max(
+        0,
+        Math.min(rowIndex, rowOffsets.length - 2)
+      );
       const newIndex = Math.max(
         0,
-        Math.min(rowIndex * numColumns + columnIndex, itemsCount - 1)
+        Math.min(limitedRowIndex * numColumns + columnIndex, itemsCount - 1)
       );
       if (newIndex === activeIndex) {
         return;

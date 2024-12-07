@@ -1,29 +1,55 @@
-export type JustifyContent =
-  | 'center'
-  | 'flex-end'
-  | 'flex-start'
-  | 'space-around'
-  | 'space-between'
-  | 'space-evenly';
-export type AlignContent =
-  | 'center'
-  | 'flex-end'
-  | 'flex-start'
-  | 'space-around' // TODO: add support
-  | 'space-between' // TODO: add support
-  | 'space-evenly' // TODO: add support
-  | 'stretch';
-export type AlignItems = 'center' | 'flex-end' | 'flex-start' | 'stretch';
-export type FlexWrap = 'nowrap' | 'wrap' | 'wrap-reverse';
-export type FlexDirection = 'column' | 'column-reverse' | 'row' | 'row-reverse';
+import type { ViewStyle } from 'react-native';
 
-export type FlexProps = Partial<{
-  justifyContent: JustifyContent;
+import type { Dimensions, NoUndef, Vector } from '../../../types';
+
+export type AlignContent = NoUndef<ViewStyle['alignContent']>;
+export type JustifyContent = NoUndef<ViewStyle['justifyContent']>;
+export type AlignItems = NoUndef<ViewStyle['alignItems']>;
+export type FlexWrap = NoUndef<ViewStyle['flexWrap']>;
+export type FlexDirection = NoUndef<ViewStyle['flexDirection']>;
+
+export type FlexAlignments = {
   alignContent: AlignContent;
+  justifyContent: JustifyContent;
   alignItems: AlignItems;
-  flexWrap: FlexWrap;
-  flexDirection: FlexDirection;
-  rowGap: number;
-  columnGap: number;
+};
+
+export type FlexProps = {
   gap: number;
-}>;
+  rowGap?: number;
+  columnGap?: number;
+} & Pick<
+  ViewStyle,
+  'height' | 'maxHeight' | 'maxWidth' | 'minHeight' | 'minWidth' | 'width'
+> &
+  Required<
+    Pick<
+      ViewStyle,
+      | 'alignContent'
+      | 'alignItems'
+      | 'flexDirection'
+      | 'flexWrap'
+      | 'justifyContent'
+    >
+  >;
+
+export type FlexLayoutProps = {
+  gaps: {
+    row: number;
+    column: number;
+  };
+  itemDimensions: Record<string, Dimensions>;
+  indexToKey: Array<string>;
+  flexDirection: FlexDirection;
+  flexWrap: FlexWrap;
+  flexAlignments: FlexAlignments;
+  measuredContainerDimensions: Dimensions;
+  providedContainerDimensions?: Dimensions;
+};
+
+export type FlexLayout = {
+  itemGroups: Array<Array<string>>;
+  itemPositions: Record<string, Vector>;
+  crossAxisGroupOffsets: Array<number>;
+  containerHeight: number;
+};

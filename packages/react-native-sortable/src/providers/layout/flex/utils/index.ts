@@ -1,68 +1,65 @@
+export * from './helpers';
+
 import type {
   DebugComponentType,
   DebugComponentUpdater
-} from '../../../debug/types';
-import type { Dimension, Dimensions, Vector } from '../../../types';
-import { sum, zipArrays } from '../../../utils';
+} from '../../../../debug/types';
+import type { Dimension, Dimensions, Vector } from '../../../../types';
+import { sum, zipArrays } from '../../../../utils';
 import type {
   AlignContent,
   AlignItems,
   FlexProps,
   JustifyContent
-} from './types';
+} from '../types';
 
-export const areDimensionsCorrect = (dimensions: Dimensions): boolean => {
-  'worklet';
-  return dimensions.width >= 0 && dimensions.height >= 0;
-};
+// export const groupItems = (
+//   indexToKey: Array<string>,
+//   dimensions: Record<string, Dimensions>,
+//   itemsGap: number,
+//   limitedDimension: 'height' | 'width',
+//   limit: number
+// ): Array<Array<string>> | null => {
+//   'worklet';
+//   const groups: Array<Array<string>> = [];
+//   let currentGroup: Array<string> = [];
+//   let currentDimension = 0;
 
-export const groupItems = (
-  indexToKey: Array<string>,
-  dimensions: Record<string, Dimensions>,
-  itemsGap: number,
-  limitedDimension: 'height' | 'width',
-  limit: number
-): Array<Array<string>> | null => {
-  'worklet';
-  const groups: Array<Array<string>> = [];
-  let currentGroup: Array<string> = [];
-  let currentDimension = 0;
+//   const getCurrentGap = () => (currentGroup.length > 0 ? itemsGap : 0);
 
-  const getCurrentGap = () => (currentGroup.length > 0 ? itemsGap : 0);
+//   for (const key of indexToKey) {
+//     const itemDimensions = dimensions[key];
+//     if (!itemDimensions) {
+//       return null;
+//     }
+//     const itemDimension = itemDimensions[limitedDimension];
+//     if (currentDimension + itemDimension > limit) {
+//       groups.push(currentGroup);
+//       currentGroup = [];
+//       currentDimension = 0;
+//     }
 
-  for (const key of indexToKey) {
-    const itemDimensions = dimensions[key];
-    if (!itemDimensions) {
-      return null;
-    }
-    const itemDimension = itemDimensions[limitedDimension];
-    if (currentDimension + itemDimension > limit) {
-      groups.push(currentGroup);
-      currentGroup = [];
-      currentDimension = 0;
-    }
+//     currentGroup.push(key);
+//     currentDimension += itemDimension + getCurrentGap();
+//   }
 
-    currentGroup.push(key);
-    currentDimension += itemDimension + getCurrentGap();
-  }
+//   if (currentGroup.length > 0) {
+//     groups.push(currentGroup);
+//   }
 
-  if (currentGroup.length > 0) {
-    groups.push(currentGroup);
-  }
+//   return groups;
+// };
 
-  return groups;
-};
-
-export const getGroupSizes = (
-  groups: Array<Array<string>>,
-  itemDimensions: Record<string, Dimensions>,
-  sizeBy: 'height' | 'width'
-): Array<number> => {
-  'worklet';
-  return groups.map(group =>
-    Math.max(...group.map(key => itemDimensions[key]?.[sizeBy] ?? 0))
-  );
-};
+// export const getGroupSizes = (
+//   groups: Array<Array<string>>,
+//   itemDimensions: Record<string, Dimensions>,
+//   sizeBy: 'height' | 'width'
+// ): Array<number> => {
+//   'worklet';
+//   return groups.map(group =>
+//     Math.max(...group.map(key => itemDimensions[key]?.[sizeBy] ?? 0))
+//   );
+// };
 
 const alignHelper = (
   align: AlignContent | JustifyContent,

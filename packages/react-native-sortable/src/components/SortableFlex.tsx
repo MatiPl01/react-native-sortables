@@ -3,7 +3,6 @@ import type { ViewProps, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
-import type { FlexProps } from '../providers';
 import {
   FlexLayoutProvider,
   SharedProvider,
@@ -26,9 +25,9 @@ function SortableFlex(props: SortableFlexProps) {
   const itemKeys = childrenArray.map(([key]) => key);
 
   return (
-    <SharedProvider {...sharedProps} itemKeys={itemKeys}>
+    <SharedProvider {...sharedProps} itemKeys={itemKeys} measureParent>
       <FlexLayoutProvider
-        {...((viewProps.style as FlexProps) ?? {})}
+        {...(viewProps.style ?? {})}
         itemsCount={itemKeys.length}>
         <SortableFlexInner
           childrenArray={childrenArray}
@@ -60,7 +59,11 @@ function SortableFlexInner({
 
   const animatedContainerStyle = useAnimatedStyle(() => {
     if (containerHeight.value === -1) {
-      return {};
+      return {
+        alignItems: undefined,
+        height: undefined,
+        justifyContent: undefined
+      };
     }
     const style: ViewStyle = { height: containerHeight.value };
     if (canSwitchToAbsoluteLayout) {

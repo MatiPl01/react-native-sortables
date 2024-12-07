@@ -25,7 +25,8 @@ const config: JestConfigWithTsJest = {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        configFile: '../../test/babel.config.cjs'
+        configFile: '../../test/babel.config.cjs',
+        diagnostics: false
       }
     ]
   },

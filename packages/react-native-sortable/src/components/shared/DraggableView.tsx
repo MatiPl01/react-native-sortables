@@ -92,12 +92,12 @@ export default function DraggableView({
             pressProgress={pressProgress}
             // Keep onLayout the closest to the children to measure the real item size
             // (without paddings or other style changes made to the wrapper component)
-            onLayout={({ nativeEvent: { layout } }) =>
+            onLayout={({ nativeEvent: { layout } }) => {
               handleItemMeasurement(key, {
                 height: layout.height,
                 width: layout.width
-              })
-            }>
+              });
+            }}>
             <ItemContextProvider
               isTouched={isTouched}
               itemKey={key}

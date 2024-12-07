@@ -21,7 +21,7 @@ type OptionalSharedProps = 'scrollableRef' | keyof SortableCallbacks;
 
 type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
 
-export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
+export const DEFAULT_SHARED_PROPS = {
   DropIndicatorComponent: DefaultDropIndicator,
   activeItemOpacity: 1,
   activeItemScale: 1.1,
@@ -53,7 +53,7 @@ export const DEFAULT_SHARED_PROPS: DefaultSharedProps = {
   snapOffsetX: '50%',
   snapOffsetY: '50%',
   sortEnabled: true
-};
+} satisfies DefaultSharedProps;
 
 /**
  * DEFAULT SORTABLE GRID PROPS
@@ -66,26 +66,30 @@ type DefaultSortableGridProps = DefaultProps<
   ExcludedFromDefaultGridProps
 >;
 
-export const DEFAULT_SORTABLE_GRID_PROPS: DefaultSortableGridProps = {
+export const DEFAULT_SORTABLE_GRID_PROPS = {
   columnGap: 0,
   columns: 1,
   keyExtractor: defaultKeyExtractor,
   rowGap: 0
-};
+} satisfies DefaultSortableGridProps;
 
 /**
  * DEFAULT SORTABLE FLEX PROPS
  */
 type OptionalDefaultFlexProps = Exclude<keyof ViewProps, 'style'>;
 
-export const DEFAULT_SORTABLE_FLEX_PROPS: DefaultProps<
-  Omit<SortableFlexProps, keyof DefaultSharedProps>,
-  OptionalDefaultFlexProps
-> = {
+export const DEFAULT_SORTABLE_FLEX_PROPS = {
   // display flex items in a row with wrapping by default
   // (users will expect this behavior in most cases when using SortableFlex)
   style: {
+    alignContent: 'flex-start',
+    alignItems: 'stretch',
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    gap: 0,
+    justifyContent: 'flex-start'
   }
-};
+} satisfies DefaultProps<
+  Omit<SortableFlexProps, keyof DefaultSharedProps>,
+  OptionalDefaultFlexProps
+>;
