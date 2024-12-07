@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import DropIndicator from '../components/shared/DropIndicator';
@@ -32,6 +33,7 @@ type SharedProviderProps = PropsWithChildren<
     debug: boolean;
     measureParent?: boolean;
     dropIndicatorStyle?: ViewStyle;
+    itemStyleOverrides?: SharedValue<Record<string, ViewStyle>>;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     DropIndicatorSettings &

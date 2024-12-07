@@ -54,5 +54,6 @@ export type FlexLayout = {
   itemGroups: Array<Array<string>>;
   itemPositions: Record<string, Vector>;
   crossAxisGroupOffsets: Array<number>;
+  crossAxisGroupSizes: Array<number>;
   totalHeight: number;
 };

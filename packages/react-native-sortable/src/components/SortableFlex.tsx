@@ -1,6 +1,9 @@
-import { cloneElement, type ReactElement } from 'react';
-import type { ViewProps } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { type ReactElement, useMemo } from 'react';
+import type { ViewProps, ViewStyle } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue
+} from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import {
@@ -23,12 +26,34 @@ function SortableFlex(props: SortableFlexProps) {
   const childrenArray = validateChildren(viewProps.children);
 
   const itemKeys = childrenArray.map(([key]) => key);
+  const viewStyle = viewProps.style ?? {};
+
+  const initialStyleOverrides = useMemo(
+    () =>
+      Object.fromEntries(
+        itemKeys.map(key => [
+          key,
+          {
+            alignContent: viewStyle.alignContent,
+            alignItems: viewStyle.alignItems,
+            flexDirection: viewStyle.flexDirection
+          }
+        ])
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  const itemStyleOverrides = useSharedValue<Record<string, ViewStyle>>(
+    initialStyleOverrides
+  );
 
   return (
-    <SharedProvider {...sharedProps} itemKeys={itemKeys} measureParent>
-      <FlexLayoutProvider
-        {...(viewProps.style ?? {})}
-        itemsCount={itemKeys.length}>
+    <SharedProvider
+      {...sharedProps}
+      itemKeys={itemKeys}
+      itemStyleOverrides={itemStyleOverrides}
+      measureParent>
+      <FlexLayoutProvider {...viewStyle} itemsCount={itemKeys.length}>
         <SortableFlexInner
           childrenArray={childrenArray}
           itemEntering={itemEntering}
@@ -53,7 +78,7 @@ function SortableFlexInner({
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout, containerHeight } =
     useCommonValuesContext();
-  const { flexDirection, stretch } = useFlexLayoutContext();
+  const { flexDirection } = useFlexLayoutContext();
 
   useFlexOrderUpdater();
 
@@ -80,10 +105,7 @@ function SortableFlexInner({
           // When flexDirection is row-reverse, we need to reverse the x-axis
           // because right offset in absolute position is calculated from the right edge
           reverseXAxis={flexDirection === 'row-reverse'}>
-          {cloneElement(child, {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            style: [child.props?.style, stretch && { flexGrow: 1 }]
-          })}
+          {child}
         </DraggableView>
       ))}
     </Animated.View>

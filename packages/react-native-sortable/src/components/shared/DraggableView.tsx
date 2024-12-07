@@ -1,5 +1,10 @@
 import { useEffect } from 'react';
-import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
+import {
+  type StyleProp,
+  StyleSheet,
+  type ViewProps,
+  type ViewStyle
+} from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
@@ -46,7 +51,7 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { canSwitchToAbsoluteLayout, overrideItemDimensions, touchedItemKey } =
+  const { canSwitchToAbsoluteLayout, touchedItemKey } =
     useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
@@ -78,17 +83,17 @@ export default function DraggableView({
       opacity: 1,
       position: 'absolute',
       transform: [{ translateX: x }, { translateY: y }],
-      zIndex: zIndex.value,
-      ...overrideItemDimensions.value[key]
+      zIndex: zIndex.value
     };
   });
 
   return (
     <Animated.View ref={viewRef} {...viewProps} style={[style, animatedStyle]}>
-      <Animated.View entering={entering} exiting={exiting}>
+      <Animated.View entering={entering} exiting={exiting} style={styles.grow}>
         <GestureDetector gesture={gesture}>
           <ItemDecoration
             isTouched={isTouched}
+            itemKey={key}
             pressProgress={pressProgress}
             // Keep onLayout the closest to the children to measure the real item size
             // (without paddings or other style changes made to the wrapper component)
@@ -112,3 +117,9 @@ export default function DraggableView({
     </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  grow: {
+    flexGrow: 1
+  }
+});

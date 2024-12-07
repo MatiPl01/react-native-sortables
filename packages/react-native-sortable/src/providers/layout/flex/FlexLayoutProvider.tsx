@@ -1,4 +1,6 @@
+import type { PropsWithChildren } from 'react';
 import { useMemo } from 'react';
+import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedReaction,
@@ -14,8 +16,9 @@ import { createProvider } from '../../utils';
 import type { FlexDirection, FlexProps } from './types';
 import { calculateLayout, calculateReferenceSize } from './utils';
 
+const EMPTY_OBJECT = {};
+
 type FlexLayoutContextType = {
-  stretch: boolean;
   flexDirection: FlexDirection;
   itemGroups: SharedValue<Array<Array<string>>>;
   keyToGroup: SharedValue<Record<string, number>>;
@@ -25,7 +28,9 @@ type FlexLayoutContextType = {
   columnGap: SharedValue<number>;
 };
 
-type FlexLayoutProviderProps = { itemsCount: number } & FlexProps;
+type FlexLayoutProviderProps = PropsWithChildren<
+  { itemsCount: number } & FlexProps
+>;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
@@ -47,6 +52,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   width
 }) => {
   const stretch = alignItems === 'stretch';
+  const isRow = flexDirection.includes('row');
 
   const {
     containerHeight,
@@ -54,16 +60,17 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     indexToKey,
     itemDimensions,
     itemPositions,
-    overrideItemDimensions,
+    itemStyleOverrides,
     parentDimensions
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
-  const keyToGroup = useSharedValue<Record<string, number>>({});
+  const keyToGroup = useSharedValue<Record<string, number>>(EMPTY_OBJECT);
   const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
   const crossAxisGroupOffsets = useSharedValue<Array<number>>([]);
-  const referenceContainerDimensions = useSharedValue<Partial<Dimensions>>({});
+  const referenceContainerDimensions =
+    useSharedValue<Partial<Dimensions>>(EMPTY_OBJECT);
 
   const columnGap = useDerivedValue(
     () =>
@@ -101,11 +108,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       parent: parentDimensions.value
     }),
     ({ measuredWidth, parent }) => {
-      console.log(measuredWidth, parent);
       if (!parent || !measuredWidth) {
-        if (Object.keys(referenceContainerDimensions.value).length) {
-          referenceContainerDimensions.value = {};
-        }
+        referenceContainerDimensions.value = EMPTY_OBJECT;
         return;
       }
 
@@ -150,6 +154,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
       // Update item positions
       itemPositions.value = layout.itemPositions;
+
       // Update container height
       const referenceHeight = referenceContainerDimensions.value.height;
       if (isHeightLimited && referenceHeight !== undefined) {
@@ -158,65 +163,36 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         containerHeight.value = layout.totalHeight;
       }
 
+      // Update overridden item dimensions (only for stretch)
+      if (stretch) {
+        const overriddenStyles: Record<string, ViewStyle> = {};
+        const overriddenDimension = isRow ? 'minHeight' : 'minWidth';
+
+        for (let i = 0; i < layout.itemGroups.length; i++) {
+          const group = layout.itemGroups[i];
+          const groupSize = layout.crossAxisGroupSizes[i];
+
+          if (!group || groupSize === undefined) {
+            return;
+          }
+
+          for (const key of group) {
+            overriddenStyles[key] = {
+              alignItems: 'stretch',
+              flexDirection,
+              [overriddenDimension]: groupSize
+            };
+          }
+        }
+        itemStyleOverrides.value = overriddenStyles;
+      } else {
+        itemStyleOverrides.value = EMPTY_OBJECT;
+      }
+
       // TODO - add overridden item dimensions and debug rects
     },
     [alignContent, alignItems, justifyContent, flexDirection, flexWrap]
   );
-
-  // // OVERRIDE ITEM DIMENSIONS UPDATER
-  // useAnimatedReaction(
-  //   () => ({
-  //     groupSizes: crossAxisGroupSizes.value,
-  //     groups: itemGroups.value
-  //   }),
-  //   ({ groupSizes, groups }) => {
-  //     if (!groupSizes.length || !groups.length || !stretch) {
-  //       return;
-  //     }
-
-  //     const overriddenDimension = groupBy === 'height' ? 'width' : 'height';
-  //     const overrideDimensions: Record<string, Partial<Dimensions>> = {};
-
-  //     for (let i = 0; i < groups.length; i++) {
-  //       const group = groups[i];
-  //       const groupSize = groupSizes[i];
-
-  //       if (!group || groupSize === undefined) {
-  //         return;
-  //       }
-
-  //       for (const key of group) {
-  //         const currentDimensions = overrideItemDimensions.value[key];
-
-  //         if (
-  //           currentDimensions &&
-  //           currentDimensions[overriddenDimension] === groupSize
-  //         ) {
-  //           overrideDimensions[key] = currentDimensions;
-  //         } else {
-  //           overrideDimensions[key] = {
-  //             [overriddenDimension]: groupSize
-  //           };
-  //         }
-  //       }
-  //     }
-
-  //     overrideItemDimensions.value = overrideDimensions;
-  //   },
-  //   [stretch]
-  // );
-
-  // const measureContainer = useCallback(
-  //   ({
-  //     nativeEvent: {
-  //       layout: { height }
-  //     }
-  //   }: LayoutChangeEvent) => {
-  //     // TODO - improve (calculate height if it is not set)
-  //     containerHeight.value = height;
-  //   },
-  //   [containerHeight]
-  // );
 
   return {
     value: {
@@ -226,9 +202,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       flexDirection,
       itemGroups,
       keyToGroup,
-      overrideItemDimensions,
-      rowGap,
-      stretch
+      rowGap
     }
   };
 });

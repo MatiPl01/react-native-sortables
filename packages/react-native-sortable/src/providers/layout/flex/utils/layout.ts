@@ -285,6 +285,7 @@ export const calculateLayout = ({
 
   return {
     crossAxisGroupOffsets: layoutResult.crossAxisGroupOffsets,
+    crossAxisGroupSizes,
     itemGroups: groups,
     itemPositions: layoutResult.itemPositions,
     totalHeight: layoutResult.totalHeight

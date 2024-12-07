@@ -12,12 +12,14 @@ import { useCommonValuesContext } from '../../providers';
 
 type ItemDecorationProps = {
   isTouched: SharedValue<boolean>;
+  itemKey: string;
   pressProgress: SharedValue<number>;
   onLayout?: ViewProps['onLayout'];
 } & ViewProps;
 
 export default function ItemDecoration({
   isTouched,
+  itemKey,
   pressProgress,
   ...rest
 }: ItemDecorationProps) {
@@ -27,7 +29,8 @@ export default function ItemDecoration({
     activeItemShadowOpacity,
     inactiveAnimationProgress,
     inactiveItemOpacity,
-    inactiveItemScale
+    inactiveItemScale,
+    itemStyleOverrides
   } = useCommonValuesContext();
 
   const resultingProgress = useDerivedValue(() =>
@@ -63,7 +66,8 @@ export default function ItemDecoration({
             [inactiveItemScale.value, 1, activeItemScale.value]
           )
         }
-      ]
+      ],
+      ...itemStyleOverrides.value[itemKey]
     };
   });
 
@@ -73,6 +77,7 @@ export default function ItemDecoration({
 const styles = StyleSheet.create({
   decoration: {
     elevation: 5,
+    flexGrow: 1,
     shadowOffset: {
       height: 0,
       width: 0

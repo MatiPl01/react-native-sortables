@@ -12,8 +12,7 @@ export default function PropsExample() {
         height: 200,
         flexWrap: 'wrap',
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-end'
+        justifyContent: 'space-between'
       }}>
       <View
         style={{
@@ -23,7 +22,7 @@ export default function PropsExample() {
         }}
       />
       <View style={{ height: 75, width: 100, backgroundColor: 'blue' }} />
-      <View style={{ height: 50, width: 100, backgroundColor: 'blue' }} />
+      <View style={{ width: 100, minHeight: 50, backgroundColor: 'blue' }} />
       <View style={{ height: 50, width: 100, backgroundColor: 'blue' }} />
       <View style={{ height: 50, width: 100, backgroundColor: 'blue' }} />
     </Component>

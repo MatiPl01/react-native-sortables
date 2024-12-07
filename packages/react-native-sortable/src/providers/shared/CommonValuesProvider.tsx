@@ -1,4 +1,5 @@
 import { type PropsWithChildren, useEffect, useRef } from 'react';
+import type { ViewStyle } from 'react-native';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 import type Animated from 'react-native-reanimated';
 import {
@@ -44,7 +45,7 @@ type CommonValuesContextType = {
   touchedItemHeight: SharedValue<number>;
   parentDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
-  overrideItemDimensions: SharedValue<Record<string, Partial<Dimensions>>>;
+  itemStyleOverrides: SharedValue<Record<string, ViewStyle>>;
 
   // DRAG STATE
   touchedItemKey: SharedValue<null | string>;
@@ -66,6 +67,7 @@ type CommonValuesProviderProps = PropsWithChildren<
     sortEnabled: boolean;
     itemKeys: Array<string>;
     reorderStrategy: ReorderStrategy;
+    itemStyleOverrides: SharedValue<Record<string, ViewStyle>>;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings
 >;
@@ -80,6 +82,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   inactiveItemOpacity: _inactiveItemOpacity,
   inactiveItemScale: _inactiveItemScale,
   itemKeys,
+  itemStyleOverrides,
   reorderStrategy: _reorderStrategy,
   snapOffsetX: _snapOffsetX,
   snapOffsetY: _snapOffsetY,
@@ -106,9 +109,6 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const touchedItemHeight = useSharedValue(-1);
   const parentDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
-  const overrideItemDimensions = useSharedValue<
-    Record<string, Partial<Dimensions>>
-  >({});
 
   // DRAG STATE
   const touchedItemKey = useSharedValue<null | string>(null);
@@ -162,8 +162,8 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       indexToKey,
       itemDimensions,
       itemPositions,
+      itemStyleOverrides,
       keyToIndex,
-      overrideItemDimensions,
       parentDimensions,
       reorderStrategy,
       snapOffsetX,
