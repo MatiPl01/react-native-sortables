@@ -1,14 +1,18 @@
-import { type PropsWithChildren } from 'react';
+import { useMemo } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
+import {
+  useAnimatedReaction,
+  useDerivedValue,
+  useSharedValue
+} from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
-import { useAnimatableValue } from '../../../hooks';
 import type { Dimensions } from '../../../types';
+import { resolveDimensionValue } from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
 import type { FlexDirection, FlexProps } from './types';
-import { calculateReferenceSize } from './utils';
+import { calculateLayout, calculateReferenceSize } from './utils';
 
 type FlexLayoutContextType = {
   stretch: boolean;
@@ -21,16 +25,13 @@ type FlexLayoutContextType = {
   columnGap: SharedValue<number>;
 };
 
-type FlexLayoutProviderProps = PropsWithChildren<
-  { itemsCount: number } & FlexProps
->;
+type FlexLayoutProviderProps = { itemsCount: number } & FlexProps;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
 )<FlexLayoutProviderProps, FlexLayoutContextType>(({
   alignContent,
   alignItems,
-  children,
   columnGap: columnGap_,
   flexDirection,
   flexWrap,
@@ -46,8 +47,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   width
 }) => {
   const stretch = alignItems === 'stretch';
-  const columnGap = useAnimatableValue(columnGap_ ?? gap);
-  const rowGap = useAnimatableValue(rowGap_ ?? gap);
 
   const {
     containerHeight,
@@ -60,6 +59,34 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
+  const itemGroups = useSharedValue<Array<Array<string>>>([]);
+  const keyToGroup = useSharedValue<Record<string, number>>({});
+  const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
+  const crossAxisGroupOffsets = useSharedValue<Array<number>>([]);
+  const referenceContainerDimensions = useSharedValue<Partial<Dimensions>>({});
+
+  const columnGap = useDerivedValue(
+    () =>
+      resolveDimensionValue(
+        columnGap_ ?? gap,
+        parentDimensions.value?.width ?? 0
+      ) ?? 0
+  );
+  const rowGap = useDerivedValue(
+    () =>
+      resolveDimensionValue(
+        rowGap_ ?? gap,
+        parentDimensions.value?.height ?? 0
+      ) ?? 0
+  );
+
+  const isHeightLimited = useMemo(
+    () =>
+      resolveDimensionValue(height, 0) !== undefined ||
+      resolveDimensionValue(maxHeight, 0) !== undefined,
+    [height, maxHeight]
+  );
+
   // Because the number of groups can dynamically change after order change
   // and we can't detect that in the React runtime, we are creating debug
   // rects for the maximum number of groups that can be displayed (which
@@ -67,150 +94,74 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
   const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
 
-  const itemGroups = useSharedValue<Array<Array<string>>>([]);
-  const keyToGroup = useSharedValue<Record<string, number>>({});
-  const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
-  const crossAxisGroupOffsets = useSharedValue<Array<number>>([]);
-  const referenceContainerDimensions = useSharedValue<Partial<Dimensions>>({});
-
   // REFERENCE CONTAINER DIMENSIONS UPDATER
   useAnimatedReaction(
-    () => parentDimensions.value,
-    dims => {
-      if (!dims) {
-        referenceContainerDimensions.value = {};
+    () => ({
+      measuredWidth: containerWidth.value,
+      parent: parentDimensions.value
+    }),
+    ({ measuredWidth, parent }) => {
+      console.log(measuredWidth, parent);
+      if (!parent || !measuredWidth) {
+        if (Object.keys(referenceContainerDimensions.value).length) {
+          referenceContainerDimensions.value = {};
+        }
         return;
       }
 
-      const { height: parentH, width: parentW } = dims;
+      const { height: parentH, width: parentW } = parent;
       const h = calculateReferenceSize(minHeight, height, maxHeight, parentH);
       const w = calculateReferenceSize(minWidth, width, maxWidth, parentW);
 
       const current = referenceContainerDimensions.value;
       if (h === current.height || w === current.width) {
-        referenceContainerDimensions.value = { height: h, width: w };
+        referenceContainerDimensions.value = {
+          height: h,
+          width: w ?? measuredWidth
+        };
       }
-    }
+    },
+    [minHeight, minWidth, height, width, maxHeight, maxWidth]
   );
 
-  // // ITEM GROUPS UPDATER
-  // useAnimatedReaction(
-  //   () => ({
-  //     containerDimensions: {
-  //       height: containerHeight.value,
-  //       width: containerWidth.value
-  //     },
-  //     dimensions: itemDimensions.value,
-  //     groupGap: groupBy === 'height' ? rowGap.value : columnGap.value,
-  //     idxToKey: indexToKey.value
-  //   }),
-  //   ({ containerDimensions, dimensions, groupGap, idxToKey }) => {
-  //     // Group items based on the layout direction
-  //     const groups = groupItems(
-  //       idxToKey,
-  //       dimensions,
-  //       groupGap,
-  //       groupBy,
-  //       flexWrap === 'nowrap' ? Infinity : containerDimensions[groupBy]
-  //     );
-  //     if (!groups) return;
+  // FLEX LAYOUT UPDATER
+  useAnimatedReaction(
+    () => ({
+      flexAlignments: {
+        alignContent,
+        alignItems,
+        justifyContent
+      },
+      flexDirection,
+      flexWrap,
+      gaps: {
+        column: columnGap.value,
+        row: rowGap.value
+      },
+      indexToKey: indexToKey.value,
+      itemDimensions: itemDimensions.value,
+      referenceContainerDimensions: referenceContainerDimensions.value
+    }),
+    props => {
+      const layout = calculateLayout(props);
+      if (!layout) {
+        return;
+      }
 
-  //     // Calculate group cross axis sizes
-  //     const sizes = getGroupSizes(
-  //       groups,
-  //       dimensions,
-  //       groupBy === 'height' ? 'width' : 'height'
-  //     );
+      // Update item positions
+      itemPositions.value = layout.itemPositions;
+      // Update container height
+      const referenceHeight = referenceContainerDimensions.value.height;
+      if (isHeightLimited && referenceHeight !== undefined) {
+        containerHeight.value = referenceHeight;
+      } else {
+        containerHeight.value = layout.totalHeight;
+      }
 
-  //     itemGroups.value = groups;
-  //     crossAxisGroupSizes.value = sizes;
-
-  //     // Update key to group mapping
-  //     const keyToGroupMapping: Record<string, number> = {};
-  //     groups.forEach((group, index) => {
-  //       group.forEach(key => {
-  //         keyToGroupMapping[key] = index;
-  //       });
-  //     });
-  //     keyToGroup.value = keyToGroupMapping;
-  //   },
-  //   [groupBy, flexWrap]
-  // );
-
-  // // ITEM POSITIONS UPDATER
-  // useAnimatedReaction(
-  //   () => ({
-  //     containerDimensions: {
-  //       height: containerHeight.value,
-  //       width: containerWidth.value
-  //     },
-  //     gaps: {
-  //       columnGap: columnGap.value,
-  //       rowGap: rowGap.value
-  //     },
-  //     groups: itemGroups.value,
-  //     sizes: crossAxisGroupSizes.value
-  //   }),
-  //   ({ containerDimensions, gaps, groups, sizes }) => {
-  //     if (
-  //       !areDimensionsCorrect(containerDimensions) ||
-  //       !groups.length ||
-  //       !sizes.length
-  //     ) {
-  //       itemPositions.value = EMPTY_OBJECT;
-  //       return;
-  //     }
-
-  //     const result = calculateLayout(
-  //       groups,
-  //       groupBy,
-  //       sizes,
-  //       itemDimensions.value,
-  //       containerDimensions,
-  //       {
-  //         ...gaps,
-  //         alignContent,
-  //         alignItems,
-  //         flexWrap,
-  //         justifyContent
-  //       }
-  //     );
-
-  //     if (result) {
-  //       itemPositions.value = result.itemPositions;
-  //       crossAxisGroupOffsets.value = result.crossAxisGroupOffsets;
-
-  //       if (debugMainAxisGapRects) {
-  //         updateDebugMainAxisGapRects(
-  //           debugMainAxisGapRects,
-  //           groupBy,
-  //           keyToGroup.value,
-  //           result.itemPositions,
-  //           crossAxisGroupSizes.value,
-  //           result.crossAxisGroupOffsets,
-  //           gaps
-  //         );
-  //       }
-  //       if (debugCrossAxisGapRects) {
-  //         updateDebugCrossAxisGapRects(
-  //           debugCrossAxisGapRects,
-  //           groupBy,
-  //           result.crossAxisGroupOffsets,
-  //           gaps
-  //         );
-  //       }
-  //     }
-  //   },
-  //   [
-  //     groupBy,
-  //     alignContent,
-  //     alignItems,
-  //     flexWrap,
-  //     justifyContent,
-  //     debugMainAxisGapRects,
-  //     debugCrossAxisGapRects
-  //   ]
-  // );
+      // TODO - add overridden item dimensions and debug rects
+    },
+    [alignContent, alignItems, justifyContent, flexDirection, flexWrap]
+  );
 
   // // OVERRIDE ITEM DIMENSIONS UPDATER
   // useAnimatedReaction(

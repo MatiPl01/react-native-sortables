@@ -14,13 +14,16 @@ export type FlexAlignments = {
   alignItems: AlignItems;
 };
 
-export type FlexProps = {
-  gap: number;
-  rowGap?: number;
-  columnGap?: number;
-} & Pick<
+export type FlexProps = Pick<
   ViewStyle,
-  'height' | 'maxHeight' | 'maxWidth' | 'minHeight' | 'minWidth' | 'width'
+  | 'columnGap'
+  | 'height'
+  | 'maxHeight'
+  | 'maxWidth'
+  | 'minHeight'
+  | 'minWidth'
+  | 'rowGap'
+  | 'width'
 > &
   Required<
     Pick<
@@ -29,6 +32,7 @@ export type FlexProps = {
       | 'alignItems'
       | 'flexDirection'
       | 'flexWrap'
+      | 'gap'
       | 'justifyContent'
     >
   >;
@@ -43,13 +47,12 @@ export type FlexLayoutProps = {
   flexDirection: FlexDirection;
   flexWrap: FlexWrap;
   flexAlignments: FlexAlignments;
-  measuredContainerDimensions: Dimensions;
-  providedContainerDimensions?: Dimensions;
+  referenceContainerDimensions: Partial<Dimensions>;
 };
 
 export type FlexLayout = {
   itemGroups: Array<Array<string>>;
   itemPositions: Record<string, Vector>;
   crossAxisGroupOffsets: Array<number>;
-  containerHeight: number;
+  totalHeight: number;
 };

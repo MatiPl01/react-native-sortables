@@ -98,29 +98,30 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     }),
     props => {
       const layout = calculateLayout(props);
+      if (!layout) {
+        return;
+      }
 
-      if (layout) {
-        // Update item positions
-        itemPositions.value = layout.itemPositions;
-        // Update container height
-        containerHeight.value = layout.containerHeight;
-        // Update overridden item dimensions
-        overrideItemDimensions.value = Object.fromEntries(
-          props.indexToKey.map(key => [
-            key,
-            { width: columnWidth.value + props.gaps.column }
-          ])
-        );
+      // Update item positions
+      itemPositions.value = layout.itemPositions;
+      // Update container height
+      containerHeight.value = layout.containerHeight;
+      // Update overridden item dimensions
+      overrideItemDimensions.value = Object.fromEntries(
+        props.indexToKey.map(key => [
+          key,
+          { width: columnWidth.value + props.gaps.column }
+        ])
+      );
 
-        // DEBUG ONLY
-        if (debugRowGapRects) {
-          for (let i = 0; i < layout.rowOffsets.length - 1; i++) {
-            debugRowGapRects[i]?.set({
-              ...DEBUG_COLORS,
-              height: rowGap.value,
-              y: layout.rowOffsets[i + 1]! - rowGap.value
-            });
-          }
+      // DEBUG ONLY
+      if (debugRowGapRects) {
+        for (let i = 0; i < layout.rowOffsets.length - 1; i++) {
+          debugRowGapRects[i]?.set({
+            ...DEBUG_COLORS,
+            height: rowGap.value,
+            y: layout.rowOffsets[i + 1]! - rowGap.value
+          });
         }
       }
     },

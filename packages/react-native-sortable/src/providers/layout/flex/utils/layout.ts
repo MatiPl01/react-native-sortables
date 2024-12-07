@@ -1,20 +1,26 @@
-/* eslint-disable import/no-unused-modules */
-import type { Dimension, Dimensions, Vector } from '../../../../types';
+import type {
+  Dimension,
+  Dimensions,
+  Direction,
+  Vector
+} from '../../../../types';
 import { reverseArray, sum } from '../../../../utils';
 import type {
   AlignContent,
+  AlignItems,
   FlexAlignments,
-  FlexDirection,
   FlexLayout,
   FlexLayoutProps,
   JustifyContent
 } from '../types';
-import { areDimensionsCorrect } from './helpers';
+
+type AxisDimensions = { cross: Dimension; main: Dimension };
+type AxisDirections = { cross: Direction; main: Direction };
 
 const createGroups = (
   indexToKey: Array<string>,
   itemDimensions: Record<string, Dimensions>,
-  mainDimension: Dimension,
+  axisDimensions: AxisDimensions,
   gap: number,
   groupMainSizeLimit: number
 ): {
@@ -30,13 +36,15 @@ const createGroups = (
   let groupCrossSize = 0;
 
   for (const key of indexToKey) {
-    const itemDimension = itemDimensions[key]?.[mainDimension];
-    if (itemDimension === undefined) {
+    const dimensions = itemDimensions[key];
+    if (!dimensions) {
       return null;
     }
+    const mainItemDimension = dimensions[axisDimensions.main];
+    const crossItemDimension = dimensions[axisDimensions.cross];
 
     if (
-      totalGroupItemsMainSize + currentGroup.length * gap + itemDimension >
+      totalGroupItemsMainSize + currentGroup.length * gap + mainItemDimension >
       groupMainSizeLimit
     ) {
       groups.push(currentGroup);
@@ -47,9 +55,9 @@ const createGroups = (
     }
 
     currentGroup.push(key);
-    totalGroupItemsMainSize += itemDimension;
-    if (itemDimension > groupCrossSize) {
-      groupCrossSize = itemDimension;
+    totalGroupItemsMainSize += mainItemDimension;
+    if (crossItemDimension > groupCrossSize) {
+      groupCrossSize = crossItemDimension;
     }
   }
 
@@ -61,40 +69,40 @@ const createGroups = (
   return { crossAxisGroupSizes, groups };
 };
 
-const calculateContentAlignment = (
-  align: AlignContent | JustifyContent,
+const calculateAlignment = (
+  align: AlignContent | AlignItems | JustifyContent,
   sizes: Array<number>,
-  providedGap: number,
-  containerSize: number
+  containerSize: number,
+  providedGap = 0
 ): {
   offsets: Array<number>;
-  minTotalSize: number;
+  totalSize: number;
 } => {
   'worklet';
   let startOffset = 0;
   let adjustedGap = providedGap;
 
   const getTotalSize = (gap: number) => sum(sizes) + gap * (sizes.length - 1);
-  const minTotalSize = getTotalSize(providedGap);
-  const adjustedContainerSize = Math.max(minTotalSize, containerSize);
+  const totalSize = getTotalSize(providedGap);
+  const adjustedContainerSize = Math.max(totalSize, containerSize);
 
   switch (align) {
     case 'flex-end':
-      startOffset = adjustedContainerSize - minTotalSize;
+      startOffset = adjustedContainerSize - totalSize;
       break;
     case 'center':
-      startOffset = (adjustedContainerSize - minTotalSize) / 2;
+      startOffset = (adjustedContainerSize - totalSize) / 2;
       break;
     case 'stretch': {
-      if (minTotalSize === 0) break;
-      const multiplier = adjustedContainerSize / minTotalSize;
+      if (totalSize === 0) break;
+      const multiplier = adjustedContainerSize / totalSize;
       const offsets = [0];
       for (let i = 0; i < sizes.length - 1; i++) {
         offsets.push(
           (offsets[i] ?? 0) + (sizes[i] ?? 0) * multiplier + providedGap
         );
       }
-      return { minTotalSize, offsets };
+      return { offsets, totalSize };
     }
     case 'space-between':
       adjustedGap = Math.max(
@@ -121,55 +129,95 @@ const calculateContentAlignment = (
     offsets.push((startOffset += (sizes[i] ?? 0) + adjustedGap));
   }
 
-  return { minTotalSize, offsets };
+  return { offsets, totalSize: adjustedContainerSize };
 };
-
-// const withJustifyContent = (justifyContent: JustifyContent) => {
-//   'worklet';
-// };
-
-// const withAlignItems = (alignItems: AlignItems) => {
-//   'worklet';
-// };
-
-// const withJustifyItems = (justifyItems: JustifyItems) => {
-//   'worklet';
-// };
 
 const handleLayoutCalculation = (
   groups: Array<Array<string>>,
   crossAxisGroupSizes: Array<number>,
   itemDimensions: Record<string, Dimensions>,
   gaps: FlexLayoutProps['gaps'],
-  mainDirection: 'column' | 'row',
-  mainDimension: Dimension,
-  { alignContent }: FlexAlignments,
-  providedContainerDimensions?: Dimensions
-): {
-  itemPositions: Record<string, Vector>;
-  crossAxisGroupOffsets: Array<number>;
-  minContainerHeight: number;
-} => {
+  axisDimensions: AxisDimensions,
+  axisDirections: AxisDirections,
+  { alignContent, alignItems, justifyContent }: FlexAlignments,
+  referenceContainerDimensions: Partial<Dimensions>
+) => {
   'worklet';
-  const isRow = mainDirection === 'row';
-  const crossDimension = isRow ? 'height' : 'width';
-  const crossDirection = isRow ? 'column' : 'row';
+  const mainContainerDimension =
+    referenceContainerDimensions[axisDimensions.main];
+  if (!mainContainerDimension) {
+    return null;
+  }
+  const isRow = axisDirections.main === 'row';
 
-  const {
-    minTotalSize: minContainerCrossSize,
-    offsets: crossAxisGroupOffsets
-  } = calculateContentAlignment(
+  // ALIGN CONTENT
+  // position groups on the cross axis
+  const contentAlignment = calculateAlignment(
     alignContent,
     crossAxisGroupSizes,
-    gaps[crossDirection],
-    providedContainerDimensions?.[crossDimension] ?? 0
+    referenceContainerDimensions[axisDimensions.cross] ?? 0,
+    gaps[axisDirections.cross]
   );
 
-  const minContainerHeight = isRow ? minContainerCrossSize : 0; // TODO: calculate minContainerMainSize
+  let totalHeight = isRow ? contentAlignment.totalSize : 0;
+  const itemPositions: Record<string, Vector> = {};
+
+  for (let i = 0; i < groups.length; i++) {
+    // JUSTIFY CONTENT
+    // position items in groups on the main axis
+    const group = groups[i]!;
+    const groupCrossSize = crossAxisGroupSizes[i]!;
+    const groupCrossOffset = contentAlignment.offsets[i]!;
+    const mainAxisGroupItemSizes: Array<number> = [];
+
+    for (const key of group) {
+      const itemSize = itemDimensions[key]?.[axisDimensions.main];
+      if (itemSize === undefined) {
+        return null;
+      }
+      mainAxisGroupItemSizes.push(itemSize);
+    }
+
+    const contentJustification = calculateAlignment(
+      justifyContent,
+      mainAxisGroupItemSizes,
+      mainContainerDimension,
+      gaps[axisDirections.main]
+    );
+    if (!isRow) {
+      totalHeight = Math.max(totalHeight, contentJustification.totalSize);
+    }
+
+    for (let j = 0; j < group.length; j++) {
+      // ALIGN ITEMS // TODO - override with alignSelf if specified for an item
+      // position items in groups on the cross axis
+      const key = group[j]!;
+      const crossAxisItemSize = itemDimensions[key]?.[axisDimensions.cross];
+      if (crossAxisItemSize === undefined) {
+        return null;
+      }
+
+      const itemAlignment = calculateAlignment(
+        alignItems,
+        [crossAxisItemSize],
+        groupCrossSize
+      );
+
+      const crossAxisPosition = groupCrossOffset + itemAlignment.offsets[0]!;
+      const mainAxisPosition = contentJustification.offsets[j]!;
+
+      if (isRow) {
+        itemPositions[key] = { x: mainAxisPosition, y: crossAxisPosition };
+      } else {
+        itemPositions[key] = { x: crossAxisPosition, y: mainAxisPosition };
+      }
+    }
+  }
 
   return {
-    crossAxisGroupOffsets,
-    minContainerHeight
+    crossAxisGroupOffsets: contentAlignment.offsets,
+    itemPositions,
+    totalHeight
   };
 };
 
@@ -180,38 +228,35 @@ export const calculateLayout = ({
   gaps,
   indexToKey,
   itemDimensions,
-  providedContainerDimensions
+  referenceContainerDimensions
 }: FlexLayoutProps): FlexLayout | null => {
   'worklet';
-  if (
-    providedContainerDimensions &&
-    !areDimensionsCorrect(providedContainerDimensions)
-  ) {
+  if (!referenceContainerDimensions.width) {
     return null;
   }
 
+  // CREATE GROUPS
   // Determine the direction of the main axis and the parallel dimension
-  let mainDirection: FlexDirection = 'row';
-  let mainDimension: Dimension = 'width';
-
-  if (flexDirection.startsWith('column')) {
-    mainDirection = 'column';
-    mainDimension = 'height';
-  }
+  const isRow = flexDirection.startsWith('row');
+  const axisDimensions: AxisDimensions = isRow
+    ? { cross: 'height', main: 'width' }
+    : { cross: 'width', main: 'height' };
+  const axisDirections: AxisDirections = isRow
+    ? { cross: 'column', main: 'row' }
+    : { cross: 'row', main: 'column' };
 
   const groupSizeLimit =
     flexWrap === 'nowrap'
       ? Infinity
-      : (providedContainerDimensions?.[mainDimension] ??
-        measuredContainerDimensions[mainDimension]);
+      : (referenceContainerDimensions[axisDimensions.main] ?? Infinity);
+
   const groupingResult = createGroups(
     indexToKey,
     itemDimensions,
-    mainDimension,
-    gaps[mainDirection],
+    axisDimensions,
+    gaps[axisDirections.cross],
     groupSizeLimit
   );
-
   if (!groupingResult) {
     return null;
   }
@@ -222,24 +267,26 @@ export const calculateLayout = ({
     reverseArray(crossAxisGroupSizes);
   }
 
+  // CALCULATE LAYOUT
+  // based on item groups, gaps and alignment
   const layoutResult = handleLayoutCalculation(
     groups,
     crossAxisGroupSizes,
     itemDimensions,
     gaps,
-    mainDirection,
-    mainDimension,
+    axisDimensions,
+    axisDirections,
     flexAlignments,
-    containerDimensions
+    referenceContainerDimensions
   );
   if (!layoutResult) {
     return null;
   }
 
   return {
-    containerHeight: containerDimensions.height,
     crossAxisGroupOffsets: layoutResult.crossAxisGroupOffsets,
     itemGroups: groups,
-    itemPositions: layoutResult.itemPositions
+    itemPositions: layoutResult.itemPositions,
+    totalHeight: layoutResult.totalHeight
   };
 };

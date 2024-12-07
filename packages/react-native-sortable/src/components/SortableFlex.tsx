@@ -1,5 +1,5 @@
 import { cloneElement, type ReactElement } from 'react';
-import type { ViewProps, ViewStyle } from 'react-native';
+import type { ViewProps } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
@@ -57,21 +57,15 @@ function SortableFlexInner({
 
   useFlexOrderUpdater();
 
-  const animatedContainerStyle = useAnimatedStyle(() => {
-    if (containerHeight.value === -1) {
-      return {
-        alignItems: undefined,
-        height: undefined,
-        justifyContent: undefined
-      };
-    }
-    const style: ViewStyle = { height: containerHeight.value };
-    if (canSwitchToAbsoluteLayout) {
-      style.justifyContent = 'flex-start';
-      style.alignItems = 'flex-start';
-    }
-    return style;
-  });
+  const animatedContainerStyle = useAnimatedStyle(() =>
+    canSwitchToAbsoluteLayout.value
+      ? {
+          alignItems: 'flex-start',
+          height: containerHeight.value,
+          justifyContent: 'flex-start'
+        }
+      : {}
+  );
 
   return (
     <Animated.View
