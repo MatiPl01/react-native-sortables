@@ -1,10 +1,15 @@
-import { useAnimatedReaction } from 'react-native-reanimated';
+import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
 import { reorderItems } from '../../../utils';
-import { useCommonValuesContext, useOrderUpdater } from '../../shared';
+import {
+  useCommonValuesContext,
+  useInactiveIndexToKey,
+  useOrderUpdater
+} from '../../shared';
 import { useGridLayoutContext } from './GridLayoutProvider';
-import { getColumnIndex, getRowIndex } from './utils';
+import type { GridLayout } from './types';
+import { calculateLayout, getColumnIndex, getRowIndex } from './utils';
 
 const MIN_ADDITIONAL_OFFSET = 5;
 
@@ -14,10 +19,18 @@ const DEBUG_COLORS = {
 };
 
 export function useGridOrderUpdater(numColumns: number): void {
-  const { activeItemKey, containerHeight, containerWidth, indexToKey } =
-    useCommonValuesContext();
-  const { columnGap, columnWidth, rowGap, rowOffsets } = useGridLayoutContext();
+  const {
+    activeItemKey,
+    containerHeight,
+    containerWidth,
+    indexToKey,
+    itemDimensions
+  } = useCommonValuesContext();
+  const { columnGap, columnWidth, rowGap } = useGridLayoutContext();
   const debugContext = useDebugContext();
+
+  const othersLayout = useSharedValue<GridLayout | null>(null);
+  const othersIndexToKey = useInactiveIndexToKey();
 
   const debugRects = debugContext?.useDebugRects([
     'top',
@@ -26,6 +39,7 @@ export function useGridOrderUpdater(numColumns: number): void {
     'right'
   ]);
 
+  // DEBUG RECTS
   useAnimatedReaction(
     () => activeItemKey.value,
     () => {
@@ -35,54 +49,119 @@ export function useGridOrderUpdater(numColumns: number): void {
     }
   );
 
+  // LAYOUT WITHOUT ACTIVE ITEM
+  useAnimatedReaction(
+    () => ({
+      columnWidth: columnWidth.value,
+      gaps: {
+        column: columnGap.value,
+        row: rowGap.value
+      },
+      indexToKey: othersIndexToKey.value,
+      itemDimensions: itemDimensions.value,
+      numColumns
+    }),
+    props => {
+      othersLayout.value = calculateLayout(props);
+    },
+    [numColumns]
+  );
+
   useOrderUpdater(
     ({ activeIndex, strategy, touchPosition: { x, y } }) => {
       'worklet';
-      const itemsCount = indexToKey.value.length;
-      const rowIndex = getRowIndex(activeIndex, numColumns);
-      const columnIndex = getColumnIndex(activeIndex, numColumns);
-
-      // Get active item bounding box
-      const rowOffsetAbove = rowOffsets.value[rowIndex];
-      const rowOffsetBelow = rowOffsets.value[rowIndex + 1];
-      if (rowOffsetAbove === undefined || rowOffsetBelow === undefined) {
+      if (!othersLayout.value) {
         return;
       }
-      const columnOffsetLeft =
-        columnIndex * (columnWidth.value + columnGap.value);
-      const columnOffsetRight = columnOffsetLeft + columnWidth.value;
+      const { rowOffsets } = othersLayout.value;
+      const itemsCount = indexToKey.value.length;
+      const startRowIndex = getRowIndex(activeIndex, numColumns);
+      const startColumnIndex = getColumnIndex(activeIndex, numColumns);
+      let rowIndex = startRowIndex;
+      let columnIndex = startColumnIndex;
 
-      // Horizontal bounds
+      // VERTICAL BOUNDS
+      // Top bound
+      let rowOffsetAbove = -Infinity;
+      let topBound = Infinity;
+
+      while (topBound > 0 && y < topBound) {
+        if (topBound !== Infinity) {
+          rowIndex--;
+        }
+        rowOffsetAbove = rowOffsets[rowIndex] ?? 0;
+        const rowAboveHeight =
+          rowOffsets[rowIndex - 1] !== undefined
+            ? rowOffsetAbove - rowOffsets[rowIndex - 1]! - rowGap.value
+            : 0;
+        const additionalOffsetTop = Math.min(
+          rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
+          rowGap.value + rowAboveHeight / 2
+        );
+        topBound = rowOffsetAbove - additionalOffsetTop;
+      }
+
+      // Bottom bound
+      let rowOffsetBelow = Infinity;
+      let bottomBound = -Infinity;
+
+      while (
+        bottomBound < containerHeight.value &&
+        y > bottomBound &&
+        rowOffsets[rowIndex] !== undefined
+      ) {
+        if (bottomBound !== -Infinity) {
+          rowIndex++;
+        }
+        const nextRowOffset = rowOffsets[rowIndex + 1];
+        if (!nextRowOffset) {
+          break;
+        }
+        rowOffsetBelow = nextRowOffset;
+        const rowBelowHeight =
+          rowOffsets[rowIndex + 2] !== undefined && rowOffsetBelow !== undefined
+            ? rowOffsets[rowIndex + 2]! - rowOffsetBelow - rowGap.value
+            : 0;
+        const additionalOffsetBottom = Math.min(
+          rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
+          rowGap.value + rowBelowHeight / 2
+        );
+        bottomBound = rowOffsetBelow - rowGap.value + additionalOffsetBottom;
+      }
+
+      // HORIZONTAL BOUNDS
       const additionalOffsetX = Math.min(
         rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
         rowGap.value + columnWidth.value / 2
       );
-      const leftBound = columnOffsetLeft - additionalOffsetX;
-      const rightBound = columnOffsetRight + additionalOffsetX;
 
-      // Top bound
-      const rowAboveHeight =
-        rowOffsets.value[rowIndex - 1] !== undefined
-          ? rowOffsetAbove - rowOffsets.value[rowIndex - 1]! - rowGap.value
-          : 0;
-      const additionalOffsetTop = Math.min(
-        rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
-        rowGap.value + rowAboveHeight / 2
-      );
-      const topBound = rowOffsetAbove - additionalOffsetTop;
+      // Left bound
+      let columnOffsetLeft = -Infinity;
+      let leftBound = Infinity;
 
-      // Bottom bound
-      const rowBelowHeight =
-        rowOffsets.value[rowIndex + 2] !== undefined
-          ? rowOffsets.value[rowIndex + 2]! - rowOffsetBelow - rowGap.value
-          : 0;
-      const additionalOffsetBottom = Math.min(
-        rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
-        rowGap.value + rowBelowHeight / 2
-      );
-      const bottomBound =
-        rowOffsetBelow - rowGap.value + additionalOffsetBottom;
+      while (leftBound > 0 && x < leftBound) {
+        if (leftBound !== Infinity) {
+          columnIndex--;
+        }
+        columnOffsetLeft = columnIndex * (columnWidth.value + columnGap.value);
+        leftBound = columnOffsetLeft - additionalOffsetX;
+      }
 
+      // Right bound
+      let columnOffsetRight = Infinity;
+      let rightBound = -Infinity;
+
+      while (rightBound < containerWidth.value && x > rightBound) {
+        if (rightBound !== -Infinity) {
+          columnIndex++;
+        }
+        columnOffsetRight =
+          columnIndex * (columnWidth.value + columnGap.value) +
+          columnWidth.value;
+        rightBound = columnOffsetRight + additionalOffsetX;
+      }
+
+      // DEBUG ONLY
       if (debugRects) {
         debugRects.top.set({
           ...DEBUG_COLORS,
@@ -106,26 +185,16 @@ export function useGridOrderUpdater(numColumns: number): void {
         });
       }
 
-      // Check if the center of the active item is over the top or bottom edge of the container
-      let dy = 0;
-      if (topBound > 0 && y < topBound) {
-        dy = -1;
-      } else if (bottomBound < containerHeight.value && y > bottomBound) {
-        dy = 1;
-      }
-
-      // Check if the center of the active item is over the left or right edge of the container
-      let dx = 0;
-      if (leftBound > 0 && x < leftBound) {
-        dx = -1;
-      } else if (rightBound < containerWidth.value && x > rightBound) {
-        dx = 1;
-      }
-
-      const indexOffset = dy * numColumns + dx;
       // Swap the active item with the item at the new index
-      const newIndex = activeIndex + indexOffset;
-      if (newIndex === activeIndex || newIndex < 0 || newIndex >= itemsCount) {
+      const limitedRowIndex = Math.max(
+        0,
+        Math.min(rowIndex, rowOffsets.length - 2)
+      );
+      const newIndex = Math.max(
+        0,
+        Math.min(limitedRowIndex * numColumns + columnIndex, itemsCount - 1)
+      );
+      if (newIndex === activeIndex) {
         return;
       }
 

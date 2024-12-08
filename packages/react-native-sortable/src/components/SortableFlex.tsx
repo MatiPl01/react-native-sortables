@@ -1,9 +1,11 @@
-import { cloneElement, type ReactElement } from 'react';
-import type { ViewProps, ViewStyle } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { type ReactElement, useMemo } from 'react';
+import { View, type ViewStyle } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue
+} from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
-import type { FlexProps } from '../providers';
 import {
   FlexLayoutProvider,
   SharedProvider,
@@ -12,7 +14,11 @@ import {
   useFlexOrderUpdater
 } from '../providers';
 import type { SortableFlexProps } from '../types';
-import { getPropsWithDefaults, validateChildren } from '../utils';
+import {
+  extractFlexContainerProps,
+  getPropsWithDefaults,
+  validateChildren
+} from '../utils';
 import { DraggableView } from './shared';
 
 function SortableFlex(props: SortableFlexProps) {
@@ -24,56 +30,78 @@ function SortableFlex(props: SortableFlexProps) {
   const childrenArray = validateChildren(viewProps.children);
 
   const itemKeys = childrenArray.map(([key]) => key);
+  const { style: viewStyle, ...restProps } = viewProps;
+
+  const initialStyleOverrides = useMemo(
+    () =>
+      Object.fromEntries(
+        itemKeys.map(key => [
+          key,
+          {
+            alignContent: viewStyle.alignContent,
+            alignItems: viewStyle.alignItems,
+            flexDirection: viewStyle.flexDirection
+          }
+        ])
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  const itemStyleOverrides = useSharedValue<Record<string, ViewStyle>>(
+    initialStyleOverrides
+  );
+
+  const [flexStyles, restStyles] = extractFlexContainerProps(viewStyle);
 
   return (
-    <SharedProvider {...sharedProps} itemKeys={itemKeys}>
-      <FlexLayoutProvider
-        {...((viewProps.style as FlexProps) ?? {})}
-        itemsCount={itemKeys.length}>
-        <SortableFlexInner
-          childrenArray={childrenArray}
-          itemEntering={itemEntering}
-          itemExiting={itemExiting}
-          viewProps={viewProps}
-        />
-      </FlexLayoutProvider>
-    </SharedProvider>
+    <View {...restProps} style={restStyles}>
+      <SharedProvider
+        {...sharedProps}
+        itemKeys={itemKeys}
+        itemStyleOverrides={itemStyleOverrides}
+        measureParent>
+        <FlexLayoutProvider {...viewStyle} itemsCount={itemKeys.length}>
+          <SortableFlexInner
+            childrenArray={childrenArray}
+            itemEntering={itemEntering}
+            itemExiting={itemExiting}
+            style={flexStyles}
+          />
+        </FlexLayoutProvider>
+      </SharedProvider>
+    </View>
   );
 }
 
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
-  viewProps: ViewProps;
+  style: ViewStyle;
 } & Required<Pick<SortableFlexProps, 'itemEntering' | 'itemExiting'>>;
 
 function SortableFlexInner({
   childrenArray,
   itemEntering,
   itemExiting,
-  viewProps
+  style
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout, containerHeight } =
     useCommonValuesContext();
-  const { flexDirection, stretch } = useFlexLayoutContext();
+  const { flexDirection } = useFlexLayoutContext();
 
   useFlexOrderUpdater();
 
-  const animatedContainerStyle = useAnimatedStyle(() => {
-    if (containerHeight.value === -1) {
-      return {};
-    }
-    const style: ViewStyle = { height: containerHeight.value };
-    if (canSwitchToAbsoluteLayout) {
-      style.justifyContent = 'flex-start';
-      style.alignItems = 'flex-start';
-    }
-    return style;
-  });
+  const animatedContainerStyle = useAnimatedStyle(() =>
+    canSwitchToAbsoluteLayout.value
+      ? {
+          alignItems: 'flex-start',
+          height: containerHeight.value,
+          justifyContent: 'flex-start'
+        }
+      : {}
+  );
 
   return (
-    <Animated.View
-      {...viewProps}
-      style={[viewProps.style, animatedContainerStyle]}>
+    <Animated.View style={[style, animatedContainerStyle]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering}
@@ -83,10 +111,7 @@ function SortableFlexInner({
           // When flexDirection is row-reverse, we need to reverse the x-axis
           // because right offset in absolute position is calculated from the right edge
           reverseXAxis={flexDirection === 'row-reverse'}>
-          {cloneElement(child, {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            style: [child.props?.style, stretch && { flexGrow: 1 }]
-          })}
+          {child}
         </DraggableView>
       ))}
     </Animated.View>

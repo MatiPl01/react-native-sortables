@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import DropIndicator from '../components/shared/DropIndicator';
@@ -30,6 +31,8 @@ type SharedProviderProps = PropsWithChildren<
     hapticsEnabled: boolean;
     reorderStrategy: ReorderStrategy;
     debug: boolean;
+    itemStyleOverrides: SharedValue<Record<string, ViewStyle>>;
+    measureParent?: boolean;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
@@ -48,6 +51,7 @@ export default function SharedProvider({
   dropIndicatorStyle,
   hapticsEnabled,
   itemKeys,
+  measureParent,
   onDragEnd,
   onDragStart,
   onOrderChange,
@@ -63,7 +67,10 @@ export default function SharedProvider({
     // Provider used for shared values between all providers below
     <CommonValuesProvider itemKeys={itemKeys} {...rest} />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider itemsCount={itemKeys.length} />,
+    <MeasurementsProvider
+      itemsCount={itemKeys.length}
+      measureParent={measureParent}
+    />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (
@@ -93,8 +100,8 @@ export default function SharedProvider({
       )}
       <LayoutAnimationConfig skipEntering skipExiting>
         {children}
+        {debug && <DebugOutlet />}
       </LayoutAnimationConfig>
-      {debug && <DebugOutlet />}
     </ContextProviderComposer>
   );
 }

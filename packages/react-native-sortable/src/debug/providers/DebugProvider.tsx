@@ -177,7 +177,6 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
           }
         }
       }
-
       return Array.isArray(updaters) ? [...updaters] : { ...updaters };
     },
     [removeUpdater, createUpdater, addUpdater, getNextKey]

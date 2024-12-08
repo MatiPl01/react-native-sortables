@@ -10,4 +10,6 @@ export type Vector = {
 
 export type Dimension = keyof Dimensions;
 
+export type Direction = 'column' | 'row';
+
 export type Coordinate = keyof Vector;

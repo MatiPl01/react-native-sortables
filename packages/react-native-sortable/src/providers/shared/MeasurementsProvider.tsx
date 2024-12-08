@@ -1,5 +1,6 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import type { LayoutRectangle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   measure,
   useAnimatedReaction,
@@ -35,20 +36,24 @@ type MeasurementsContextType = {
 
 type MeasurementsProviderProps = PropsWithChildren<{
   itemsCount: number;
+  measureParent?: boolean;
 }>;
 
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
 )<MeasurementsProviderProps, MeasurementsContextType>(({
   children,
-  itemsCount
+  itemsCount,
+  measureParent
 }) => {
   const {
+    activeItemDropped,
     canSwitchToAbsoluteLayout,
     containerHeight,
     containerRef,
     containerWidth,
     itemDimensions,
+    parentDimensions,
     touchedItemHeight,
     touchedItemKey,
     touchedItemWidth
@@ -120,13 +125,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
   });
 
-  const handleContainerWidthMeasurement = useUIStableCallback(
-    (width: number) => {
-      'worklet';
-      maybeUpdateValue(containerWidth, width, OFFSET_EPS);
-    }
-  );
-
   const updateTouchedItemDimensions = useCallback(
     (key: string) => {
       'worklet';
@@ -168,11 +166,28 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     maybeSwitchToAbsoluteLayout
   ]);
 
-  const handleHelperContainerHeightMeasurement = useUIStableCallback(
+  const handleParentMeasurement = useCallback(
+    (layout: LayoutRectangle) => {
+      parentDimensions.value = {
+        height: layout.height,
+        width: layout.width
+      };
+    },
+    [parentDimensions]
+  );
+
+  const handleContainerWidthMeasurement = useCallback(
+    (width: number) => {
+      maybeUpdateValue(containerWidth, width, OFFSET_EPS);
+    },
+    [containerWidth]
+  );
+
+  const handleHelperContainerHeightMeasurement = useCallback(
     (height: number) => {
-      'worklet';
       maybeSwitchToAbsoluteLayout(height);
-    }
+    },
+    [maybeSwitchToAbsoluteLayout]
   );
 
   // Use this handler to measure the applied container height
@@ -189,28 +204,44 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   );
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
-    height: containerHeight.value === -1 ? undefined : containerHeight.value
+    // Use minHeight instead of height in order not to limit the height
+    // of grid items (e.g. when it is calculated via the aspect ratio)
+    minHeight: containerHeight.value === -1 ? undefined : containerHeight.value,
+    overflow:
+      touchedItemKey.value !== null || !activeItemDropped.value
+        ? 'visible'
+        : 'hidden'
   }));
 
   return {
     children: (
-      <Animated.View
-        ref={containerRef}
-        style={[styles.container, animatedContainerStyle]}
-        onLayout={({ nativeEvent: { layout } }) =>
-          handleContainerWidthMeasurement(layout.width)
-        }>
-        {/* Helper component used to ensure that the calculated container height
-        was reflected in layout and is applied to the container */}
+      <>
+        {measureParent && (
+          <View
+            style={styles.container}
+            onLayout={({ nativeEvent: { layout } }) =>
+              handleParentMeasurement(layout)
+            }
+          />
+        )}
         <Animated.View
-          ref={helperContainerRef}
-          style={[styles.helperContainer, animatedContainerStyle]}
+          ref={containerRef}
+          style={[styles.container, animatedContainerStyle]}
           onLayout={({ nativeEvent: { layout } }) =>
-            handleHelperContainerHeightMeasurement(layout.height)
-          }
-        />
-        {children}
-      </Animated.View>
+            handleContainerWidthMeasurement(layout.width)
+          }>
+          {/* Helper component used to ensure that the calculated container height
+        was reflected in layout and is applied to the container */}
+          <Animated.View
+            ref={helperContainerRef}
+            style={[styles.helperContainer, animatedContainerStyle]}
+            onLayout={({ nativeEvent: { layout } }) =>
+              handleHelperContainerHeightMeasurement(layout.height)
+            }
+          />
+          {children}
+        </Animated.View>
+      </>
     ),
     value: {
       handleItemMeasurement,

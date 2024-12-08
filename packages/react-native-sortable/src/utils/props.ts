@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { StyleSheet, type ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { DEFAULT_SHARED_PROPS, STYLE_PROPS } from '../constants/props';
 import type { SharedProps } from '../types';
@@ -62,3 +64,28 @@ export const getPropsWithDefaults = <
     sharedProps: sharedProps as Required<{ [K in keyof SharedProps]: P[K] }>
   };
 };
+
+const FLEX_CONTAINER_PROPS = new Set([
+  'alignContent',
+  'alignItems',
+  'justifyContent',
+  'flexDirection',
+  'rowGap',
+  'columnGap',
+  'gap',
+  'flexWrap'
+]);
+
+export const extractFlexContainerProps = (style: ViewStyle) =>
+  Object.entries(style).reduce<[ViewStyle, ViewStyle]>(
+    (acc, [key, value]) => {
+      const k = key as keyof ViewStyle;
+      if (FLEX_CONTAINER_PROPS.has(k)) {
+        acc[0][k] = value;
+      } else {
+        acc[1][k] = value;
+      }
+      return acc;
+    },
+    [{}, {}]
+  );

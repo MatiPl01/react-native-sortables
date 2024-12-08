@@ -82,3 +82,23 @@ export const reorderItems = <T>(
       return reorderSwap(array, fromIndex, toIndex);
   }
 };
+
+export const resolveDimensionValue = (
+  value: unknown,
+  parentDimension: number
+): number | undefined => {
+  'worklet';
+  if (value === undefined || value === null || value === 'auto') {
+    return undefined;
+  }
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const percentage = parseFloat(value) / 100;
+    if (!isNaN(percentage)) {
+      return parentDimension * percentage;
+    }
+  }
+  return undefined;
+};

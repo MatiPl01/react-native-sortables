@@ -311,7 +311,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
-      touchedItemKey.value = key;
       activationProgress.value = 0;
       activationState.value = DragActivationState.TOUCHED;
       startTouch.value = firstTouch;
@@ -340,6 +339,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             callback
           );
 
+        touchedItemKey.value = key;
         touchStartItemPosition.value = itemPositions.value[key] ?? null;
         activationState.value = DragActivationState.ACTIVATING;
         inactiveAnimationProgress.value = animate();
