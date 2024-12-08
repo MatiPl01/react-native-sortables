@@ -19,7 +19,7 @@ import type { Vector } from '../../types';
 
 export type DropIndicatorComponentProps = {
   activationProgress: SharedValue<number>;
-  activatedItemKey: SharedValue<null | string>;
+  touchedItemKey: SharedValue<null | string>;
   dropIndex: SharedValue<number>;
   dropPosition: SharedValue<Vector>;
   orderedItemKeys: SharedValue<Array<string>>;
@@ -33,7 +33,7 @@ type DropIndicatorProps = {
 
 function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const {
-    activatedItemKey,
+    touchedItemKey,
     activationProgress,
     activeItemDropped,
     indexToKey,
@@ -46,7 +46,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   // Clone the array in order to prevent user from mutating the internal state
   const orderedItemKeys = useDerivedValue(() => [...indexToKey.value]);
 
-  const { x, y } = useItemPosition(activatedItemKey, {
+  const { x, y } = useItemPosition(touchedItemKey, {
     easing: Easing.out(Easing.ease),
     ignoreTouched: true
   });
@@ -57,7 +57,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   useAnimatedReaction(
     () => ({
       kToI: keyToIndex.value,
-      key: activatedItemKey.value,
+      key: touchedItemKey.value,
       positions: itemPositions.value
     }),
     ({ kToI, key, positions }) => {
@@ -91,7 +91,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
       <DropIndicatorComponent
-        activatedItemKey={activatedItemKey}
+        touchedItemKey={touchedItemKey}
         activationProgress={activationProgress}
         dropIndex={dropIndex}
         dropPosition={dropPosition}

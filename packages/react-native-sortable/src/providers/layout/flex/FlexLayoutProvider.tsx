@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useMemo } from 'react';
-import type { ViewStyle } from 'react-native';
+import { useMemo, useRef } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedReaction,
@@ -10,10 +9,10 @@ import {
 
 import { useDebugContext } from '../../../debug';
 import type { Dimensions } from '../../../types';
-import { resolveDimensionValue } from '../../../utils';
+import { haveEqualPropValues, resolveDimensionValue } from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import type { FlexDirection, FlexLayout, FlexProps } from './types';
+import type { FlexDirection, FlexProps } from './types';
 import {
   calculateLayout,
   calculateReferenceSize,
@@ -52,19 +51,31 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   maxWidth,
   minHeight,
   minWidth,
+  padding,
+  paddingBlock,
+  paddingBlockEnd,
+  paddingBlockStart,
+  paddingBottom,
+  paddingEnd,
+  paddingHorizontal,
+  paddingInline,
+  paddingInlineEnd,
+  paddingInlineStart,
+  paddingLeft,
+  paddingRight,
+  paddingStart,
+  paddingTop,
+  paddingVertical,
   rowGap: rowGap_,
   width
 }) => {
-  const stretch = alignItems === 'stretch';
-  const isRow = flexDirection.includes('row');
-
   const {
     containerHeight,
     containerWidth,
     indexToKey,
     itemDimensions,
     itemPositions,
-    itemStyleOverrides,
+    itemsStyleOverride,
     parentDimensions
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
@@ -84,15 +95,68 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     () =>
       resolveDimensionValue(
         columnGap_ ?? gap,
-        parentDimensions.value?.width ?? 0
+        parentDimensions?.value?.width ?? 0
       ) ?? 0
   );
   const rowGap = useDerivedValue(
     () =>
       resolveDimensionValue(
         rowGap_ ?? gap,
-        parentDimensions.value?.height ?? 0
+        parentDimensions?.value?.height ?? 0
       ) ?? 0
+  );
+
+  const topPadding = useMemo(
+    () =>
+      paddingTop ??
+      paddingBlockStart ??
+      paddingBlock ??
+      paddingVertical ??
+      padding,
+    [paddingTop, paddingBlockStart, paddingBlock, paddingVertical, padding]
+  );
+  const bottomPadding = useMemo(
+    () =>
+      paddingBottom ??
+      paddingBlockEnd ??
+      paddingBlock ??
+      paddingVertical ??
+      padding,
+    [paddingBottom, paddingBlockEnd, paddingBlock, paddingVertical, padding]
+  );
+  const leftPadding = useMemo(
+    () =>
+      paddingLeft ??
+      paddingInlineStart ??
+      paddingStart ??
+      paddingInline ??
+      paddingHorizontal ??
+      padding,
+    [
+      paddingLeft,
+      paddingInlineStart,
+      paddingStart,
+      paddingInline,
+      paddingHorizontal,
+      padding
+    ]
+  );
+  const rightPadding = useMemo(
+    () =>
+      paddingRight ??
+      paddingInlineEnd ??
+      paddingEnd ??
+      paddingInline ??
+      paddingHorizontal ??
+      padding,
+    [
+      paddingRight,
+      paddingInlineEnd,
+      paddingEnd,
+      paddingInline,
+      paddingHorizontal,
+      padding
+    ]
   );
 
   const isHeightLimited = useMemo(
@@ -109,48 +173,20 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
   const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
 
-  const updateItemStyleOverrides = useCallback(
-    (layout: FlexLayout) => {
+  const isFirstRenderRef = useRef(true);
+  if (isFirstRenderRef.current) {
+    isFirstRenderRef.current = false;
+    itemsStyleOverride.modify(v => {
       'worklet';
-
-      if (stretch) {
-        const overriddenStyles: Record<string, ViewStyle> = {};
-        const overriddenDimension = isRow ? 'minHeight' : 'minWidth';
-
-        for (let i = 0; i < layout.itemGroups.length; i++) {
-          const group = layout.itemGroups[i];
-          const groupSize = layout.crossAxisGroupSizes[i];
-
-          if (!group || groupSize === undefined) {
-            return;
-          }
-
-          for (const key of group) {
-            const currentOverride = itemStyleOverrides.value[key];
-            if (groupSize !== currentOverride?.[overriddenDimension]) {
-              overriddenStyles[key] = {
-                alignItems: 'stretch',
-                flexDirection,
-                [overriddenDimension]: groupSize
-              };
-            } else {
-              overriddenStyles[key] = currentOverride;
-            }
-          }
-        }
-        itemStyleOverrides.value = overriddenStyles;
-      } else {
-        itemStyleOverrides.value = EMPTY_OBJECT;
-      }
-    },
-    [flexDirection, isRow, itemStyleOverrides, stretch]
-  );
+      return { alignItems, flexDirection, flexGrow: 1 } as typeof v;
+    }, true);
+  }
 
   // REFERENCE CONTAINER DIMENSIONS UPDATER
   useAnimatedReaction(
     () => ({
       measuredWidth: containerWidth.value,
-      parent: parentDimensions.value
+      parent: parentDimensions?.value
     }),
     ({ measuredWidth, parent }) => {
       if (!parent || !measuredWidth) {
@@ -159,18 +195,57 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       }
 
       const { height: parentH, width: parentW } = parent;
-      const h = calculateReferenceSize(minHeight, height, maxHeight, parentH);
-      const w = calculateReferenceSize(minWidth, width, maxWidth, parentW);
+      const tp = resolveDimensionValue(topPadding, parentH);
+      const bp = resolveDimensionValue(bottomPadding, parentH);
+      const lp = resolveDimensionValue(leftPadding, parentW);
+      const rp = resolveDimensionValue(rightPadding, parentW);
+
+      const paddingX = (lp ?? 0) + (rp ?? 0);
+      const paddingY = (tp ?? 0) + (bp ?? 0);
+
+      const h = calculateReferenceSize(
+        minHeight,
+        height,
+        maxHeight,
+        parentH + paddingY
+      );
+      const w = calculateReferenceSize(
+        minWidth,
+        width,
+        maxWidth,
+        parentW + paddingX
+      );
 
       const current = referenceContainerDimensions.value;
-      if (h === current.height || w === current.width) {
-        referenceContainerDimensions.value = {
-          height: h,
-          width: w ?? measuredWidth
-        };
+      if (h !== current.height || (w ?? measuredWidth) !== current.width) {
+        const newReferenceDimensions: Partial<Dimensions> = {};
+
+        if (h !== undefined) {
+          newReferenceDimensions.height = h - paddingY;
+        }
+        if (w !== undefined) {
+          newReferenceDimensions.width = w - paddingX;
+        } else {
+          newReferenceDimensions.width = measuredWidth;
+        }
+
+        if (!haveEqualPropValues(newReferenceDimensions, current)) {
+          referenceContainerDimensions.value = newReferenceDimensions;
+        }
       }
     },
-    [minHeight, minWidth, height, width, maxHeight, maxWidth]
+    [
+      minHeight,
+      minWidth,
+      height,
+      width,
+      maxHeight,
+      maxWidth,
+      topPadding,
+      bottomPadding,
+      leftPadding,
+      rightPadding
+    ]
   );
 
   // FLEX LAYOUT UPDATER
@@ -211,8 +286,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       } else {
         containerHeight.value = layout.totalHeight;
       }
-      // Update style overrides
-      updateItemStyleOverrides(layout);
 
       // DEBUG ONLY
       if (debugCrossAxisGapRects && debugMainAxisGapRects) {

@@ -5,6 +5,7 @@ import type { AnimatedRef } from 'react-native-reanimated';
 import type { DropIndicatorComponentProps } from '../components';
 import type { LayoutAnimation } from './reanimated';
 import type { AnimatableValues, Simplify } from './utils';
+import { AlignContent, AlignItems } from '../providers';
 
 /**
  * SHARED PROPS
@@ -132,4 +133,10 @@ export type SortableGridProps<I> = Simplify<
 /**
  * SORTABLE FLEX PROPS
  */
-export type SortableFlexProps = SharedProps & ViewProps;
+export type SortableFlexProps = SharedProps &
+  Omit<ViewProps, 'style'> & {
+    style: Omit<ViewStyle, 'alignContent' | 'alignItems'> & {
+      alignContent?: AlignContent;
+      alignItems?: AlignItems;
+    };
+  };

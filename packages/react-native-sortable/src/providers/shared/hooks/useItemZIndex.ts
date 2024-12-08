@@ -11,13 +11,13 @@ export default function useItemZIndex(
     y: SharedValue<null | number>;
   }
 ): SharedValue<number> {
-  const { itemPositions, activatedItemKey } = useCommonValuesContext();
+  const { itemPositions, touchedItemKey } = useCommonValuesContext();
 
   const zIndex = useSharedValue(0);
 
   useAnimatedReaction(
     () => ({
-      isBeingActivated: activatedItemKey.value === key,
+      isBeingActivated: touchedItemKey.value === key,
       progress: pressProgress.value,
       targetPosition: itemPositions.value[key]
     }),

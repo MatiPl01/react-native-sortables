@@ -30,7 +30,7 @@ export default function ItemDecoration({
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
-    itemStyleOverrides
+    itemsStyleOverride
   } = useCommonValuesContext();
 
   const resultingProgress = useDerivedValue(() =>
@@ -67,7 +67,7 @@ export default function ItemDecoration({
           )
         }
       ],
-      ...itemStyleOverrides.value[itemKey]
+      ...itemsStyleOverride.value
     };
   });
 

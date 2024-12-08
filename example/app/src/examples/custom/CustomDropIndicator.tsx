@@ -12,7 +12,7 @@ import Animated, {
 import type { DropIndicatorComponentProps } from 'react-native-sortable';
 
 export default function CustomDropIndicator({
-  activatedItemKey,
+  touchedItemKey,
   activationProgress,
   dropIndex,
   orderedItemKeys,
@@ -32,7 +32,7 @@ export default function CustomDropIndicator({
   const scale = useSharedValue(0);
   const colorIndex = useSharedValue(0);
   const showIndicator = useDerivedValue(
-    () => activationProgress.value > 0.2 && activatedItemKey.value !== null
+    () => activationProgress.value > 0.2 && touchedItemKey.value !== null
   );
 
   useAnimatedReaction(

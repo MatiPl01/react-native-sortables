@@ -1,10 +1,7 @@
 import { useMemo } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
 import { useAnimatableValue, useStableCallback } from '../hooks';
@@ -85,13 +82,11 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     () => [{ flexBasis: `${100 / columns}%` }, animatedItemWrapperStyle],
     [animatedItemWrapperStyle, columns]
   );
-  const itemStyleOverrides = useSharedValue<Record<string, ViewStyle>>({});
 
   return (
     <SharedProvider
       {...sharedProps}
       itemKeys={itemKeys}
-      itemStyleOverrides={itemStyleOverrides}
       key={columns}
       onDragEnd={onDragEnd}>
       <GridLayoutProvider

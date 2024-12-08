@@ -46,14 +46,12 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { activatedItemKey, canSwitchToAbsoluteLayout } =
+  const { touchedItemKey, canSwitchToAbsoluteLayout } =
     useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
   const viewRef = useAnimatedRef<Animated.View>();
-  const isBeingActivated = useDerivedValue(
-    () => activatedItemKey.value === key
-  );
+  const isBeingActivated = useDerivedValue(() => touchedItemKey.value === key);
   const pressProgress = useSharedValue(0);
 
   const position = useItemPosition(key);

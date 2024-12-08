@@ -93,17 +93,6 @@ const calculateAlignment = (
     case 'center':
       startOffset = (adjustedContainerSize - totalSize) / 2;
       break;
-    case 'stretch': {
-      if (totalSize === 0) break;
-      const multiplier = adjustedContainerSize / totalSize;
-      const offsets = [0];
-      for (let i = 0; i < sizes.length - 1; i++) {
-        offsets.push(
-          (offsets[i] ?? 0) + (sizes[i] ?? 0) * multiplier + providedGap
-        );
-      }
-      return { offsets, totalSize };
-    }
     case 'space-between':
       adjustedGap = Math.max(
         (adjustedContainerSize - sum(sizes)) / (sizes.length - 1),
@@ -156,7 +145,7 @@ const handleLayoutCalculation = (
     alignContent,
     crossAxisGroupSizes,
     referenceContainerDimensions[axisDimensions.cross] ?? 0,
-    gaps[axisDirections.cross]
+    gaps[axisDirections.main]
   );
 
   let totalHeight = isRow ? contentAlignment.totalSize : 0;
@@ -182,7 +171,7 @@ const handleLayoutCalculation = (
       justifyContent,
       mainAxisGroupItemSizes,
       mainContainerDimension,
-      gaps[axisDirections.main]
+      gaps[axisDirections.cross]
     );
     if (!isRow) {
       totalHeight = Math.max(totalHeight, contentJustification.totalSize);

@@ -1,10 +1,8 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
-import type { LayoutRectangle } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, {
   measure,
   useAnimatedReaction,
-  useAnimatedRef,
   useAnimatedStyle,
   useSharedValue
 } from 'react-native-reanimated';
@@ -43,18 +41,16 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
 )<MeasurementsProviderProps, MeasurementsContextType>(({
   children,
-  itemsCount,
-  measureParent
+  itemsCount
 }) => {
   const {
-    activatedItemKey,
+    touchedItemKey,
     activeItemDropped,
     canSwitchToAbsoluteLayout,
     containerHeight,
     containerRef,
     containerWidth,
     itemDimensions,
-    parentDimensions,
     touchedItemHeight,
     touchedItemWidth
   } = useCommonValuesContext();
@@ -63,7 +59,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   const initialItemMeasurementsCompleted = useSharedValue(false);
   const updateTimeoutId = useSharedValue<AnimatedTimeoutID>(-1);
 
-  const helperContainerRef = useAnimatedRef<Animated.View>();
   const measurementIntervalId = useSharedValue<AnimatedIntervalID>(-1);
   const measurementRetryCount = useSharedValue(0);
 
@@ -91,7 +86,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       itemDimensions.value[key] = dimensions;
-      if (activatedItemKey.value === key) {
+      if (touchedItemKey.value === key) {
         touchedItemWidth.value = dimensions.width;
         touchedItemHeight.value = dimensions.height;
       }
@@ -151,7 +146,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     measurementRetryCount.value = 0;
     clearAnimatedInterval(measurementIntervalId.value);
     measurementIntervalId.value = setAnimatedInterval(() => {
-      const measuredHeight = measure(helperContainerRef)?.height ?? -1;
+      const measuredHeight = measure(containerRef)?.height ?? -1;
       maybeSwitchToAbsoluteLayout(measuredHeight);
       if (measurementRetryCount.value >= MAX_MEASUREMENT_RETRIES) {
         clearAnimatedInterval(measurementIntervalId.value);
@@ -160,34 +155,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
     }, MEASUREMENT_RETRY_INTERVAL);
   }, [
-    helperContainerRef,
+    containerRef,
     measurementIntervalId,
     measurementRetryCount,
     maybeSwitchToAbsoluteLayout
   ]);
-
-  const handleParentMeasurement = useCallback(
-    (layout: LayoutRectangle) => {
-      parentDimensions.value = {
-        height: layout.height,
-        width: layout.width
-      };
-    },
-    [parentDimensions]
-  );
 
   const handleContainerWidthMeasurement = useCallback(
     (width: number) => {
       maybeUpdateValue(containerWidth, width, OFFSET_EPS);
     },
     [containerWidth]
-  );
-
-  const handleHelperContainerHeightMeasurement = useCallback(
-    (height: number) => {
-      maybeSwitchToAbsoluteLayout(height);
-    },
-    [maybeSwitchToAbsoluteLayout]
   );
 
   // Use this handler to measure the applied container height
@@ -208,7 +186,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     // of grid items (e.g. when it is calculated via the aspect ratio)
     minHeight: containerHeight.value === -1 ? undefined : containerHeight.value,
     overflow:
-      activatedItemKey.value !== null || !activeItemDropped.value
+      touchedItemKey.value !== null || !activeItemDropped.value
         ? 'visible'
         : 'hidden'
   }));
@@ -216,31 +194,14 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   return {
     children: (
       <>
-        {measureParent && (
-          <View
-            style={styles.container}
-            onLayout={({ nativeEvent: { layout } }) =>
-              handleParentMeasurement(layout)
-            }
-          />
-        )}
         <Animated.View
           ref={containerRef}
-          style={[styles.container, animatedContainerStyle]}
-          onLayout={({ nativeEvent: { layout } }) =>
-            handleContainerWidthMeasurement(layout.width)
-          }>
-          {/* Helper component used to ensure that the calculated container height
-        was reflected in layout and is applied to the container */}
-          <Animated.View
-            ref={helperContainerRef}
-            style={[styles.helperContainer, animatedContainerStyle]}
-            onLayout={({ nativeEvent: { layout } }) =>
-              handleHelperContainerHeightMeasurement(layout.height)
-            }
-          />
-          {children}
-        </Animated.View>
+          style={[styles.helperContainer, animatedContainerStyle]}
+          onLayout={({ nativeEvent: { layout } }) => {
+            handleContainerWidthMeasurement(layout.width);
+          }}
+        />
+        {children}
       </>
     ),
     value: {
@@ -253,11 +214,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 });
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%'
-  },
   helperContainer: {
-    position: 'absolute'
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0
   }
 });
 

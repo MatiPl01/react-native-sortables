@@ -65,7 +65,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   DragContextType
 >(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange }) => {
   const {
-    activatedItemKey,
+    touchedItemKey,
     activationProgress,
     activationState,
     activeItemDropped,
@@ -248,7 +248,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         withTiming(0, { duration: TIME_TO_ACTIVATE_PAN }, callback);
 
       clearAnimatedTimeout(activationTimeoutId.value);
-      activatedItemKey.value = null;
+      touchedItemKey.value = null;
       startTouch.value = null;
       touchTranslation.value = null;
       touchStartItemPosition.value = null;
@@ -278,7 +278,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
     },
     [
-      activatedItemKey,
+      touchedItemKey,
       dragStartTouchTranslation,
       touchStartItemPosition,
       startTouch,
@@ -338,8 +338,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           );
 
         activationProgress.value = 0;
+        touchedItemKey.value = key;
         startTouch.value = firstTouch;
-        activatedItemKey.value = key;
         touchStartItemPosition.value = itemPositions.value[key] ?? null;
         activationState.value = DragActivationState.ACTIVATING;
         inactiveAnimationProgress.value = animate();
@@ -350,7 +350,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             e.state !== State.CANCELLED &&
             e.state !== State.END
           ) {
-            if (activatedItemKey.value === key && itemPositions.value[key]) {
+            if (touchedItemKey.value === key && itemPositions.value[key]) {
               onActivate();
               handleDragStart(key, reorderStrategy);
             } else {
@@ -362,7 +362,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     },
     [
       startTouch,
-      activatedItemKey,
+      touchedItemKey,
       itemPositions,
       containerHeight,
       activationTimeoutId,
@@ -382,7 +382,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     (e: GestureTouchEvent, reverseXAxis: boolean, onFail: () => void) => {
       'worklet';
       const firstTouch = e.allTouches[0];
-      if (!firstTouch || !startTouch.value || activatedItemKey.value === null) {
+      if (!firstTouch || !startTouch.value || touchedItemKey.value === null) {
         onFail();
         return;
       }
@@ -403,7 +403,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         y: dY
       };
     },
-    [startTouch, touchTranslation, activatedItemKey, activeItemKey]
+    [startTouch, touchTranslation, touchedItemKey, activeItemKey]
   );
 
   const handleOrderChange = useCallback(

@@ -14,6 +14,7 @@ import type {
   ActiveItemSnapSettings,
   AnimatedValues,
   Dimensions,
+  Maybe,
   ReorderStrategy,
   Vector
 } from '../../types';
@@ -43,12 +44,12 @@ type CommonValuesContextType = {
   containerHeight: SharedValue<number>;
   touchedItemWidth: SharedValue<number>;
   touchedItemHeight: SharedValue<number>;
-  parentDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
-  itemStyleOverrides: SharedValue<Record<string, ViewStyle>>;
+  itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
+  parentDimensions?: SharedValue<Dimensions | null>;
 
   // DRAG STATE
-  activatedItemKey: SharedValue<null | string>;
+  touchedItemKey: SharedValue<null | string>;
   activeItemKey: SharedValue<null | string>;
   activationState: SharedValue<DragActivationState>;
   activationProgress: SharedValue<number>;
@@ -67,7 +68,8 @@ type CommonValuesProviderProps = PropsWithChildren<
     sortEnabled: boolean;
     itemKeys: Array<string>;
     reorderStrategy: ReorderStrategy;
-    itemStyleOverrides: SharedValue<Record<string, ViewStyle>>;
+    initialItemsStyleOverride?: ViewStyle;
+    parentDimensions?: SharedValue<Dimensions | null>;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings
 >;
@@ -82,10 +84,11 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   inactiveItemOpacity: _inactiveItemOpacity,
   inactiveItemScale: _inactiveItemScale,
   itemKeys,
-  itemStyleOverrides,
+  parentDimensions,
   reorderStrategy: _reorderStrategy,
   snapOffsetX: _snapOffsetX,
   snapOffsetY: _snapOffsetY,
+  initialItemsStyleOverride,
   sortEnabled: _sortEnabled
 }) => {
   const prevKeysRef = useRef<Array<string>>([]);
@@ -107,11 +110,13 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const containerHeight = useSharedValue(-1);
   const touchedItemWidth = useSharedValue(-1);
   const touchedItemHeight = useSharedValue(-1);
-  const parentDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
+  const itemsStyleOverride = useSharedValue<Maybe<ViewStyle>>(
+    initialItemsStyleOverride
+  );
 
   // DRAG STATE
-  const activatedItemKey = useSharedValue<null | string>(null);
+  const touchedItemKey = useSharedValue<null | string>(null);
   const activeItemKey = useSharedValue<null | string>(null);
   const activationState = useSharedValue(DragActivationState.INACTIVE);
   const activationProgress = useSharedValue(0);
@@ -144,7 +149,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   return {
     value: {
-      activatedItemKey,
+      touchedItemKey,
       activationProgress,
       activationState,
       activeItemDropped,
@@ -161,11 +166,11 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       inactiveItemOpacity,
       inactiveItemScale,
       indexToKey,
+      parentDimensions,
       itemDimensions,
       itemPositions,
-      itemStyleOverrides,
+      itemsStyleOverride,
       keyToIndex,
-      parentDimensions,
       reorderStrategy,
       snapOffsetX,
       snapOffsetY,

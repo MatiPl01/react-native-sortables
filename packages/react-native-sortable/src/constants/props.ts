@@ -83,7 +83,7 @@ export const DEFAULT_SORTABLE_FLEX_PROPS = {
   // (users will expect this behavior in most cases when using SortableFlex)
   style: {
     alignContent: 'flex-start',
-    alignItems: 'stretch',
+    alignItems: 'flex-start',
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 0,

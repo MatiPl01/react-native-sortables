@@ -12,7 +12,7 @@ export default function useItemPanGesture(
   pressProgress: SharedValue<number>,
   reverseXAxis = false
 ) {
-  const { reorderStrategy, activatedItemKey } = useCommonValuesContext();
+  const { reorderStrategy, touchedItemKey } = useCommonValuesContext();
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
     useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
@@ -23,7 +23,7 @@ export default function useItemPanGesture(
         .manualActivation(true)
         .onTouchesDown((e, manager) => {
           // Ignore touch if another item is already being touched/activated
-          if (activatedItemKey.value !== null) {
+          if (touchedItemKey.value !== null) {
             manager.fail();
             return;
           }
@@ -57,7 +57,7 @@ export default function useItemPanGesture(
       reverseXAxis,
       reorderStrategy,
       pressProgress,
-      activatedItemKey,
+      touchedItemKey,
       handleTouchStart,
       handleTouchesMove,
       handleDragEnd,
