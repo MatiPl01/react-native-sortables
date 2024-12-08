@@ -57,12 +57,12 @@ export default function useItemPosition(
 
   useAnimatedReaction(
     () => ({
-      isTouched: touchedItemKey.value === itemKey.value,
+      isBeingActivated: touchedItemKey.value === itemKey.value,
       position:
         itemKey.value !== null ? itemPositions.value[itemKey.value] : null
     }),
-    ({ isTouched, position }) => {
-      if (!position || (!ignoreTouched && isTouched)) {
+    ({ isBeingActivated, position }) => {
+      if (!position || (!ignoreTouched && isBeingActivated)) {
         return;
       }
       x.value =

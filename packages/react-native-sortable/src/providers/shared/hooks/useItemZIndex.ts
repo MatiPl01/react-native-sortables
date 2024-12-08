@@ -17,12 +17,12 @@ export default function useItemZIndex(
 
   useAnimatedReaction(
     () => ({
-      isTouched: touchedItemKey.value === key,
+      isBeingActivated: touchedItemKey.value === key,
       progress: pressProgress.value,
       targetPosition: itemPositions.value[key]
     }),
-    ({ isTouched, progress, targetPosition }) => {
-      if (isTouched) {
+    ({ isBeingActivated, progress, targetPosition }) => {
+      if (isBeingActivated) {
         zIndex.value = 3;
       } else if (progress > 0) {
         zIndex.value = 2;

@@ -11,15 +11,13 @@ import Animated, {
 import { useCommonValuesContext } from '../../providers';
 
 type ItemDecorationProps = {
-  isTouched: SharedValue<boolean>;
-  itemKey: string;
+  isBeingActivated: SharedValue<boolean>;
   pressProgress: SharedValue<number>;
   onLayout?: ViewProps['onLayout'];
 } & ViewProps;
 
 export default function ItemDecoration({
-  isTouched,
-  itemKey,
+  isBeingActivated,
   pressProgress,
   ...rest
 }: ItemDecorationProps) {
@@ -30,11 +28,11 @@ export default function ItemDecoration({
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
-    itemStyleOverrides
+    itemsStyleOverride
   } = useCommonValuesContext();
 
   const resultingProgress = useDerivedValue(() =>
-    isTouched.value || pressProgress.value > 0
+    isBeingActivated.value || pressProgress.value > 0
       ? pressProgress.value
       : -inactiveAnimationProgress.value
   );
@@ -67,7 +65,7 @@ export default function ItemDecoration({
           )
         }
       ],
-      ...itemStyleOverrides.value[itemKey]
+      ...itemsStyleOverride.value
     };
   });
 
@@ -77,7 +75,6 @@ export default function ItemDecoration({
 const styles = StyleSheet.create({
   decoration: {
     elevation: 5,
-    flexGrow: 1,
     shadowOffset: {
       height: 0,
       width: 0

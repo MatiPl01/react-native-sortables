@@ -44,7 +44,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     indexToKey,
     itemDimensions,
     itemPositions,
-    itemStyleOverrides
+    itemsStyleOverride
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
@@ -107,9 +107,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       // Update container height
       containerHeight.value = layout.containerHeight;
       // Update style overrides
-      itemStyleOverrides.value = Object.fromEntries(
-        props.indexToKey.map(key => [key, { width: columnWidth.value }])
-      );
+      const currentStyleOverride = itemsStyleOverride.value;
+      if (currentStyleOverride?.width !== columnWidth.value) {
+        itemsStyleOverride.value = {
+          width: columnWidth.value
+        };
+      }
 
       // DEBUG ONLY
       if (debugRowGapRects) {

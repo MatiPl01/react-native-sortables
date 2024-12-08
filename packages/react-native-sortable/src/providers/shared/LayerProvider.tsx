@@ -50,7 +50,8 @@ const { LayerProvider, useLayerContext } = createProvider('Layer', {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%'
+    alignContent: 'stretch',
+    flexDirection: 'row'
   }
 });
 

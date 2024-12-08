@@ -1,5 +1,6 @@
-import { type ReactElement, useMemo } from 'react';
-import { View, type ViewStyle } from 'react-native';
+import { type ReactElement } from 'react';
+import type { ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue
@@ -10,10 +11,11 @@ import {
   FlexLayoutProvider,
   SharedProvider,
   useCommonValuesContext,
+  useContainerOverflow,
   useFlexLayoutContext,
   useFlexOrderUpdater
 } from '../providers';
-import type { SortableFlexProps } from '../types';
+import type { Dimensions, SortableFlexProps } from '../types';
 import {
   extractFlexContainerProps,
   getPropsWithDefaults,
@@ -26,82 +28,74 @@ function SortableFlex(props: SortableFlexProps) {
     rest: viewProps,
     sharedProps: { itemEntering, itemExiting, ...sharedProps }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
+  const parentDimensions = useSharedValue<Dimensions | null>(null);
 
   const childrenArray = validateChildren(viewProps.children);
-
   const itemKeys = childrenArray.map(([key]) => key);
-  const { style: viewStyle, ...restProps } = viewProps;
 
-  const initialStyleOverrides = useMemo(
-    () =>
-      Object.fromEntries(
-        itemKeys.map(key => [
-          key,
-          {
-            alignContent: viewStyle.alignContent,
-            alignItems: viewStyle.alignItems,
-            flexDirection: viewStyle.flexDirection
-          }
-        ])
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-  const itemStyleOverrides = useSharedValue<Record<string, ViewStyle>>(
-    initialStyleOverrides
-  );
-
-  const [flexStyles, restStyles] = extractFlexContainerProps(viewStyle);
+  const [flexStyle, restStyle] = extractFlexContainerProps(viewProps.style);
 
   return (
-    <View {...restProps} style={restStyles}>
-      <SharedProvider
-        {...sharedProps}
-        itemKeys={itemKeys}
-        itemStyleOverrides={itemStyleOverrides}
-        measureParent>
-        <FlexLayoutProvider {...viewStyle} itemsCount={itemKeys.length}>
-          <SortableFlexInner
-            childrenArray={childrenArray}
-            itemEntering={itemEntering}
-            itemExiting={itemExiting}
-            style={flexStyles}
-          />
-        </FlexLayoutProvider>
-      </SharedProvider>
+    <View
+      style={restStyle}
+      onLayout={({ nativeEvent: { layout } }) => {
+        parentDimensions.value = {
+          height: layout.height,
+          width: layout.width
+        };
+      }}>
+      <View style={styles.container}>
+        <SharedProvider
+          {...sharedProps}
+          itemKeys={itemKeys}
+          parentDimensions={parentDimensions}>
+          <FlexLayoutProvider {...viewProps.style} itemsCount={itemKeys.length}>
+            <SortableFlexInner
+              childrenArray={childrenArray}
+              flexStyle={flexStyle}
+              itemEntering={itemEntering}
+              itemExiting={itemExiting}
+            />
+          </FlexLayoutProvider>
+        </SharedProvider>
+      </View>
     </View>
   );
 }
 
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
-  style: ViewStyle;
+  flexStyle: ViewStyle;
 } & Required<Pick<SortableFlexProps, 'itemEntering' | 'itemExiting'>>;
 
 function SortableFlexInner({
   childrenArray,
+  flexStyle,
   itemEntering,
-  itemExiting,
-  style
+  itemExiting
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout, containerHeight } =
     useCommonValuesContext();
   const { flexDirection } = useFlexLayoutContext();
+  const overflow = useContainerOverflow();
 
   useFlexOrderUpdater();
 
   const animatedContainerStyle = useAnimatedStyle(() =>
     canSwitchToAbsoluteLayout.value
       ? {
+          alignContent: 'flex-start',
           alignItems: 'flex-start',
-          height: containerHeight.value,
-          justifyContent: 'flex-start'
+          flexBasis: '100%',
+          justifyContent: 'flex-start',
+          minHeight: containerHeight.value,
+          overflow: overflow.value
         }
       : {}
   );
 
   return (
-    <Animated.View style={[style, animatedContainerStyle]}>
+    <Animated.View style={[flexStyle, animatedContainerStyle]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering}
@@ -117,5 +111,12 @@ function SortableFlexInner({
     </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    flexGrow: 1
+  }
+});
 
 export default SortableFlex;

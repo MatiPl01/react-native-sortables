@@ -311,9 +311,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
-      activationProgress.value = 0;
       activationState.value = DragActivationState.TOUCHED;
-      startTouch.value = firstTouch;
 
       // This should never happen, but just in case the container height
       // was not measured within the specified interval and onLayout
@@ -339,7 +337,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             callback
           );
 
+        activationProgress.value = 0;
         touchedItemKey.value = key;
+        startTouch.value = firstTouch;
         touchStartItemPosition.value = itemPositions.value[key] ?? null;
         activationState.value = DragActivationState.ACTIVATING;
         inactiveAnimationProgress.value = animate();

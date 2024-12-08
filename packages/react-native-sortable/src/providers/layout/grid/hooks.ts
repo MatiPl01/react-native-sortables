@@ -1,7 +1,9 @@
+import { useCallback } from 'react';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
-import { reorderItems } from '../../../utils';
+import type { Vector } from '../../../types';
+import { isValidVector, reorderItems } from '../../../utils';
 import {
   useCommonValuesContext,
   useInactiveIndexToKey,
@@ -18,6 +20,8 @@ const DEBUG_COLORS = {
   borderColor: '#00007e'
 };
 
+const DEBUG_RECT_KEYS = ['bottom', 'left', 'right', 'top'];
+
 export function useGridOrderUpdater(numColumns: number): void {
   const {
     activeItemKey,
@@ -32,12 +36,23 @@ export function useGridOrderUpdater(numColumns: number): void {
   const othersLayout = useSharedValue<GridLayout | null>(null);
   const othersIndexToKey = useInactiveIndexToKey();
 
-  const debugRects = debugContext?.useDebugRects([
-    'top',
-    'bottom',
-    'left',
-    'right'
-  ]);
+  const debugRects = debugContext?.useDebugRects(DEBUG_RECT_KEYS);
+
+  const updateDebugRect = useCallback(
+    (key: string, from: Vector, to: Vector) => {
+      'worklet';
+      if (!isValidVector(from) || !isValidVector(to)) {
+        debugRects?.[key]?.hide();
+      } else {
+        debugRects?.[key]?.set({
+          ...DEBUG_COLORS,
+          from,
+          to
+        });
+      }
+    },
+    [debugRects]
+  );
 
   // DEBUG RECTS
   useAnimatedReaction(
@@ -163,32 +178,32 @@ export function useGridOrderUpdater(numColumns: number): void {
 
       // DEBUG ONLY
       if (debugRects) {
-        debugRects.top.set({
-          ...DEBUG_COLORS,
-          from: { x: leftBound, y: topBound },
-          to: { x: rightBound, y: rowOffsetAbove }
-        });
-        debugRects.bottom.set({
-          ...DEBUG_COLORS,
-          from: { x: leftBound, y: rowOffsetBelow - rowGap.value },
-          to: { x: rightBound, y: bottomBound }
-        });
-        debugRects.left.set({
-          ...DEBUG_COLORS,
-          from: { x: leftBound, y: topBound },
-          to: { x: columnOffsetLeft, y: bottomBound }
-        });
-        debugRects.right.set({
-          ...DEBUG_COLORS,
-          from: { x: columnOffsetRight, y: topBound },
-          to: { x: rightBound, y: bottomBound }
-        });
+        updateDebugRect(
+          'top',
+          { x: leftBound, y: topBound },
+          { x: rightBound, y: rowOffsetAbove }
+        );
+        updateDebugRect(
+          'bottom',
+          { x: leftBound, y: rowOffsetBelow - rowGap.value },
+          { x: rightBound, y: bottomBound }
+        );
+        updateDebugRect(
+          'left',
+          { x: leftBound, y: topBound },
+          { x: columnOffsetLeft, y: bottomBound }
+        );
+        updateDebugRect(
+          'right',
+          { x: columnOffsetRight, y: topBound },
+          { x: rightBound, y: bottomBound }
+        );
       }
 
       // Swap the active item with the item at the new index
       const limitedRowIndex = Math.max(
         0,
-        Math.min(rowIndex, rowOffsets.length - 2)
+        Math.min(rowIndex, Math.ceil(itemsCount / numColumns))
       );
       const newIndex = Math.max(
         0,

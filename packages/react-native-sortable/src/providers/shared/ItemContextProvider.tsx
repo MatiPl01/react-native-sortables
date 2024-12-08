@@ -12,7 +12,7 @@ type ItemContextType = {
   };
   pressProgress: Readonly<SharedValue<number>>;
   zIndex: Readonly<SharedValue<number>>;
-  isTouched: Readonly<SharedValue<boolean>>;
+  isBeingActivated: Readonly<SharedValue<boolean>>;
   dragActivationState: Readonly<SharedValue<DragActivationState>>;
 };
 

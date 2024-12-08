@@ -2,9 +2,12 @@ import type { ViewStyle } from 'react-native';
 
 import type { Dimensions, NoUndef, Vector } from '../../../types';
 
-export type AlignContent = NoUndef<ViewStyle['alignContent']>;
+export type AlignContent = Exclude<
+  NoUndef<ViewStyle['alignContent']>,
+  'stretch'
+>;
+export type AlignItems = Exclude<NoUndef<ViewStyle['alignItems']>, 'stretch'>;
 export type JustifyContent = NoUndef<ViewStyle['justifyContent']>;
-export type AlignItems = NoUndef<ViewStyle['alignItems']>;
 export type FlexWrap = NoUndef<ViewStyle['flexWrap']>;
 export type FlexDirection = NoUndef<ViewStyle['flexDirection']>;
 
@@ -14,28 +17,13 @@ export type FlexAlignments = {
   alignItems: AlignItems;
 };
 
-export type FlexProps = Pick<
-  ViewStyle,
-  | 'columnGap'
-  | 'height'
-  | 'maxHeight'
-  | 'maxWidth'
-  | 'minHeight'
-  | 'minWidth'
-  | 'rowGap'
-  | 'width'
-> &
-  Required<
-    Pick<
-      ViewStyle,
-      | 'alignContent'
-      | 'alignItems'
-      | 'flexDirection'
-      | 'flexWrap'
-      | 'gap'
-      | 'justifyContent'
-    >
-  >;
+type RequiredProps = 'flexDirection' | 'flexWrap' | 'gap' | 'justifyContent';
+
+export type FlexProps = {
+  alignContent: AlignContent;
+  alignItems: AlignItems;
+} & Omit<ViewStyle, RequiredProps> &
+  Required<Pick<ViewStyle, RequiredProps>>;
 
 export type FlexLayoutProps = {
   gaps: {
