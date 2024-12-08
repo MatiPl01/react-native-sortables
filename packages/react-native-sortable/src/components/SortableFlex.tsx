@@ -1,5 +1,5 @@
 import { type ReactElement, useMemo } from 'react';
-import type { ViewProps, ViewStyle } from 'react-native';
+import { View, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue
@@ -14,7 +14,11 @@ import {
   useFlexOrderUpdater
 } from '../providers';
 import type { SortableFlexProps } from '../types';
-import { getPropsWithDefaults, validateChildren } from '../utils';
+import {
+  extractFlexContainerProps,
+  getPropsWithDefaults,
+  validateChildren
+} from '../utils';
 import { DraggableView } from './shared';
 
 function SortableFlex(props: SortableFlexProps) {
@@ -26,7 +30,7 @@ function SortableFlex(props: SortableFlexProps) {
   const childrenArray = validateChildren(viewProps.children);
 
   const itemKeys = childrenArray.map(([key]) => key);
-  const viewStyle = viewProps.style ?? {};
+  const { style: viewStyle, ...restProps } = viewProps;
 
   const initialStyleOverrides = useMemo(
     () =>
@@ -47,34 +51,38 @@ function SortableFlex(props: SortableFlexProps) {
     initialStyleOverrides
   );
 
+  const [flexStyles, restStyles] = extractFlexContainerProps(viewStyle);
+
   return (
-    <SharedProvider
-      {...sharedProps}
-      itemKeys={itemKeys}
-      itemStyleOverrides={itemStyleOverrides}
-      measureParent>
-      <FlexLayoutProvider {...viewStyle} itemsCount={itemKeys.length}>
-        <SortableFlexInner
-          childrenArray={childrenArray}
-          itemEntering={itemEntering}
-          itemExiting={itemExiting}
-          viewProps={viewProps}
-        />
-      </FlexLayoutProvider>
-    </SharedProvider>
+    <View {...restProps} style={restStyles}>
+      <SharedProvider
+        {...sharedProps}
+        itemKeys={itemKeys}
+        itemStyleOverrides={itemStyleOverrides}
+        measureParent>
+        <FlexLayoutProvider {...viewStyle} itemsCount={itemKeys.length}>
+          <SortableFlexInner
+            childrenArray={childrenArray}
+            itemEntering={itemEntering}
+            itemExiting={itemExiting}
+            style={flexStyles}
+          />
+        </FlexLayoutProvider>
+      </SharedProvider>
+    </View>
   );
 }
 
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
-  viewProps: ViewProps;
+  style: ViewStyle;
 } & Required<Pick<SortableFlexProps, 'itemEntering' | 'itemExiting'>>;
 
 function SortableFlexInner({
   childrenArray,
   itemEntering,
   itemExiting,
-  viewProps
+  style
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout, containerHeight } =
     useCommonValuesContext();
@@ -93,9 +101,7 @@ function SortableFlexInner({
   );
 
   return (
-    <Animated.View
-      {...viewProps}
-      style={[viewProps.style, animatedContainerStyle]}>
+    <Animated.View style={[style, animatedContainerStyle]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering}

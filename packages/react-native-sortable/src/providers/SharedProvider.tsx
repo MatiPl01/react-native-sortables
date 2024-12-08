@@ -31,9 +31,9 @@ type SharedProviderProps = PropsWithChildren<
     hapticsEnabled: boolean;
     reorderStrategy: ReorderStrategy;
     debug: boolean;
+    itemStyleOverrides: SharedValue<Record<string, ViewStyle>>;
     measureParent?: boolean;
     dropIndicatorStyle?: ViewStyle;
-    itemStyleOverrides?: SharedValue<Record<string, ViewStyle>>;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     DropIndicatorSettings &

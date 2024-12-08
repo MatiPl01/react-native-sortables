@@ -9,8 +9,7 @@ import {
 } from '../../shared';
 import { useGridLayoutContext } from './GridLayoutProvider';
 import type { GridLayout } from './types';
-import { calculateLayout } from './utils';
-import { getColumnIndex, getRowIndex } from './utils/helpers';
+import { calculateLayout, getColumnIndex, getRowIndex } from './utils';
 
 const MIN_ADDITIONAL_OFFSET = 5;
 
@@ -69,7 +68,7 @@ export function useGridOrderUpdater(numColumns: number): void {
   );
 
   useOrderUpdater(
-    ({ activeIndex, activeKey, strategy, touchPosition: { x, y } }) => {
+    ({ activeIndex, strategy, touchPosition: { x, y } }) => {
       'worklet';
       if (!othersLayout.value) {
         return;

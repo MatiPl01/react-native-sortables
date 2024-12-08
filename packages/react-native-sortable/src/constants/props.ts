@@ -1,4 +1,4 @@
-import type { ViewProps } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
 
 import { DefaultDropIndicator } from '../components/defaults';
 import type {
@@ -37,7 +37,7 @@ export const DEFAULT_SHARED_PROPS = {
     borderStyle: 'dashed',
     borderWidth: 2,
     flex: 1
-  },
+  } as ViewStyle,
   enableActiveItemSnap: true,
   hapticsEnabled: false,
   inactiveItemOpacity: 0.5,

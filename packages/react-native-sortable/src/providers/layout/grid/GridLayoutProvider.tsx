@@ -104,16 +104,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       // Update item positions
       itemPositions.value = layout.itemPositions;
-
       // Update container height
       containerHeight.value = layout.containerHeight;
-
-      // Update overridden item dimensions
+      // Update style overrides
       itemStyleOverrides.value = Object.fromEntries(
-        props.indexToKey.map(key => [
-          key,
-          { width: columnWidth.value + props.gaps.column }
-        ])
+        props.indexToKey.map(key => [key, { width: columnWidth.value }])
       );
 
       // DEBUG ONLY
