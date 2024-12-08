@@ -176,12 +176,12 @@ const SortableGridItem = typedMemo(function <I>({
 });
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    width: '100%'
-  },
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap'
+  },
+  outerContainer: {
+    width: '100%'
   }
 });
 
