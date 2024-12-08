@@ -12,14 +12,12 @@ import { useCommonValuesContext } from '../../providers';
 
 type ItemDecorationProps = {
   isBeingActivated: SharedValue<boolean>;
-  itemKey: string;
   pressProgress: SharedValue<number>;
   onLayout?: ViewProps['onLayout'];
 } & ViewProps;
 
 export default function ItemDecoration({
   isBeingActivated,
-  itemKey,
   pressProgress,
   ...rest
 }: ItemDecorationProps) {

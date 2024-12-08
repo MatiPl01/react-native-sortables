@@ -67,7 +67,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       if (width === -1) {
         return;
       }
-      const colWidth = (width + gap) / columns - gap;
+      const colWidth = width / columns - gap;
       columnWidth.value = colWidth;
 
       // DEBUG ONLY

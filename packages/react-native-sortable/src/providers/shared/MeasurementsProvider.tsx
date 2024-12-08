@@ -44,14 +44,13 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   itemsCount
 }) => {
   const {
-    touchedItemKey,
-    activeItemDropped,
     canSwitchToAbsoluteLayout,
     containerHeight,
     containerRef,
     containerWidth,
     itemDimensions,
     touchedItemHeight,
+    touchedItemKey,
     touchedItemWidth
   } = useCommonValuesContext();
 
@@ -182,13 +181,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   );
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
-    // Use minHeight instead of height in order not to limit the height
-    // of grid items (e.g. when it is calculated via the aspect ratio)
-    minHeight: containerHeight.value === -1 ? undefined : containerHeight.value,
-    overflow:
-      touchedItemKey.value !== null || !activeItemDropped.value
-        ? 'visible'
-        : 'hidden'
+    minHeight: containerHeight.value === -1 ? undefined : containerHeight.value
   }));
 
   return {
@@ -215,10 +208,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
 const styles = StyleSheet.create({
   helperContainer: {
-    position: 'absolute',
-    top: 0,
     left: 0,
-    right: 0
+    position: 'absolute',
+    right: 0,
+    top: 0
   }
 });
 

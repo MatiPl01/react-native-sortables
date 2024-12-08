@@ -1,7 +1,8 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
-import { LayoutAnimationConfig, SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import DropIndicator from '../components/shared/DropIndicator';
 import { DebugOutlet, DebugProvider } from '../debug';

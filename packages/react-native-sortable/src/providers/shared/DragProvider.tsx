@@ -65,7 +65,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   DragContextType
 >(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange }) => {
   const {
-    touchedItemKey,
     activationProgress,
     activationState,
     activeItemDropped,
@@ -80,6 +79,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     snapOffsetY,
     touchPosition,
     touchedItemHeight,
+    touchedItemKey,
     touchedItemPosition,
     touchedItemWidth
   } = useCommonValuesContext();

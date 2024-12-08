@@ -83,12 +83,12 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   enableActiveItemSnap: _enableActiveItemSnap,
   inactiveItemOpacity: _inactiveItemOpacity,
   inactiveItemScale: _inactiveItemScale,
+  initialItemsStyleOverride,
   itemKeys,
   parentDimensions,
   reorderStrategy: _reorderStrategy,
   snapOffsetX: _snapOffsetX,
   snapOffsetY: _snapOffsetY,
-  initialItemsStyleOverride,
   sortEnabled: _sortEnabled
 }) => {
   const prevKeysRef = useRef<Array<string>>([]);
@@ -149,7 +149,6 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   return {
     value: {
-      touchedItemKey,
       activationProgress,
       activationState,
       activeItemDropped,
@@ -166,17 +165,18 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       inactiveItemOpacity,
       inactiveItemScale,
       indexToKey,
-      parentDimensions,
       itemDimensions,
       itemPositions,
       itemsStyleOverride,
       keyToIndex,
+      parentDimensions,
       reorderStrategy,
       snapOffsetX,
       snapOffsetY,
       sortEnabled,
       touchPosition,
       touchedItemHeight,
+      touchedItemKey,
       touchedItemPosition,
       touchedItemWidth
     }

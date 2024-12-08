@@ -12,11 +12,11 @@ import Animated, {
 import type { DropIndicatorComponentProps } from 'react-native-sortable';
 
 export default function CustomDropIndicator({
-  touchedItemKey,
   activationProgress,
   dropIndex,
   orderedItemKeys,
-  style
+  style,
+  touchedItemKey
 }: DropIndicatorComponentProps) {
   const itemsCount = useDerivedValue(() => orderedItemKeys.value.length);
   const indexes = useDerivedValue(() =>

@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue
@@ -10,10 +11,11 @@ import {
   FlexLayoutProvider,
   SharedProvider,
   useCommonValuesContext,
+  useContainerOverflow,
   useFlexLayoutContext,
   useFlexOrderUpdater
 } from '../providers';
-import { Dimensions, type SortableFlexProps } from '../types';
+import type { Dimensions, SortableFlexProps } from '../types';
 import {
   extractFlexContainerProps,
   getPropsWithDefaults,
@@ -50,9 +52,9 @@ function SortableFlex(props: SortableFlexProps) {
           <FlexLayoutProvider {...viewProps.style} itemsCount={itemKeys.length}>
             <SortableFlexInner
               childrenArray={childrenArray}
+              flexStyle={flexStyle}
               itemEntering={itemEntering}
               itemExiting={itemExiting}
-              flexStyle={flexStyle}
             />
           </FlexLayoutProvider>
         </SharedProvider>
@@ -68,23 +70,25 @@ type SortableFlexInnerProps = {
 
 function SortableFlexInner({
   childrenArray,
+  flexStyle,
   itemEntering,
-  itemExiting,
-  flexStyle
+  itemExiting
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout, containerHeight } =
     useCommonValuesContext();
   const { flexDirection } = useFlexLayoutContext();
+  const overflow = useContainerOverflow();
 
   useFlexOrderUpdater();
 
   const animatedContainerStyle = useAnimatedStyle(() =>
     canSwitchToAbsoluteLayout.value
       ? {
+          alignContent: 'flex-start',
           alignItems: 'flex-start',
-          minHeight: containerHeight.value,
           justifyContent: 'flex-start',
-          alignContent: 'flex-start'
+          minHeight: containerHeight.value,
+          overflow: overflow.value
         }
       : {}
   );
@@ -109,8 +113,8 @@ function SortableFlexInner({
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    flexGrow: 1
   }
 });
 

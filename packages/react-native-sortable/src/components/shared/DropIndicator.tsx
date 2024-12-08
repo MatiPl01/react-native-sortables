@@ -33,13 +33,13 @@ type DropIndicatorProps = {
 
 function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const {
-    touchedItemKey,
     activationProgress,
     activeItemDropped,
     indexToKey,
     itemPositions,
     keyToIndex,
     touchedItemHeight,
+    touchedItemKey,
     touchedItemWidth
   } = useCommonValuesContext();
 
@@ -91,12 +91,12 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
       <DropIndicatorComponent
-        touchedItemKey={touchedItemKey}
         activationProgress={activationProgress}
         dropIndex={dropIndex}
         dropPosition={dropPosition}
         orderedItemKeys={orderedItemKeys}
         style={style}
+        touchedItemKey={touchedItemKey}
       />
     </Animated.View>
   );

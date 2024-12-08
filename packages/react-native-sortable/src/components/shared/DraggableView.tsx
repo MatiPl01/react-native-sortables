@@ -46,7 +46,7 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { touchedItemKey, canSwitchToAbsoluteLayout } =
+  const { canSwitchToAbsoluteLayout, touchedItemKey } =
     useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
@@ -88,7 +88,6 @@ export default function DraggableView({
         <GestureDetector gesture={gesture}>
           <ItemDecoration
             isBeingActivated={isBeingActivated}
-            itemKey={key}
             pressProgress={pressProgress}
             // Keep onLayout the closest to the children to measure the real item size
             // (without paddings or other style changes made to the wrapper component)

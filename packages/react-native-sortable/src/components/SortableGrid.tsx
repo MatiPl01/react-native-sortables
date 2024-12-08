@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
@@ -8,6 +9,8 @@ import { useAnimatableValue, useStableCallback } from '../hooks';
 import {
   GridLayoutProvider,
   SharedProvider,
+  useCommonValuesContext,
+  useContainerOverflow,
   useGridOrderUpdater
 } from '../providers';
 import type {
@@ -68,21 +71,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     });
   });
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    marginHorizontal: -columnGapValue.value / 2,
-    marginVertical: -rowGapValue.value / 2
-  }));
-
-  const animatedItemWrapperStyle = useAnimatedStyle(() => ({
-    paddingHorizontal: columnGapValue.value / 2,
-    paddingVertical: rowGapValue.value / 2
-  }));
-
-  const itemStyle = useMemo<StyleProp<ViewStyle>>(
-    () => [{ flexBasis: `${100 / columns}%` }, animatedItemWrapperStyle],
-    [animatedItemWrapperStyle, columns]
-  );
-
   return (
     <SharedProvider
       {...sharedProps}
@@ -95,14 +83,14 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
         itemsCount={data.length}
         rowGap={rowGapValue}>
         <SortableGridInner
+          columnGap={columnGapValue}
           columns={columns}
           data={data}
           itemEntering={itemEntering}
           itemExiting={itemExiting}
           itemKeys={itemKeys}
-          itemStyle={itemStyle}
           renderItem={renderItem}
-          style={animatedContainerStyle}
+          rowGap={rowGapValue}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -111,8 +99,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
 type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
-  itemStyle: StyleProp<ViewStyle>;
-  style: StyleProp<ViewStyle>;
+  rowGap: SharedValue<number>;
+  columnGap: SharedValue<number>;
 } & Required<
   Pick<
     SortableGridProps<I>,
@@ -121,19 +109,38 @@ type SortableGridInnerProps<I> = {
 >;
 
 function SortableGridInner<I>({
+  columnGap,
   columns,
   data,
   itemEntering,
   itemExiting,
   itemKeys,
-  itemStyle,
   renderItem,
-  style
+  rowGap
 }: SortableGridInnerProps<I>) {
+  const { canSwitchToAbsoluteLayout, containerHeight } =
+    useCommonValuesContext();
+  const overflow = useContainerOverflow();
+
   useGridOrderUpdater(columns);
 
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    marginHorizontal: -columnGap.value / 2,
+    marginVertical: -rowGap.value / 2,
+    minHeight: canSwitchToAbsoluteLayout.value
+      ? containerHeight.value
+      : undefined,
+    overflow: overflow.value
+  }));
+
+  const animatedItemStyle = useAnimatedStyle(() => ({
+    flexBasis: `${100 / columns}%`,
+    paddingHorizontal: columnGap.value / 2,
+    paddingVertical: rowGap.value / 2
+  }));
+
   return (
-    <Animated.View style={[styles.gridContainer, style]}>
+    <Animated.View style={[styles.gridContainer, animatedContainerStyle]}>
       {zipArrays(data, itemKeys).map(([item, key]) => (
         <SortableGridItem
           entering={itemEntering}
@@ -142,7 +149,7 @@ function SortableGridInner<I>({
           itemKey={key}
           key={key}
           renderItem={renderItem}
-          style={itemStyle}
+          style={animatedItemStyle}
         />
       ))}
     </Animated.View>
@@ -153,9 +160,9 @@ type SortableGridItemProps<I> = {
   itemKey: string;
   item: I;
   renderItem: SortableGridRenderItem<I>;
-  style: StyleProp<ViewStyle>;
   entering: LayoutAnimation;
   exiting: LayoutAnimation;
+  style: ViewStyle;
 };
 
 const SortableGridItem = typedMemo(function <I>({
@@ -168,8 +175,11 @@ const SortableGridItem = typedMemo(function <I>({
 
 const styles = StyleSheet.create({
   gridContainer: {
+    alignItems: 'flex-start',
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    width: '100%'
   }
 });
 

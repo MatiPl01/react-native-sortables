@@ -7,12 +7,13 @@ export default function PropsExample() {
   return (
     <Component
       style={{
-        alignContent: 'space-between',
+        alignContent: 'flex-end',
         backgroundColor: 'red',
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 20,
         height: 200,
+        justifyContent: 'center',
         padding: 20
       }}>
       <Animated.View

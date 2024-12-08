@@ -41,10 +41,10 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   const {
     activationProgress,
     activeItemKey,
+    containerRef,
     itemDimensions,
     touchedItemKey,
-    touchedItemPosition,
-    containerRef
+    touchedItemPosition
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
