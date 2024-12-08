@@ -88,7 +88,7 @@ function SortableFlexInner({
           alignItems: 'flex-start',
           flexBasis: '100%',
           justifyContent: 'flex-start',
-          minHeight: containerHeight.value,
+          height: containerHeight.value,
           overflow: overflow.value
         }
       : {}

@@ -127,9 +127,7 @@ function SortableGridInner<I>({
   const animatedContainerStyle = useAnimatedStyle(() => ({
     marginHorizontal: -columnGap.value / 2,
     marginVertical: -rowGap.value / 2,
-    minHeight: canSwitchToAbsoluteLayout.value
-      ? containerHeight.value
-      : undefined,
+    height: canSwitchToAbsoluteLayout.value ? containerHeight.value : undefined,
     overflow: overflow.value
   }));
 
