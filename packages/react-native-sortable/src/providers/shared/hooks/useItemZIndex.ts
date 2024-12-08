@@ -11,18 +11,18 @@ export default function useItemZIndex(
     y: SharedValue<null | number>;
   }
 ): SharedValue<number> {
-  const { itemPositions, touchedItemKey } = useCommonValuesContext();
+  const { itemPositions, activatedItemKey } = useCommonValuesContext();
 
   const zIndex = useSharedValue(0);
 
   useAnimatedReaction(
     () => ({
-      isTouched: touchedItemKey.value === key,
+      isBeingActivated: activatedItemKey.value === key,
       progress: pressProgress.value,
       targetPosition: itemPositions.value[key]
     }),
-    ({ isTouched, progress, targetPosition }) => {
-      if (isTouched) {
+    ({ isBeingActivated, progress, targetPosition }) => {
+      if (isBeingActivated) {
         zIndex.value = 3;
       } else if (progress > 0) {
         zIndex.value = 2;

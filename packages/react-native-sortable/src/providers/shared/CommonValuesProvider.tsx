@@ -48,7 +48,7 @@ type CommonValuesContextType = {
   itemStyleOverrides: SharedValue<Record<string, ViewStyle>>;
 
   // DRAG STATE
-  touchedItemKey: SharedValue<null | string>;
+  activatedItemKey: SharedValue<null | string>;
   activeItemKey: SharedValue<null | string>;
   activationState: SharedValue<DragActivationState>;
   activationProgress: SharedValue<number>;
@@ -111,7 +111,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
 
   // DRAG STATE
-  const touchedItemKey = useSharedValue<null | string>(null);
+  const activatedItemKey = useSharedValue<null | string>(null);
   const activeItemKey = useSharedValue<null | string>(null);
   const activationState = useSharedValue(DragActivationState.INACTIVE);
   const activationProgress = useSharedValue(0);
@@ -144,6 +144,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   return {
     value: {
+      activatedItemKey,
       activationProgress,
       activationState,
       activeItemDropped,
@@ -171,7 +172,6 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       sortEnabled,
       touchPosition,
       touchedItemHeight,
-      touchedItemKey,
       touchedItemPosition,
       touchedItemWidth
     }

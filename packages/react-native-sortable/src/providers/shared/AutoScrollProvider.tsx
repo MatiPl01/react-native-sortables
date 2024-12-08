@@ -43,7 +43,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     activeItemKey,
     containerRef,
     itemDimensions,
-    touchedItemKey,
+    activatedItemKey,
     touchedItemPosition
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
@@ -114,7 +114,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   useAnimatedReaction(
     () => ({
       isEnabled: enabled.value,
-      itemKey: touchedItemKey.value,
+      itemKey: activatedItemKey.value,
       progress: activationProgress.value
     }),
     ({ isEnabled, itemKey, progress }) => {

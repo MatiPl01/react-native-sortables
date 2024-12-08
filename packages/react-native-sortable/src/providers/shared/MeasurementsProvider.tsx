@@ -47,6 +47,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   measureParent
 }) => {
   const {
+    activatedItemKey,
     activeItemDropped,
     canSwitchToAbsoluteLayout,
     containerHeight,
@@ -55,7 +56,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     itemDimensions,
     parentDimensions,
     touchedItemHeight,
-    touchedItemKey,
     touchedItemWidth
   } = useCommonValuesContext();
 
@@ -91,7 +91,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       itemDimensions.value[key] = dimensions;
-      if (touchedItemKey.value === key) {
+      if (activatedItemKey.value === key) {
         touchedItemWidth.value = dimensions.width;
         touchedItemHeight.value = dimensions.height;
       }
@@ -208,7 +208,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     // of grid items (e.g. when it is calculated via the aspect ratio)
     minHeight: containerHeight.value === -1 ? undefined : containerHeight.value,
     overflow:
-      touchedItemKey.value !== null || !activeItemDropped.value
+      activatedItemKey.value !== null || !activeItemDropped.value
         ? 'visible'
         : 'hidden'
   }));

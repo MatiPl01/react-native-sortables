@@ -65,6 +65,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   DragContextType
 >(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange }) => {
   const {
+    activatedItemKey,
     activationProgress,
     activationState,
     activeItemDropped,
@@ -79,7 +80,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     snapOffsetY,
     touchPosition,
     touchedItemHeight,
-    touchedItemKey,
     touchedItemPosition,
     touchedItemWidth
   } = useCommonValuesContext();
@@ -248,7 +248,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         withTiming(0, { duration: TIME_TO_ACTIVATE_PAN }, callback);
 
       clearAnimatedTimeout(activationTimeoutId.value);
-      touchedItemKey.value = null;
+      activatedItemKey.value = null;
       startTouch.value = null;
       touchTranslation.value = null;
       touchStartItemPosition.value = null;
@@ -278,7 +278,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
     },
     [
-      touchedItemKey,
+      activatedItemKey,
       dragStartTouchTranslation,
       touchStartItemPosition,
       startTouch,
@@ -311,9 +311,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
-      activationProgress.value = 0;
       activationState.value = DragActivationState.TOUCHED;
-      startTouch.value = firstTouch;
 
       // This should never happen, but just in case the container height
       // was not measured within the specified interval and onLayout
@@ -339,7 +337,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             callback
           );
 
-        touchedItemKey.value = key;
+        activationProgress.value = 0;
+        startTouch.value = firstTouch;
+        activatedItemKey.value = key;
         touchStartItemPosition.value = itemPositions.value[key] ?? null;
         activationState.value = DragActivationState.ACTIVATING;
         inactiveAnimationProgress.value = animate();
@@ -350,7 +350,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             e.state !== State.CANCELLED &&
             e.state !== State.END
           ) {
-            if (touchedItemKey.value === key && itemPositions.value[key]) {
+            if (activatedItemKey.value === key && itemPositions.value[key]) {
               onActivate();
               handleDragStart(key, reorderStrategy);
             } else {
@@ -362,7 +362,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     },
     [
       startTouch,
-      touchedItemKey,
+      activatedItemKey,
       itemPositions,
       containerHeight,
       activationTimeoutId,
@@ -382,7 +382,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     (e: GestureTouchEvent, reverseXAxis: boolean, onFail: () => void) => {
       'worklet';
       const firstTouch = e.allTouches[0];
-      if (!firstTouch || !startTouch.value || touchedItemKey.value === null) {
+      if (!firstTouch || !startTouch.value || activatedItemKey.value === null) {
         onFail();
         return;
       }
@@ -403,7 +403,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         y: dY
       };
     },
-    [startTouch, touchTranslation, touchedItemKey, activeItemKey]
+    [startTouch, touchTranslation, activatedItemKey, activeItemKey]
   );
 
   const handleOrderChange = useCallback(

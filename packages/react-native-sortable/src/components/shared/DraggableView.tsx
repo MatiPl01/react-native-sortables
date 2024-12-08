@@ -1,10 +1,5 @@
 import { useEffect } from 'react';
-import {
-  type StyleProp,
-  StyleSheet,
-  type ViewProps,
-  type ViewStyle
-} from 'react-native';
+import { type StyleProp, type ViewProps, type ViewStyle } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
@@ -51,12 +46,14 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { canSwitchToAbsoluteLayout, touchedItemKey } =
+  const { activatedItemKey, canSwitchToAbsoluteLayout } =
     useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
   const viewRef = useAnimatedRef<Animated.View>();
-  const isTouched = useDerivedValue(() => touchedItemKey.value === key);
+  const isBeingActivated = useDerivedValue(
+    () => activatedItemKey.value === key
+  );
   const pressProgress = useSharedValue(0);
 
   const position = useItemPosition(key);
@@ -89,10 +86,10 @@ export default function DraggableView({
 
   return (
     <Animated.View ref={viewRef} {...viewProps} style={[style, animatedStyle]}>
-      <Animated.View entering={entering} exiting={exiting} style={styles.grow}>
+      <Animated.View entering={entering} exiting={exiting}>
         <GestureDetector gesture={gesture}>
           <ItemDecoration
-            isTouched={isTouched}
+            isBeingActivated={isBeingActivated}
             itemKey={key}
             pressProgress={pressProgress}
             // Keep onLayout the closest to the children to measure the real item size
@@ -104,7 +101,7 @@ export default function DraggableView({
               });
             }}>
             <ItemContextProvider
-              isTouched={isTouched}
+              isBeingActivated={isBeingActivated}
               itemKey={key}
               position={position}
               pressProgress={pressProgress}
@@ -117,9 +114,3 @@ export default function DraggableView({
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  grow: {
-    flexGrow: 1
-  }
-});

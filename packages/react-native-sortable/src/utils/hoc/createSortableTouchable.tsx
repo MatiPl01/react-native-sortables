@@ -12,21 +12,20 @@ export default function createSortableTouchable<P extends AnyPressHandlers>(
   Component: ComponentType<P>
 ): ComponentType<P> {
   function Wrapper({ onPress, ...rest }: P) {
-    const { dragActivationState, isTouched } = useItemContext();
+    const { dragActivationState } = useItemContext();
     const isCancelled = useSharedValue(false);
 
     useAnimatedReaction(
       () => ({
-        dragState: dragActivationState.value,
-        touched: isTouched.value
+        dragState: dragActivationState.value
       }),
-      ({ dragState, touched }) => {
+      ({ dragState }) => {
         // Cancels when the item starts being activated
-        if (touched && dragState === DragActivationState.ACTIVATING) {
+        if (dragState === DragActivationState.ACTIVATING) {
           isCancelled.value = true;
         }
         // Resets state when the item is touched again
-        else if (touched && dragState === DragActivationState.TOUCHED) {
+        else if (dragState === DragActivationState.TOUCHED) {
           isCancelled.value = false;
         }
       }

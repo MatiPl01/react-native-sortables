@@ -1,4 +1,4 @@
-import type { Offset, ReorderStrategy } from '../types';
+import type { Offset, ReorderStrategy, Vector } from '../types';
 
 export const getOffsetDistance = (
   providedOffset: Offset,
@@ -101,4 +101,14 @@ export const resolveDimensionValue = (
     }
   }
   return undefined;
+};
+
+export const isValidCoordinate = (coordinate: number): boolean => {
+  'worklet';
+  return !isNaN(coordinate) && coordinate > -Infinity && coordinate < Infinity;
+};
+
+export const isValidVector = (vector: Vector): boolean => {
+  'worklet';
+  return isValidCoordinate(vector.x) && isValidCoordinate(vector.y);
 };

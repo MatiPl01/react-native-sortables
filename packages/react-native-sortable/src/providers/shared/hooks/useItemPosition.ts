@@ -28,7 +28,7 @@ export default function useItemPosition(
   x: SharedValue<null | number>;
   y: SharedValue<null | number>;
 } {
-  const { itemPositions, touchedItemKey, touchedItemPosition } =
+  const { itemPositions, activatedItemKey, touchedItemPosition } =
     useCommonValuesContext();
 
   const itemKey = useAnimatableValue(key);
@@ -57,12 +57,12 @@ export default function useItemPosition(
 
   useAnimatedReaction(
     () => ({
-      isTouched: touchedItemKey.value === itemKey.value,
+      isBeingActivated: activatedItemKey.value === itemKey.value,
       position:
         itemKey.value !== null ? itemPositions.value[itemKey.value] : null
     }),
-    ({ isTouched, position }) => {
-      if (!position || (!ignoreTouched && isTouched)) {
+    ({ isBeingActivated, position }) => {
+      if (!position || (!ignoreTouched && isBeingActivated)) {
         return;
       }
       x.value =
@@ -80,7 +80,7 @@ export default function useItemPosition(
     ({ position }) => {
       if (
         !ignoreTouched &&
-        touchedItemKey.value === itemKey.value &&
+        activatedItemKey.value === itemKey.value &&
         position
       ) {
         x.value = position.x;
