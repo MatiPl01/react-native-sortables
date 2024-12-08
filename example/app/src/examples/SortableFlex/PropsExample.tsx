@@ -7,7 +7,7 @@ export default function PropsExample() {
   return (
     <Component
       style={{
-        alignContent: 'flex-end',
+        alignContent: 'space-between',
         backgroundColor: 'red',
         flexDirection: 'row',
         flexWrap: 'wrap',

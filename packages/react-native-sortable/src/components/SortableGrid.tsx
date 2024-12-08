@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
@@ -140,19 +140,21 @@ function SortableGridInner<I>({
   }));
 
   return (
-    <Animated.View style={[styles.gridContainer, animatedContainerStyle]}>
-      {zipArrays(data, itemKeys).map(([item, key]) => (
-        <SortableGridItem
-          entering={itemEntering}
-          exiting={itemExiting}
-          item={item}
-          itemKey={key}
-          key={key}
-          renderItem={renderItem}
-          style={animatedItemStyle}
-        />
-      ))}
-    </Animated.View>
+    <View style={styles.outerContainer}>
+      <Animated.View style={[styles.gridContainer, animatedContainerStyle]}>
+        {zipArrays(data, itemKeys).map(([item, key]) => (
+          <SortableGridItem
+            entering={itemEntering}
+            exiting={itemExiting}
+            item={item}
+            itemKey={key}
+            key={key}
+            renderItem={renderItem}
+            style={animatedItemStyle}
+          />
+        ))}
+      </Animated.View>
+    </View>
   );
 }
 
@@ -174,12 +176,12 @@ const SortableGridItem = typedMemo(function <I>({
 });
 
 const styles = StyleSheet.create({
-  gridContainer: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+  outerContainer: {
     width: '100%'
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap'
   }
 });
 
