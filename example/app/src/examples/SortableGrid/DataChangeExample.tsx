@@ -139,13 +139,13 @@ export default function DataChangeExample() {
           </Group>
 
           <Sortable.Grid
-            animateHeight
             columnGap={spacing.sm}
             columns={COLUMNS}
             data={data}
             renderItem={renderItem}
             rowGap={spacing.xs}
             scrollableRef={scrollableRef}
+            animateHeight
             debug
             onDragEnd={({ data: newData }) => setData(newData)}
           />
