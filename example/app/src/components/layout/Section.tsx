@@ -23,7 +23,7 @@ export default function Section({
         <Text style={styles.title}>{title}</Text>
         {description && <Text style={styles.description}>{description}</Text>}
       </View>
-      {children && <Group style={fill && flex.fill}>{children}</Group>}
+      {children && <Group style={[fill && flex.fill]}>{children}</Group>}
     </View>
   );
 }

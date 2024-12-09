@@ -129,6 +129,7 @@ export default function DataChangeExample() {
           <Sortable.Flex
             scrollableRef={scrollableRef}
             style={styles.sortableFlex}
+            animateHeight
             onDragEnd={onDragEnd}>
             {data.map(item => (
               <Sortable.Pressable

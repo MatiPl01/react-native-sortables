@@ -203,7 +203,7 @@ export function useGridOrderUpdater(numColumns: number): void {
       // Swap the active item with the item at the new index
       const limitedRowIndex = Math.max(
         0,
-        Math.min(rowIndex, Math.ceil(itemsCount / numColumns))
+        Math.min(rowIndex, Math.floor((itemsCount - 1) / numColumns))
       );
       const newIndex = Math.max(
         0,
