@@ -127,6 +127,7 @@ export default function DataChangeExample() {
           </Group>
 
           <Sortable.Flex
+            animateHeight
             scrollableRef={scrollableRef}
             style={styles.sortableFlex}
             onDragEnd={onDragEnd}>

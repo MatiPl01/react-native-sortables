@@ -85,7 +85,6 @@ function Slider({ current, from, to }: SliderProps) {
 
 const styles = StyleSheet.create({
   sliderBar: {
-    backgroundColor: 'gray',
     borderRadius: 5,
     height: 10
   },
@@ -94,7 +93,6 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   sliderThumb: {
-    backgroundColor: 'blue',
     borderRadius: 25,
     height: 25,
     left: -12.5,

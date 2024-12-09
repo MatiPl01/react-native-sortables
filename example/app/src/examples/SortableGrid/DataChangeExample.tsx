@@ -139,6 +139,7 @@ export default function DataChangeExample() {
           </Group>
 
           <Sortable.Grid
+            animateHeight
             columnGap={spacing.sm}
             columns={COLUMNS}
             data={data}

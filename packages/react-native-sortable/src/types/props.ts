@@ -82,6 +82,7 @@ export type ReorderStrategy = 'insert' | 'swap';
 
 export type SharedProps = Simplify<
   {
+    animateHeight?: boolean;
     sortEnabled?: boolean;
     hapticsEnabled?: boolean;
     reorderStrategy?: ReorderStrategy;

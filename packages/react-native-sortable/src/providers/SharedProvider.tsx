@@ -4,14 +4,12 @@ import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
-import DropIndicator from '../components/shared/DropIndicator';
 import { DebugOutlet, DebugProvider } from '../debug';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
   AutoScrollSettings,
   Dimensions,
-  DropIndicatorSettings,
   PartialBy,
   ReorderStrategy,
   SortableCallbacks
@@ -37,26 +35,22 @@ type SharedProviderProps = PropsWithChildren<
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
-    DropIndicatorSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
     SortableCallbacks
 >;
 
 export default function SharedProvider({
-  DropIndicatorComponent,
   autoScrollActivationOffset,
   autoScrollEnabled,
   autoScrollSpeed,
   children,
   debug,
-  dropIndicatorStyle,
   hapticsEnabled,
   itemKeys,
   onDragEnd,
   onDragStart,
   onOrderChange,
   scrollableRef,
-  showDropIndicator,
   ...rest
 }: SharedProviderProps) {
   const providers = [
@@ -89,12 +83,6 @@ export default function SharedProvider({
 
   return (
     <ContextProviderComposer providers={providers}>
-      {showDropIndicator && (
-        <DropIndicator
-          DropIndicatorComponent={DropIndicatorComponent}
-          style={dropIndicatorStyle}
-        />
-      )}
       <LayoutAnimationConfig skipEntering skipExiting>
         {children}
         {debug && <DebugOutlet />}
