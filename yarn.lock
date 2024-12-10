@@ -3668,6 +3668,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-community/cli-config-android@npm:16.0.0":
+  version: 16.0.0
+  resolution: "@react-native-community/cli-config-android@npm:16.0.0"
+  dependencies:
+    "@react-native-community/cli-tools": "npm:16.0.0"
+    chalk: "npm:^4.1.2"
+    fast-glob: "npm:^3.3.2"
+    fast-xml-parser: "npm:^4.4.1"
+  checksum: 10c0/68ad6e34ab134c9b0a13f1175ec9cfc2abae215efe30ef1f88beb7713dcf41a63d6cfb9dd24e8d1ae252839c3a76dd6328fea87920e90da0092264c0d468263f
+  languageName: node
+  linkType: hard
+
 "@react-native-community/cli-config-apple@npm:15.0.1":
   version: 15.0.1
   resolution: "@react-native-community/cli-config-apple@npm:15.0.1"
@@ -3741,6 +3753,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-community/cli-platform-android@npm:16.0.0":
+  version: 16.0.0
+  resolution: "@react-native-community/cli-platform-android@npm:16.0.0"
+  dependencies:
+    "@react-native-community/cli-config-android": "npm:16.0.0"
+    "@react-native-community/cli-tools": "npm:16.0.0"
+    chalk: "npm:^4.1.2"
+    execa: "npm:^5.0.0"
+    logkitty: "npm:^0.7.1"
+  checksum: 10c0/2d1bcb8e0f52072458c155a39a7b9d7853a39badca08ff386d61f26eebdb5faff18940a0d0fb2b0b1c615e29b3c6160c1146243ee0c40cb7ee6b62ffb9a04be6
+  languageName: node
+  linkType: hard
+
 "@react-native-community/cli-platform-apple@npm:15.0.1":
   version: 15.0.1
   resolution: "@react-native-community/cli-platform-apple@npm:15.0.1"
@@ -3796,6 +3821,25 @@ __metadata:
     shell-quote: "npm:^1.7.3"
     sudo-prompt: "npm:^9.0.0"
   checksum: 10c0/342e0fee1b624d9cf4dd8bbfdd42c2d70c1ed671fde33b07bb42109aa4e5e1fbfc7a320fa8c3b3324031836c837e6d28fd40c4c5d89dda615319957e24b8f188
+  languageName: node
+  linkType: hard
+
+"@react-native-community/cli-tools@npm:16.0.0":
+  version: 16.0.0
+  resolution: "@react-native-community/cli-tools@npm:16.0.0"
+  dependencies:
+    appdirsjs: "npm:^1.2.4"
+    chalk: "npm:^4.1.2"
+    execa: "npm:^5.0.0"
+    find-up: "npm:^5.0.0"
+    mime: "npm:^2.4.1"
+    open: "npm:^6.2.0"
+    ora: "npm:^5.4.1"
+    prompts: "npm:^2.4.2"
+    semver: "npm:^7.5.2"
+    shell-quote: "npm:^1.7.3"
+    sudo-prompt: "npm:^9.0.0"
+  checksum: 10c0/5333a9acc882ba4c668d3372b5b416a74719fe8693c750ae9007eba6451f1786ca18d1f6b58e06477375e18ec407439c6e76ebdcecbec4c1e10b2cbae52f79e7
   languageName: node
   linkType: hard
 
@@ -7536,7 +7580,7 @@ __metadata:
     "@fortawesome/react-native-fontawesome": "npm:^0.3.2"
     "@react-native-async-storage/async-storage": "npm:^1.24.0"
     "@react-native-community/cli": "npm:15.0.1"
-    "@react-native-community/cli-platform-android": "npm:15.0.1"
+    "@react-native-community/cli-platform-android": "npm:16.0.0"
     "@react-native-community/cli-platform-ios": "npm:15.0.1"
     "@react-native/babel-preset": "npm:0.76.2"
     "@react-native/metro-config": "npm:0.76.2"
