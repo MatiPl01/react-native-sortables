@@ -29,7 +29,7 @@ export const createGridStrategy =
     const othersLayout = useGridLayout(othersIndexToKey);
     const debugBox = useDebugBoundingBox();
 
-    return ({ activeIndex, touchPosition: { x, y } }) => {
+    return ({ activeIndex, position: { x, y } }) => {
       'worklet';
       if (!othersLayout.value) {
         return;

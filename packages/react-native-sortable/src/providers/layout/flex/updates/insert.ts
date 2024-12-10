@@ -25,7 +25,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     mainDimension = 'height';
   }
 
-  return ({ activeIndex, activeKey, position, touchPosition }) => {
+  return ({ activeIndex, activeKey, position }) => {
     'worklet';
     let groupIndex = keyToGroup.value[activeKey];
     if (groupIndex === undefined) {
@@ -37,7 +37,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     while (
       offsetBefore !== undefined &&
       groupIndex >= 0 &&
-      touchPosition[crossCoordinate] < offsetBefore
+      position[crossCoordinate] < offsetBefore
     ) {
       groupIndex -= 1;
       offsetBefore = crossAxisGroupOffsets.value[groupIndex];
@@ -47,7 +47,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     while (
       offsetAfter !== undefined &&
       groupIndex < itemGroups.value.length &&
-      touchPosition[crossCoordinate] > offsetAfter
+      position[crossCoordinate] > offsetAfter
     ) {
       groupIndex += 1;
       offsetAfter = crossAxisGroupOffsets.value[groupIndex + 1];
@@ -78,7 +78,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       if (otherPosition[mainCoordinate] < position[mainCoordinate]) {
         const otherEnd =
           otherPosition[mainCoordinate] + otherDimensions[mainDimension];
-        if (otherEnd > touchPosition[mainCoordinate]) {
+        if (otherEnd > position[mainCoordinate]) {
           overlappingItemKey = key;
           break;
         }
@@ -87,7 +87,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       // Item after the active item in the group
       if (otherPosition[mainCoordinate] > position[mainCoordinate]) {
         const otherStart = otherPosition[mainCoordinate];
-        if (otherStart < touchPosition[mainCoordinate]) {
+        if (otherStart < position[mainCoordinate]) {
           overlappingItemKey = key;
           break;
         }

@@ -1,4 +1,5 @@
-import { type PropsWithChildren, useMemo } from 'react';
+import { type PropsWithChildren, useCallback, useMemo } from 'react';
+import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedReaction,
   useDerivedValue,
@@ -105,6 +106,41 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
   const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
 
+  const useFlexLayout = useCallback(
+    (idxToKey: SharedValue<Array<string>>) =>
+      useDerivedValue(() =>
+        calculateLayout({
+          flexAlignments: {
+            alignContent,
+            alignItems,
+            justifyContent
+          },
+          flexDirection,
+          flexWrap,
+          gaps: {
+            column: columnGap.value,
+            row: rowGap.value
+          },
+          indexToKey: idxToKey.value,
+          itemDimensions: itemDimensions.value,
+          limits: dimensionsLimits.value,
+          paddings
+        })
+      ),
+    [
+      alignContent,
+      alignItems,
+      justifyContent,
+      flexDirection,
+      flexWrap,
+      columnGap,
+      rowGap,
+      itemDimensions,
+      dimensionsLimits,
+      paddings
+    ]
+  );
+
   // FLEX LAYOUT UPDATER
   useAnimatedReaction(
     () => ({
@@ -161,7 +197,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       flexDirection,
       itemGroups,
       keyToGroup,
-      rowGap
+      rowGap,
+      useFlexLayout
     }
   };
 });
