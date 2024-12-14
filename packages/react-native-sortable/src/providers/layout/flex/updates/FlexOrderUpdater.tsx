@@ -1,24 +1,24 @@
 import { useDebugContext } from '../../../../debug';
-import type { SortableGridStrategy } from '../../../../types';
+import type { SortableFlexStrategy } from '../../../../types';
 import { useCommonValuesContext, useOrderUpdater } from '../../../shared';
-import { useGridLayoutContext } from '../GridLayoutProvider';
+import { useFlexLayoutContext } from '../FlexLayoutProvider';
 import strategies from './strategies';
 
-type GridOrderUpdaterProps = {
-  strategy: SortableGridStrategy;
+type FlexOrderUpdaterProps = {
+  strategy: SortableFlexStrategy;
 };
 
-export default function GridOrderUpdater({ strategy }: GridOrderUpdaterProps) {
+export default function FlexOrderUpdater({ strategy }: FlexOrderUpdaterProps) {
   const factory =
     typeof strategy === 'string' ? strategies[strategy] : strategy;
 
   const commonValues = useCommonValuesContext();
-  const gridLayout = useGridLayoutContext();
+  const flexLayout = useFlexLayoutContext();
   const debug = useDebugContext();
 
   const updater = factory({
     ...commonValues,
-    ...gridLayout,
+    ...flexLayout,
     ...debug
   });
 

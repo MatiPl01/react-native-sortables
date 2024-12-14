@@ -3,10 +3,12 @@ import type { ViewProps, ViewStyle } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 
 import type { DropIndicatorComponentProps } from '../components';
+import type { DebugProviderContextType } from '../debug';
 import type {
   AlignContent,
   AlignItems,
   CommonValuesContextType,
+  FlexLayoutContextType,
   GridLayoutContextType,
   OrderUpdater
 } from '../providers';
@@ -125,7 +127,8 @@ export type SortableGridRenderItem<I> = (
 ) => JSX.Element;
 
 export type SortableGridStrategyFactory = (
-  props: CommonValuesContextType & GridLayoutContextType
+  props: { debugContext?: DebugProviderContextType } & CommonValuesContextType &
+    GridLayoutContextType
 ) => OrderUpdater;
 
 export type SortableGridStrategy = 'insert' | SortableGridStrategyFactory;
@@ -153,7 +156,8 @@ export type SortableFlexDragEndCallback = (
 ) => void;
 
 export type SortableFlexStrategyFactory = (
-  props: CommonValuesContextType
+  props: { debugContext?: DebugProviderContextType } & CommonValuesContextType &
+    FlexLayoutContextType
 ) => OrderUpdater;
 
 export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;

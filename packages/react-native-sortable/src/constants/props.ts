@@ -16,7 +16,6 @@ export const STYLE_PROPS = ['style', 'dropIndicatorStyle'] as const;
 /**
  * DEFAULT SHARED PROPS
  */
-
 type OptionalSharedProps = 'scrollableRef' | keyof SortableCallbacks;
 
 type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unused-modules */
 import { Pressable, TouchableHighlight, TouchableOpacity } from 'react-native';
 
 import { SortableFlex, SortableGrid, SortableLayer } from './components';
@@ -13,10 +14,12 @@ export type {
   OrderChangeCallback,
   OrderChangeParams,
   SortableFlexProps,
+  SortableFlexStrategyFactory,
   SortableGridDragEndCallback,
   SortableGridDragEndParams,
   SortableGridProps,
-  SortableGridRenderItem
+  SortableGridRenderItem,
+  SortableGridStrategyFactory
 } from './types';
 
 const Sortable = {
