@@ -48,7 +48,6 @@ export const DEFAULT_SHARED_PROPS = {
   onDragEnd: undefined,
   onDragStart: undefined,
   onOrderChange: undefined,
-  reorderStrategy: 'insert',
   scrollableRef: undefined,
   showDropIndicator: false,
   snapOffsetX: '50%',
@@ -71,7 +70,8 @@ export const DEFAULT_SORTABLE_GRID_PROPS = {
   columnGap: 0,
   columns: 1,
   keyExtractor: defaultKeyExtractor,
-  rowGap: 0
+  rowGap: 0,
+  strategy: 'insert'
 } satisfies DefaultSortableGridProps;
 
 /**
@@ -80,6 +80,7 @@ export const DEFAULT_SORTABLE_GRID_PROPS = {
 type OptionalDefaultFlexProps = Exclude<keyof ViewProps, 'style'>;
 
 export const DEFAULT_SORTABLE_FLEX_PROPS = {
+  strategy: 'insert',
   // display flex items in a row with wrapping by default
   // (users will expect this behavior in most cases when using SortableFlex)
   style: {

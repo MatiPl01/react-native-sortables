@@ -1,30 +1,29 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
-import type {
-  Dimensions,
-  Maybe,
-  ReorderStrategy,
-  Vector
-} from '../../../types';
+import type { Dimensions, Maybe, Vector } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
+export type OrderUpdaterCallbackProps = {
+  activeKey: string;
+  activeIndex: number;
+  dimensions: Dimensions;
+  position: Vector;
+  touchPosition: Vector;
+};
+
+export type OrderUpdater = (
+  params: OrderUpdaterCallbackProps
+) => Maybe<Array<string>>;
+
 export default function useOrderUpdater(
-  callback: (props: {
-    activeKey: string;
-    activeIndex: number;
-    dimensions: Dimensions;
-    position: Vector;
-    touchPosition: Vector;
-    strategy: ReorderStrategy;
-  }) => Maybe<Array<string>>,
+  updater: OrderUpdater,
   deps?: Array<unknown>
 ) {
   const {
     activeItemKey,
     itemDimensions,
     keyToIndex,
-    reorderStrategy,
     touchPosition,
     touchedItemPosition
   } = useCommonValuesContext();
@@ -36,10 +35,9 @@ export default function useOrderUpdater(
       positions: {
         item: touchedItemPosition.value,
         touch: touchPosition.value
-      },
-      strategy: reorderStrategy.value
+      }
     }),
-    ({ activeKey, positions, strategy }) => {
+    ({ activeKey, positions }) => {
       if (
         activeKey === null ||
         positions.item === null ||
@@ -57,12 +55,11 @@ export default function useOrderUpdater(
         return;
       }
 
-      const newOrder = callback({
+      const newOrder = updater({
         activeIndex,
         activeKey,
         dimensions,
         position: positions.item,
-        strategy,
         touchPosition: positions.touch
       });
 
@@ -71,8 +68,7 @@ export default function useOrderUpdater(
           activeKey,
           activeIndex,
           newOrder.indexOf(activeKey),
-          newOrder,
-          strategy
+          newOrder
         );
       }
     },

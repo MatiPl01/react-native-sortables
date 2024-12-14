@@ -18,7 +18,7 @@ import {
 } from '../../constants';
 import { useDebugContext } from '../../debug';
 import { useHaptics, useJSStableCallback } from '../../hooks';
-import type { ReorderStrategy, SortableCallbacks, Vector } from '../../types';
+import type { SortableCallbacks, Vector } from '../../types';
 import { DragActivationState } from '../../types';
 import {
   clearAnimatedTimeout,
@@ -35,7 +35,6 @@ type DragContextType = {
   handleTouchStart: (
     e: GestureTouchEvent,
     key: string,
-    reorderStrategy: ReorderStrategy,
     pressProgress: SharedValue<number>,
     onActivate: () => void
   ) => void;
@@ -44,13 +43,12 @@ type DragContextType = {
     reverseXAxis: boolean,
     onFail: () => void
   ) => void;
-  handleDragEnd: (key: string, reorderStrategy: ReorderStrategy) => void;
+  handleDragEnd: (key: string) => void;
   handleOrderChange: (
     key: string,
     fromIndex: number,
     toIndex: number,
-    newOrder: Array<string>,
-    reorderStrategy: ReorderStrategy
+    newOrder: Array<string>
   ) => void;
 };
 
@@ -211,7 +209,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
    */
 
   const handleDragStart = useCallback(
-    (key: string, reorderStrategy: ReorderStrategy) => {
+    (key: string) => {
       'worklet';
       updateStartScrollOffset?.();
       activeItemKey.value = key;
@@ -223,8 +221,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       haptics.medium();
       stableOnDragStart({
         fromIndex: dragStartIndex.value,
-        key,
-        reorderStrategy
+        key
       });
     },
     [
@@ -242,7 +239,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   );
 
   const handleDragEnd = useCallback(
-    (key: string, reorderStrategy: ReorderStrategy) => {
+    (key: string) => {
       'worklet';
       const delayed = (callback?: (finished: boolean | undefined) => void) =>
         withTiming(0, { duration: TIME_TO_ACTIVATE_PAN }, callback);
@@ -271,7 +268,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         stableOnDragEnd({
           fromIndex: dragStartIndex.value,
           key,
-          reorderStrategy,
           toIndex: keyToIndex.value[key]!
         });
         dragStartIndex.value = -1;
@@ -301,7 +297,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     (
       e: GestureTouchEvent,
       key: string,
-      reorderStrategy: ReorderStrategy,
       pressProgress: SharedValue<number>,
       onActivate: () => void
     ) => {
@@ -352,9 +347,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           ) {
             if (touchedItemKey.value === key && itemPositions.value[key]) {
               onActivate();
-              handleDragStart(key, reorderStrategy);
+              handleDragStart(key);
             } else {
-              handleDragEnd(key, reorderStrategy);
+              handleDragEnd(key);
             }
           }
         });
@@ -411,18 +406,15 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       key: string,
       fromIndex: number,
       toIndex: number,
-      newOrder: Array<string>,
-      reorderStrategy: ReorderStrategy
+      newOrder: Array<string>
     ) => {
       'worklet';
       indexToKey.value = newOrder;
-
       haptics.light();
+
       stableOnOrderChange({
         fromIndex,
         key,
-        newOrder,
-        reorderStrategy,
         toIndex
       });
     },

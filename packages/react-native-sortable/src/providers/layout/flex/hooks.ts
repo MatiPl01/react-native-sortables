@@ -1,5 +1,5 @@
 import type { Coordinate, Dimension } from '../../../types';
-import { reorderItems } from '../../../utils';
+import { reorderInsert } from '../../../utils';
 import { useCommonValuesContext, useOrderUpdater } from '../../shared';
 import { useFlexLayoutContext } from './FlexLayoutProvider';
 
@@ -22,7 +22,7 @@ export function useFlexOrderUpdater(): void {
   }
 
   useOrderUpdater(
-    ({ activeIndex, activeKey, position, strategy, touchPosition }) => {
+    ({ activeIndex, activeKey, position, touchPosition }) => {
       'worklet';
       let groupIndex = keyToGroup.value[activeKey];
       if (groupIndex === undefined) {
@@ -100,12 +100,7 @@ export function useFlexOrderUpdater(): void {
       }
 
       // Return the new order of items
-      return reorderItems(
-        indexToKey.value,
-        activeIndex,
-        overlappingIndex,
-        strategy
-      );
+      return reorderInsert(indexToKey.value, activeIndex, overlappingIndex);
     },
     [mainCoordinate, crossCoordinate, mainDimension, crossDimension]
   );

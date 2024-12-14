@@ -3,7 +3,13 @@ import type { ViewProps, ViewStyle } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 
 import type { DropIndicatorComponentProps } from '../components';
-import type { AlignContent, AlignItems } from '../providers';
+import type {
+  AlignContent,
+  AlignItems,
+  CommonValuesContextType,
+  GridLayoutContextType,
+  OrderUpdater
+} from '../providers';
 import type { LayoutAnimation } from './reanimated';
 import type { AnimatableValues, Simplify } from './utils';
 
@@ -50,22 +56,18 @@ export type ItemLayoutAnimationSettings = {
 export type DragStartParams = {
   key: string;
   fromIndex: number;
-  reorderStrategy: ReorderStrategy;
 };
 
 export type DragEndParams = {
   key: string;
   fromIndex: number;
   toIndex: number;
-  reorderStrategy: ReorderStrategy;
 };
 
 export type OrderChangeParams = {
-  newOrder: Array<string>;
   fromIndex: number;
   toIndex: number;
   key: string;
-  reorderStrategy: ReorderStrategy;
 };
 
 export type DragStartCallback = (params: DragStartParams) => void;
@@ -78,14 +80,11 @@ export type SortableCallbacks = {
   onOrderChange?: OrderChangeCallback;
 };
 
-export type ReorderStrategy = 'insert' | 'swap';
-
 export type SharedProps = Simplify<
   {
     animateHeight?: boolean;
     sortEnabled?: boolean;
     hapticsEnabled?: boolean;
-    reorderStrategy?: ReorderStrategy;
     debug?: boolean;
   } & Partial<ActiveItemDecorationSettings> &
     Partial<ActiveItemSnapSettings> &
@@ -98,14 +97,6 @@ export type SharedProps = Simplify<
 /**
  * SORTABLE GRID PROPS
  */
-export type SortableGridDragEndParams<I> = {
-  data: Array<I>;
-} & DragEndParams;
-
-export type SortableGridDragEndCallback<I> = (
-  params: SortableGridDragEndParams<I>
-) => void;
-
 export type SortableGridLayoutSettings = {
   columns: number;
 } & AnimatableValues<{
@@ -121,12 +112,18 @@ export type SortableGridRenderItem<I> = (
   info: SortableGridRenderItemInfo<I>
 ) => JSX.Element;
 
+export type SortableGridStrategyFactory = (
+  props: CommonValuesContextType & GridLayoutContextType
+) => OrderUpdater;
+
+export type SortableGridStrategy = 'insert' | SortableGridStrategyFactory;
+
 export type SortableGridProps<I> = Simplify<
   {
     data: Array<I>;
     renderItem: SortableGridRenderItem<I>;
+    strategy?: SortableGridStrategy;
     keyExtractor?: (item: I, index: number) => string;
-    onDragEnd?: SortableGridDragEndCallback<I>;
   } & Omit<SharedProps, 'onDragEnd'> &
     Partial<SortableGridLayoutSettings>
 >;
@@ -134,7 +131,14 @@ export type SortableGridProps<I> = Simplify<
 /**
  * SORTABLE FLEX PROPS
  */
+export type SortableFlexStrategyFactory = (
+  props: CommonValuesContextType
+) => OrderUpdater;
+
+export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
+
 export type SortableFlexProps = {
+  strategy?: SortableFlexStrategy;
   style: {
     alignContent?: AlignContent;
     alignItems?: AlignItems;

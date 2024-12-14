@@ -8,16 +8,17 @@ import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
 import { useAnimatableValue, useStableCallback } from '../hooks';
 import {
   GridLayoutProvider,
+  GridOrderUpdater,
   SharedProvider,
-  useCommonValuesContext,
-  useGridOrderUpdater
+  useCommonValuesContext
 } from '../providers';
 import type {
   DragEndCallback,
   DropIndicatorSettings,
   LayoutAnimation,
   SortableGridProps,
-  SortableGridRenderItem
+  SortableGridRenderItem,
+  SortableGridStrategy
 } from '../types';
 import {
   defaultKeyExtractor,
@@ -37,7 +38,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       data,
       keyExtractor = defaultKeyExtractor,
       renderItem,
-      rowGap
+      rowGap,
+      strategy
     },
     sharedProps: {
       DropIndicatorComponent,
@@ -99,6 +101,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           renderItem={renderItem}
           rowGap={rowGapValue}
           showDropIndicator={showDropIndicator}
+          strategy={strategy}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -109,6 +112,7 @@ type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
   rowGap: SharedValue<number>;
   columnGap: SharedValue<number>;
+  strategy: SortableGridStrategy;
 } & DropIndicatorSettings &
   Required<
     Pick<
@@ -131,10 +135,10 @@ function SortableGridInner<I>({
   itemKeys,
   renderItem,
   rowGap,
+  strategy,
   ...containerProps
 }: SortableGridInnerProps<I>) {
   const { canSwitchToAbsoluteLayout } = useCommonValuesContext();
-  useGridOrderUpdater(columns);
 
   const animatedOuterStyle = useAnimatedStyle(() => ({
     marginBottom: canSwitchToAbsoluteLayout.value ? -rowGap.value : 0
@@ -156,6 +160,7 @@ function SortableGridInner<I>({
       {...containerProps}
       innerStyle={[styles.gridContainer, animatedInnerStyle]}
       outerStyle={animatedOuterStyle}>
+      <GridOrderUpdater strategy={strategy} />
       {zipArrays(data, itemKeys).map(([item, key]) => (
         <SortableGridItem
           entering={itemEntering}

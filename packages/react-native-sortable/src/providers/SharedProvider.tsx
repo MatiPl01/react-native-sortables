@@ -11,7 +11,6 @@ import type {
   AutoScrollSettings,
   Dimensions,
   PartialBy,
-  ReorderStrategy,
   SortableCallbacks
 } from '../types';
 import {
@@ -28,7 +27,6 @@ type SharedProviderProps = PropsWithChildren<
     itemKeys: Array<string>;
     sortEnabled: boolean;
     hapticsEnabled: boolean;
-    reorderStrategy: ReorderStrategy;
     debug: boolean;
     parentDimensions?: SharedValue<Dimensions | null>;
     initialItemsStyleOverride?: ViewStyle;

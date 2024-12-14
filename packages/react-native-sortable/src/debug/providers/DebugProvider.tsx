@@ -20,7 +20,7 @@ import type {
 } from '../types';
 import { DebugComponentType } from '../types';
 
-type DebugProviderContextType = {
+export type DebugProviderContextType = {
   // Overloaded signatures for useDebugLines
   useDebugLines<K extends string>(keys: Array<K>): Record<K, DebugLineUpdater>;
   useDebugLines(count: number): Array<DebugLineUpdater>;
