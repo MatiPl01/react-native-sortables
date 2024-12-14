@@ -12,7 +12,7 @@ export default function useItemPanGesture(
   pressProgress: SharedValue<number>,
   reverseXAxis = false
 ) {
-  const { reorderStrategy, touchedItemKey } = useCommonValuesContext();
+  const { touchedItemKey } = useCommonValuesContext();
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
     useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
@@ -28,13 +28,7 @@ export default function useItemPanGesture(
             return;
           }
 
-          handleTouchStart(
-            e,
-            key,
-            reorderStrategy.value,
-            pressProgress,
-            manager.activate
-          );
+          handleTouchStart(e, key, pressProgress, manager.activate);
         })
         .onTouchesCancelled((_, manager) => {
           manager.fail();
@@ -50,12 +44,11 @@ export default function useItemPanGesture(
             duration: TIME_TO_ACTIVATE_PAN
           });
           updateStartScrollOffset?.(-1);
-          handleDragEnd(key, reorderStrategy.value);
+          handleDragEnd(key);
         }),
     [
       key,
       reverseXAxis,
-      reorderStrategy,
       pressProgress,
       touchedItemKey,
       handleTouchStart,

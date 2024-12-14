@@ -1,5 +1,6 @@
 export { AutoScrollProvider, useAutoScrollContext } from './AutoScrollProvider';
 export {
+  type CommonValuesContextType,
   CommonValuesProvider,
   useCommonValuesContext
 } from './CommonValuesProvider';

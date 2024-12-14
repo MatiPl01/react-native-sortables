@@ -111,10 +111,6 @@ export default function DataChangeExample() {
     }
   ];
 
-  // You can use this as well if you prefer, similarly to the
-  // SortableFlex example
-  // const onDragEnd = useDragEndHandler(data, setData);
-
   return (
     // Need to set flex: 1 for the ScrollView parent component in order
     // to ensure that it occupies the entire available space

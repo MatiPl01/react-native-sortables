@@ -1,5 +1,4 @@
 /* eslint-disable import/no-unused-modules */
-
 import { Pressable, TouchableHighlight, TouchableOpacity } from 'react-native';
 
 import { SortableFlex, SortableGrid, SortableLayer } from './components';
@@ -7,7 +6,6 @@ import { createSortableTouchable } from './utils';
 
 export type { DropIndicatorComponentProps } from './components';
 export * from './constants/layoutAnimations';
-export { useDragEndHandler } from './hooks';
 export type {
   DragEndCallback,
   DragEndParams,
@@ -15,12 +13,13 @@ export type {
   DragStartParams,
   OrderChangeCallback,
   OrderChangeParams,
-  ReorderStrategy,
   SortableFlexProps,
+  SortableFlexStrategyFactory,
   SortableGridDragEndCallback,
   SortableGridDragEndParams,
   SortableGridProps,
-  SortableGridRenderItem
+  SortableGridRenderItem,
+  SortableGridStrategyFactory
 } from './types';
 
 const Sortable = {

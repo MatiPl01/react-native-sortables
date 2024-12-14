@@ -8,22 +8,23 @@ import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
 import { useAnimatableValue, useStableCallback } from '../hooks';
 import {
   GridLayoutProvider,
+  GridOrderUpdater,
   SharedProvider,
-  useCommonValuesContext,
-  useGridOrderUpdater
+  useCommonValuesContext
 } from '../providers';
 import type {
   DragEndCallback,
   DropIndicatorSettings,
   LayoutAnimation,
   SortableGridProps,
-  SortableGridRenderItem
+  SortableGridRenderItem,
+  SortableGridStrategy
 } from '../types';
 import {
   defaultKeyExtractor,
   getPropsWithDefaults,
   isInternalFunction,
-  reorderOnDragEnd,
+  orderItems,
   typedMemo,
   zipArrays
 } from '../utils';
@@ -37,7 +38,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       data,
       keyExtractor = defaultKeyExtractor,
       renderItem,
-      rowGap
+      rowGap,
+      strategy
     },
     sharedProps: {
       DropIndicatorComponent,
@@ -63,16 +65,17 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     if (!_onDragEnd) {
       return;
     }
+    const updatedParams = {
+      ...params,
+      data: orderItems(data, itemKeys, params, true)
+    };
     // For cases when user provides onOrderChange created via a helper
     // useOrderChangeHandler hook
     if (isInternalFunction(_onDragEnd, 'DragEndCallback')) {
-      return (_onDragEnd as DragEndCallback)(params);
+      return _onDragEnd(updatedParams);
     }
     // Add the data property for the sortable grid if a custom user callback is provided
-    _onDragEnd({
-      ...params,
-      data: reorderOnDragEnd(data, params, true)
-    });
+    _onDragEnd(updatedParams);
   });
 
   return (
@@ -99,6 +102,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           renderItem={renderItem}
           rowGap={rowGapValue}
           showDropIndicator={showDropIndicator}
+          strategy={strategy}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -109,6 +113,7 @@ type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
   rowGap: SharedValue<number>;
   columnGap: SharedValue<number>;
+  strategy: SortableGridStrategy;
 } & DropIndicatorSettings &
   Required<
     Pick<
@@ -131,10 +136,10 @@ function SortableGridInner<I>({
   itemKeys,
   renderItem,
   rowGap,
+  strategy,
   ...containerProps
 }: SortableGridInnerProps<I>) {
   const { canSwitchToAbsoluteLayout } = useCommonValuesContext();
-  useGridOrderUpdater(columns);
 
   const animatedOuterStyle = useAnimatedStyle(() => ({
     marginBottom: canSwitchToAbsoluteLayout.value ? -rowGap.value : 0
@@ -156,6 +161,7 @@ function SortableGridInner<I>({
       {...containerProps}
       innerStyle={[styles.gridContainer, animatedInnerStyle]}
       outerStyle={animatedOuterStyle}>
+      <GridOrderUpdater strategy={strategy} />
       {zipArrays(data, itemKeys).map(([item, key]) => (
         <SortableGridItem
           entering={itemEntering}

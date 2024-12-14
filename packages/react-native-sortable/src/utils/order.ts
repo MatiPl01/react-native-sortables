@@ -1,16 +1,18 @@
 import type { DragEndParams } from '../types';
-import { reorderItems } from './layout';
 
-export const reorderOnDragEnd = <I>(
+export const orderItems = <I>(
   data: Array<I>,
-  params: DragEndParams,
-  persistIfUnchanged?: boolean
+  itemKeys: Array<string>,
+  { fromIndex, keyToIndex, toIndex }: DragEndParams,
+  skipIfNoChange?: boolean
 ): Array<I> => {
-  const { fromIndex, reorderStrategy, toIndex } = params;
-
-  if (persistIfUnchanged && fromIndex === toIndex) {
+  if (skipIfNoChange && fromIndex === toIndex) {
     return data;
   }
 
-  return reorderItems(data, fromIndex, toIndex, reorderStrategy);
+  const result: Array<I> = [];
+  for (let i = 0; i < itemKeys.length; i++) {
+    result[keyToIndex[itemKeys[i]!]!] = data[i]!;
+  }
+  return result;
 };

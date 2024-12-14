@@ -4,49 +4,77 @@ import { StyleSheet, View } from 'react-native';
 import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
+import { useStableCallback } from '../hooks';
 import {
   FlexLayoutProvider,
+  FlexOrderUpdater,
   SharedProvider,
   useCommonValuesContext,
-  useFlexLayoutContext,
-  useFlexOrderUpdater
+  useFlexLayoutContext
 } from '../providers';
 import type {
   Dimensions,
+  DragEndCallback,
   DropIndicatorSettings,
-  SortableFlexProps
+  SortableFlexProps,
+  SortableFlexStrategy
 } from '../types';
 import {
   extractFlexContainerProps,
   getPropsWithDefaults,
+  isInternalFunction,
+  orderItems,
   validateChildren
 } from '../utils';
 import { DraggableView, SortableContainer } from './shared';
 
 function SortableFlex(props: SortableFlexProps) {
   const {
-    rest: viewProps,
+    rest: { children, onLayout, strategy, style, ...viewProps },
     sharedProps: {
       DropIndicatorComponent,
       animateHeight,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
+      onDragEnd: _onDragEnd,
       showDropIndicator,
       ...sharedProps
     }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
   const parentDimensions = useSharedValue<Dimensions | null>(null);
 
-  const childrenArray = validateChildren(viewProps.children);
+  const childrenArray = validateChildren(children);
   const itemKeys = childrenArray.map(([key]) => key);
 
-  const [flexStyle, restStyle] = extractFlexContainerProps(viewProps.style);
+  const [flexStyle, restStyle] = extractFlexContainerProps(style);
+
+  const onDragEnd = useStableCallback<DragEndCallback>(params => {
+    if (!_onDragEnd) {
+      return;
+    }
+    const updatedParams = {
+      ...params,
+      order<I>(data: Array<I>) {
+        return orderItems(data, itemKeys, params, true);
+      }
+    };
+    // For cases when user provides onOrderChange created via a helper
+    // useOrderChangeHandler hook
+    if (isInternalFunction(_onDragEnd, 'DragEndCallback')) {
+      return _onDragEnd(updatedParams);
+    }
+    // Add the data property for the sortable grid if a custom user callback is provided
+    _onDragEnd(updatedParams);
+  });
 
   return (
     <View
+      {...viewProps}
       style={restStyle}
-      onLayout={({ nativeEvent: { layout } }) => {
+      onLayout={event => {
+        onLayout?.(event);
+        const layout = event.nativeEvent.layout;
         parentDimensions.value = {
           height: layout.height,
           width: layout.width
@@ -56,8 +84,9 @@ function SortableFlex(props: SortableFlexProps) {
         <SharedProvider
           {...sharedProps}
           itemKeys={itemKeys}
-          parentDimensions={parentDimensions}>
-          <FlexLayoutProvider {...viewProps.style} itemsCount={itemKeys.length}>
+          parentDimensions={parentDimensions}
+          onDragEnd={onDragEnd}>
+          <FlexLayoutProvider {...style} itemsCount={itemKeys.length}>
             <SortableFlexInner
               animateHeight={animateHeight}
               childrenArray={childrenArray}
@@ -67,6 +96,7 @@ function SortableFlex(props: SortableFlexProps) {
               itemEntering={itemEntering}
               itemExiting={itemExiting}
               showDropIndicator={showDropIndicator}
+              strategy={strategy}
             />
           </FlexLayoutProvider>
         </SharedProvider>
@@ -78,6 +108,7 @@ function SortableFlex(props: SortableFlexProps) {
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
   flexStyle: ViewStyle;
+  strategy: SortableFlexStrategy;
 } & DropIndicatorSettings &
   Required<
     Pick<SortableFlexProps, 'animateHeight' | 'itemEntering' | 'itemExiting'>
@@ -88,11 +119,11 @@ function SortableFlexInner({
   flexStyle,
   itemEntering,
   itemExiting,
+  strategy,
   ...containerProps
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout } = useCommonValuesContext();
   const { flexDirection } = useFlexLayoutContext();
-  useFlexOrderUpdater();
 
   const animatedFlexStyle = useAnimatedStyle(() =>
     canSwitchToAbsoluteLayout.value
@@ -108,6 +139,7 @@ function SortableFlexInner({
     <SortableContainer
       {...containerProps}
       innerStyle={[flexStyle, animatedFlexStyle]}>
+      <FlexOrderUpdater strategy={strategy} />
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering}

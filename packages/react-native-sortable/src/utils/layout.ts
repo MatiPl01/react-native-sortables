@@ -1,4 +1,4 @@
-import type { Offset, ReorderStrategy, Vector } from '../types';
+import type { Offset, Vector } from '../types';
 
 export const getOffsetDistance = (
   providedOffset: Offset,
@@ -20,7 +20,7 @@ export const getOffsetDistance = (
   return distance * percentage;
 };
 
-const reorderInsert = <T>(
+export const reorderInsert = <T>(
   array: Array<T>,
   fromIndex: number,
   toIndex: number
@@ -48,7 +48,7 @@ const reorderInsert = <T>(
   ];
 };
 
-const reorderSwap = <T>(
+export const reorderSwap = <T>(
   array: Array<T>,
   fromIndex: number,
   toIndex: number
@@ -65,22 +65,6 @@ const reorderSwap = <T>(
   result[fromIndex] = swappedItem;
   result[toIndex] = draggedItem;
   return result;
-};
-
-export const reorderItems = <T>(
-  array: Array<T>,
-  fromIndex: number,
-  toIndex: number,
-  strategy: ReorderStrategy
-): Array<T> => {
-  'worklet';
-
-  switch (strategy) {
-    case 'insert':
-      return reorderInsert(array, fromIndex, toIndex);
-    case 'swap':
-      return reorderSwap(array, fromIndex, toIndex);
-  }
 };
 
 export const resolveDimensionValue = (

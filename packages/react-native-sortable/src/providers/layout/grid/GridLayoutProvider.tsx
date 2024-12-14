@@ -1,7 +1,8 @@
-import { type PropsWithChildren } from 'react';
+import { type PropsWithChildren, useCallback } from 'react';
 import {
   type SharedValue,
   useAnimatedReaction,
+  useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
@@ -10,6 +11,7 @@ import { useAnimatableValue } from '../../../hooks';
 import type { Animatable } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
+import type { GridLayout } from './types';
 import { calculateLayout } from './utils';
 
 const DEBUG_COLORS = {
@@ -17,10 +19,14 @@ const DEBUG_COLORS = {
   borderColor: '#825500'
 };
 
-type GridLayoutContextType = {
+export type GridLayoutContextType = {
   columnWidth: SharedValue<number>;
   columnGap: SharedValue<number>;
   rowGap: SharedValue<number>;
+  numColumns: number;
+  useGridLayout: (
+    idxToKey: SharedValue<Array<string>>
+  ) => SharedValue<GridLayout | null>;
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{
@@ -57,6 +63,25 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const rowGap = useAnimatableValue(rowGap_);
   const columnWidth = useSharedValue(-1);
 
+  const useGridLayout = useCallback(
+    (idxToKey: SharedValue<Array<string>>) =>
+      useDerivedValue(() =>
+        calculateLayout({
+          columnWidth: columnWidth.value,
+          gaps: {
+            column: columnGap.value,
+            row: rowGap.value
+          },
+          indexToKey: idxToKey.value,
+          itemDimensions: itemDimensions.value,
+          numColumns: columns
+        })
+      ),
+    [columnWidth, columnGap, rowGap, columns, itemDimensions]
+  );
+
+  const gridLayout = useGridLayout(indexToKey);
+
   // TARGET COLUMN WIDTH UPDATER
   useAnimatedReaction(
     () => ({
@@ -86,18 +111,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
   // GRID LAYOUT UPDATER
   useAnimatedReaction(
-    () => ({
-      columnWidth: columnWidth.value,
-      gaps: {
-        column: columnGap.value,
-        row: rowGap.value
-      },
-      indexToKey: indexToKey.value,
-      itemDimensions: itemDimensions.value,
-      numColumns: columns
-    }),
-    props => {
-      const layout = calculateLayout(props);
+    () => gridLayout.value,
+    layout => {
       if (!layout) {
         return;
       }
@@ -132,7 +147,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     value: {
       columnGap,
       columnWidth,
-      rowGap
+      numColumns: columns,
+      rowGap,
+      useGridLayout
     }
   };
 });

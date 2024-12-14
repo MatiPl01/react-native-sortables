@@ -1,5 +1,10 @@
+export { default as useDebugBoundingBox } from './useDebugBoundingBox';
 export { default as useInactiveIndexToKey } from './useInactiveIndexToKey';
 export { default as useItemPanGesture } from './useItemPanGesture';
 export { default as useItemPosition } from './useItemPosition';
 export { default as useItemZIndex } from './useItemZIndex';
-export { default as useOrderUpdater } from './useOrderUpdater';
+export {
+  type OrderUpdater,
+  type OrderUpdaterCallbackProps,
+  default as useOrderUpdater
+} from './useOrderUpdater';

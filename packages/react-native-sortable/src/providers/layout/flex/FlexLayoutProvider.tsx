@@ -7,6 +7,7 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
+import { EMPTY_OBJECT } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type { Dimensions } from '../../../types';
 import { haveEqualPropValues, resolveDimensionValue } from '../../../utils';
@@ -19,9 +20,7 @@ import {
   updateLayoutDebugRects
 } from './utils';
 
-const EMPTY_OBJECT = {};
-
-type FlexLayoutContextType = {
+export type FlexLayoutContextType = {
   flexDirection: FlexDirection;
   itemGroups: SharedValue<Array<Array<string>>>;
   keyToGroup: SharedValue<Record<string, number>>;
