@@ -55,7 +55,7 @@ type DragContextType = {
 type DragProviderProps = PropsWithChildren<
   {
     hapticsEnabled: boolean;
-  } & SortableCallbacks
+  } & Required<SortableCallbacks>
 >;
 
 const { DragProvider, useDragContext } = createProvider('Drag')<
@@ -267,7 +267,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
         stableOnDragEnd({
           fromIndex: dragStartIndex.value,
+          indexToKey: indexToKey.value,
           key,
+          keyToIndex: keyToIndex.value,
           toIndex: keyToIndex.value[key]!
         });
         dragStartIndex.value = -1;
@@ -276,6 +278,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     [
       touchedItemKey,
       dragStartTouchTranslation,
+      indexToKey,
       touchStartItemPosition,
       startTouch,
       touchTranslation,
@@ -414,11 +417,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       stableOnOrderChange({
         fromIndex,
+        indexToKey: indexToKey.value,
         key,
+        keyToIndex: keyToIndex.value,
         toIndex
       });
     },
-    [indexToKey, stableOnOrderChange, haptics]
+    [indexToKey, keyToIndex, stableOnOrderChange, haptics]
   );
 
   return {

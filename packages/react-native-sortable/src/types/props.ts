@@ -62,12 +62,16 @@ export type DragEndParams = {
   key: string;
   fromIndex: number;
   toIndex: number;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
 };
 
 export type OrderChangeParams = {
   fromIndex: number;
   toIndex: number;
   key: string;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
 };
 
 export type DragStartCallback = (params: DragStartParams) => void;
@@ -97,6 +101,14 @@ export type SharedProps = Simplify<
 /**
  * SORTABLE GRID PROPS
  */
+export type SortableGridDragEndParams<I> = {
+  data: Array<I>;
+} & DragEndParams;
+
+export type SortableGridDragEndCallback<I> = (
+  params: SortableGridDragEndParams<I>
+) => void;
+
 export type SortableGridLayoutSettings = {
   columns: number;
 } & AnimatableValues<{
@@ -123,6 +135,7 @@ export type SortableGridProps<I> = Simplify<
     data: Array<I>;
     renderItem: SortableGridRenderItem<I>;
     strategy?: SortableGridStrategy;
+    onDragEnd?: SortableGridDragEndCallback<I>;
     keyExtractor?: (item: I, index: number) => string;
   } & Omit<SharedProps, 'onDragEnd'> &
     Partial<SortableGridLayoutSettings>
@@ -131,6 +144,14 @@ export type SortableGridProps<I> = Simplify<
 /**
  * SORTABLE FLEX PROPS
  */
+export type SortableFlexDragEndParams = {
+  order: <I>(data: Array<I>) => Array<I>;
+} & DragEndParams;
+
+export type SortableFlexDragEndCallback = (
+  params: SortableFlexDragEndParams
+) => void;
+
 export type SortableFlexStrategyFactory = (
   props: CommonValuesContextType
 ) => OrderUpdater;
@@ -139,9 +160,10 @@ export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
 
 export type SortableFlexProps = {
   strategy?: SortableFlexStrategy;
+  onDragEnd?: SortableFlexDragEndCallback;
   style: {
     alignContent?: AlignContent;
     alignItems?: AlignItems;
   } & Omit<ViewStyle, 'alignContent' | 'alignItems'>;
-} & Omit<ViewProps, 'style'> &
-  SharedProps;
+} & Omit<SharedProps, 'onDragEnd'> &
+  Omit<ViewProps, 'style'>;

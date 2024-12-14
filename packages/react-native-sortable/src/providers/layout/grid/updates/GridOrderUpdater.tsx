@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { useDebugContext } from '../../../../debug';
 import type { SortableGridStrategy } from '../../../../types';
 import { useCommonValuesContext, useOrderUpdater } from '../../../shared';
@@ -18,15 +16,11 @@ export default function GridOrderUpdater({ strategy }: OrderUpdaterProps) {
   const gridLayout = useGridLayoutContext();
   const debug = useDebugContext();
 
-  const updater = useMemo(
-    () =>
-      factory({
-        ...commonValues,
-        ...gridLayout,
-        ...debug
-      }),
-    [factory, commonValues, gridLayout, debug]
-  );
+  const updater = factory({
+    ...commonValues,
+    ...gridLayout,
+    ...debug
+  });
 
   useOrderUpdater(updater);
 

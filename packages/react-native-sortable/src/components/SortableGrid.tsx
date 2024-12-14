@@ -24,7 +24,7 @@ import {
   defaultKeyExtractor,
   getPropsWithDefaults,
   isInternalFunction,
-  reorderOnDragEnd,
+  orderItems,
   typedMemo,
   zipArrays
 } from '../utils';
@@ -65,16 +65,17 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     if (!_onDragEnd) {
       return;
     }
+    const updatedParams = {
+      ...params,
+      data: orderItems(data, itemKeys, params, true)
+    };
     // For cases when user provides onOrderChange created via a helper
     // useOrderChangeHandler hook
     if (isInternalFunction(_onDragEnd, 'DragEndCallback')) {
-      return (_onDragEnd as DragEndCallback)(params);
+      return _onDragEnd(updatedParams);
     }
     // Add the data property for the sortable grid if a custom user callback is provided
-    _onDragEnd({
-      ...params,
-      data: reorderOnDragEnd(data, params, true)
-    });
+    _onDragEnd(updatedParams);
   });
 
   return (

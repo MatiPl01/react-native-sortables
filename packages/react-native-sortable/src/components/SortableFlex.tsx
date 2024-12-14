@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
+import { useStableCallback } from '../hooks';
 import {
   FlexLayoutProvider,
   SharedProvider,
@@ -13,12 +14,15 @@ import {
 } from '../providers';
 import type {
   Dimensions,
+  DragEndCallback,
   DropIndicatorSettings,
   SortableFlexProps
 } from '../types';
 import {
   extractFlexContainerProps,
   getPropsWithDefaults,
+  isInternalFunction,
+  orderItems,
   validateChildren
 } from '../utils';
 import { DraggableView, SortableContainer } from './shared';
@@ -32,6 +36,7 @@ function SortableFlex(props: SortableFlexProps) {
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
+      onDragEnd: _onDragEnd,
       showDropIndicator,
       ...sharedProps
     }
@@ -42,6 +47,25 @@ function SortableFlex(props: SortableFlexProps) {
   const itemKeys = childrenArray.map(([key]) => key);
 
   const [flexStyle, restStyle] = extractFlexContainerProps(viewProps.style);
+
+  const onDragEnd = useStableCallback<DragEndCallback>(params => {
+    if (!_onDragEnd) {
+      return;
+    }
+    const updatedParams = {
+      ...params,
+      order<I>(data: Array<I>) {
+        return orderItems(data, itemKeys, params, true);
+      }
+    };
+    // For cases when user provides onOrderChange created via a helper
+    // useOrderChangeHandler hook
+    if (isInternalFunction(_onDragEnd, 'DragEndCallback')) {
+      return _onDragEnd(updatedParams);
+    }
+    // Add the data property for the sortable grid if a custom user callback is provided
+    _onDragEnd(updatedParams);
+  });
 
   return (
     <View
@@ -56,7 +80,8 @@ function SortableFlex(props: SortableFlexProps) {
         <SharedProvider
           {...sharedProps}
           itemKeys={itemKeys}
-          parentDimensions={parentDimensions}>
+          parentDimensions={parentDimensions}
+          onDragEnd={onDragEnd}>
           <FlexLayoutProvider {...viewProps.style} itemsCount={itemKeys.length}>
             <SortableFlexInner
               animateHeight={animateHeight}

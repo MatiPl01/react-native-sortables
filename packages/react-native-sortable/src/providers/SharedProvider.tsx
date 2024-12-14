@@ -34,7 +34,7 @@ type SharedProviderProps = PropsWithChildren<
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
-    SortableCallbacks
+    Required<SortableCallbacks>
 >;
 
 export default function SharedProvider({
