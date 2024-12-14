@@ -12,8 +12,8 @@ import type {
 } from '../../../../types';
 import { reverseArray, sum } from '../../../../utils';
 
-type AxisDimensions = { cross: Dimension; main: Dimension };
-type AxisDirections = { cross: Direction; main: Direction };
+export type AxisDimensions = { cross: Dimension; main: Dimension };
+export type AxisDirections = { cross: Direction; main: Direction };
 
 const createGroups = (
   indexToKey: Array<string>,
@@ -77,6 +77,7 @@ const calculateAlignment = (
 ): {
   offsets: Array<number>;
   totalSize: number;
+  adjustedGap: number;
 } => {
   'worklet';
   let startOffset = 0;
@@ -136,7 +137,7 @@ const calculateAlignment = (
     offsets.push((startOffset += (sizes[i] ?? 0) + adjustedGap));
   }
 
-  return { offsets, totalSize: clampedTotalSize };
+  return { offsets, totalSize: clampedTotalSize, adjustedGap };
 };
 
 const handleLayoutCalculation = (
@@ -285,7 +286,8 @@ const handleLayoutCalculation = (
   return {
     crossAxisGroupOffsets: contentAlignment.offsets,
     itemPositions,
-    totalHeight
+    totalHeight,
+    adjustedCrossGap: contentAlignment.adjustedGap
   };
 };
 
@@ -366,6 +368,7 @@ export const calculateLayout = ({
     crossAxisGroupSizes,
     itemGroups: groups,
     itemPositions: layoutResult.itemPositions,
-    totalHeight: layoutResult.totalHeight
+    totalHeight: layoutResult.totalHeight,
+    adjustedCrossGap: layoutResult.adjustedCrossGap
   };
 };

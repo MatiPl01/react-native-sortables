@@ -22,7 +22,6 @@ export default function useOrderUpdater(updater: OrderUpdater) {
       if (!dimensions) {
         return;
       }
-
       const activeIndex = keyToIndex.value[activeKey];
       if (activeIndex === undefined) {
         return;

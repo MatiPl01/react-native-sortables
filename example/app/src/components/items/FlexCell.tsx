@@ -34,7 +34,8 @@ export default function FlexCell({
         sharedCellStyles.cell,
         cellSizeStyles.cell,
         active && sharedCellStyles.activeCell,
-        { height }
+        { height },
+        { height: Math.random() * 100 + 40 }
       ]}>
       {typeof children === 'string' ? (
         <Text style={[sharedCellStyles.cellText, cellSizeStyles.cellText]}>

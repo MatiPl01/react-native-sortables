@@ -13,7 +13,9 @@ export default function GridCard({ active, children, height }: GridCardProps) {
     <View
       style={[
         styles.card,
+
         active && styles.activeCard,
+        { height: Math.random() * 150 + 20 },
         height !== undefined ? { aspectRatio: 'auto', height } : {}
       ]}>
       {typeof children === 'string' ? (
@@ -31,7 +33,6 @@ const styles = StyleSheet.create({
   },
   card: {
     alignItems: 'center',
-    aspectRatio: 1,
     backgroundColor: colors.primary,
     borderRadius: radius.sm,
     justifyContent: 'center'

@@ -1,7 +1,6 @@
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { GridLayout } from '../layout';
-import type { FlexDirection } from '../layout/flex';
+import type { FlexDirection, FlexLayoutProps, GridLayout } from '../layout';
 
 export type GridLayoutContextType = {
   columnWidth: SharedValue<number>;
@@ -21,4 +20,6 @@ export type FlexLayoutContextType = {
   crossAxisGroupOffsets: SharedValue<Array<number>>;
   rowGap: SharedValue<number>;
   columnGap: SharedValue<number>;
+  adjustedCrossGap: SharedValue<number>;
+  dimensionsLimits: SharedValue<FlexLayoutProps['limits']>;
 };

@@ -69,6 +69,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   const columnGap = useDerivedValue(() => columnGap_ ?? gap);
   const rowGap = useDerivedValue(() => rowGap_ ?? gap);
+  const adjustedCrossGap = useSharedValue<number>(0);
 
   const paddings = useMemo(
     () => ({
@@ -173,6 +174,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       // Update cross axis group offsets and sizes
       crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
       crossAxisGroupSizes.value = layout.crossAxisGroupSizes;
+      // Update adjusted cross gap
+      adjustedCrossGap.value = layout.adjustedCrossGap;
       // Update container height
       const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
       containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
@@ -191,9 +194,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   return {
     value: {
+      adjustedCrossGap,
       columnGap,
       crossAxisGroupOffsets,
       crossAxisGroupSizes,
+      dimensionsLimits,
       flexDirection,
       itemGroups,
       keyToGroup,
