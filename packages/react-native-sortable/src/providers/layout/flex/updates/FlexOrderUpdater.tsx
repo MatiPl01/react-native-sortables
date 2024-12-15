@@ -12,6 +12,12 @@ export default function FlexOrderUpdater({ strategy }: FlexOrderUpdaterProps) {
   const factory =
     typeof strategy === 'string' ? strategies[strategy] : strategy;
 
+  if (!factory) {
+    throw new Error(
+      `'${strategy}' is not a valid ordering strategy for Sortable.Flex`
+    );
+  }
+
   const commonValues = useCommonValuesContext();
   const flexLayout = useFlexLayoutContext();
   const debug = useDebugContext();

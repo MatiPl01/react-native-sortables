@@ -131,7 +131,10 @@ export type SortableGridStrategyFactory = (
     GridLayoutContextType
 ) => OrderUpdater;
 
-export type SortableGridStrategy = 'insert' | SortableGridStrategyFactory;
+export type SortableGridStrategy =
+  | 'insert'
+  | 'swap'
+  | SortableGridStrategyFactory;
 
 export type SortableGridProps<I> = Simplify<
   {

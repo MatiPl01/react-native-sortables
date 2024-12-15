@@ -142,7 +142,6 @@ export default function DataChangeExample() {
             rowGap={spacing.xs}
             scrollableRef={scrollableRef}
             animateHeight
-            debug
             onDragEnd={({ data: newData }) => setData(newData)}
           />
 
