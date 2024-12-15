@@ -12,6 +12,12 @@ export default function GridOrderUpdater({ strategy }: GridOrderUpdaterProps) {
   const factory =
     typeof strategy === 'string' ? strategies[strategy] : strategy;
 
+  if (!factory && typeof strategy === 'string') {
+    throw new Error(
+      `'${strategy}' is not a valid ordering strategy for Sortable.Grid`
+    );
+  }
+
   const commonValues = useCommonValuesContext();
   const gridLayout = useGridLayoutContext();
   const debug = useDebugContext();

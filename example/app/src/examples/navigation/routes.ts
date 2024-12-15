@@ -26,6 +26,10 @@ const routes: Routes = {
         Component: SortableGrid.DataChangeExample,
         name: 'Data Change'
       },
+      OrderingStrategy: {
+        Component: SortableGrid.OrderingStrategyExample,
+        name: 'Ordering Strategy'
+      },
       CallbacksExample: {
         Component: SortableGrid.CallbacksExample,
         name: 'Callbacks'
