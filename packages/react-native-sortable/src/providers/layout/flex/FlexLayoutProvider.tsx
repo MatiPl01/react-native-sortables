@@ -174,8 +174,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       // Update cross axis group offsets and sizes
       crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
       crossAxisGroupSizes.value = layout.crossAxisGroupSizes;
-      // Update adjusted cross gap
-      adjustedCrossGap.value = layout.adjustedCrossGap;
       // Update container height
       const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
       containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);

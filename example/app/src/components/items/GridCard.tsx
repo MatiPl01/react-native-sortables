@@ -10,14 +10,7 @@ type GridCardProps = PropsWithChildren<{
 
 export default function GridCard({ active, children, height }: GridCardProps) {
   return (
-    <View
-      style={[
-        styles.card,
-
-        active && styles.activeCard,
-        { height: Math.random() * 150 + 20 },
-        height !== undefined ? { aspectRatio: 'auto', height } : {}
-      ]}>
+    <View style={[styles.card, active && styles.activeCard]}>
       {typeof children === 'string' ? (
         <Text style={styles.text}>{children}</Text>
       ) : (
@@ -35,7 +28,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.primary,
     borderRadius: radius.sm,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    aspectRatio: 1
   },
   text: {
     color: colors.background1,
