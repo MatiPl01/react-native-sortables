@@ -32,7 +32,7 @@
     "@types/react-test-renderer": "^18.3.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "jest": "^29.7.0",
-    "lint-staged": "^15.2.7",
+    "lint-staged": "^15.2.11",
     "react-test-renderer": "18.3.1"
   },
   "lint-staged": {
