@@ -4,7 +4,8 @@
     "module": "esnext",
     "noEmit": false,
     "declaration": true,
-    "target": "esnext"
+    "target": "esnext",
+    "types": ["react-native", "jest", "node"]
   },
   "include": ["src"],
   "exclude": ["__tests__", "**/*.test.ts", "**/*.test.tsx"]

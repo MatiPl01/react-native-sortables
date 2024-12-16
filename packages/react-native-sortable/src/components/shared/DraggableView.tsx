@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { type StyleProp, type ViewProps, type ViewStyle } from 'react-native';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedRef,
