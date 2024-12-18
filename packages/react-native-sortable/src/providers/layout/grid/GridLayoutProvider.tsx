@@ -105,8 +105,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           });
         }
       }
-    },
-    [columns, debugColumnGapRects]
+    }
   );
 
   // GRID LAYOUT UPDATER
@@ -139,8 +138,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           });
         }
       }
-    },
-    [columns, debugRowGapRects]
+    }
   );
 
   return {

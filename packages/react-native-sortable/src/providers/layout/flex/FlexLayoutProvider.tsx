@@ -232,19 +232,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
           referenceContainerDimensions.value = newReferenceDimensions;
         }
       }
-    },
-    [
-      minHeight,
-      minWidth,
-      height,
-      width,
-      maxHeight,
-      maxWidth,
-      topPadding,
-      bottomPadding,
-      leftPadding,
-      rightPadding
-    ]
+    }
   );
 
   // FLEX LAYOUT UPDATER
@@ -295,8 +283,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
           itemDimensions
         );
       }
-    },
-    [alignContent, alignItems, justifyContent, flexDirection, flexWrap]
+    }
   );
 
   return {
