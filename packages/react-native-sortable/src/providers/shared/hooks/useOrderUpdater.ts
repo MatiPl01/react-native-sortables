@@ -16,10 +16,7 @@ export type OrderUpdater = (
   params: OrderUpdaterCallbackProps
 ) => Maybe<Array<string>>;
 
-export default function useOrderUpdater(
-  updater: OrderUpdater,
-  deps?: Array<unknown>
-) {
+export default function useOrderUpdater(updater: OrderUpdater) {
   const {
     activeItemKey,
     itemDimensions,
@@ -71,7 +68,6 @@ export default function useOrderUpdater(
           newOrder
         );
       }
-    },
-    deps
+    }
   );
 }

@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  LinearTransition,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
@@ -11,8 +12,9 @@ import Animated, {
 import {
   ItemContextProvider,
   useCommonValuesContext,
+  useItemLayoutPosition,
   useItemPanGesture,
-  useItemPosition,
+  useItemTranslation,
   useItemZIndex,
   useMeasurementsContext
 } from '../../providers';
@@ -21,8 +23,10 @@ import ItemDecoration from './ItemDecoration';
 
 const RELATIVE_STYLE: ViewStyle = {
   height: undefined,
+  left: undefined,
   opacity: 1,
   position: 'relative',
+  top: undefined,
   transform: [],
   width: undefined,
   zIndex: 0
@@ -33,9 +37,7 @@ type DraggableViewProps = {
   reverseXAxis?: boolean;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
-} & {
-  style?: StyleProp<ViewStyle>;
-} & Omit<ViewProps, 'style'>;
+} & ViewProps;
 
 export default function DraggableView({
   children,
@@ -54,8 +56,9 @@ export default function DraggableView({
   const isBeingActivated = useDerivedValue(() => touchedItemKey.value === key);
   const pressProgress = useSharedValue(0);
 
-  const position = useItemPosition(key);
-  const zIndex = useItemZIndex(key, pressProgress, position);
+  const layoutPosition = useItemLayoutPosition(key, pressProgress);
+  const translation = useItemTranslation(key, layoutPosition, pressProgress);
+  const zIndex = useItemZIndex(key, pressProgress);
   const gesture = useItemPanGesture(key, pressProgress, reverseXAxis);
 
   useEffect(() => {
@@ -67,23 +70,31 @@ export default function DraggableView({
       return RELATIVE_STYLE;
     }
 
-    const x = position.x.value;
-    const y = position.y.value;
+    const layoutX = layoutPosition.x.value;
+    const layoutY = layoutPosition.y.value;
+    const translateX = translation.x.value;
+    const translateY = translation.y.value;
 
-    if (x === null || y === null) {
+    if (translateX === null || translateY === null) {
       return { ...RELATIVE_STYLE, opacity: 0, zIndex: -1 };
     }
 
     return {
+      left: layoutX,
       opacity: 1,
       position: 'absolute',
-      transform: [{ translateX: x }, { translateY: y }],
+      top: layoutY,
+      transform: [{ translateX }, { translateY }],
       zIndex: zIndex.value
     };
   });
 
   return (
-    <Animated.View ref={viewRef} {...viewProps} style={[style, animatedStyle]}>
+    <Animated.View
+      ref={viewRef}
+      {...viewProps}
+      layout={LinearTransition}
+      style={[style, animatedStyle]}>
       <Animated.View entering={entering} exiting={exiting}>
         <GestureDetector gesture={gesture}>
           <ItemDecoration
@@ -100,7 +111,7 @@ export default function DraggableView({
             <ItemContextProvider
               isBeingActivated={isBeingActivated}
               itemKey={key}
-              position={position}
+              position={layoutPosition}
               pressProgress={pressProgress}
               zIndex={zIndex}>
               {children}

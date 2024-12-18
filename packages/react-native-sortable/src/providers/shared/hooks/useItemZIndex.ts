@@ -1,42 +1,21 @@
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
 export default function useItemZIndex(
   key: string,
-  pressProgress: SharedValue<number>,
-  position: {
-    x: SharedValue<null | number>;
-    y: SharedValue<null | number>;
-  }
+  pressProgress: SharedValue<number>
 ): SharedValue<number> {
-  const { itemPositions, touchedItemKey } = useCommonValuesContext();
+  const { touchedItemKey } = useCommonValuesContext();
 
-  const zIndex = useSharedValue(0);
-
-  useAnimatedReaction(
-    () => ({
-      isBeingActivated: touchedItemKey.value === key,
-      progress: pressProgress.value,
-      targetPosition: itemPositions.value[key]
-    }),
-    ({ isBeingActivated, progress, targetPosition }) => {
-      if (isBeingActivated) {
-        zIndex.value = 3;
-      } else if (progress > 0) {
-        zIndex.value = 2;
-      } else if (
-        targetPosition &&
-        (position.x.value !== targetPosition.x ||
-          position.y.value !== targetPosition.y)
-      ) {
-        zIndex.value = 1;
-      } else {
-        zIndex.value = 0;
-      }
+  return useDerivedValue<number>(() => {
+    if (touchedItemKey.value === key) {
+      return 2;
     }
-  );
-
-  return zIndex;
+    if (pressProgress.value > 0) {
+      return 1;
+    }
+    return 0;
+  });
 }
