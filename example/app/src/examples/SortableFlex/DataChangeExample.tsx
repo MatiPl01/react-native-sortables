@@ -130,7 +130,7 @@ export default function DataChangeExample() {
               rowGap={spacing.xs}
               scrollableRef={scrollableRef}
               animateHeight
-              // debug
+              debug
               hapticsEnabled
               onDragEnd={({ order }) => setData(order(data))}>
               {data.map(item => (
