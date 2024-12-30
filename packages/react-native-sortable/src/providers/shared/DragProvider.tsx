@@ -67,6 +67,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationState,
     activeItemDropped,
     activeItemKey,
+    canSwitchToAbsoluteLayout,
     enableActiveItemSnap,
     inactiveAnimationProgress,
     indexToKey,
@@ -80,7 +81,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     touchedItemPosition,
     touchedItemWidth
   } = useCommonValuesContext();
-  const { updateTouchedItemDimensions } = useMeasurementsContext();
+  const { updateTouchedItemDimensions, tryMeasureContainerHeight } =
+    useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
@@ -305,6 +307,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const firstTouch = e.allTouches[0];
       if (!firstTouch) {
         return;
+      }
+
+      if (!canSwitchToAbsoluteLayout.value) {
+        tryMeasureContainerHeight?.();
       }
 
       activationState.value = DragActivationState.TOUCHED;

@@ -2,6 +2,7 @@ import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, {
+  measure,
   runOnUI,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -24,6 +25,7 @@ import { useCommonValuesContext } from './CommonValuesProvider';
 type MeasurementsContextType = {
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
+  tryMeasureContainerHeight: () => void;
   updateTouchedItemDimensions: (key: string) => void;
 };
 
@@ -121,20 +123,34 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     [itemDimensions, touchedItemHeight, touchedItemWidth]
   );
 
+  const checkMeasuredHeight = useCallback(
+    (measuredHeight: number) => {
+      'worklet';
+      if (
+        containerHeight.value !== -1 &&
+        Math.abs(measuredHeight - containerHeight.value) < OFFSET_EPS
+      ) {
+        containerHeightApplied.value = true;
+      }
+    },
+    [containerHeight, containerHeightApplied]
+  );
+
   const handleHelperContainerMeasurement = useCallback(
     ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
       maybeUpdateValue(containerWidth, layout.width, OFFSET_EPS);
-      runOnUI((measuredHeight: number) => {
-        if (
-          containerHeight.value !== -1 &&
-          Math.abs(measuredHeight - containerHeight.value) < OFFSET_EPS
-        ) {
-          containerHeightApplied.value = true;
-        }
-      })(layout.height);
+      runOnUI(checkMeasuredHeight)(layout.height);
     },
-    [containerWidth, containerHeight, containerHeightApplied]
+    [containerWidth, checkMeasuredHeight]
   );
+
+  const tryMeasureContainerHeight = useCallback(() => {
+    'worklet';
+    const measurements = measure(containerRef);
+    if (measurements) {
+      checkMeasuredHeight(measurements.height);
+    }
+  }, [checkMeasuredHeight, containerHeight]);
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     minHeight: containerHeight.value === -1 ? undefined : containerHeight.value
@@ -161,6 +177,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     ),
     value: {
       handleItemMeasurement,
+      tryMeasureContainerHeight,
       handleItemRemoval,
       updateTouchedItemDimensions
     }
