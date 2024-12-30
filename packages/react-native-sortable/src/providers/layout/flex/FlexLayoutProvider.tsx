@@ -15,7 +15,7 @@ import type {
 } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import { calculateLayout, updateLayoutDebugRects } from './utils';
+import { calculateLayout } from './utils';
 
 type FlexLayoutProviderProps = PropsWithChildren<
   {
@@ -182,14 +182,14 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
 
       // DEBUG ONLY
-      if (debugCrossAxisGapRects && debugMainAxisGapRects) {
-        updateLayoutDebugRects(
-          layout,
-          debugCrossAxisGapRects,
-          debugMainAxisGapRects,
-          itemDimensions
-        );
-      }
+      // if (debugCrossAxisGapRects && debugMainAxisGapRects) {
+      //   updateLayoutDebugRects(
+      //     layout,
+      //     debugCrossAxisGapRects,
+      //     debugMainAxisGapRects,
+      //     itemDimensions
+      //   );
+      // }
     }
   );
 

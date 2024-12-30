@@ -9,6 +9,8 @@ import type {
 import { areArraysDifferent, reorderInsert } from '../../../../utils';
 import { EMPTY_ARRAY } from '../../../../constants';
 
+const MIN_ADDITIONAL_OFFSET = 5;
+
 export const useInsertStrategy: SortableFlexStrategyFactory = ({
   activeItemKey,
   columnGap,
@@ -28,12 +30,14 @@ export const useInsertStrategy: SortableFlexStrategyFactory = ({
   let crossCoordinate: Coordinate = 'y';
   let mainDimension: Dimension = 'width';
   let mainGap: SharedValue<number> = columnGap;
+  let crossGap: SharedValue<number> = rowGap;
 
   if (flexDirection.startsWith('column')) {
     mainCoordinate = 'y';
     crossCoordinate = 'x';
     mainDimension = 'height';
     mainGap = rowGap;
+    crossGap = columnGap;
   }
 
   const indexToKeyWithActiveInGroupBefore =
@@ -138,17 +142,30 @@ export const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     // GROUP BOUNDS
 
-    let crossBeforeOffset = -Infinity;
+    let crossOffsetBefore = -Infinity;
     let crossBeforeBound = Infinity;
 
     do {
-      if (crossBeforeOffset !== Infinity) {
+      if (crossOffsetBefore !== Infinity) {
         groupIndex--;
       }
-      crossBeforeOffset =
+      crossOffsetBefore =
         layoutWithActiveInGroupBefore.value?.crossAxisGroupOffsets[
           groupIndex
         ] ?? 0;
-    } while (groupIndex > 0);
+      const groupBeforeSize =
+        layoutWithActiveInGroupBefore.value?.crossAxisGroupSizes[
+          groupIndex - 1
+        ] ?? 0;
+      const additionalOffsetBefore = Math.min(
+        crossGap.value / 2 + MIN_ADDITIONAL_OFFSET,
+        crossGap.value + groupBeforeSize / 2
+      );
+      crossBeforeBound = crossOffsetBefore - additionalOffsetBefore;
+    } while (
+      crossBeforeBound > 0 &&
+      position[crossCoordinate] < crossBeforeBound
+    );
+    console.log(groupIndex);
   };
 };
