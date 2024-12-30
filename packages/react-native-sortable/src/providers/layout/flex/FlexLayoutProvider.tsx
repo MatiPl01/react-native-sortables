@@ -66,6 +66,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   );
   const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
   const crossAxisGroupOffsets = useSharedValue<Array<number>>([]);
+  const groupSizeLimit = useSharedValue<number>(Infinity);
 
   const columnGap = useDerivedValue(() => columnGap_ ?? gap);
   const rowGap = useDerivedValue(() => rowGap_ ?? gap);
@@ -174,6 +175,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       // Update cross axis group offsets and sizes
       crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
       crossAxisGroupSizes.value = layout.crossAxisGroupSizes;
+      // Update group size limit
+      groupSizeLimit.value = layout.groupSizeLimit;
       // Update container height
       const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
       containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
@@ -198,6 +201,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       crossAxisGroupSizes,
       dimensionsLimits,
       flexDirection,
+      groupSizeLimit,
       itemGroups,
       keyToGroup,
       rowGap,

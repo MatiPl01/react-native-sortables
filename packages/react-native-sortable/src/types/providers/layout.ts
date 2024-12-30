@@ -21,5 +21,6 @@ export type FlexLayoutContextType = {
   rowGap: SharedValue<number>;
   columnGap: SharedValue<number>;
   adjustedCrossGap: SharedValue<number>;
+  groupSizeLimit: SharedValue<number>;
   dimensionsLimits: SharedValue<FlexLayoutProps['limits']>;
 };

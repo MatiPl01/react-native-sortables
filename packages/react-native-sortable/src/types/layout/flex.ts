@@ -48,4 +48,5 @@ export type FlexLayout = {
   crossAxisGroupSizes: Array<number>;
   totalHeight: number;
   adjustedCrossGap: number;
+  groupSizeLimit: number;
 };

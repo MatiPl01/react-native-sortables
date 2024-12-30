@@ -137,7 +137,7 @@ const calculateAlignment = (
     offsets.push((startOffset += (sizes[i] ?? 0) + adjustedGap));
   }
 
-  return { offsets, totalSize: clampedTotalSize, adjustedGap };
+  return { adjustedGap, offsets, totalSize: clampedTotalSize };
 };
 
 const handleLayoutCalculation = (
@@ -284,10 +284,10 @@ const handleLayoutCalculation = (
   }
 
   return {
+    adjustedCrossGap: contentAlignment.adjustedGap,
     crossAxisGroupOffsets: contentAlignment.offsets,
     itemPositions,
-    totalHeight,
-    adjustedCrossGap: contentAlignment.adjustedGap
+    totalHeight
   };
 };
 
@@ -364,11 +364,12 @@ export const calculateLayout = ({
   }
 
   return {
+    adjustedCrossGap: layoutResult.adjustedCrossGap,
     crossAxisGroupOffsets: layoutResult.crossAxisGroupOffsets,
     crossAxisGroupSizes,
+    groupSizeLimit,
     itemGroups: groups,
     itemPositions: layoutResult.itemPositions,
-    totalHeight: layoutResult.totalHeight,
-    adjustedCrossGap: layoutResult.adjustedCrossGap
+    totalHeight: layoutResult.totalHeight
   };
 };

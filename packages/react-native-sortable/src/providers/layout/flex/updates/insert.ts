@@ -1,29 +1,133 @@
+import type { SharedValue } from 'react-native-reanimated';
+import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
+
 import type {
   Coordinate,
   Dimension,
   SortableFlexStrategyFactory
 } from '../../../../types';
-import { reorderInsert } from '../../../../utils';
+import { areArraysDifferent, reorderInsert } from '../../../../utils';
+import { EMPTY_ARRAY } from '../../../../constants';
 
-const useInsertStrategy: SortableFlexStrategyFactory = ({
+export const useInsertStrategy: SortableFlexStrategyFactory = ({
+  activeItemKey,
+  columnGap,
   crossAxisGroupOffsets,
   flexDirection,
+  groupSizeLimit,
   indexToKey,
   itemDimensions,
   itemGroups,
   itemPositions,
   keyToGroup,
-  keyToIndex
+  keyToIndex,
+  rowGap,
+  useFlexLayout
 }) => {
   let mainCoordinate: Coordinate = 'x';
   let crossCoordinate: Coordinate = 'y';
   let mainDimension: Dimension = 'width';
+  let mainGap: SharedValue<number> = columnGap;
 
   if (flexDirection.startsWith('column')) {
     mainCoordinate = 'y';
     crossCoordinate = 'x';
     mainDimension = 'height';
+    mainGap = rowGap;
   }
+
+  const indexToKeyWithActiveInGroupBefore =
+    useSharedValue<Array<string>>(EMPTY_ARRAY);
+  const indexToKeyWithActiveInGroupAfter =
+    useSharedValue<Array<string>>(EMPTY_ARRAY);
+
+  useAnimatedReaction(
+    () => ({
+      activeKey: activeItemKey.value,
+      dimensions: itemDimensions.value,
+      groups: itemGroups.value,
+      kToGroup: keyToGroup.value,
+      limit: groupSizeLimit.value
+    }),
+    ({ activeKey, dimensions, groups, kToGroup, limit }) => {
+      if (activeKey === null) {
+        indexToKeyWithActiveInGroupBefore.value = EMPTY_ARRAY;
+        indexToKeyWithActiveInGroupAfter.value = EMPTY_ARRAY;
+        return;
+      }
+
+      const activeIndex = keyToIndex.value[activeKey];
+      if (activeIndex === undefined) {
+        return;
+      }
+      const groupIndex = kToGroup[activeKey];
+      if (groupIndex === undefined) {
+        return;
+      }
+
+      const groupBefore = groups[groupIndex - 1];
+
+      if (groupBefore) {
+        const firstKey = groupBefore[0];
+        if (firstKey) {
+          const firstIndex = keyToIndex.value[firstKey];
+          if (firstIndex !== undefined) {
+            const result = reorderInsert(
+              indexToKey.value,
+              activeIndex,
+              firstIndex
+            );
+            if (
+              areArraysDifferent(
+                result,
+                indexToKeyWithActiveInGroupBefore.value
+              )
+            ) {
+              indexToKeyWithActiveInGroupBefore.value = result;
+            }
+          }
+        }
+      }
+
+      const group = groups[groupIndex];
+      const groupAfter = groups[groupIndex + 1];
+      if (group && groupAfter) {
+        let totalGroupSize = group.reduce(
+          (acc, key) =>
+            acc +
+            (key === activeKey
+              ? 0
+              : (dimensions[key]?.[mainDimension] ?? 0) + mainGap.value),
+          0
+        );
+        let swapIdx: number | undefined;
+        for (const key of groupAfter) {
+          const itemSize = dimensions[key]?.[mainDimension];
+          swapIdx = keyToIndex.value[key];
+          if (itemSize && totalGroupSize + itemSize <= limit) {
+            totalGroupSize += itemSize + mainGap.value;
+          } else {
+            break;
+          }
+        }
+        if (swapIdx !== undefined) {
+          const result = reorderInsert(indexToKey.value, activeIndex, swapIdx);
+          if (
+            areArraysDifferent(result, indexToKeyWithActiveInGroupAfter.value)
+          ) {
+            indexToKeyWithActiveInGroupAfter.value = result;
+          }
+        }
+      }
+    }
+  );
+
+  const layoutWithActiveInGroupBefore = useFlexLayout(
+    indexToKeyWithActiveInGroupBefore
+  );
+  const layoutWithActiveInGroupAfter = useFlexLayout(
+    indexToKeyWithActiveInGroupAfter
+  );
 
   return ({ activeIndex, activeKey, position }) => {
     'worklet';
@@ -32,79 +136,19 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       return;
     }
 
-    // Select the group in which the active item is currently located
-    let offsetBefore = crossAxisGroupOffsets.value[groupIndex];
-    while (
-      offsetBefore !== undefined &&
-      groupIndex >= 0 &&
-      position[crossCoordinate] < offsetBefore
-    ) {
-      groupIndex -= 1;
-      offsetBefore = crossAxisGroupOffsets.value[groupIndex];
-    }
+    // GROUP BOUNDS
 
-    let offsetAfter = crossAxisGroupOffsets.value[groupIndex + 1];
-    while (
-      offsetAfter !== undefined &&
-      groupIndex < itemGroups.value.length &&
-      position[crossCoordinate] > offsetAfter
-    ) {
-      groupIndex += 1;
-      offsetAfter = crossAxisGroupOffsets.value[groupIndex + 1];
-    }
+    let crossBeforeOffset = -Infinity;
+    let crossBeforeBound = Infinity;
 
-    // Check if the active item center is overlapping with another item
-    // within the same group
-    let overlappingItemKey: string | undefined;
-    const group = itemGroups.value[groupIndex];
-    if (!group) {
-      return;
-    }
-    for (const key of group) {
-      if (key === activeKey) {
-        continue;
+    do {
+      if (crossBeforeOffset !== Infinity) {
+        groupIndex--;
       }
-
-      const otherDimensions = itemDimensions.value[key];
-      if (!otherDimensions) {
-        continue;
-      }
-      const otherPosition = itemPositions.value[key];
-      if (!otherPosition) {
-        continue;
-      }
-
-      // Item before the active item in the group
-      if (otherPosition[mainCoordinate] < position[mainCoordinate]) {
-        const otherEnd =
-          otherPosition[mainCoordinate] + otherDimensions[mainDimension];
-        if (otherEnd > position[mainCoordinate]) {
-          overlappingItemKey = key;
-          break;
-        }
-      }
-
-      // Item after the active item in the group
-      if (otherPosition[mainCoordinate] > position[mainCoordinate]) {
-        const otherStart = otherPosition[mainCoordinate];
-        if (otherStart < position[mainCoordinate]) {
-          overlappingItemKey = key;
-          break;
-        }
-      }
-    }
-
-    if (overlappingItemKey === undefined) {
-      return;
-    }
-    const overlappingIndex = keyToIndex.value[overlappingItemKey];
-    if (overlappingIndex === undefined) {
-      return;
-    }
-
-    // Return the new order of items
-    return reorderInsert(indexToKey.value, activeIndex, overlappingIndex);
+      crossBeforeOffset =
+        layoutWithActiveInGroupBefore.value?.crossAxisGroupOffsets[
+          groupIndex
+        ] ?? 0;
+    } while (groupIndex > 0);
   };
 };
-
-export default useInsertStrategy;
