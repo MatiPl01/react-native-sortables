@@ -14,21 +14,21 @@ export default function DataChangeExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
   const [data, setData] = useState(AVAILABLE_DATA.slice(0, 12));
 
-  const getNewItemName = useCallback(() => {
-    if (data.length >= AVAILABLE_DATA.length) {
+  const getNewItemName = useCallback((currentData: string[]) => {
+    if (currentData.length >= AVAILABLE_DATA.length) {
       return null;
     }
     for (const item of AVAILABLE_DATA) {
-      if (!data.includes(item)) {
+      if (!currentData.includes(item)) {
         return item;
       }
     }
     return null;
-  }, [data]);
+  }, []);
 
   const prependItem = useCallback(() => {
     setData(prevData => {
-      const newItem = getNewItemName();
+      const newItem = getNewItemName(prevData);
       if (newItem) {
         return [newItem, ...prevData];
       }
@@ -38,7 +38,7 @@ export default function DataChangeExample() {
 
   const insertItem = useCallback(() => {
     setData(prevData => {
-      const newItem = getNewItemName();
+      const newItem = getNewItemName(prevData);
       if (newItem) {
         const index = Math.floor(Math.random() * (prevData.length - 1));
         return [...prevData.slice(0, index), newItem, ...prevData.slice(index)];
@@ -49,7 +49,7 @@ export default function DataChangeExample() {
 
   const appendItem = useCallback(() => {
     setData(prevData => {
-      const newItem = getNewItemName();
+      const newItem = getNewItemName(prevData);
       if (newItem) {
         return [...prevData, newItem];
       }

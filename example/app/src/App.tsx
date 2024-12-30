@@ -6,7 +6,6 @@ import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { SafeArea } from './components';
 import { ExamplesStackNavigator } from './examples';
 import { noop } from './utils';
 
@@ -47,9 +46,7 @@ export default function App() {
         <NavigationContainer
           initialState={navigationState}
           onStateChange={persistNavigationState}>
-          <SafeArea>
-            <ExamplesStackNavigator />
-          </SafeArea>
+          <ExamplesStackNavigator />
         </NavigationContainer>
       </SafeAreaProvider>
     </GestureHandlerRootView>
