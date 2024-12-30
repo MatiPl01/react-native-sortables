@@ -60,8 +60,8 @@ function FlatListExample() {
   return (
     <AnimatedFlatList
       data={LIST_ITEM_SECTIONS}
-      ref={scrollableRef}
       ListHeaderComponentStyle={styles.foreground}
+      ref={scrollableRef}
       ListFooterComponent={
         <Section title='List footer'>
           <ManyCards scrollableRef={scrollableRef} />
