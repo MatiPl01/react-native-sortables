@@ -6,18 +6,19 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable no-underscore-dangle */
 
 import { NativeModules, TurboModuleRegistry } from 'react-native';
 // Types can be imported even if the module is not available
 import type { HapticOptions } from 'react-native-haptic-feedback';
 import { HapticFeedbackTypes } from 'react-native-haptic-feedback';
+import { runOnJS } from 'react-native-reanimated';
 
-const loadNative = () => {
-  const isTurboModuleEnabled = !!(global as any).__turboModuleProxy;
+const loadNative = (isTurboModuleEnabled: boolean) => {
   const hapticFeedback = isTurboModuleEnabled
     ? TurboModuleRegistry.get('RNHapticFeedback')
     : NativeModules.RNHapticFeedback;
@@ -26,7 +27,8 @@ const loadNative = () => {
 
 const load = () => {
   try {
-    const nativeTrigger = loadNative();
+    const isTurboModuleEnabled = !!(global as any).__turboModuleProxy;
+    const nativeTrigger = loadNative(isTurboModuleEnabled);
 
     const defaultOptions = {
       enableVibrateFallback: false,
@@ -55,7 +57,13 @@ const load = () => {
       const triggerOptions = createTriggerOptions(options);
 
       try {
-        nativeTrigger(type, triggerOptions);
+        if (isTurboModuleEnabled) {
+          nativeTrigger(type, triggerOptions);
+        } else {
+          // I couldn't get it working right without calling runOnJS on the old
+          // architecture (paper) so I decided to use it here
+          runOnJS(nativeTrigger)(type, triggerOptions);
+        }
       } catch (err) {
         console.warn('react-native-haptic-feedback is not available');
       }

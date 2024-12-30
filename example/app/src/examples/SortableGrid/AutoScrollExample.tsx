@@ -6,7 +6,7 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortable';
 
 import { GridCard, Group, Section, TabView } from '@/components';
-import { colors, spacing } from '@/theme';
+import { colors, spacing, style } from '@/theme';
 import { getItems } from '@/utils';
 
 const MANY_ITEMS = getItems(21);
@@ -38,7 +38,10 @@ function ScrollViewExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   return (
-    <Animated.ScrollView ref={scrollableRef} removeClippedSubviews={false}>
+    <Animated.ScrollView
+      contentContainerStyle={style.contentContainer}
+      ref={scrollableRef}
+      removeClippedSubviews={false}>
       <Sortable.Layer>
         <Group>
           <ManyCards scrollableRef={scrollableRef} />
@@ -66,6 +69,7 @@ function FlatListExample() {
   return (
     <AnimatedFlatList
       CellRendererComponent={Sortable.Layer}
+      contentContainerStyle={style.contentContainer}
       data={LIST_ITEM_SECTIONS}
       ListHeaderComponentStyle={styles.foreground}
       ref={scrollableRef}
@@ -93,6 +97,7 @@ function FlashListExample() {
 
   return (
     <AnimatedFlashList
+      contentContainerStyle={style.contentContainer}
       data={LIST_ITEM_SECTIONS}
       estimatedItemSize={275}
       ref={scrollableRef}

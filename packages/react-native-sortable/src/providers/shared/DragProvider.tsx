@@ -67,7 +67,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationState,
     activeItemDropped,
     activeItemKey,
-    containerHeight,
     enableActiveItemSnap,
     inactiveAnimationProgress,
     indexToKey,
@@ -81,8 +80,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     touchedItemPosition,
     touchedItemWidth
   } = useCommonValuesContext();
-  const { tryMeasureContainerHeight, updateTouchedItemDimensions } =
-    useMeasurementsContext();
+  const { updateTouchedItemDimensions } = useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
@@ -310,15 +308,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       activationState.value = DragActivationState.TOUCHED;
-
-      // This should never happen, but just in case the container height
-      // was not measured within the specified interval and onLayout
-      // was not called, we will try to measure it again after the item
-      // is touched
-      if (containerHeight.value === -1) {
-        tryMeasureContainerHeight();
-      }
-
       clearAnimatedTimeout(activationTimeoutId.value);
       // Start handling touch after a delay to prevent accidental activation
       // e.g. while scrolling the ScrollView
@@ -335,6 +324,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             callback
           );
 
+        onActivate();
         activationProgress.value = 0;
         touchedItemKey.value = key;
         startTouch.value = firstTouch;
@@ -349,7 +339,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             e.state !== State.END
           ) {
             if (touchedItemKey.value === key && itemPositions.value[key]) {
-              onActivate();
               handleDragStart(key);
             } else {
               handleDragEnd(key);
@@ -362,7 +351,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       startTouch,
       touchedItemKey,
       itemPositions,
-      containerHeight,
       activationTimeoutId,
       touchStartItemPosition,
       activationState,
@@ -371,7 +359,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateLayer,
       handleDragStart,
       handleDragEnd,
-      tryMeasureContainerHeight,
       updateTouchedItemDimensions
     ]
   );

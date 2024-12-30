@@ -8,6 +8,7 @@ import { useStableCallback } from '../hooks';
 import {
   FlexLayoutProvider,
   FlexOrderUpdater,
+  LayerProvider,
   SharedProvider,
   useCommonValuesContext,
   useFlexLayoutContext
@@ -69,39 +70,41 @@ function SortableFlex(props: SortableFlexProps) {
   });
 
   return (
-    <View
-      {...viewProps}
-      style={restStyle}
-      onLayout={event => {
-        onLayout?.(event);
-        const layout = event.nativeEvent.layout;
-        parentDimensions.value = {
-          height: layout.height,
-          width: layout.width
-        };
-      }}>
-      <View style={styles.container}>
-        <SharedProvider
-          {...sharedProps}
-          itemKeys={itemKeys}
-          parentDimensions={parentDimensions}
-          onDragEnd={onDragEnd}>
-          <FlexLayoutProvider {...style} itemsCount={itemKeys.length}>
-            <SortableFlexInner
-              animateHeight={animateHeight}
-              childrenArray={childrenArray}
-              DropIndicatorComponent={DropIndicatorComponent}
-              dropIndicatorStyle={dropIndicatorStyle}
-              flexStyle={flexStyle}
-              itemEntering={itemEntering}
-              itemExiting={itemExiting}
-              showDropIndicator={showDropIndicator}
-              strategy={strategy}
-            />
-          </FlexLayoutProvider>
-        </SharedProvider>
+    <LayerProvider>
+      <View
+        {...viewProps}
+        style={restStyle}
+        onLayout={event => {
+          onLayout?.(event);
+          const layout = event.nativeEvent.layout;
+          parentDimensions.value = {
+            height: layout.height,
+            width: layout.width
+          };
+        }}>
+        <View style={styles.container}>
+          <SharedProvider
+            {...sharedProps}
+            itemKeys={itemKeys}
+            parentDimensions={parentDimensions}
+            onDragEnd={onDragEnd}>
+            <FlexLayoutProvider {...style} itemsCount={itemKeys.length}>
+              <SortableFlexInner
+                animateHeight={animateHeight}
+                childrenArray={childrenArray}
+                DropIndicatorComponent={DropIndicatorComponent}
+                dropIndicatorStyle={dropIndicatorStyle}
+                flexStyle={flexStyle}
+                itemEntering={itemEntering}
+                itemExiting={itemExiting}
+                showDropIndicator={showDropIndicator}
+                strategy={strategy}
+              />
+            </FlexLayoutProvider>
+          </SharedProvider>
+        </View>
       </View>
-    </View>
+    </LayerProvider>
   );
 }
 

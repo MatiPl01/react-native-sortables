@@ -28,7 +28,6 @@ export default function useItemPanGesture(
             manager.fail();
             return;
           }
-
           handleTouchStart(e, key, pressProgress, manager.activate);
         })
         .onTouchesCancelled((_, manager) => {

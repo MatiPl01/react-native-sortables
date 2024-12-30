@@ -4,7 +4,7 @@ import type { SortableGridRenderItem } from 'react-native-sortable';
 import Sortable from 'react-native-sortable';
 
 import { GridCard, Section, Stagger } from '@/components';
-import { spacing } from '@/theme';
+import { spacing, style } from '@/theme';
 import { getItems } from '@/utils';
 
 const DATA = getItems(12);
@@ -17,7 +17,7 @@ export default function OrderingStrategyExample() {
   );
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={style.contentContainer}>
       <Stagger ParentComponent={Sortable.Layer}>
         <Section
           description='The relative order of items is preserved. The active item is inserted into the new position.'

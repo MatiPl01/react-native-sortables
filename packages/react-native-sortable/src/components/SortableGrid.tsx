@@ -9,6 +9,7 @@ import { useAnimatableValue, useStableCallback } from '../hooks';
 import {
   GridLayoutProvider,
   GridOrderUpdater,
+  LayerProvider,
   SharedProvider,
   useCommonValuesContext
 } from '../providers';
@@ -79,33 +80,35 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   });
 
   return (
-    <SharedProvider
-      {...sharedProps}
-      itemKeys={itemKeys}
-      key={columns}
-      onDragEnd={onDragEnd}>
-      <GridLayoutProvider
-        columnGap={columnGapValue}
-        columns={columns}
-        itemsCount={data.length}
-        rowGap={rowGapValue}>
-        <SortableGridInner
-          animateHeight={animateHeight}
+    <LayerProvider>
+      <SharedProvider
+        {...sharedProps}
+        itemKeys={itemKeys}
+        key={columns}
+        onDragEnd={onDragEnd}>
+        <GridLayoutProvider
           columnGap={columnGapValue}
           columns={columns}
-          data={data}
-          DropIndicatorComponent={DropIndicatorComponent}
-          dropIndicatorStyle={dropIndicatorStyle}
-          itemEntering={itemEntering}
-          itemExiting={itemExiting}
-          itemKeys={itemKeys}
-          renderItem={renderItem}
-          rowGap={rowGapValue}
-          showDropIndicator={showDropIndicator}
-          strategy={strategy}
-        />
-      </GridLayoutProvider>
-    </SharedProvider>
+          itemsCount={data.length}
+          rowGap={rowGapValue}>
+          <SortableGridInner
+            animateHeight={animateHeight}
+            columnGap={columnGapValue}
+            columns={columns}
+            data={data}
+            DropIndicatorComponent={DropIndicatorComponent}
+            dropIndicatorStyle={dropIndicatorStyle}
+            itemEntering={itemEntering}
+            itemExiting={itemExiting}
+            itemKeys={itemKeys}
+            renderItem={renderItem}
+            rowGap={rowGapValue}
+            showDropIndicator={showDropIndicator}
+            strategy={strategy}
+          />
+        </GridLayoutProvider>
+      </SharedProvider>
+    </LayerProvider>
   );
 }
 

@@ -4,7 +4,7 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortable';
 
 import { Button, FlexCell, Group, Section, Stagger } from '@/components';
-import { colors, flex, spacing } from '@/theme';
+import { colors, flex, spacing, style } from '@/theme';
 import { getCategories } from '@/utils';
 
 const AVAILABLE_DATA = getCategories(20);
@@ -13,7 +13,7 @@ export default function DataChangeExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
   const [data, setData] = useState(AVAILABLE_DATA.slice(0, 10));
 
-  const getNewItemName = useCallback((currentData: string[]) => {
+  const getNewItemName = useCallback((currentData: Array<string>) => {
     if (currentData.length >= AVAILABLE_DATA.length) {
       return null;
     }
@@ -102,49 +102,51 @@ export default function DataChangeExample() {
   ];
 
   return (
-    // Need to set flex: 1 for the ScrollView parent component in order
-    // to ensure that it occupies the entire available space
-    <Stagger wrapperStye={index => (index === 2 ? flex.fill : {})}>
-      {menuSections.map(({ buttons, description, title }) => (
-        <Section description={description} key={title} title={title}>
-          <View style={styles.row}>
-            {buttons.map(btnProps => (
-              <Button {...btnProps} key={btnProps.title} />
-            ))}
-          </View>
-        </Section>
-      ))}
+    <View style={[flex.fill, style.contentContainer]}>
+      {/* Need to set flex: 1 for the ScrollView parent component in order
+      to ensure that it occupies the entire available space */}
+      <Stagger wrapperStye={index => (index === 2 ? flex.fill : {})}>
+        {menuSections.map(({ buttons, description, title }) => (
+          <Section description={description} key={title} title={title}>
+            <View style={styles.row}>
+              {buttons.map(btnProps => (
+                <Button {...btnProps} key={btnProps.title} />
+              ))}
+            </View>
+          </Section>
+        ))}
 
-      <Group style={[flex.fill, styles.scrollViewGroup]}>
-        <Animated.ScrollView
-          contentContainerStyle={styles.scrollViewContent}
-          ref={scrollableRef}
-          style={styles.scrollView}>
-          <Group withMargin={false} bordered center>
-            <Text style={styles.title}>Above SortableFlex</Text>
-          </Group>
+        <Group style={[flex.fill, styles.scrollViewGroup]}>
+          <Animated.ScrollView
+            contentContainerStyle={styles.scrollViewContent}
+            ref={scrollableRef}
+            style={styles.scrollView}>
+            <Group withMargin={false} bordered center>
+              <Text style={styles.title}>Above SortableFlex</Text>
+            </Group>
 
-          <Sortable.Flex
-            scrollableRef={scrollableRef}
-            style={styles.sortableFlex}
-            animateHeight
-            hapticsEnabled
-            onDragEnd={({ order }) => setData(order(data))}>
-            {data.map(item => (
-              <Sortable.Pressable
-                key={item}
-                onPress={onRemoveItem.bind(null, item)}>
-                <FlexCell size='large'>{item}</FlexCell>
-              </Sortable.Pressable>
-            ))}
-          </Sortable.Flex>
+            <Sortable.Flex
+              scrollableRef={scrollableRef}
+              style={styles.sortableFlex}
+              animateHeight
+              hapticsEnabled
+              onDragEnd={({ order }) => setData(order(data))}>
+              {data.map(item => (
+                <Sortable.Pressable
+                  key={item}
+                  onPress={onRemoveItem.bind(null, item)}>
+                  <FlexCell size='large'>{item}</FlexCell>
+                </Sortable.Pressable>
+              ))}
+            </Sortable.Flex>
 
-          <Group withMargin={false} bordered center>
-            <Text style={styles.title}>Below SortableFlex</Text>
-          </Group>
-        </Animated.ScrollView>
-      </Group>
-    </Stagger>
+            <Group withMargin={false} bordered center>
+              <Text style={styles.title}>Below SortableFlex</Text>
+            </Group>
+          </Animated.ScrollView>
+        </Group>
+      </Stagger>
+    </View>
   );
 }
 

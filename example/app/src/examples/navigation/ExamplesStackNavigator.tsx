@@ -4,6 +4,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { memo, useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 
 import { RouteCard, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
@@ -11,7 +12,6 @@ import { colors, flex, spacing } from '@/theme';
 import exampleRoutes from './routes';
 import type { Routes } from './types';
 import { getScreenTitle, hasRoutes } from './utils';
-import { Pressable } from 'react-native-gesture-handler';
 
 const StackNavigator =
   createNativeStackNavigator<Record<string, React.ComponentType>>();
@@ -55,8 +55,8 @@ function createStackNavigator(routes: Routes): React.ComponentType {
       <View style={flex.fill}>
         <StackNavigator.Navigator
           screenOptions={{
-            headerTitleAlign: 'center',
-            headerLeft: () => <BackButton />
+            headerLeft: () => <BackButton />,
+            headerTitleAlign: 'center'
           }}>
           {createNavigationScreens(routes, 'Examples')}
         </StackNavigator.Navigator>

@@ -1,6 +1,9 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue
+} from 'react-native-reanimated';
 
 import { createProvider } from '../utils';
 
@@ -35,10 +38,13 @@ const { LayerProvider, useLayerContext } = createProvider('Layer', {
     [zIndex, updateParentLayer]
   );
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    zIndex: disabled ? 0 : zIndex.value
+  }));
+
   return {
     children: (
-      <Animated.View
-        style={[styles.container, { zIndex: disabled ? 0 : zIndex }]}>
+      <Animated.View style={[styles.container, animatedStyle]}>
         {children}
       </Animated.View>
     ),

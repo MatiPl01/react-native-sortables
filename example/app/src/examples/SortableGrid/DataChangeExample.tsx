@@ -4,7 +4,7 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable, { type SortableGridRenderItem } from 'react-native-sortable';
 
 import { Button, GridCard, Group, Section, Stagger } from '@/components';
-import { colors, flex, spacing, text } from '@/theme';
+import { colors, flex, spacing, style, text } from '@/theme';
 import { getItems } from '@/utils';
 
 const AVAILABLE_DATA = getItems(18);
@@ -14,7 +14,7 @@ export default function DataChangeExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
   const [data, setData] = useState(AVAILABLE_DATA.slice(0, 12));
 
-  const getNewItemName = useCallback((currentData: string[]) => {
+  const getNewItemName = useCallback((currentData: Array<string>) => {
     if (currentData.length >= AVAILABLE_DATA.length) {
       return null;
     }
@@ -112,46 +112,48 @@ export default function DataChangeExample() {
   ];
 
   return (
-    // Need to set flex: 1 for the ScrollView parent component in order
-    // to ensure that it occupies the entire available space
-    <Stagger wrapperStye={index => (index === 2 ? flex.fill : {})}>
-      {menuSections.map(({ buttons, description, title }) => (
-        <Section description={description} key={title} title={title}>
-          <View style={styles.row}>
-            {buttons.map(btnProps => (
-              <Button {...btnProps} key={btnProps.title} />
-            ))}
-          </View>
-        </Section>
-      ))}
+    <View style={[flex.fill, style.contentContainer]}>
+      {/* Need to set flex: 1 for the ScrollView parent component in order
+      // to ensure that it occupies the entire available space */}
+      <Stagger wrapperStye={index => (index === 2 ? flex.fill : {})}>
+        {menuSections.map(({ buttons, description, title }) => (
+          <Section description={description} key={title} title={title}>
+            <View style={styles.row}>
+              {buttons.map(btnProps => (
+                <Button {...btnProps} key={btnProps.title} />
+              ))}
+            </View>
+          </Section>
+        ))}
 
-      <Group style={[flex.fill, styles.scrollViewGroup]}>
-        <Animated.ScrollView
-          contentContainerStyle={styles.scrollViewContent}
-          ref={scrollableRef}
-          style={flex.fill}>
-          <Group withMargin={false} bordered center>
-            <Text style={styles.title}>Above SortableGrid</Text>
-          </Group>
+        <Group style={[flex.fill, styles.scrollViewGroup]}>
+          <Animated.ScrollView
+            contentContainerStyle={styles.scrollViewContent}
+            ref={scrollableRef}
+            style={flex.fill}>
+            <Group withMargin={false} bordered center>
+              <Text style={styles.title}>Above SortableGrid</Text>
+            </Group>
 
-          <Sortable.Grid
-            columnGap={spacing.sm}
-            columns={COLUMNS}
-            data={data}
-            renderItem={renderItem}
-            rowGap={spacing.xs}
-            scrollableRef={scrollableRef}
-            animateHeight
-            hapticsEnabled
-            onDragEnd={({ data: newData }) => setData(newData)}
-          />
+            <Sortable.Grid
+              columnGap={spacing.sm}
+              columns={COLUMNS}
+              data={data}
+              renderItem={renderItem}
+              rowGap={spacing.xs}
+              scrollableRef={scrollableRef}
+              animateHeight
+              hapticsEnabled
+              onDragEnd={({ data: newData }) => setData(newData)}
+            />
 
-          <Group withMargin={false} bordered center>
-            <Text style={styles.title}>Below SortableGrid</Text>
-          </Group>
-        </Animated.ScrollView>
-      </Group>
-    </Stagger>
+            <Group withMargin={false} bordered center>
+              <Text style={styles.title}>Below SortableGrid</Text>
+            </Group>
+          </Animated.ScrollView>
+        </Group>
+      </Stagger>
+    </View>
   );
 }
 

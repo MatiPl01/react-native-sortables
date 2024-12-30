@@ -3,14 +3,14 @@ import Sortable from 'react-native-sortable';
 
 import { FlexCell, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';
-import { radius, spacing } from '@/theme';
+import { radius, spacing, style } from '@/theme';
 import { getCategories } from '@/utils';
 
 const DATA = getCategories(9);
 
 export default function DropIndicatorExample() {
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={style.contentContainer}>
       <Stagger ParentComponent={Sortable.Layer}>
         <Section title='Without drop indicator'>
           <Sortable.Flex style={styles.sortableFlex}>
