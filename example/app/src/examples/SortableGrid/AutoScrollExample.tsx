@@ -1,6 +1,6 @@
 import type { FlashList } from '@shopify/flash-list';
 import { AnimatedFlashList } from '@shopify/flash-list';
-import { StyleSheet, Text } from 'react-native';
+import { FlatList, StyleSheet, Text } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortable';
@@ -13,6 +13,10 @@ const MANY_ITEMS = getItems(21);
 const FEW_ITEMS = getItems(6);
 
 const LIST_ITEM_SECTIONS = ['List item 1', 'List item 2', 'List item 3'];
+
+const AnimatedFlatList = Animated.createAnimatedComponent(
+  FlatList
+) as typeof FlatList;
 
 export default function AutoScrollExample() {
   return (
@@ -34,10 +38,7 @@ function ScrollViewExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   return (
-    <Animated.ScrollView
-      ref={scrollableRef}
-      removeClippedSubviews={false}
-      style={styles.scrollable}>
+    <Animated.ScrollView ref={scrollableRef} removeClippedSubviews={false}>
       <Group>
         <ManyCards scrollableRef={scrollableRef} />
       </Group>
@@ -57,9 +58,10 @@ function FlatListExample() {
   const scrollableRef = useAnimatedRef<Animated.FlatList<string>>();
 
   return (
-    <Animated.FlatList
+    <AnimatedFlatList
       data={LIST_ITEM_SECTIONS}
       ref={scrollableRef}
+      ListHeaderComponentStyle={styles.foreground}
       ListFooterComponent={
         <Section title='List footer'>
           <ManyCards scrollableRef={scrollableRef} />
@@ -149,8 +151,8 @@ function SeparatorSection() {
 }
 
 const styles = StyleSheet.create({
-  scrollable: {
-    overflow: 'visible'
+  foreground: {
+    zIndex: 1
   },
   section: {
     height: 100
