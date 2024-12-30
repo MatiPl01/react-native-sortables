@@ -39,17 +39,23 @@ function ScrollViewExample() {
 
   return (
     <Animated.ScrollView ref={scrollableRef} removeClippedSubviews={false}>
-      <Group>
-        <ManyCards scrollableRef={scrollableRef} />
-      </Group>
+      <Sortable.Layer>
+        <Group>
+          <ManyCards scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
       <SeparatorSection />
-      <Group>
-        <FewCards scrollableRef={scrollableRef} />
-      </Group>
+      <Sortable.Layer>
+        <Group>
+          <FewCards scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
       <SeparatorSection />
-      <Group>
-        <ManyCards scrollableRef={scrollableRef} />
-      </Group>
+      <Sortable.Layer>
+        <Group>
+          <ManyCards scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
     </Animated.ScrollView>
   );
 }
@@ -62,6 +68,7 @@ function FlatListExample() {
       data={LIST_ITEM_SECTIONS}
       ListHeaderComponentStyle={styles.foreground}
       ref={scrollableRef}
+      CellRendererComponent={Sortable.Layer}
       ListFooterComponent={
         <Section title='List footer'>
           <ManyCards scrollableRef={scrollableRef} />

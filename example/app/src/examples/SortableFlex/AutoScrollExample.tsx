@@ -1,5 +1,5 @@
 import { AnimatedFlashList, type FlashList } from '@shopify/flash-list';
-import { StyleSheet, Text } from 'react-native';
+import { FlatList, StyleSheet, Text } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortable';
@@ -12,6 +12,10 @@ const MANY_CATEGORIES = getCategories(20);
 const FEW_CATEGORIES = getCategories(6);
 
 const LIST_ITEM_SECTIONS = ['List item 1', 'List item 2', 'List item 3'];
+
+const AnimatedFlatList = Animated.createAnimatedComponent(
+  FlatList
+) as typeof FlatList;
 
 export default function AutoScrollExample() {
   return (
@@ -34,17 +38,23 @@ function ScrollViewExample() {
 
   return (
     <Animated.ScrollView ref={scrollableRef} removeClippedSubviews={false}>
-      <Group>
-        <ManyCategories scrollableRef={scrollableRef} />
-      </Group>
+      <Sortable.Layer>
+        <Group>
+          <ManyCategories scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
       <SeparatorSection />
-      <Group>
-        <FewCategories scrollableRef={scrollableRef} />
-      </Group>
+      <Sortable.Layer>
+        <Group>
+          <FewCategories scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
       <SeparatorSection />
-      <Group>
-        <ManyCategories scrollableRef={scrollableRef} />
-      </Group>
+      <Sortable.Layer>
+        <Group>
+          <ManyCategories scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
     </Animated.ScrollView>
   );
 }
@@ -53,9 +63,10 @@ function FlatListExample() {
   const scrollableRef = useAnimatedRef<Animated.FlatList<string>>();
 
   return (
-    <Animated.FlatList
+    <AnimatedFlatList
       data={LIST_ITEM_SECTIONS}
       ListHeaderComponentStyle={styles.foreground}
+      CellRendererComponent={Sortable.Layer}
       ref={scrollableRef}
       ListFooterComponent={
         <Section title='List footer'>
