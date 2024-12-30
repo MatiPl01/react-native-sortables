@@ -55,6 +55,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   const scrollOffset = useScrollViewOffset(scrollableRef);
   const targetScrollOffset = useSharedValue(-1);
   const dragStartScrollOffset = useAnimatableValue(-1);
+  const startContainerPageY = useSharedValue(-1);
+  const prevScrollToOffset = useSharedValue(-1);
 
   const activeItemHeight = useDerivedValue(() => {
     const key = activeItemKey.value;
@@ -97,12 +99,16 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         ? Math.min(currentOffset + step, targetOffset)
         : Math.max(currentOffset + step, targetOffset);
 
-    if (Math.abs(nextOffset - currentOffset) < OFFSET_EPS) {
+    if (
+      Math.abs(nextOffset - currentOffset) < OFFSET_EPS ||
+      prevScrollToOffset.value === nextOffset
+    ) {
       targetScrollOffset.value = -1;
       return;
     }
 
     scrollTo(scrollableRef, 0, nextOffset, false);
+    prevScrollToOffset.value = nextOffset;
   }, false);
 
   const toggleFrameCallback = useCallback(
@@ -126,6 +132,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         return;
       }
       targetScrollOffset.value = -1;
+      startContainerPageY.value = -1;
+      prevScrollToOffset.value = -1;
       runOnJS(toggleFrameCallback)(shouldBeEnabled);
       isFrameCallbackActive.value = shouldBeEnabled;
     }
@@ -174,6 +182,10 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       const { height: sH, pageY: sY } = scrollableMeasurements;
       const { height: cH, pageY: cY } = containerMeasurements;
 
+      if (startContainerPageY.value === -1) {
+        startContainerPageY.value = cY;
+      }
+
       const itemTopOffset = itemOffset;
       const itemBottomOffset = itemTopOffset + itemHeight;
 
@@ -208,21 +220,16 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         });
       }
 
+      const deltaY = startContainerPageY.value - cY;
+      const offsetY = dragStartScrollOffset.value + deltaY;
       // Scroll up
       if (topDistance > 0 && topOverflow > 0) {
-        targetScrollOffset.value = Math.max(
-          0,
-          scrollOffset.value - Math.min(topOverflow, topDistance)
-        );
+        targetScrollOffset.value = offsetY - Math.min(topOverflow, topDistance);
       }
       // Scroll down
       else if (bottomDistance > 0 && bottomOverflow > 0) {
-        // Unfortunately, we don't have enough information to get the
-        // height of the scrollable content, so we cannot limit the target
-        // scroll offset to the maximum scrollable offset (as we do for
-        // the minimum scroll offset while scrolling up).
         targetScrollOffset.value =
-          scrollOffset.value + Math.min(bottomOverflow, bottomDistance);
+          offsetY + Math.min(bottomOverflow, bottomDistance);
       }
     }
   );

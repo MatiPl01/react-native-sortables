@@ -33,10 +33,7 @@ function ScrollViewExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   return (
-    <Animated.ScrollView
-      ref={scrollableRef}
-      removeClippedSubviews={false}
-      style={styles.scrollable}>
+    <Animated.ScrollView ref={scrollableRef} removeClippedSubviews={false}>
       <Group>
         <ManyCategories scrollableRef={scrollableRef} />
       </Group>
@@ -58,6 +55,7 @@ function FlatListExample() {
   return (
     <Animated.FlatList
       data={LIST_ITEM_SECTIONS}
+      ListHeaderComponentStyle={styles.foreground}
       ref={scrollableRef}
       ListFooterComponent={
         <Section title='List footer'>
@@ -146,8 +144,8 @@ function SeparatorSection() {
 }
 
 const styles = StyleSheet.create({
-  scrollable: {
-    overflow: 'visible'
+  foreground: {
+    zIndex: 1
   },
   section: {
     alignItems: 'center',
