@@ -64,9 +64,9 @@ function FlatListExample() {
 
   return (
     <AnimatedFlatList
+      CellRendererComponent={Sortable.Layer}
       data={LIST_ITEM_SECTIONS}
       ListHeaderComponentStyle={styles.foreground}
-      CellRendererComponent={Sortable.Layer}
       ref={scrollableRef}
       ListFooterComponent={
         <Section title='List footer'>

@@ -65,10 +65,10 @@ function FlatListExample() {
 
   return (
     <AnimatedFlatList
+      CellRendererComponent={Sortable.Layer}
       data={LIST_ITEM_SECTIONS}
       ListHeaderComponentStyle={styles.foreground}
       ref={scrollableRef}
-      CellRendererComponent={Sortable.Layer}
       ListFooterComponent={
         <Section title='List footer'>
           <ManyCards scrollableRef={scrollableRef} />
