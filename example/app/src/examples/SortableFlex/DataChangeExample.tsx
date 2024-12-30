@@ -128,6 +128,7 @@ export default function DataChangeExample() {
             scrollableRef={scrollableRef}
             style={styles.sortableFlex}
             animateHeight
+            hapticsEnabled
             onDragEnd={({ order }) => setData(order(data))}>
             {data.map(item => (
               <Sortable.Pressable

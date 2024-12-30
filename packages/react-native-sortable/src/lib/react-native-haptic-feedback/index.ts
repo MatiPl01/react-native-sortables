@@ -30,7 +30,7 @@ const load = () => {
 
     const defaultOptions = {
       enableVibrateFallback: false,
-      ignoreAndroidSystemSettings: false
+      ignoreAndroidSystemSettings: true
     };
 
     const createTriggerOptions = (options: HapticOptions) => {
