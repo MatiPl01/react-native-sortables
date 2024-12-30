@@ -379,8 +379,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const handleTouchesMove = useCallback(
     (e: GestureTouchEvent, reverseXAxis: boolean, onFail: () => void) => {
       'worklet';
+      if (!startTouch.value || touchedItemKey.value === null) {
+        return;
+      }
+
       const firstTouch = e.allTouches[0];
-      if (!firstTouch || !startTouch.value || touchedItemKey.value === null) {
+      if (!firstTouch) {
         onFail();
         return;
       }
