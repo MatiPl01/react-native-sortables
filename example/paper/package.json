@@ -2,7 +2,7 @@
   "name": "example-paper",
   "version": "1.0.0",
   "dependencies": {
-    "react-native": "^0.76.2",
+    "react-native": "^0.76.5",
     "react-native-sortable": "workspace:*"
   },
   "private": true,
