@@ -9,13 +9,14 @@ import {
 import type { DEFAULT_SORTABLE_FLEX_PROPS } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type {
+  FlexLayout,
   FlexLayoutContextType,
   RequiredBy,
   SortableFlexStyle
 } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import { calculateLayout } from './utils';
+import { calculateLayout, updateLayoutDebugRects } from './utils';
 
 type FlexLayoutProviderProps = PropsWithChildren<
   {
@@ -108,10 +109,13 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
   const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
 
-  const useFlexLayout = useCallback(
-    (idxToKey: SharedValue<Array<string>>) =>
-      useDerivedValue(() =>
-        calculateLayout({
+  const useFlexLayoutReaction = useCallback(
+    (
+      idxToKey: SharedValue<Array<string>>,
+      onChange: (layout: FlexLayout | null) => void
+    ) =>
+      useAnimatedReaction(
+        () => ({
           flexAlignments: {
             alignContent,
             alignItems,
@@ -127,7 +131,10 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
           itemDimensions: itemDimensions.value,
           limits: dimensionsLimits.value,
           paddings
-        })
+        }),
+        layoutProps => {
+          onChange(calculateLayout(layoutProps));
+        }
       ),
     [
       alignContent,
@@ -143,55 +150,35 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     ]
   );
 
-  // FLEX LAYOUT UPDATER
-  useAnimatedReaction(
-    () => ({
-      flexAlignments: {
-        alignContent,
-        alignItems,
-        justifyContent
-      },
-      flexDirection,
-      flexWrap,
-      gaps: {
-        column: columnGap.value,
-        row: rowGap.value
-      },
-      indexToKey: indexToKey.value,
-      itemDimensions: itemDimensions.value,
-      limits: dimensionsLimits.value,
-      paddings
-    }),
-    props => {
-      const layout = calculateLayout(props);
-      if (!layout) {
-        return;
-      }
-
-      // Update item groups
-      itemGroups.value = layout.itemGroups;
-      // Update item positions
-      itemPositions.value = layout.itemPositions;
-      // Update cross axis group offsets and sizes
-      crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
-      crossAxisGroupSizes.value = layout.crossAxisGroupSizes;
-      // Update group size limit
-      groupSizeLimit.value = layout.groupSizeLimit;
-      // Update container height
-      const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
-      containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
-
-      // DEBUG ONLY
-      // if (debugCrossAxisGapRects && debugMainAxisGapRects) {
-      //   updateLayoutDebugRects(
-      //     layout,
-      //     debugCrossAxisGapRects,
-      //     debugMainAxisGapRects,
-      //     itemDimensions
-      //   );
-      // }
+  useFlexLayoutReaction(indexToKey, layout => {
+    ('worklet');
+    if (!layout) {
+      return;
     }
-  );
+
+    // Update item groups
+    itemGroups.value = layout.itemGroups;
+    // Update item positions
+    itemPositions.value = layout.itemPositions;
+    // Update cross axis group offsets and sizes
+    crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
+    crossAxisGroupSizes.value = layout.crossAxisGroupSizes;
+    // Update group size limit
+    groupSizeLimit.value = layout.groupSizeLimit;
+    // Update container height
+    const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
+    containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
+
+    // DEBUG ONLY
+    if (debugCrossAxisGapRects && debugMainAxisGapRects) {
+      updateLayoutDebugRects(
+        layout,
+        debugCrossAxisGapRects,
+        debugMainAxisGapRects,
+        itemDimensions
+      );
+    }
+  });
 
   return {
     value: {
@@ -205,7 +192,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       itemGroups,
       keyToGroup,
       rowGap,
-      useFlexLayout
+      useFlexLayoutReaction
     }
   };
 });

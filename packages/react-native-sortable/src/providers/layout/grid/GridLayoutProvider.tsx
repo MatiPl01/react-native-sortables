@@ -2,14 +2,17 @@ import { type PropsWithChildren, useCallback } from 'react';
 import {
   type SharedValue,
   useAnimatedReaction,
-  useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
-import type { Animatable, GridLayoutContextType } from '../../../types';
-import { useCommonValuesContext } from '../../shared';
+import type {
+  Animatable,
+  GridLayout,
+  GridLayoutContextType
+} from '../../../types';
+import { useCommonValuesContext, useDerivedLayoutFactory } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout } from './utils';
 
@@ -52,10 +55,13 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const rowGap = useAnimatableValue(rowGap_);
   const columnWidth = useSharedValue(-1);
 
-  const useGridLayout = useCallback(
-    (idxToKey: SharedValue<Array<string>>) =>
-      useDerivedValue(() =>
-        calculateLayout({
+  const useGridLayoutReaction = useCallback(
+    (
+      idxToKey: SharedValue<Array<string>>,
+      onChange: (layout: GridLayout | null) => void
+    ) =>
+      useAnimatedReaction(
+        () => ({
           columnWidth: columnWidth.value,
           gaps: {
             column: columnGap.value,
@@ -64,12 +70,15 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           indexToKey: idxToKey.value,
           itemDimensions: itemDimensions.value,
           numColumns: columns
-        })
+        }),
+        layoutProps => {
+          onChange(calculateLayout(layoutProps));
+        }
       ),
     [columnWidth, columnGap, rowGap, columns, itemDimensions]
   );
 
-  const gridLayout = useGridLayout(indexToKey);
+  const useGridLayout = useDerivedLayoutFactory(useGridLayoutReaction);
 
   // TARGET COLUMN WIDTH UPDATER
   useAnimatedReaction(
@@ -98,37 +107,35 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   );
 
   // GRID LAYOUT UPDATER
-  useAnimatedReaction(
-    () => gridLayout.value,
-    layout => {
-      if (!layout) {
-        return;
-      }
+  useGridLayoutReaction(indexToKey, layout => {
+    'worklet';
+    if (!layout) {
+      return;
+    }
 
-      // Update item positions
-      itemPositions.value = layout.itemPositions;
-      // Update container height
-      containerHeight.value = layout.containerHeight;
-      // Update style overrides
-      const currentStyleOverride = itemsStyleOverride.value;
-      if (currentStyleOverride?.width !== columnWidth.value) {
-        itemsStyleOverride.value = {
-          width: columnWidth.value
-        };
-      }
+    // Update item positions
+    itemPositions.value = layout.itemPositions;
+    // Update container height
+    containerHeight.value = layout.containerHeight;
+    // Update style overrides
+    const currentStyleOverride = itemsStyleOverride.value;
+    if (currentStyleOverride?.width !== columnWidth.value) {
+      itemsStyleOverride.value = {
+        width: columnWidth.value
+      };
+    }
 
-      // DEBUG ONLY
-      if (debugRowGapRects) {
-        for (let i = 0; i < layout.rowOffsets.length - 1; i++) {
-          debugRowGapRects[i]?.set({
-            ...DEBUG_COLORS,
-            height: rowGap.value,
-            y: layout.rowOffsets[i + 1]! - rowGap.value
-          });
-        }
+    // DEBUG ONLY
+    if (debugRowGapRects) {
+      for (let i = 0; i < layout.rowOffsets.length - 1; i++) {
+        debugRowGapRects[i]?.set({
+          ...DEBUG_COLORS,
+          height: rowGap.value,
+          y: layout.rowOffsets[i + 1]! - rowGap.value
+        });
       }
     }
-  );
+  });
 
   return {
     value: {
