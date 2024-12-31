@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { Dimensions, Platform, StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Sortable, {
   type DragEndCallback,
@@ -8,7 +9,7 @@ import Sortable, {
 } from 'react-native-sortable';
 
 import { AnimatedText, GridCard, Section, Stagger } from '@/components';
-import { flex, spacing } from '@/theme';
+import { flex, sizes, spacing } from '@/theme';
 import { formatCallbackParams, getItems } from '@/utils';
 
 const DATA = getItems(8);
@@ -44,24 +45,34 @@ export default function CallbacksExample() {
   );
 
   return (
-    <Stagger wrapperStye={index => (index === 0 ? flex.fill : {})}>
-      <Section title='Callback output' fill>
-        <AnimatedText style={flex.fill} text={text} multiline />
-      </Section>
-      <Section
-        description='Drag items around to see callbacks output'
-        title='SortableGrid'>
-        <Sortable.Grid
-          columnGap={spacing.xs}
-          columns={COLUMNS}
-          data={DATA}
-          renderItem={renderItem}
-          rowGap={spacing.xs}
-          onDragEnd={onDragEnd}
-          onDragStart={onDragStart}
-          onOrderChange={onOrderChange}
-        />
-      </Section>
-    </Stagger>
+    <View style={styles.container}>
+      <Stagger wrapperStye={index => (index === 0 ? flex.fill : {})}>
+        <Section title='Callback output' fill>
+          <AnimatedText style={flex.fill} text={text} multiline />
+        </Section>
+        <Section
+          description='Drag items around to see callbacks output'
+          title='SortableGrid'>
+          <Sortable.Grid
+            columnGap={spacing.xs}
+            columns={COLUMNS}
+            data={DATA}
+            renderItem={renderItem}
+            rowGap={spacing.xs}
+            onDragEnd={onDragEnd}
+            onDragStart={onDragStart}
+            onOrderChange={onOrderChange}
+          />
+        </Section>
+      </Stagger>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    height:
+      Dimensions.get('window').height -
+      (Platform.OS === 'ios' ? sizes.xxl : sizes.lg)
+  }
+});

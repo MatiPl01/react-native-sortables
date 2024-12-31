@@ -15,6 +15,11 @@ import Animated, {
 import { useCommonValuesContext } from '../../providers';
 import type { Vector } from '../../types';
 
+const DEFAULT_STYLE: ViewStyle = {
+  opacity: 0,
+  transform: [{ translateX: 0 }, { translateY: 0 }]
+};
+
 export type DropIndicatorComponentProps = {
   activationProgress: SharedValue<number>;
   touchedItemKey: SharedValue<null | string>;
@@ -46,34 +51,55 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
 
   const dropIndex = useSharedValue(0);
   const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
+  const isHidden = useDerivedValue(
+    () => activeItemDropped.value && activationProgress.value === 0
+  );
+  const x = useSharedValue<null | number>(null);
+  const y = useSharedValue<null | number>(null);
 
   useAnimatedReaction(
     () => ({
+      hidden: isHidden.value,
       kToI: keyToIndex.value,
       key: touchedItemKey.value,
       positions: itemPositions.value
     }),
-    ({ kToI, key, positions }) => {
+    ({ hidden, kToI, key, positions }) => {
       if (key !== null) {
         dropIndex.value = kToI[key] ?? 0;
         dropPosition.value = positions[key] ?? { x: 0, y: 0 };
+
+        const update = (target: SharedValue<null | number>, value: number) => {
+          if (target.value === null) {
+            target.value = value;
+          } else {
+            target.value = withTiming(value, {
+              easing: Easing.out(Easing.ease)
+            });
+          }
+        };
+
+        update(x, dropPosition.value.x);
+        update(y, dropPosition.value.y);
+      } else if (hidden) {
+        x.value = null;
+        y.value = null;
       }
     }
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (activeItemDropped.value && activationProgress.value === 0) {
-      return { opacity: 0 };
-    }
+    const translateX = x.value;
+    const translateY = y.value;
 
-    const animate = (value: number) =>
-      withTiming(value, { easing: Easing.out(Easing.ease) });
-    const { x, y } = dropPosition.value;
+    if (translateX === null || translateY === null || isHidden.value) {
+      return DEFAULT_STYLE;
+    }
 
     return {
       height: touchedItemHeight.value,
       opacity: 1,
-      transform: [{ translateX: animate(x) }, { translateY: animate(y) }],
+      transform: [{ translateX }, { translateY }],
       width: touchedItemWidth.value
     };
   });

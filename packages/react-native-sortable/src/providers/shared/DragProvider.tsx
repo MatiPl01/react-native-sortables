@@ -67,7 +67,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationState,
     activeItemDropped,
     activeItemKey,
-    containerHeight,
+    canSwitchToAbsoluteLayout,
     enableActiveItemSnap,
     inactiveAnimationProgress,
     indexToKey,
@@ -309,16 +309,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
-      activationState.value = DragActivationState.TOUCHED;
-
-      // This should never happen, but just in case the container height
-      // was not measured within the specified interval and onLayout
-      // was not called, we will try to measure it again after the item
-      // is touched
-      if (containerHeight.value === -1) {
-        tryMeasureContainerHeight();
+      if (!canSwitchToAbsoluteLayout.value) {
+        tryMeasureContainerHeight?.();
       }
 
+      activationState.value = DragActivationState.TOUCHED;
       clearAnimatedTimeout(activationTimeoutId.value);
       // Start handling touch after a delay to prevent accidental activation
       // e.g. while scrolling the ScrollView
@@ -335,6 +330,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             callback
           );
 
+        onActivate();
         activationProgress.value = 0;
         touchedItemKey.value = key;
         startTouch.value = firstTouch;
@@ -349,7 +345,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             e.state !== State.END
           ) {
             if (touchedItemKey.value === key && itemPositions.value[key]) {
-              onActivate();
               handleDragStart(key);
             } else {
               handleDragEnd(key);
@@ -362,7 +357,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       startTouch,
       touchedItemKey,
       itemPositions,
-      containerHeight,
       activationTimeoutId,
       touchStartItemPosition,
       activationState,
@@ -371,16 +365,21 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateLayer,
       handleDragStart,
       handleDragEnd,
+      updateTouchedItemDimensions,
       tryMeasureContainerHeight,
-      updateTouchedItemDimensions
+      canSwitchToAbsoluteLayout
     ]
   );
 
   const handleTouchesMove = useCallback(
     (e: GestureTouchEvent, reverseXAxis: boolean, onFail: () => void) => {
       'worklet';
+      if (!startTouch.value || touchedItemKey.value === null) {
+        return;
+      }
+
       const firstTouch = e.allTouches[0];
-      if (!firstTouch || !startTouch.value || touchedItemKey.value === null) {
+      if (!firstTouch) {
         onFail();
         return;
       }

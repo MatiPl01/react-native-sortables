@@ -1,10 +1,10 @@
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { memo } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInLeft, FadeInRight } from 'react-native-reanimated';
+import { memo, useCallback, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 
 import { RouteCard, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
@@ -18,34 +18,34 @@ const StackNavigator =
 
 const BackButton = memo(function BackButton() {
   const navigation = useNavigation();
+  const [prevRoute, setPrevRoute] = useState<string | undefined>(() => {
+    const state = navigation.getState();
+    return state?.routes[state.index - 1]?.key?.split('-')[0];
+  });
 
-  const state = navigation.getState();
-  if (!state) {
-    return null;
-  }
-
-  const { index, routes } = state;
-  const prevRoute = routes[index - 1]!;
+  useFocusEffect(
+    useCallback(() => {
+      return navigation.addListener('state', e => {
+        const { index, routes } = e.data.state;
+        setPrevRoute(routes[index - 1]?.key?.split('-')[0]);
+      });
+    }, [navigation])
+  );
 
   if (!prevRoute) {
     return null;
   }
 
   return (
-    <TouchableOpacity
+    <Pressable
       hitSlop={spacing.md}
       style={styles.backButton}
       onPress={() => {
         navigation.goBack();
       }}>
       <FontAwesomeIcon color={colors.primary} icon={faChevronLeft} />
-      <Animated.Text
-        entering={FadeInRight}
-        exiting={FadeInLeft}
-        style={styles.backButtonText}>
-        {getScreenTitle(prevRoute.name)}
-      </Animated.Text>
-    </TouchableOpacity>
+      <Text style={styles.backButtonText}>{getScreenTitle(prevRoute)}</Text>
+    </Pressable>
   );
 });
 
@@ -55,7 +55,8 @@ function createStackNavigator(routes: Routes): React.ComponentType {
       <View style={flex.fill}>
         <StackNavigator.Navigator
           screenOptions={{
-            headerLeft: () => <BackButton />
+            headerLeft: () => <BackButton />,
+            headerTitleAlign: 'center'
           }}>
           {createNavigationScreens(routes, 'Examples')}
         </StackNavigator.Navigator>
@@ -124,7 +125,9 @@ const styles = StyleSheet.create({
   backButton: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: spacing.xxs
+    gap: spacing.xxs,
+    marginRight: spacing.xs,
+    paddingTop: spacing.xxs
   },
   backButtonText: {
     color: colors.primary,
