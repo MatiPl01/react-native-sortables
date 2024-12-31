@@ -1,27 +1,37 @@
+/* eslint-disable import/no-unused-modules */
 import type { SharedValue } from 'react-native-reanimated';
+import {
+  useAnimatedReaction,
+  useDerivedValue,
+  useSharedValue
+} from 'react-native-reanimated';
 
+import { EMPTY_ARRAY } from '../../../../constants';
 import type {
   Coordinate,
   Dimension,
+  FlexLayout,
   SortableFlexStrategyFactory
 } from '../../../../types';
+import { getIndexToKeyWithActiveInGroup } from '../utils';
 
 const MIN_ADDITIONAL_OFFSET = 5;
 
 const useInsertStrategy: SortableFlexStrategyFactory = ({
   activeItemKey,
+  calculateFlexLayout,
   columnGap,
   crossAxisGroupOffsets,
+  crossAxisGroupSizes,
   flexDirection,
   groupSizeLimit,
   indexToKey,
   itemDimensions,
   itemGroups,
-  itemPositions,
   keyToGroup,
   keyToIndex,
   rowGap,
-  useFlexLayout
+  useFlexLayoutReaction
 }) => {
   let mainCoordinate: Coordinate = 'x';
   let crossCoordinate: Coordinate = 'y';
@@ -37,133 +47,156 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     crossGap = columnGap;
   }
 
-  // const indexToKeyWithActiveInGroupBefore =
-  //   useSharedValue<Array<string>>(EMPTY_ARRAY);
-  // const indexToKeyWithActiveInGroupAfter =
-  //   useSharedValue<Array<string>>(EMPTY_ARRAY);
+  const swappedBeforeIndexToKey = useSharedValue<Array<string>>(EMPTY_ARRAY);
+  const swappedAfterIndexToKey = useSharedValue<Array<string>>(EMPTY_ARRAY);
+  const swappedBeforeLayout = useSharedValue<FlexLayout | null>(null);
+  const swappedAfterLayout = useSharedValue<FlexLayout | null>(null);
 
-  // useAnimatedReaction(
-  //   () => ({
-  //     activeKey: activeItemKey.value,
-  //     dimensions: itemDimensions.value,
-  //     groups: itemGroups.value,
-  //     kToGroup: keyToGroup.value,
-  //     limit: groupSizeLimit.value
-  //   }),
-  //   ({ activeKey, dimensions, groups, kToGroup, limit }) => {
-  //     if (activeKey === null) {
-  //       indexToKeyWithActiveInGroupBefore.value = EMPTY_ARRAY;
-  //       indexToKeyWithActiveInGroupAfter.value = EMPTY_ARRAY;
-  //       return;
-  //     }
+  const activeGroupIndex = useDerivedValue(() => {
+    const key = activeItemKey.value;
+    if (key === null) return null;
+    return keyToGroup.value[key] ?? null;
+  });
 
-  //     const activeIndex = keyToIndex.value[activeKey];
-  //     if (activeIndex === undefined) {
-  //       return;
-  //     }
-  //     const groupIndex = kToGroup[activeKey];
-  //     if (groupIndex === undefined) {
-  //       return;
-  //     }
+  useAnimatedReaction(
+    () => ({
+      groupIndex: activeGroupIndex.value,
+      options: {
+        activeItemKey: activeItemKey.value,
+        indexToKey: indexToKey.value,
+        itemGroups: itemGroups.value,
+        keyToGroup: keyToGroup.value,
+        keyToIndex: keyToIndex.value
+      }
+    }),
+    ({ groupIndex, options }) => {
+      if (groupIndex === null || groupIndex === 0) {
+        swappedBeforeIndexToKey.value = EMPTY_ARRAY;
+        return;
+      }
+      swappedBeforeIndexToKey.value =
+        getIndexToKeyWithActiveInGroup(groupIndex - 1, options) ?? EMPTY_ARRAY;
+    }
+  );
 
-  //     const groupBefore = groups[groupIndex - 1];
+  useAnimatedReaction(
+    () => ({
+      groupIndex: activeGroupIndex.value,
+      options: {
+        activeItemKey: activeItemKey.value,
+        groupSizeLimit: groupSizeLimit.value,
+        indexToKey: indexToKey.value,
+        itemDimensions: itemDimensions.value,
+        itemGroups: itemGroups.value,
+        keyToGroup: keyToGroup.value,
+        keyToIndex: keyToIndex.value,
+        mainDimension,
+        mainGap: mainGap.value
+      }
+    }),
+    ({ groupIndex, options }) => {
+      if (groupIndex === null || groupIndex >= options.itemGroups.length - 1) {
+        swappedAfterIndexToKey.value = EMPTY_ARRAY;
+        return;
+      }
+      swappedAfterIndexToKey.value =
+        getIndexToKeyWithActiveInGroup(groupIndex + 1, options) ?? EMPTY_ARRAY;
+    }
+  );
 
-  //     if (groupBefore) {
-  //       const firstKey = groupBefore[0];
-  //       if (firstKey) {
-  //         const firstIndex = keyToIndex.value[firstKey];
-  //         if (firstIndex !== undefined) {
-  //           const result = reorderInsert(
-  //             indexToKey.value,
-  //             activeIndex,
-  //             firstIndex
-  //           );
-  //           if (
-  //             areArraysDifferent(
-  //               result,
-  //               indexToKeyWithActiveInGroupBefore.value
-  //             )
-  //           ) {
-  //             indexToKeyWithActiveInGroupBefore.value = result;
-  //           }
-  //         }
-  //       }
-  //     }
-
-  //     const group = groups[groupIndex];
-  //     const groupAfter = groups[groupIndex + 1];
-  //     if (group && groupAfter) {
-  //       let totalGroupSize = group.reduce(
-  //         (acc, key) =>
-  //           acc +
-  //           (key === activeKey
-  //             ? 0
-  //             : (dimensions[key]?.[mainDimension] ?? 0) + mainGap.value),
-  //         0
-  //       );
-  //       let swapIdx: number | undefined;
-  //       for (const key of groupAfter) {
-  //         const itemSize = dimensions[key]?.[mainDimension];
-  //         swapIdx = keyToIndex.value[key];
-  //         if (itemSize && totalGroupSize + itemSize <= limit) {
-  //           totalGroupSize += itemSize + mainGap.value;
-  //         } else {
-  //           break;
-  //         }
-  //       }
-  //       if (swapIdx !== undefined) {
-  //         const result = reorderInsert(indexToKey.value, activeIndex, swapIdx);
-  //         if (
-  //           areArraysDifferent(result, indexToKeyWithActiveInGroupAfter.value)
-  //         ) {
-  //           indexToKeyWithActiveInGroupAfter.value = result;
-  //         }
-  //       }
-  //     }
-  //   }
-  // );
-
-  // const layoutWithActiveInGroupBefore = useFlexLayout(
-  //   indexToKeyWithActiveInGroupBefore
-  // );
-  // const layoutWithActiveInGroupAfter = useFlexLayout(
-  //   indexToKeyWithActiveInGroupAfter
-  // );
-
-  return ({ activeIndex, activeKey, position }) => {
+  useFlexLayoutReaction(swappedBeforeIndexToKey, layout => {
     'worklet';
-    //   let groupIndex = keyToGroup.value[activeKey];
-    //   if (groupIndex === undefined) {
-    //     return;
-    //   }
+    swappedBeforeLayout.value = layout;
+  });
 
-    //   // GROUP BOUNDS
+  useFlexLayoutReaction(swappedAfterIndexToKey, layout => {
+    'worklet';
+    swappedAfterLayout.value = layout;
+  });
 
-    //   let crossOffsetBefore = -Infinity;
-    //   let crossBeforeBound = Infinity;
+  return ({ activeIndex, position }) => {
+    'worklet';
+    if (activeGroupIndex.value === null) return;
 
-    //   do {
-    //     if (crossOffsetBefore !== Infinity) {
-    //       groupIndex--;
-    //     }
-    //     crossOffsetBefore =
-    //       layoutWithActiveInGroupBefore.value?.crossAxisGroupOffsets[
-    //         groupIndex
-    //       ] ?? 0;
-    //     const groupBeforeSize =
-    //       layoutWithActiveInGroupBefore.value?.crossAxisGroupSizes[
-    //         groupIndex - 1
-    //       ] ?? 0;
-    //     const additionalOffsetBefore = Math.min(
-    //       crossGap.value / 2 + MIN_ADDITIONAL_OFFSET,
-    //       crossGap.value + groupBeforeSize / 2
-    //     );
-    //     crossBeforeBound = crossOffsetBefore - additionalOffsetBefore;
-    //   } while (
-    //     crossBeforeBound > 0 &&
-    //     position[crossCoordinate] < crossBeforeBound
-    //   );
-    //   console.log(groupIndex);
+    const crossOffset = position[crossCoordinate];
+
+    const idxToKeyOptions = {
+      activeItemKey: activeItemKey.value,
+      groupSizeLimit: groupSizeLimit.value,
+      indexToKey: indexToKey.value,
+      itemDimensions: itemDimensions.value,
+      itemGroups: itemGroups.value,
+      keyToGroup: keyToGroup.value,
+      keyToIndex: keyToIndex.value,
+      mainDimension,
+      mainGap: mainGap.value
+    };
+
+    let groupIndex = activeGroupIndex.value;
+
+    // CROSS AXIS BOUNDS
+    // Group before
+    let swapBeforeOffset = -Infinity;
+    let swapBeforeBound = Infinity;
+
+    do {
+      if (swapBeforeBound !== Infinity) {
+        groupIndex--;
+        swappedBeforeLayout.value = calculateFlexLayout(
+          getIndexToKeyWithActiveInGroup(groupIndex, idxToKeyOptions) ??
+            EMPTY_ARRAY
+        );
+      }
+      swapBeforeOffset =
+        ((swappedBeforeLayout.value?.crossAxisGroupOffsets[groupIndex] ?? 0) +
+          (crossAxisGroupOffsets.value[groupIndex] ?? 0)) /
+        2;
+      const additionalSwapOffset = Math.min(
+        crossGap.value / 2 + MIN_ADDITIONAL_OFFSET,
+        (crossGap.value +
+          (swappedBeforeLayout.value?.crossAxisGroupSizes?.[groupIndex - 1] ??
+            0)) /
+          2
+      );
+      swapBeforeBound = swapBeforeOffset - additionalSwapOffset;
+    } while (swapBeforeBound > 0 && crossOffset < swapBeforeBound);
+
+    // Group after
+    let swapAfterOffset = Infinity;
+    let swapAfterBound = -Infinity;
+
+    do {
+      if (swapAfterBound !== -Infinity) {
+        groupIndex++;
+        swappedAfterLayout.value = calculateFlexLayout(
+          getIndexToKeyWithActiveInGroup(groupIndex, idxToKeyOptions) ??
+            EMPTY_ARRAY
+        );
+      }
+      const swappedAfterOffset =
+        (swappedAfterLayout.value?.crossAxisGroupOffsets[groupIndex] ?? 0) +
+        (swappedAfterLayout.value?.crossAxisGroupSizes[groupIndex] ?? 0);
+      const afterOffset =
+        (crossAxisGroupOffsets.value[groupIndex] ?? 0) +
+        (crossAxisGroupSizes.value[groupIndex] ?? 0);
+      swapAfterOffset =
+        swappedAfterOffset === 0
+          ? afterOffset
+          : (swappedAfterOffset + afterOffset) / 2;
+      const additionalSwapOffset = Math.min(
+        crossGap.value / 2 + MIN_ADDITIONAL_OFFSET,
+        (crossGap.value +
+          (swappedAfterLayout.value?.crossAxisGroupSizes?.[groupIndex + 1] ??
+            0)) /
+          2
+      );
+      swapAfterBound = swapAfterOffset + additionalSwapOffset;
+    } while (
+      crossOffset > swapAfterBound &&
+      groupIndex < itemGroups.value.length - 1
+    );
+
+    // MAIN AXIS BOUNDS
   };
 };
 

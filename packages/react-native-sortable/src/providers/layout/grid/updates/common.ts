@@ -56,7 +56,7 @@ export const createGridStrategy =
             : 0;
         const additionalOffsetTop = Math.min(
           rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
-          rowGap.value + rowAboveHeight / 2
+          (rowGap.value + rowAboveHeight) / 2
         );
         topBound = rowOffsetAbove - additionalOffsetTop;
       } while (topBound > 0 && y < topBound);
@@ -80,7 +80,7 @@ export const createGridStrategy =
             : 0;
         const additionalOffsetBottom = Math.min(
           rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
-          rowGap.value + rowBelowHeight / 2
+          (rowGap.value + rowBelowHeight) / 2
         );
         bottomBound = rowOffsetBelow - rowGap.value + additionalOffsetBottom;
       } while (bottomBound < containerHeight.value && y > bottomBound);
@@ -88,7 +88,7 @@ export const createGridStrategy =
       // HORIZONTAL BOUNDS
       const additionalOffsetX = Math.min(
         rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
-        rowGap.value + columnWidth.value / 2
+        (rowGap.value + columnWidth.value) / 2
       );
 
       // Left bound

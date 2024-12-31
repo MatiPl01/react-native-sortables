@@ -150,6 +150,41 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     ]
   );
 
+  const calculateFlexLayout = useCallback(
+    (idxToKey: Array<string>) => {
+      'worklet';
+      return calculateLayout({
+        flexAlignments: {
+          alignContent,
+          alignItems,
+          justifyContent
+        },
+        flexDirection,
+        flexWrap,
+        gaps: {
+          column: columnGap.value,
+          row: rowGap.value
+        },
+        indexToKey: idxToKey,
+        itemDimensions: itemDimensions.value,
+        limits: dimensionsLimits.value,
+        paddings
+      });
+    },
+    [
+      alignContent,
+      alignItems,
+      justifyContent,
+      flexDirection,
+      flexWrap,
+      columnGap,
+      rowGap,
+      itemDimensions,
+      dimensionsLimits,
+      paddings
+    ]
+  );
+
   useFlexLayoutReaction(indexToKey, layout => {
     ('worklet');
     if (!layout) {
@@ -163,8 +198,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     // Update cross axis group offsets and sizes
     crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
     crossAxisGroupSizes.value = layout.crossAxisGroupSizes;
-    // Update group size limit
+    // Update group size limit and adjusted cross gap
     groupSizeLimit.value = layout.groupSizeLimit;
+    adjustedCrossGap.value = layout.adjustedCrossGap;
     // Update container height
     const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
     containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
@@ -182,7 +218,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   return {
     value: {
-      adjustedCrossGap,
+      calculateFlexLayout,
       columnGap,
       crossAxisGroupOffsets,
       crossAxisGroupSizes,
@@ -190,6 +226,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       flexDirection,
       groupSizeLimit,
       itemGroups,
+      adjustedCrossGap,
       keyToGroup,
       rowGap,
       useFlexLayoutReaction

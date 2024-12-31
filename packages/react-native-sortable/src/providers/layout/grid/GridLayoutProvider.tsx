@@ -2,6 +2,7 @@ import { type PropsWithChildren, useCallback } from 'react';
 import {
   type SharedValue,
   useAnimatedReaction,
+  useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
@@ -12,7 +13,7 @@ import type {
   GridLayout,
   GridLayoutContextType
 } from '../../../types';
-import { useCommonValuesContext, useDerivedLayoutFactory } from '../../shared';
+import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout } from './utils';
 
@@ -78,7 +79,22 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     [columnWidth, columnGap, rowGap, columns, itemDimensions]
   );
 
-  const useGridLayout = useDerivedLayoutFactory(useGridLayoutReaction);
+  const useGridLayout = useCallback(
+    (idxToKey: SharedValue<Array<string>>) =>
+      useDerivedValue(() =>
+        calculateLayout({
+          columnWidth: columnWidth.value,
+          gaps: {
+            column: columnGap.value,
+            row: rowGap.value
+          },
+          indexToKey: idxToKey.value,
+          itemDimensions: itemDimensions.value,
+          numColumns: columns
+        })
+      ),
+    [columnWidth, columnGap, rowGap, columns, itemDimensions]
+  );
 
   // TARGET COLUMN WIDTH UPDATER
   useAnimatedReaction(
