@@ -16,8 +16,8 @@ import { useCommonValuesContext } from '../../providers';
 import type { Vector } from '../../types';
 
 const DEFAULT_STYLE: ViewStyle = {
-  transform: [{ translateX: 0 }, { translateY: 0 }],
-  opacity: 0
+  opacity: 0,
+  transform: [{ translateX: 0 }, { translateY: 0 }]
 };
 
 export type DropIndicatorComponentProps = {
@@ -54,22 +54,22 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const isHidden = useDerivedValue(
     () => activeItemDropped.value && activationProgress.value === 0
   );
-  const x = useSharedValue<number | null>(null);
-  const y = useSharedValue<number | null>(null);
+  const x = useSharedValue<null | number>(null);
+  const y = useSharedValue<null | number>(null);
 
   useAnimatedReaction(
     () => ({
+      hidden: isHidden.value,
       kToI: keyToIndex.value,
       key: touchedItemKey.value,
-      positions: itemPositions.value,
-      hidden: isHidden.value
+      positions: itemPositions.value
     }),
-    ({ kToI, key, positions, hidden }) => {
+    ({ hidden, kToI, key, positions }) => {
       if (key !== null) {
         dropIndex.value = kToI[key] ?? 0;
         dropPosition.value = positions[key] ?? { x: 0, y: 0 };
 
-        const update = (target: SharedValue<number | null>, value: number) => {
+        const update = (target: SharedValue<null | number>, value: number) => {
           if (target.value === null) {
             target.value = value;
           } else {

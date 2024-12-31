@@ -81,7 +81,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     touchedItemPosition,
     touchedItemWidth
   } = useCommonValuesContext();
-  const { updateTouchedItemDimensions, tryMeasureContainerHeight } =
+  const { tryMeasureContainerHeight, updateTouchedItemDimensions } =
     useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
@@ -365,7 +365,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateLayer,
       handleDragStart,
       handleDragEnd,
-      updateTouchedItemDimensions
+      updateTouchedItemDimensions,
+      tryMeasureContainerHeight,
+      canSwitchToAbsoluteLayout
     ]
   );
 

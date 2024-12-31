@@ -150,7 +150,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     if (measurements) {
       checkMeasuredHeight(measurements.height);
     }
-  }, [checkMeasuredHeight, containerHeight]);
+  }, [checkMeasuredHeight, containerRef]);
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     minHeight: containerHeight.value === -1 ? undefined : containerHeight.value
@@ -177,8 +177,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     ),
     value: {
       handleItemMeasurement,
-      tryMeasureContainerHeight,
       handleItemRemoval,
+      tryMeasureContainerHeight,
       updateTouchedItemDimensions
     }
   };
