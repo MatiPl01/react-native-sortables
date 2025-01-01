@@ -40,13 +40,15 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
   rowGap,
   useFlexLayoutReaction
 }) => {
+  const isColumn = flexDirection.startsWith('column');
+
   let mainCoordinate: Coordinate = 'x';
   let crossCoordinate: Coordinate = 'y';
   let mainDimension: Dimension = 'width';
   let mainGap: SharedValue<number> = columnGap;
   let crossGap: SharedValue<number> = rowGap;
 
-  if (flexDirection.startsWith('column')) {
+  if (isColumn) {
     mainCoordinate = 'y';
     crossCoordinate = 'x';
     mainDimension = 'height';
@@ -156,12 +158,12 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     // CROSS AXIS BOUNDS
     let groupIndex = activeGroupIndex.value;
+    let firstGroupItemIndex = activeIndex;
     const crossAxisPosition = position[crossCoordinate];
 
     // Group before
     let swapGroupBeforeOffset = -Infinity;
     let swapGroupBeforeBound = Infinity;
-    let firstGroupItemIndex = activeIndex;
 
     do {
       if (swapGroupBeforeBound !== Infinity) {
@@ -191,6 +193,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     );
 
     // Group after
+    let swappedAfteGroupsCount =
+      swappedAfterLayout.value?.itemGroups.length ?? 0;
     let swapGroupAfterOffset = Infinity;
     let swapGroupAfterBound = -Infinity;
 
@@ -202,6 +206,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
         swappedAfterLayout.value = calculateFlexLayout(
           reorderInsert(indexToKey.value, activeIndex, newIndex)
         );
+        swappedAfteGroupsCount =
+          swappedAfterLayout.value?.itemGroups.length ?? 0;
         firstGroupItemIndex = newIndex;
       }
       const swappedAfterOffset =
@@ -223,10 +229,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       swapGroupAfterBound = swapGroupAfterOffset + additionalSwapOffset;
     } while (
       crossAxisPosition > swapGroupAfterBound &&
-      groupIndex < itemGroups.value.length - 1
+      groupIndex < swappedAfteGroupsCount
     );
-
-    console.log(activeGroupIndex.value, groupIndex);
 
     // MAIN AXIS BOUNDS
     const groupIndexDiff = groupIndex - activeGroupIndex.value;
@@ -237,13 +241,11 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     if (groupIndexDiff < 0) {
       // Swapped to the group before the current group
       const layout = swappedBeforeLayout.value;
-      console.log('swap before', layout?.itemGroups, groupIndex);
       groupItems = layout?.itemGroups[groupIndex];
       positions = layout?.itemPositions;
     } else if (groupIndexDiff > 0) {
       // Swapped to the group after the current group
       const layout = swappedAfterLayout.value;
-      console.log('swap after', layout?.itemGroups, groupIndex);
       groupItems = layout?.itemGroups[groupIndex];
       positions = layout?.itemPositions;
     } else {
@@ -323,23 +325,44 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     // DEBUG ONLY
     if (debugBox) {
-      debugBox.top.update(
-        { x: swapItemBeforeBound, y: swapGroupBeforeBound },
-        { x: swapItemAfterBound, y: swapGroupBeforeOffset }
-      );
-      debugBox.bottom.update(
-        { x: swapItemBeforeBound, y: swapGroupAfterBound },
-        { x: swapItemAfterBound, y: swapGroupAfterOffset }
-      );
-      debugBox.right.update(
-        { x: swapItemAfterBound, y: swapGroupBeforeOffset },
-        { x: swapItemAfterOffset, y: swapGroupAfterOffset }
-      );
-      debugBox.left.update(
-        { x: swapItemBeforeBound, y: swapGroupBeforeOffset },
-        { x: swapItemBeforeOffset, y: swapGroupAfterOffset }
-      );
+      if (isColumn) {
+        debugBox.top.update(
+          { x: swapGroupBeforeBound, y: swapItemBeforeBound },
+          { x: swapGroupAfterBound, y: swapItemBeforeOffset }
+        );
+        debugBox.bottom.update(
+          { x: swapGroupAfterBound, y: swapItemAfterOffset },
+          { x: swapGroupBeforeBound, y: swapItemAfterBound }
+        );
+        debugBox.right.update(
+          { x: swapGroupAfterOffset, y: swapItemBeforeBound },
+          { x: swapGroupAfterBound, y: swapItemAfterBound }
+        );
+        debugBox.left.update(
+          { x: swapGroupBeforeBound, y: swapItemBeforeBound },
+          { x: swapGroupBeforeOffset, y: swapItemAfterBound }
+        );
+      } else {
+        debugBox.top.update(
+          { x: swapItemBeforeBound, y: swapGroupBeforeBound },
+          { x: swapItemAfterBound, y: swapGroupBeforeOffset }
+        );
+        debugBox.bottom.update(
+          { x: swapItemBeforeBound, y: swapGroupAfterBound },
+          { x: swapItemAfterBound, y: swapGroupAfterOffset }
+        );
+        debugBox.right.update(
+          { x: swapItemAfterBound, y: swapGroupBeforeBound },
+          { x: swapItemAfterOffset, y: swapGroupAfterBound }
+        );
+        debugBox.left.update(
+          { x: swapItemBeforeBound, y: swapGroupBeforeBound },
+          { x: swapItemBeforeOffset, y: swapGroupAfterBound }
+        );
+      }
     }
+
+    if (inGroupIndex === -1) return;
 
     const newActiveIndex = firstGroupItemIndex + inGroupIndex;
     if (newActiveIndex === activeIndex) return;
