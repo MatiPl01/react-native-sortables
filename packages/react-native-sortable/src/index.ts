@@ -4,13 +4,13 @@ import { Pressable, TouchableHighlight, TouchableOpacity } from 'react-native';
 import { SortableFlex, SortableGrid, SortableLayer } from './components';
 import { createSortableTouchable } from './utils';
 
-export type { DropIndicatorComponentProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
   DragEndCallback,
   DragEndParams,
   DragStartCallback,
   DragStartParams,
+  DropIndicatorComponentProps,
   OrderChangeCallback,
   OrderChangeParams,
   SortableFlexProps,

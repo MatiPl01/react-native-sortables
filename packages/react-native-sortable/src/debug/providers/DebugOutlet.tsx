@@ -1,13 +1,14 @@
 import { memo, useCallback, useState } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 
+import { DebugCross, DebugLine, DebugRect } from '../components';
 import type {
   DebugCrossProps,
   DebugLineProps,
-  DebugRectProps
-} from '../components';
-import { DebugCross, DebugLine, DebugRect } from '../components';
-import { DebugComponentType, type DebugViews } from '../types';
+  DebugRectProps,
+  DebugViews
+} from '../types';
+import { DebugComponentType } from '../types';
 import { useDebugContext } from './DebugProvider';
 
 const DebugOutlet = memo(function DebugOutlet() {

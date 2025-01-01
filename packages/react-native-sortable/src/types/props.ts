@@ -1,8 +1,7 @@
 import type { ComponentType } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
-import type { AnimatedRef } from 'react-native-reanimated';
+import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
-import type { DropIndicatorComponentProps } from '../components';
 import type { DebugProviderContextType } from '../debug';
 import type {
   AlignContent,
@@ -12,12 +11,22 @@ import type {
   GridLayoutContextType,
   OrderUpdater
 } from '../providers';
+import type { Vector } from './layout';
 import type { LayoutAnimation } from './reanimated';
 import type { AnimatableValues, Simplify } from './utils';
 
 /**
  * SHARED PROPS
  */
+
+export type DropIndicatorComponentProps = {
+  activationProgress: SharedValue<number>;
+  touchedItemKey: SharedValue<null | string>;
+  dropIndex: SharedValue<number>;
+  dropPosition: SharedValue<Vector>;
+  orderedItemKeys: SharedValue<Array<string>>;
+  style: ViewStyle;
+};
 
 export type ActiveItemDecorationSettings = AnimatableValues<{
   activeItemScale: number;

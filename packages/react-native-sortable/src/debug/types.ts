@@ -1,12 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
+import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
-import type {
-  DebugCrossProps,
-  DebugLineProps,
-  DebugRectProps
-} from './components';
+import type { AnyRecord, Maybe, Vector } from '../types';
 
 export enum DebugComponentType {
   Cross = 'cross',
@@ -14,11 +9,98 @@ export enum DebugComponentType {
   Rect = 'rect'
 }
 
+export type DebugCrossProps = (
+  | {
+      x: Maybe<number>;
+      y: Maybe<number>;
+      position?: never;
+    }
+  | {
+      x?: never;
+      y?: never;
+      position: Maybe<Vector>;
+    }
+) &
+  Pick<DebugLineProps, 'color' | 'opacity' | 'style' | 'thickness' | 'visible'>;
+
+export type DebugLineProps = {
+  visible?: boolean;
+  color?: ViewStyle['borderColor'];
+  thickness?: number;
+  style?: ViewStyle['borderStyle'];
+  opacity?: number;
+} & (
+  | {
+      from: Maybe<Vector>;
+      to: Maybe<Vector>;
+      x?: never;
+      y?: never;
+    }
+  | {
+      x: Maybe<number>;
+      y?: never;
+      from?: never;
+      to?: never;
+    }
+  | {
+      x?: never;
+      y: Maybe<number>;
+      from?: never;
+      to?: never;
+    }
+);
+
+export type DebugRectProps = {
+  backgroundOpacity?: number;
+  visible?: boolean;
+} & (
+  | {
+      from: Maybe<Vector>;
+      to: Maybe<Vector>;
+      x?: never;
+      y?: never;
+      width?: never;
+      height?: never;
+      positionOrigin?: never;
+    }
+  | {
+      x: Maybe<number>;
+      y: Maybe<number>;
+      from?: never;
+      to?: never;
+      width: Maybe<number>;
+      height: Maybe<number>;
+      positionOrigin?: `${'left' | 'right'} ${'bottom' | 'top'}`;
+    }
+  | {
+      x: Maybe<number>;
+      y?: never;
+      from?: never;
+      to?: never;
+      width: Maybe<number>;
+      height?: never;
+      positionOrigin?: `${'left' | 'right'}`;
+    }
+  | {
+      x?: never;
+      y: Maybe<number>;
+      from?: never;
+      to?: never;
+      width?: never;
+      height: Maybe<number>;
+      positionOrigin?: `${'bottom' | 'top'}`;
+    }
+) &
+  Pick<
+    ViewStyle,
+    'backgroundColor' | 'borderColor' | 'borderStyle' | 'borderWidth'
+  >;
+
 export type WrappedProps<P> = { props: SharedValue<P> };
 
 type CreateDebugComponentUpdater<
   T extends DebugComponentType,
-  P extends Record<string, any>
+  P extends AnyRecord
 > = {
   props: SharedValue<P>;
   hide: () => void;

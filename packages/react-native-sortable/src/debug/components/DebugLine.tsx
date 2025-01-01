@@ -1,38 +1,9 @@
-import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import type { Maybe, Vector } from '../../types';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
-import type { WrappedProps } from '../types';
-
-export type DebugLineProps = {
-  visible?: boolean;
-  color?: ViewStyle['borderColor'];
-  thickness?: number;
-  style?: ViewStyle['borderStyle'];
-  opacity?: number;
-} & (
-  | {
-      from: Maybe<Vector>;
-      to: Maybe<Vector>;
-      x?: never;
-      y?: never;
-    }
-  | {
-      x: Maybe<number>;
-      y?: never;
-      from?: never;
-      to?: never;
-    }
-  | {
-      x?: never;
-      y: Maybe<number>;
-      from?: never;
-      to?: never;
-    }
-);
+import type { DebugLineProps, WrappedProps } from '../types';
 
 export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
   const screenDiagonal = useScreenDiagonal();
