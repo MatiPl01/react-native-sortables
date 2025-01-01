@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortable';
 import Sortable from 'react-native-sortable';
 
 import { Button, GridCard, Group, Stagger } from '@/components';
 import { colors, flex, sizes, spacing, style, text } from '@/theme';
 import { getItems } from '@/utils';
-import Animated, { useAnimatedRef } from 'react-native-reanimated';
 
 const DATA = getItems(16);
 const COLUMNS = 4;
@@ -19,7 +19,11 @@ export default function DifferentSizeItems() {
   const [strategyIndex, setStrategyIndex] = useState(0);
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => <GridCard height={50 + Math.random() * 100}>{item}</GridCard>,
+    ({ item }) => (
+      <GridCard height={50 + Math.random() * 100} key={counter}>
+        {item}
+      </GridCard>
+    ),
     [counter]
   );
 
@@ -57,9 +61,9 @@ export default function DifferentSizeItems() {
 
         <Group style={[flex.fill, styles.scrollViewGroup]}>
           <Animated.ScrollView
-            style={flex.fill}
             contentContainerStyle={styles.scrollViewContent}
-            ref={scrollableRef}>
+            ref={scrollableRef}
+            style={flex.fill}>
             <Sortable.Grid
               columnGap={spacing.xs}
               columns={COLUMNS}
