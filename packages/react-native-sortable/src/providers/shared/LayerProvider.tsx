@@ -5,17 +5,8 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 
+import type { LayerProviderContextType, LayerState } from '../../types';
 import { createProvider } from '../utils';
-
-export enum LayerState {
-  Focused = 2,
-  Idle = 0,
-  Intermediate = 1
-}
-
-type LayerProviderContextType = {
-  updateLayer: (state: LayerState) => void;
-};
 
 type LayerProviderProps = PropsWithChildren<{
   disabled?: boolean;

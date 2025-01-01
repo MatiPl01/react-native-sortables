@@ -18,8 +18,8 @@ import {
 } from '../../constants';
 import { useDebugContext } from '../../debug';
 import { useHaptics, useJSStableCallback } from '../../hooks';
-import type { SortableCallbacks, Vector } from '../../types';
-import { DragActivationState } from '../../types';
+import type { DragContextType, SortableCallbacks, Vector } from '../../types';
+import { DragActivationState, LayerState } from '../../types';
 import {
   clearAnimatedTimeout,
   getOffsetDistance,
@@ -28,29 +28,8 @@ import {
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
-import { LayerState, useLayerContext } from './LayerProvider';
+import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
-
-type DragContextType = {
-  handleTouchStart: (
-    e: GestureTouchEvent,
-    key: string,
-    pressProgress: SharedValue<number>,
-    onActivate: () => void
-  ) => void;
-  handleTouchesMove: (
-    e: GestureTouchEvent,
-    reverseXAxis: boolean,
-    onFail: () => void
-  ) => void;
-  handleDragEnd: (key: string) => void;
-  handleOrderChange: (
-    key: string,
-    fromIndex: number,
-    toIndex: number,
-    newOrder: Array<string>
-  ) => void;
-};
 
 type DragProviderProps = PropsWithChildren<
   {

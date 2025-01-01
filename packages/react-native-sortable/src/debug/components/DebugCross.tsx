@@ -1,7 +1,11 @@
 import type { SharedValue } from 'react-native-reanimated';
 import { useDerivedValue } from 'react-native-reanimated';
 
-import type { DebugCrossProps, DebugLineProps, WrappedProps } from '../types';
+import type {
+  DebugCrossProps,
+  DebugLineProps,
+  WrappedProps
+} from '../../types/debug';
 import DebugLine from './DebugLine';
 
 export default function DebugCross({ props }: WrappedProps<DebugCrossProps>) {

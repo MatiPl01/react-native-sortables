@@ -9,11 +9,10 @@ import {
 
 import { EMPTY_OBJECT } from '../../../constants';
 import { useDebugContext } from '../../../debug';
-import type { Dimensions } from '../../../types';
+import type { Dimensions, FlexDirection, FlexProps } from '../../../types';
 import { haveEqualPropValues, resolveDimensionValue } from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import type { FlexDirection, FlexProps } from './types';
 import {
   calculateLayout,
   calculateReferenceSize,

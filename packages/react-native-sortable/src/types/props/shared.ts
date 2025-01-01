@@ -1,23 +1,10 @@
 import type { ComponentType } from 'react';
-import type { ViewProps, ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
-import type { DebugProviderContextType } from '../debug';
-import type {
-  AlignContent,
-  AlignItems,
-  CommonValuesContextType,
-  FlexLayoutContextType,
-  GridLayoutContextType,
-  OrderUpdater
-} from '../providers';
-import type { Vector } from './layout';
-import type { LayoutAnimation } from './reanimated';
-import type { AnimatableValues, Simplify } from './utils';
-
-/**
- * SHARED PROPS
- */
+import type { Vector } from '../layout';
+import type { LayoutAnimation } from '../reanimated';
+import type { AnimatableValues, Simplify } from '../utils';
 
 export type DropIndicatorComponentProps = {
   activationProgress: SharedValue<number>;
@@ -108,78 +95,3 @@ export type SharedProps = Simplify<
     Partial<ItemLayoutAnimationSettings> &
     SortableCallbacks
 >;
-
-/**
- * SORTABLE GRID PROPS
- */
-export type SortableGridDragEndParams<I> = {
-  data: Array<I>;
-} & DragEndParams;
-
-export type SortableGridDragEndCallback<I> = (
-  params: SortableGridDragEndParams<I>
-) => void;
-
-export type SortableGridLayoutSettings = {
-  columns: number;
-} & AnimatableValues<{
-  rowGap: number;
-  columnGap: number;
-}>;
-
-export type SortableGridRenderItemInfo<I> = {
-  item: I;
-};
-
-export type SortableGridRenderItem<I> = (
-  info: SortableGridRenderItemInfo<I>
-) => JSX.Element;
-
-export type SortableGridStrategyFactory = (
-  props: { debugContext?: DebugProviderContextType } & CommonValuesContextType &
-    GridLayoutContextType
-) => OrderUpdater;
-
-export type SortableGridStrategy =
-  | 'insert'
-  | 'swap'
-  | SortableGridStrategyFactory;
-
-export type SortableGridProps<I> = Simplify<
-  {
-    data: Array<I>;
-    renderItem: SortableGridRenderItem<I>;
-    strategy?: SortableGridStrategy;
-    onDragEnd?: SortableGridDragEndCallback<I>;
-    keyExtractor?: (item: I, index: number) => string;
-  } & Omit<SharedProps, 'onDragEnd'> &
-    Partial<SortableGridLayoutSettings>
->;
-
-/**
- * SORTABLE FLEX PROPS
- */
-export type SortableFlexDragEndParams = {
-  order: <I>(data: Array<I>) => Array<I>;
-} & DragEndParams;
-
-export type SortableFlexDragEndCallback = (
-  params: SortableFlexDragEndParams
-) => void;
-
-export type SortableFlexStrategyFactory = (
-  props: { debugContext?: DebugProviderContextType } & CommonValuesContextType &
-    FlexLayoutContextType
-) => OrderUpdater;
-
-export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
-
-export type SortableFlexProps = {
-  strategy?: SortableFlexStrategy;
-  onDragEnd?: SortableFlexDragEndCallback;
-  style: {
-    alignContent?: AlignContent;
-    alignItems?: AlignItems;
-  } & Omit<ViewStyle, 'alignContent' | 'alignItems'>;
-} & Omit<SharedProps, 'onDragEnd'> &
-  Omit<ViewProps, 'style'>;

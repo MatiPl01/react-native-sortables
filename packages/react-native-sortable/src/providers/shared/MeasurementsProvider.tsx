@@ -11,7 +11,7 @@ import Animated, {
 
 import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
-import type { Dimensions } from '../../types';
+import type { Dimensions, MeasurementsContextType } from '../../types';
 import type { AnimatedTimeoutID } from '../../utils';
 import {
   areDimensionsDifferent,
@@ -21,13 +21,6 @@ import {
 } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
-
-type MeasurementsContextType = {
-  handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
-  handleItemRemoval: (key: string) => void;
-  tryMeasureContainerHeight: () => void;
-  updateTouchedItemDimensions: (key: string) => void;
-};
 
 type MeasurementsProviderProps = PropsWithChildren<{
   itemsCount: number;

@@ -1,7 +1,8 @@
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { AnyRecord, Maybe, Vector } from '../types';
+import type { Vector } from './layout';
+import type { AnyRecord, Maybe } from './utils';
 
 export enum DebugComponentType {
   Cross = 'cross',
@@ -118,8 +119,8 @@ export type DebugComponentUpdater<T extends DebugComponentType> =
         : never;
 
 export type DebugLineUpdater = DebugComponentUpdater<DebugComponentType.Line>;
-export type DebugRectUpdater = DebugComponentUpdater<DebugComponentType.Rect>;
 export type DebugCrossUpdater = DebugComponentUpdater<DebugComponentType.Cross>;
+export type DebugRectUpdater = DebugComponentUpdater<DebugComponentType.Rect>;
 
 export type DebugViews = Record<
   number,

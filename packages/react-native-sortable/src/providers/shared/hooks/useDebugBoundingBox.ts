@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules */
 import { useCallback, useMemo } from 'react';
 import { useAnimatedReaction } from 'react-native-reanimated';
 

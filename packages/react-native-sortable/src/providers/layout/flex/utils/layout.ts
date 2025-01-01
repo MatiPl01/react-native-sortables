@@ -1,18 +1,16 @@
 import type {
+  AlignContent,
+  AlignItems,
   Dimension,
   Dimensions,
   Direction,
-  Vector
-} from '../../../../types';
-import { reverseArray, sum } from '../../../../utils';
-import type {
-  AlignContent,
-  AlignItems,
   FlexAlignments,
   FlexLayout,
   FlexLayoutProps,
-  JustifyContent
-} from '../types';
+  JustifyContent,
+  Vector
+} from '../../../../types';
+import { reverseArray, sum } from '../../../../utils';
 
 type AxisDimensions = { cross: Dimension; main: Dimension };
 type AxisDirections = { cross: Direction; main: Direction };

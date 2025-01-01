@@ -8,10 +8,9 @@ import {
 
 import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
-import type { Animatable } from '../../../types';
+import type { Animatable, GridLayout } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import type { GridLayout } from './types';
 import { calculateLayout } from './utils';
 
 const DEBUG_COLORS = {

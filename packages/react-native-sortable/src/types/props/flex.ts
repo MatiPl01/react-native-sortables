@@ -1,6 +1,14 @@
-import type { ViewStyle } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
 
-import type { Dimensions, NoUndef, Vector } from '../../../types';
+import type { FlexLayoutContextType } from '../../providers';
+import type { Dimensions, Vector } from '../layout';
+import type {
+  CommonValuesContextType,
+  DebugProviderContextType,
+  OrderUpdater
+} from '../providers';
+import type { NoUndef } from '../utils';
+import type { DragEndParams, SharedProps } from './shared';
 
 export type AlignContent = Exclude<
   NoUndef<ViewStyle['alignContent']>,
@@ -45,3 +53,28 @@ export type FlexLayout = {
   crossAxisGroupSizes: Array<number>;
   totalHeight: number;
 };
+
+export type SortableFlexDragEndParams = {
+  order: <I>(data: Array<I>) => Array<I>;
+} & DragEndParams;
+
+export type SortableFlexDragEndCallback = (
+  params: SortableFlexDragEndParams
+) => void;
+
+export type SortableFlexStrategyFactory = (
+  props: { debugContext?: DebugProviderContextType } & CommonValuesContextType &
+    FlexLayoutContextType
+) => OrderUpdater;
+
+export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
+
+export type SortableFlexProps = {
+  strategy?: SortableFlexStrategy;
+  onDragEnd?: SortableFlexDragEndCallback;
+  style: {
+    alignContent?: AlignContent;
+    alignItems?: AlignItems;
+  } & Omit<ViewStyle, 'alignContent' | 'alignItems'>;
+} & Omit<SharedProps, 'onDragEnd'> &
+  Omit<ViewProps, 'style'>;
