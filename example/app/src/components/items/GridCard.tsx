@@ -14,7 +14,7 @@ export default function GridCard({ active, children, height }: GridCardProps) {
       style={[
         styles.card,
         active && styles.activeCard,
-        height !== undefined ? { aspectRatio: undefined, height } : {}
+        height !== undefined ? { aspectRatio: 'auto', height } : {}
       ]}>
       {typeof children === 'string' ? (
         <Text style={styles.text}>{children}</Text>

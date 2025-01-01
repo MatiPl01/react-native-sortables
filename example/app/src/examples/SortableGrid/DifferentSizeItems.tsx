@@ -1,30 +1,33 @@
 import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortable';
 import Sortable from 'react-native-sortable';
 
 import { Button, GridCard, Group, Stagger } from '@/components';
 import { colors, flex, sizes, spacing, style, text } from '@/theme';
 import { getItems } from '@/utils';
+import Animated, { useAnimatedRef } from 'react-native-reanimated';
 
-const DATA = getItems(12);
+const DATA = getItems(16);
 const COLUMNS = 4;
 
 const ORDERING_STRATEGIES = ['insert', 'swap'] as const;
 
 export default function DifferentSizeItems() {
+  const scrollableRef = useAnimatedRef<Animated.ScrollView>();
+  const [counter, setCounter] = useState(0);
   const [strategyIndex, setStrategyIndex] = useState(0);
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => <GridCard>{item}</GridCard>,
-    []
+    ({ item }) => <GridCard height={50 + Math.random() * 100}>{item}</GridCard>,
+    [counter]
   );
 
   const strategy = ORDERING_STRATEGIES[strategyIndex];
 
   return (
     <View style={[flex.fill, style.contentContainer]}>
-      <Stagger>
+      <Stagger wrapperStye={index => (index === 3 ? flex.fill : {})}>
         <Group style={styles.option} withMargin={false}>
           <Text>
             <Text style={text.label1}>Ordering Strategy</Text>{' '}
@@ -39,19 +42,34 @@ export default function DifferentSizeItems() {
           />
         </Group>
 
+        <Group style={styles.option} withMargin={false}>
+          <Text>
+            <Text style={text.label1}>Randomize heights</Text>{' '}
+          </Text>
+          <Button
+            style={styles.button}
+            title='random'
+            onPress={() => setCounter(prev => prev + 1)}
+          />
+        </Group>
+
         <Text style={styles.title}>With &quot;{strategy}&quot; strategy</Text>
-        <Group style={styles.scrollViewGroup}>
-          <ScrollView contentContainerStyle={styles.scrollViewContent}>
+
+        <Group style={[flex.fill, styles.scrollViewGroup]}>
+          <Animated.ScrollView
+            style={flex.fill}
+            contentContainerStyle={styles.scrollViewContent}
+            ref={scrollableRef}>
             <Sortable.Grid
               columnGap={spacing.xs}
               columns={COLUMNS}
               data={DATA}
               renderItem={renderItem}
               rowGap={spacing.xs}
+              scrollableRef={scrollableRef}
               strategy={strategy}
-              animateHeight
             />
-          </ScrollView>
+          </Animated.ScrollView>
         </Group>
       </Stagger>
     </View>
