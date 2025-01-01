@@ -7,7 +7,6 @@ import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import { useStableCallback } from '../hooks';
 import {
   FlexLayoutProvider,
-  FlexOrderUpdater,
   LayerProvider,
   SharedProvider,
   useCommonValuesContext,
@@ -17,8 +16,7 @@ import type {
   Dimensions,
   DragEndCallback,
   DropIndicatorSettings,
-  SortableFlexProps,
-  SortableFlexStrategy
+  SortableFlexProps
 } from '../types';
 import {
   extractFlexContainerProps,
@@ -88,7 +86,10 @@ function SortableFlex(props: SortableFlexProps) {
             itemKeys={itemKeys}
             parentDimensions={parentDimensions}
             onDragEnd={onDragEnd}>
-            <FlexLayoutProvider {...style} itemsCount={itemKeys.length}>
+            <FlexLayoutProvider
+              {...style}
+              itemsCount={itemKeys.length}
+              strategy={strategy}>
               <SortableFlexInner
                 animateHeight={animateHeight}
                 childrenArray={childrenArray}
@@ -98,7 +99,6 @@ function SortableFlex(props: SortableFlexProps) {
                 itemEntering={itemEntering}
                 itemExiting={itemExiting}
                 showDropIndicator={showDropIndicator}
-                strategy={strategy}
               />
             </FlexLayoutProvider>
           </SharedProvider>
@@ -111,7 +111,6 @@ function SortableFlex(props: SortableFlexProps) {
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
   flexStyle: ViewStyle;
-  strategy: SortableFlexStrategy;
 } & DropIndicatorSettings &
   Required<
     Pick<SortableFlexProps, 'animateHeight' | 'itemEntering' | 'itemExiting'>
@@ -122,7 +121,6 @@ function SortableFlexInner({
   flexStyle,
   itemEntering,
   itemExiting,
-  strategy,
   ...containerProps
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout } = useCommonValuesContext();
@@ -142,7 +140,6 @@ function SortableFlexInner({
     <SortableContainer
       {...containerProps}
       innerStyle={[flexStyle, animatedFlexStyle]}>
-      <FlexOrderUpdater strategy={strategy} />
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering}

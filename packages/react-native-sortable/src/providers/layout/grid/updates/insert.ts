@@ -1,8 +1,8 @@
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
-import { EMPTY_ARRAY } from '../../../../../constants';
-import { areArraysDifferent, reorderInsert } from '../../../../../utils';
-import { useCommonValuesContext } from '../../../../shared';
+import { EMPTY_ARRAY } from '../../../../constants';
+import { areArraysDifferent, reorderInsert } from '../../../../utils';
+import { useCommonValuesContext } from '../../../shared';
 import { createGridStrategy } from './common';
 
 /**

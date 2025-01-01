@@ -3,6 +3,7 @@ export {
   CommonValuesProvider,
   useCommonValuesContext
 } from './CommonValuesProvider';
+export * from './components';
 export { DragProvider, useDragContext } from './DragProvider';
 export * from './hooks';
 export { ItemContextProvider, useItemContext } from './ItemContextProvider';

@@ -11,11 +11,17 @@ import { useDebugContext } from '../../../debug';
 import type {
   Dimensions,
   FlexLayoutContextType,
-  FlexProps
+  FlexProps,
+  SortableFlexStrategy
 } from '../../../types';
 import { haveEqualPropValues, resolveDimensionValue } from '../../../utils';
-import { useCommonValuesContext } from '../../shared';
+import {
+  OrderUpdaterComponent,
+  useCommonValuesContext,
+  useStrategyKey
+} from '../../shared';
 import { createProvider } from '../../utils';
+import { FLEX_STRATEGIES } from './updates';
 import {
   calculateLayout,
   calculateReferenceSize,
@@ -23,7 +29,7 @@ import {
 } from './utils';
 
 type FlexLayoutProviderProps = PropsWithChildren<
-  { itemsCount: number } & FlexProps
+  { itemsCount: number; strategy: SortableFlexStrategy } & FlexProps
 >;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
@@ -31,6 +37,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 )<FlexLayoutProviderProps, FlexLayoutContextType>(({
   alignContent,
   alignItems,
+  children,
   columnGap: columnGap_,
   flexDirection,
   flexWrap,
@@ -58,6 +65,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   paddingTop,
   paddingVertical,
   rowGap: rowGap_,
+  strategy,
   width
 }) => {
   const {
@@ -278,16 +286,29 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     }
   );
 
+  const value = {
+    columnGap,
+    crossAxisGroupOffsets,
+    crossAxisGroupSizes,
+    flexDirection,
+    itemGroups,
+    keyToGroup,
+    rowGap
+  };
+
   return {
-    value: {
-      columnGap,
-      crossAxisGroupOffsets,
-      crossAxisGroupSizes,
-      flexDirection,
-      itemGroups,
-      keyToGroup,
-      rowGap
-    }
+    children: (
+      <>
+        <OrderUpdaterComponent
+          additionalValues={value}
+          key={useStrategyKey(strategy)}
+          predefinedStrategies={FLEX_STRATEGIES}
+          strategy={strategy}
+        />
+        {children}
+      </>
+    ),
+    value
   };
 });
 

@@ -1,8 +1,8 @@
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { SortableGridStrategyFactory } from '../../../../../types';
-import { useDebugBoundingBox } from '../../../../shared';
-import { getColumnIndex, getRowIndex } from '../../utils';
+import type { SortableGridStrategyFactory } from '../../../../types';
+import { useDebugBoundingBox } from '../../../shared';
+import { getColumnIndex, getRowIndex } from '../utils';
 
 const MIN_ADDITIONAL_OFFSET = 5;
 
