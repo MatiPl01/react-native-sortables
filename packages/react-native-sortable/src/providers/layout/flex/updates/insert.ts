@@ -2,10 +2,10 @@ import type {
   Coordinate,
   Dimension,
   SortableFlexStrategyFactory
-} from '../../../../../types';
-import { reorderInsert } from '../../../../../utils';
+} from '../../../../types';
+import { reorderInsert } from '../../../../utils';
 
-export const useInsertStrategy: SortableFlexStrategyFactory = ({
+const useInsertStrategy: SortableFlexStrategyFactory = ({
   crossAxisGroupOffsets,
   flexDirection,
   indexToKey,
@@ -106,3 +106,5 @@ export const useInsertStrategy: SortableFlexStrategyFactory = ({
     return reorderInsert(indexToKey.value, activeIndex, overlappingIndex);
   };
 };
+
+export default useInsertStrategy;

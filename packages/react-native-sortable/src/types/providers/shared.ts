@@ -15,7 +15,7 @@ import type {
   ActiveItemSnapSettings
 } from '../props/shared';
 import type { DragActivationState } from '../state';
-import type { AnimatedValues, Maybe } from '../utils';
+import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
 
 // COMMON VALUES
 
@@ -153,3 +153,16 @@ type OrderUpdaterCallbackProps = {
 export type OrderUpdater = (
   params: OrderUpdaterCallbackProps
 ) => Maybe<Array<string>>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyStrategyFactory = (props: any) => OrderUpdater;
+
+export type PredefinedStrategies = Record<string, AnyStrategyFactory>;
+
+export type OrderUpdaterProps<
+  P extends PredefinedStrategies = PredefinedStrategies
+> = {
+  predefinedStrategies: P;
+  strategy: AnyStrategyFactory | keyof P;
+  useAdditionalValues: () => AnyRecord;
+};

@@ -5,11 +5,17 @@ import { colors, radius } from '@/theme';
 
 type GridCardProps = PropsWithChildren<{
   active?: boolean;
+  height?: number;
 }>;
 
-export default function GridCard({ active, children }: GridCardProps) {
+export default function GridCard({ active, children, height }: GridCardProps) {
   return (
-    <View style={[styles.card, active && styles.activeCard]}>
+    <View
+      style={[
+        styles.card,
+        active && styles.activeCard,
+        height !== undefined ? { aspectRatio: 'auto', height } : {}
+      ]}>
       {typeof children === 'string' ? (
         <Text style={styles.text}>{children}</Text>
       ) : (

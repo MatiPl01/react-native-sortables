@@ -1,11 +1,10 @@
-/* eslint-disable import/no-unused-modules */
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
-import { EMPTY_ARRAY } from '../../../../../constants';
-import { areArraysDifferent, reorderSwap } from '../../../../../utils';
-import { useCommonValuesContext } from '../../../../shared';
-import { useGridLayoutContext } from '../../GridLayoutProvider';
-import { getColumnIndex } from '../../utils';
+import { EMPTY_ARRAY } from '../../../../constants';
+import { areArraysDifferent, reorderSwap } from '../../../../utils';
+import { useCommonValuesContext } from '../../../shared';
+import { useGridLayoutContext } from '../GridLayoutProvider';
+import { getColumnIndex } from '../utils';
 import { createGridStrategy } from './common';
 
 /**
