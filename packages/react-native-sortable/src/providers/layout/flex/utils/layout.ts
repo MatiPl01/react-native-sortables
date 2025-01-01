@@ -70,7 +70,7 @@ const createGroups = (
 const calculateAlignment = (
   align: AlignContent | AlignItems | JustifyContent,
   sizes: Array<number>,
-  containerSize: number,
+  containerSize?: number,
   providedGap = 0
 ): {
   offsets: Array<number>;
@@ -82,7 +82,7 @@ const calculateAlignment = (
 
   const getTotalSize = (gap: number) => sum(sizes) + gap * (sizes.length - 1);
   const totalSize = getTotalSize(providedGap);
-  const adjustedContainerSize = Math.max(totalSize, containerSize);
+  const adjustedContainerSize = Math.max(totalSize, containerSize ?? 0);
 
   switch (align) {
     case 'flex-end':
@@ -132,9 +132,6 @@ const handleLayoutCalculation = (
   'worklet';
   const mainContainerDimension =
     referenceContainerDimensions[axisDimensions.main];
-  if (!mainContainerDimension) {
-    return null;
-  }
   const isRow = axisDirections.main === 'row';
 
   // ALIGN CONTENT

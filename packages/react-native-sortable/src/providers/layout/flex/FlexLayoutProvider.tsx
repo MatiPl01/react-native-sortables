@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import {
   useAnimatedReaction,
   useDerivedValue,
@@ -66,7 +66,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     indexToKey,
     itemDimensions,
     itemPositions,
-    itemsStyleOverride,
     parentDimensions
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
@@ -163,15 +162,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   // is the number of items minus 1 in the worst case for just a single group)
   const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
   const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
-
-  const isFirstRenderRef = useRef(true);
-  if (isFirstRenderRef.current) {
-    isFirstRenderRef.current = false;
-    itemsStyleOverride.modify(v => {
-      'worklet';
-      return { alignItems, flexDirection, flexGrow: 1 } as typeof v;
-    }, true);
-  }
 
   // REFERENCE CONTAINER DIMENSIONS UPDATER
   useAnimatedReaction(
