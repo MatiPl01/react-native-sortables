@@ -6,11 +6,14 @@ import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import { useStableCallback } from '../hooks';
 import {
+  FLEX_STRATEGIES,
   FlexLayoutProvider,
   LayerProvider,
+  OrderUpdaterComponent,
   SharedProvider,
   useCommonValuesContext,
-  useFlexLayoutContext
+  useFlexLayoutContext,
+  useStrategyKey
 } from '../providers';
 import type {
   Dimensions,
@@ -86,10 +89,13 @@ function SortableFlex(props: SortableFlexProps) {
             itemKeys={itemKeys}
             parentDimensions={parentDimensions}
             onDragEnd={onDragEnd}>
-            <FlexLayoutProvider
-              {...style}
-              itemsCount={itemKeys.length}
-              strategy={strategy}>
+            <FlexLayoutProvider {...style} itemsCount={itemKeys.length}>
+              <OrderUpdaterComponent
+                key={useStrategyKey(strategy)}
+                predefinedStrategies={FLEX_STRATEGIES}
+                strategy={strategy}
+                useAdditionalValues={useFlexLayoutContext}
+              />
               <SortableFlexInner
                 animateHeight={animateHeight}
                 childrenArray={childrenArray}

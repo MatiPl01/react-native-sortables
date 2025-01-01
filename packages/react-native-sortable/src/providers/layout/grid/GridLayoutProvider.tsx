@@ -8,18 +8,9 @@ import {
 
 import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
-import type {
-  Animatable,
-  GridLayoutContextType,
-  SortableGridStrategy
-} from '../../../types';
-import {
-  OrderUpdaterComponent,
-  useCommonValuesContext,
-  useStrategyKey
-} from '../../shared';
+import type { Animatable, GridLayoutContextType } from '../../../types';
+import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import { GRID_STRATEGIES } from './updates';
 import { calculateLayout } from './utils';
 
 const DEBUG_COLORS = {
@@ -32,18 +23,15 @@ type GridLayoutProviderProps = PropsWithChildren<{
   columns: number;
   rowGap: Animatable<number>;
   columnGap: Animatable<number>;
-  strategy: SortableGridStrategy;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   'GridLayout'
 )<GridLayoutProviderProps, GridLayoutContextType>(({
-  children,
   columnGap: columnGap_,
   columns,
   itemsCount,
-  rowGap: rowGap_,
-  strategy
+  rowGap: rowGap_
 }) => {
   const {
     containerHeight,
@@ -142,27 +130,14 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     }
   );
 
-  const value = {
-    columnGap,
-    columnWidth,
-    numColumns: columns,
-    rowGap,
-    useGridLayout
-  };
-
   return {
-    children: (
-      <>
-        <OrderUpdaterComponent
-          additionalValues={value}
-          key={useStrategyKey(strategy)}
-          predefinedStrategies={GRID_STRATEGIES}
-          strategy={strategy}
-        />
-        {children}
-      </>
-    ),
-    value
+    value: {
+      columnGap,
+      columnWidth,
+      numColumns: columns,
+      rowGap,
+      useGridLayout
+    }
   };
 });
 

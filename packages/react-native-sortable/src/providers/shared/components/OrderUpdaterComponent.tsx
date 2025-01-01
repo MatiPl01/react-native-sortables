@@ -1,15 +1,14 @@
 import { useMemo, useRef } from 'react';
 
 import { useDebugContext } from '../../../debug';
-import type { AnyRecord, OrderUpdater } from '../../../types';
+import type {
+  AnyStrategyFactory,
+  OrderUpdaterProps,
+  PredefinedStrategies
+} from '../../../types';
 import { typedMemo } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useOrderUpdater } from '../hooks';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyStrategyFactory = (props: any) => OrderUpdater;
-
-type PredefinedStrategies = Record<string, AnyStrategyFactory>;
 
 export function useStrategyKey(strategy: AnyStrategyFactory | string) {
   const counterRef = useRef(0);
@@ -21,16 +20,10 @@ export function useStrategyKey(strategy: AnyStrategyFactory | string) {
   );
 }
 
-type OrderUpdaterProps<P extends PredefinedStrategies> = {
-  predefinedStrategies: P;
-  strategy: AnyStrategyFactory | keyof P;
-  additionalValues: AnyRecord;
-};
-
 function OrderUpdaterComponent<P extends PredefinedStrategies>({
-  additionalValues,
   predefinedStrategies,
-  strategy
+  strategy,
+  useAdditionalValues
 }: OrderUpdaterProps<P>) {
   const factory =
     typeof strategy === 'string' ? predefinedStrategies[strategy] : strategy;
@@ -42,7 +35,7 @@ function OrderUpdaterComponent<P extends PredefinedStrategies>({
   const updater = (factory as AnyStrategyFactory)({
     ...useCommonValuesContext(),
     ...useDebugContext(),
-    ...additionalValues
+    ...useAdditionalValues()
   });
 
   useOrderUpdater(updater);

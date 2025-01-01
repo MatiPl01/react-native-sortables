@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules */
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_ARRAY } from '../../../../constants';

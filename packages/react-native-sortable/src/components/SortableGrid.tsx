@@ -7,10 +7,14 @@ import { useAnimatedStyle } from 'react-native-reanimated';
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
 import { useAnimatableValue, useStableCallback } from '../hooks';
 import {
+  GRID_STRATEGIES,
   GridLayoutProvider,
   LayerProvider,
+  OrderUpdaterComponent,
   SharedProvider,
-  useCommonValuesContext
+  useCommonValuesContext,
+  useGridLayoutContext,
+  useStrategyKey
 } from '../providers';
 import type {
   DragEndCallback,
@@ -88,8 +92,13 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           columnGap={columnGapValue}
           columns={columns}
           itemsCount={data.length}
-          rowGap={rowGapValue}
-          strategy={strategy}>
+          rowGap={rowGapValue}>
+          <OrderUpdaterComponent
+            key={useStrategyKey(strategy)}
+            predefinedStrategies={GRID_STRATEGIES}
+            strategy={strategy}
+            useAdditionalValues={useGridLayoutContext}
+          />
           <SortableGridInner
             animateHeight={animateHeight}
             columnGap={columnGapValue}
