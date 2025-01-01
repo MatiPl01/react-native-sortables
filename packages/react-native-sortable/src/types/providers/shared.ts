@@ -8,14 +8,14 @@ import type {
   DebugLineUpdater,
   DebugRectUpdater,
   DebugViews
-} from './debug';
-import type { Dimensions, Vector } from './layout';
+} from '../debug';
+import type { Dimensions, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings
-} from './props/shared';
-import type { DragActivationState } from './state';
-import type { AnimatedValues, Maybe } from './utils';
+} from '../props/shared';
+import type { DragActivationState } from '../state';
+import type { AnimatedValues, Maybe } from '../utils';
 
 // COMMON VALUES
 

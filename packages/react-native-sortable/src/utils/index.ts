@@ -2,7 +2,6 @@ export * from './arrays';
 export * from './children';
 export * from './equality';
 export * from './helpers';
-export * from './hoc';
 export * from './keys';
 export * from './layout';
 export * from './memo';

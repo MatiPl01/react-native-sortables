@@ -1,9 +1,9 @@
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
+import type { DebugRectProps, WrappedProps } from '../../types/debug';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
-import type { DebugRectProps, WrappedProps } from '../../types/debug';
 
 export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
   const screenDiagonal = useScreenDiagonal();

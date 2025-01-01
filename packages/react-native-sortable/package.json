@@ -59,12 +59,12 @@
   "react-native": "src/index",
   "scripts": {
     "build": "yarn clean && bob build",
+    "circular-dependency-check": "yarn madge --extensions js,jsx,ts,tsx --circular src",
     "clean": "../../scripts/clean.sh",
     "postpack": "rm ./README.md",
     "prepack": "bob build && cp ../../README.md ./README.md",
     "test": "jest",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "circular-dependency-check": "yarn madge --extensions js,jsx,ts,tsx --circular src"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "types": "dist/typescript/index.d.ts"
 }

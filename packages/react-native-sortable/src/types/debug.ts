@@ -1,7 +1,7 @@
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { Vector } from './layout';
+import type { Vector } from './layout/shared';
 import type { AnyRecord, Maybe } from './utils';
 
 export enum DebugComponentType {

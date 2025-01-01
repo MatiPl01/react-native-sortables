@@ -1,29 +1,11 @@
-import type { GridLayoutContextType } from '../../providers';
-import type { Dimensions, Vector } from '../layout';
 import type {
   CommonValuesContextType,
   DebugProviderContextType,
+  GridLayoutContextType,
   OrderUpdater
 } from '../providers';
 import type { AnimatableValues, Simplify } from '../utils';
 import type { DragEndParams, SharedProps } from './shared';
-
-export type GridLayoutProps = {
-  columnWidth: number;
-  gaps: {
-    row: number;
-    column: number;
-  };
-  itemDimensions: Record<string, Dimensions>;
-  indexToKey: Array<string>;
-  numColumns: number;
-};
-
-export type GridLayout = {
-  rowOffsets: Array<number>;
-  itemPositions: Record<string, Vector>;
-  containerHeight: number;
-};
 
 export type SortableGridDragEndParams<I> = {
   data: Array<I>;

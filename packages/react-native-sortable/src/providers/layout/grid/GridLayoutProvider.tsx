@@ -8,7 +8,7 @@ import {
 
 import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
-import type { Animatable, GridLayout } from '../../../types';
+import type { Animatable, GridLayoutContextType } from '../../../types';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout } from './utils';
@@ -16,16 +16,6 @@ import { calculateLayout } from './utils';
 const DEBUG_COLORS = {
   backgroundColor: '#ffa500',
   borderColor: '#825500'
-};
-
-export type GridLayoutContextType = {
-  columnWidth: SharedValue<number>;
-  columnGap: SharedValue<number>;
-  rowGap: SharedValue<number>;
-  numColumns: number;
-  useGridLayout: (
-    idxToKey: SharedValue<Array<string>>
-  ) => SharedValue<GridLayout | null>;
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{

@@ -2,7 +2,7 @@ import type { ComponentType } from 'react';
 import type { ViewStyle } from 'react-native';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
-import type { Vector } from '../layout';
+import type { Vector } from '../layout/shared';
 import type { LayoutAnimation } from '../reanimated';
 import type { AnimatableValues, Simplify } from '../utils';
 

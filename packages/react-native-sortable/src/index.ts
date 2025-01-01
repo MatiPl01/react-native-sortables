@@ -1,8 +1,12 @@
 /* eslint-disable import/no-unused-modules */
 import { Pressable, TouchableHighlight, TouchableOpacity } from 'react-native';
 
-import { SortableFlex, SortableGrid, SortableLayer } from './components';
-import { createSortableTouchable } from './utils';
+import {
+  createSortableTouchable,
+  SortableFlex,
+  SortableGrid,
+  SortableLayer
+} from './components';
 
 export * from './constants/layoutAnimations';
 export type {
