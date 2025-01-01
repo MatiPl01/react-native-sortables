@@ -1,7 +1,18 @@
 import type { Dimension, Dimensions } from '../../../../types';
-import { reorderInsert } from '../../../../utils';
 
-export const getIndexToKeyWithActiveInGroup = (
+export type ActiveIndexWhenInGroupOptions = {
+  activeItemKey: null | string;
+  groupSizeLimit?: number;
+  indexToKey: Array<string>;
+  itemDimensions?: Record<string, Dimensions>;
+  itemGroups: Array<Array<string>>;
+  keyToGroup: Record<string, number>;
+  keyToIndex: Record<string, number>;
+  mainDimension?: Dimension;
+  mainGap?: number;
+};
+
+export const getActiveIndexWhenInGroup = (
   targetGroupIndex: number,
   {
     activeItemKey,
@@ -13,17 +24,7 @@ export const getIndexToKeyWithActiveInGroup = (
     keyToIndex,
     mainDimension = 'width',
     mainGap = 0
-  }: {
-    activeItemKey: null | string;
-    indexToKey: Array<string>;
-    keyToIndex: Record<string, number>;
-    keyToGroup: Record<string, number>;
-    itemGroups: Array<Array<string>>;
-    itemDimensions?: Record<string, Dimensions>;
-    mainDimension?: Dimension;
-    groupSizeLimit?: number;
-    mainGap?: number;
-  }
+  }: ActiveIndexWhenInGroupOptions
 ) => {
   'worklet';
   if (activeItemKey === null) return null;
@@ -43,14 +44,14 @@ export const getIndexToKeyWithActiveInGroup = (
     const firstIndex = keyToIndex[firstKey];
     if (firstIndex === undefined) return null;
 
-    return reorderInsert(indexToKey, activeIndex, firstIndex);
+    return firstIndex;
   }
 
   // Otherwise, we need to remove the active item from the current group,
   // fit all items in the remaining space between the current group and
   // the target group, and then insert the active item in the target group
   if (groupSizeLimit === Infinity) {
-    return reorderInsert(indexToKey, activeIndex, indexToKey.length - 1);
+    return indexToKey.length - 1;
   }
 
   const firstItemKey = itemGroups[currentGroupIndex]?.[0];
@@ -82,5 +83,5 @@ export const getIndexToKeyWithActiveInGroup = (
     }
   }
 
-  return reorderInsert(indexToKey, activeIndex, targetItemIndex);
+  return targetItemIndex - 1;
 };
