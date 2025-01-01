@@ -11,29 +11,9 @@ import { cancelAnimation, makeMutable } from 'react-native-reanimated';
 
 import { useDebouncedStableCallback } from '../../hooks';
 import { createProvider } from '../../providers/utils';
-import type {
-  DebugComponentUpdater,
-  DebugCrossUpdater,
-  DebugLineUpdater,
-  DebugRectUpdater,
-  DebugViews
-} from '../types';
-import { DebugComponentType } from '../types';
-
-export type DebugProviderContextType = {
-  // Overloaded signatures for useDebugLines
-  useDebugLines<K extends string>(keys: Array<K>): Record<K, DebugLineUpdater>;
-  useDebugLines(count: number): Array<DebugLineUpdater>;
-
-  // Overloaded signatures for useDebugRects
-  useDebugRects<K extends string>(keys: Array<K>): Record<K, DebugRectUpdater>;
-  useDebugRects(count: number): Array<DebugRectUpdater>;
-
-  useDebugLine: () => DebugLineUpdater;
-  useDebugRect: () => DebugRectUpdater;
-  useDebugCross: () => DebugCrossUpdater;
-  useObserver: (observer: (views: DebugViews) => void) => void;
-};
+import type { DebugProviderContextType } from '../../types';
+import type { DebugComponentUpdater, DebugViews } from '../../types/debug';
+import { DebugComponentType } from '../../types/debug';
 
 type DebugProviderProps = PropsWithChildren<unknown>;
 

@@ -25,6 +25,10 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install --immutable
 
+      - name: 🔄 Find circular dependencies
+        working-directory: packages/react-native-sortable
+        run: yarn circular-dependency-check
+
       - name: 🔎 Run typecheck
         run: yarn typecheck
 

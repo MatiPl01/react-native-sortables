@@ -3,7 +3,7 @@ import Animated, {
   useAnimatedStyle
 } from 'react-native-reanimated';
 
-import type { DropIndicatorComponentProps } from '../shared';
+import type { DropIndicatorComponentProps } from '../../types';
 
 export default function DefaultDropIndicator({
   activationProgress,

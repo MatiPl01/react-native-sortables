@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import type { SharedValue } from 'react-native-reanimated';
 import {
   measure,
   runOnJS,
@@ -14,19 +13,13 @@ import {
 import { OFFSET_EPS } from '../../constants';
 import { useDebugContext } from '../../debug';
 import { useAnimatableValue } from '../../hooks';
-import type { AutoScrollSettings } from '../../types';
+import type { AutoScrollContextType, AutoScrollSettings } from '../../types';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
 const DEBUG_COLORS = {
   backgroundColor: '#CE00B5',
   borderColor: '#4E0044'
-};
-
-type AutoScrollContextType = {
-  scrollOffset: SharedValue<number>;
-  dragStartScrollOffset: SharedValue<number>;
-  updateStartScrollOffset: (providedOffset?: number) => void;
 };
 
 const { AutoScrollProvider, useAutoScrollContext } = createProvider(

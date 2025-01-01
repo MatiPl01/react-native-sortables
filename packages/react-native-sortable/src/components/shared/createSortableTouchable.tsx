@@ -2,7 +2,8 @@ import { type ComponentType, useCallback } from 'react';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { useItemContext } from '../../providers';
-import { type AnyFunction, DragActivationState, type Maybe } from '../../types';
+import type { AnyFunction, Maybe } from '../../types';
+import { DragActivationState } from '../../types';
 
 type AnyPressHandlers = {
   onPress?: Maybe<AnyFunction>;

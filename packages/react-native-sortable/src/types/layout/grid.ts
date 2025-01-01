@@ -1,4 +1,4 @@
-import type { Dimensions, Vector } from '../../../types';
+import type { Dimensions, Vector } from './shared';
 
 export type GridLayoutProps = {
   columnWidth: number;

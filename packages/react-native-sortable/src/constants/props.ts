@@ -8,7 +8,7 @@ import type {
   SortableFlexProps,
   SortableGridProps
 } from '../types';
-import { defaultKeyExtractor } from '../utils';
+import { defaultKeyExtractor } from '../utils/keys';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
 
 export const STYLE_PROPS = ['style', 'dropIndicatorStyle'] as const;

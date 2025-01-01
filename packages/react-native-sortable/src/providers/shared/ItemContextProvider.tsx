@@ -1,20 +1,8 @@
 import type { PropsWithChildren } from 'react';
-import { type SharedValue } from 'react-native-reanimated';
 
-import type { DragActivationState } from '../../types';
+import type { ItemContextType } from '../../types';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
-
-type ItemContextType = {
-  position: {
-    x: Readonly<SharedValue<null | number>>;
-    y: Readonly<SharedValue<null | number>>;
-  };
-  pressProgress: Readonly<SharedValue<number>>;
-  zIndex: Readonly<SharedValue<number>>;
-  isBeingActivated: Readonly<SharedValue<boolean>>;
-  dragActivationState: Readonly<SharedValue<DragActivationState>>;
-};
 
 type ItemContextProviderProps = PropsWithChildren<
   {

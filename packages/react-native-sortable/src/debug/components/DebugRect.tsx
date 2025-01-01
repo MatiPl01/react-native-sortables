@@ -1,57 +1,9 @@
-import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import type { Maybe, Vector } from '../../types';
+import type { DebugRectProps, WrappedProps } from '../../types/debug';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
-import type { WrappedProps } from '../types';
-
-export type DebugRectProps = {
-  backgroundOpacity?: number;
-  visible?: boolean;
-} & (
-  | {
-      from: Maybe<Vector>;
-      to: Maybe<Vector>;
-      x?: never;
-      y?: never;
-      width?: never;
-      height?: never;
-      positionOrigin?: never;
-    }
-  | {
-      x: Maybe<number>;
-      y: Maybe<number>;
-      from?: never;
-      to?: never;
-      width: Maybe<number>;
-      height: Maybe<number>;
-      positionOrigin?: `${'left' | 'right'} ${'bottom' | 'top'}`;
-    }
-  | {
-      x: Maybe<number>;
-      y?: never;
-      from?: never;
-      to?: never;
-      width: Maybe<number>;
-      height?: never;
-      positionOrigin?: `${'left' | 'right'}`;
-    }
-  | {
-      x?: never;
-      y: Maybe<number>;
-      from?: never;
-      to?: never;
-      width?: never;
-      height: Maybe<number>;
-      positionOrigin?: `${'bottom' | 'top'}`;
-    }
-) &
-  Pick<
-    ViewStyle,
-    'backgroundColor' | 'borderColor' | 'borderStyle' | 'borderWidth'
-  >;
 
 export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
   const screenDiagonal = useScreenDiagonal();

@@ -1,6 +1,7 @@
 import type { ViewStyle } from 'react-native';
 
-import type { Dimensions, NoUndef, Vector } from '../../../types';
+import type { NoUndef } from '../utils';
+import type { Dimensions, Vector } from './shared';
 
 export type AlignContent = Exclude<
   NoUndef<ViewStyle['alignContent']>,
@@ -16,14 +17,6 @@ export type FlexAlignments = {
   justifyContent: JustifyContent;
   alignItems: AlignItems;
 };
-
-type RequiredProps = 'flexDirection' | 'flexWrap' | 'gap' | 'justifyContent';
-
-export type FlexProps = {
-  alignContent: AlignContent;
-  alignItems: AlignItems;
-} & Omit<ViewStyle, RequiredProps> &
-  Required<Pick<ViewStyle, RequiredProps>>;
 
 export type FlexLayoutProps = {
   gaps: {

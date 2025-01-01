@@ -4,10 +4,11 @@ import type { SharedValue } from 'react-native-reanimated';
 import type {
   DebugCrossProps,
   DebugLineProps,
-  DebugRectProps
-} from '../components';
+  DebugRectProps,
+  DebugViews
+} from '../../types/debug';
+import { DebugComponentType } from '../../types/debug';
 import { DebugCross, DebugLine, DebugRect } from '../components';
-import { DebugComponentType, type DebugViews } from '../types';
 import { useDebugContext } from './DebugProvider';
 
 const DebugOutlet = memo(function DebugOutlet() {

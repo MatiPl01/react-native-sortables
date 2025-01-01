@@ -1,8 +1,7 @@
 import type { SharedValue } from 'react-native-reanimated';
 
 import type { DebugRectUpdater } from '../../../../debug';
-import type { Dimensions } from '../../../../types';
-import type { FlexLayout } from '../types';
+import type { Dimensions, FlexLayout } from '../../../../types';
 
 const DEBUG_COLORS = {
   backgroundColor: '#ffa500',

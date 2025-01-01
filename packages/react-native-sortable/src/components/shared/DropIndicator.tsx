@@ -13,20 +13,11 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useCommonValuesContext } from '../../providers';
-import type { Vector } from '../../types';
+import type { DropIndicatorComponentProps, Vector } from '../../types';
 
 const DEFAULT_STYLE: ViewStyle = {
   opacity: 0,
   transform: [{ translateX: 0 }, { translateY: 0 }]
-};
-
-export type DropIndicatorComponentProps = {
-  activationProgress: SharedValue<number>;
-  touchedItemKey: SharedValue<null | string>;
-  dropIndex: SharedValue<number>;
-  dropPosition: SharedValue<Vector>;
-  orderedItemKeys: SharedValue<Array<string>>;
-  style: ViewStyle;
 };
 
 type DropIndicatorProps = {

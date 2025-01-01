@@ -27,6 +27,9 @@
   },
   "packageManager": "yarn@4.3.1",
   "private": true,
+  "resolutions": {
+    "typescript": "5.3.3"
+  },
   "scripts": {
     "build": "yarn workspace react-native-sortable build",
     "clean": "yarn workspace react-native-sortable clean",

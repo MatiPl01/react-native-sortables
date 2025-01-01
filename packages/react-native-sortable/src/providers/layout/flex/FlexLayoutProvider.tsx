@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from 'react';
 import { useMemo, useRef } from 'react';
-import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedReaction,
   useDerivedValue,
@@ -9,26 +8,19 @@ import {
 
 import { EMPTY_OBJECT } from '../../../constants';
 import { useDebugContext } from '../../../debug';
-import type { Dimensions } from '../../../types';
+import type {
+  Dimensions,
+  FlexLayoutContextType,
+  FlexProps
+} from '../../../types';
 import { haveEqualPropValues, resolveDimensionValue } from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import type { FlexDirection, FlexProps } from './types';
 import {
   calculateLayout,
   calculateReferenceSize,
   updateLayoutDebugRects
 } from './utils';
-
-export type FlexLayoutContextType = {
-  flexDirection: FlexDirection;
-  itemGroups: SharedValue<Array<Array<string>>>;
-  keyToGroup: SharedValue<Record<string, number>>;
-  crossAxisGroupSizes: SharedValue<Array<number>>;
-  crossAxisGroupOffsets: SharedValue<Array<number>>;
-  rowGap: SharedValue<number>;
-  columnGap: SharedValue<number>;
-};
 
 type FlexLayoutProviderProps = PropsWithChildren<
   { itemsCount: number } & FlexProps

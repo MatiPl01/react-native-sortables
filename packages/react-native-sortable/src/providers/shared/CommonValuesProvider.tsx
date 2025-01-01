@@ -1,6 +1,6 @@
 import { type PropsWithChildren, useEffect, useRef } from 'react';
 import type { ViewStyle } from 'react-native';
-import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import type Animated from 'react-native-reanimated';
 import {
   useAnimatedRef,
@@ -12,7 +12,7 @@ import { useAnimatableValue } from '../../hooks';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
-  AnimatedValues,
+  CommonValuesContextType,
   Dimensions,
   Maybe,
   Vector
@@ -20,46 +20,6 @@ import type {
 import { DragActivationState } from '../../types';
 import { areArraysDifferent } from '../../utils';
 import { createProvider } from '../utils';
-
-/**
- * Context values shared between all providers.
- * (they are stored in a single context to make the access to them easier
- * between different providers)
- */
-
-export type CommonValuesContextType = {
-  // ORDER
-  indexToKey: SharedValue<Array<string>>;
-  keyToIndex: SharedValue<Record<string, number>>;
-
-  // POSITIONs
-  itemPositions: SharedValue<Record<string, Vector>>;
-  touchPosition: SharedValue<Vector | null>;
-  touchedItemPosition: SharedValue<Vector | null>;
-
-  // DIMENSIONS
-  containerWidth: SharedValue<number>;
-  containerHeight: SharedValue<number>;
-  touchedItemWidth: SharedValue<number>;
-  touchedItemHeight: SharedValue<number>;
-  itemDimensions: SharedValue<Record<string, Dimensions>>;
-  itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
-  parentDimensions?: SharedValue<Dimensions | null>;
-
-  // DRAG STATE
-  touchedItemKey: SharedValue<null | string>;
-  activeItemKey: SharedValue<null | string>;
-  activationState: SharedValue<DragActivationState>;
-  activationProgress: SharedValue<number>;
-  inactiveAnimationProgress: SharedValue<number>;
-  activeItemDropped: SharedValue<boolean>;
-
-  // OTHER
-  containerRef: AnimatedRef<Animated.View>;
-  sortEnabled: SharedValue<boolean>;
-  canSwitchToAbsoluteLayout: SharedValue<boolean>;
-} & AnimatedValues<ActiveItemDecorationSettings> &
-  AnimatedValues<ActiveItemSnapSettings>;
 
 type CommonValuesProviderProps = PropsWithChildren<
   {

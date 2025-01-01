@@ -1,24 +1,12 @@
 import type { SharedValue } from 'react-native-reanimated';
 import { useDerivedValue } from 'react-native-reanimated';
 
-import type { Maybe, Vector } from '../../types';
-import type { WrappedProps } from '../types';
-import type { DebugLineProps } from './DebugLine';
+import type {
+  DebugCrossProps,
+  DebugLineProps,
+  WrappedProps
+} from '../../types/debug';
 import DebugLine from './DebugLine';
-
-export type DebugCrossProps = (
-  | {
-      x: Maybe<number>;
-      y: Maybe<number>;
-      position?: never;
-    }
-  | {
-      x?: never;
-      y?: never;
-      position: Maybe<Vector>;
-    }
-) &
-  Pick<DebugLineProps, 'color' | 'opacity' | 'style' | 'thickness' | 'visible'>;
 
 export default function DebugCross({ props }: WrappedProps<DebugCrossProps>) {
   const horizontalLineProps = useDerivedValue(() => ({

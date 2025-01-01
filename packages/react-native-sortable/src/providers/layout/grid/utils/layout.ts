@@ -1,5 +1,4 @@
-import type { Vector } from '../../../../types';
-import type { GridLayout, GridLayoutProps } from '../types';
+import type { GridLayout, GridLayoutProps, Vector } from '../../../../types';
 import { getColumnIndex, getRowIndex } from './helpers';
 
 export const calculateLayout = ({

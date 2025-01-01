@@ -1,20 +1,8 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
-import type { Dimensions, Maybe, Vector } from '../../../types';
+import type { OrderUpdater } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
-
-export type OrderUpdaterCallbackProps = {
-  activeKey: string;
-  activeIndex: number;
-  dimensions: Dimensions;
-  position: Vector;
-  touchPosition: Vector;
-};
-
-export type OrderUpdater = (
-  params: OrderUpdaterCallbackProps
-) => Maybe<Array<string>>;
 
 export default function useOrderUpdater(updater: OrderUpdater) {
   const {
