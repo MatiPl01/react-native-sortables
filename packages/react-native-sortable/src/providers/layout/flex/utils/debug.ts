@@ -30,8 +30,11 @@ export const updateLayoutDebugRects = (
       y
     });
 
-    for (let j = 0; j < layout.itemGroups[i]!.length; j++) {
-      const key = layout.itemGroups[i]![j]!;
+    const group = layout.itemGroups[i];
+    if (!group) break;
+
+    for (let j = 0; j < group.length; j++) {
+      const key = group[j]!;
       const nextKey = layout.itemGroups[i]![j + 1];
 
       if (!nextKey) {

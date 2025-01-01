@@ -226,6 +226,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       groupIndex < itemGroups.value.length - 1
     );
 
+    console.log(activeGroupIndex.value, groupIndex);
+
     // MAIN AXIS BOUNDS
     const groupIndexDiff = groupIndex - activeGroupIndex.value;
     let groupItems: Array<string> | undefined;
@@ -235,11 +237,13 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     if (groupIndexDiff < 0) {
       // Swapped to the group before the current group
       const layout = swappedBeforeLayout.value;
+      console.log('swap before', layout?.itemGroups, groupIndex);
       groupItems = layout?.itemGroups[groupIndex];
       positions = layout?.itemPositions;
     } else if (groupIndexDiff > 0) {
       // Swapped to the group after the current group
       const layout = swappedAfterLayout.value;
+      console.log('swap after', layout?.itemGroups, groupIndex);
       groupItems = layout?.itemGroups[groupIndex];
       positions = layout?.itemPositions;
     } else {
@@ -256,9 +260,9 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     if (!groupItems || !positions) return;
     const mainAxisPosition = position[mainCoordinate];
+    const activeMainSize = dimensions[mainDimension];
 
     // Item after
-    const activeMainSize = dimensions[mainDimension];
     let currentEndOffset =
       (positions[activeKey]?.[mainCoordinate] ?? 0) + activeMainSize;
     let swapItemAfterOffset = -Infinity;
@@ -270,10 +274,11 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       }
       const nextItemKey = groupItems[inGroupIndex + 1];
       if (nextItemKey !== undefined) {
-        const nextItemPosition = positions[nextItemKey]?.[mainCoordinate] ?? 0;
+        const nextItemStartOffset =
+          positions[nextItemKey]?.[mainCoordinate] ?? 0;
         const nextItemSize =
           itemDimensions.value[nextItemKey]?.[mainDimension] ?? 0;
-        const nextItemEndOffset = nextItemPosition + nextItemSize;
+        const nextItemEndOffset = nextItemStartOffset + nextItemSize;
         swapItemAfterOffset =
           (currentEndOffset - activeMainSize + nextItemEndOffset) / 2;
         const additionalOffset = Math.min(
@@ -289,37 +294,57 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     } while (mainAxisPosition > swapItemAfterBound);
 
     // Item before
-    // const swapItemBeforeOffset = Infinity;
-    // const swapItemBeforeBound = -Infinity;
+    const currentStartOffset = positions[activeKey]?.[mainCoordinate] ?? 0;
+    let swapItemBeforeOffset = Infinity;
+    let swapItemBeforeBound = -Infinity;
 
-    // do {
-    //   if (swapItemBeforeBound !== -Infinity) {
-    //     inGroupIndex--;
-    //   }
-    // } while (mainAxisPosition < swapItemBeforeBound && inGroupIndex > 0);
-
-    // console.log(groupItems, inGroupIndex);
+    do {
+      if (swapItemBeforeBound !== -Infinity) {
+        inGroupIndex--;
+      }
+      const prevItemKey = groupItems[inGroupIndex - 1];
+      if (prevItemKey !== undefined) {
+        const prevItemStartOffset =
+          positions[prevItemKey]?.[mainCoordinate] ?? 0;
+        const prevItemSize =
+          itemDimensions.value[prevItemKey]?.[mainDimension] ?? 0;
+        swapItemBeforeOffset =
+          (prevItemStartOffset + currentStartOffset + activeMainSize) / 2;
+        const additionalOffset = Math.min(
+          mainGap.value / 2 + MIN_ADDITIONAL_OFFSET,
+          (mainGap.value + prevItemSize) / 2
+        );
+        swapItemBeforeBound = swapItemBeforeOffset - additionalOffset;
+      } else {
+        swapItemBeforeOffset = swapItemBeforeBound = currentStartOffset;
+        break;
+      }
+    } while (mainAxisPosition < swapItemBeforeBound);
 
     // DEBUG ONLY
     if (debugBox) {
       debugBox.top.update(
-        { x: 0, y: swapGroupBeforeBound },
+        { x: swapItemBeforeBound, y: swapGroupBeforeBound },
         { x: swapItemAfterBound, y: swapGroupBeforeOffset }
       );
       debugBox.bottom.update(
-        { x: 0, y: swapGroupAfterBound },
+        { x: swapItemBeforeBound, y: swapGroupAfterBound },
         { x: swapItemAfterBound, y: swapGroupAfterOffset }
       );
       debugBox.right.update(
         { x: swapItemAfterBound, y: swapGroupBeforeOffset },
         { x: swapItemAfterOffset, y: swapGroupAfterOffset }
       );
+      debugBox.left.update(
+        { x: swapItemBeforeBound, y: swapGroupBeforeOffset },
+        { x: swapItemBeforeOffset, y: swapGroupAfterOffset }
+      );
     }
 
     const newActiveIndex = firstGroupItemIndex + inGroupIndex;
     if (newActiveIndex === activeIndex) return;
 
-    console.log(indexToKey.value, activeIndex, newActiveIndex);
+    console.log(activeIndex, newActiveIndex, firstGroupItemIndex, inGroupIndex);
 
     return reorderInsert(indexToKey.value, activeIndex, newActiveIndex);
   };
