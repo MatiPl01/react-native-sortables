@@ -13,7 +13,6 @@ type AnimatedHeightContainerProps = PropsWithChildren<
   {
     animateHeight: boolean;
     innerStyle?: StyleProp<ViewStyle>;
-    outerStyle?: StyleProp<ViewStyle>;
   } & DropIndicatorSettings
 >;
 
@@ -23,7 +22,6 @@ export default function SortableContainer({
   children,
   dropIndicatorStyle,
   innerStyle,
-  outerStyle,
   showDropIndicator
 }: AnimatedHeightContainerProps) {
   const {
@@ -58,7 +56,7 @@ export default function SortableContainer({
   );
 
   return (
-    <Animated.View style={[outerContainerStyle, outerStyle, styles.grow]}>
+    <Animated.View style={[outerContainerStyle, styles.grow]}>
       {showDropIndicator && (
         <DropIndicator
           DropIndicatorComponent={DropIndicatorComponent}

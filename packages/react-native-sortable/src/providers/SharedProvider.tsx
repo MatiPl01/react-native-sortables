@@ -15,6 +15,7 @@ import {
   AutoScrollProvider,
   CommonValuesProvider,
   DragProvider,
+  LayerProvider,
   MeasurementsProvider
 } from './shared';
 import { ContextProviderComposer } from './utils';
@@ -48,6 +49,8 @@ export default function SharedProvider({
   ...rest
 }: SharedProviderProps) {
   const providers = [
+    // Provider used for proper zIndex management
+    <LayerProvider />,
     // Provider used for layout debugging
     debug && <DebugProvider />,
     // Provider used for shared values between all providers below

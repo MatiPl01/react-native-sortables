@@ -9,10 +9,8 @@ import { useAnimatableValue, useDragEndHandler } from '../hooks';
 import {
   GRID_STRATEGIES,
   GridLayoutProvider,
-  LayerProvider,
   OrderUpdaterComponent,
   SharedProvider,
-  useCommonValuesContext,
   useGridLayoutContext,
   useStrategyKey
 } from '../providers';
@@ -68,40 +66,38 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   }));
 
   return (
-    <LayerProvider>
-      <SharedProvider
-        {...sharedProps}
-        itemKeys={itemKeys}
-        key={columns}
-        onDragEnd={onDragEnd}>
-        <GridLayoutProvider
+    <SharedProvider
+      {...sharedProps}
+      itemKeys={itemKeys}
+      key={columns}
+      onDragEnd={onDragEnd}>
+      <GridLayoutProvider
+        columnGap={columnGapValue}
+        columns={columns}
+        itemsCount={data.length}
+        rowGap={rowGapValue}>
+        <OrderUpdaterComponent
+          key={useStrategyKey(strategy)}
+          predefinedStrategies={GRID_STRATEGIES}
+          strategy={strategy}
+          useAdditionalValues={useGridLayoutContext}
+        />
+        <SortableGridInner
+          animateHeight={animateHeight}
           columnGap={columnGapValue}
           columns={columns}
-          itemsCount={data.length}
-          rowGap={rowGapValue}>
-          <OrderUpdaterComponent
-            key={useStrategyKey(strategy)}
-            predefinedStrategies={GRID_STRATEGIES}
-            strategy={strategy}
-            useAdditionalValues={useGridLayoutContext}
-          />
-          <SortableGridInner
-            animateHeight={animateHeight}
-            columnGap={columnGapValue}
-            columns={columns}
-            data={data}
-            DropIndicatorComponent={DropIndicatorComponent}
-            dropIndicatorStyle={dropIndicatorStyle}
-            itemEntering={itemEntering}
-            itemExiting={itemExiting}
-            itemKeys={itemKeys}
-            renderItem={renderItem}
-            rowGap={rowGapValue}
-            showDropIndicator={showDropIndicator}
-          />
-        </GridLayoutProvider>
-      </SharedProvider>
-    </LayerProvider>
+          data={data}
+          DropIndicatorComponent={DropIndicatorComponent}
+          dropIndicatorStyle={dropIndicatorStyle}
+          itemEntering={itemEntering}
+          itemExiting={itemExiting}
+          itemKeys={itemKeys}
+          renderItem={renderItem}
+          rowGap={rowGapValue}
+          showDropIndicator={showDropIndicator}
+        />
+      </GridLayoutProvider>
+    </SharedProvider>
   );
 }
 
@@ -133,12 +129,6 @@ function SortableGridInner<I>({
   rowGap,
   ...containerProps
 }: SortableGridInnerProps<I>) {
-  const { canSwitchToAbsoluteLayout } = useCommonValuesContext();
-
-  const animatedOuterStyle = useAnimatedStyle(() => ({
-    marginBottom: canSwitchToAbsoluteLayout.value ? -rowGap.value : 0
-  }));
-
   const animatedInnerStyle = useAnimatedStyle(() => ({
     marginHorizontal: -columnGap.value / 2,
     marginVertical: -rowGap.value / 2
@@ -153,8 +143,7 @@ function SortableGridInner<I>({
   return (
     <SortableContainer
       {...containerProps}
-      innerStyle={[styles.gridContainer, animatedInnerStyle]}
-      outerStyle={animatedOuterStyle}>
+      innerStyle={[styles.gridContainer, animatedInnerStyle]}>
       {zipArrays(data, itemKeys).map(([item, key]) => (
         <SortableGridItem
           entering={itemEntering}

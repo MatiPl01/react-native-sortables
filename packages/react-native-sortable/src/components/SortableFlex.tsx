@@ -1,25 +1,19 @@
 import { type ReactElement } from 'react';
 import type { ViewStyle } from 'react-native';
-import { View } from 'react-native';
-import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import {
   FLEX_STRATEGIES,
   FlexLayoutProvider,
-  LayerProvider,
   OrderUpdaterComponent,
   SharedProvider,
   useCommonValuesContext,
   useFlexLayoutContext,
   useStrategyKey
 } from '../providers';
-import type {
-  Dimensions,
-  DropIndicatorSettings,
-  SortableFlexProps
-} from '../types';
+import type { DropIndicatorSettings, SortableFlexProps } from '../types';
 import {
   extractFlexContainerProps,
   getPropsWithDefaults,
@@ -50,8 +44,6 @@ function SortableFlex(props: SortableFlexProps) {
     }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
 
-  const parentDimensions = useSharedValue<Dimensions | null>(null);
-
   const childrenArray = validateChildren(children);
   const itemKeys = childrenArray.map(([key]) => key);
 
@@ -62,46 +54,29 @@ function SortableFlex(props: SortableFlexProps) {
     }
   }));
 
-  const [flexStyle, restStyle] = extractFlexContainerProps(style);
+  const [flexStyle] = extractFlexContainerProps(style);
 
   return (
-    <LayerProvider>
-      <View
-        {...viewProps}
-        style={restStyle}
-        onLayout={event => {
-          onLayout?.(event);
-          const layout = event.nativeEvent.layout;
-          parentDimensions.value = {
-            height: layout.height,
-            width: layout.width
-          };
-        }}>
-        <SharedProvider
-          {...sharedProps}
-          itemKeys={itemKeys}
-          onDragEnd={onDragEnd}>
-          <FlexLayoutProvider itemsCount={itemKeys.length} style={style}>
-            <OrderUpdaterComponent
-              key={useStrategyKey(strategy)}
-              predefinedStrategies={FLEX_STRATEGIES}
-              strategy={strategy}
-              useAdditionalValues={useFlexLayoutContext}
-            />
-            <SortableFlexInner
-              animateHeight={animateHeight}
-              childrenArray={childrenArray}
-              DropIndicatorComponent={DropIndicatorComponent}
-              dropIndicatorStyle={dropIndicatorStyle}
-              flexStyle={flexStyle}
-              itemEntering={itemEntering}
-              itemExiting={itemExiting}
-              showDropIndicator={showDropIndicator}
-            />
-          </FlexLayoutProvider>
-        </SharedProvider>
-      </View>
-    </LayerProvider>
+    <SharedProvider {...sharedProps} itemKeys={itemKeys} onDragEnd={onDragEnd}>
+      <FlexLayoutProvider itemsCount={itemKeys.length} style={style}>
+        <OrderUpdaterComponent
+          key={useStrategyKey(strategy)}
+          predefinedStrategies={FLEX_STRATEGIES}
+          strategy={strategy}
+          useAdditionalValues={useFlexLayoutContext}
+        />
+        <SortableFlexInner
+          animateHeight={animateHeight}
+          childrenArray={childrenArray}
+          DropIndicatorComponent={DropIndicatorComponent}
+          dropIndicatorStyle={dropIndicatorStyle}
+          flexStyle={flexStyle}
+          itemEntering={itemEntering}
+          itemExiting={itemExiting}
+          showDropIndicator={showDropIndicator}
+        />
+      </FlexLayoutProvider>
+    </SharedProvider>
   );
 }
 
