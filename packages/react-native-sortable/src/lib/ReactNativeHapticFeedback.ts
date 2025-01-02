@@ -1,7 +1,7 @@
 /**
  * Copied from library sources and adjusted to work with reanimated
- * and make it possible to use react-native-haptic-feedback as an
- * optional dependency
+ * worklet runtime and make it possible to use react-native-haptic-feedback
+ * as an optional dependency
  */
 
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -69,7 +69,7 @@ const load = () => {
       }
     };
 
-    return trigger;
+    return { trigger };
   } catch (err) {
     return null;
   }

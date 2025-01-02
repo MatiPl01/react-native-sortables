@@ -72,6 +72,7 @@ export default function DataChangeExample() {
   }, []);
 
   const sortItems = useCallback(() => {
+    console.log(Haptics);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(e => {
       console.log(e);
     });
