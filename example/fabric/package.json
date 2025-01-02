@@ -2,6 +2,7 @@
   "name": "example-fabric",
   "version": "1.0.0",
   "dependencies": {
+    "expo": "^52.0.0",
     "react-native": "^0.76.5",
     "react-native-sortable": "workspace:*"
   },

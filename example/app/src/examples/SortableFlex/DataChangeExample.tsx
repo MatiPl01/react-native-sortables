@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
@@ -71,6 +72,9 @@ export default function DataChangeExample() {
   }, []);
 
   const sortItems = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(e => {
+      console.log(e);
+    });
     setData(prevData => [...prevData].sort());
   }, []);
 
