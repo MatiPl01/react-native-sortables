@@ -16,7 +16,9 @@ export const STYLE_PROPS = ['style', 'dropIndicatorStyle'] as const;
 /**
  * DEFAULT SHARED PROPS
  */
-type OptionalSharedProps = 'scrollableRef' | keyof SortableCallbacks;
+type OptionalSharedProps =
+  | 'scrollableRef'
+  | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
 type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
 
@@ -44,7 +46,6 @@ export const DEFAULT_SHARED_PROPS = {
   inactiveItemScale: 1,
   itemEntering: SortableItemEntering,
   itemExiting: SortableItemExiting,
-  onDragEnd: undefined,
   onDragStart: undefined,
   onOrderChange: undefined,
   scrollableRef: undefined,
@@ -57,7 +58,7 @@ export const DEFAULT_SHARED_PROPS = {
 /**
  * DEFAULT SORTABLE GRID PROPS
  */
-type ExcludedFromDefaultGridProps = 'data' | 'renderItem'; // must be passed by the user
+type ExcludedFromDefaultGridProps = 'data' | 'onDragEnd' | 'renderItem';
 
 type DefaultSortableGridProps = DefaultProps<
   Omit<SortableGridProps<unknown>, keyof DefaultSharedProps>,
@@ -78,6 +79,14 @@ export const DEFAULT_SORTABLE_GRID_PROPS = {
  */
 type OptionalDefaultFlexProps = Exclude<keyof ViewProps, 'style'>;
 
+type ExcludedFromDefaultFlexProps = 'onDragEnd';
+
+type DefaultSortableFlexProps = DefaultProps<
+  Omit<SortableFlexProps, keyof DefaultSharedProps>,
+  OptionalDefaultFlexProps,
+  ExcludedFromDefaultFlexProps
+>;
+
 export const DEFAULT_SORTABLE_FLEX_PROPS = {
   strategy: 'insert',
   // display flex items in a row with wrapping by default
@@ -90,7 +99,4 @@ export const DEFAULT_SORTABLE_FLEX_PROPS = {
     gap: 0,
     justifyContent: 'flex-start'
   }
-} satisfies DefaultProps<
-  Omit<SortableFlexProps, keyof DefaultSharedProps>,
-  OptionalDefaultFlexProps
->;
+} satisfies DefaultSortableFlexProps;

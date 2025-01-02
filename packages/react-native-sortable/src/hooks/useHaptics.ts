@@ -10,7 +10,7 @@ type HapticImpact = {
 
 let hapticFeedback: ReturnType<typeof ReactNativeHapticFeedback.load> = null;
 
-export function useHaptics(enabled: boolean): HapticImpact {
+export default function useHaptics(enabled: boolean): HapticImpact {
   const enabledValue = useDerivedValue(() => enabled);
 
   if (enabled && !hapticFeedback) {

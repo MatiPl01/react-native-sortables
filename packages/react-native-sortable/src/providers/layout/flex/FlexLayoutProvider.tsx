@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { useMemo } from 'react';
+import { View, type ViewStyle } from 'react-native';
 import {
   useAnimatedReaction,
   useDerivedValue,
@@ -9,11 +10,16 @@ import {
 import { EMPTY_OBJECT } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type {
+  AlignContent,
+  AlignItems,
   Dimensions,
-  FlexLayoutContextType,
-  FlexProps
+  FlexLayoutContextType
 } from '../../../types';
-import { haveEqualPropValues, resolveDimensionValue } from '../../../utils';
+import {
+  areDimensionsDifferent,
+  haveEqualPropValues,
+  resolveDimensionValue
+} from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
 import {
@@ -22,54 +28,70 @@ import {
   updateLayoutDebugRects
 } from './utils';
 
-type FlexLayoutProviderProps = PropsWithChildren<
-  { itemsCount: number } & FlexProps
->;
+type RequiredStyleProps =
+  | 'flexDirection'
+  | 'flexWrap'
+  | 'gap'
+  | 'justifyContent';
+
+type FlexLayoutProviderProps = PropsWithChildren<{
+  itemsCount: number;
+  style: {
+    alignContent: AlignContent;
+    alignItems: AlignItems;
+  } & Omit<ViewStyle, RequiredStyleProps> &
+    Required<Pick<ViewStyle, RequiredStyleProps>>;
+}>;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
 )<FlexLayoutProviderProps, FlexLayoutContextType>(({
-  alignContent,
-  alignItems,
-  columnGap: columnGap_,
-  flexDirection,
-  flexWrap,
-  gap,
-  height,
+  children,
   itemsCount,
-  justifyContent,
-  maxHeight,
-  maxWidth,
-  minHeight,
-  minWidth,
-  padding,
-  paddingBlock,
-  paddingBlockEnd,
-  paddingBlockStart,
-  paddingBottom,
-  paddingEnd,
-  paddingHorizontal,
-  paddingInline,
-  paddingInlineEnd,
-  paddingInlineStart,
-  paddingLeft,
-  paddingRight,
-  paddingStart,
-  paddingTop,
-  paddingVertical,
-  rowGap: rowGap_,
-  width
+  style
 }) => {
+  const {
+    alignContent,
+    alignItems,
+    columnGap: columnGap_,
+    flexDirection,
+    flexWrap,
+    gap,
+    height,
+    justifyContent,
+    maxHeight,
+    maxWidth,
+    minHeight,
+    minWidth,
+    padding,
+    paddingBlock,
+    paddingBlockEnd,
+    paddingBlockStart,
+    paddingBottom,
+    paddingEnd,
+    paddingHorizontal,
+    paddingInline,
+    paddingInlineEnd,
+    paddingInlineStart,
+    paddingLeft,
+    paddingRight,
+    paddingStart,
+    paddingTop,
+    paddingVertical,
+    rowGap: rowGap_,
+    width
+  } = style;
+
   const {
     containerHeight,
     containerWidth,
     indexToKey,
     itemDimensions,
-    itemPositions,
-    parentDimensions
+    itemPositions
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
+  const parentDimensions = useSharedValue<Dimensions | null>(null);
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
   const keyToGroup = useDerivedValue<Record<string, number>>(() =>
     Object.fromEntries(
@@ -269,6 +291,20 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   );
 
   return {
+    children: (
+      <View
+        onLayout={({ nativeEvent: { layout } }) => {
+          const dimensions = { height: layout.height, width: layout.width };
+          if (
+            !parentDimensions.value ||
+            areDimensionsDifferent(dimensions, parentDimensions.value)
+          ) {
+            parentDimensions.value = dimensions;
+          }
+        }}>
+        {children}
+      </View>
+    ),
     value: {
       columnGap,
       crossAxisGroupOffsets,

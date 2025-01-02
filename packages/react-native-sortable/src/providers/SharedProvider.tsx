@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { DebugOutlet, DebugProvider } from '../debug';
@@ -9,7 +8,6 @@ import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
   AutoScrollSettings,
-  Dimensions,
   PartialBy,
   SortableCallbacks
 } from '../types';
@@ -17,6 +15,7 @@ import {
   AutoScrollProvider,
   CommonValuesProvider,
   DragProvider,
+  LayerProvider,
   MeasurementsProvider
 } from './shared';
 import { ContextProviderComposer } from './utils';
@@ -27,7 +26,6 @@ type SharedProviderProps = PropsWithChildren<
     sortEnabled: boolean;
     hapticsEnabled: boolean;
     debug: boolean;
-    parentDimensions?: SharedValue<Dimensions | null>;
     initialItemsStyleOverride?: ViewStyle;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
@@ -51,6 +49,8 @@ export default function SharedProvider({
   ...rest
 }: SharedProviderProps) {
   const providers = [
+    // Provider used for proper zIndex management
+    <LayerProvider />,
     // Provider used for layout debugging
     debug && <DebugProvider />,
     // Provider used for shared values between all providers below

@@ -1,3 +1,4 @@
 export * from './callbacks';
-export * from './haptics';
+export * from './handlers';
 export * from './reanimated';
+export { default as useHaptics } from './useHaptics';

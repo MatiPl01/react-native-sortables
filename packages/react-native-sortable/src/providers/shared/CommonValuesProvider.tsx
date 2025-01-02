@@ -1,6 +1,5 @@
 import { type PropsWithChildren, useEffect, useRef } from 'react';
 import type { ViewStyle } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 import type Animated from 'react-native-reanimated';
 import {
   useAnimatedRef,
@@ -26,7 +25,6 @@ type CommonValuesProviderProps = PropsWithChildren<
     sortEnabled: boolean;
     itemKeys: Array<string>;
     initialItemsStyleOverride?: ViewStyle;
-    parentDimensions?: SharedValue<Dimensions | null>;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings
 >;
@@ -42,7 +40,6 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   inactiveItemScale: _inactiveItemScale,
   initialItemsStyleOverride,
   itemKeys,
-  parentDimensions,
   snapOffsetX: _snapOffsetX,
   snapOffsetY: _snapOffsetY,
   sortEnabled: _sortEnabled
@@ -124,7 +121,6 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemPositions,
       itemsStyleOverride,
       keyToIndex,
-      parentDimensions,
       snapOffsetX,
       snapOffsetY,
       sortEnabled,

@@ -42,7 +42,9 @@ export const calculateLayout = ({
   }
 
   const offsetAfterLastRow = rowOffsets[rowOffsets.length - 1];
-  const containerHeight = offsetAfterLastRow ? offsetAfterLastRow : 0;
+  const containerHeight = offsetAfterLastRow
+    ? Math.max(offsetAfterLastRow - gaps.row, 0)
+    : 0;
 
   return {
     containerHeight,
