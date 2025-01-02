@@ -5,7 +5,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
-import { useAnimatableValue, useStableCallback } from '../hooks';
+import { useAnimatableValue, useDragEndHandler } from '../hooks';
 import {
   GRID_STRATEGIES,
   GridLayoutProvider,
@@ -17,7 +17,6 @@ import {
   useStrategyKey
 } from '../providers';
 import type {
-  DragEndCallback,
   DropIndicatorSettings,
   LayoutAnimation,
   SortableGridProps,
@@ -26,7 +25,6 @@ import type {
 import {
   defaultKeyExtractor,
   getPropsWithDefaults,
-  isInternalFunction,
   orderItems,
   typedMemo,
   zipArrays
@@ -40,6 +38,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       columns,
       data,
       keyExtractor = defaultKeyExtractor,
+      onDragEnd: _onDragEnd,
       renderItem,
       rowGap,
       strategy
@@ -50,7 +49,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
-      onDragEnd: _onDragEnd,
       showDropIndicator,
       ...sharedProps
     }
@@ -64,22 +62,10 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     [data, keyExtractor]
   );
 
-  const onDragEnd = useStableCallback<DragEndCallback>(params => {
-    if (!_onDragEnd) {
-      return;
-    }
-    const updatedParams = {
-      ...params,
-      data: orderItems(data, itemKeys, params, true)
-    };
-    // For cases when user provides onOrderChange created via a helper
-    // useOrderChangeHandler hook
-    if (isInternalFunction(_onDragEnd, 'DragEndCallback')) {
-      return _onDragEnd(updatedParams);
-    }
-    // Add the data property for the sortable grid if a custom user callback is provided
-    _onDragEnd(updatedParams);
-  });
+  const onDragEnd = useDragEndHandler(_onDragEnd, params => ({
+    ...params,
+    data: orderItems(data, itemKeys, params, true)
+  }));
 
   return (
     <LayerProvider>

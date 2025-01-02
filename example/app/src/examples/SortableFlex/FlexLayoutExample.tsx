@@ -176,7 +176,8 @@ const styles = StyleSheet.create({
     minWidth: sizes.xxl
   },
   group: {
-    gap: spacing.xs
+    gap: spacing.xs,
+    padding: spacing.none
   },
   scrollViewContent: {
     gap: spacing.sm,
@@ -189,6 +190,7 @@ const styles = StyleSheet.create({
   },
   sortableFlex: {
     maxHeight: sizes.xxxl,
-    minHeight: sizes.xxl
+    minHeight: sizes.xxl,
+    padding: spacing.md
   }
 });

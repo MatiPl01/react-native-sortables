@@ -9,14 +9,6 @@ import type {
 } from '../providers';
 import type { DragEndParams, SharedProps } from './shared';
 
-type RequiredProps = 'flexDirection' | 'flexWrap' | 'gap' | 'justifyContent';
-
-export type FlexProps = {
-  alignContent: AlignContent;
-  alignItems: AlignItems;
-} & Omit<ViewStyle, RequiredProps> &
-  Required<Pick<ViewStyle, RequiredProps>>;
-
 export type SortableFlexDragEndParams = {
   order: <I>(data: Array<I>) => Array<I>;
 } & DragEndParams;

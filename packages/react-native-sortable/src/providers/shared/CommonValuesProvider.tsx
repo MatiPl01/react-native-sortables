@@ -42,7 +42,6 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   inactiveItemScale: _inactiveItemScale,
   initialItemsStyleOverride,
   itemKeys,
-  parentDimensions,
   snapOffsetX: _snapOffsetX,
   snapOffsetY: _snapOffsetY,
   sortEnabled: _sortEnabled
@@ -124,7 +123,6 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemPositions,
       itemsStyleOverride,
       keyToIndex,
-      parentDimensions,
       snapOffsetX,
       snapOffsetY,
       sortEnabled,
