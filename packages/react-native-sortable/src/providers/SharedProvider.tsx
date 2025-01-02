@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
-import type { ViewStyle } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { DebugOutlet, DebugProvider } from '../debug';
@@ -26,6 +26,7 @@ type SharedProviderProps = PropsWithChildren<
     sortEnabled: boolean;
     hapticsEnabled: boolean;
     debug: boolean;
+    viewProps?: ViewProps;
     initialItemsStyleOverride?: ViewStyle;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
@@ -44,17 +45,18 @@ export default function SharedProvider({
   itemKeys,
   onDragEnd,
   onDragStart,
+  viewProps,
   onOrderChange,
   scrollableRef,
-  ...rest
+  ...commonValues
 }: SharedProviderProps) {
   const providers = [
     // Provider used for proper zIndex management
-    <LayerProvider />,
+    <LayerProvider {...viewProps} />,
     // Provider used for layout debugging
     debug && <DebugProvider />,
     // Provider used for shared values between all providers below
-    <CommonValuesProvider itemKeys={itemKeys} {...rest} />,
+    <CommonValuesProvider itemKeys={itemKeys} {...commonValues} />,
     // Provider used for measurements of items and the container
     <MeasurementsProvider itemsCount={itemKeys.length} />,
     // Provider used for auto-scrolling when dragging an item near the

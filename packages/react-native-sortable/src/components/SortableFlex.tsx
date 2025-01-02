@@ -1,5 +1,5 @@
-import { type ReactElement } from 'react';
-import type { ViewProps, ViewStyle } from 'react-native';
+import type { ReactElement } from 'react';
+import type { ViewStyle } from 'react-native';
 import { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
@@ -46,8 +46,14 @@ function SortableFlex(props: SortableFlexProps) {
     }
   }));
 
+  const [innerStyle, outerStyle] = extractFlexInnerContainerProps(style);
+
   return (
-    <SharedProvider {...sharedProps} itemKeys={itemKeys} onDragEnd={onDragEnd}>
+    <SharedProvider
+      {...sharedProps}
+      viewProps={{ ...viewProps, style: outerStyle }}
+      itemKeys={itemKeys}
+      onDragEnd={onDragEnd}>
       <FlexLayoutProvider itemsCount={itemKeys.length} style={style}>
         <OrderUpdaterComponent
           key={useStrategyKey(strategy)}
@@ -63,8 +69,7 @@ function SortableFlex(props: SortableFlexProps) {
           itemEntering={itemEntering}
           itemExiting={itemExiting}
           showDropIndicator={showDropIndicator}
-          style={style}
-          viewProps={viewProps}
+          style={innerStyle}
         />
       </FlexLayoutProvider>
     </SharedProvider>
@@ -74,7 +79,6 @@ function SortableFlex(props: SortableFlexProps) {
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
   style: ViewStyle;
-  viewProps: Omit<ViewProps, 'style'>;
 } & DropIndicatorSettings &
   Required<
     Pick<SortableFlexProps, 'animateHeight' | 'itemEntering' | 'itemExiting'>
@@ -85,7 +89,6 @@ function SortableFlexInner({
   itemEntering,
   itemExiting,
   style,
-  viewProps,
   ...containerProps
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout } = useCommonValuesContext();
@@ -101,14 +104,8 @@ function SortableFlexInner({
       : {}
   );
 
-  const [innerStyle, outerStyle] = extractFlexInnerContainerProps(style);
-
   return (
-    <SortableContainer
-      {...containerProps}
-      innerStyle={[innerStyle, animatedFlexStyle]}
-      outerStyle={outerStyle}
-      viewProps={viewProps}>
+    <SortableContainer {...containerProps} style={[style, animatedFlexStyle]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering}

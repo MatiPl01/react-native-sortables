@@ -1,5 +1,5 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ViewProps } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue
@@ -8,13 +8,19 @@ import Animated, {
 import type { LayerProviderContextType, LayerState } from '../../types';
 import { createProvider } from '../utils';
 
-type LayerProviderProps = PropsWithChildren<{
-  disabled?: boolean;
-}>;
+type LayerProviderProps = PropsWithChildren<
+  ViewProps & {
+    disabled?: boolean;
+  }
+>;
 
 const { LayerProvider, useLayerContext } = createProvider('Layer', {
   guarded: false
-})<LayerProviderProps, LayerProviderContextType>(({ children, disabled }) => {
+})<LayerProviderProps, LayerProviderContextType>(({
+  children,
+  disabled,
+  ...viewProps
+}) => {
   const { updateLayer: updateParentLayer } = (useLayerContext() ??
     {}) as Partial<LayerProviderContextType>;
 
@@ -35,7 +41,9 @@ const { LayerProvider, useLayerContext } = createProvider('Layer', {
 
   return {
     children: (
-      <Animated.View style={[styles.container, animatedStyle]}>
+      <Animated.View
+        {...viewProps}
+        style={[styles.container, viewProps.style, animatedStyle]}>
         {children}
       </Animated.View>
     ),
