@@ -10,10 +10,6 @@ const routes: Routes = {
     CardComponent: SortableGridCard,
     name: 'SortableGrid',
     routes: {
-      Props: {
-        Component: SortableGrid.PropsExample,
-        name: 'Properties'
-      },
       DropIndicator: {
         Component: SortableGrid.DropIndicatorExample,
         name: 'Drop Indicator'
@@ -48,10 +44,6 @@ const routes: Routes = {
     CardComponent: SortableFlexCard,
     name: 'SortableFlex',
     routes: {
-      Props: {
-        Component: SortableFlex.PropsExample,
-        name: 'Properties'
-      },
       DropIndicator: {
         Component: SortableFlex.DropIndicatorExample,
         name: 'Drop Indicator'
@@ -63,6 +55,10 @@ const routes: Routes = {
       DataChange: {
         Component: SortableFlex.DataChangeExample,
         name: 'Data Change'
+      },
+      FlexLayout: {
+        Component: SortableFlex.FlexLayoutExample,
+        name: 'Flex Layout'
       },
       CallbacksExample: {
         Component: SortableFlex.CallbacksExample,

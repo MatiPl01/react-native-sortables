@@ -4,8 +4,8 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortable';
 import Sortable from 'react-native-sortable';
 
-import { Button, GridCard, Group, Stagger } from '@/components';
-import { colors, flex, sizes, spacing, style, text } from '@/theme';
+import { Button, GridCard, Group, OptionGroup, Stagger } from '@/components';
+import { colors, flex, sizes, spacing, style } from '@/theme';
 import { getItems } from '@/utils';
 
 const DATA = getItems(16);
@@ -32,11 +32,7 @@ export default function DifferentSizeItems() {
   return (
     <View style={[flex.fill, style.contentContainer]}>
       <Stagger wrapperStye={index => (index === 3 ? flex.fill : {})}>
-        <Group style={styles.option} withMargin={false}>
-          <Text>
-            <Text style={text.label1}>Ordering Strategy</Text>{' '}
-            <Text style={text.subHeading3}>({strategy})</Text>
-          </Text>
+        <OptionGroup label='Ordering Strategy' value={strategy ?? ''}>
           <Button
             style={styles.button}
             title={strategy ?? ''}
@@ -44,18 +40,15 @@ export default function DifferentSizeItems() {
               setStrategyIndex(prev => (prev + 1) % ORDERING_STRATEGIES.length)
             }
           />
-        </Group>
+        </OptionGroup>
 
-        <Group style={styles.option} withMargin={false}>
-          <Text>
-            <Text style={text.label1}>Randomize heights</Text>{' '}
-          </Text>
+        <OptionGroup label='Randomize heights'>
           <Button
             style={styles.button}
             title='random'
             onPress={() => setCounter(prev => prev + 1)}
           />
-        </Group>
+        </OptionGroup>
 
         <Text style={styles.title}>With &quot;{strategy}&quot; strategy</Text>
 
@@ -84,13 +77,6 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     width: sizes.xl
-  },
-  option: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: spacing.sm,
-    marginTop: spacing.sm
   },
   scrollViewContent: {
     gap: spacing.sm,

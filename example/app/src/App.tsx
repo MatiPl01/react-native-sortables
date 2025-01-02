@@ -1,3 +1,4 @@
+import { PortalProvider } from '@gorhom/portal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NavigationState } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -46,7 +47,9 @@ export default function App() {
         <NavigationContainer
           initialState={navigationState}
           onStateChange={persistNavigationState}>
-          <ExamplesStackNavigator />
+          <PortalProvider>
+            <ExamplesStackNavigator />
+          </PortalProvider>
         </NavigationContainer>
       </SafeAreaProvider>
     </GestureHandlerRootView>

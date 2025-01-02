@@ -5,4 +5,3 @@ export { default as DebugExample } from './DebugExample';
 export { default as DifferentSizeItems } from './DifferentSizeItems';
 export { default as DropIndicatorExample } from './DropIndicatorExample';
 export { default as OrderingStrategyExample } from './OrderingStrategyExample';
-export { default as PropsExample } from './PropsExample';

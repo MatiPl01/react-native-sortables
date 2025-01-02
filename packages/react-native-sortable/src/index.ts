@@ -19,6 +19,7 @@ export type {
   OrderChangeParams,
   SortableFlexProps,
   SortableFlexStrategyFactory,
+  SortableFlexStyle,
   SortableGridDragEndCallback,
   SortableGridDragEndParams,
   SortableGridProps,

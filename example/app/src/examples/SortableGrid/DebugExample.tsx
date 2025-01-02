@@ -4,7 +4,14 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortable';
 import Sortable from 'react-native-sortable';
 
-import { Button, GridCard, Group, Section, Stagger } from '@/components';
+import {
+  Button,
+  GridCard,
+  Group,
+  OptionGroup,
+  Section,
+  Stagger
+} from '@/components';
 import { colors, flex, sizes, spacing, style, text } from '@/theme';
 import { getItems } from '@/utils';
 
@@ -30,33 +37,25 @@ export default function DebugExample() {
           title='Settings'
         />
 
-        <Group style={styles.option} withMargin={false}>
-          <Text>
-            <Text style={text.label1}>Debug</Text>{' '}
-            <Text style={text.subHeading3}>
-              ({debugEnabled ? 'Enabled' : 'Disabled'})
-            </Text>
-          </Text>
+        <OptionGroup
+          label='Debug'
+          value={debugEnabled ? 'Enabled' : 'Disabled'}>
           <Button
             style={styles.button}
             title={debugEnabled ? 'Disable' : 'Enable'}
             onPress={() => setDebugEnabled(prev => !prev)}
           />
-        </Group>
+        </OptionGroup>
 
-        <Group style={styles.option} withMargin={false}>
-          <Text>
-            <Text style={text.label1}>Auto Scroll</Text>{' '}
-            <Text style={text.subHeading3}>
-              ({autoScrollEnabled ? 'Enabled' : 'Disabled'})
-            </Text>
-          </Text>
+        <OptionGroup
+          label='Auto Scroll'
+          value={autoScrollEnabled ? 'Enabled' : 'Disabled'}>
           <Button
             style={styles.button}
             title={autoScrollEnabled ? 'Disable' : 'Enable'}
             onPress={() => setAutoScrollEnabled(prev => !prev)}
           />
-        </Group>
+        </OptionGroup>
 
         <Group style={[flex.fill, styles.scrollViewGroup]}>
           <Animated.ScrollView
@@ -94,13 +93,6 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     width: sizes.xl
-  },
-  option: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: spacing.sm,
-    marginTop: spacing.sm
   },
   scrollViewContent: {
     gap: spacing.sm,
