@@ -1,5 +1,5 @@
 import { type ReactElement } from 'react';
-import type { ViewStyle } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
 import { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
@@ -15,7 +15,7 @@ import {
 } from '../providers';
 import type { DropIndicatorSettings, SortableFlexProps } from '../types';
 import {
-  extractFlexContainerProps,
+  extractFlexInnerContainerProps,
   getPropsWithDefaults,
   orderItems,
   validateChildren
@@ -24,21 +24,13 @@ import { DraggableView, SortableContainer } from './shared';
 
 function SortableFlex(props: SortableFlexProps) {
   const {
-    rest: {
-      children,
-      onDragEnd: _onDragEnd,
-      onLayout,
-      strategy,
-      style,
-      ...viewProps
-    },
+    rest: { children, onDragEnd: _onDragEnd, strategy, style, ...viewProps },
     sharedProps: {
       DropIndicatorComponent,
       animateHeight,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
-
       showDropIndicator,
       ...sharedProps
     }
@@ -54,8 +46,6 @@ function SortableFlex(props: SortableFlexProps) {
     }
   }));
 
-  const [flexStyle] = extractFlexContainerProps(style);
-
   return (
     <SharedProvider {...sharedProps} itemKeys={itemKeys} onDragEnd={onDragEnd}>
       <FlexLayoutProvider itemsCount={itemKeys.length} style={style}>
@@ -70,10 +60,11 @@ function SortableFlex(props: SortableFlexProps) {
           childrenArray={childrenArray}
           DropIndicatorComponent={DropIndicatorComponent}
           dropIndicatorStyle={dropIndicatorStyle}
-          flexStyle={flexStyle}
           itemEntering={itemEntering}
           itemExiting={itemExiting}
           showDropIndicator={showDropIndicator}
+          style={style}
+          viewProps={viewProps}
         />
       </FlexLayoutProvider>
     </SharedProvider>
@@ -82,7 +73,8 @@ function SortableFlex(props: SortableFlexProps) {
 
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
-  flexStyle: ViewStyle;
+  style: ViewStyle;
+  viewProps: Omit<ViewProps, 'style'>;
 } & DropIndicatorSettings &
   Required<
     Pick<SortableFlexProps, 'animateHeight' | 'itemEntering' | 'itemExiting'>
@@ -90,9 +82,10 @@ type SortableFlexInnerProps = {
 
 function SortableFlexInner({
   childrenArray,
-  flexStyle,
   itemEntering,
   itemExiting,
+  style,
+  viewProps,
   ...containerProps
 }: SortableFlexInnerProps) {
   const { canSwitchToAbsoluteLayout } = useCommonValuesContext();
@@ -108,10 +101,14 @@ function SortableFlexInner({
       : {}
   );
 
+  const [innerStyle, outerStyle] = extractFlexInnerContainerProps(style);
+
   return (
     <SortableContainer
       {...containerProps}
-      innerStyle={[flexStyle, animatedFlexStyle]}>
+      innerStyle={[innerStyle, animatedFlexStyle]}
+      outerStyle={outerStyle}
+      viewProps={viewProps}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering}

@@ -33,15 +33,23 @@ export const getPropsWithDefaults = <
   // merge styles from props and defaults
   for (const styleKey of STYLE_PROPS) {
     if (hasStyleProp(styleKey, propsWithDefaults)) {
-      const style = StyleSheet.flatten(
-        [
-          hasStyleProp(styleKey, DEFAULT_SHARED_PROPS) &&
-            DEFAULT_SHARED_PROPS[styleKey],
-          hasStyleProp(styleKey, componentDefaultProps) &&
-            componentDefaultProps[styleKey],
-          hasStyleProp(styleKey, props) && props[styleKey]
-        ].filter(Boolean)
-      );
+      const style: ViewStyle = {
+        ...(hasStyleProp(styleKey, DEFAULT_SHARED_PROPS) &&
+          DEFAULT_SHARED_PROPS[styleKey]),
+        ...(hasStyleProp(styleKey, componentDefaultProps) &&
+          componentDefaultProps[styleKey])
+      };
+
+      const propsStyle = hasStyleProp(styleKey, props)
+        ? StyleSheet.flatten(props[styleKey])
+        : {};
+
+      // Only override defaultStyle with defined values from propsStyle
+      Object.entries(propsStyle).forEach(([key, value]) => {
+        if (value !== undefined) {
+          style[key as keyof ViewStyle] = value;
+        }
+      });
 
       propsWithDefaults[styleKey] = style;
     }
@@ -76,11 +84,11 @@ const FLEX_CONTAINER_PROPS = new Set([
   'flexWrap'
 ]);
 
-export const extractFlexContainerProps = (style: ViewStyle) =>
+export const extractFlexInnerContainerProps = (style: ViewStyle) =>
   Object.entries(style).reduce<[ViewStyle, ViewStyle]>(
     (acc, [key, value]) => {
       const k = key as keyof ViewStyle;
-      if (FLEX_CONTAINER_PROPS.has(k)) {
+      if (FLEX_CONTAINER_PROPS.has(k) || k.startsWith('padding')) {
         acc[0][k] = value;
       } else {
         acc[1][k] = value;

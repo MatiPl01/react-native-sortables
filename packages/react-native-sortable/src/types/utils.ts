@@ -25,9 +25,6 @@ export type AnimatedValues<T extends Record<string, any>> = {
 
 type RequiredExcept<T, K extends keyof T> = Omit<Required<T>, K> & Pick<T, K>;
 
-export type RequiredBy<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>> &
-  Required<Pick<T, K>>;
-
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type Maybe<T> = T | null | undefined;

@@ -41,7 +41,6 @@ export type CommonValuesContextType = {
   touchedItemHeight: SharedValue<number>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
-  parentDimensions?: SharedValue<Dimensions | null>;
 
   // DRAG STATE
   touchedItemKey: SharedValue<null | string>;

@@ -17,7 +17,7 @@ import {
   OptionGroup,
   SelectListDropdown
 } from '@/components';
-import { flex, sizes, spacing, text } from '@/theme';
+import { colors, flex, radius, sizes, spacing, text } from '@/theme';
 import { getCategories } from '@/utils';
 
 const DATA = getCategories(9);
@@ -117,7 +117,7 @@ export default function FlexLayoutExample() {
               style={styles.group}
               withMargin={false}
               bordered>
-              <Text style={text.subHeading2}>{direction}</Text>
+              <Text style={styles.groupTitle}>{direction}</Text>
               <Sortable.Flex
                 style={[
                   styles.sortableFlex,
@@ -179,6 +179,11 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     padding: spacing.none
   },
+  groupTitle: {
+    ...text.subHeading2,
+    marginHorizontal: spacing.sm,
+    marginTop: spacing.sm
+  },
   scrollViewContent: {
     gap: spacing.sm,
     padding: spacing.sm
@@ -189,8 +194,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.none
   },
   sortableFlex: {
-    maxHeight: sizes.xxxl,
-    minHeight: sizes.xxl,
+    backgroundColor: colors.background3,
+    borderRadius: radius.md,
+    maxHeight: 300,
+    minHeight: 225,
+    overflow: 'hidden',
     padding: spacing.md
   }
 });

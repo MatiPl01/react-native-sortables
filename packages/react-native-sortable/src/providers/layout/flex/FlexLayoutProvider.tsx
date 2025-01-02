@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { useMemo } from 'react';
-import type { ViewStyle } from 'react-native';
+import { View, type ViewStyle } from 'react-native';
 import {
   useAnimatedReaction,
   useDerivedValue,
@@ -15,7 +15,11 @@ import type {
   Dimensions,
   FlexLayoutContextType
 } from '../../../types';
-import { haveEqualPropValues, resolveDimensionValue } from '../../../utils';
+import {
+  areDimensionsDifferent,
+  haveEqualPropValues,
+  resolveDimensionValue
+} from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
 import {
@@ -41,7 +45,11 @@ type FlexLayoutProviderProps = PropsWithChildren<{
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
-)<FlexLayoutProviderProps, FlexLayoutContextType>(({ itemsCount, style }) => {
+)<FlexLayoutProviderProps, FlexLayoutContextType>(({
+  children,
+  itemsCount,
+  style
+}) => {
   const {
     alignContent,
     alignItems,
@@ -79,11 +87,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     containerWidth,
     indexToKey,
     itemDimensions,
-    itemPositions,
-    parentDimensions
+    itemPositions
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
+  const parentDimensions = useSharedValue<Dimensions | null>(null);
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
   const keyToGroup = useDerivedValue<Record<string, number>>(() =>
     Object.fromEntries(
@@ -283,6 +291,20 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   );
 
   return {
+    children: (
+      <View
+        onLayout={({ nativeEvent: { layout } }) => {
+          const dimensions = { height: layout.height, width: layout.width };
+          if (
+            !parentDimensions.value ||
+            areDimensionsDifferent(dimensions, parentDimensions.value)
+          ) {
+            parentDimensions.value = dimensions;
+          }
+        }}>
+        {children}
+      </View>
+    ),
     value: {
       columnGap,
       crossAxisGroupOffsets,
