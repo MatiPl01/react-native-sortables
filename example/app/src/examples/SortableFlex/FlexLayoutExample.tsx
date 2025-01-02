@@ -124,8 +124,11 @@ export default function FlexLayoutExample() {
                   flexStyle,
                   { flexDirection: direction }
                 ]}>
-                {DATA.map(item => (
-                  <FlexCell key={item} size='large'>
+                {DATA.map((item, index) => (
+                  <FlexCell
+                    height={34 + (index % 3) * 10}
+                    key={item}
+                    size='large'>
                     {item}
                   </FlexCell>
                 ))}
@@ -185,6 +188,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.none
   },
   sortableFlex: {
-    maxHeight: sizes.xxxl
+    maxHeight: sizes.xxxl,
+    minHeight: sizes.xxl
   }
 });
