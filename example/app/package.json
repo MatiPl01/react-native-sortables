@@ -16,13 +16,13 @@
     "react-native-safe-area-context": "^4.14.0",
     "react-native-screens": "^4.1.0",
     "react-native-sortable": "workspace:*",
-    "react-native-svg": "^15.9.0"
+    "react-native-svg": "^15.9.0",
+    "@gorhom/portal": "^1.0.14"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
-    "@gorhom/portal": "^1.0.14",
     "@react-native-community/cli": "15.0.1",
     "@react-native-community/cli-platform-android": "15.0.1",
     "@react-native-community/cli-platform-ios": "15.0.1",
@@ -42,7 +42,7 @@
       "bash -c tsc --noEmit"
     ]
   },
-  "react-native": "index.ts",
+  "react-native": "index",
   "scripts": {
     "test": "jest",
     "typecheck": "tsc -p tsconfig.json --noEmit"
