@@ -7,12 +7,14 @@ import { colors, radius, spacing } from '@/theme';
 
 type FlexCellProps = PropsWithChildren<{
   active?: boolean;
+  height?: number;
   size?: 'large' | 'small';
 }>;
 
 export default function FlexCell({
   active,
   children,
+  height,
   size = 'small'
 }: FlexCellProps) {
   let cellSizeStyles: { cell: ViewStyle; cellText: TextStyle };
@@ -31,7 +33,8 @@ export default function FlexCell({
       style={[
         sharedCellStyles.cell,
         cellSizeStyles.cell,
-        active && sharedCellStyles.activeCell
+        active && sharedCellStyles.activeCell,
+        { height }
       ]}>
       {typeof children === 'string' ? (
         <Text style={[sharedCellStyles.cellText, cellSizeStyles.cellText]}>

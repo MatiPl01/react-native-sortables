@@ -1,4 +1,5 @@
 export { colors } from './colors';
+export { iconSizes } from './icons';
 export { flex } from './layout';
 export { radius } from './radius';
 export { sizes } from './sizes';

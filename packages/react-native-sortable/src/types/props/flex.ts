@@ -1,4 +1,4 @@
-import type { ViewProps, ViewStyle } from 'react-native';
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
 
 import type { AlignContent, AlignItems } from '../layout/flex';
 import type {
@@ -32,12 +32,14 @@ export type SortableFlexStrategyFactory = (
 
 export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
 
+export type SortableFlexStyle = {
+  alignContent?: AlignContent;
+  alignItems?: AlignItems;
+} & Omit<ViewStyle, 'alignContent' | 'alignItems'>;
+
 export type SortableFlexProps = {
   strategy?: SortableFlexStrategy;
   onDragEnd?: SortableFlexDragEndCallback;
-  style: {
-    alignContent?: AlignContent;
-    alignItems?: AlignItems;
-  } & Omit<ViewStyle, 'alignContent' | 'alignItems'>;
+  style?: StyleProp<SortableFlexStyle>;
 } & Omit<SharedProps, 'onDragEnd'> &
   Omit<ViewProps, 'style'>;
