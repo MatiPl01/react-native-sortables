@@ -20,7 +20,7 @@ import {
 import { colors, flex, radius, sizes, spacing, text } from '@/theme';
 import { getCategories } from '@/utils';
 
-const DATA = getCategories(9);
+const DATA = getCategories(7);
 
 type FlexDirection = Required<SortableFlexStyle>['flexDirection'];
 type AlignContent = Required<SortableFlexStyle>['alignContent'];
@@ -118,21 +118,23 @@ export default function FlexLayoutExample() {
               withMargin={false}
               bordered>
               <Text style={styles.groupTitle}>{direction}</Text>
-              <Sortable.Flex
-                style={[
-                  styles.sortableFlex,
-                  flexStyle,
-                  { flexDirection: direction }
-                ]}>
-                {DATA.map((item, index) => (
-                  <FlexCell
-                    height={34 + (index % 3) * 10}
-                    key={item}
-                    size='large'>
-                    {item}
-                  </FlexCell>
-                ))}
-              </Sortable.Flex>
+              <View style={styles.parent}>
+                <Sortable.Flex
+                  style={[
+                    styles.sortableFlex,
+                    flexStyle,
+                    { flexDirection: direction }
+                  ]}>
+                  {DATA.map((item, index) => (
+                    <FlexCell
+                      height={34 + (index % 3) * 10}
+                      key={item}
+                      size='large'>
+                      {item}
+                    </FlexCell>
+                  ))}
+                </Sortable.Flex>
+              </View>
             </Group>
           ))}
         </ScrollView>
@@ -184,6 +186,9 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.sm,
     marginTop: spacing.sm
   },
+  parent: {
+    maxHeight: 200
+  },
   scrollViewContent: {
     gap: spacing.sm,
     padding: spacing.sm
@@ -196,8 +201,8 @@ const styles = StyleSheet.create({
   sortableFlex: {
     backgroundColor: colors.background3,
     borderRadius: radius.md,
-    maxHeight: 300,
-    minHeight: 225,
+    flexBasis: '100%',
+    flexGrow: 1,
     overflow: 'hidden',
     padding: spacing.md
   }

@@ -28,7 +28,7 @@ export type FlexLayoutProps = {
   flexDirection: FlexDirection;
   flexWrap: FlexWrap;
   flexAlignments: FlexAlignments;
-  referenceContainerDimensions: Partial<Dimensions>;
+  containerWidth: number;
 };
 
 export type FlexLayout = {
