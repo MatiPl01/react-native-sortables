@@ -4,7 +4,7 @@ import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
 import type { Vector } from '../layout/shared';
 import type { LayoutAnimation } from '../reanimated';
-import type { AnimatableValues, Simplify } from '../utils';
+import type { AnimatableProps, Simplify } from '../utils';
 
 export type DropIndicatorComponentProps = {
   activationProgress: SharedValue<number>;
@@ -15,7 +15,7 @@ export type DropIndicatorComponentProps = {
   style: ViewStyle;
 };
 
-export type ActiveItemDecorationSettings = AnimatableValues<{
+export type ActiveItemDecorationSettings = AnimatableProps<{
   activeItemScale: number;
   activeItemOpacity: number;
   activeItemShadowOpacity: number;
@@ -25,7 +25,7 @@ export type ActiveItemDecorationSettings = AnimatableValues<{
 
 export type Offset = `${number}%` | number;
 
-export type ActiveItemSnapSettings = AnimatableValues<{
+export type ActiveItemSnapSettings = AnimatableProps<{
   enableActiveItemSnap: boolean;
   snapOffsetX: Offset;
   snapOffsetY: Offset;
@@ -34,7 +34,7 @@ export type ActiveItemSnapSettings = AnimatableValues<{
 export type AutoScrollSettings = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scrollableRef: AnimatedRef<any>; // TODO - type this properly
-} & AnimatableValues<{
+} & AnimatableProps<{
   autoScrollActivationOffset: [number, number] | number;
   autoScrollSpeed: number;
   autoScrollEnabled: boolean;

@@ -127,19 +127,19 @@ const handleLayoutCalculation = (
   axisDimensions: AxisDimensions,
   axisDirections: AxisDirections,
   { alignContent, alignItems, justifyContent }: FlexAlignments,
-  referenceContainerDimensions: Partial<Dimensions>
+  limits: FlexLayoutProps['limits']
 ) => {
   'worklet';
-  const mainContainerDimension =
-    referenceContainerDimensions[axisDimensions.main];
   const isRow = axisDirections.main === 'row';
+  const containerMainMinSize = isRow ? limits.width : limits.minHeight;
+  const containerCrossMinSize = isRow ? limits.minHeight : limits.width;
 
   // ALIGN CONTENT
   // position groups on the cross axis
   const contentAlignment = calculateAlignment(
     alignContent,
     crossAxisGroupSizes,
-    referenceContainerDimensions[axisDimensions.cross] ?? 0,
+    containerCrossMinSize,
     gaps[axisDirections.main]
   );
 
@@ -165,7 +165,7 @@ const handleLayoutCalculation = (
     const contentJustification = calculateAlignment(
       justifyContent,
       mainAxisGroupItemSizes,
-      mainContainerDimension,
+      containerMainMinSize,
       gaps[axisDirections.cross]
     );
     if (!isRow) {
@@ -212,10 +212,10 @@ export const calculateLayout = ({
   gaps,
   indexToKey,
   itemDimensions,
-  referenceContainerDimensions
+  limits
 }: FlexLayoutProps): FlexLayout | null => {
   'worklet';
-  if (!referenceContainerDimensions.width) {
+  if (limits.width === -1) {
     return null;
   }
 
@@ -229,10 +229,10 @@ export const calculateLayout = ({
     ? { cross: 'column', main: 'row' }
     : { cross: 'row', main: 'column' };
 
-  const groupSizeLimit =
-    flexWrap === 'nowrap'
-      ? Infinity
-      : (referenceContainerDimensions[axisDimensions.main] ?? Infinity);
+  let groupSizeLimit = Infinity;
+  if (flexWrap !== 'nowrap') {
+    groupSizeLimit = isRow ? limits.width : limits.maxHeight;
+  }
 
   const groupingResult = createGroups(
     indexToKey,
@@ -261,7 +261,7 @@ export const calculateLayout = ({
     axisDimensions,
     axisDirections,
     flexAlignments,
-    referenceContainerDimensions
+    limits
   );
   if (!layoutResult) {
     return null;

@@ -1,87 +1,46 @@
 import type { PropsWithChildren } from 'react';
-import { useMemo } from 'react';
-import { View, type ViewStyle } from 'react-native';
 import {
   useAnimatedReaction,
   useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
-import { EMPTY_OBJECT } from '../../../constants';
+import type { DEFAULT_SORTABLE_FLEX_PROPS } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type {
-  AlignContent,
-  AlignItems,
-  Dimensions,
-  FlexLayoutContextType
+  FlexLayoutContextType,
+  RequiredBy,
+  SortableFlexStyle
 } from '../../../types';
-import {
-  areDimensionsDifferent,
-  haveEqualPropValues,
-  resolveDimensionValue
-} from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
-import {
-  calculateLayout,
-  calculateReferenceSize,
-  updateLayoutDebugRects
-} from './utils';
+import { calculateLayout, updateLayoutDebugRects } from './utils';
 
-type RequiredStyleProps =
-  | 'flexDirection'
-  | 'flexWrap'
-  | 'gap'
-  | 'justifyContent';
-
-type FlexLayoutProviderProps = PropsWithChildren<{
-  itemsCount: number;
-  style: {
-    alignContent: AlignContent;
-    alignItems: AlignItems;
-  } & Omit<ViewStyle, RequiredStyleProps> &
-    Required<Pick<ViewStyle, RequiredStyleProps>>;
-}>;
+type FlexLayoutProviderProps = PropsWithChildren<
+  {
+    itemsCount: number;
+  } & RequiredBy<
+    SortableFlexStyle,
+    keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
+  >
+>;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
 )<FlexLayoutProviderProps, FlexLayoutContextType>(({
-  children,
+  alignContent,
+  alignItems,
+  columnGap: columnGap_,
+  flexDirection,
+  flexWrap,
+  gap,
+  height,
   itemsCount,
-  style
+  justifyContent,
+  maxHeight,
+  minHeight,
+  rowGap: rowGap_
 }) => {
-  const {
-    alignContent,
-    alignItems,
-    columnGap: columnGap_,
-    flexDirection,
-    flexWrap,
-    gap,
-    height,
-    justifyContent,
-    maxHeight,
-    maxWidth,
-    minHeight,
-    minWidth,
-    padding,
-    paddingBlock,
-    paddingBlockEnd,
-    paddingBlockStart,
-    paddingBottom,
-    paddingEnd,
-    paddingHorizontal,
-    paddingInline,
-    paddingInlineEnd,
-    paddingInlineStart,
-    paddingLeft,
-    paddingRight,
-    paddingStart,
-    paddingTop,
-    paddingVertical,
-    rowGap: rowGap_,
-    width
-  } = style;
-
   const {
     containerHeight,
     containerWidth,
@@ -91,7 +50,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
-  const parentDimensions = useSharedValue<Dimensions | null>(null);
   const itemGroups = useSharedValue<Array<Array<string>>>([]);
   const keyToGroup = useDerivedValue<Record<string, number>>(() =>
     Object.fromEntries(
@@ -100,83 +58,20 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   );
   const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
   const crossAxisGroupOffsets = useSharedValue<Array<number>>([]);
-  const referenceContainerDimensions =
-    useSharedValue<Partial<Dimensions>>(EMPTY_OBJECT);
 
-  const columnGap = useDerivedValue(
-    () =>
-      resolveDimensionValue(
-        columnGap_ ?? gap,
-        parentDimensions?.value?.width ?? 0
-      ) ?? 0
-  );
-  const rowGap = useDerivedValue(
-    () =>
-      resolveDimensionValue(
-        rowGap_ ?? gap,
-        parentDimensions?.value?.height ?? 0
-      ) ?? 0
-  );
+  const columnGap = useDerivedValue(() => columnGap_ ?? gap);
+  const rowGap = useDerivedValue(() => rowGap_ ?? gap);
 
-  const topPadding = useMemo(
-    () =>
-      paddingTop ??
-      paddingBlockStart ??
-      paddingBlock ??
-      paddingVertical ??
-      padding,
-    [paddingTop, paddingBlockStart, paddingBlock, paddingVertical, padding]
-  );
-  const bottomPadding = useMemo(
-    () =>
-      paddingBottom ??
-      paddingBlockEnd ??
-      paddingBlock ??
-      paddingVertical ??
-      padding,
-    [paddingBottom, paddingBlockEnd, paddingBlock, paddingVertical, padding]
-  );
-  const leftPadding = useMemo(
-    () =>
-      paddingLeft ??
-      paddingInlineStart ??
-      paddingStart ??
-      paddingInline ??
-      paddingHorizontal ??
-      padding,
-    [
-      paddingLeft,
-      paddingInlineStart,
-      paddingStart,
-      paddingInline,
-      paddingHorizontal,
-      padding
-    ]
-  );
-  const rightPadding = useMemo(
-    () =>
-      paddingRight ??
-      paddingInlineEnd ??
-      paddingEnd ??
-      paddingInline ??
-      paddingHorizontal ??
-      padding,
-    [
-      paddingRight,
-      paddingInlineEnd,
-      paddingEnd,
-      paddingInline,
-      paddingHorizontal,
-      padding
-    ]
-  );
+  const dimensionsLimits = useDerivedValue(() => {
+    const minH = Math.max(minHeight ?? 0, height ?? 0);
+    const maxH = Math.max(maxHeight ?? 0, height ?? 0) || Infinity;
 
-  const isHeightLimited = useMemo(
-    () =>
-      resolveDimensionValue(height, 0) !== undefined ||
-      resolveDimensionValue(maxHeight, 0) !== undefined,
-    [height, maxHeight]
-  );
+    return {
+      maxHeight: maxH,
+      minHeight: maxHeight ? Math.min(minH, maxH) : minH,
+      width: containerWidth.value
+    };
+  });
 
   // Because the number of groups can dynamically change after order change
   // and we can't detect that in the React runtime, we are creating debug
@@ -184,60 +79,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   // is the number of items minus 1 in the worst case for just a single group)
   const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
   const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
-
-  // REFERENCE CONTAINER DIMENSIONS UPDATER
-  useAnimatedReaction(
-    () => ({
-      measuredWidth: containerWidth.value,
-      parent: parentDimensions?.value
-    }),
-    ({ measuredWidth, parent }) => {
-      if (!parent || !measuredWidth) {
-        referenceContainerDimensions.value = EMPTY_OBJECT;
-        return;
-      }
-
-      const { height: parentH, width: parentW } = parent;
-      const tp = resolveDimensionValue(topPadding, parentH);
-      const bp = resolveDimensionValue(bottomPadding, parentH);
-      const lp = resolveDimensionValue(leftPadding, parentW);
-      const rp = resolveDimensionValue(rightPadding, parentW);
-
-      const paddingX = (lp ?? 0) + (rp ?? 0);
-      const paddingY = (tp ?? 0) + (bp ?? 0);
-
-      const h = calculateReferenceSize(
-        minHeight,
-        height,
-        maxHeight,
-        parentH + paddingY
-      );
-      const w = calculateReferenceSize(
-        minWidth,
-        width,
-        maxWidth,
-        parentW + paddingX
-      );
-
-      const current = referenceContainerDimensions.value;
-      if (h !== current.height || (w ?? measuredWidth) !== current.width) {
-        const newReferenceDimensions: Partial<Dimensions> = {};
-
-        if (h !== undefined) {
-          newReferenceDimensions.height = h - paddingY;
-        }
-        if (w !== undefined) {
-          newReferenceDimensions.width = w - paddingX;
-        } else {
-          newReferenceDimensions.width = measuredWidth;
-        }
-
-        if (!haveEqualPropValues(newReferenceDimensions, current)) {
-          referenceContainerDimensions.value = newReferenceDimensions;
-        }
-      }
-    }
-  );
 
   // FLEX LAYOUT UPDATER
   useAnimatedReaction(
@@ -255,7 +96,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       },
       indexToKey: indexToKey.value,
       itemDimensions: itemDimensions.value,
-      referenceContainerDimensions: referenceContainerDimensions.value
+      limits: dimensionsLimits.value
     }),
     props => {
       const layout = calculateLayout(props);
@@ -271,12 +112,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
       crossAxisGroupSizes.value = layout.crossAxisGroupSizes;
       // Update container height
-      const referenceHeight = referenceContainerDimensions.value.height;
-      if (isHeightLimited && referenceHeight !== undefined) {
-        containerHeight.value = referenceHeight;
-      } else {
-        containerHeight.value = layout.totalHeight;
-      }
+      const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
+      containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
 
       // DEBUG ONLY
       if (debugCrossAxisGapRects && debugMainAxisGapRects) {
@@ -291,20 +128,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   );
 
   return {
-    children: (
-      <View
-        onLayout={({ nativeEvent: { layout } }) => {
-          const dimensions = { height: layout.height, width: layout.width };
-          if (
-            !parentDimensions.value ||
-            areDimensionsDifferent(dimensions, parentDimensions.value)
-          ) {
-            parentDimensions.value = dimensions;
-          }
-        }}>
-        {children}
-      </View>
-    ),
     value: {
       columnGap,
       crossAxisGroupOffsets,

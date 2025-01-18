@@ -72,7 +72,9 @@ export default function FlexLayoutExample() {
     alignContent,
     alignItems,
     flexWrap: FLEX_WRAP_OPTIONS[flexWrapIndex],
-    justifyContent
+    justifyContent,
+    maxHeight: 300,
+    minHeight: 225
   };
 
   return (
@@ -118,21 +120,18 @@ export default function FlexLayoutExample() {
               withMargin={false}
               bordered>
               <Text style={styles.groupTitle}>{direction}</Text>
-              <Sortable.Flex
-                style={[
-                  styles.sortableFlex,
-                  flexStyle,
-                  { flexDirection: direction }
-                ]}>
-                {DATA.map((item, index) => (
-                  <FlexCell
-                    height={34 + (index % 3) * 10}
-                    key={item}
-                    size='large'>
-                    {item}
-                  </FlexCell>
-                ))}
-              </Sortable.Flex>
+              <View style={styles.flexWrapper}>
+                <Sortable.Flex flexDirection={direction} {...flexStyle}>
+                  {DATA.map((item, index) => (
+                    <FlexCell
+                      height={34 + (index % 3) * 10}
+                      key={item}
+                      size='large'>
+                      {item}
+                    </FlexCell>
+                  ))}
+                </Sortable.Flex>
+              </View>
             </Group>
           ))}
         </ScrollView>
@@ -193,11 +192,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.none,
     paddingVertical: spacing.none
   },
-  sortableFlex: {
+  flexWrapper: {
     backgroundColor: colors.background3,
     borderRadius: radius.md,
-    maxHeight: 300,
-    minHeight: 225,
     overflow: 'hidden',
     padding: spacing.md
   }

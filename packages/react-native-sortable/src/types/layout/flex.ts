@@ -28,7 +28,11 @@ export type FlexLayoutProps = {
   flexDirection: FlexDirection;
   flexWrap: FlexWrap;
   flexAlignments: FlexAlignments;
-  referenceContainerDimensions: Partial<Dimensions>;
+  limits: {
+    minHeight: number;
+    maxHeight: number;
+    width: number;
+  };
 };
 
 export type FlexLayout = {

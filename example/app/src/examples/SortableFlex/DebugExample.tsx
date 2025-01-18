@@ -62,7 +62,8 @@ export default function DebugExample() {
             <Sortable.Flex
               debug={debugEnabled}
               scrollableRef={autoScrollEnabled ? scrollableRef : undefined}
-              style={styles.sortableFlex}>
+              columnGap={spacing.sm}
+              rowGap={spacing.xs}>
               {DATA.map(item => (
                 <FlexCell key={item} size='large'>
                   {item}
@@ -96,10 +97,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     paddingHorizontal: spacing.none,
     paddingVertical: spacing.none
-  },
-  sortableFlex: {
-    columnGap: spacing.md,
-    rowGap: spacing.xs
   },
   title: {
     ...text.subHeading2,

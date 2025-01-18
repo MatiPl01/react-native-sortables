@@ -129,7 +129,10 @@ type CategoriesSectionProps = {
 
 function ManyCategories({ scrollableRef }: CategoriesSectionProps) {
   return (
-    <Sortable.Flex scrollableRef={scrollableRef} style={styles.sortableFlex}>
+    <Sortable.Flex
+      scrollableRef={scrollableRef}
+      columnGap={spacing.sm}
+      rowGap={spacing.xs}>
       {MANY_CATEGORIES.map(item => (
         <FlexCell key={item} size='large'>
           {item}
@@ -141,7 +144,10 @@ function ManyCategories({ scrollableRef }: CategoriesSectionProps) {
 
 function FewCategories({ scrollableRef }: CategoriesSectionProps) {
   return (
-    <Sortable.Flex scrollableRef={scrollableRef} style={styles.sortableFlex}>
+    <Sortable.Flex
+      scrollableRef={scrollableRef}
+      columnGap={spacing.sm}
+      rowGap={spacing.xs}>
       {FEW_CATEGORIES.map(item => (
         <FlexCell key={item} size='large'>
           {item}
@@ -167,10 +173,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 100,
     justifyContent: 'center'
-  },
-  sortableFlex: {
-    columnGap: spacing.sm,
-    rowGap: spacing.xs
   },
   title: {
     color: colors.foreground3,
