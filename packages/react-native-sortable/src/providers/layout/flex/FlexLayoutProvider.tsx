@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren, useMemo } from 'react';
 import {
   useAnimatedReaction,
   useDerivedValue,
@@ -39,6 +39,13 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   justifyContent,
   maxHeight,
   minHeight,
+  padding,
+  paddingBottom,
+  paddingHorizontal,
+  paddingLeft,
+  paddingRight,
+  paddingTop,
+  paddingVertical,
   rowGap: rowGap_
 }) => {
   const {
@@ -61,6 +68,24 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   const columnGap = useDerivedValue(() => columnGap_ ?? gap);
   const rowGap = useDerivedValue(() => rowGap_ ?? gap);
+
+  const paddings = useMemo(
+    () => ({
+      bottom: paddingBottom ?? paddingVertical ?? padding,
+      left: paddingLeft ?? paddingHorizontal ?? padding,
+      right: paddingRight ?? paddingHorizontal ?? padding,
+      top: paddingTop ?? paddingVertical ?? padding
+    }),
+    [
+      paddingTop,
+      paddingBottom,
+      paddingLeft,
+      paddingRight,
+      paddingVertical,
+      paddingHorizontal,
+      padding
+    ]
+  );
 
   const dimensionsLimits = useDerivedValue(() => {
     const minH = Math.max(minHeight ?? 0, height ?? 0);
@@ -96,7 +121,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       },
       indexToKey: indexToKey.value,
       itemDimensions: itemDimensions.value,
-      limits: dimensionsLimits.value
+      limits: dimensionsLimits.value,
+      paddings
     }),
     props => {
       const layout = calculateLayout(props);

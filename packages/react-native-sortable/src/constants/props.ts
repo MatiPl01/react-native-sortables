@@ -85,6 +85,12 @@ type OptionalDefaultFlexProps =
   | 'maxWidth'
   | 'minHeight'
   | 'minWidth'
+  | 'paddingBottom'
+  | 'paddingHorizontal'
+  | 'paddingLeft'
+  | 'paddingRight'
+  | 'paddingTop'
+  | 'paddingVertical'
   | 'rowGap'
   | 'width';
 
@@ -105,5 +111,6 @@ export const DEFAULT_SORTABLE_FLEX_PROPS = {
   flexWrap: 'wrap',
   gap: 0,
   justifyContent: 'flex-start',
+  padding: 0,
   strategy: 'insert'
 } satisfies DefaultSortableFlexProps;

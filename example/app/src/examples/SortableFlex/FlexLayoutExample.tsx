@@ -74,7 +74,8 @@ export default function FlexLayoutExample() {
     flexWrap: FLEX_WRAP_OPTIONS[flexWrapIndex],
     justifyContent,
     maxHeight: 300,
-    minHeight: 225
+    minHeight: 225,
+    padding: spacing.md
   };
 
   return (
@@ -177,8 +178,7 @@ const styles = StyleSheet.create({
   flexWrapper: {
     backgroundColor: colors.background3,
     borderRadius: radius.md,
-    overflow: 'hidden',
-    padding: spacing.md
+    overflow: 'hidden'
   },
   group: {
     gap: spacing.xs,

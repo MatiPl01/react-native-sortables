@@ -128,12 +128,20 @@ const handleLayoutCalculation = (
   axisDirections: AxisDirections,
   { alignContent, alignItems, justifyContent }: FlexAlignments,
   isReverse: boolean,
+  paddings: FlexLayoutProps['paddings'],
   limits: FlexLayoutProps['limits']
 ) => {
   'worklet';
   const isRow = axisDirections.main === 'row';
-  const containerMainMinSize = isRow ? limits.width : limits.minHeight;
-  const containerCrossMinSize = isRow ? limits.minHeight : limits.width;
+  let containerMainMinSize = limits.width - paddings.left - paddings.right;
+  let containerCrossMinSize = limits.minHeight - paddings.top - paddings.bottom;
+
+  if (!isRow) {
+    [containerMainMinSize, containerCrossMinSize] = [
+      containerCrossMinSize,
+      containerMainMinSize
+    ];
+  }
 
   // ALIGN CONTENT
   // position groups on the cross axis
@@ -144,7 +152,8 @@ const handleLayoutCalculation = (
     gaps[axisDirections.main]
   );
 
-  let totalHeight = isRow ? contentAlignment.totalSize : 0;
+  const paddingHorizontal = paddings.left + paddings.right;
+  let totalHeight = isRow ? contentAlignment.totalSize + paddingHorizontal : 0;
   const itemPositions: Record<string, Vector> = {};
 
   for (let i = 0; i < groups.length; i++) {
@@ -170,7 +179,10 @@ const handleLayoutCalculation = (
       gaps[axisDirections.cross]
     );
     if (!isRow) {
-      totalHeight = Math.max(totalHeight, contentJustification.totalSize);
+      totalHeight = Math.max(
+        totalHeight,
+        contentJustification.totalSize + paddingHorizontal
+      );
     }
 
     for (let j = 0; j < group.length; j++) {
@@ -194,21 +206,35 @@ const handleLayoutCalculation = (
       if (isRow && isReverse) {
         // row-reverse
         itemPositions[key] = {
-          x: limits.width - mainAxisPosition - mainAxisGroupItemSizes[j]!,
-          y: crossAxisPosition
+          x:
+            limits.width -
+            mainAxisPosition -
+            mainAxisGroupItemSizes[j]! -
+            paddings.right,
+          y: crossAxisPosition + paddings.top
         };
       } else if (isRow) {
         // row
-        itemPositions[key] = { x: mainAxisPosition, y: crossAxisPosition };
+        itemPositions[key] = {
+          x: mainAxisPosition + paddings.left,
+          y: crossAxisPosition + paddings.top
+        };
       } else if (isReverse) {
         // column-reverse
         itemPositions[key] = {
-          x: crossAxisPosition,
-          y: totalHeight - mainAxisPosition - mainAxisGroupItemSizes[j]!
+          x: crossAxisPosition + paddings.left,
+          y:
+            totalHeight -
+            mainAxisPosition -
+            mainAxisGroupItemSizes[j]! -
+            paddings.bottom
         };
       } else {
         // column
-        itemPositions[key] = { x: crossAxisPosition, y: mainAxisPosition };
+        itemPositions[key] = {
+          x: crossAxisPosition + paddings.left,
+          y: mainAxisPosition + paddings.top
+        };
       }
     }
   }
@@ -227,7 +253,8 @@ export const calculateLayout = ({
   gaps,
   indexToKey,
   itemDimensions,
-  limits
+  limits,
+  paddings
 }: FlexLayoutProps): FlexLayout | null => {
   'worklet';
   if (limits.width === -1) {
@@ -246,7 +273,11 @@ export const calculateLayout = ({
 
   let groupSizeLimit = Infinity;
   if (flexWrap !== 'nowrap') {
-    groupSizeLimit = isRow ? limits.width : limits.maxHeight;
+    if (isRow) {
+      groupSizeLimit = limits.width - paddings.left - paddings.right;
+    } else {
+      groupSizeLimit = limits.maxHeight - paddings.top - paddings.bottom;
+    }
   }
 
   const groupingResult = createGroups(
@@ -278,6 +309,7 @@ export const calculateLayout = ({
     axisDirections,
     flexAlignments,
     isReverse,
+    paddings,
     limits
   );
   if (!layoutResult) {
