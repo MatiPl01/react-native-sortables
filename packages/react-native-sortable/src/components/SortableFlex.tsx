@@ -1,6 +1,5 @@
 import { type ReactElement } from 'react';
 import type { ViewStyle } from 'react-native';
-import { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import { useDragEndHandler } from '../hooks';
@@ -9,7 +8,6 @@ import {
   FlexLayoutProvider,
   OrderUpdaterComponent,
   SharedProvider,
-  useCommonValuesContext,
   useFlexLayoutContext,
   useStrategyKey
 } from '../providers';
@@ -80,30 +78,14 @@ function SortableFlexInner({
   style,
   ...containerProps
 }: SortableFlexInnerProps) {
-  const { canSwitchToAbsoluteLayout } = useCommonValuesContext();
-  const { flexDirection } = useFlexLayoutContext();
-
-  const animatedFlexStyle = useAnimatedStyle(() =>
-    canSwitchToAbsoluteLayout.value
-      ? {
-          alignContent: 'flex-start',
-          alignItems: 'flex-start',
-          justifyContent: 'flex-start'
-        }
-      : {}
-  );
-
   return (
-    <SortableContainer {...containerProps} style={[style, animatedFlexStyle]}>
+    <SortableContainer {...containerProps} style={style}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering}
           exiting={itemExiting}
           itemKey={key}
-          key={key}
-          // When flexDirection is row-reverse, we need to reverse the x-axis
-          // because right offset in absolute position is calculated from the right edge
-          reverseXAxis={flexDirection === 'row-reverse'}>
+          key={key}>
           {child}
         </DraggableView>
       ))}

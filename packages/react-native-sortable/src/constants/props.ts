@@ -11,7 +11,7 @@ import type {
 import { defaultKeyExtractor } from '../utils/keys';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
 
-export const STYLE_PROPS = ['style', 'dropIndicatorStyle'] as const;
+export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
 
 /**
  * DEFAULT SHARED PROPS

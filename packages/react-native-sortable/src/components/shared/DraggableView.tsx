@@ -34,7 +34,6 @@ const RELATIVE_STYLE: ViewStyle = {
 
 type DraggableViewProps = {
   itemKey: string;
-  reverseXAxis?: boolean;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
 } & ViewProps;
@@ -44,7 +43,6 @@ export default function DraggableView({
   entering,
   exiting,
   itemKey: key,
-  reverseXAxis,
   style,
   ...viewProps
 }: DraggableViewProps) {
@@ -59,7 +57,7 @@ export default function DraggableView({
   const layoutPosition = useItemLayoutPosition(key, pressProgress);
   const translation = useItemTranslation(key, layoutPosition, pressProgress);
   const zIndex = useItemZIndex(key, pressProgress);
-  const gesture = useItemPanGesture(key, pressProgress, reverseXAxis);
+  const gesture = useItemPanGesture(key, pressProgress);
 
   useEffect(() => {
     return () => handleItemRemoval(key);

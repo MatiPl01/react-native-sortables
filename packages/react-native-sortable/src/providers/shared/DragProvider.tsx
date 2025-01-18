@@ -351,7 +351,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   );
 
   const handleTouchesMove = useCallback(
-    (e: GestureTouchEvent, reverseXAxis: boolean, onFail: () => void) => {
+    (e: GestureTouchEvent, onFail: () => void) => {
       'worklet';
       if (!startTouch.value || touchedItemKey.value === null) {
         return;
@@ -374,10 +374,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
-      touchTranslation.value = {
-        x: reverseXAxis ? -dX : dX,
-        y: dY
-      };
+      touchTranslation.value = { x: dX, y: dY };
     },
     [startTouch, touchTranslation, touchedItemKey, activeItemKey]
   );
