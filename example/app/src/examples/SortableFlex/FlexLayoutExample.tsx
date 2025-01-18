@@ -29,9 +29,9 @@ type AlignItems = Required<SortableFlexStyle>['alignItems'];
 type FlexWrap = Required<SortableFlexStyle>['flexWrap'];
 
 const FLEX_DIRECTIONS: Array<FlexDirection> = [
-  // 'row'
-  // 'column'
-  // 'row-reverse'
+  'row',
+  'column',
+  'row-reverse',
   'column-reverse'
 ];
 
