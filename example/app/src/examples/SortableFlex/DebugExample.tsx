@@ -60,10 +60,10 @@ export default function DebugExample() {
             </Group>
 
             <Sortable.Flex
-              debug={debugEnabled}
-              scrollableRef={autoScrollEnabled ? scrollableRef : undefined}
               columnGap={spacing.sm}
-              rowGap={spacing.xs}>
+              debug={debugEnabled}
+              rowGap={spacing.xs}
+              scrollableRef={autoScrollEnabled ? scrollableRef : undefined}>
               {DATA.map(item => (
                 <FlexCell key={item} size='large'>
                   {item}

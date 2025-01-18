@@ -130,9 +130,9 @@ type CategoriesSectionProps = {
 function ManyCategories({ scrollableRef }: CategoriesSectionProps) {
   return (
     <Sortable.Flex
-      scrollableRef={scrollableRef}
       columnGap={spacing.sm}
-      rowGap={spacing.xs}>
+      rowGap={spacing.xs}
+      scrollableRef={scrollableRef}>
       {MANY_CATEGORIES.map(item => (
         <FlexCell key={item} size='large'>
           {item}
@@ -145,9 +145,9 @@ function ManyCategories({ scrollableRef }: CategoriesSectionProps) {
 function FewCategories({ scrollableRef }: CategoriesSectionProps) {
   return (
     <Sortable.Flex
-      scrollableRef={scrollableRef}
       columnGap={spacing.sm}
-      rowGap={spacing.xs}>
+      rowGap={spacing.xs}
+      scrollableRef={scrollableRef}>
       {FEW_CATEGORIES.map(item => (
         <FlexCell key={item} size='large'>
           {item}

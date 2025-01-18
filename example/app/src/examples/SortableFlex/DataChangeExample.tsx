@@ -126,9 +126,9 @@ export default function DataChangeExample() {
             </Group>
 
             <Sortable.Flex
-              scrollableRef={scrollableRef}
               columnGap={spacing.sm}
               rowGap={spacing.xs}
+              scrollableRef={scrollableRef}
               animateHeight
               hapticsEnabled
               onDragEnd={({ order }) => setData(order(data))}>

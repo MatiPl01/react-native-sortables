@@ -19,9 +19,9 @@ const SortableFlexCard: RouteCardComponent = props => {
   return (
     <RouteCard {...props}>
       <Sortable.Flex
-        sortEnabled={false}
         columnGap={spacing.xs}
-        rowGap={spacing.xxs}>
+        rowGap={spacing.xxs}
+        sortEnabled={false}>
         {data.map(item => (
           <FlexCell active={item === ACTIVE_ITEM} key={item}>
             {item}

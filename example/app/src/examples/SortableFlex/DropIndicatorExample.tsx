@@ -26,8 +26,8 @@ export default function DropIndicatorExample() {
           description='With custom style that changes border radius of the default drop indicator'
           title='Default drop indicator'>
           <Sortable.Flex
-            dropIndicatorStyle={styles.dropIndicatorStyle}
             columnGap={spacing.sm}
+            dropIndicatorStyle={styles.dropIndicatorStyle}
             rowGap={spacing.xs}
             showDropIndicator>
             {DATA.map(item => (
@@ -42,10 +42,10 @@ export default function DropIndicatorExample() {
           description='Looks better without inactive item opacity, so inactiveItemOpacity is set to 1 in this example'
           title='Custom drop indicator'>
           <Sortable.Flex
+            columnGap={spacing.sm}
             DropIndicatorComponent={CustomDropIndicator}
             dropIndicatorStyle={styles.dropIndicatorStyle}
             inactiveItemOpacity={1}
-            columnGap={spacing.sm}
             rowGap={spacing.xs}
             showDropIndicator>
             {DATA.map(item => (

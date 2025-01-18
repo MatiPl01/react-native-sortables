@@ -174,6 +174,12 @@ const styles = StyleSheet.create({
   dropdown: {
     minWidth: sizes.xxl
   },
+  flexWrapper: {
+    backgroundColor: colors.background3,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+    padding: spacing.md
+  },
   group: {
     gap: spacing.xs,
     padding: spacing.none
@@ -191,11 +197,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     paddingHorizontal: spacing.none,
     paddingVertical: spacing.none
-  },
-  flexWrapper: {
-    backgroundColor: colors.background3,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    padding: spacing.md
   }
 });
