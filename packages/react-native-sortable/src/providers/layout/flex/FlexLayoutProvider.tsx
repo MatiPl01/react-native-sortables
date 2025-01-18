@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback, useMemo } from 'react';
+import { type PropsWithChildren, useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedReaction,
@@ -73,23 +73,12 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const rowGap = useDerivedValue(() => rowGap_ ?? gap);
   const adjustedCrossGap = useSharedValue<number>(0);
 
-  const paddings = useMemo(
-    () => ({
-      bottom: paddingBottom ?? paddingVertical ?? padding,
-      left: paddingLeft ?? paddingHorizontal ?? padding,
-      right: paddingRight ?? paddingHorizontal ?? padding,
-      top: paddingTop ?? paddingVertical ?? padding
-    }),
-    [
-      paddingTop,
-      paddingBottom,
-      paddingLeft,
-      paddingRight,
-      paddingVertical,
-      paddingHorizontal,
-      padding
-    ]
-  );
+  const paddings = useDerivedValue(() => ({
+    bottom: paddingBottom ?? paddingVertical ?? padding,
+    left: paddingLeft ?? paddingHorizontal ?? padding,
+    right: paddingRight ?? paddingHorizontal ?? padding,
+    top: paddingTop ?? paddingVertical ?? padding
+  }));
 
   const dimensionsLimits = useDerivedValue(() => {
     const minH = Math.max(minHeight ?? 0, height ?? 0);
@@ -130,7 +119,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
           indexToKey: idxToKey.value,
           itemDimensions: itemDimensions.value,
           limits: dimensionsLimits.value,
-          paddings
+          paddings: paddings.value
         }),
         layoutProps => {
           onChange(calculateLayout(layoutProps));
@@ -168,7 +157,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         indexToKey: idxToKey,
         itemDimensions: itemDimensions.value,
         limits: dimensionsLimits.value,
-        paddings
+        paddings: paddings.value
       });
     },
     [
@@ -186,7 +175,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   );
 
   useFlexLayoutReaction(indexToKey, layout => {
-    ('worklet');
+    'worklet';
     if (!layout) {
       return;
     }
@@ -218,6 +207,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   return {
     value: {
+      adjustedCrossGap,
       calculateFlexLayout,
       columnGap,
       crossAxisGroupOffsets,
@@ -226,7 +216,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       flexDirection,
       groupSizeLimit,
       itemGroups,
-      adjustedCrossGap,
       keyToGroup,
       rowGap,
       useFlexLayoutReaction
