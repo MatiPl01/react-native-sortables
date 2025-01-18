@@ -70,7 +70,9 @@ const createGroups = (
 const calculateAlignment = (
   align: AlignContent | AlignItems | JustifyContent,
   sizes: Array<number>,
-  containerSize?: number,
+  minSize: number,
+  maxSize: number,
+  shouldWrap: boolean,
   providedGap = 0
 ): {
   offsets: Array<number>;
@@ -81,32 +83,50 @@ const calculateAlignment = (
   let adjustedGap = providedGap;
 
   const getTotalSize = (gap: number) => sum(sizes) + gap * (sizes.length - 1);
+
   const totalSize = getTotalSize(providedGap);
-  const adjustedContainerSize = Math.max(totalSize, containerSize ?? 0);
+  const clampedTotalSize = Math.min(
+    Math.max(getTotalSize(providedGap), minSize),
+    maxSize
+  );
 
   switch (align) {
     case 'flex-end':
-      startOffset = adjustedContainerSize - totalSize;
+      startOffset = clampedTotalSize - totalSize;
       break;
     case 'center':
-      startOffset = (adjustedContainerSize - totalSize) / 2;
+      startOffset = (clampedTotalSize - totalSize) / 2;
       break;
     case 'space-between':
-      adjustedGap = Math.max(
-        (adjustedContainerSize - sum(sizes)) / (sizes.length - 1),
-        providedGap
-      );
+      if (sizes.length > 1 || shouldWrap) {
+        adjustedGap = Math.max(
+          (clampedTotalSize - sum(sizes)) / (sizes.length - 1),
+          providedGap
+        );
+      }
       break;
     case 'space-around':
-      adjustedGap =
-        (adjustedContainerSize - sum(sizes) + providedGap) / sizes.length;
-      startOffset = (adjustedContainerSize - getTotalSize(adjustedGap)) / 2;
+      if (sizes.length > 1 || shouldWrap) {
+        adjustedGap = Math.max(
+          (clampedTotalSize - sum(sizes) + providedGap) / sizes.length,
+          providedGap
+        );
+        if (adjustedGap > providedGap) {
+          startOffset = (clampedTotalSize - getTotalSize(adjustedGap)) / 2;
+        }
+      }
       break;
     case 'space-evenly':
-      adjustedGap =
-        (adjustedContainerSize - sum(sizes) + 2 * providedGap) /
-        (sizes.length + 1);
-      startOffset = (adjustedContainerSize - getTotalSize(adjustedGap)) / 2;
+      if (sizes.length > 1 || shouldWrap) {
+        adjustedGap = Math.max(
+          (clampedTotalSize - sum(sizes) + 2 * providedGap) /
+            (sizes.length + 1),
+          providedGap
+        );
+        if (adjustedGap > providedGap) {
+          startOffset = (clampedTotalSize - getTotalSize(adjustedGap)) / 2;
+        }
+      }
       break;
   }
 
@@ -116,7 +136,7 @@ const calculateAlignment = (
     offsets.push((startOffset += (sizes[i] ?? 0) + adjustedGap));
   }
 
-  return { offsets, totalSize: adjustedContainerSize };
+  return { offsets, totalSize: clampedTotalSize };
 };
 
 const handleLayoutCalculation = (
@@ -127,20 +147,32 @@ const handleLayoutCalculation = (
   axisDimensions: AxisDimensions,
   axisDirections: AxisDirections,
   { alignContent, alignItems, justifyContent }: FlexAlignments,
-  isReverse: boolean,
   paddings: FlexLayoutProps['paddings'],
-  limits: FlexLayoutProps['limits']
+  limits: FlexLayoutProps['limits'],
+  isReverse: boolean,
+  shouldWrap: boolean
 ) => {
   'worklet';
   const isRow = axisDirections.main === 'row';
-  let containerMainMinSize = limits.width - paddings.left - paddings.right;
-  let containerCrossMinSize = limits.minHeight - paddings.top - paddings.bottom;
+  const isMultiColumn = !isRow && groups.length > 1;
+  const paddingHorizontal = paddings.left + paddings.right;
+  const paddingVertical = paddings.top + paddings.bottom;
 
-  if (!isRow) {
-    [containerMainMinSize, containerCrossMinSize] = [
-      containerCrossMinSize,
-      containerMainMinSize
-    ];
+  let minMainContainerSize: number;
+  let maxMainContainerSize: number;
+  let minCrossContainerSize: number;
+  let maxCrossContainerSize: number;
+
+  if (isRow) {
+    minMainContainerSize = limits.width - paddingHorizontal;
+    maxMainContainerSize = minMainContainerSize; // width is the same
+    minCrossContainerSize = limits.minHeight - paddingVertical;
+    maxCrossContainerSize = limits.maxHeight - paddingVertical;
+  } else {
+    minMainContainerSize = limits.minHeight - paddingVertical;
+    maxMainContainerSize = limits.maxHeight - paddingVertical;
+    minCrossContainerSize = limits.width - paddingHorizontal;
+    maxCrossContainerSize = minCrossContainerSize; // width is the same
   }
 
   // ALIGN CONTENT
@@ -148,12 +180,18 @@ const handleLayoutCalculation = (
   const contentAlignment = calculateAlignment(
     alignContent,
     crossAxisGroupSizes,
-    containerCrossMinSize,
+    minCrossContainerSize,
+    maxCrossContainerSize,
+    shouldWrap,
     gaps[axisDirections.main]
   );
 
-  const paddingHorizontal = paddings.left + paddings.right;
-  let totalHeight = isRow ? contentAlignment.totalSize + paddingHorizontal : 0;
+  let totalHeight = isRow
+    ? contentAlignment.totalSize + paddingHorizontal
+    : isMultiColumn
+      ? limits.maxHeight
+      : limits.minHeight;
+
   const itemPositions: Record<string, Vector> = {};
 
   for (let i = 0; i < groups.length; i++) {
@@ -175,10 +213,13 @@ const handleLayoutCalculation = (
     const contentJustification = calculateAlignment(
       justifyContent,
       mainAxisGroupItemSizes,
-      containerMainMinSize,
+      isMultiColumn ? maxMainContainerSize : minMainContainerSize,
+      maxMainContainerSize,
+      shouldWrap,
       gaps[axisDirections.cross]
     );
-    if (!isRow) {
+
+    if (!isRow && !isMultiColumn) {
       totalHeight = Math.max(
         totalHeight,
         contentJustification.totalSize + paddingHorizontal
@@ -197,7 +238,9 @@ const handleLayoutCalculation = (
       const itemAlignment = calculateAlignment(
         alignItems,
         [crossAxisItemSize],
-        groupCrossSize
+        groupCrossSize,
+        groupCrossSize,
+        shouldWrap
       );
 
       const crossAxisPosition = groupCrossOffset + itemAlignment.offsets[0]!;
@@ -271,8 +314,9 @@ export const calculateLayout = ({
     ? { cross: 'column', main: 'row' }
     : { cross: 'row', main: 'column' };
 
+  const shouldWrap = flexWrap !== 'nowrap';
   let groupSizeLimit = Infinity;
-  if (flexWrap !== 'nowrap') {
+  if (shouldWrap) {
     if (isRow) {
       groupSizeLimit = limits.width - paddings.left - paddings.right;
     } else {
@@ -308,9 +352,10 @@ export const calculateLayout = ({
     axisDimensions,
     axisDirections,
     flexAlignments,
-    isReverse,
     paddings,
-    limits
+    limits,
+    isReverse,
+    shouldWrap
   );
   if (!layoutResult) {
     return null;

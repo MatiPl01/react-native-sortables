@@ -29,9 +29,9 @@ type AlignItems = Required<SortableFlexStyle>['alignItems'];
 type FlexWrap = Required<SortableFlexStyle>['flexWrap'];
 
 const FLEX_DIRECTIONS: Array<FlexDirection> = [
-  'row',
-  'column',
-  'row-reverse',
+  // 'row'
+  // 'column'
+  // 'row-reverse'
   'column-reverse'
 ];
 
@@ -72,6 +72,7 @@ export default function FlexLayoutExample() {
     alignContent,
     alignItems,
     flexWrap: FLEX_WRAP_OPTIONS[flexWrapIndex],
+    gap: 10,
     justifyContent,
     maxHeight: 300,
     minHeight: 225,
