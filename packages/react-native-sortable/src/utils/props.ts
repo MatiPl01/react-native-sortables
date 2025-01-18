@@ -26,9 +26,12 @@ export const getPropsWithDefaults = <
 } => {
   const propsWithDefaults = {
     ...DEFAULT_SHARED_PROPS,
-    ...componentDefaultProps,
-    ...props
-  };
+    ...componentDefaultProps
+  } as unknown as P;
+
+  for (const key in props) {
+    if (props[key]) propsWithDefaults[key] = props[key];
+  }
 
   // merge styles from props and defaults
   for (const styleKey of STYLE_PROPS) {

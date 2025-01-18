@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withTiming
@@ -57,22 +56,16 @@ export default function SortableContainer({
   );
 
   return (
-    <Animated.View style={[outerContainerStyle, styles.grow]}>
+    <Animated.View style={outerContainerStyle}>
       {showDropIndicator && (
         <DropIndicator
           DropIndicatorComponent={DropIndicatorComponent}
           style={dropIndicatorStyle}
         />
       )}
-      <Animated.View style={[style, innerContainerStyle, styles.grow]}>
+      <Animated.View style={[style, innerContainerStyle]}>
         {children}
       </Animated.View>
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  grow: {
-    flexGrow: 1
-  }
-});

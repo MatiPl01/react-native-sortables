@@ -33,6 +33,12 @@ export type FlexLayoutProps = {
     maxHeight: number;
     width: number;
   };
+  paddings: {
+    bottom: number;
+    left: number;
+    right: number;
+    top: number;
+  };
 };
 
 export type FlexLayout = {

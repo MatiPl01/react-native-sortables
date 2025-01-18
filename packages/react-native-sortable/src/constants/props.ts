@@ -11,7 +11,7 @@ import type {
 import { defaultKeyExtractor } from '../utils/keys';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
 
-export const STYLE_PROPS = ['style', 'dropIndicatorStyle'] as const;
+export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
 
 /**
  * DEFAULT SHARED PROPS
@@ -85,6 +85,12 @@ type OptionalDefaultFlexProps =
   | 'maxWidth'
   | 'minHeight'
   | 'minWidth'
+  | 'paddingBottom'
+  | 'paddingHorizontal'
+  | 'paddingLeft'
+  | 'paddingRight'
+  | 'paddingTop'
+  | 'paddingVertical'
   | 'rowGap'
   | 'width';
 
@@ -105,5 +111,6 @@ export const DEFAULT_SORTABLE_FLEX_PROPS = {
   flexWrap: 'wrap',
   gap: 0,
   justifyContent: 'flex-start',
+  padding: 0,
   strategy: 'insert'
 } satisfies DefaultSortableFlexProps;

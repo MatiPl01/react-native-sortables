@@ -83,11 +83,7 @@ export type DragContextType = {
     pressProgress: SharedValue<number>,
     onActivate: () => void
   ) => void;
-  handleTouchesMove: (
-    e: GestureTouchEvent,
-    reverseXAxis: boolean,
-    onFail: () => void
-  ) => void;
+  handleTouchesMove: (e: GestureTouchEvent, onFail: () => void) => void;
   handleDragEnd: (key: string) => void;
   handleOrderChange: (
     key: string,

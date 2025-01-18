@@ -46,6 +46,13 @@ export type SortableFlexStyle = {
   minWidth?: number;
   maxHeight?: number;
   maxWidth?: number;
+  padding?: number;
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingLeft?: number;
+  paddingBottom?: number;
+  paddingVertical?: number;
+  paddingHorizontal?: number;
 };
 
 export type SortableFlexProps = Simplify<

@@ -9,8 +9,7 @@ import { useDragContext } from '../DragProvider';
 
 export default function useItemPanGesture(
   key: string,
-  pressProgress: SharedValue<number>,
-  reverseXAxis = false
+  pressProgress: SharedValue<number>
 ) {
   const { sortEnabled, touchedItemKey } = useCommonValuesContext();
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
@@ -37,7 +36,7 @@ export default function useItemPanGesture(
           manager.end();
         })
         .onTouchesMove((e, manager) => {
-          handleTouchesMove(e, reverseXAxis, manager.fail);
+          handleTouchesMove(e, manager.fail);
         })
         .onFinalize(() => {
           pressProgress.value = withTiming(0, {
@@ -48,7 +47,6 @@ export default function useItemPanGesture(
         }),
     [
       key,
-      reverseXAxis,
       pressProgress,
       touchedItemKey,
       handleTouchStart,
