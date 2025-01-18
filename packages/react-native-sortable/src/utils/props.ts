@@ -72,28 +72,3 @@ export const getPropsWithDefaults = <
     sharedProps: sharedProps as Required<{ [K in keyof SharedProps]: P[K] }>
   };
 };
-
-const FLEX_CONTAINER_PROPS = new Set([
-  'alignContent',
-  'alignItems',
-  'justifyContent',
-  'flexDirection',
-  'rowGap',
-  'columnGap',
-  'gap',
-  'flexWrap'
-]);
-
-export const extractFlexInnerContainerProps = (style: ViewStyle) =>
-  Object.entries(style).reduce<[ViewStyle, ViewStyle]>(
-    (acc, [key, value]) => {
-      const k = key as keyof ViewStyle;
-      if (FLEX_CONTAINER_PROPS.has(k) || k.startsWith('padding')) {
-        acc[0][k] = value;
-      } else {
-        acc[1][k] = value;
-      }
-      return acc;
-    },
-    [{}, {}]
-  );

@@ -67,26 +67,6 @@ export const reorderSwap = <T>(
   return result;
 };
 
-export const resolveDimensionValue = (
-  value: unknown,
-  parentDimension: number
-): number | undefined => {
-  'worklet';
-  if (value === undefined || value === null || value === 'auto') {
-    return undefined;
-  }
-  if (typeof value === 'number') {
-    return value;
-  }
-  if (typeof value === 'string') {
-    const percentage = parseFloat(value) / 100;
-    if (!isNaN(percentage)) {
-      return parentDimension * percentage;
-    }
-  }
-  return undefined;
-};
-
 export const isValidCoordinate = (coordinate: number): boolean => {
   'worklet';
   return !isNaN(coordinate) && coordinate > -Infinity && coordinate < Infinity;

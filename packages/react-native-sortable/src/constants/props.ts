@@ -1,4 +1,4 @@
-import type { ViewProps, ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
 
 import { DefaultDropIndicator } from '../components/defaults';
 import type {
@@ -77,7 +77,16 @@ export const DEFAULT_SORTABLE_GRID_PROPS = {
 /**
  * DEFAULT SORTABLE FLEX PROPS
  */
-type OptionalDefaultFlexProps = Exclude<keyof ViewProps, 'style'>;
+type OptionalDefaultFlexProps =
+  | 'children'
+  | 'columnGap'
+  | 'height'
+  | 'maxHeight'
+  | 'maxWidth'
+  | 'minHeight'
+  | 'minWidth'
+  | 'rowGap'
+  | 'width';
 
 type ExcludedFromDefaultFlexProps = 'onDragEnd';
 
@@ -88,15 +97,13 @@ type DefaultSortableFlexProps = DefaultProps<
 >;
 
 export const DEFAULT_SORTABLE_FLEX_PROPS = {
-  strategy: 'insert',
+  alignContent: 'flex-start',
+  alignItems: 'flex-start',
   // display flex items in a row with wrapping by default
   // (users will expect this behavior in most cases when using SortableFlex)
-  style: {
-    alignContent: 'flex-start',
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 0,
-    justifyContent: 'flex-start'
-  }
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  gap: 0,
+  justifyContent: 'flex-start',
+  strategy: 'insert'
 } satisfies DefaultSortableFlexProps;

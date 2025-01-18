@@ -4,7 +4,7 @@ import type {
   GridLayoutContextType,
   OrderUpdater
 } from '../providers';
-import type { AnimatableValues, Simplify } from '../utils';
+import type { AnimatableProps, Simplify } from '../utils';
 import type { DragEndParams, SharedProps } from './shared';
 
 export type SortableGridDragEndParams<I> = {
@@ -17,7 +17,7 @@ export type SortableGridDragEndCallback<I> = (
 
 export type SortableGridLayoutSettings = {
   columns: number;
-} & AnimatableValues<{
+} & AnimatableProps<{
   rowGap: number;
   columnGap: number;
 }>;

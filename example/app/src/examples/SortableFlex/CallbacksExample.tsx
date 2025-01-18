@@ -47,7 +47,8 @@ export default function CallbacksExample() {
           description='Drag items around to see callbacks output'
           title='SortableFlex'>
           <Sortable.Flex
-            style={styles.sortableFlex}
+            columnGap={spacing.sm}
+            rowGap={spacing.xs}
             onDragEnd={onDragEnd}
             onDragStart={onDragStart}
             onOrderChange={onOrderChange}>
@@ -68,6 +69,5 @@ const styles = StyleSheet.create({
     height:
       Dimensions.get('window').height -
       (Platform.OS === 'ios' ? sizes.xxl : sizes.lg)
-  },
-  sortableFlex: { columnGap: spacing.xs, rowGap: spacing.xxs }
+  }
 });

@@ -13,7 +13,7 @@ export default function DropIndicatorExample() {
     <ScrollView contentContainerStyle={style.contentContainer}>
       <Stagger ParentComponent={Sortable.Layer}>
         <Section title='Without drop indicator'>
-          <Sortable.Flex style={styles.sortableFlex}>
+          <Sortable.Flex columnGap={spacing.sm} rowGap={spacing.xs}>
             {DATA.map(item => (
               <FlexCell key={item} size='large'>
                 {item}
@@ -26,8 +26,9 @@ export default function DropIndicatorExample() {
           description='With custom style that changes border radius of the default drop indicator'
           title='Default drop indicator'>
           <Sortable.Flex
+            columnGap={spacing.sm}
             dropIndicatorStyle={styles.dropIndicatorStyle}
-            style={styles.sortableFlex}
+            rowGap={spacing.xs}
             showDropIndicator>
             {DATA.map(item => (
               <FlexCell key={item} size='large'>
@@ -41,10 +42,11 @@ export default function DropIndicatorExample() {
           description='Looks better without inactive item opacity, so inactiveItemOpacity is set to 1 in this example'
           title='Custom drop indicator'>
           <Sortable.Flex
+            columnGap={spacing.sm}
             DropIndicatorComponent={CustomDropIndicator}
             dropIndicatorStyle={styles.dropIndicatorStyle}
             inactiveItemOpacity={1}
-            style={styles.sortableFlex}
+            rowGap={spacing.xs}
             showDropIndicator>
             {DATA.map(item => (
               <FlexCell key={item} size='large'>
@@ -61,9 +63,5 @@ export default function DropIndicatorExample() {
 const styles = StyleSheet.create({
   dropIndicatorStyle: {
     borderRadius: radius.full
-  },
-  sortableFlex: {
-    columnGap: spacing.xs,
-    rowGap: spacing.xxs
   }
 });

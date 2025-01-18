@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -13,9 +13,7 @@ import DropIndicator from './DropIndicator';
 type AnimatedHeightContainerProps = PropsWithChildren<
   {
     animateHeight: boolean;
-    viewProps?: ViewProps;
-    outerStyle?: StyleProp<ViewStyle>;
-    innerStyle?: StyleProp<ViewStyle>;
+    style?: StyleProp<ViewStyle>;
   } & DropIndicatorSettings
 >;
 
@@ -24,10 +22,8 @@ export default function SortableContainer({
   animateHeight,
   children,
   dropIndicatorStyle,
-  innerStyle,
-  outerStyle,
   showDropIndicator,
-  viewProps
+  style
 }: AnimatedHeightContainerProps) {
   const {
     activeItemDropped,
@@ -61,16 +57,14 @@ export default function SortableContainer({
   );
 
   return (
-    <Animated.View
-      {...viewProps}
-      style={[viewProps?.style, outerStyle, outerContainerStyle, styles.grow]}>
+    <Animated.View style={[outerContainerStyle, styles.grow]}>
       {showDropIndicator && (
         <DropIndicator
           DropIndicatorComponent={DropIndicatorComponent}
           style={dropIndicatorStyle}
         />
       )}
-      <Animated.View style={[innerStyle, innerContainerStyle, styles.grow]}>
+      <Animated.View style={[style, innerContainerStyle, styles.grow]}>
         {children}
       </Animated.View>
     </Animated.View>

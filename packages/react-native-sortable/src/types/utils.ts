@@ -15,7 +15,7 @@ export type Animatable<V> = SharedValue<V> | V;
 
 export type UnAnimatable<V> = V extends SharedValue<infer U> ? U : V;
 
-export type AnimatableValues<T extends Record<string, any>> = {
+export type AnimatableProps<T extends Record<string, any>> = {
   [K in keyof T]: Animatable<UnAnimatable<T[K]>>;
 };
 
@@ -24,6 +24,9 @@ export type AnimatedValues<T extends Record<string, any>> = {
 };
 
 type RequiredExcept<T, K extends keyof T> = Omit<Required<T>, K> & Pick<T, K>;
+
+export type RequiredBy<T, K extends keyof T> = Omit<T, K> &
+  Required<Pick<T, K>>;
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 

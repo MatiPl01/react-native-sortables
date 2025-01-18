@@ -1,12 +1,19 @@
-import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
+import type { PropsWithChildren } from 'react';
 
-import type { AlignContent, AlignItems } from '../layout/flex';
+import type {
+  AlignContent,
+  AlignItems,
+  FlexDirection,
+  FlexWrap,
+  JustifyContent
+} from '../layout/flex';
 import type {
   CommonValuesContextType,
   DebugProviderContextType,
   FlexLayoutContextType,
   OrderUpdater
 } from '../providers';
+import type { Simplify } from '../utils';
 import type { DragEndParams, SharedProps } from './shared';
 
 export type SortableFlexDragEndParams = {
@@ -27,11 +34,26 @@ export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
 export type SortableFlexStyle = {
   alignContent?: AlignContent;
   alignItems?: AlignItems;
-} & Omit<ViewStyle, 'alignContent' | 'alignItems'>;
+  justifyContent?: JustifyContent;
+  flexDirection?: FlexDirection;
+  flexWrap?: FlexWrap;
+  gap?: number;
+  rowGap?: number;
+  columnGap?: number;
+  height?: number;
+  width?: number;
+  minHeight?: number;
+  minWidth?: number;
+  maxHeight?: number;
+  maxWidth?: number;
+};
 
-export type SortableFlexProps = {
-  strategy?: SortableFlexStrategy;
-  onDragEnd?: SortableFlexDragEndCallback;
-  style?: StyleProp<SortableFlexStyle>;
-} & Omit<SharedProps, 'onDragEnd'> &
-  Omit<ViewProps, 'style'>;
+export type SortableFlexProps = Simplify<
+  PropsWithChildren<
+    {
+      strategy?: SortableFlexStrategy;
+      onDragEnd?: SortableFlexDragEndCallback;
+    } & Omit<SharedProps, 'onDragEnd'> &
+      SortableFlexStyle
+  >
+>;

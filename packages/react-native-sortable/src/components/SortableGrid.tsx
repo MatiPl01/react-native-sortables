@@ -143,7 +143,7 @@ function SortableGridInner<I>({
   return (
     <SortableContainer
       {...containerProps}
-      innerStyle={[styles.gridContainer, animatedInnerStyle]}>
+      style={[styles.gridContainer, animatedInnerStyle]}>
       {zipArrays(data, itemKeys).map(([item, key]) => (
         <SortableGridItem
           entering={itemEntering}

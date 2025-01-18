@@ -126,8 +126,9 @@ export default function DataChangeExample() {
             </Group>
 
             <Sortable.Flex
+              columnGap={spacing.sm}
+              rowGap={spacing.xs}
               scrollableRef={scrollableRef}
-              style={styles.sortableFlex}
               animateHeight
               hapticsEnabled
               onDragEnd={({ order }) => setData(order(data))}>
@@ -168,10 +169,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     paddingHorizontal: spacing.none,
     paddingVertical: spacing.none
-  },
-  sortableFlex: {
-    columnGap: spacing.sm,
-    rowGap: spacing.xs
   },
   title: {
     color: colors.foreground3,

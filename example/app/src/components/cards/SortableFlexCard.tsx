@@ -1,4 +1,3 @@
-import { StyleSheet } from 'react-native';
 import Sortable from 'react-native-sortable';
 
 import { FlexCell } from '@/components/items';
@@ -19,7 +18,10 @@ const SortableFlexCard: RouteCardComponent = props => {
 
   return (
     <RouteCard {...props}>
-      <Sortable.Flex sortEnabled={false} style={styles.container}>
+      <Sortable.Flex
+        columnGap={spacing.xs}
+        rowGap={spacing.xxs}
+        sortEnabled={false}>
         {data.map(item => (
           <FlexCell active={item === ACTIVE_ITEM} key={item}>
             {item}
@@ -29,12 +31,5 @@ const SortableFlexCard: RouteCardComponent = props => {
     </RouteCard>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    columnGap: spacing.xs,
-    rowGap: spacing.xxs
-  }
-});
 
 export default SortableFlexCard;
