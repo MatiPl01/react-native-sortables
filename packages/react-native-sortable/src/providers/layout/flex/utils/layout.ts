@@ -127,6 +127,7 @@ const handleLayoutCalculation = (
   axisDimensions: AxisDimensions,
   axisDirections: AxisDirections,
   { alignContent, alignItems, justifyContent }: FlexAlignments,
+  isReverse: boolean,
   limits: FlexLayoutProps['limits']
 ) => {
   'worklet';
@@ -190,9 +191,23 @@ const handleLayoutCalculation = (
       const crossAxisPosition = groupCrossOffset + itemAlignment.offsets[0]!;
       const mainAxisPosition = contentJustification.offsets[j]!;
 
-      if (isRow) {
+      if (isRow && isReverse) {
+        // row-reverse
+        itemPositions[key] = {
+          x: limits.width - mainAxisPosition - mainAxisGroupItemSizes[j]!,
+          y: crossAxisPosition
+        };
+      } else if (isRow) {
+        // row
         itemPositions[key] = { x: mainAxisPosition, y: crossAxisPosition };
+      } else if (isReverse) {
+        // column-reverse
+        itemPositions[key] = {
+          x: crossAxisPosition,
+          y: totalHeight - mainAxisPosition - mainAxisGroupItemSizes[j]!
+        };
       } else {
+        // column
         itemPositions[key] = { x: crossAxisPosition, y: mainAxisPosition };
       }
     }
@@ -253,6 +268,7 @@ export const calculateLayout = ({
 
   // CALCULATE LAYOUT
   // based on item groups, gaps and alignment
+  const isReverse = flexDirection.endsWith('reverse');
   const layoutResult = handleLayoutCalculation(
     groups,
     crossAxisGroupSizes,
@@ -261,6 +277,7 @@ export const calculateLayout = ({
     axisDimensions,
     axisDirections,
     flexAlignments,
+    isReverse,
     limits
   );
   if (!layoutResult) {
