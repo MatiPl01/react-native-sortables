@@ -52,7 +52,11 @@ export default function DebugExample() {
 
         <Group style={[flex.fill, styles.scrollViewGroup]}>
           <Animated.ScrollView
+            // We set key here to dismiss the property change on the fly warning
+            // (scrollableRef and debug properties of the sortable component
+            // shouldn't be changed on the fly)
             contentContainerStyle={styles.scrollViewContent}
+            key={2 * +debugEnabled + +autoScrollEnabled}
             ref={scrollableRef}
             style={flex.fill}>
             <Group style={styles.boundGroup} withMargin={false} bordered center>

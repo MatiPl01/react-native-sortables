@@ -4,6 +4,7 @@ import type { ViewStyle } from 'react-native';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { DebugOutlet, DebugProvider } from '../debug';
+import { useWarnOnPropChange } from '../hooks';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
@@ -48,6 +49,9 @@ export default function SharedProvider({
   scrollableRef,
   ...rest
 }: SharedProviderProps) {
+  useWarnOnPropChange('debug', debug);
+  useWarnOnPropChange('scrollableRef', scrollableRef);
+
   const providers = [
     // Provider used for proper zIndex management
     <LayerProvider />,
