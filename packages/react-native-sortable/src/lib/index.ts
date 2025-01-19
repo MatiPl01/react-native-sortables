@@ -1,1 +1,2 @@
-export { default as ReactNativeHapticFeedback } from './react-native-haptic-feedback';
+export { default as ReactNativeHapticFeedback } from './ReactNativeHapticFeedback';
+export { default as ExpoHaptics } from './ExpoHaptics';

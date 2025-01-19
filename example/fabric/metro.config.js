@@ -11,7 +11,11 @@ const workspaces = getWorkspaces(__dirname).filter(
 );
 
 const customConfig = {
-  watchFolders: [path.resolve(__dirname, '../../node_modules'), ...workspaces]
+  watchFolders: [path.resolve(__dirname, '../../node_modules'), ...workspaces],
+  server: {
+    // This fixes resolution of the app entry point on Android but breaks on iOS
+    // unstable_serverRoot: null
+  }
 };
 
 module.exports = wrapWithReanimatedMetroConfig(
