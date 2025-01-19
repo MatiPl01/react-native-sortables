@@ -53,7 +53,7 @@
   "workspaces": {
     "packages": [
       "example/*",
-      "packages/*"
+      "packages/react-native-sortable"
     ]
   }
 }
