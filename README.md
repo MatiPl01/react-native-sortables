@@ -31,27 +31,27 @@ React Native Sortable is a powerful and easy-to-use library that brings smooth, 
 
 - 🎯 **Flexible Layouts**
 
-  - Grid and Flex layout options
-  - Support for items with different dimensions
+  - **Grid** and **Flex** layout options
+  - Support for items with **different dimensions**
 
 - 🚀 **Performance & Reliability**
 
-  - Built with Reanimated and Gesture Handler
-  - Supports both Old and New Architecture
-  - Type safe with TypeScript
-  - Expo compatible
+  - Built with [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) and [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/)
+  - Supports both **Old** and **New Architecture**
+  - Type safe with **TypeScript**
+  - **Expo** compatible
 
 - ✨ **Rich Interactions**
 
-  - Auto-scrolling beyond screen bounds
-  - Customizable layout animations for items addition and removal
-  - Built-in haptic feedback integration (requires [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback) dependency)
-  - Different reordering strategies (insertion, swapping)
+  - **Auto-scrolling** beyond screen bounds
+  - Customizable **layout animations** for items addition and removal
+  - Built-in **haptic feedback** integration (requires [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback) dependency)
+  - Different **reordering strategies** (insertion, swapping)
 
 - 💡 **Developer Experience**
 
-  - Simple API with powerful customization
-  - Minimal setup required
+  - Simple API with powerful **customization**
+  - **Minimal setup** required
 
 - ➕ [More features](.) <!-- TODO - add link -->
 
