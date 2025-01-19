@@ -45,7 +45,7 @@ React Native Sortable is a powerful and easy-to-use library that brings smooth, 
 
   - Auto-scrolling beyond screen bounds
   - Customizable layout animations for items addition and removal
-  - Built-in haptic feedback (requires [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback) dependency)
+  - Built-in haptic feedback integration (requires [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback) dependency)
   - Different reordering strategies (insertion, swapping)
 
 - 💡 **Developer Experience**
