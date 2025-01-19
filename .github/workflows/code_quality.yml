@@ -33,7 +33,7 @@ jobs:
         run: yarn typecheck
 
       - name: 🧹 Run lint
-        run: yarn lint:all
+        run: yarn lint
 
       - name: 🎨 Run Prettier check
         run: yarn format:check
