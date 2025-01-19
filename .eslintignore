@@ -3,5 +3,4 @@ example/*
 **/bob.config.cjs
 **/babel.config.cjs
 **/jest.setup.js
-**/.eslintrc.cjs
 **/dist
