@@ -5,6 +5,6 @@ sidebar_label: Introduction
 
 # React Native Sortable
 
-![a](@site/static/img/banner.png)
+![React Native Sortable Banner](@site/static/img/banner.png)
 
 ## Introduction

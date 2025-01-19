@@ -1,5 +1,8 @@
 {
   "label": "Sortable Grid",
   "position": 2,
-  "link": { "type": "doc", "id": "overview" }
+  "link": {
+    "type": "doc",
+    "id": "overview"
+  }
 }

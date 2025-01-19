@@ -1,5 +1,8 @@
 {
   "label": "Sortable Flex",
   "position": 3,
-  "link": { "type": "doc", "id": "overview" }
+  "link": {
+    "type": "doc",
+    "id": "overview"
+  }
 }
