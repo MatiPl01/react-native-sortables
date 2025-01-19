@@ -9,7 +9,7 @@
     "eslint-config-react-native-matipl01": "2.1.0",
     "get-yarn-workspaces": "^1.0.2",
     "husky": "^9.1.4",
-    "lint-staged": "^15.2.7",
+    "lint-staged": "^15.4.1",
     "prettier": "^3.3.2",
     "syncpack": "^12.3.3",
     "ts-jest": "^29.1.5",
