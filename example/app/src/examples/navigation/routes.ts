@@ -10,6 +10,10 @@ const routes: Routes = {
     CardComponent: SortableGridCard,
     name: 'SortableGrid',
     routes: {
+      Playground: {
+        Component: SortableGrid.PlaygroundExample,
+        name: 'Playground'
+      },
       DropIndicator: {
         Component: SortableGrid.DropIndicatorExample,
         name: 'Drop Indicator'
@@ -44,6 +48,10 @@ const routes: Routes = {
     CardComponent: SortableFlexCard,
     name: 'SortableFlex',
     routes: {
+      Playground: {
+        Component: SortableFlex.PlaygroundExample,
+        name: 'Playground'
+      },
       DropIndicator: {
         Component: SortableFlex.DropIndicatorExample,
         name: 'Drop Indicator'
