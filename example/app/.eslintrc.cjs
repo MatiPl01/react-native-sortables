@@ -7,14 +7,6 @@ module.exports = {
   parserOptions: {
     project: path.join(__dirname, 'tsconfig.json')
   },
-  settings: {
-    'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true,
-        project: path.join(__dirname, 'tsconfig.json')
-      }
-    }
-  },
   rules: {
     'no-relative-import-paths/no-relative-import-paths': [
       'warn',
@@ -24,5 +16,13 @@ module.exports = {
         rootDir: path.relative(rootDir, path.join(__dirname, 'src'))
       }
     ]
+  },
+  settings: {
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: path.join(__dirname, 'tsconfig.json')
+      }
+    }
   }
 };
