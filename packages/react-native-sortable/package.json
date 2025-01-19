@@ -1,6 +1,9 @@
 {
   "name": "react-native-sortable",
+  "description": "Powerful Sortable Components for Flexible Content Reordering in React Native",
   "version": "1.0.0",
+  "author": "Mateusz Łopaciński (https://github.com/MatiPl01)",
+  "bugs": "https://github.com/MatiPl01/react-native-sortable/issues",
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
@@ -36,7 +39,26 @@
     "README.md",
     "CHANGELOG.md"
   ],
-  "keywords": [],
+  "homepage": "https://github.com/MatiPl01/react-native-sortable#readme",
+  "keywords": [
+    "draggable",
+    "draggable-flex",
+    "draggable-grid",
+    "expo",
+    "flex",
+    "gesture-handler",
+    "gestures",
+    "grid",
+    "haptic-feedback",
+    "haptics",
+    "react-native",
+    "reanimated",
+    "reorder",
+    "sortable",
+    "sortable-flex",
+    "sortable-grid"
+  ],
+  "license": "MIT",
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "bash -c tsc --noEmit"
@@ -57,6 +79,7 @@
     "access": "public"
   },
   "react-native": "src/index",
+  "repository": "https://github.com/MatiPl01/react-native-sortable",
   "scripts": {
     "build": "yarn clean && bob build",
     "circular-dependency-check": "yarn madge --extensions js,jsx,ts,tsx --circular src",
