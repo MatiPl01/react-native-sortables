@@ -1,0 +1,5 @@
+# Sortable Grid
+
+import gridVideo from '@site/static/video/grid.mp4';
+
+<video autoPlay loop muted width="100%" src={gridVideo} />
