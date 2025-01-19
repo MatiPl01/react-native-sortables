@@ -26,14 +26,12 @@ const config: Config = {
       'classic',
       {
         blog: {
-          // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/MatiPl01/react-native-sortable/edit/main/packages/docs/',
           feedOptions: {
             type: ['rss', 'atom'],
             xslt: true
           },
-          // Please change this to your repo.
           onInlineAuthors: 'warn',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
@@ -41,9 +39,8 @@ const config: Config = {
           showReadingTime: true
         },
         docs: {
-          // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/MatiPl01/react-native-sortable/edit/main/packages/docs/',
           // Please change this to your repo.
           sidebarPath: './sidebars.ts'
         },
@@ -61,52 +58,53 @@ const config: Config = {
   // useful metadata like html lang. For example, if your site is Chinese, you
   themeConfig: {
     footer: {
-      copyright: `Copyright © ${new Date().getFullYear()} React Native Sortable`,
+      copyright: `Copyright © ${new Date().getFullYear()} | React Native Sortable by MatiPl01`,
       links: [
-        {
-          items: [
-            {
-              label: 'Tutorial',
-              to: '/docs/intro'
-            }
-          ],
-          title: 'Docs'
-        },
-        {
-          items: [
-            {
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-              label: 'Stack Overflow'
-            },
-            {
-              href: 'https://discordapp.com/invite/docusaurus',
-              label: 'Discord'
-            },
-            {
-              href: 'https://x.com/docusaurus',
-              label: 'X'
-            }
-          ],
-          title: 'Community'
-        },
-        {
-          items: [
-            {
-              label: 'Blog',
-              to: '/blog'
-            },
-            {
-              href: 'https://github.com/facebook/docusaurus',
-              label: 'GitHub'
-            }
-          ],
-          title: 'More'
-        }
+        // TODO - change links
+        // {
+        //   items: [
+        //     {
+        //       label: 'Tutorial',
+        //       to: '/docs/intro'
+        //     }
+        //   ],
+        //   title: 'Docs'
+        // },
+        // {
+        //   items: [
+        //     {
+        //       href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+        //       label: 'Stack Overflow'
+        //     },
+        //     {
+        //       href: 'https://discordapp.com/invite/docusaurus',
+        //       label: 'Discord'
+        //     },
+        //     {
+        //       href: 'https://x.com/docusaurus',
+        //       label: 'X'
+        //     }
+        //   ],
+        //   title: 'Community'
+        // },
+        // {
+        //   items: [
+        //     {
+        //       label: 'Blog',
+        //       to: '/blog'
+        //     },
+        //     {
+        //       href: 'https://github.com/facebook/docusaurus',
+        //       label: 'GitHub'
+        //     }
+        //   ],
+        //   title: 'More'
+        // }
       ],
       style: 'dark'
     },
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/docusaurus-social-card.jpg', // TODO - change image
     navbar: {
       items: [
         {
@@ -129,7 +127,7 @@ const config: Config = {
       title: 'Sortable'
     },
     prism: {
-      darkTheme: prismThemes.dracula,
+      darkTheme: prismThemes.vsDark,
       theme: prismThemes.github
     }
   } satisfies Preset.ThemeConfig,
@@ -137,7 +135,9 @@ const config: Config = {
   title: 'Sortable',
 
   // Set the production url of your site here
+  // TODO - change url
   url: 'https://your-docusaurus-site.example.com'
 };
 
+// eslint-disable-next-line import/no-unused-modules
 export default config;
