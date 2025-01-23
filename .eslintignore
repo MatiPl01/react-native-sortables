@@ -4,3 +4,4 @@ example/*
 **/babel.config.cjs
 **/jest.setup.js
 **/dist
+**/README.md

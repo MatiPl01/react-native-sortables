@@ -1,0 +1,86 @@
+---
+sidebar_position: 2
+---
+
+# Getting Started
+
+## 1. Prerequisites
+
+Before getting started, you need to install and configure the following dependencies:
+
+### Required Dependencies
+
+- **react-native-reanimated**: Required for animations
+
+  - Follow the installation guide in [react-native-reanimated docs](https://docs.swmansion.com/react-native-reanimated/)
+
+- **react-native-gesture-handler**: Required for gesture handling
+  - Follow the installation guide in [react-native-gesture-handler docs](https://docs.swmansion.com/react-native-gesture-handler/)
+
+### Optional Dependencies
+
+- **react-native-haptic-feedback**: For haptic feedback support
+  - Follow the installation guide in the [react-native-haptic-feedback README](https://github.com/mkuczera/react-native-haptic-feedback)
+
+## 2. Installation
+
+import TabView from '@site/src/components/TabView';
+
+<TabView>
+  <TabView.Item label='NPM'>
+
+```sh
+npm install react-native-sortable
+```
+
+  </TabView.Item>
+  <TabView.Item label='YARN'>
+
+```sh
+yarn add react-native-sortable
+```
+
+  </TabView.Item>
+</TabView>
+
+## 3. Basic Usage
+
+```tsx
+import { useCallback } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
+import type { SortableGridRenderItem } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
+
+const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
+
+export default function Grid() {
+  const renderItem = useCallback<SortableGridRenderItem<string>>(
+    ({ item }) => (
+      <View style={styles.card}>
+        <Text>{item}</Text>
+      </View>
+    ),
+    []
+  );
+
+  return (
+    <Sortable.Grid
+      columns={3}
+      data={DATA}
+      renderItem={renderItem}
+      rowGap={10}
+      columnGap={10}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#36877F',
+    height: 100,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+});
+```
