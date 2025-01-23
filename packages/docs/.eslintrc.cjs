@@ -65,7 +65,8 @@ module.exports = {
       files: ['*.ts', '*.tsx'],
       extends: path.join(rootDir, '.eslintrc.cjs'),
       rules: {
-        'import/no-unresolved': 'off'
+        'import/no-unresolved': 'off',
+        'import/no-unused-modules': 'off'
       }
     },
 

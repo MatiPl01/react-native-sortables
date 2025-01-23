@@ -49,8 +49,9 @@ Check out the **[Getting Started](./getting-started) guide** to begin using Reac
 
 ---
 
-## Built with ❤️ and:
+## Built with ❤️ and
 
 - [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated)
 - [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler)
+- [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback)
 - [react-native-builder-bob](https://github.com/callstack/react-native-builder-bob)
