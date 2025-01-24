@@ -43,44 +43,9 @@ yarn add react-native-sortable
   </TabView.Item>
 </TabView>
 
-## 3. Basic Usage
+## 3. Next Steps
 
-```tsx
-import { useCallback } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import type { SortableGridRenderItem } from 'react-native-sortable';
-import Sortable from 'react-native-sortable';
+Head over to one of the following sections to learn how to use the library:
 
-const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
-
-export default function Grid() {
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <View style={styles.card}>
-        <Text>{item}</Text>
-      </View>
-    ),
-    []
-  );
-
-  return (
-    <Sortable.Grid
-      columns={3}
-      data={DATA}
-      renderItem={renderItem}
-      rowGap={10}
-      columnGap={10}
-    />
-  );
-}
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#36877F',
-    height: 100,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-});
-```
+- [Sortable Grid](./grid/overview)
+- [Sortable Flex](./flex/overview)
