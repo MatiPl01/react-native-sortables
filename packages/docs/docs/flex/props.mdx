@@ -6,75 +6,81 @@ sidebar_position: 2
 
 ## Base
 
-### data
+### children
 
-An array (or array-like list) of items to render.
+Children components to render within the flex container.
 
-| type       | default | required |
-| ---------- | ------- | -------- |
-| `Array<T>` | NO      | YES      |
-
----
-
-### renderItem
-
-Takes an item from data and renders it into the grid.
-
-| type                        | default | required |
-| --------------------------- | ------- | -------- |
-| `SortableGridRenderItem<T>` | NO      | YES      |
-
-<details>
-  <summary>Type definitions</summary>
-
-```tsx
-type SortableGridRenderItem<T> = (
-  info: SortableGridRenderItemInfo<T>
-) => JSX.Element;
-
-type SortableGridRenderItemInfo<T> = {
-  item: T;
-  index: number;
-};
-```
-
-</details>
+| type        | default | required |
+| ----------- | ------- | -------- |
+| `ReactNode` | NO      | YES      |
 
 ---
 
-### keyExtractor
+## Flex Layout
 
-Used to extract a unique key for each item. Key is used for the identification of the item when items are reordered.
+### alignContent
 
-| type                                 | default | required |
-| ------------------------------------ | ------- | -------- |
-| `(item: T, index: number) => string` | YES\*   | NO       |
+Controls how item groups are aligned along the cross axis.
 
-\*Default `keyExtractor` implementation returns item if it is a string, `id` or `key` property if the item is an object and has one of those properties or stringified item in all other cases.
-
-:::important
-
-If your data items are **objects** that have neither `id` nor `key` properties, you **should always** provide a custom `keyExtractor` implementation.
-
-:::
+| type                                                                                            | default      | required |
+| ----------------------------------------------------------------------------------------------- | ------------ | -------- |
+| `'flex-start' \| 'flex-end' \| 'center' \| 'space-between' \| 'space-around' \| 'space-evenly'` | 'flex-start' | NO       |
 
 ---
 
-## Grid Layout
+### justifyContent
 
-### columns
+Controls how items are positioned within groups along the main axis.
 
-Number of columns in the grid.
+| type                                                                                            | default      | required |
+| ----------------------------------------------------------------------------------------------- | ------------ | -------- |
+| `'flex-start' \| 'flex-end' \| 'center' \| 'space-between' \| 'space-around' \| 'space-evenly'` | 'flex-start' | NO       |
+
+---
+
+### alignItems
+
+Controls how items are aligned within the group along the cross axis.
+
+| type                                                   | default | required |
+| ------------------------------------------------------ | ------- | -------- |
+| `'flex-start' \| 'flex-end' \| 'center' \| 'baseline'` | NO      | NO       |
+
+---
+
+### flexDirection
+
+Controls the direction of items in the flex container.
+
+| type                                                     | default | required |
+| -------------------------------------------------------- | ------- | -------- |
+| `'row' \| 'column' \| 'row-reverse' \| 'column-reverse'` | 'row'   | NO       |
+
+---
+
+### flexWrap
+
+Controls whether items should wrap or not.
+
+| type                                   | default | required |
+| -------------------------------------- | ------- | -------- |
+| `'nowrap' \| 'wrap' \| 'wrap-reverse'` | 'wrap'  | NO       |
+
+---
+
+### gap
+
+Gap between items in the flex container.
 
 | type     | default | required |
 | -------- | ------- | -------- |
-| `number` | 1       | NO       |
+| `number` | 0       | NO       |
 
 ---
 
 ### rowGap
 
-Gap between rows in the grid.
+Gap between rows in the flex container.
 
 | type     | default | required |
 | -------- | ------- | -------- |
@@ -84,7 +90,137 @@ Gap between rows in the grid.
 
 ### columnGap
 
-Gap between columns in the grid.
+Gap between columns in the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
+
+---
+
+### height
+
+Height of the flex container. If not specified, the height will be determined by the content.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | NO      | NO       |
+
+---
+
+### width
+
+Width of the flex container. If not specified, the width will be determined by the content.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | NO      | NO       |
+
+---
+
+### minHeight
+
+Minimum height of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | NO      | NO       |
+
+---
+
+### minWidth
+
+Minimum width of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | NO      | NO       |
+
+---
+
+### maxHeight
+
+Maximum height of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | NO      | NO       |
+
+---
+
+### maxWidth
+
+Maximum width of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | NO      | NO       |
+
+---
+
+### padding
+
+Padding of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
+
+---
+
+### paddingTop
+
+Top padding of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
+
+---
+
+### paddingRight
+
+Right padding of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
+
+---
+
+### paddingLeft
+
+Left padding of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
+
+---
+
+### paddingBottom
+
+Bottom padding of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
+
+---
+
+### paddingVertical
+
+Vertical padding of the flex container.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
+
+---
+
+### paddingHorizontal
+
+Horizontal padding of the flex container.
 
 | type     | default | required |
 | -------- | ------- | -------- |
@@ -94,7 +230,7 @@ Gap between columns in the grid.
 
 ### animateHeight
 
-Whether the height of the grid should be animated when the items are reordered.
+Whether the height of the flex component should be animated when the items are reordered.
 
 | type      | default | required |
 | --------- | ------- | -------- |
@@ -180,7 +316,7 @@ Horizontal snap offset of the item. When percentage is used, it is relative to t
 
 | type     | default | required |
 | -------- | ------- | -------- |
-| `Offset` | '50%'   | NO       |
+| `Offset` | 50%     | NO       |
 
 ---
 
@@ -190,7 +326,7 @@ Vertical snap offset of the item. When percentage is used, it is relative to the
 
 | type     | default | required |
 | -------- | ------- | -------- |
-| `Offset` | '50%'   | NO       |
+| `Offset` | 50%     | NO       |
 
 :::tip
 
@@ -202,11 +338,11 @@ You can think of the snap offset as a point positioned relative to the **top lef
 
 ## Auto Scroll
 
-Auto scroll settings control the **behavior of the grid** when the active item is dragged **close to the edges** of the grid. They are used to **automatically scroll** the scrollable container when the active item is close to the edges.
+Auto scroll settings control the **behavior of the flex** component when the active item is dragged **close to the edges** of this component. They are used to **automatically scroll** the scrollable container when the active item is close to the edges.
 
 ### scrollableRef
 
-An `AnimatedRef` to the scrollable container (e.g. `Animated.ScrollView` or `Animated.FlatList` from `react-native-reanimated`) within which the grid is rendered.
+An `AnimatedRef` to the scrollable container (e.g. `Animated.ScrollView` or `Animated.FlatList` from `react-native-reanimated`) within which the flex component is rendered.
 
 | type                 | default | required |
 | -------------------- | ------- | -------- |
@@ -220,7 +356,7 @@ An `AnimatedRef` to the scrollable container (e.g. `Animated.ScrollView` or `Ani
 
 ### autoScrollActivationOffset
 
-Offset from the edge of the grid at which the auto scroll is activated.
+Offset from the edge of the flex component at which the auto scroll is activated.
 
 You can provide a **single number**, which will be used for both **top** and **bottom** edges or an array of **two numbers**, first for **top** edge and second for **bottom** edge.
 
@@ -310,11 +446,11 @@ type DropIndicatorComponentProps = {
 
 ## Layout Animations
 
-Layout animations control the **appearance or disappearance animations** of items **added or removed from the grid**.
+Layout animations control the **appearance or disappearance animations** of items **added or removed from the flex container**.
 
 ### itemEntering
 
-Layout animation to use when an item is added to the grid.
+Layout animation to use when an item is added to the flex container.
 
 | type              | default                | required |
 | ----------------- | ---------------------- | -------- |
@@ -326,7 +462,7 @@ Layout animation to use when an item is added to the grid.
 
 ### itemExiting
 
-Layout animation to use when an item is removed from the grid.
+Layout animation to use when an item is removed from the flex container.
 
 | type              | default               | required |
 | ----------------- | --------------------- | -------- |
@@ -366,25 +502,23 @@ type DragStartParams = {
 
 Called when the drag gesture ends. Data passed to the callback is the new order of the items.
 
-| type                             | default | required |
-| -------------------------------- | ------- | -------- |
-| `SortableGridDragEndCallback<T>` | NO      | NO       |
+| type                          | default | required |
+| ----------------------------- | ------- | -------- |
+| `SortableFlexDragEndCallback` | NO      | NO       |
 
 <details>
   <summary>Type definitions</summary>
 
 ```tsx
-type SortableGridDragEndCallback<T> = (
-  params: SortableGridDragEndParams<T>
-) => void;
+type SortableFlexDragEndCallback = (params: SortableFlexDragEndParams) => void;
 
-type SortableGridDragEndParams<T> = {
+type SortableFlexDragEndParams = {
   key: string;
   fromIndex: number;
   toIndex: number;
   indexToKey: Array<string>;
   keyToIndex: Record<string, number>;
-  data: Array<T>;
+  order: <I>(data: Array<I>) => Array<I>; // orders provided array to match the new order of items
 };
 ```
 
@@ -427,16 +561,16 @@ Controls how items **are reordered** while the **active item** is being **dragge
 
 | type                   | default  | required |
 | ---------------------- | -------- | -------- |
-| `SortableGridStrategy` | 'insert' | NO       |
+| `SortableFlexStrategy` | 'insert' | NO       |
 
 <details>
   <summary>Type definitions</summary>
 
 ```tsx
-type SortableGridStrategy = 'insert' | 'swap' | SortableGridStrategyFactory;
+type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
 ```
 
-{/* TODO: Add link to docs page explaining how to use SortableGridStrategyFactory */}
+{/* TODO: Add link to docs page explaining how to use SortableFlexStrategyFactory */}
 
 </details>
 
