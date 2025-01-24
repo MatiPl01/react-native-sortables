@@ -1,0 +1,469 @@
+---
+sidebar_position: 2
+---
+
+# Props
+
+## Base
+
+### data
+
+An array (or array-like list) of items to render.
+
+| type       | default | required |
+| ---------- | ------- | -------- |
+| `Array<T>` | NO      | YES      |
+
+---
+
+### renderItem
+
+Takes an item from data and renders it into the grid.
+
+| type                        | default | required |
+| --------------------------- | ------- | -------- |
+| `SortableGridRenderItem<T>` | NO      | YES      |
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type SortableGridRenderItem<T> = (
+  info: SortableGridRenderItemInfo<T>
+) => JSX.Element;
+
+type SortableGridRenderItemInfo<T> = {
+  item: T;
+  index: number;
+};
+```
+
+</details>
+
+---
+
+### keyExtractor
+
+Used to extract a unique key for each item. Key is used for the identification of the item when items are reordered.
+
+| type                                 | default | required |
+| ------------------------------------ | ------- | -------- |
+| `(item: T, index: number) => string` | YES\*   | NO       |
+
+\*Default `keyExtractor` implementation returns item if it is a string, `id` or `key` property if the item is an object and has one of those properties or stringified item in all other cases.
+
+:::important
+
+If your data items are **objects** that have neither `id` nor `key` properties, you **should always** provide a custom `keyExtractor` implementation.
+
+:::
+
+---
+
+## Grid Layout
+
+### columns
+
+Number of columns in the grid.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 1       | NO       |
+
+---
+
+### rowGap
+
+Gap between rows in the grid.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
+
+---
+
+### columnGap
+
+Gap between columns in the grid.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
+
+---
+
+### animateHeight
+
+Whether the height of the grid should be animated when the items are reordered.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | false   | NO       |
+
+:::warning
+
+This may sometimes cause **performance issues** as it requires layout recalculations.
+
+:::
+
+---
+
+## Active Item Decoration
+
+All active item decoration settings are applied when the **item becomes active** (when drag gesture starts being handled).
+
+### activeItemScale
+
+Scale to which the pressed item is scaled when active.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 1.1     | NO       |
+
+---
+
+### activeItemOpacity
+
+Opacity to which the pressed item is animated when active.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 1       | NO       |
+
+### activeItemShadowOpacity
+
+Shadow opacity of the active item.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0.2     | NO       |
+
+---
+
+### inactiveItemOpacity
+
+Opacity to which all items except the pressed one are animated when pressed item becomes active.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0.5     | NO       |
+
+---
+
+### inactiveItemScale
+
+Scale to which all items except the pressed one are animated when pressed item becomes active.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 1       | NO       |
+
+---
+
+## Active Item Snap
+
+Active item snap settings determine how the active item will be **positioned in relation to the finger** when the drag gesture starts. They control **snapping of the active item to the user's finger**.
+
+### enableActiveItemSnap
+
+Whether the active item should snap to the finger.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | true    | NO       |
+
+---
+
+### snapOffsetX
+
+Horizontal snap offset of the item. When percentage is used, it is relative to the width of the item.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `Offset` | 50%     | NO       |
+
+---
+
+### snapOffsetY
+
+Vertical snap offset of the item. When percentage is used, it is relative to the height of the item.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `Offset` | 50%     | NO       |
+
+:::tip
+
+You can think of the snap offset as a point positioned relative to the **top left** corner of the item. The `snapOffsetX` moves the point to the **right** and the `snapOffsetY` moves it **down**.
+
+:::
+
+---
+
+## Auto Scroll
+
+Auto scroll settings control the **behavior of the grid** when the active item is dragged **close to the edges** of the grid. They are used to **automatically scroll** the grid when the active item is close to the edges.
+
+### scrollableRef
+
+An `AnimatedRef` to the scrollable container (e.g. `Animated.ScrollView` or `Animated.FlatList` from `react-native-reanimated`) within which the grid is rendered.
+
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `AnimatedRef<any>`\* | NO      | NO\*\*   |
+
+\*This is just a temporary type.
+
+\*\*You need to provide this prop if you want to use auto scroll.
+
+---
+
+### autoScrollActivationOffset
+
+Offset from the edge of the grid at which the auto scroll is activated.
+
+You can provide a s**ingle number**, which will be used for both **top** and **bottom** edges or an array of **two numbers**, first for **top** edge and second for **bottom** edge.
+
+| type                         | default | required |
+| ---------------------------- | ------- | -------- |
+| `[number, number] \| number` | 40      | NO       |
+
+---
+
+### autoScrollSpeed
+
+Speed of the auto scroll. Adjust it based on your preferences.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 1       | NO       |
+
+---
+
+### autoScrollEnabled
+
+Controls whether the auto scroll is enabled.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | true    | NO       |
+
+:::important
+
+Use this prop to **disable** auto scroll instead of removing the `scrollableRef` prop. The `scrollableRef` prop cannot be changed on the fly.
+
+:::
+
+---
+
+## Drop Indicator
+
+Drop indicator settings control the **visual feedback** showing the **target position** of the **active item** at which it will be positioned when the **drag gesture ends**.
+
+### showDropIndicator
+
+Controls whether the drop indicator is shown.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | false   | NO       |
+
+---
+
+### dropIndicatorStyle
+
+Style of the drop indicator. This is typically used to **customize the appearance** of the default drop indicator component.
+
+| type        | default | required |
+| ----------- | ------- | -------- |
+| `ViewStyle` | \{}     | NO       |
+
+---
+
+### DropIndicatorComponent
+
+Component to use as the drop indicator. It gives a **full control** over the drop indicator **appearance and behavior**.
+
+| type                                         | default | required |
+| -------------------------------------------- | ------- | -------- |
+| `ComponentType<DropIndicatorComponentProps>` | YES\*   | NO       |
+
+\*Default `DropIndicatorComponent` implementation is a simple `View` with a **dashed border** and a **semi-transparent background**.
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type DropIndicatorComponentProps = {
+  activationProgress: SharedValue<number>;
+  touchedItemKey: SharedValue<null | string>;
+  dropIndex: SharedValue<number>;
+  dropPosition: SharedValue<Vector>;
+  orderedItemKeys: SharedValue<Array<string>>;
+  style: ViewStyle;
+};
+```
+
+</details>
+
+---
+
+## Layout Animations
+
+Layout animations control the **appearance or disappearance animations** of items **added or removed from the grid**.
+
+### itemEntering
+
+Layout animation to use when an item is added to the grid.
+
+| type              | default                | required |
+| ----------------- | ---------------------- | -------- |
+| `LayoutAnimation` | SortableItemEntering\* | NO       |
+
+\*Library default `itemEntering` implementation.
+
+---
+
+### itemExiting
+
+Layout animation to use when an item is removed from the grid.
+
+| type              | default               | required |
+| ----------------- | --------------------- | -------- |
+| `LayoutAnimation` | SortableItemExiting\* | NO       |
+
+\*Library default `itemExiting` implementation.
+
+---
+
+## Callbacks
+
+### onDragStart
+
+Called when the drag gesture starts.
+
+| type                | default | required |
+| ------------------- | ------- | -------- |
+| `DragStartCallback` | NO      | NO       |
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type DragStartCallback = (params: DragStartParams) => void;
+
+type DragStartParams = {
+  key: string;
+  fromIndex: number;
+};
+```
+
+</details>
+
+---
+
+### onDragEnd
+
+Called when the drag gesture ends. Data passed to the callback is the new order of the items.
+
+| type                             | default | required |
+| -------------------------------- | ------- | -------- |
+| `SortableGridDragEndCallback<T>` | NO      | NO       |
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type SortableGridDragEndCallback<T> = (
+  params: SortableGridDragEndParams<T>
+) => void;
+
+type SortableGridDragEndParams<T> = {
+  key: string;
+  fromIndex: number;
+  toIndex: number;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
+  data: Array<T>;
+};
+```
+
+</details>
+
+---
+
+### onOrderChange
+
+Called when the order of the items changes while dragging.
+
+| type                  | default | required |
+| --------------------- | ------- | -------- |
+| `OrderChangeCallback` | NO      | NO       |
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type OrderChangeCallback = (params: OrderChangeParams) => void;
+
+type OrderChangeParams = {
+  key: string;
+  fromIndex: number;
+  toIndex: number;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
+};
+```
+
+</details>
+
+---
+
+## Other Settings
+
+### Order Updater Strategy
+
+Controls how items **are reordered** while the **active item** is being **dragged around**.
+
+| type                   | default  | required |
+| ---------------------- | -------- | -------- |
+| `SortableGridStrategy` | 'insert' | NO       |
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type SortableGridStrategy = 'insert' | 'swap' | SortableGridStrategyFactory;
+```
+
+{/* TODO: Add link to docs page explaining how to use SortableGridStrategyFactory */}
+
+</details>
+
+---
+
+### hapticsEnabled
+
+Whether haptics are enabled. Vibrations are fired when the **pressed item becomes active**, the **order of items changes** or the drag gesture ends and the **item is dropped**.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | false   | NO       |
+
+---
+
+:::important
+
+To use haptics, you have to install `react-native-haptic-feedback` package. See this [Getting Started](../getting-started#optional-dependencies) section for more details.
+
+:::
+
+---
+
+### debug
+
+Enables debug mode, which shows additional views helpful for debugging. This property is intended for the library **developers** and is not recommended for the library **users**.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | false   | NO       |

@@ -2,6 +2,8 @@
   "label": "Examples",
   "position": 3,
   "link": {
-    "type": "generated-index"
+    "type": "generated-index",
+    "title": "Grid Examples",
+    "slug": "/grid/examples"
   }
 }
