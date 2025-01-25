@@ -49,15 +49,11 @@ export default function DataChangeExample() {
 
   const appendItem = useCallback(() => {
     setData(prevData => {
-      const newArray = [...prevData];
-
-      for (let i = 0; i < 5; i++) {
-        const newItem = getNewItemName(newArray);
-        if (newItem) {
-          newArray.push(newItem);
-        }
+      const newItem = getNewItemName(prevData);
+      if (newItem) {
+        return [...prevData, newItem];
       }
-      return newArray;
+      return prevData;
     });
   }, [getNewItemName]);
 

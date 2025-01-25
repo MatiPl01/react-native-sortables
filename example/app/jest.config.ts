@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unused-modules */
 import { type JestConfigWithTsJest, pathsToModuleNameMapper } from 'ts-jest';
 
 import { compilerOptions } from './tsconfig.json';
