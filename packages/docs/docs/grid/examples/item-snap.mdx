@@ -1,0 +1,104 @@
+---
+sidebar_position: 3
+description: ''
+---
+
+# Item snap
+
+## Description
+
+The item snap is a **transformation of the item** that happens when the user **presses the item** (before the drag starts). It **transforms** the item **in relation to the touch position**.
+
+## Source Code
+
+```tsx
+import { useCallback } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import type { SortableGridRenderItem } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
+
+const DATA = Array.from({ length: 4 }, (_, index) => `Item ${index + 1}`);
+
+export default function Example() {
+  const renderItem = useCallback<SortableGridRenderItem<string>>(
+    ({ item }) => (
+      <View style={styles.card}>
+        <Text style={styles.text}>{item}</Text>
+      </View>
+    ),
+    []
+  );
+
+  return (
+    <View style={styles.container}>
+      <Sortable.Grid
+        columnGap={10}
+        columns={2}
+        data={DATA}
+        renderItem={renderItem}
+        rowGap={10}
+        // enableActiveItemSnap={true}
+        // snapOffsetX='50%'
+        // snapOffsetY='50%'
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    alignItems: 'center',
+    backgroundColor: '#36877F',
+    borderRadius: 10,
+    height: 100,
+    justifyContent: 'center'
+  },
+  container: {
+    padding: 10
+  },
+  text: {
+    color: 'white',
+    fontWeight: 'bold'
+  }
+});
+```
+
+## Result
+
+### Default
+
+import defaultVideo from '@site/static/video/grid-snap-default.mp4';
+
+<video autoPlay loop muted width='300px' src={defaultVideo} />
+
+### Disabled
+
+```tsx
+enableActiveItemSnap={false}
+```
+
+import disabledVideo from '@site/static/video/grid-snap-disabled.mp4';
+
+<video autoPlay loop muted width='300px' src={disabledVideo} />
+
+### Custom Numeric
+
+```tsx
+snapOffsetX={0}
+snapOffsetY={0}
+```
+
+import custom1Video from '@site/static/video/grid-snap-custom1.mp4';
+
+<video autoPlay loop muted width='300px' src={custom1Video} />
+
+### Custom Mixed
+
+```tsx
+snapOffsetX='120%'
+snapOffsetY={10}
+```
+
+import custom2Video from '@site/static/video/grid-snap-custom2.mp4';
+
+<video autoPlay loop muted width='300px' src={custom2Video} />
