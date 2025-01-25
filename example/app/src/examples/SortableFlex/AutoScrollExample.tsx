@@ -41,23 +41,17 @@ function ScrollViewExample() {
       contentContainerStyle={style.contentContainer}
       ref={scrollableRef}
       removeClippedSubviews={false}>
-      <Sortable.Layer>
-        <Group>
-          <ManyCategories scrollableRef={scrollableRef} />
-        </Group>
-      </Sortable.Layer>
+      <Group>
+        <ManyCategories scrollableRef={scrollableRef} />
+      </Group>
       <SeparatorSection />
-      <Sortable.Layer>
-        <Group>
-          <FewCategories scrollableRef={scrollableRef} />
-        </Group>
-      </Sortable.Layer>
+      <Group>
+        <FewCategories scrollableRef={scrollableRef} />
+      </Group>
       <SeparatorSection />
-      <Sortable.Layer>
-        <Group>
-          <ManyCategories scrollableRef={scrollableRef} />
-        </Group>
-      </Sortable.Layer>
+      <Group>
+        <ManyCategories scrollableRef={scrollableRef} />
+      </Group>
     </Animated.ScrollView>
   );
 }

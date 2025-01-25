@@ -4,6 +4,8 @@ import type { SharedValue } from 'react-native-reanimated';
 
 export type AnyFunction = (...args: Array<any>) => any;
 
+export type EmptyFunction = () => void;
+
 export type AnyRecord = Record<string, any>;
 
 export type Simplify<T> = {
