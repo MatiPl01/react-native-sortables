@@ -1,6 +1,7 @@
-import { colors, text } from '@/theme';
-import { Text, View, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Sortable from 'react-native-sortable';
+
+import { colors, text } from '@/theme';
 
 const DATA = [
   'Poland',
@@ -22,7 +23,7 @@ export default function Flex() {
     <Sortable.Flex gap={10} padding={10}>
       {/* You can render anything within the Sortable.Flex component */}
       {DATA.map(item => (
-        <View style={styles.cell} key={item}>
+        <View key={item} style={styles.cell}>
           <Text style={styles.text}>{item}</Text>
         </View>
       ))}
@@ -32,11 +33,11 @@ export default function Flex() {
 
 const styles = StyleSheet.create({
   cell: {
+    alignItems: 'center',
     backgroundColor: '#36877F',
     borderRadius: 9999,
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    padding: 10
   },
   text: {
     ...text.label2,

@@ -1,0 +1,81 @@
+---
+sidebar_position: 2
+---
+
+# Touchables
+
+## Overview
+
+React Native Sortable exports a few touchable components, i.e. `Pressable`, `TouchableOpacity` and `TouchableHighlight`.
+
+The role of these components is to properly handle **press gesture** on components nested within children of **sortable components**.
+
+### Purpose
+
+These touchable components are designed to:
+
+- Handle **press gestures** properly within **sortable component items**
+- **Prevent conflicts** between press handling and **drag-and-drop** functionality
+
+### When to Use?
+
+Use these components when you need to add **interactive elements** (buttons, links, etc.) inside **sortable items**. The **press gesture** on a touchable component may interfere with the **gesture detector** used for item activation and dragging. These components will automatically **ignore press events** when sortable component item starts being dragged.
+
+## Usage
+
+Use these components withing a sortable component's child (item) component.
+
+```tsx
+import Sortable from 'react-native-sortable';
+
+function Item({ item }: { item: string }) {
+  return (
+    // ... other components
+    <Sortable.Pressable
+      onPress={() => {
+        console.log('pressed');
+      }}>
+      {/* ... other components */}
+    </Sortable.Pressable>
+    // ... other components
+  );
+}
+```
+
+And, for example, if you use the **Sortable Grid** component:
+
+```tsx
+import { useCallback } from 'react';
+import Sortable from 'react-native-sortable';
+import type { SortableGridRenderItem } from 'react-native-sortable';
+
+export default function Grid() {
+  const renderItem = useCallback<SortableGridRenderItem<string>>(
+    ({ item }) => <Item item={item} />,
+    []
+  );
+
+  return (
+    <Sortable.Grid
+      renderItem={renderItem}
+      // ... other props
+    />
+  );
+}
+```
+
+## Props
+
+### onPress
+
+Function that will be called when the user **presses** the component **nested within a sortable component child**.
+
+| type                                                            | default | required |
+| --------------------------------------------------------------- | ------- | -------- |
+| `((event: GestureResponderEvent) => void) \| null \| undefined` | NO      | NO       |
+
+:::info
+
+If you need more different props, you can open a [Pull Request](https://github.com/MatiPl01/react-native-sortable/) to add them or request them in the [GitHub Discussions](https://github.com/MatiPl01/react-native-sortable/discussions).
+
+:::
