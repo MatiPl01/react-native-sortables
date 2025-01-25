@@ -1,28 +1,22 @@
-import { useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Animated, {
-  interpolateColor,
-  useAnimatedReaction,
-  useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-  withSequence,
-  withSpring,
-  withTiming
-} from 'react-native-reanimated';
-import type {
-  DropIndicatorComponentProps,
-  SortableGridRenderItem
-} from 'react-native-sortable';
+import { useCallback, useState } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
+import type { SortableGridRenderItem } from 'react-native-sortable';
 import Sortable from 'react-native-sortable';
 
-const DATA = Array.from({ length: 18 }, (_, index) => `Item ${index + 1}`);
+const DATA = Array.from({ length: 4 }, (_, index) => `Item ${index + 1}`);
 
-export default function Example() {
+export default function Grid() {
+  const [data, setData] = useState(DATA);
+
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
       <View style={styles.card}>
         <Text style={styles.text}>{item}</Text>
+        <Sortable.Pressable
+          style={styles.deleteButton}
+          onPress={() => setData(prev => prev.filter(i => i !== item))}>
+          <Text style={styles.text}>Delete</Text>
+        </Sortable.Pressable>
       </View>
     ),
     []
@@ -31,89 +25,35 @@ export default function Example() {
   return (
     <View style={styles.container}>
       <Sortable.Grid
-        columnGap={10}
-        columns={3}
-        data={DATA}
-        DropIndicatorComponent={DropIndicator}
+        columns={2}
+        data={data}
         renderItem={renderItem}
         rowGap={10}
-        showDropIndicator
+        columnGap={10}
       />
     </View>
   );
 }
 
-function DropIndicator({
-  activationProgress,
-  dropIndex,
-  orderedItemKeys,
-  style,
-  touchedItemKey
-}: DropIndicatorComponentProps) {
-  const itemsCount = useDerivedValue(() => orderedItemKeys.value.length);
-  const indexes = useDerivedValue(() =>
-    Array.from({ length: itemsCount.value }, (_, i) => i)
-  );
-  const colors = useDerivedValue(() =>
-    new Array(itemsCount.value).fill(null).map((_, i) => {
-      const hue = (360 / itemsCount.value) * i;
-      return `hsl(${hue}, 100%, 50%)`;
-    })
-  );
-
-  const scale = useSharedValue(0);
-  const colorIndex = useSharedValue(0);
-  const showIndicator = useDerivedValue(
-    () => activationProgress.value > 0.2 && touchedItemKey.value !== null
-  );
-
-  useAnimatedReaction(
-    () => ({
-      count: itemsCount.value,
-      index: dropIndex.value,
-      show: showIndicator.value
-    }),
-    ({ count, index, show }, prev) => {
-      if (show !== prev?.show) {
-        scale.value = withSpring(+show);
-      } else if (show && index !== prev?.index) {
-        colorIndex.value = withTiming(index % count);
-        scale.value = withSequence(
-          withTiming(0.75, { duration: 100 }),
-          withSpring(1)
-        );
-      }
-    }
-  );
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      colorIndex.value,
-      indexes.value,
-      colors.value
-    ),
-    transform: [{ scale: scale.value }]
-  }));
-
-  return (
-    <Animated.View style={[style, styles.customIndicator, animatedStyle]} />
-  );
-}
-
 const styles = StyleSheet.create({
-  card: {
-    alignItems: 'center',
-    backgroundColor: '#36877F',
-    borderRadius: 10,
-    height: 100,
-    justifyContent: 'center'
-  },
   container: {
     padding: 10
   },
-  customIndicator: { borderStyle: 'solid' },
+  card: {
+    backgroundColor: '#36877F',
+    height: 100,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10
+  },
   text: {
     color: 'white',
     fontWeight: 'bold'
+  },
+  deleteButton: {
+    backgroundColor: '#6AA67C',
+    padding: 10,
+    borderRadius: 10
   }
 });
