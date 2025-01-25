@@ -1,14 +1,24 @@
 import { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import type { SortableGridRenderItem } from 'react-native-sortable';
+import Animated, {
+  interpolateColor,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming
+} from 'react-native-reanimated';
+import type {
+  DropIndicatorComponentProps,
+  SortableGridRenderItem
+} from 'react-native-sortable';
 import Sortable from 'react-native-sortable';
 
-const DATA = Array.from({ length: 30 }, (_, index) => `Item ${index + 1}`);
+const DATA = Array.from({ length: 18 }, (_, index) => `Item ${index + 1}`);
 
-export default function PlaygroundExample() {
-  const scrollableRef = useAnimatedRef<Animated.ScrollView>();
-
+export default function Example() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
       <View style={styles.card}>
@@ -19,20 +29,74 @@ export default function PlaygroundExample() {
   );
 
   return (
-    <Animated.ScrollView
-      contentContainerStyle={styles.contentContainer}
-      ref={scrollableRef}>
+    <View style={styles.container}>
       <Sortable.Grid
         columnGap={10}
         columns={3}
         data={DATA}
+        DropIndicatorComponent={DropIndicator}
         renderItem={renderItem}
         rowGap={10}
-        scrollableRef={scrollableRef} // required for auto scroll
-        // autoScrollActivationOffset={200}
-        autoScrollSpeed={0.2}
+        showDropIndicator
       />
-    </Animated.ScrollView>
+    </View>
+  );
+}
+
+function DropIndicator({
+  activationProgress,
+  dropIndex,
+  orderedItemKeys,
+  style,
+  touchedItemKey
+}: DropIndicatorComponentProps) {
+  const itemsCount = useDerivedValue(() => orderedItemKeys.value.length);
+  const indexes = useDerivedValue(() =>
+    Array.from({ length: itemsCount.value }, (_, i) => i)
+  );
+  const colors = useDerivedValue(() =>
+    new Array(itemsCount.value).fill(null).map((_, i) => {
+      const hue = (360 / itemsCount.value) * i;
+      return `hsl(${hue}, 100%, 50%)`;
+    })
+  );
+
+  const scale = useSharedValue(0);
+  const colorIndex = useSharedValue(0);
+  const showIndicator = useDerivedValue(
+    () => activationProgress.value > 0.2 && touchedItemKey.value !== null
+  );
+
+  useAnimatedReaction(
+    () => ({
+      count: itemsCount.value,
+      index: dropIndex.value,
+      show: showIndicator.value
+    }),
+    ({ count, index, show }, prev) => {
+      if (show !== prev?.show) {
+        scale.value = withSpring(+show);
+      } else if (show && index !== prev?.index) {
+        colorIndex.value = withTiming(index % count);
+        scale.value = withSequence(
+          withTiming(0.75, { duration: 100 }),
+          withSpring(1)
+        );
+      }
+    }
+  );
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      colorIndex.value,
+      indexes.value,
+      colors.value
+    ),
+    transform: [{ scale: scale.value }]
+  }));
+
+  return (
+    <Animated.View style={[style, styles.customIndicator, animatedStyle]} />
   );
 }
 
@@ -44,9 +108,10 @@ const styles = StyleSheet.create({
     height: 100,
     justifyContent: 'center'
   },
-  contentContainer: {
+  container: {
     padding: 10
   },
+  customIndicator: { borderStyle: 'solid' },
   text: {
     color: 'white',
     fontWeight: 'bold'

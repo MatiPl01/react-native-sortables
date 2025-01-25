@@ -3,8 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { memo, useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RouteCard, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
@@ -12,7 +13,6 @@ import { colors, flex, spacing } from '@/theme';
 import exampleRoutes from './routes';
 import type { Routes } from './types';
 import { getScreenTitle, hasRoutes } from './utils';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const StackNavigator =
   createNativeStackNavigator<Record<string, React.ComponentType>>();
@@ -57,8 +57,8 @@ function createStackNavigator(routes: Routes): React.ComponentType {
         <StackNavigator.Navigator
           screenOptions={{
             headerLeft: () => <BackButton />,
-            headerTitleAlign: 'center',
-            headerShown: false
+            headerShown: false,
+            headerTitleAlign: 'center'
           }}>
           {createNavigationScreens(routes, 'Examples')}
         </StackNavigator.Navigator>

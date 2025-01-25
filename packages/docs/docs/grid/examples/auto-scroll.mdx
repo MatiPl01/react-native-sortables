@@ -19,7 +19,7 @@ import Sortable from 'react-native-sortable';
 
 const DATA = Array.from({ length: 30 }, (_, index) => `Item ${index + 1}`);
 
-export default function PlaygroundExample() {
+export default function Example() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
