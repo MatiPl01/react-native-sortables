@@ -12,7 +12,7 @@ Children components to render within the flex container.
 
 | type        | default | required |
 | ----------- | ------- | -------- |
-| `ReactNode` | NO      | YES      |
+| `ReactNode` | NO      | NO       |
 
 ---
 
@@ -518,7 +518,7 @@ type SortableFlexDragEndParams = {
   toIndex: number;
   indexToKey: Array<string>;
   keyToIndex: Record<string, number>;
-  order: <I>(data: Array<I>) => Array<I>; // orders provided array to match the new order of items
+  order: <I>(data: Array<I>) => Array<I>; // returns new array with items in the new order
 };
 ```
 
@@ -555,7 +555,7 @@ type OrderChangeParams = {
 
 ## Other Settings
 
-### Order Updater Strategy
+### strategy
 
 Controls how items **are reordered** while the **active item** is being **dragged around**.
 
