@@ -146,9 +146,9 @@ function SortableGridInner<I>({
       style={[styles.gridContainer, animatedInnerStyle]}>
       {zipArrays(data, itemKeys).map(([item, key], index) => (
         <SortableGridItem
-          index={index}
           entering={itemEntering}
           exiting={itemExiting}
+          index={index}
           item={item}
           itemKey={key}
           key={key}
@@ -176,7 +176,7 @@ const SortableGridItem = typedMemo(function <I>({
   renderItem,
   ...rest
 }: SortableGridItemProps<I>) {
-  return <DraggableView {...rest}>{renderItem({ item, index })}</DraggableView>;
+  return <DraggableView {...rest}>{renderItem({ index, item })}</DraggableView>;
 });
 
 const styles = StyleSheet.create({
