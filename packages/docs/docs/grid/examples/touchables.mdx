@@ -1,0 +1,93 @@
+---
+sidebar_position: 4
+description: ''
+---
+
+# Touchables
+
+## Description
+
+This example shows why touchable components exported from this library are useful whe you need to **properly detect press events** on **components nested inside** the sortable component item.
+
+:::info
+
+The **usage is the same** for **all touchable components exported from this library**. To see more information about other touchable components, please **refer to the [Touchables](/helper-components/touchables) page**.
+
+:::
+
+## Source Code
+
+```tsx
+import { useCallback, useState } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
+import type { SortableGridRenderItem } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
+
+const DATA = Array.from({ length: 4 }, (_, index) => `Item ${index + 1}`);
+
+export default function Grid() {
+  const [data, setData] = useState(DATA);
+
+  const renderItem = useCallback<SortableGridRenderItem<string>>(
+    ({ item }) => (
+      <View style={styles.card}>
+        <Text style={styles.text}>{item}</Text>
+        <Sortable.Pressable
+          style={styles.deleteButton}
+          onPress={() => setData(prev => prev.filter(i => i !== item))}>
+          <Text style={styles.text}>Delete</Text>
+        </Sortable.Pressable>
+      </View>
+    ),
+    []
+  );
+
+  return (
+    <View style={styles.container}>
+      <Sortable.Grid
+        columns={2}
+        data={data}
+        renderItem={renderItem}
+        rowGap={10}
+        columnGap={10}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 10
+  },
+  card: {
+    backgroundColor: '#36877F',
+    height: 100,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10
+  },
+  text: {
+    color: 'white',
+    fontWeight: 'bold'
+  },
+  deleteButton: {
+    backgroundColor: '#6AA67C',
+    padding: 10,
+    borderRadius: 10
+  }
+});
+```
+
+## Result
+
+You can see that the `Pressable` component from React Native **still detects the press event even when the item started being dragged**, which is not the desired behavior.
+
+On the contrary, the `Sortable.Pressable` component from this library **properly handles the press event** and grid items are removed only when the **Delete** button is **pressed, not when the item is dragged**.
+
+import correctVideo from '@site/static/video/grid-touchables-correct.mp4';
+import incorrectVideo from '@site/static/video/grid-touchables-incorrect.mp4';
+
+| React Native's `Pressable`                                                                    | `Sortable.Pressable`                                                                        |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| <video autoPlay loop muted width="100%" style={{ maxWidth: '300px' }} src={incorrectVideo} /> | <video autoPlay loop muted width="100%" style={{ maxWidth: '300px' }} src={correctVideo} /> |

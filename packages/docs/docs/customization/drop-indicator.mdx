@@ -1,0 +1,110 @@
+---
+sidebar_position: 1
+description: ''
+---
+
+# Drop Indicator
+
+import dropIndicatorVideo from '@site/static/video/drop-indicator.mp4';
+
+<video autoPlay loop muted src={dropIndicatorVideo} />
+
+## Overview
+
+The **Drop Indicator** component is used to indicate the position **where the active item will be dropped** after being released.
+
+You can customize the default drop indicator just by using the `dropIndicatorStyle` prop of the sortable component.
+
+This documentation page focuses on a more advanced customization where you can pass a custom `DropIndicatorComponent` to the sortable component.
+
+## Usage
+
+This is the simplest implementation of the **Drop Indicator** component where we use the default `style` prop and just change the `borderRadius`.
+
+```tsx
+import { View } from 'react-native';
+import type { DropIndicatorComponentProps } from 'react-native-sortable';
+
+function CustomDropIndicator({
+  style // style from the `dropIndicatorStyle` prop or a default style
+}: DropIndicatorComponentProps) {
+  return <View style={[style, { borderRadius: '100%' }]} />;
+}
+
+export default function Grid() {
+  return (
+    <Sortable.Grid
+      DropIndicatorComponent={CustomDropIndicator}
+      // ... other props
+    />
+  );
+}
+```
+
+## Props
+
+Props in the `DropIndicatorComponentProps` type.
+
+### activationProgress
+
+A shared value that represents the **long-press activation state** of an item. This value animates from **0 to 1** during the long-press gesture, before the dragging interaction begins. You can use this value to create **smooth visual transitions** or feedback during the activation phase.
+
+- `0`: Item is **not being pressed**
+- `1`: Item has been **fully activated** and is ready to be dragged
+
+| type                  | default |
+| --------------------- | ------- |
+| `SharedValue<number>` | 0       |
+
+### touchedItemKey
+
+A shared value that represents the **key of the item that is currently being touched**. This value is updated when the touched item activation animation starts.
+
+| type                          | default |
+| ----------------------------- | ------- |
+| `SharedValue<string \| null>` | null    |
+
+### dropIndex
+
+A shared value that represents the **index** of the active item at which it will be **positioned after being released**.
+
+| type                  | default |
+| --------------------- | ------- |
+| `SharedValue<number>` | 0       |
+
+### dropPosition
+
+A shared value that represents the **absolute position** of the active item at which it will be **positioned after being released**.
+
+| type                  | default       |
+| --------------------- | ------------- |
+| `SharedValue<Vector>` | \{x: 0, y: 0} |
+
+### orderedItemKeys
+
+An array of strings representing the keys of the items in the sortable component in their **current sort order**.
+
+| type                         | default |
+| ---------------------------- | ------- |
+| `SharedValue<Array<string>>` | []      |
+
+### style
+
+Style of the drop indicator. This is typically used to **customize the appearance** of the default drop indicator component.
+
+| type        | default |
+| ----------- | ------- |
+| `ViewStyle` | YES\*   |
+
+\* The default style is passed only if not overridden by the `dropIndicatorStyle` prop. It looks like this:
+
+```ts
+{
+  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  borderColor: 'black',
+  borderRadius: 10,
+  borderStyle: 'dashed',
+  borderWidth: 2,
+  flex: 1
+}
+```

@@ -4,3 +4,4 @@ export { default as DataChangeExample } from './DataChangeExample';
 export { default as DebugExample } from './DebugExample';
 export { default as DropIndicatorExample } from './DropIndicatorExample';
 export { default as FlexLayoutExample } from './FlexLayoutExample';
+export { default as PlaygroundExample } from './PlaygroundExample';

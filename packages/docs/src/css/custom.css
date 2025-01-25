@@ -1,0 +1,145 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* Global reset */
+body {
+  box-sizing: border-box;
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: Lato, Arial, Helvetica, sans-serif;
+}
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  box-sizing: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #2e8555;
+  --ifm-color-primary-dark: #29784c;
+  --ifm-color-primary-darker: #277148;
+  --ifm-color-primary-darkest: #205d3b;
+  --ifm-color-primary-light: #33925d;
+  --ifm-color-primary-lighter: #359962;
+  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-details-color-background: #edf7f3;
+  --ifm-details-color-border: #33925d40;
+  --ifm-details-color-text: var(--ifm-color-emphasis-900);
+  --ifm-details-color-icon: var(--ifm-color-emphasis-900);
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #25c2a0;
+  --ifm-color-primary-dark: #21af90;
+  --ifm-color-primary-darker: #1fa588;
+  --ifm-color-primary-darkest: #1a8870;
+  --ifm-color-primary-light: #29d5b0;
+  --ifm-color-primary-lighter: #32d8b4;
+  --ifm-color-primary-lightest: #4fddbf;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-details-color-background: #1a3a31;
+  --ifm-details-color-border: #25c2a040;
+  --ifm-details-color-text: #ffffff;
+  --ifm-details-color-icon: #25c2a0;
+}
+
+hr {
+  background-color: var(--ifm-color-emphasis-200);
+}
+
+/**
+ * Table styles
+ */
+
+table {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  overflow-x: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+th:first-child,
+td:first-child {
+  width: 50%;
+}
+
+th,
+td {
+  text-align: left;
+}
+
+th,
+td {
+  padding-block: 0.5rem !important;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+td:last-child,
+th:last-child {
+  border-right: none;
+}
+
+/* For dark mode */
+[data-theme='dark'] table {
+  border-color: #333;
+}
+
+[data-theme='dark'] th,
+[data-theme='dark'] td {
+  border-color: #333;
+}
+
+[data-theme='dark'] th {
+  background-color: #242526;
+}
+
+/**
+ * Details styles
+ */
+details {
+  background-color: var(--ifm-details-color-background) !important;
+  border: 1px solid var(--ifm-details-color-border) !important;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  color: var(--ifm-details-color-text) !important;
+}
+
+details summary {
+  font-weight: 600;
+}
+
+details summary::before {
+  border-left-color: var(--ifm-details-color-icon) !important;
+}
+
+details summary + div > div {
+  border-color: var(--ifm-details-color-border) !important;
+}
+
+details code {
+  min-width: unset !important;
+}

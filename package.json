@@ -42,8 +42,9 @@
     "format:deps": "syncpack format",
     "husky:install": "./scripts/husky.sh",
     "lib": "yarn workspace react-native-sortable",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "lint": "yarn workspaces foreach -A -p run lint",
+    "lint:all": "yarn lint && yarn lint:docs",
+    "lint:docs": "cd packages/docs && yarn lint && cd ../..",
     "postinstall": "yarn husky:install",
     "prepare": "husky",
     "test": "yarn lib test && yarn example:app test",
@@ -53,7 +54,7 @@
   "workspaces": {
     "packages": [
       "example/*",
-      "packages/*"
+      "packages/react-native-sortable"
     ]
   }
 }

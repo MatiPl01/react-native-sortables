@@ -24,6 +24,7 @@ export type SortableGridLayoutSettings = {
 
 export type SortableGridRenderItemInfo<I> = {
   item: I;
+  index: number;
 };
 
 export type SortableGridRenderItem<I> = (

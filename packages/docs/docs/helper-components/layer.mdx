@@ -1,0 +1,69 @@
+---
+sidebar_position: 1
+description: ''
+---
+
+# Layer
+
+## Overview
+
+The **Sortable Layer** component manages a `zIndex` for proper rendering of sortable components.
+
+:::important
+In most cases, you **wouldn't need** this component because all sortable components use **Sortable Layer** internally. Use it **only if necessary**.
+:::
+
+### When to use?
+
+The **Sortable Layer** component should be used only when necessary, i.e. if you notice that the item dragged around **appears under other components** on the screen.
+
+### How it works?
+
+**Sortable Layer** provides automatic zIndex management through the following mechanisms:
+
+- Detects when a child item of a nested sortable component **starts being dragged**
+- Automatically **adjusts zIndex** values to maintain proper visual hierarchy
+- Ensures that **dragged items** remain **visible above other components**
+- When multiple **Sortable Layer** components are nested one in another, information is **bubbled up** and `zIndex` is updated in **each of them**
+
+## Usage
+
+```tsx
+import Sortable from 'react-native-sortable';
+
+function MyComponent() {
+  return (
+    // ... other components
+    <Sortable.Layer>
+      {/* ... other components */}
+      <Sortable.Grid // or Sortable.Flex
+      // ... sortable grid props
+      />
+      {/* ... other components */}
+    </Sortable.Layer>
+    // ... other components
+  );
+}
+```
+
+## Props
+
+### children
+
+Child components whose `zIndex` will be managed by the Layer component. The Layer component will **automatically adjust** the `zIndex` of its children when a **nested sortable item is being dragged**.
+
+| type        | default | required |
+| ----------- | ------- | -------- |
+| `ReactNode` | NO      | NO       |
+
+:::important
+**At least one sortable component** must be present as a **descendant** for this functionality to take effect.
+:::
+
+### disabled
+
+**Controls whether** the Layer component's automatic `zIndex` management **is active**. When set to `true`, the Layer component **will not modify** the `zIndex` of its children **during drag operations**.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | `false` | NO       |

@@ -1,0 +1,30 @@
+.tabList {
+  display: flex;
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+  width: min-content;
+}
+
+.tabButton {
+  padding: 0.5rem 1rem;
+  background: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ifm-color-emphasis-700);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tabButton:hover {
+  color: var(--ifm-color-primary);
+}
+
+.tabButton.active {
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  border-bottom-color: var(--ifm-color-primary);
+}
+
+.tabContent {
+  padding-top: 1rem;
+}

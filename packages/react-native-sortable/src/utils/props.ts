@@ -30,7 +30,9 @@ export const getPropsWithDefaults = <
   } as unknown as P;
 
   for (const key in props) {
-    if (props[key]) propsWithDefaults[key] = props[key];
+    if (props[key] !== undefined) {
+      propsWithDefaults[key] = props[key];
+    }
   }
 
   // merge styles from props and defaults

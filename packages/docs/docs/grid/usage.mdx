@@ -1,0 +1,68 @@
+---
+sidebar_position: 1
+---
+
+# Usage
+
+Here is a simple **Sortable Grid** usage example. For more specific usage scenarios, see the [Examples](./examples) section.
+
+Items returned from the `renderItem` function **don't have to be the same components** and **don't need to have the same height**.
+
+## Basic Example
+
+```tsx
+import { useCallback } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
+import type { SortableGridRenderItem } from 'react-native-sortable';
+import Sortable from 'react-native-sortable';
+
+const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
+
+export default function Grid() {
+  const renderItem = useCallback<SortableGridRenderItem<string>>(
+    ({ item }) => (
+      <View style={styles.card}>
+        <Text>{item}</Text>
+      </View>
+    ),
+    []
+  );
+
+  return (
+    <Sortable.Grid
+      columns={3}
+      data={DATA} // Pass your data here
+      renderItem={renderItem}
+      rowGap={10}
+      columnGap={10}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#36877F',
+    height: 100,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+});
+```
+
+## Details
+
+To create a grid, you need to import the `Sortable` object from the `react-native-sortable` package and then, use the `Sortable.Grid` component.
+
+The `Sortable.Grid` component requires the following props which are similar to the ones in the `FlatList` component:
+
+- `data`: The data to render in the grid.
+- `renderItem`: A function that renders a single item in the grid.
+
+You can customize the grid appearance and behavior by using other props. See the [Props](./props) section for more information.
+
+:::important
+
+Remember to to wrap your `renderItem` function in a `useCallback` hook to avoid unnecessary re-renders.
+
+:::
