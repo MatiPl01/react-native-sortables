@@ -12,6 +12,7 @@ import { colors, flex, spacing } from '@/theme';
 import exampleRoutes from './routes';
 import type { Routes } from './types';
 import { getScreenTitle, hasRoutes } from './utils';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const StackNavigator =
   createNativeStackNavigator<Record<string, React.ComponentType>>();
@@ -52,15 +53,16 @@ const BackButton = memo(function BackButton() {
 function createStackNavigator(routes: Routes): React.ComponentType {
   return function Navigator() {
     return (
-      <View style={flex.fill}>
+      <SafeAreaView style={flex.fill}>
         <StackNavigator.Navigator
           screenOptions={{
             headerLeft: () => <BackButton />,
-            headerTitleAlign: 'center'
+            headerTitleAlign: 'center',
+            headerShown: false
           }}>
           {createNavigationScreens(routes, 'Examples')}
         </StackNavigator.Navigator>
-      </View>
+      </SafeAreaView>
     );
   };
 }

@@ -1,3 +1,16 @@
+---
+sidebar_position: 1
+---
+
+# Auto Scroll
+
+## Description
+
+This example demonstrates how to use the **auto scroll** feature of the **SortableGrid** component.
+
+## Source Code
+
+```tsx
 import { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
@@ -29,8 +42,9 @@ export default function PlaygroundExample() {
         renderItem={renderItem}
         rowGap={10}
         scrollableRef={scrollableRef} // required for auto scroll
-        // autoScrollActivationOffset={200}
-        autoScrollSpeed={0.2}
+        // autoScrollActivationOffset={40}
+        // autoScrollSpeed={1}
+        // autoScrollEnabled={true}
       />
     </Animated.ScrollView>
   );
@@ -52,3 +66,38 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   }
 });
+```
+
+## Result
+
+:::info
+
+The animation is a **little choppy** in development mode on the New Architecture (this is caused by `react-native-reanimated`). It is butter **smooth** on the Old Architecture. It also **looks better** in **release builds**.
+
+:::
+
+### Default
+
+import defaultVideo from '@site/static/video/grid-auto-scroll-default.mp4';
+
+<video autoPlay loop muted width='300px' src={defaultVideo} />
+
+### Custom autoScrollActivationOffset
+
+```tsx
+autoScrollActivationOffset={200}
+```
+
+import offsetVideo from '@site/static/video/grid-auto-scroll-offset.mp4';
+
+<video autoPlay loop muted width='300px' src={offsetVideo} />
+
+### Custom autoScrollSpeed
+
+```tsx
+autoScrollSpeed={0.2}
+```
+
+import speedVideo from '@site/static/video/grid-auto-scroll-speed.mp4';
+
+<video autoPlay loop muted width='300px' src={speedVideo} />
