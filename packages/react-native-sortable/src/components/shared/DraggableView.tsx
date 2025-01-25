@@ -3,7 +3,6 @@ import type { ViewProps, ViewStyle } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   LinearTransition,
-  useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue
@@ -32,6 +31,13 @@ const RELATIVE_STYLE: ViewStyle = {
   zIndex: 0
 };
 
+const NO_TRANSLATION_STYLE: ViewStyle = {
+  ...RELATIVE_STYLE,
+  opacity: 0,
+  position: 'absolute',
+  zIndex: -1
+};
+
 type DraggableViewProps = {
   itemKey: string;
   entering?: LayoutAnimation;
@@ -50,7 +56,6 @@ export default function DraggableView({
     useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
-  const viewRef = useAnimatedRef<Animated.View>();
   const isBeingActivated = useDerivedValue(() => touchedItemKey.value === key);
   const pressProgress = useSharedValue(0);
 
@@ -74,7 +79,7 @@ export default function DraggableView({
     const translateY = translation.y.value;
 
     if (translateX === null || translateY === null) {
-      return { ...RELATIVE_STYLE, opacity: 0, zIndex: -1 };
+      return NO_TRANSLATION_STYLE;
     }
 
     return {
@@ -89,7 +94,6 @@ export default function DraggableView({
 
   return (
     <Animated.View
-      ref={viewRef}
       {...viewProps}
       layout={LinearTransition}
       style={[style, animatedStyle]}>
