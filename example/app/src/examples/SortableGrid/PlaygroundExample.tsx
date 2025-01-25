@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import type { SortableGridRenderItem } from 'react-native-sortable';
 import Sortable from 'react-native-sortable';
 
@@ -19,7 +18,7 @@ export default function PlaygroundExample() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Sortable.Grid
         columnGap={10}
         columns={3}
@@ -27,7 +26,7 @@ export default function PlaygroundExample() {
         renderItem={renderItem}
         rowGap={10}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

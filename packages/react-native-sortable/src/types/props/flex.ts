@@ -33,8 +33,8 @@ export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
 
 export type SortableFlexStyle = {
   alignContent?: AlignContent;
-  alignItems?: AlignItems;
   justifyContent?: JustifyContent;
+  alignItems?: AlignItems;
   flexDirection?: FlexDirection;
   flexWrap?: FlexWrap;
   gap?: number;
