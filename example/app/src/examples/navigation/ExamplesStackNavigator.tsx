@@ -3,9 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { memo, useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RouteCard, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
@@ -53,16 +52,15 @@ const BackButton = memo(function BackButton() {
 function createStackNavigator(routes: Routes): React.ComponentType {
   return function Navigator() {
     return (
-      <SafeAreaView style={flex.fill}>
+      <View style={flex.fill}>
         <StackNavigator.Navigator
           screenOptions={{
             headerLeft: () => <BackButton />,
-            headerShown: false,
             headerTitleAlign: 'center'
           }}>
           {createNavigationScreens(routes, 'Examples')}
         </StackNavigator.Navigator>
-      </SafeAreaView>
+      </View>
     );
   };
 }
