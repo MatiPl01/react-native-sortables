@@ -41,6 +41,7 @@ const config: Config = {
         docs: {
           editUrl:
             'https://github.com/MatiPl01/react-native-sortable/edit/main/packages/docs/',
+          routeBasePath: '/',
           // Please change this to your repo.
           sidebarPath: './sidebars.ts'
         },

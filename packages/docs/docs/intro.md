@@ -1,6 +1,7 @@
 ---
 sidebar_position: 1
 sidebar_label: Introduction
+slug: /
 ---
 
 # React Native Sortable
@@ -19,7 +20,7 @@ sidebar_label: Introduction
 - Handle items with **varying dimensions**
 - **Customizable** spacing and arrangement
 
-### ✨ Smooth Interactions
+### ✨ Interactive Features
 
 - **Auto-scrolling** when dragging beyond screen bounds
 - **Layout animations** for item additions and removals

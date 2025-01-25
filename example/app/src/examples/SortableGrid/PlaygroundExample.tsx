@@ -44,10 +44,5 @@ const styles = StyleSheet.create({
   text: {
     ...text.label2,
     color: colors.white
-  },
-  sibling: {
-    backgroundColor: 'red',
-    height: sizes.xl,
-    zIndex: 1000
   }
 });
