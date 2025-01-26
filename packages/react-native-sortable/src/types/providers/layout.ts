@@ -29,7 +29,7 @@ export type FlexLayoutContextType = {
   adjustedCrossGap: SharedValue<number>;
   dimensionsLimits: SharedValue<FlexLayoutProps['limits']>;
   useFlexLayoutReaction: (
-    idxToKey: SharedValue<Array<string>>,
+    idxToKey: SharedValue<Array<string> | null>,
     onChange: (layout: FlexLayout | null) => void
   ) => void;
   calculateFlexLayout: (idxToKey: Array<string>) => FlexLayout | null;

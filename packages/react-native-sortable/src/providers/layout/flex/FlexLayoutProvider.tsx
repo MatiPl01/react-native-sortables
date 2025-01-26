@@ -100,29 +100,32 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   const useFlexLayoutReaction = useCallback(
     (
-      idxToKey: SharedValue<Array<string>>,
+      idxToKey: SharedValue<Array<string> | null> | SharedValue<Array<string>>,
       onChange: (layout: FlexLayout | null) => void
     ) =>
       useAnimatedReaction(
-        () => ({
-          flexAlignments: {
-            alignContent,
-            alignItems,
-            justifyContent
-          },
-          flexDirection,
-          flexWrap,
-          gaps: {
-            column: columnGap.value,
-            row: rowGap.value
-          },
-          indexToKey: idxToKey.value,
-          itemDimensions: itemDimensions.value,
-          limits: dimensionsLimits.value,
-          paddings: paddings.value
-        }),
-        layoutProps => {
-          onChange(calculateLayout(layoutProps));
+        () =>
+          idxToKey.value === null
+            ? null
+            : {
+                flexAlignments: {
+                  alignContent,
+                  alignItems,
+                  justifyContent
+                },
+                flexDirection,
+                flexWrap,
+                gaps: {
+                  column: columnGap.value,
+                  row: rowGap.value
+                },
+                indexToKey: idxToKey.value,
+                itemDimensions: itemDimensions.value,
+                limits: dimensionsLimits.value,
+                paddings: paddings.value
+              },
+        props => {
+          onChange(props && calculateLayout(props));
         }
       ),
     [
