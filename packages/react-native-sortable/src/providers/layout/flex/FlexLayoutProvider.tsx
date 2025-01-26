@@ -59,19 +59,10 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
-  const itemGroups = useSharedValue<Array<Array<string>>>([]);
-  const keyToGroup = useDerivedValue<Record<string, number>>(() =>
-    Object.fromEntries(
-      itemGroups.value.flatMap((group, i) => group.map(key => [key, i]))
-    )
-  );
-  const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
-  const crossAxisGroupOffsets = useSharedValue<Array<number>>([]);
-  const groupSizeLimit = useSharedValue<number>(Infinity);
+  const keyToGroup = useSharedValue<Record<string, number>>({});
 
   const columnGap = useDerivedValue(() => columnGap_ ?? gap);
   const rowGap = useDerivedValue(() => rowGap_ ?? gap);
-  const adjustedCrossGap = useSharedValue<number>(0);
 
   const paddings = useDerivedValue(() => ({
     bottom: paddingBottom ?? paddingVertical ?? padding,
@@ -90,6 +81,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       width: containerWidth.value
     };
   });
+
+  const appliedLayout = useSharedValue<FlexLayout | null>(null);
 
   // Because the number of groups can dynamically change after order change
   // and we can't detect that in the React runtime, we are creating debug
@@ -183,19 +176,17 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       return;
     }
 
-    // Update item groups
-    itemGroups.value = layout.itemGroups;
+    // Update current layout
+    appliedLayout.value = layout;
     // Update item positions
     itemPositions.value = layout.itemPositions;
-    // Update cross axis group offsets and sizes
-    crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
-    crossAxisGroupSizes.value = layout.crossAxisGroupSizes;
-    // Update group size limit and adjusted cross gap
-    groupSizeLimit.value = layout.groupSizeLimit;
-    adjustedCrossGap.value = layout.adjustedCrossGap;
     // Update container height
     const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
     containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
+    // Update key to group
+    keyToGroup.value = Object.fromEntries(
+      layout.itemGroups.flatMap((group, i) => group.map(key => [key, i]))
+    );
 
     // DEBUG ONLY
     if (debugCrossAxisGapRects && debugMainAxisGapRects) {
@@ -210,16 +201,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   return {
     value: {
-      adjustedCrossGap,
       calculateFlexLayout,
       columnGap,
-      crossAxisGroupOffsets,
-      crossAxisGroupSizes,
-      dimensionsLimits,
       flexDirection,
-      groupSizeLimit,
-      itemGroups,
       keyToGroup,
+      appliedLayout,
       rowGap,
       useFlexLayoutReaction
     }

@@ -1,6 +1,8 @@
 import type { Dimension, Dimensions } from '../../../../../types';
 import { reorderInsert } from '../../../../../utils';
 
+const MIN_ADDITIONAL_OFFSET = 5;
+
 export type ItemGroupSwapProps = {
   activeItemKey: string;
   activeItemIndex: number; // can be in different group than the currentGroupIndex
