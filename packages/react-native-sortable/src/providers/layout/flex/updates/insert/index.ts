@@ -28,6 +28,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
   columnGap,
   crossAxisGroupOffsets,
   crossAxisGroupSizes,
+  debugContext,
   flexDirection,
   groupSizeLimit,
   indexToKey,
@@ -60,6 +61,13 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
   const swappedBeforeLayout = useSharedValue<FlexLayout | null>(null);
   const swappedAfterLayout = useSharedValue<FlexLayout | null>(null);
   const debugBox = useDebugBoundingBox();
+
+  const debugLines = debugContext?.useDebugLines([
+    'beforeOffset',
+    'beforeBound',
+    'afterOffset',
+    'afterBound'
+  ]);
 
   const activeGroupIndex = useDerivedValue(() => {
     const key = activeItemKey.value;
@@ -130,6 +138,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     let swapGroupBeforeBound = Infinity;
 
     do {
+      let currentCrossAxisGroupOffsets = crossAxisGroupOffsets.value;
+
       if (swapGroupBeforeBound !== Infinity) {
         const indexes = getSwappedToGroupBeforeIndices({
           ...sharedSwapProps,
@@ -137,13 +147,19 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
           activeItemIndex: activeIndex
         });
         if (indexes === null) break;
+        if (swappedBeforeLayout.value) {
+          currentCrossAxisGroupOffsets =
+            swappedBeforeLayout.value?.crossAxisGroupOffsets;
+        }
         swappedBeforeLayout.value = calculateFlexLayout(indexes.indexToKey);
         firstGroupItemIndex = indexes.itemIndex;
         groupIndex = indexes.groupIndex;
       }
-      swapGroupBeforeOffset =
+
+      swapGroupBeforeOffset = currentCrossAxisGroupOffsets[groupIndex] ?? 0;
+      const averageOffsetBefore =
         ((swappedBeforeLayout.value?.crossAxisGroupOffsets[groupIndex] ?? 0) +
-          (crossAxisGroupOffsets.value[groupIndex] ?? 0)) /
+          swapGroupBeforeOffset) /
         2;
       const additionalSwapOffset = Math.min(
         crossGap.value / 2 + MIN_ADDITIONAL_OFFSET,
@@ -152,7 +168,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
             0)) /
           2
       );
-      swapGroupBeforeBound = swapGroupBeforeOffset - additionalSwapOffset;
+      swapGroupBeforeBound = averageOffsetBefore - additionalSwapOffset;
     } while (
       swapGroupBeforeBound > 0 &&
       crossAxisPosition < swapGroupBeforeBound
@@ -165,6 +181,9 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     let swapGroupAfterBound = -Infinity;
 
     do {
+      let currentCrossAxisGroupOffsets = crossAxisGroupOffsets.value;
+      let currentCrossAxisGroupSizes = crossAxisGroupSizes.value;
+
       if (swapGroupAfterBound !== -Infinity) {
         const indexes = getSwappedToGroupAfterIndices({
           ...sharedSwapProps,
@@ -172,33 +191,52 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
           activeItemIndex: activeIndex
         });
         if (indexes === null) break;
+        if (swappedAfterLayout.value) {
+          currentCrossAxisGroupOffsets =
+            swappedAfterLayout.value?.crossAxisGroupOffsets;
+          currentCrossAxisGroupSizes =
+            swappedAfterLayout.value?.crossAxisGroupSizes;
+        }
         swappedAfterLayout.value = calculateFlexLayout(indexes.indexToKey);
         swappedAfteGroupsCount =
           swappedAfterLayout.value?.itemGroups.length ?? 0;
         firstGroupItemIndex = indexes.itemIndex;
         groupIndex = indexes.groupIndex;
       }
+
+      swapGroupAfterOffset =
+        (currentCrossAxisGroupOffsets[groupIndex] ?? 0) +
+        (currentCrossAxisGroupSizes[groupIndex] ?? 0);
       const swappedAfterOffset =
         (swappedAfterLayout.value?.crossAxisGroupOffsets[groupIndex] ?? 0) +
         (swappedAfterLayout.value?.crossAxisGroupSizes[groupIndex] ?? 0);
-      const afterOffset =
-        (crossAxisGroupOffsets.value[groupIndex] ?? 0) +
-        (crossAxisGroupSizes.value[groupIndex] ?? 0);
-      swapGroupAfterOffset =
+      const averageOffsetAfter =
         swappedAfterOffset === 0
-          ? afterOffset
-          : (swappedAfterOffset + afterOffset) / 2;
+          ? swapGroupAfterOffset
+          : (swappedAfterOffset + swapGroupAfterOffset) / 2;
       const additionalSwapOffset = Math.min(
         crossGap.value / 2 + MIN_ADDITIONAL_OFFSET,
         (crossGap.value +
           (swappedAfterLayout.value?.crossAxisGroupSizes?.[groupIndex] ?? 0)) /
           2
       );
-      swapGroupAfterBound = swapGroupAfterOffset + additionalSwapOffset;
+      swapGroupAfterBound = averageOffsetAfter + additionalSwapOffset;
     } while (
       crossAxisPosition > swapGroupAfterBound &&
-      groupIndex < swappedAfteGroupsCount
+      groupIndex < swappedAfteGroupsCount &&
+      groupIndex >= activeGroupIndex.value
     );
+
+    debugLines?.beforeBound.set({ y: swapGroupBeforeBound, color: 'blue' });
+    debugLines?.beforeOffset.set({
+      y: Math.max(swapGroupBeforeOffset, swapGroupBeforeBound),
+      color: 'red'
+    });
+    debugLines?.afterOffset.set({
+      y: Math.min(swapGroupAfterOffset, swapGroupAfterBound),
+      color: 'purple'
+    });
+    debugLines?.afterBound.set({ y: swapGroupAfterBound, color: 'black' });
 
     // // MAIN AXIS BOUNDS
     // const groupIndexDiff = groupIndex - activeGroupIndex.value;
