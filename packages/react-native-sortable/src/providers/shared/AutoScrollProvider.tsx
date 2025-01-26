@@ -37,12 +37,12 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     containerRef,
     itemDimensions,
     touchedItemKey,
-    touchedItemPosition
+    touchPosition
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
   const debugRects = debugContext?.useDebugRects(['top', 'bottom']);
-  const debugLines = debugContext?.useDebugLines(['top', 'bottom']);
+  const debugLine = debugContext?.useDebugLine();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);
@@ -139,14 +139,14 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       if (
         !enabled.value ||
         activeItemHeight.value === -1 ||
-        !touchedItemPosition.value
+        !touchPosition.value
       ) {
         return null;
       }
 
       return {
         itemHeight: activeItemHeight.value,
-        itemOffset: touchedItemPosition.value.y,
+        touchOffset: touchPosition.value.y,
         threshold: offsetThreshold.value
       };
     },
@@ -154,8 +154,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       const hideDebugViews = () => {
         debugRects?.top?.hide();
         debugRects?.bottom?.hide();
-        debugLines?.top?.hide();
-        debugLines?.bottom?.hide();
+        debugLine?.hide();
       };
 
       if (!props) {
@@ -171,7 +170,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         return;
       }
 
-      const { itemHeight, itemOffset, threshold } = props;
+      const { touchOffset, threshold } = props;
       const { height: sH, pageY: sY } = scrollableMeasurements;
       const { height: cH, pageY: cY } = containerMeasurements;
 
@@ -179,15 +178,11 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         startContainerPageY.value = cY;
       }
 
-      const itemTopOffset = itemOffset;
-      const itemBottomOffset = itemTopOffset + itemHeight;
-
       const topDistance = sY + threshold.top - cY;
       const bottomDistance = cY + cH - (sY + sH - threshold.bottom);
 
-      const topOverflow = sY + threshold.top - (cY + itemTopOffset);
-      const bottomOverflow =
-        cY + itemBottomOffset - (sY + sH - threshold.bottom);
+      const topOverflow = sY + threshold.top - (cY + touchOffset);
+      const bottomOverflow = cY + touchOffset - (sY + sH - threshold.bottom);
 
       if (debugRects) {
         debugRects.top.set({
@@ -202,14 +197,10 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
           y: sY - cY + sH
         });
       }
-      if (debugLines) {
-        debugLines.top.set({
+      if (debugLine) {
+        debugLine.set({
           color: DEBUG_COLORS.backgroundColor,
-          y: itemTopOffset
-        });
-        debugLines.bottom.set({
-          color: DEBUG_COLORS.backgroundColor,
-          y: itemBottomOffset
+          y: touchOffset
         });
       }
 
