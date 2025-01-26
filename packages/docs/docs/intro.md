@@ -40,7 +40,7 @@ slug: /
 React Native Sortable is an MIT-licensed open source project. You can support its development by:
 
 - Starring the **[GitHub repository](https://github.com/MatiPl01/react-native-sortable)**
-- **[Sponsoring](https://github.com/sponsors/MatiPl01)** the maintainer <!-- TODO: Check if link works -->
+- **[Sponsoring](https://github.com/sponsors/MatiPl01)** the autor of the library
 - **Contributing** with bug reports, feature requests, or pull requests
 - **Sharing** your **experience** with the library
 
