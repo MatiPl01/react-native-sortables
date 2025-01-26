@@ -9,7 +9,7 @@
 
 **Powerful Sortable Components for Flexible Content Reordering in React Native**
 
-[Documentation](.) | [Examples](.) | [API Reference](.) | [Contributing](.) <!-- TODO - add links -->
+[Documentation](https://react-native-sortable-docs.vercel.app/) | [Examples](https://react-native-sortable-docs.vercel.app/grid/examples) | [Contributing](.) <!-- TODO - add links -->
 
 ![npm](https://img.shields.io/npm/dw/react-native-smart-sortable?color=ffd53e)
 ![GitHub issues](https://img.shields.io/github/issues/MatiPl01/react-native-smart-sortable?color=ffd53e)
@@ -53,7 +53,7 @@ React Native Sortable is a powerful and easy-to-use library that brings smooth, 
   - Simple API with powerful **customization**
   - **Minimal setup** required
 
-- ➕ [More features](.) <!-- TODO - add link -->
+- ➕ [More features](https://react-native-sortable-docs.vercel.app/#-key-features)
 
 ## Installation
 
@@ -120,11 +120,11 @@ const styles = StyleSheet.create({
 });
 ```
 
-For detailed usage and examples, check out our [Documentation](.). <!-- TODO - add link to docs -->
+For detailed usage and examples, check out the [Documentation](https://react-native-sortable-docs.vercel.app/).
 
 ## Contributing
 
-Contributions are welcome! Please read our [Contributing Guide](.) for details. <!-- TODO - add link to contributions -->
+Contributions are welcome! Please read the [Contributing Guide](.) for details. <!-- TODO - add link to contributions -->
 
 ## License
 
