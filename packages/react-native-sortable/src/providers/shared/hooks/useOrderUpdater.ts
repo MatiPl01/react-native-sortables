@@ -5,36 +5,23 @@ import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
 export default function useOrderUpdater(updater: OrderUpdater) {
-  const {
-    activeItemKey,
-    itemDimensions,
-    keyToIndex,
-    touchPosition,
-    touchedItemPosition
-  } = useCommonValuesContext();
+  const { activeItemKey, itemDimensions, keyToIndex, touchPosition } =
+    useCommonValuesContext();
   const { handleOrderChange } = useDragContext();
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
-      positions: {
-        item: touchedItemPosition.value,
-        touch: touchPosition.value
-      }
+      position: touchPosition.value
     }),
-    ({ activeKey, positions }) => {
-      if (
-        activeKey === null ||
-        positions.item === null ||
-        positions.touch === null
-      ) {
+    ({ activeKey, position }) => {
+      if (!activeKey || !position) {
         return;
       }
       const dimensions = itemDimensions.value[activeKey];
       if (!dimensions) {
         return;
       }
-
       const activeIndex = keyToIndex.value[activeKey];
       if (activeIndex === undefined) {
         return;
@@ -44,8 +31,7 @@ export default function useOrderUpdater(updater: OrderUpdater) {
         activeIndex,
         activeKey,
         dimensions,
-        position: positions.item,
-        touchPosition: positions.touch
+        position
       });
 
       if (newOrder) {

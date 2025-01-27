@@ -33,8 +33,8 @@ function OrderUpdaterComponent<P extends PredefinedStrategies>({
   }
 
   const updater = (factory as AnyStrategyFactory)({
+    debugContext: useDebugContext(),
     ...useCommonValuesContext(),
-    ...useDebugContext(),
     ...useAdditionalValues()
   });
 

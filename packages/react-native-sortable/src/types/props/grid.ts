@@ -32,8 +32,10 @@ export type SortableGridRenderItem<I> = (
 ) => JSX.Element;
 
 export type SortableGridStrategyFactory = (
-  props: { debugContext?: DebugProviderContextType } & CommonValuesContextType &
-    GridLayoutContextType
+  props: Simplify<
+    { debugContext?: DebugProviderContextType } & CommonValuesContextType &
+      GridLayoutContextType
+  >
 ) => OrderUpdater;
 
 export type SortableGridStrategy =

@@ -1,10 +1,8 @@
 import type { SharedValue } from 'react-native-reanimated';
 
 import type { SortableGridStrategyFactory } from '../../../../types';
-import { useDebugBoundingBox } from '../../../shared';
+import { getAdditionalSwapOffset, useDebugBoundingBox } from '../../../shared';
 import { getColumnIndex, getRowIndex } from '../utils';
-
-const MIN_ADDITIONAL_OFFSET = 5;
 
 export const createGridStrategy =
   (
@@ -29,7 +27,7 @@ export const createGridStrategy =
     const othersLayout = useGridLayout(othersIndexToKey);
     const debugBox = useDebugBoundingBox();
 
-    return ({ activeIndex, touchPosition: { x, y } }) => {
+    return ({ activeIndex, position: { x, y } }) => {
       'worklet';
       if (!othersLayout.value) {
         return;
@@ -45,7 +43,7 @@ export const createGridStrategy =
       let rowOffsetAbove = -Infinity;
       let topBound = Infinity;
 
-      while (topBound > 0 && y < topBound) {
+      do {
         if (topBound !== Infinity) {
           rowIndex--;
         }
@@ -54,22 +52,18 @@ export const createGridStrategy =
           rowOffsets[rowIndex - 1] !== undefined
             ? rowOffsetAbove - rowOffsets[rowIndex - 1]! - rowGap.value
             : 0;
-        const additionalOffsetTop = Math.min(
-          rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
-          rowGap.value + rowAboveHeight / 2
+        const additionalOffsetTop = getAdditionalSwapOffset(
+          rowGap.value,
+          rowAboveHeight
         );
         topBound = rowOffsetAbove - additionalOffsetTop;
-      }
+      } while (topBound > 0 && y < topBound);
 
       // Bottom bound
       let rowOffsetBelow = Infinity;
       let bottomBound = -Infinity;
 
-      while (
-        bottomBound < containerHeight.value &&
-        y > bottomBound &&
-        rowOffsets[rowIndex] !== undefined
-      ) {
+      do {
         if (bottomBound !== -Infinity) {
           rowIndex++;
         }
@@ -82,36 +76,36 @@ export const createGridStrategy =
           rowOffsets[rowIndex + 2] !== undefined && rowOffsetBelow !== undefined
             ? rowOffsets[rowIndex + 2]! - rowOffsetBelow - rowGap.value
             : 0;
-        const additionalOffsetBottom = Math.min(
-          rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
-          rowGap.value + rowBelowHeight / 2
+        const additionalOffsetBottom = getAdditionalSwapOffset(
+          rowGap.value,
+          rowBelowHeight
         );
         bottomBound = rowOffsetBelow - rowGap.value + additionalOffsetBottom;
-      }
+      } while (bottomBound < containerHeight.value && y > bottomBound);
 
       // HORIZONTAL BOUNDS
-      const additionalOffsetX = Math.min(
-        rowGap.value / 2 + MIN_ADDITIONAL_OFFSET,
-        rowGap.value + columnWidth.value / 2
+      const additionalOffsetX = getAdditionalSwapOffset(
+        rowGap.value,
+        columnWidth.value
       );
 
       // Left bound
       let columnOffsetLeft = -Infinity;
       let leftBound = Infinity;
 
-      while (leftBound > 0 && x < leftBound) {
+      do {
         if (leftBound !== Infinity) {
           columnIndex--;
         }
         columnOffsetLeft = columnIndex * (columnWidth.value + columnGap.value);
         leftBound = columnOffsetLeft - additionalOffsetX;
-      }
+      } while (leftBound > 0 && x < leftBound);
 
       // Right bound
       let columnOffsetRight = Infinity;
       let rightBound = -Infinity;
 
-      while (rightBound < containerWidth.value && x > rightBound) {
+      do {
         if (rightBound !== -Infinity) {
           columnIndex++;
         }
@@ -119,7 +113,7 @@ export const createGridStrategy =
           columnIndex * (columnWidth.value + columnGap.value) +
           columnWidth.value;
         rightBound = columnOffsetRight + additionalOffsetX;
-      }
+      } while (rightBound < containerWidth.value && x > rightBound);
 
       // DEBUG ONLY
       if (debugBox) {

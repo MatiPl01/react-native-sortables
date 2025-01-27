@@ -25,8 +25,10 @@ export type SortableFlexDragEndCallback = (
 ) => void;
 
 export type SortableFlexStrategyFactory = (
-  props: { debugContext?: DebugProviderContextType } & CommonValuesContextType &
-    FlexLayoutContextType
+  props: Simplify<
+    { debugContext?: DebugProviderContextType } & CommonValuesContextType &
+      FlexLayoutContextType
+  >
 ) => OrderUpdater;
 
 export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;

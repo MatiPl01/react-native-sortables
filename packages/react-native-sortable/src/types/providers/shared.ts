@@ -142,7 +142,6 @@ type OrderUpdaterCallbackProps = {
   activeIndex: number;
   dimensions: Dimensions;
   position: Vector;
-  touchPosition: Vector;
 };
 
 export type OrderUpdater = (

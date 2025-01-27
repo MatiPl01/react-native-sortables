@@ -20,7 +20,7 @@ import { createGridStrategy } from './common';
  */
 function useInactiveIndexToKey() {
   const { activeItemKey, indexToKey } = useCommonValuesContext();
-  const result = useSharedValue<Array<string>>([]);
+  const result = useSharedValue<Array<string>>(EMPTY_ARRAY);
 
   useAnimatedReaction(
     () => ({

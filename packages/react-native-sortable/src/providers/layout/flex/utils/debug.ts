@@ -18,7 +18,7 @@ export const updateLayoutDebugRects = (
 
   let itemIndex = 0;
 
-  for (let i = 0; i < layout.crossAxisGroupOffsets.length - 1; i++) {
+  for (let i = 0; i < layout.crossAxisGroupOffsets.length; i++) {
     const size = layout.crossAxisGroupSizes[i]!;
     const offset = layout.crossAxisGroupOffsets[i]!;
     const nextOffset = layout.crossAxisGroupOffsets[i + 1]!;
@@ -30,8 +30,11 @@ export const updateLayoutDebugRects = (
       y
     });
 
-    for (let j = 0; j < layout.itemGroups[i]!.length; j++) {
-      const key = layout.itemGroups[i]![j]!;
+    const group = layout.itemGroups[i];
+    if (!group) break;
+
+    for (let j = 0; j < group.length; j++) {
+      const key = group[j]!;
       const nextKey = layout.itemGroups[i]![j + 1];
 
       if (!nextKey) {
@@ -50,5 +53,17 @@ export const updateLayoutDebugRects = (
 
       itemIndex++;
     }
+  }
+
+  for (
+    let i = layout.crossAxisGroupOffsets.length - 1;
+    i < debugMainAxisGapRects.length;
+    i++
+  ) {
+    debugCrossAxisGapRects[i]?.hide();
+  }
+
+  for (let i = itemIndex; i < debugMainAxisGapRects.length; i++) {
+    debugMainAxisGapRects[i]?.hide();
   }
 };
