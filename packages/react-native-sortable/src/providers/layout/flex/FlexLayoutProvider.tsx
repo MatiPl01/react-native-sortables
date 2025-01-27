@@ -201,11 +201,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   return {
     value: {
+      appliedLayout,
       calculateFlexLayout,
       columnGap,
       flexDirection,
       keyToGroup,
-      appliedLayout,
       rowGap,
       useFlexLayoutReaction
     }

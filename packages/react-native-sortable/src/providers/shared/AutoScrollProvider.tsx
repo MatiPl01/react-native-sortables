@@ -36,8 +36,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     activeItemKey,
     containerRef,
     itemDimensions,
-    touchedItemKey,
-    touchPosition
+    touchPosition,
+    touchedItemKey
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
@@ -146,8 +146,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
 
       return {
         itemHeight: activeItemHeight.value,
-        touchOffset: touchPosition.value.y,
-        threshold: offsetThreshold.value
+        threshold: offsetThreshold.value,
+        touchOffset: touchPosition.value.y
       };
     },
     props => {
@@ -170,7 +170,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         return;
       }
 
-      const { touchOffset, threshold } = props;
+      const { threshold, touchOffset } = props;
       const { height: sH, pageY: sY } = scrollableMeasurements;
       const { height: cH, pageY: cY } = containerMeasurements;
 

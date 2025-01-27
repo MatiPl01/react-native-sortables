@@ -16,22 +16,22 @@ import {
   getAdditionalSwapOffset,
   useDebugBoundingBox
 } from '../../../../shared';
+import type { ItemGroupSwapProps } from './utils';
 import {
-  getSwappedToGroupBeforeIndices,
   getSwappedToGroupAfterIndices,
-  ItemGroupSwapProps,
+  getSwappedToGroupBeforeIndices,
   getTotalGroupSize
 } from './utils';
 
 const useInsertStrategy: SortableFlexStrategyFactory = ({
   activeItemKey,
+  appliedLayout,
   calculateFlexLayout,
   columnGap,
   flexDirection,
   indexToKey,
   itemDimensions,
   keyToGroup,
-  appliedLayout,
   keyToIndex,
   rowGap,
   useFlexLayoutReaction
@@ -70,8 +70,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       activeGroupIndex.value !== null &&
       appliedLayout.value !== null
         ? {
-            activeItemKey: activeItemKey.value,
             activeItemIndex: keyToIndex.value[activeItemKey.value]!,
+            activeItemKey: activeItemKey.value,
             currentGroupIndex: activeGroupIndex.value,
             groupSizeLimit: appliedLayout.value.groupSizeLimit,
             indexToKey: indexToKey.value,
@@ -119,10 +119,10 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       activeItemKey: activeKey,
       groupSizeLimit: currentLayout.groupSizeLimit,
       indexToKey: indexToKey.value,
-      keyToIndex: keyToIndex.value,
-      keyToGroup: keyToGroup.value,
       itemDimensions: itemDimensions.value,
       itemGroups: currentLayout.itemGroups,
+      keyToGroup: keyToGroup.value,
+      keyToIndex: keyToIndex.value,
       mainDimension,
       mainGap: mainGap.value
     };
@@ -142,8 +142,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
         if (nextLayout) currentLayout = nextLayout;
         const indexes = getSwappedToGroupBeforeIndices({
           ...sharedSwapProps,
-          currentGroupIndex: groupIndex,
-          activeItemIndex: activeIndex
+          activeItemIndex: activeIndex,
+          currentGroupIndex: groupIndex
         });
         if (!indexes) break;
         nextLayout = calculateFlexLayout(indexes.indexToKey);
@@ -181,8 +181,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
         if (nextLayout) currentLayout = nextLayout;
         const indexes = getSwappedToGroupAfterIndices({
           ...sharedSwapProps,
-          currentGroupIndex: groupIndex,
-          activeItemIndex: activeIndex
+          activeItemIndex: activeIndex,
+          currentGroupIndex: groupIndex
         });
         if (indexes === null) break;
         if (nextLayout) currentLayout = nextLayout;
