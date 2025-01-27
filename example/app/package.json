@@ -46,9 +46,9 @@
   },
   "react-native": "index.ts",
   "scripts": {
-    "test": "jest",
-    "lint": "eslint .",
     "format": "prettier --write .",
+    "lint": "eslint .",
+    "test": "jest",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   }
 }

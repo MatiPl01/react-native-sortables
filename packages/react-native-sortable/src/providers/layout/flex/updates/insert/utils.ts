@@ -34,7 +34,7 @@ const getFirstItemIndex = (
   return keyToIndex[firstKey] ?? null;
 };
 
-const getTotalGroupSize = (
+export const getTotalGroupSize = (
   group: Array<string>,
   itemDimensions: Record<string, Dimensions>,
   mainDimension: Dimension,
