@@ -12,8 +12,8 @@ import type {
 } from '../../../../types';
 import { reverseArray, sum } from '../../../../utils';
 
-type AxisDimensions = { cross: Dimension; main: Dimension };
-type AxisDirections = { cross: Direction; main: Direction };
+export type AxisDimensions = { cross: Dimension; main: Dimension };
+export type AxisDirections = { cross: Direction; main: Direction };
 
 const createGroups = (
   indexToKey: Array<string>,
@@ -77,6 +77,7 @@ const calculateAlignment = (
 ): {
   offsets: Array<number>;
   totalSize: number;
+  adjustedGap: number;
 } => {
   'worklet';
   let startOffset = 0;
@@ -136,7 +137,7 @@ const calculateAlignment = (
     offsets.push((startOffset += (sizes[i] ?? 0) + adjustedGap));
   }
 
-  return { offsets, totalSize: clampedTotalSize };
+  return { adjustedGap, offsets, totalSize: clampedTotalSize };
 };
 
 const handleLayoutCalculation = (
@@ -282,8 +283,28 @@ const handleLayoutCalculation = (
     }
   }
 
+  let additionalOffset = 0;
+  if (isRow && isReverse) {
+    // row-reverse
+    additionalOffset = paddings.bottom;
+  } else if (isRow) {
+    // row
+    additionalOffset = paddings.top;
+  } else if (isReverse) {
+    // column-reverse
+    additionalOffset = paddings.right;
+  } else {
+    // column
+    additionalOffset = paddings.left;
+  }
+
+  const crossAxisGroupOffsets = contentAlignment.offsets.map(
+    offset => offset + additionalOffset
+  );
+
   return {
-    crossAxisGroupOffsets: contentAlignment.offsets,
+    adjustedCrossGap: contentAlignment.adjustedGap,
+    crossAxisGroupOffsets,
     itemPositions,
     totalHeight
   };
@@ -362,8 +383,10 @@ export const calculateLayout = ({
   }
 
   return {
+    adjustedCrossGap: layoutResult.adjustedCrossGap,
     crossAxisGroupOffsets: layoutResult.crossAxisGroupOffsets,
     crossAxisGroupSizes,
+    groupSizeLimit,
     itemGroups: groups,
     itemPositions: layoutResult.itemPositions,
     totalHeight: layoutResult.totalHeight

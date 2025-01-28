@@ -12,3 +12,4 @@ export {
   MeasurementsProvider,
   useMeasurementsContext
 } from './MeasurementsProvider';
+export * from './utils';

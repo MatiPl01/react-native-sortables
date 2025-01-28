@@ -1,4 +1,5 @@
-import { type PropsWithChildren, useMemo } from 'react';
+import { type PropsWithChildren, useCallback } from 'react';
+import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedReaction,
   useDerivedValue,
@@ -8,6 +9,7 @@ import {
 import type { DEFAULT_SORTABLE_FLEX_PROPS } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type {
+  FlexLayout,
   FlexLayoutContextType,
   RequiredBy,
   SortableFlexStyle
@@ -57,35 +59,17 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
-  const itemGroups = useSharedValue<Array<Array<string>>>([]);
-  const keyToGroup = useDerivedValue<Record<string, number>>(() =>
-    Object.fromEntries(
-      itemGroups.value.flatMap((group, i) => group.map(key => [key, i]))
-    )
-  );
-  const crossAxisGroupSizes = useSharedValue<Array<number>>([]);
-  const crossAxisGroupOffsets = useSharedValue<Array<number>>([]);
+  const keyToGroup = useSharedValue<Record<string, number>>({});
 
   const columnGap = useDerivedValue(() => columnGap_ ?? gap);
   const rowGap = useDerivedValue(() => rowGap_ ?? gap);
 
-  const paddings = useMemo(
-    () => ({
-      bottom: paddingBottom ?? paddingVertical ?? padding,
-      left: paddingLeft ?? paddingHorizontal ?? padding,
-      right: paddingRight ?? paddingHorizontal ?? padding,
-      top: paddingTop ?? paddingVertical ?? padding
-    }),
-    [
-      paddingTop,
-      paddingBottom,
-      paddingLeft,
-      paddingRight,
-      paddingVertical,
-      paddingHorizontal,
-      padding
-    ]
-  );
+  const paddings = useDerivedValue(() => ({
+    bottom: paddingBottom ?? paddingVertical ?? padding,
+    left: paddingLeft ?? paddingHorizontal ?? padding,
+    right: paddingRight ?? paddingHorizontal ?? padding,
+    top: paddingTop ?? paddingVertical ?? padding
+  }));
 
   const dimensionsLimits = useDerivedValue(() => {
     const minH = Math.max(minHeight ?? 0, height ?? 0);
@@ -98,6 +82,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     };
   });
 
+  const appliedLayout = useSharedValue<FlexLayout | null>(null);
+
   // Because the number of groups can dynamically change after order change
   // and we can't detect that in the React runtime, we are creating debug
   // rects for the maximum number of groups that can be displayed (which
@@ -105,63 +91,124 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
   const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
 
-  // FLEX LAYOUT UPDATER
-  useAnimatedReaction(
-    () => ({
-      flexAlignments: {
-        alignContent,
-        alignItems,
-        justifyContent
-      },
+  const useFlexLayoutReaction = useCallback(
+    (
+      idxToKey: SharedValue<Array<string> | null> | SharedValue<Array<string>>,
+      onChange: (layout: FlexLayout | null) => void
+    ) =>
+      useAnimatedReaction(
+        () =>
+          idxToKey.value === null
+            ? null
+            : {
+                flexAlignments: {
+                  alignContent,
+                  alignItems,
+                  justifyContent
+                },
+                flexDirection,
+                flexWrap,
+                gaps: {
+                  column: columnGap.value,
+                  row: rowGap.value
+                },
+                indexToKey: idxToKey.value,
+                itemDimensions: itemDimensions.value,
+                limits: dimensionsLimits.value,
+                paddings: paddings.value
+              },
+        props => {
+          onChange(props && calculateLayout(props));
+        }
+      ),
+    [
+      alignContent,
+      alignItems,
+      justifyContent,
       flexDirection,
       flexWrap,
-      gaps: {
-        column: columnGap.value,
-        row: rowGap.value
-      },
-      indexToKey: indexToKey.value,
-      itemDimensions: itemDimensions.value,
-      limits: dimensionsLimits.value,
+      columnGap,
+      rowGap,
+      itemDimensions,
+      dimensionsLimits,
       paddings
-    }),
-    props => {
-      const layout = calculateLayout(props);
-      if (!layout) {
-        return;
-      }
-
-      // Update item groups
-      itemGroups.value = layout.itemGroups;
-      // Update item positions
-      itemPositions.value = layout.itemPositions;
-      // Update cross axis group offsets and sizes
-      crossAxisGroupOffsets.value = layout.crossAxisGroupOffsets;
-      crossAxisGroupSizes.value = layout.crossAxisGroupSizes;
-      // Update container height
-      const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
-      containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
-
-      // DEBUG ONLY
-      if (debugCrossAxisGapRects && debugMainAxisGapRects) {
-        updateLayoutDebugRects(
-          layout,
-          debugCrossAxisGapRects,
-          debugMainAxisGapRects,
-          itemDimensions
-        );
-      }
-    }
+    ]
   );
+
+  const calculateFlexLayout = useCallback(
+    (idxToKey: Array<string>) => {
+      'worklet';
+      return calculateLayout({
+        flexAlignments: {
+          alignContent,
+          alignItems,
+          justifyContent
+        },
+        flexDirection,
+        flexWrap,
+        gaps: {
+          column: columnGap.value,
+          row: rowGap.value
+        },
+        indexToKey: idxToKey,
+        itemDimensions: itemDimensions.value,
+        limits: dimensionsLimits.value,
+        paddings: paddings.value
+      });
+    },
+    [
+      alignContent,
+      alignItems,
+      justifyContent,
+      flexDirection,
+      flexWrap,
+      columnGap,
+      rowGap,
+      itemDimensions,
+      dimensionsLimits,
+      paddings
+    ]
+  );
+
+  useFlexLayoutReaction(indexToKey, layout => {
+    'worklet';
+    if (!layout) {
+      return;
+    }
+
+    // Update current layout
+    appliedLayout.value = layout;
+    // Update item positions
+    itemPositions.value = layout.itemPositions;
+    // Update container height
+    const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
+    containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
+    // Update key to group
+    keyToGroup.value = Object.fromEntries(
+      layout.itemGroups.flatMap((group, i) => group.map(key => [key, i]))
+    );
+
+    // DEBUG ONLY
+    if (debugCrossAxisGapRects && debugMainAxisGapRects) {
+      updateLayoutDebugRects(
+        flexDirection,
+        layout,
+        debugCrossAxisGapRects,
+        debugMainAxisGapRects,
+        itemDimensions
+      );
+    }
+  });
 
   return {
     value: {
+      appliedLayout,
+      calculateFlexLayout,
       columnGap,
-      crossAxisGroupOffsets,
-      crossAxisGroupSizes,
       flexDirection,
-      itemGroups,
       keyToGroup,
-      rowGap
+      rowGap,
+      useFlexLayoutReaction
     }
   };
 });

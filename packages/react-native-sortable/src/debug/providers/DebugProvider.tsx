@@ -7,7 +7,7 @@ import {
   useState
 } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { cancelAnimation, makeMutable } from 'react-native-reanimated';
+import { cancelAnimation, makeMutable, runOnUI } from 'react-native-reanimated';
 
 import { useDebouncedStableCallback } from '../../hooks';
 import { createProvider } from '../../providers/utils';
@@ -75,7 +75,7 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
       if (!updater) {
         return;
       }
-      cancelAnimation(updater.props as SharedValue);
+      runOnUI(cancelAnimation)(updater.props as SharedValue);
       delete debugViewsRef.current[key];
       notifyObservers();
     },

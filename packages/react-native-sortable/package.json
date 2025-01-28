@@ -20,9 +20,11 @@
     "@testing-library/react-native": "^12.5.1",
     "@types/react": "^18.3.3",
     "@types/react-test-renderer": "^18.3.0",
+    "eslint": "^8.56.0",
     "jest": "^29.7.0",
     "lint-staged": "^15.2.7",
     "madge": "^8.0.0",
+    "prettier": "^3.3.2",
     "react": "^18.3.1",
     "react-native": "^0.76.5",
     "react-native-builder-bob": "^0.23.2",
@@ -85,7 +87,11 @@
     "clean": "../../scripts/clean.sh",
     "postpack": "rm ./README.md",
     "prepack": "bob build && cp ../../README.md ./README.md",
+    "format:code": "prettier --write . --ignore-unknown",
+    "format:deps": "syncpack format",
+    "format": "yarn format:code && yarn format:deps",
     "test": "jest",
+    "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "types": "dist/typescript/index.d.ts"

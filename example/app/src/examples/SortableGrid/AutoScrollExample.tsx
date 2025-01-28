@@ -42,17 +42,24 @@ function ScrollViewExample() {
       contentContainerStyle={style.contentContainer}
       ref={scrollableRef}
       removeClippedSubviews={false}>
-      <Group>
-        <ManyCards scrollableRef={scrollableRef} />
-      </Group>
+      {/* Sortable.Layer is needed on Old Architecture (Paper) */}
+      <Sortable.Layer>
+        <Group>
+          <ManyCards scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
       <SeparatorSection />
-      <Group>
-        <FewCards scrollableRef={scrollableRef} />
-      </Group>
+      <Sortable.Layer>
+        <Group>
+          <FewCards scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
       <SeparatorSection />
-      <Group>
-        <ManyCards scrollableRef={scrollableRef} />
-      </Group>
+      <Sortable.Layer>
+        <Group>
+          <ManyCards scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
     </Animated.ScrollView>
   );
 }
