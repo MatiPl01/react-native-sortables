@@ -41,13 +41,7 @@
         "changelogFile": "CHANGELOG.md"
       }
     ],
-    [
-      "@semantic-release/npm",
-      {
-        "pkgRoot": ".",
-        "tarballDir": "dist"
-      }
-    ],
+    "semantic-release-yarn",
     [
       "@semantic-release/git",
       {
