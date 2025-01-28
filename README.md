@@ -2,7 +2,6 @@
 
 ![sortable](https://github.com/user-attachments/assets/fe66c312-54b3-4a91-aaee-2bc48c761f34)
 
-<!-- PROJECT LOGO AND TITLE -->
 <div align="center">
 
 # <img src="https://github.com/user-attachments/assets/e7dbfceb-63a4-42ef-8c68-f8396a2fbf2e" width="28" /> React Native Sortable
@@ -134,6 +133,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - 🌟 Star this repo to show support
 - 🐛 Report bugs by [creating an issue](https://github.com/MatiPl01/react-native-sortable/issues)
-- 💡 Request features in discussions [open a discussion](https://github.com/MatiPl01/react-native-sortable/discussions) <!-- TODO - setup discussions -->
+- 💡 Request features in discussions [open a discussion](https://github.com/MatiPl01/react-native-sortable/discussions)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
