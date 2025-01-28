@@ -39,6 +39,15 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
   const isColumn = flexDirection.startsWith('column');
   const isReverse = flexDirection.endsWith('reverse');
 
+  const gt = (a: number, b: number) => {
+    'worklet';
+    return isReverse ? a < b : a > b;
+  };
+  const lt = (a: number, b: number) => {
+    'worklet';
+    return isReverse ? a > b : a < b;
+  };
+
   let mainCoordinate: Coordinate = 'x';
   let crossCoordinate: Coordinate = 'y';
   let mainDimension: Dimension = 'width';
@@ -252,7 +261,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
       swapItemAfterOffset =
         currentItemPosition[mainCoordinate] +
-        currentItemDimensions[mainDimension];
+        (isReverse ? 0 : currentItemDimensions[mainDimension]);
 
       const nextItemKey = currentGroup[itemIndexInGroup + 1];
       if (nextItemKey === undefined) {
@@ -283,9 +292,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       swapItemAfterBound =
         averageOffset + (isCurrentBeforeNext ? 1 : -1) * additionalSwapOffset;
     } while (
-      itemIndexInGroup < currentGroup.length - 1 && isReverse
-        ? mainAxisPosition < swapItemAfterBound
-        : mainAxisPosition > swapItemAfterBound
+      itemIndexInGroup < currentGroup.length - 1 &&
+      gt(mainAxisPosition, swapItemAfterBound)
     );
 
     // Item before
@@ -316,7 +324,9 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       const currentItemDimensions = itemDimensions.value[currentItemKey];
       if (!currentItemPosition || !currentItemDimensions) return;
 
-      swapItemBeforeOffset = currentItemPosition[mainCoordinate];
+      swapItemBeforeOffset =
+        currentItemPosition[mainCoordinate] +
+        (isReverse ? currentItemDimensions[mainDimension] : 0);
 
       const prevItemKey = currentGroup[itemIndexInGroup - 1];
       if (prevItemKey === undefined) {
@@ -349,34 +359,22 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     } while (
       // handle edge case when the active item cannot be the first item of
       // the current group
-      itemIndexInGroup > (canBeFirst ? 0 : 1) && isReverse
-        ? mainAxisPosition > swapItemBeforeBound
-        : mainAxisPosition < swapItemBeforeBound
+      itemIndexInGroup > (canBeFirst ? 0 : 1) &&
+      lt(mainAxisPosition, swapItemBeforeBound)
     );
 
     // DEBUG ONLY
     if (debugBox) {
-      console.log({
-        swapGroupAfterBound,
-        swapGroupAfterOffset,
-        swapGroupBeforeBound,
-        swapGroupBeforeOffset,
-        swapItemAfterBound,
-        swapItemAfterOffset,
-        swapItemBeforeBound,
-        swapItemBeforeOffset
-      });
-
-      if (swapGroupAfterOffset > swapGroupAfterBound) {
+      if (gt(swapGroupAfterOffset, swapGroupAfterBound)) {
         swapGroupAfterOffset = swapGroupAfterBound;
       }
-      if (swapGroupBeforeOffset < swapGroupBeforeBound) {
+      if (lt(swapGroupBeforeOffset, swapGroupBeforeBound)) {
         swapGroupBeforeOffset = swapGroupBeforeBound;
       }
-      if (swapItemAfterOffset > swapItemAfterBound) {
+      if (gt(swapItemAfterOffset, swapItemAfterBound)) {
         swapItemAfterOffset = swapItemAfterBound;
       }
-      if (swapItemBeforeOffset < swapItemBeforeBound) {
+      if (lt(swapItemBeforeOffset, swapItemBeforeBound)) {
         swapItemBeforeOffset = swapItemBeforeBound;
       }
 
