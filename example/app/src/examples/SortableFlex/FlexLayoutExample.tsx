@@ -75,7 +75,7 @@ export default function FlexLayoutExample() {
     gap: 10,
     justifyContent,
     maxHeight: 300,
-    minHeight: 250,
+    minHeight: 225,
     padding: spacing.md
   };
 
