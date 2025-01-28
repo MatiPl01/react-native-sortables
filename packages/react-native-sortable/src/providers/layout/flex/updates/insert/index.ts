@@ -356,6 +356,17 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     // DEBUG ONLY
     if (debugBox) {
+      console.log({
+        swapGroupAfterBound,
+        swapGroupAfterOffset,
+        swapGroupBeforeBound,
+        swapGroupBeforeOffset,
+        swapItemAfterBound,
+        swapItemAfterOffset,
+        swapItemBeforeBound,
+        swapItemBeforeOffset
+      });
+
       if (swapGroupAfterOffset > swapGroupAfterBound) {
         swapGroupAfterOffset = swapGroupAfterBound;
       }
