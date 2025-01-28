@@ -49,13 +49,13 @@ export const getTotalGroupSize = (
 };
 
 const getIndexesWhenSwappedToGroupBefore = ({
-  activeItemKey,
   activeItemIndex,
+  activeItemKey,
   currentGroupIndex,
-  keyToIndex,
-  itemGroups,
   groupSizeLimit,
   itemDimensions,
+  itemGroups,
+  keyToIndex,
   mainDimension,
   mainGap
 }: ItemGroupSwapProps): Omit<ItemGroupSwapResult, 'indexToKey'> | null => {
@@ -108,15 +108,15 @@ const getIndexesWhenSwappedToGroupBefore = ({
 };
 
 const getIndexesWhenSwappedToGroupAfter = ({
-  itemGroups,
-  currentGroupIndex,
   activeItemIndex,
   activeItemKey,
-  keyToGroup,
-  keyToIndex,
+  currentGroupIndex,
+  groupSizeLimit,
   indexToKey,
   itemDimensions,
-  groupSizeLimit,
+  itemGroups,
+  keyToGroup,
+  keyToIndex,
   mainDimension,
   mainGap
 }: ItemGroupSwapProps): Omit<ItemGroupSwapResult, 'indexToKey'> | null => {

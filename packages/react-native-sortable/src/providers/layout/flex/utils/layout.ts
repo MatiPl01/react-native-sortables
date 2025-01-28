@@ -283,9 +283,28 @@ const handleLayoutCalculation = (
     }
   }
 
+  let additionalOffset = 0;
+  if (isRow && isReverse) {
+    // row-reverse
+    additionalOffset = paddings.bottom;
+  } else if (isRow) {
+    // row
+    additionalOffset = paddings.top;
+  } else if (isReverse) {
+    // column-reverse
+    additionalOffset = paddings.right;
+  } else {
+    // column
+    additionalOffset = paddings.left;
+  }
+
+  const crossAxisGroupOffsets = contentAlignment.offsets.map(
+    offset => offset + additionalOffset
+  );
+
   return {
     adjustedCrossGap: contentAlignment.adjustedGap,
-    crossAxisGroupOffsets: contentAlignment.offsets,
+    crossAxisGroupOffsets,
     itemPositions,
     totalHeight
   };

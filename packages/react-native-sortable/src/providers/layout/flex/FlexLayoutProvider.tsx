@@ -191,6 +191,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     // DEBUG ONLY
     if (debugCrossAxisGapRects && debugMainAxisGapRects) {
       updateLayoutDebugRects(
+        flexDirection,
         layout,
         debugCrossAxisGapRects,
         debugMainAxisGapRects,
@@ -201,11 +202,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   return {
     value: {
+      appliedLayout,
       calculateFlexLayout,
       columnGap,
       flexDirection,
       keyToGroup,
-      appliedLayout,
       rowGap,
       useFlexLayoutReaction
     }
