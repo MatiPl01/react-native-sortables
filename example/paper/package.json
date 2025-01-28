@@ -9,7 +9,7 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "pod": "cd ios && pod install && rm -f .xcode.env.local && cd ..",
+    "pod": "cd ios && bundle install && bundle exec pod install && rm -f .xcode.env.local && cd ..",
     "postinstall": "yarn watchman:clear",
     "start": "react-native start",
     "watchman:clear": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all || echo 'Watchman not found, skipping...'"

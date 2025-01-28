@@ -8,7 +8,7 @@
 
 **Powerful Sortable Components for Flexible Content Reordering in React Native**
 
-[Documentation](https://react-native-sortable-docs.vercel.app/) | [Examples](https://react-native-sortable-docs.vercel.app/grid/examples) | [Contributing](.) <!-- TODO - add links -->
+[Documentation](https://react-native-sortable-docs.vercel.app/) | [Examples](https://react-native-sortable-docs.vercel.app/grid/examples) | [Contributing](./CONTRIBUTING.md)
 
 ![npm](https://img.shields.io/npm/dw/react-native-smart-sortable?color=ffd53e)
 ![GitHub issues](https://img.shields.io/github/issues/MatiPl01/react-native-smart-sortable?color=ffd53e)
@@ -123,7 +123,7 @@ For detailed usage and examples, check out the [Documentation](https://react-nat
 
 ## Contributing
 
-Contributions are welcome! Please read the [Contributing Guide](.) for details. <!-- TODO - add link to contributions -->
+Contributions are welcome! Please read the [Contributing Guide](./CONTRIBUTING.md) for details.
 
 ## License
 
