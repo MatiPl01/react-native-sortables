@@ -26,6 +26,7 @@ jobs:
           cache: 'yarn'
 
       - name: 📦 Install dependencies
+        working-directory: packages/react-native-sortable
         run: yarn install --immutable
 
       - name: 🎉 Release
