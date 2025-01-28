@@ -85,13 +85,13 @@
     "build": "yarn clean && bob build",
     "circular-dependency-check": "yarn madge --extensions js,jsx,ts,tsx --circular src",
     "clean": "../../scripts/clean.sh",
-    "postpack": "rm ./README.md",
-    "prepack": "bob build && cp ../../README.md ./README.md",
+    "format": "yarn format:code && yarn format:deps",
     "format:code": "prettier --write . --ignore-unknown",
     "format:deps": "syncpack format",
-    "format": "yarn format:code && yarn format:deps",
-    "test": "jest",
     "lint": "eslint .",
+    "postpack": "rm ./README.md",
+    "prepack": "bob build && cp ../../README.md ./README.md",
+    "test": "jest",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "types": "dist/typescript/index.d.ts"
