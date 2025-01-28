@@ -166,15 +166,16 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
       swapGroupBeforeOffset =
         currentLayout.crossAxisGroupOffsets[groupIndex] ?? 0;
-      const averageOffsetBefore =
-        ((nextLayout?.crossAxisGroupOffsets[groupIndex] ?? 0) +
-          swapGroupBeforeOffset) /
+      const swapOffset =
+        ((nextLayout?.crossAxisGroupOffsets[groupIndex - 1] ?? 0) +
+          swapGroupBeforeOffset +
+          (currentLayout.crossAxisGroupSizes[groupIndex - 1] ?? 0)) /
         2;
       const additionalSwapOffset = getAdditionalSwapOffset(
         crossGap.value,
         nextLayout?.crossAxisGroupSizes?.[groupIndex - 1] ?? 0
       );
-      swapGroupBeforeBound = averageOffsetBefore - additionalSwapOffset;
+      swapGroupBeforeBound = swapOffset - additionalSwapOffset;
     } while (
       swapGroupBeforeBound > 0 &&
       crossAxisPosition < swapGroupBeforeBound
@@ -206,21 +207,24 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
         nextLayout = swappedAfterLayout.value;
       }
 
+      const currentGroupBeforeOffset =
+        currentLayout.crossAxisGroupOffsets[groupIndex] ?? 0;
+
       swapGroupAfterOffset =
-        (currentLayout.crossAxisGroupOffsets[groupIndex] ?? 0) +
+        currentGroupBeforeOffset +
         (currentLayout.crossAxisGroupSizes[groupIndex] ?? 0);
       const swappedAfterOffset =
-        (nextLayout?.crossAxisGroupOffsets[groupIndex] ?? 0) +
-        (nextLayout?.crossAxisGroupSizes[groupIndex] ?? 0);
-      const averageOffsetAfter =
+        (nextLayout?.crossAxisGroupOffsets[groupIndex + 1] ?? 0) +
+        (nextLayout?.crossAxisGroupSizes[groupIndex + 1] ?? 0);
+      const swapOffset =
         swappedAfterOffset === 0
           ? swapGroupAfterOffset
-          : (swappedAfterOffset + swapGroupAfterOffset) / 2;
+          : (currentGroupBeforeOffset + swappedAfterOffset) / 2;
       const additionalSwapOffset = getAdditionalSwapOffset(
         crossGap.value,
         nextLayout?.crossAxisGroupSizes?.[groupIndex] ?? 0
       );
-      swapGroupAfterBound = averageOffsetAfter + additionalSwapOffset;
+      swapGroupAfterBound = swapOffset + additionalSwapOffset;
     } while (
       crossAxisPosition > swapGroupAfterBound &&
       groupIndex < swappedAfteGroupsCount &&
@@ -365,19 +369,6 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     // DEBUG ONLY
     if (debugBox) {
-      if (gt(swapGroupAfterOffset, swapGroupAfterBound)) {
-        swapGroupAfterOffset = swapGroupAfterBound;
-      }
-      if (lt(swapGroupBeforeOffset, swapGroupBeforeBound)) {
-        swapGroupBeforeOffset = swapGroupBeforeBound;
-      }
-      if (gt(swapItemAfterOffset, swapItemAfterBound)) {
-        swapItemAfterOffset = swapItemAfterBound;
-      }
-      if (lt(swapItemBeforeOffset, swapItemBeforeBound)) {
-        swapItemBeforeOffset = swapItemBeforeBound;
-      }
-
       if (isColumn) {
         debugBox.top.update(
           { x: swapGroupBeforeBound, y: swapItemBeforeBound },
