@@ -5,3 +5,4 @@ example/*
 **/jest.setup.js
 **/dist
 **/README.md
+**/CONTRIBUTING.md
