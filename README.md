@@ -1,6 +1,6 @@
 <a name="readme-top"></a>
 
-![Banner](https://github.com/user-attachments/assets/fe66c312-54b3-4a91-aaee-2bc48c761f34)
+![Banner](https://github.com/user-attachments/assets/532e7ed2-9035-4d5b-9df9-b349ee41608e)
 
 <div align="center">
 
