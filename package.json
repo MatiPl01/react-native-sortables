@@ -1,5 +1,5 @@
 {
-  "name": "react-native-sortable-monorepo",
+  "name": "react-native-sortables-monorepo",
   "version": "1.0.0",
   "devDependencies": {
     "@types/eslint": "^8.56.10",
@@ -31,8 +31,8 @@
     "typescript": "5.3.3"
   },
   "scripts": {
-    "build": "yarn workspace react-native-sortable build",
-    "clean": "yarn workspace react-native-sortable clean",
+    "build": "yarn workspace react-native-sortables build",
+    "clean": "yarn workspace react-native-sortables clean",
     "example:app": "yarn workspace example-app",
     "example:fabric": "yarn workspace example-fabric",
     "example:paper": "yarn workspace example-paper",
@@ -41,7 +41,7 @@
     "format:code": "prettier --write . --ignore-unknown",
     "format:deps": "syncpack format",
     "husky:install": "./scripts/husky.sh",
-    "lib": "yarn workspace react-native-sortable",
+    "lib": "yarn workspace react-native-sortables",
     "lint": "yarn workspaces foreach -A -p run lint",
     "lint:all": "yarn lint && yarn lint:docs",
     "lint:docs": "cd packages/docs && yarn lint && cd ../..",
@@ -54,7 +54,7 @@
   "workspaces": {
     "packages": [
       "example/*",
-      "packages/react-native-sortable"
+      "packages/react-native-sortables"
     ]
   }
 }

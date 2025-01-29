@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "react-native": "^0.76.5",
-    "react-native-sortable": "workspace:*"
+    "react-native-sortables": "workspace:*"
   },
   "private": true,
   "scripts": {

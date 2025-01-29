@@ -6,7 +6,7 @@ import Sortable, {
   type DragStartCallback,
   type OrderChangeCallback,
   type SortableGridRenderItem
-} from 'react-native-sortable';
+} from 'react-native-sortables';
 
 import { AnimatedText, GridCard, Section, Stagger } from '@/components';
 import { flex, sizes, spacing } from '@/theme';

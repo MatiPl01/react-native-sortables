@@ -7,7 +7,7 @@ description: ''
 
 ## Overview
 
-React Native Sortable exports a few touchable components, i.e. `Pressable`, `TouchableOpacity` and `TouchableHighlight`.
+React Native Sortables exports a few touchable components, i.e. `Pressable`, `TouchableOpacity` and `TouchableHighlight`.
 
 The role of these components is to properly handle **press gesture** on components nested within children of **sortable components**.
 
@@ -27,7 +27,7 @@ Use these components when you need to add **interactive elements** (buttons, lin
 Use these components withing a sortable component's child (item) component.
 
 ```tsx
-import Sortable from 'react-native-sortable';
+import Sortable from 'react-native-sortables';
 
 function Item({ item }: { item: string }) {
   return (
@@ -47,8 +47,8 @@ And, for example, if you use the **Sortable Grid** component:
 
 ```tsx
 import { useCallback } from 'react';
-import Sortable from 'react-native-sortable';
-import type { SortableGridRenderItem } from 'react-native-sortable';
+import Sortable from 'react-native-sortables';
+import type { SortableGridRenderItem } from 'react-native-sortables';
 
 export default function Grid() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
@@ -77,6 +77,6 @@ Function that will be called when the user **presses** the component **nested wi
 
 :::info
 
-If you need more different props, you can open a [Pull Request](https://github.com/MatiPl01/react-native-sortable/) to add them or request them in the [GitHub Discussions](https://github.com/MatiPl01/react-native-sortable/discussions).
+If you need more different props, you can open a [Pull Request](https://github.com/MatiPl01/react-native-sortables/) to add them or request them in the [GitHub Discussions](https://github.com/MatiPl01/react-native-sortables/discussions).
 
 :::

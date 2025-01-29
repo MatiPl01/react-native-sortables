@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import Sortable from 'react-native-sortable';
+import Sortable from 'react-native-sortables';
 
 import { colors, text } from '@/theme';
 

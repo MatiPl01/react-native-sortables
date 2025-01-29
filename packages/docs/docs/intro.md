@@ -4,13 +4,13 @@ sidebar_label: Introduction
 slug: /
 ---
 
-# React Native Sortable
+# React Native Sortables
 
-![React Native Sortable Banner](@site/static/img/banner.png)
+![React Native Sortables Banner](@site/static/img/banner.png)
 
-## What is React Native Sortable?
+## What is React Native Sortables?
 
-**React Native Sortable** is a library for smooth **drag-and-drop reordering** of items. It offers ready-to-use **sortable components** with **intuitive gesture-based reordering**, working seamlessly across iOS and Android platforms.
+**React Native Sortables** is a library for smooth **drag-and-drop reordering** of items. It offers ready-to-use **sortable components** with **intuitive gesture-based reordering**, working seamlessly across iOS and Android platforms.
 
 ## ⭐ Key Features
 
@@ -37,16 +37,16 @@ slug: /
 
 ## 💝 Support & Sponsorship
 
-React Native Sortable is an MIT-licensed open source project. You can support its development by:
+React Native Sortables is an MIT-licensed open source project. You can support its development by:
 
-- Starring the **[GitHub repository](https://github.com/MatiPl01/react-native-sortable)**
+- Starring the **[GitHub repository](https://github.com/MatiPl01/react-native-sortables)**
 - **[Sponsoring](https://github.com/sponsors/MatiPl01)** the autor of the library
 - **Contributing** with bug reports, feature requests, or pull requests
 - **Sharing** your **experience** with the library
 
 ## 🚀 Ready to Start?
 
-Check out the **[Getting Started](./getting-started) guide** to begin using React Native Sortable in your project!
+Check out the **[Getting Started](./getting-started) guide** to begin using React Native Sortables in your project!
 
 ---
 

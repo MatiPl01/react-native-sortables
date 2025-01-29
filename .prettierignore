@@ -7,3 +7,6 @@ android
 ios
 node_modules
 CHANGELOG.md
+.bundle
+example/fabric/vendor
+example/paper/vendor

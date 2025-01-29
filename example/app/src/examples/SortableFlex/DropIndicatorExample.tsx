@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import Sortable from 'react-native-sortable';
+import Sortable from 'react-native-sortables';
 
 import { FlexCell, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';

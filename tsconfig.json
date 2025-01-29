@@ -3,7 +3,7 @@
   "include": [
     "packages",
     "jest.config.ts",
-    "packages/react-native-sortable/jest.setup.js"
+    "packages/react-native-sortables/jest.setup.js"
   ],
   "exclude": ["example", "**/dist"]
 }

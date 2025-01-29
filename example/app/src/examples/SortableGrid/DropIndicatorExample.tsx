@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { ScrollView } from 'react-native';
-import type { SortableGridRenderItem } from 'react-native-sortable';
-import Sortable from 'react-native-sortable';
+import type { SortableGridRenderItem } from 'react-native-sortables';
+import Sortable from 'react-native-sortables';
 
 import { GridCard, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';

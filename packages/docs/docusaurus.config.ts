@@ -27,7 +27,7 @@ const config: Config = {
       {
         blog: {
           editUrl:
-            'https://github.com/MatiPl01/react-native-sortable/edit/main/packages/docs/',
+            'https://github.com/MatiPl01/react-native-sortables/edit/main/packages/docs/',
           feedOptions: {
             type: ['rss', 'atom'],
             xslt: true
@@ -40,7 +40,7 @@ const config: Config = {
         },
         docs: {
           editUrl:
-            'https://github.com/MatiPl01/react-native-sortable/edit/main/packages/docs/',
+            'https://github.com/MatiPl01/react-native-sortables/edit/main/packages/docs/',
           routeBasePath: '/',
           // Please change this to your repo.
           sidebarPath: './sidebars.ts'
@@ -52,56 +52,15 @@ const config: Config = {
     ]
   ],
 
-  projectName: 'react-native-sortable', // Usually your repo name.
-  tagline: 'React Native Sortable',
+  projectName: 'react-native-sortables', // Usually your repo name.
+  tagline: 'React Native Sortables',
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   themeConfig: {
     footer: {
-      copyright: `Copyright © ${new Date().getFullYear()} | React Native Sortable by MatiPl01`,
-      links: [
-        // TODO - change links
-        // {
-        //   items: [
-        //     {
-        //       label: 'Tutorial',
-        //       to: '/docs/intro'
-        //     }
-        //   ],
-        //   title: 'Docs'
-        // },
-        // {
-        //   items: [
-        //     {
-        //       href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-        //       label: 'Stack Overflow'
-        //     },
-        //     {
-        //       href: 'https://discordapp.com/invite/docusaurus',
-        //       label: 'Discord'
-        //     },
-        //     {
-        //       href: 'https://x.com/docusaurus',
-        //       label: 'X'
-        //     }
-        //   ],
-        //   title: 'Community'
-        // },
-        // {
-        //   items: [
-        //     {
-        //       label: 'Blog',
-        //       to: '/blog'
-        //     },
-        //     {
-        //       href: 'https://github.com/facebook/docusaurus',
-        //       label: 'GitHub'
-        //     }
-        //   ],
-        //   title: 'More'
-        // }
-      ],
+      copyright: `Copyright © ${new Date().getFullYear()} | React Native Sortables by MatiPl01`,
+      links: [],
       style: 'dark'
     },
     // Replace with your project's social card
@@ -114,18 +73,18 @@ const config: Config = {
           sidebarId: 'tutorialSidebar',
           type: 'docSidebar'
         },
-        { label: 'Blog', position: 'left', to: '/blog' },
+        // { label: 'Blog', position: 'left', to: '/blog' },
         {
-          href: 'https://github.com/MatiPl01/react-native-sortable',
+          href: 'https://github.com/MatiPl01/react-native-sortables',
           label: 'GitHub',
           position: 'right'
         }
       ],
       logo: {
-        alt: 'React Native Sortable Logo',
+        alt: 'React Native Sortables Logo',
         src: 'img/logo.svg'
       },
-      title: 'Sortable'
+      title: 'Sortables'
     },
     prism: {
       darkTheme: prismThemes.vsDark,
@@ -133,7 +92,7 @@ const config: Config = {
     }
   } satisfies Preset.ThemeConfig,
 
-  title: 'Sortable',
+  title: 'Sortables',
 
   // Set the production url of your site here
   // TODO - change url

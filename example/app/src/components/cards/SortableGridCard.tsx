@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import type { SortableGridRenderItem } from 'react-native-sortable';
-import Sortable from 'react-native-sortable';
+import type { SortableGridRenderItem } from 'react-native-sortables';
+import Sortable from 'react-native-sortables';
 
 import { GridCard } from '@/components';
 import { useItemOrderChange } from '@/hooks';
