@@ -7884,7 +7884,7 @@ __metadata:
     react-native-reanimated: "npm:^3.16.6"
     react-native-safe-area-context: "npm:^4.14.0"
     react-native-screens: "npm:^4.1.0"
-    react-native-sortable: "workspace:*"
+    react-native-sortables: "workspace:*"
     react-native-svg: "npm:^15.9.0"
     react-test-renderer: "npm:18.3.1"
   languageName: unknown
@@ -7895,7 +7895,7 @@ __metadata:
   resolution: "example-fabric@workspace:example/fabric"
   dependencies:
     react-native: "npm:^0.76.5"
-    react-native-sortable: "workspace:*"
+    react-native-sortables: "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -7904,7 +7904,7 @@ __metadata:
   resolution: "example-paper@workspace:example/paper"
   dependencies:
     react-native: "npm:^0.76.5"
-    react-native-sortable: "workspace:*"
+    react-native-sortables: "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -13358,9 +13358,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-sortable-monorepo@workspace:.":
+"react-native-sortables-monorepo@workspace:.":
   version: 0.0.0-use.local
-  resolution: "react-native-sortable-monorepo@workspace:."
+  resolution: "react-native-sortables-monorepo@workspace:."
   dependencies:
     "@types/eslint": "npm:^8.56.10"
     "@types/jest": "npm:^29.5.12"
@@ -13378,9 +13378,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"react-native-sortable@workspace:*, react-native-sortable@workspace:packages/react-native-sortable":
+"react-native-sortables@workspace:*, react-native-sortables@workspace:packages/react-native-sortables":
   version: 0.0.0-use.local
-  resolution: "react-native-sortable@workspace:packages/react-native-sortable"
+  resolution: "react-native-sortables@workspace:packages/react-native-sortables"
   dependencies:
     "@babel/core": "npm:^7.25.2"
     "@babel/preset-env": "npm:^7.25.3"

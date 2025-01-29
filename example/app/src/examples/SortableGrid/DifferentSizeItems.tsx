@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import type { SortableGridRenderItem } from 'react-native-sortable';
-import Sortable from 'react-native-sortable';
+import type { SortableGridRenderItem } from 'react-native-sortables';
+import Sortable from 'react-native-sortables';
 
 import { Button, GridCard, Group, OptionGroup, Stagger } from '@/components';
 import { colors, flex, sizes, spacing, style } from '@/theme';

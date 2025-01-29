@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import type { SortableGridRenderItem } from 'react-native-sortable';
-import Sortable from 'react-native-sortable';
+import type { SortableGridRenderItem } from 'react-native-sortables';
+import Sortable from 'react-native-sortables';
 
 import { colors, radius, sizes, spacing, text } from '@/theme';
 

@@ -2,7 +2,7 @@ import { AnimatedFlashList, type FlashList } from '@shopify/flash-list';
 import { FlatList, StyleSheet, Text } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import Sortable from 'react-native-sortable';
+import Sortable from 'react-native-sortables';
 
 import { FlexCell, Group, Section, TabView } from '@/components';
 import { colors, spacing, style } from '@/theme';

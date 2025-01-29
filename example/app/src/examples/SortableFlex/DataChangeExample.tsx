@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import Sortable from 'react-native-sortable';
+import Sortable from 'react-native-sortables';
 
 import { Button, FlexCell, Group, Section, Stagger } from '@/components';
 import { colors, flex, spacing, style } from '@/theme';

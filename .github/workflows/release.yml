@@ -26,11 +26,11 @@ jobs:
           cache: 'yarn'
 
       - name: 📦 Install dependencies
-        working-directory: packages/react-native-sortable
+        working-directory: packages/react-native-sortables
         run: yarn install --immutable
 
       - name: 🎉 Release
-        working-directory: packages/react-native-sortable
+        working-directory: packages/react-native-sortables
         run: yarn semantic-release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}

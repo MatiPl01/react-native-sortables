@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks';
 
-import { useStableCallback } from '../callbacks';
+import { useStableCallback } from '.';
 
 describe(useStableCallback, () => {
   const callback1 = jest.fn();

@@ -9,7 +9,7 @@ import Animated, {
   withSpring,
   withTiming
 } from 'react-native-reanimated';
-import type { DropIndicatorComponentProps } from 'react-native-sortable';
+import type { DropIndicatorComponentProps } from 'react-native-sortables';
 
 export default function CustomDropIndicator({
   activationProgress,

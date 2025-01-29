@@ -7,8 +7,8 @@ import {
   Text,
   View
 } from 'react-native';
-import type { SortableFlexStyle } from 'react-native-sortable';
-import Sortable from 'react-native-sortable';
+import type { SortableFlexStyle } from 'react-native-sortables';
+import Sortable from 'react-native-sortables';
 
 import {
   Button,

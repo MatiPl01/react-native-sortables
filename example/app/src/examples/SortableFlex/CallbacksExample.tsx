@@ -5,7 +5,7 @@ import Sortable, {
   type DragEndCallback,
   type DragStartCallback,
   type OrderChangeCallback
-} from 'react-native-sortable';
+} from 'react-native-sortables';
 
 import { AnimatedText, FlexCell, Section, Stagger } from '@/components';
 import { flex, sizes, spacing } from '@/theme';

@@ -1,4 +1,4 @@
-import Sortable from 'react-native-sortable';
+import Sortable from 'react-native-sortables';
 
 import { FlexCell } from '@/components/items';
 import { useItemOrderChange } from '@/hooks';

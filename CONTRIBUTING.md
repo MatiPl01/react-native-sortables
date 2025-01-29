@@ -1,6 +1,6 @@
-# Contributing to React Native Sortable
+# Contributing to React Native Sortables
 
-Thank you for your interest in contributing to React Native Sortable! Contributions are welcome in the following forms:
+Thank you for your interest in contributing to React Native Sortables! Contributions are welcome in the following forms:
 
 - Reporting a bug
 - Submitting a fix
@@ -10,7 +10,7 @@ Thank you for your interest in contributing to React Native Sortable! Contributi
 
 ### Creating Issues
 
-Bugs and feature requests can be reported through GitHub issues by [opening a new issue](https://github.com/MatiPl01/react-native-sortable/issues).
+Bugs and feature requests can be reported through GitHub issues by [opening a new issue](https://github.com/MatiPl01/react-native-sortables/issues).
 
 ### Writing Bug Reports
 
@@ -53,7 +53,7 @@ This project uses GitHub to host code, track issues and feature requests, and ac
 
 ## Discussions
 
-For proposing new features or discussing ideas, please use [GitHub Discussions](https://github.com/MatiPl01/react-native-sortable/discussions). This is a great place to:
+For proposing new features or discussing ideas, please use [GitHub Discussions](https://github.com/MatiPl01/react-native-sortables/discussions). This is a great place to:
 
 - Share your ideas for new features
 - Discuss potential improvements
