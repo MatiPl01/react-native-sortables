@@ -1,0 +1,5 @@
+{
+  "build": {
+    "ignoreCommand": ".vercel/ignore.sh"
+  }
+}
