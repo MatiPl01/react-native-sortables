@@ -9,7 +9,7 @@
     "@react-navigation/native-stack": "^6.9.26",
     "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A1.7.0#~/.yarn/patches/@shopify-flash-list-npm-1.7.0-8b9f270a18.patch",
     "react": "^18.3.1",
-    "react-native": "^0.76.5",
+    "react-native": "0.76.5",
     "react-native-gesture-handler": "^2.21.2",
     "react-native-haptic-feedback": "^2.3.3",
     "react-native-reanimated": "^3.16.6",
