@@ -36,6 +36,7 @@
     "example:app": "yarn workspace example-app",
     "example:fabric": "yarn workspace example-fabric",
     "example:paper": "yarn workspace example-paper",
+    "example:web": "yarn workspace example-web",
     "format": "yarn format:code && yarn format:deps",
     "format:check": "prettier --check . --ignore-unknown",
     "format:code": "prettier --write . --ignore-unknown",
@@ -53,7 +54,10 @@
   "type": "module",
   "workspaces": {
     "packages": [
-      "example/*",
+      "example/app",
+      "example/fabric",
+      "example/paper",
+      "example/web",
       "packages/react-native-sortables"
     ]
   }

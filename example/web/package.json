@@ -1,0 +1,21 @@
+{
+  "name": "example-web",
+  "version": "0.0.1",
+  "dependencies": {
+    "expo": "^52.0.28",
+    "react-dom": "18.3.1",
+    "react-native": "^0.76.5",
+    "react-native-sortables": "workspace:*",
+    "react-native-web": "0.19.13"
+  },
+  "devDependencies": {
+    "@expo/metro-runtime": "~4.0.1",
+    "babel-preset-expo": "^12.0.6",
+    "serve": "^14.2.4"
+  },
+  "private": true,
+  "scripts": {
+    "production": "yarn expo export -p web && yarn serve dist --single",
+    "start": "expo start --web"
+  }
+}
