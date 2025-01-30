@@ -1,6 +1,6 @@
 {
   "name": "react-native-sortables-web",
   "web": {
-    "favicon": "./assets/favicon.ico"
+    "favicon": "./assets/favicon.png"
   }
 }

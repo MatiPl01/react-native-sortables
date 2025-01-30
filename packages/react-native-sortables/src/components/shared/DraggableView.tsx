@@ -5,7 +5,8 @@ import Animated, {
   LinearTransition,
   useAnimatedStyle,
   useDerivedValue,
-  useSharedValue
+  useSharedValue,
+  withTiming
 } from 'react-native-reanimated';
 
 import {
@@ -19,6 +20,7 @@ import {
 } from '../../providers';
 import type { LayoutAnimation } from '../../types';
 import ItemDecoration from './ItemDecoration';
+import { IS_WEB } from '../../utils';
 
 const RELATIVE_STYLE: ViewStyle = {
   height: undefined,
@@ -82,11 +84,14 @@ export default function DraggableView({
       return NO_TRANSLATION_STYLE;
     }
 
+    const left = layoutX !== null && IS_WEB ? withTiming(layoutX) : layoutX;
+    const top = layoutY !== null && IS_WEB ? withTiming(layoutY) : layoutY;
+
     return {
-      left: layoutX,
+      left,
       opacity: 1,
       position: 'absolute',
-      top: layoutY,
+      top,
       transform: [{ translateX }, { translateY }],
       zIndex: zIndex.value
     };
@@ -95,7 +100,7 @@ export default function DraggableView({
   return (
     <Animated.View
       {...viewProps}
-      layout={LinearTransition}
+      layout={IS_WEB ? undefined : LinearTransition}
       style={[style, animatedStyle]}>
       <Animated.View entering={entering} exiting={exiting}>
         <GestureDetector gesture={gesture}>
