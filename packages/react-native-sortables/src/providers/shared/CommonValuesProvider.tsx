@@ -11,6 +11,7 @@ import { useAnimatableValue } from '../../hooks';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
+  Animatable,
   CommonValuesContextType,
   Dimensions,
   Maybe,
@@ -22,7 +23,7 @@ import { createProvider } from '../utils';
 
 type CommonValuesProviderProps = PropsWithChildren<
   {
-    sortEnabled: boolean;
+    sortEnabled: Animatable<boolean>;
     itemKeys: Array<string>;
     initialItemsStyleOverride?: ViewStyle;
   } & ActiveItemDecorationSettings &
@@ -89,7 +90,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   // OTHER
   const containerRef = useAnimatedRef<Animated.View>();
-  const sortEnabled = useDerivedValue(() => _sortEnabled);
+  const sortEnabled = useAnimatableValue(_sortEnabled);
   const canSwitchToAbsoluteLayout = useSharedValue(false);
 
   useEffect(() => {
