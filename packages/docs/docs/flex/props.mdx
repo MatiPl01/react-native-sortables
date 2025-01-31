@@ -8,7 +8,7 @@ sidebar_position: 2
 Whenever `Animatable<T>` is used, it refers to the following type definition:
 
 ```ts
-type Animatable<V> = SharedValue<V> | V;
+type Animatable<T> = SharedValue<T> | T;
 ```
 
 This means that properties of type `Animatable<T>` can accept either:
@@ -34,9 +34,9 @@ Children components to render within the flex container.
 
 Controls whether the sorting is enabled and the item hold and drag gesture is handled.
 
-| type      | default | required |
-| --------- | ------- | -------- |
-| `boolean` | true    | NO       |
+| type                  | default | required |
+| --------------------- | ------- | -------- |
+| `Animatable<boolean>` | true    | NO       |
 
 ---
 
@@ -276,9 +276,9 @@ All active item decoration settings are applied when the **item becomes active**
 
 Scale to which the pressed item is scaled when active.
 
-| type     | default | required |
-| -------- | ------- | -------- |
-| `number` | 1.1     | NO       |
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 1.1     | NO       |
 
 ---
 
@@ -286,17 +286,19 @@ Scale to which the pressed item is scaled when active.
 
 Opacity to which the pressed item is animated when active.
 
-| type     | default | required |
-| -------- | ------- | -------- |
-| `number` | 1       | NO       |
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 1       | NO       |
+
+---
 
 ### activeItemShadowOpacity
 
 Shadow opacity of the active item.
 
-| type     | default | required |
-| -------- | ------- | -------- |
-| `number` | 0.2     | NO       |
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 0.2     | NO       |
 
 ---
 
@@ -304,9 +306,9 @@ Shadow opacity of the active item.
 
 Opacity to which all items except the pressed one are animated when pressed item becomes active.
 
-| type     | default | required |
-| -------- | ------- | -------- |
-| `number` | 0.5     | NO       |
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 0.5     | NO       |
 
 ---
 
@@ -314,9 +316,9 @@ Opacity to which all items except the pressed one are animated when pressed item
 
 Scale to which all items except the pressed one are animated when pressed item becomes active.
 
-| type     | default | required |
-| -------- | ------- | -------- |
-| `number` | 1       | NO       |
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 1       | NO       |
 
 ---
 
@@ -328,9 +330,9 @@ Active item snap settings determine how the active item will be **positioned in 
 
 Whether the active item should snap to the finger.
 
-| type      | default | required |
-| --------- | ------- | -------- |
-| `boolean` | true    | NO       |
+| type                  | default | required |
+| --------------------- | ------- | -------- |
+| `Animatable<boolean>` | true    | NO       |
 
 ---
 
@@ -338,9 +340,18 @@ Whether the active item should snap to the finger.
 
 Horizontal snap offset of the item. When percentage is used, it is relative to the width of the item.
 
-| type     | default | required |
-| -------- | ------- | -------- |
-| `Offset` | 50%     | NO       |
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<Offset>` | 50%     | NO       |
+
+<details>
+  <summary>Type definitions</summary>
+
+```ts
+type Offset = `${number}%` | number;
+```
+
+</details>
 
 ---
 
@@ -348,9 +359,18 @@ Horizontal snap offset of the item. When percentage is used, it is relative to t
 
 Vertical snap offset of the item. When percentage is used, it is relative to the height of the item.
 
-| type     | default | required |
-| -------- | ------- | -------- |
-| `Offset` | 50%     | NO       |
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<Offset>` | 50%     | NO       |
+
+<details>
+  <summary>Type definitions</summary>
+
+```ts
+type Offset = `${number}%` | number;
+```
+
+</details>
 
 :::tip
 
@@ -384,9 +404,9 @@ Offset from the edge of the flex component at which the auto scroll is activated
 
 You can provide a **single number**, which will be used for both **top** and **bottom** edges or an array of **two numbers**, first for **top** edge and second for **bottom** edge.
 
-| type                         | default | required |
-| ---------------------------- | ------- | -------- |
-| `[number, number] \| number` | 75      | NO       |
+| type                                     | default | required |
+| ---------------------------------------- | ------- | -------- |
+| `Animatable<[number, number] \| number>` | 75      | NO       |
 
 ---
 
@@ -394,9 +414,9 @@ You can provide a **single number**, which will be used for both **top** and **b
 
 Speed of the auto scroll. Adjust it based on your preferences.
 
-| type     | default | required |
-| -------- | ------- | -------- |
-| `number` | 1       | NO       |
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 1       | NO       |
 
 ---
 
@@ -404,9 +424,9 @@ Speed of the auto scroll. Adjust it based on your preferences.
 
 Controls whether the auto scroll is enabled.
 
-| type      | default | required |
-| --------- | ------- | -------- |
-| `boolean` | true    | NO       |
+| type                  | default | required |
+| --------------------- | ------- | -------- |
+| `Animatable<boolean>` | true    | NO       |
 
 :::important
 

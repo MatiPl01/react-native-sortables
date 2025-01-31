@@ -8,7 +8,7 @@ sidebar_position: 2
 Whenever `Animatable<T>` is used, it refers to the following type definition:
 
 ```ts
-type Animatable<V> = SharedValue<V> | V;
+type Animatable<T> = SharedValue<T> | T;
 ```
 
 This means that properties of type `Animatable<T>` can accept either:
