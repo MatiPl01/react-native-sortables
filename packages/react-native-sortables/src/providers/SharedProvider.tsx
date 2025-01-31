@@ -8,6 +8,7 @@ import { useWarnOnPropChange } from '../hooks';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
+  Animatable,
   AutoScrollSettings,
   PartialBy,
   SortableCallbacks
@@ -24,7 +25,7 @@ import { ContextProviderComposer } from './utils';
 type SharedProviderProps = PropsWithChildren<
   {
     itemKeys: Array<string>;
-    sortEnabled: boolean;
+    sortEnabled: Animatable<boolean>;
     hapticsEnabled: boolean;
     debug: boolean;
     initialItemsStyleOverride?: ViewStyle;

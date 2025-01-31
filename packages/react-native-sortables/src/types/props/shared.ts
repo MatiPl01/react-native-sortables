@@ -4,7 +4,7 @@ import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
 import type { Vector } from '../layout/shared';
 import type { LayoutAnimation } from '../reanimated';
-import type { AnimatableProps, Simplify } from '../utils';
+import type { Animatable, AnimatableProps, Simplify } from '../utils';
 
 export type DropIndicatorComponentProps = {
   activationProgress: SharedValue<number>;
@@ -85,8 +85,8 @@ export type SortableCallbacks = {
 export type SharedProps = Simplify<
   {
     animateHeight?: boolean;
-    sortEnabled?: boolean;
     hapticsEnabled?: boolean;
+    sortEnabled?: Animatable<boolean>;
     debug?: boolean;
   } & Omit<SortableCallbacks, 'onDragEnd'> &
     Partial<ActiveItemDecorationSettings> &
