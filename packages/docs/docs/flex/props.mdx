@@ -4,6 +4,20 @@ sidebar_position: 2
 
 # Props
 
+:::info
+Whenever `Animatable<T>` is used, it refers to the following type definition:
+
+```ts
+type Animatable<V> = SharedValue<V> | V;
+```
+
+This means that properties of type `Animatable<T>` can accept either:
+
+- A Reanimated shared value (`SharedValue<T>`)
+- Or a static value of type `T`
+
+:::
+
 ## Base
 
 ### children
