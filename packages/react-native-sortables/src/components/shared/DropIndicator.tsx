@@ -41,7 +41,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
 
   const dropIndex = useSharedValue(0);
   const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
-  const prevTouchedItemKey = useSharedValue<null | string>(null);
+  const prevUpdateItemKey = useSharedValue<null | string>(null);
 
   const x = useSharedValue<null | number>(null);
   const y = useSharedValue<null | number>(null);
@@ -59,7 +59,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
         dropPosition.value = positions[key] ?? { x: 0, y: 0 };
 
         const update = (target: SharedValue<null | number>, value: number) => {
-          if (target.value === null || prevTouchedItemKey.value === null) {
+          if (target.value === null || prevUpdateItemKey.value === null) {
             target.value = value;
           } else {
             target.value = withTiming(value, {
@@ -74,7 +74,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
         x.value = null;
         y.value = null;
       }
-      prevTouchedItemKey.value = key;
+      prevUpdateItemKey.value = key;
     }
   );
 

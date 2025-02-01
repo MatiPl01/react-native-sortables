@@ -70,6 +70,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   // DRAG STATE
   const touchedItemKey = useSharedValue<null | string>(null);
+  const prevTouchedItemKey = useSharedValue<null | string>(null);
   const activeItemKey = useSharedValue<null | string>(null);
   const activationState = useSharedValue(DragActivationState.INACTIVE);
   const activationProgress = useSharedValue(0);
@@ -122,6 +123,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemPositions,
       itemsStyleOverride,
       keyToIndex,
+      prevTouchedItemKey,
       snapOffsetX,
       snapOffsetY,
       sortEnabled,

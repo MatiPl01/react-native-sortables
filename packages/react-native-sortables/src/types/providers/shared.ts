@@ -44,6 +44,7 @@ export type CommonValuesContextType = {
 
   // DRAG STATE
   touchedItemKey: SharedValue<null | string>;
+  prevTouchedItemKey: SharedValue<null | string>;
   activeItemKey: SharedValue<null | string>;
   activationState: SharedValue<DragActivationState>;
   activationProgress: SharedValue<number>;

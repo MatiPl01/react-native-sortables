@@ -14,28 +14,54 @@ type ItemDecorationProps = {
   isBeingActivated: SharedValue<boolean>;
   pressProgress: SharedValue<number>;
   onLayout?: ViewProps['onLayout'];
+  itemKey: string;
 } & ViewProps;
 
 export default function ItemDecoration({
   isBeingActivated,
+  itemKey: key,
   pressProgress,
   ...rest
 }: ItemDecorationProps) {
   const {
+    activeItemDropped,
     activeItemOpacity,
     activeItemScale,
     activeItemShadowOpacity,
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
-    itemsStyleOverride
+    itemsStyleOverride,
+    prevTouchedItemKey
   } = useCommonValuesContext();
 
-  const resultingProgress = useDerivedValue(() =>
-    isBeingActivated.value || pressProgress.value > 0
-      ? pressProgress.value
-      : -inactiveAnimationProgress.value
-  );
+  const resultingProgress = useDerivedValue(() => {
+    if (isBeingActivated.value) {
+      if (activeItemDropped.value) {
+        return pressProgress.value;
+      }
+
+      return interpolate(
+        pressProgress.value,
+        [0, 1],
+        [-inactiveAnimationProgress.value, 1]
+      );
+    }
+
+    if (pressProgress.value > 0) {
+      if (prevTouchedItemKey.value === key) {
+        return pressProgress.value;
+      }
+
+      return interpolate(
+        pressProgress.value,
+        [0, 1],
+        [-inactiveAnimationProgress.value, 1]
+      );
+    }
+
+    return -inactiveAnimationProgress.value;
+  });
 
   const animatedStyle = useAnimatedStyle(() => {
     const progress = resultingProgress.value;

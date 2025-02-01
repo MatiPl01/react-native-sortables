@@ -22,7 +22,11 @@ export default function useItemPanGesture(
         .onTouchesDown((e, manager) => {
           // Ignore touch if another item is already being touched/activated
           // or sorting is disabled
-          if (touchedItemKey.value !== null || !sortEnabled.value) {
+          if (
+            touchedItemKey.value !== null ||
+            pressProgress.value > 0 ||
+            !sortEnabled.value
+          ) {
             manager.fail();
             return;
           }
