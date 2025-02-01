@@ -128,8 +128,7 @@ const getIndexesWhenSwappedToGroupAfter = ({
   // and then insert the active item in the target group
   const activeItemGroupIndex = keyToGroup[activeItemKey];
   const groupAfterIndex = currentGroupIndex + 1;
-  const groupAfter = itemGroups[groupAfterIndex];
-  if (activeItemGroupIndex === undefined || !groupAfter) return null;
+  if (activeItemGroupIndex === undefined) return null;
 
   const firstInActiveGroupIndex = getFirstItemIndex(
     itemGroups[activeItemGroupIndex]!,
