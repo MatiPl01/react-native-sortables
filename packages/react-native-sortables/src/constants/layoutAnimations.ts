@@ -1,18 +1,17 @@
-/* eslint-disable import/no-unused-modules */
 import { type LayoutAnimation, withTiming } from 'react-native-reanimated';
 
-import { ITEM_ANIMATION_DURATION } from './timings';
+import { ITEM_LAYOUT_ANIMATION_DURATION } from './timings';
 
 export const SortableItemExiting = (): LayoutAnimation => {
   'worklet';
   const animations = {
     opacity: withTiming(0, {
-      duration: ITEM_ANIMATION_DURATION
+      duration: ITEM_LAYOUT_ANIMATION_DURATION
     }),
     transform: [
       {
         scale: withTiming(0.5, {
-          duration: ITEM_ANIMATION_DURATION
+          duration: ITEM_LAYOUT_ANIMATION_DURATION
         })
       }
     ]
@@ -31,12 +30,12 @@ export const SortableItemEntering = (): LayoutAnimation => {
   'worklet';
   const animations = {
     opacity: withTiming(1, {
-      duration: ITEM_ANIMATION_DURATION
+      duration: ITEM_LAYOUT_ANIMATION_DURATION
     }),
     transform: [
       {
         scale: withTiming(1, {
-          duration: ITEM_ANIMATION_DURATION
+          duration: ITEM_LAYOUT_ANIMATION_DURATION
         })
       }
     ]

@@ -35,6 +35,7 @@ export default function SortableContainer({
     if (!canSwitchToAbsoluteLayout.value) {
       return {};
     }
+    console.log(touchedItemKey.value, activeItemDropped.value);
     return {
       height: animateHeight
         ? withTiming(containerHeight.value)

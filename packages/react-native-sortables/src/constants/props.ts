@@ -9,7 +9,9 @@ import type {
   SortableGridProps
 } from '../types';
 import { defaultKeyExtractor } from '../utils/keys';
+import { DRAG_ACTIVATION_FAIL_OFFSET } from './layout';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
+import { DRAG_ACTIVATION_DELAY, DRAG_ANIMATION_DURATION } from './timings';
 
 export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
 
@@ -32,6 +34,10 @@ export const DEFAULT_SHARED_PROPS = {
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
   debug: false,
+  dragActivationDelay: DRAG_ACTIVATION_DELAY,
+  dragActivationDuration: DRAG_ANIMATION_DURATION,
+  dragActivationFailOffset: DRAG_ACTIVATION_FAIL_OFFSET,
+  dropAnimationDuration: DRAG_ANIMATION_DURATION,
   dropIndicatorStyle: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     borderColor: 'black',

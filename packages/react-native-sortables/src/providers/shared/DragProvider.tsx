@@ -11,14 +11,14 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import {
-  ACTIVATE_PAN_ANIMATION_DELAY,
-  ACTIVATION_FAIL_OFFSET,
-  TIME_TO_ACTIVATE_PAN
-} from '../../constants';
 import { useDebugContext } from '../../debug';
 import { useHaptics, useJSStableCallback } from '../../hooks';
-import type { DragContextType, SortableCallbacks, Vector } from '../../types';
+import type {
+  DragContextType,
+  ItemActivationSettings,
+  SortableCallbacks,
+  Vector
+} from '../../types';
 import { DragActivationState, LayerState } from '../../types';
 import {
   clearAnimatedTimeout,
@@ -34,13 +34,23 @@ import { useMeasurementsContext } from './MeasurementsProvider';
 type DragProviderProps = PropsWithChildren<
   {
     hapticsEnabled: boolean;
-  } & Required<SortableCallbacks>
+  } & Required<ItemActivationSettings> &
+    Required<SortableCallbacks>
 >;
 
 const { DragProvider, useDragContext } = createProvider('Drag')<
   DragProviderProps,
   DragContextType
->(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange }) => {
+>(({
+  dragActivationDelay,
+  dragActivationDuration,
+  dragActivationFailOffset,
+  dropAnimationDuration,
+  hapticsEnabled,
+  onDragEnd,
+  onDragStart,
+  onOrderChange
+}) => {
   const {
     activationProgress,
     activationState,
@@ -218,12 +228,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const handleDragEnd = useCallback(
     (key: string, pressProgress: SharedValue<number>) => {
       'worklet';
-      pressProgress.value = withTiming(0, {
-        duration: TIME_TO_ACTIVATE_PAN
-      });
 
       const delayed = (callback?: (finished: boolean | undefined) => void) =>
-        withTiming(0, { duration: TIME_TO_ACTIVATE_PAN }, callback);
+        withTiming(0, { duration: dropAnimationDuration }, callback);
 
       clearAnimatedTimeout(activationTimeoutId.value);
       touchedItemKey.value = null;
@@ -233,6 +240,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dragStartTouchTranslation.value = null;
       activationState.value = DragActivationState.INACTIVE;
 
+      pressProgress.value = delayed();
       inactiveAnimationProgress.value = delayed();
       activationProgress.value = delayed(finished => {
         if (finished && touchedItemKey.value === null) {
@@ -269,6 +277,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationProgress,
       activationState,
       inactiveAnimationProgress,
+      dropAnimationDuration,
       dragStartIndex,
       keyToIndex,
       stableOnDragEnd,
@@ -303,13 +312,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         updateLayer?.(LayerState.Focused);
 
         const animate = (callback?: (finished?: boolean) => void) =>
-          withTiming(
-            1,
-            {
-              duration: TIME_TO_ACTIVATE_PAN - ACTIVATE_PAN_ANIMATION_DELAY
-            },
-            callback
-          );
+          withTiming(1, { duration: dragActivationDuration }, callback);
 
         onActivate();
         activationProgress.value = 0;
@@ -333,7 +336,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             }
           }
         });
-      }, ACTIVATE_PAN_ANIMATION_DELAY);
+      }, dragActivationDelay);
     },
     [
       startTouch,
@@ -350,7 +353,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       handleDragEnd,
       updateTouchedItemDimensions,
       tryMeasureContainerHeight,
-      canSwitchToAbsoluteLayout
+      canSwitchToAbsoluteLayout,
+      dragActivationDelay,
+      dragActivationDuration
     ]
   );
 
@@ -373,14 +378,20 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // Cancel touch if the touch moved too far from the initial position
       // before the item was activated
       const r = Math.sqrt(dX * dX + dY * dY);
-      if (activeItemKey.value === null && r >= ACTIVATION_FAIL_OFFSET) {
+      if (activeItemKey.value === null && r >= dragActivationFailOffset) {
         onFail();
         return;
       }
 
       touchTranslation.value = { x: dX, y: dY };
     },
-    [startTouch, touchTranslation, touchedItemKey, activeItemKey]
+    [
+      startTouch,
+      touchTranslation,
+      touchedItemKey,
+      activeItemKey,
+      dragActivationFailOffset
+    ]
   );
 
   const handleOrderChange = useCallback(
@@ -407,6 +418,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
   return {
     value: {
+      dropAnimationDuration,
       handleDragEnd,
       handleOrderChange,
       handleTouchStart,

@@ -8,6 +8,7 @@ import {
 
 import type { AnimatedVector } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
+import { useDragContext } from '../DragProvider';
 
 export default function useItemTranslation(
   key: string,
@@ -16,6 +17,7 @@ export default function useItemTranslation(
 ) {
   const { itemPositions, touchedItemKey, touchedItemPosition } =
     useCommonValuesContext();
+  const { dropAnimationDuration } = useDragContext();
 
   const hasPressProgress = useDerivedValue(() => pressProgress.value > 0);
   const x = useSharedValue<null | number>(null);
@@ -52,8 +54,8 @@ export default function useItemTranslation(
       } else if (hasProgress) {
         // If the was dropped (has press progress but is no longer touched),
         // we animate the translation to the target position.
-        x.value = withTiming(newX);
-        y.value = withTiming(newY);
+        x.value = withTiming(newX, { duration: dropAnimationDuration });
+        y.value = withTiming(newY, { duration: dropAnimationDuration });
       } else if (x.value === null || y.value === null) {
         // If the item was mounted with the relative position, we set the
         // translation to 0, 0. This just indicates that transformation values

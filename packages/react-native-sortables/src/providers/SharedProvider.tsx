@@ -10,6 +10,7 @@ import type {
   ActiveItemSnapSettings,
   Animatable,
   AutoScrollSettings,
+  ItemActivationSettings,
   PartialBy,
   SortableCallbacks
 } from '../types';
@@ -33,6 +34,7 @@ type SharedProviderProps = PropsWithChildren<
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
+    Required<ItemActivationSettings> &
     Required<SortableCallbacks>
 >;
 
@@ -42,6 +44,10 @@ export default function SharedProvider({
   autoScrollSpeed,
   children,
   debug,
+  dragActivationDelay,
+  dragActivationDuration,
+  dragActivationFailOffset,
+  dropAnimationDuration,
   hapticsEnabled,
   itemKeys,
   onDragEnd,
@@ -74,6 +80,10 @@ export default function SharedProvider({
     ),
     // Provider used for dragging and item swapping logic
     <DragProvider
+      dragActivationDelay={dragActivationDelay}
+      dragActivationDuration={dragActivationDuration}
+      dragActivationFailOffset={dragActivationFailOffset}
+      dropAnimationDuration={dropAnimationDuration}
       hapticsEnabled={hapticsEnabled}
       onDragEnd={onDragEnd}
       onDragStart={onDragStart}

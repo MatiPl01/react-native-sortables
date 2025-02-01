@@ -77,6 +77,7 @@ export type AutoScrollContextType = {
 // DRAG
 
 export type DragContextType = {
+  dropAnimationDuration: number;
   handleTouchStart: (
     e: GestureTouchEvent,
     key: string,
