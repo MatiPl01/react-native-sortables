@@ -19,8 +19,8 @@ import {
   useMeasurementsContext
 } from '../../providers';
 import type { LayoutAnimation } from '../../types';
-import ItemDecoration from './ItemDecoration';
 import { IS_WEB } from '../../utils';
+import ItemDecoration from './ItemDecoration';
 
 const RELATIVE_STYLE: ViewStyle = {
   height: undefined,

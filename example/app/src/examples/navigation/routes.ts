@@ -8,7 +8,7 @@ import type { Routes } from './types';
 const routes: Routes = {
   SortableGrid: {
     CardComponent: SortableGridCard,
-    name: 'SortableGrid',
+    name: 'Sortable Grid',
     routes: {
       Playground: {
         Component: SortableGrid.PlaygroundExample,
@@ -46,7 +46,7 @@ const routes: Routes = {
   },
   SortableFlex: {
     CardComponent: SortableFlexCard,
-    name: 'SortableFlex',
+    name: 'Sortable Flex',
     routes: {
       Playground: {
         Component: SortableFlex.PlaygroundExample,

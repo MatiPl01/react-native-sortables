@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Dimensions, Platform, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Sortable, {
   type DragEndCallback,
@@ -8,7 +8,7 @@ import Sortable, {
   type SortableGridRenderItem
 } from 'react-native-sortables';
 
-import { AnimatedText, GridCard, Section, Stagger } from '@/components';
+import { AnimatedText, GridCard, Screen, Section, Stagger } from '@/components';
 import { flex, sizes, spacing } from '@/theme';
 import { formatCallbackParams, getItems } from '@/utils';
 
@@ -45,7 +45,7 @@ export default function CallbacksExample() {
   );
 
   return (
-    <View style={styles.container}>
+    <Screen style={styles.container}>
       <Stagger wrapperStye={index => (index === 0 ? flex.fill : {})}>
         <Section title='Callback output' fill>
           <AnimatedText style={flex.fill} text={text} multiline />
@@ -65,14 +65,12 @@ export default function CallbacksExample() {
           />
         </Section>
       </Stagger>
-    </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height:
-      Dimensions.get('window').height -
-      (Platform.OS === 'ios' ? sizes.xxl : sizes.lg)
+    maxHeight: Dimensions.get('window').height - sizes.xxl
   }
 });

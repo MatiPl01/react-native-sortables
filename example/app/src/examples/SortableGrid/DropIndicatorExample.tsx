@@ -1,11 +1,10 @@
 import { useCallback } from 'react';
-import { ScrollView } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { GridCard, Section, Stagger } from '@/components';
+import { GridCard, ScrollScreen, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';
-import { spacing, style } from '@/theme';
+import { spacing } from '@/theme';
 import { getItems } from '@/utils';
 
 const DATA = getItems(8);
@@ -18,7 +17,7 @@ export default function DropIndicatorExample() {
   );
 
   return (
-    <ScrollView contentContainerStyle={style.contentContainer}>
+    <ScrollScreen noPadding>
       <Stagger ParentComponent={Sortable.Layer}>
         <Section title='Without drop indicator'>
           <Sortable.Grid
@@ -56,6 +55,6 @@ export default function DropIndicatorExample() {
           />
         </Section>
       </Stagger>
-    </ScrollView>
+    </ScrollScreen>
   );
 }

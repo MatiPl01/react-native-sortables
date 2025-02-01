@@ -3,11 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { memo, useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 
-import { RouteCard, Stagger } from '@/components';
+import { RouteCard, Scroll, Stagger } from '@/components';
 import { colors, flex, spacing } from '@/theme';
+import { IS_WEB } from '@/utils';
 
 import exampleRoutes from './routes';
 import type { Routes } from './types';
@@ -20,19 +21,19 @@ const BackButton = memo(function BackButton() {
   const navigation = useNavigation();
   const [prevRoute, setPrevRoute] = useState<string | undefined>(() => {
     const state = navigation.getState();
-    return state?.routes[state.index - 1]?.key?.split('-')[0];
+    return state?.routes[state.index - 1]?.name;
   });
 
   useFocusEffect(
     useCallback(() => {
       return navigation.addListener('state', e => {
         const { index, routes } = e.data.state;
-        setPrevRoute(routes[index - 1]?.key?.split('-')[0]);
+        setPrevRoute(routes[index - 1]?.name);
       });
     }, [navigation])
   );
 
-  if (!prevRoute) {
+  if (!prevRoute || !navigation.canGoBack()) {
     return null;
   }
 
@@ -58,7 +59,7 @@ function createStackNavigator(routes: Routes): React.ComponentType {
             headerLeft: () => <BackButton />,
             headerTitleAlign: 'center'
           }}>
-          {createNavigationScreens(routes, 'Examples')}
+          {createNavigationScreens(routes, 'Examples', 'Examples')}
         </StackNavigator.Navigator>
       </View>
     );
@@ -68,9 +69,7 @@ function createStackNavigator(routes: Routes): React.ComponentType {
 function createRoutesScreen(routes: Routes, path: string): React.ComponentType {
   function RoutesScreen() {
     return (
-      <ScrollView
-        contentContainerStyle={styles.scrollViewContent}
-        style={styles.scrollView}>
+      <Scroll contentContainerStyle={styles.scrollViewContent}>
         <Stagger>
           {Object.entries(routes).map(
             ([key, { CardComponent = RouteCard, name }]) => (
@@ -78,7 +77,7 @@ function createRoutesScreen(routes: Routes, path: string): React.ComponentType {
             )
           )}
         </Stagger>
-      </ScrollView>
+      </Scroll>
     );
   }
 
@@ -89,8 +88,8 @@ function createRoutesScreen(routes: Routes, path: string): React.ComponentType {
 
 function createNavigationScreens(
   routes: Routes,
-  path: string,
-  parentName?: string
+  name: string,
+  path: string
 ): Array<React.ReactNode> {
   return [
     // Create a screen for the navigation routes
@@ -100,14 +99,14 @@ function createNavigationScreens(
       name={path}
       options={{
         contentStyle: styles.content,
-        title: parentName ?? getScreenTitle(path)
+        title: name
       }}
     />,
     // Create screens for all nested routes or components
     ...Object.entries(routes).flatMap(([key, value]) => {
       const newPath = `${path}/${key}`;
       if (hasRoutes(value)) {
-        return createNavigationScreens(value.routes, newPath, value.name);
+        return createNavigationScreens(value.routes, value.name, newPath);
       }
       return (
         <StackNavigator.Screen
@@ -126,6 +125,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     gap: spacing.xxs,
+    marginLeft: IS_WEB ? spacing.md : 0,
     marginRight: spacing.xs,
     paddingTop: spacing.xxs
   },
@@ -135,11 +135,6 @@ const styles = StyleSheet.create({
   },
   content: {
     backgroundColor: colors.background3
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl
   },
   scrollViewContent: {
     gap: spacing.md
