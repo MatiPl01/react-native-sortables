@@ -235,7 +235,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       inactiveAnimationProgress.value = delayed();
       activationProgress.value = delayed(finished => {
-        if (finished && activeItemKey.value !== null) {
+        if (finished && touchedItemKey.value === null) {
           activeItemDropped.value = true;
           updateLayer?.(LayerState.Idle);
         }
@@ -285,7 +285,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       onActivate: () => void
     ) => {
       'worklet';
-      activeItemDropped.value = false;
       const firstTouch = e.allTouches[0];
       if (!firstTouch) {
         return;
@@ -314,6 +313,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
         onActivate();
         activationProgress.value = 0;
+        activeItemDropped.value = false;
         touchedItemKey.value = key;
         startTouch.value = firstTouch;
         touchStartItemPosition.value = itemPositions.value[key] ?? null;
