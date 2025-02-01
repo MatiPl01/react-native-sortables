@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { Gesture } from 'react-native-gesture-handler';
-import { type SharedValue, withTiming } from 'react-native-reanimated';
+import { type SharedValue } from 'react-native-reanimated';
 
-import { TIME_TO_ACTIVATE_PAN } from '../../../constants';
 import { useAutoScrollContext } from '../AutoScrollProvider';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
@@ -39,11 +38,8 @@ export default function useItemPanGesture(
           handleTouchesMove(e, manager.fail);
         })
         .onFinalize(() => {
-          pressProgress.value = withTiming(0, {
-            duration: TIME_TO_ACTIVATE_PAN
-          });
           updateStartScrollOffset?.(-1);
-          handleDragEnd(key);
+          handleDragEnd(key, pressProgress);
         }),
     [
       key,

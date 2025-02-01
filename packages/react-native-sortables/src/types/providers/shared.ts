@@ -84,7 +84,7 @@ export type DragContextType = {
     onActivate: () => void
   ) => void;
   handleTouchesMove: (e: GestureTouchEvent, onFail: () => void) => void;
-  handleDragEnd: (key: string) => void;
+  handleDragEnd: (key: string, pressProgress: SharedValue<number>) => void;
   handleOrderChange: (
     key: string,
     fromIndex: number,
