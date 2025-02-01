@@ -192,7 +192,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       'worklet';
       updateStartScrollOffset?.();
       activeItemKey.value = key;
-      activeItemDropped.value = false;
       dragStartIndex.value = keyToIndex.value[key]!;
       dragStartTouchTranslation.value = touchTranslation.value;
       activationState.value = DragActivationState.ACTIVE;
@@ -209,7 +208,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateStartScrollOffset,
       stableOnDragStart,
       activationState,
-      activeItemDropped,
       activeItemKey,
       dragStartIndex,
       keyToIndex,
@@ -218,8 +216,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   );
 
   const handleDragEnd = useCallback(
-    (key: string) => {
+    (key: string, pressProgress: SharedValue<number>) => {
       'worklet';
+      pressProgress.value = withTiming(0, {
+        duration: TIME_TO_ACTIVATE_PAN
+      });
+
       const delayed = (callback?: (finished: boolean | undefined) => void) =>
         withTiming(0, { duration: TIME_TO_ACTIVATE_PAN }, callback);
 
@@ -233,7 +235,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       inactiveAnimationProgress.value = delayed();
       activationProgress.value = delayed(finished => {
-        if (finished) {
+        if (finished && touchedItemKey.value === null) {
           activeItemDropped.value = true;
           updateLayer?.(LayerState.Idle);
         }
@@ -311,6 +313,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
         onActivate();
         activationProgress.value = 0;
+        activeItemDropped.value = false;
         touchedItemKey.value = key;
         startTouch.value = firstTouch;
         touchStartItemPosition.value = itemPositions.value[key] ?? null;
@@ -326,7 +329,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
             if (touchedItemKey.value === key && itemPositions.value[key]) {
               handleDragStart(key);
             } else {
-              handleDragEnd(key);
+              handleDragEnd(key, pressProgress);
             }
           }
         });
@@ -340,6 +343,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       touchStartItemPosition,
       activationState,
       activationProgress,
+      activeItemDropped,
       inactiveAnimationProgress,
       updateLayer,
       handleDragStart,

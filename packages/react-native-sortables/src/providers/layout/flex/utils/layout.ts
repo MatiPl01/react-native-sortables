@@ -188,7 +188,7 @@ const handleLayoutCalculation = (
   );
 
   let totalHeight = isRow
-    ? contentAlignment.totalSize + paddingHorizontal
+    ? contentAlignment.totalSize + paddingVertical
     : isMultiColumn
       ? limits.maxHeight
       : limits.minHeight;
@@ -223,7 +223,7 @@ const handleLayoutCalculation = (
     if (!isRow && !isMultiColumn) {
       totalHeight = Math.max(
         totalHeight,
-        contentJustification.totalSize + paddingHorizontal
+        contentJustification.totalSize + paddingVertical
       );
     }
 

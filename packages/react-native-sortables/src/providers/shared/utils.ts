@@ -1,9 +1,9 @@
-const MIN_ADDITIONAL_OFFSET = 5;
+import { EXTRA_SWAP_OFFSET } from '../../constants';
 
 export const getAdditionalSwapOffset = (gap: number, size: number) => {
   'worklet';
   return Math.max(
-    MIN_ADDITIONAL_OFFSET,
-    Math.min(gap / 2 + MIN_ADDITIONAL_OFFSET, (gap + size) / 2)
+    EXTRA_SWAP_OFFSET,
+    Math.min(gap / 2 + EXTRA_SWAP_OFFSET, (gap + size) / 2)
   );
 };
