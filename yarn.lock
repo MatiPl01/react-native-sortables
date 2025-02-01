@@ -9663,13 +9663,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-root@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "find-root@npm:1.1.0"
-  checksum: 10c0/1abc7f3bf2f8d78ff26d9e00ce9d0f7b32e5ff6d1da2857bcdf4746134c422282b091c672cde0572cac3840713487e0a7a636af9aa1b74cb11894b447a521efa
-  languageName: node
-  linkType: hard
-
 "find-up-simple@npm:^1.0.0":
   version: 1.0.0
   resolution: "find-up-simple@npm:1.0.0"
@@ -9740,13 +9733,6 @@ __metadata:
   version: 3.3.1
   resolution: "flatted@npm:3.3.1"
   checksum: 10c0/324166b125ee07d4ca9bcf3a5f98d915d5db4f39d711fba640a3178b959919aae1f7cfd8aabcfef5826ed8aa8a2aa14cc85b2d7d18ff638ddf4ae3df39573eaf
-  languageName: node
-  linkType: hard
-
-"flatten@npm:^1.0.2":
-  version: 1.0.3
-  resolution: "flatten@npm:1.0.3"
-  checksum: 10c0/9f9b1f3dcd05be057bb83ec27f2513da5306e7bfc0cf8bd839ab423eb1b0f99683a25c97b48fafd5959819159659ce9f1397623a46f89a8577ba095fcf5fb753
   languageName: node
   linkType: hard
 
@@ -10104,17 +10090,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-yarn-workspaces@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "get-yarn-workspaces@npm:1.0.2"
-  dependencies:
-    find-root: "npm:^1.1.0"
-    flatten: "npm:^1.0.2"
-    glob: "npm:^7.1.2"
-  checksum: 10c0/9c8fd871a254e4ba70867c3ce6bad54cbb02d03a9388d4d4ac48a60cea656b49f2cc34b67cec89e7c23f5675e39f458fff3df6b75f6a0428002dc7e22db7f52f
-  languageName: node
-  linkType: hard
-
 "getenv@npm:^1.0.0":
   version: 1.0.0
   resolution: "getenv@npm:1.0.0"
@@ -10170,7 +10145,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^7.1.1, glob@npm:^7.1.2, glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.2.3":
+"glob@npm:^7.1.1, glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.2.3":
   version: 7.2.3
   resolution: "glob@npm:7.2.3"
   dependencies:
@@ -15391,7 +15366,6 @@ __metadata:
     "@types/node": "npm:^20.14.9"
     eslint: "npm:^8.56.0"
     eslint-config-react-native-matipl01: "npm:2.1.0"
-    get-yarn-workspaces: "npm:^1.0.2"
     husky: "npm:^9.1.4"
     lint-staged: "npm:^15.2.7"
     prettier: "npm:^3.3.2"
