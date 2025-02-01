@@ -14,8 +14,12 @@ export default function useItemTranslation(
   layoutPosition: AnimatedVector,
   pressProgress: SharedValue<number>
 ) {
-  const { itemPositions, touchedItemKey, touchedItemPosition } =
-    useCommonValuesContext();
+  const {
+    dropAnimationDuration,
+    itemPositions,
+    touchedItemKey,
+    touchedItemPosition
+  } = useCommonValuesContext();
 
   const hasPressProgress = useDerivedValue(() => pressProgress.value > 0);
   const x = useSharedValue<null | number>(null);
@@ -42,7 +46,10 @@ export default function useItemTranslation(
       const newX = position.x - (layoutX ?? 0);
       const newY = position.y - (layoutY ?? 0);
 
-      if (isTouched || layoutX === null || layoutY === null) {
+      if (
+        isTouched ||
+        ((layoutX === null || layoutY === null) && !hasProgress)
+      ) {
         // Apply the translation immediately if the item is being dragged or
         // the item was mounted with the absolute position and we cannot set
         // its top, left values because they will be animated from 0, 0 by the
@@ -50,10 +57,10 @@ export default function useItemTranslation(
         x.value = newX;
         y.value = newY;
       } else if (hasProgress) {
-        // If the was dropped (has press progress but is no longer touched),
+        // If the was released (has press progress but is no longer touched),
         // we animate the translation to the target position.
-        x.value = withTiming(newX);
-        y.value = withTiming(newY);
+        x.value = withTiming(newX, { duration: dropAnimationDuration.value });
+        y.value = withTiming(newY, { duration: dropAnimationDuration.value });
       } else if (x.value === null || y.value === null) {
         // If the item was mounted with the relative position, we set the
         // translation to 0, 0. This just indicates that transformation values

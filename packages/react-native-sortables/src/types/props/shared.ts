@@ -25,6 +25,13 @@ export type ActiveItemDecorationSettings = AnimatableProps<{
 
 export type Offset = `${number}%` | number;
 
+export type ItemActivationSettings = AnimatableProps<{
+  dragActivationDelay: number;
+  dragActivationDuration: number;
+  dragActivationFailOffset: number;
+  dropAnimationDuration: number;
+}>;
+
 export type ActiveItemSnapSettings = AnimatableProps<{
   enableActiveItemSnap: boolean;
   snapOffsetX: Offset;
@@ -93,5 +100,6 @@ export type SharedProps = Simplify<
     Partial<ActiveItemSnapSettings> &
     Partial<AutoScrollSettings> &
     Partial<DropIndicatorSettings> &
+    Partial<ItemActivationSettings> &
     Partial<ItemLayoutAnimationSettings>
 >;

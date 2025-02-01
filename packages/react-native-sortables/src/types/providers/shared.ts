@@ -12,7 +12,8 @@ import type {
 import type { Dimensions, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
-  ActiveItemSnapSettings
+  ActiveItemSnapSettings,
+  ItemActivationSettings
 } from '../props/shared';
 import type { DragActivationState } from '../state';
 import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
@@ -29,7 +30,7 @@ export type CommonValuesContextType = {
   indexToKey: SharedValue<Array<string>>;
   keyToIndex: SharedValue<Record<string, number>>;
 
-  // POSITIONs
+  // POSITIONS
   itemPositions: SharedValue<Record<string, Vector>>;
   touchPosition: SharedValue<Vector | null>;
   touchedItemPosition: SharedValue<Vector | null>;
@@ -44,6 +45,7 @@ export type CommonValuesContextType = {
 
   // DRAG STATE
   touchedItemKey: SharedValue<null | string>;
+  prevTouchedItemKey: SharedValue<null | string>;
   activeItemKey: SharedValue<null | string>;
   activationState: SharedValue<DragActivationState>;
   activationProgress: SharedValue<number>;
@@ -55,7 +57,8 @@ export type CommonValuesContextType = {
   sortEnabled: SharedValue<boolean>;
   canSwitchToAbsoluteLayout: SharedValue<boolean>;
 } & AnimatedValues<ActiveItemDecorationSettings> &
-  AnimatedValues<ActiveItemSnapSettings>;
+  AnimatedValues<ActiveItemSnapSettings> &
+  AnimatedValues<ItemActivationSettings>;
 
 // MEASUREMENTS
 

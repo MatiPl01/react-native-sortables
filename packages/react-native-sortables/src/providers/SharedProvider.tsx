@@ -10,6 +10,7 @@ import type {
   ActiveItemSnapSettings,
   Animatable,
   AutoScrollSettings,
+  ItemActivationSettings,
   PartialBy,
   SortableCallbacks
 } from '../types';
@@ -33,6 +34,7 @@ type SharedProviderProps = PropsWithChildren<
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
+    Required<ItemActivationSettings> &
     Required<SortableCallbacks>
 >;
 

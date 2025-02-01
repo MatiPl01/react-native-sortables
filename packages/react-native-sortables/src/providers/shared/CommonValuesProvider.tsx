@@ -14,6 +14,7 @@ import type {
   Animatable,
   CommonValuesContextType,
   Dimensions,
+  ItemActivationSettings,
   Maybe,
   Vector
 } from '../../types';
@@ -27,7 +28,8 @@ type CommonValuesProviderProps = PropsWithChildren<
     itemKeys: Array<string>;
     initialItemsStyleOverride?: ViewStyle;
   } & ActiveItemDecorationSettings &
-    ActiveItemSnapSettings
+    ActiveItemSnapSettings &
+    ItemActivationSettings
 >;
 
 const { CommonValuesProvider, useCommonValuesContext } = createProvider(
@@ -36,6 +38,10 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   activeItemOpacity: _activeItemOpacity,
   activeItemScale: _activeItemScale,
   activeItemShadowOpacity: _activeItemShadowOpacity,
+  dragActivationDelay: _dragActivationDelay,
+  dragActivationDuration: _dragActivationDuration,
+  dragActivationFailOffset: _dragActivationFailOffset,
+  dropAnimationDuration: _dropAnimationDuration,
   enableActiveItemSnap: _enableActiveItemSnap,
   inactiveItemOpacity: _inactiveItemOpacity,
   inactiveItemScale: _inactiveItemScale,
@@ -53,7 +59,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
     Object.fromEntries(indexToKey.value.map((key, index) => [key, index]))
   );
 
-  // POSITIONs
+  // POSITIONS
   const itemPositions = useSharedValue<Record<string, Vector>>({});
   const touchPosition = useSharedValue<Vector | null>(null);
   const touchedItemPosition = useSharedValue<Vector | null>(null);
@@ -70,11 +76,20 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   // DRAG STATE
   const touchedItemKey = useSharedValue<null | string>(null);
+  const prevTouchedItemKey = useSharedValue<null | string>(null);
   const activeItemKey = useSharedValue<null | string>(null);
   const activationState = useSharedValue(DragActivationState.INACTIVE);
   const activationProgress = useSharedValue(0);
   const inactiveAnimationProgress = useSharedValue(0);
   const activeItemDropped = useSharedValue(true);
+
+  // ITEM ACTIVATION SETTINGS
+  const dragActivationDelay = useAnimatableValue(_dragActivationDelay);
+  const dragActivationDuration = useAnimatableValue(_dragActivationDuration);
+  const dragActivationFailOffset = useAnimatableValue(
+    _dragActivationFailOffset
+  );
+  const dropAnimationDuration = useAnimatableValue(_dropAnimationDuration);
 
   // ACTIVE ITEM DECORATION
   const activeItemOpacity = useAnimatableValue(_activeItemOpacity);
@@ -113,6 +128,10 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       containerHeight,
       containerRef,
       containerWidth,
+      dragActivationDelay,
+      dragActivationDuration,
+      dragActivationFailOffset,
+      dropAnimationDuration,
       enableActiveItemSnap,
       inactiveAnimationProgress,
       inactiveItemOpacity,
@@ -122,6 +141,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemPositions,
       itemsStyleOverride,
       keyToIndex,
+      prevTouchedItemKey,
       snapOffsetX,
       snapOffsetY,
       sortEnabled,
