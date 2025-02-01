@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 
@@ -8,11 +8,12 @@ import {
   FlexCell,
   Group,
   OptionGroup,
+  Screen,
   Section,
   Stagger
 } from '@/components';
 import { colors, flex, sizes, spacing, style, text } from '@/theme';
-import { getCategories } from '@/utils';
+import { getCategories, IS_WEB } from '@/utils';
 
 const DATA = getCategories(30);
 
@@ -23,8 +24,8 @@ export default function DebugExample() {
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
   return (
-    <View style={[flex.fill, style.contentContainer]}>
-      <Stagger wrapperStye={index => (index === 3 ? flex.fill : {})}>
+    <Screen style={style.contentContainer}>
+      <Stagger wrapperStye={index => (!IS_WEB && index === 3 ? flex.fill : {})}>
         <Section
           description='Press the buttons to change settings'
           title='Settings'
@@ -81,7 +82,7 @@ export default function DebugExample() {
           </Animated.ScrollView>
         </Group>
       </Stagger>
-    </View>
+    </Screen>
   );
 }
 

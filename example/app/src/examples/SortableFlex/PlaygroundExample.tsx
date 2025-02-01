@@ -1,33 +1,24 @@
 import { StyleSheet, Text, View } from 'react-native';
 import Sortable from 'react-native-sortables';
 
+import { Screen } from '@/components';
 import { colors, text } from '@/theme';
+import { getCategories, IS_WEB } from '@/utils';
 
-const DATA = [
-  'Poland',
-  'Germany',
-  'France',
-  'Italy',
-  'Spain',
-  'Portugal',
-  'Greece',
-  'Great Britain',
-  'United States',
-  'Canada',
-  'Australia',
-  'New Zealand'
-];
+const DATA = getCategories(IS_WEB ? 30 : 10);
 
 export default function Flex() {
   return (
-    <Sortable.Flex gap={10} padding={10}>
-      {/* You can render anything within the Sortable.Flex component */}
-      {DATA.map(item => (
-        <View key={item} style={styles.cell}>
-          <Text style={styles.text}>{item}</Text>
-        </View>
-      ))}
-    </Sortable.Flex>
+    <Screen>
+      <Sortable.Flex gap={10} padding={10}>
+        {/* You can render anything within the Sortable.Flex component */}
+        {DATA.map(item => (
+          <View key={item} style={styles.cell}>
+            <Text style={styles.text}>{item}</Text>
+          </View>
+        ))}
+      </Sortable.Flex>
+    </Screen>
   );
 }
 

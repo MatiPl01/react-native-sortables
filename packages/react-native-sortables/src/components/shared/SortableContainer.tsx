@@ -5,6 +5,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
+import { DebugOutlet } from '../../debug';
 import { useCommonValuesContext } from '../../providers';
 import type { DropIndicatorSettings } from '../../types';
 import DropIndicator from './DropIndicator';
@@ -66,6 +67,8 @@ export default function SortableContainer({
       <Animated.View style={[style, innerContainerStyle]}>
         {children}
       </Animated.View>
+      {/* Renders an overlay view helpful for debugging */}
+      <DebugOutlet />
     </Animated.View>
   );
 }

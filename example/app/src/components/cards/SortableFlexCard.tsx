@@ -3,12 +3,12 @@ import Sortable from 'react-native-sortables';
 import { FlexCell } from '@/components/items';
 import { useItemOrderChange } from '@/hooks';
 import { spacing } from '@/theme';
-import { getCategories } from '@/utils';
+import { getCategories, IS_WEB } from '@/utils';
 
 import type { RouteCardComponent } from './RouteCard';
 import RouteCard from './RouteCard';
 
-const DATA = getCategories(10);
+const DATA = getCategories(IS_WEB ? 20 : 10);
 
 const ACTIVE_INDEX = 2;
 const ACTIVE_ITEM = DATA[ACTIVE_INDEX];

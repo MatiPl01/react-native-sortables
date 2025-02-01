@@ -9117,7 +9117,7 @@ __metadata:
     react-native: "npm:0.76.5"
     react-native-gesture-handler: "npm:^2.21.2"
     react-native-haptic-feedback: "npm:^2.3.3"
-    react-native-reanimated: "npm:^3.16.6"
+    react-native-reanimated: "patch:react-native-reanimated@npm%3A3.16.6#~/.yarn/patches/react-native-reanimated-npm-3.16.6-597f489ee0.patch"
     react-native-safe-area-context: "npm:^4.14.0"
     react-native-screens: "npm:^4.1.0"
     react-native-sortables: "workspace:*"
@@ -15313,7 +15313,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:^3.16.6":
+"react-native-reanimated@npm:3.16.6":
   version: 3.16.6
   resolution: "react-native-reanimated@npm:3.16.6"
   dependencies:
@@ -15333,6 +15333,29 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/42c8fb6cfdc5128afcd20d5e9e0bdd2ab56f0e5c5f1907c9d43322c0fadbf97cdfb27e120b9f649f4a7205d69411ed4a5b63602e864a89d4dcf849f915051f4d
+  languageName: node
+  linkType: hard
+
+"react-native-reanimated@patch:react-native-reanimated@npm%3A3.16.6#~/.yarn/patches/react-native-reanimated-npm-3.16.6-597f489ee0.patch":
+  version: 3.16.6
+  resolution: "react-native-reanimated@patch:react-native-reanimated@npm%3A3.16.6#~/.yarn/patches/react-native-reanimated-npm-3.16.6-597f489ee0.patch::version=3.16.6&hash=f8867e"
+  dependencies:
+    "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
+    "@babel/plugin-transform-class-properties": "npm:^7.0.0-0"
+    "@babel/plugin-transform-classes": "npm:^7.0.0-0"
+    "@babel/plugin-transform-nullish-coalescing-operator": "npm:^7.0.0-0"
+    "@babel/plugin-transform-optional-chaining": "npm:^7.0.0-0"
+    "@babel/plugin-transform-shorthand-properties": "npm:^7.0.0-0"
+    "@babel/plugin-transform-template-literals": "npm:^7.0.0-0"
+    "@babel/plugin-transform-unicode-regex": "npm:^7.0.0-0"
+    "@babel/preset-typescript": "npm:^7.16.7"
+    convert-source-map: "npm:^2.0.0"
+    invariant: "npm:^2.2.4"
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/fce77c22e8a56c27e646b9a46b331866e46ae7c2113449a2b264b9508ceffd304ef962ccd8c1d8fb4b4c7aabe9fc35b2a1300c4dd22059bf3bdf283064fbfbf5
   languageName: node
   linkType: hard
 
@@ -15407,7 +15430,7 @@ __metadata:
     react-native-builder-bob: "npm:^0.23.2"
     react-native-gesture-handler: "npm:^2.21.2"
     react-native-haptic-feedback: "npm:>=2.0.0"
-    react-native-reanimated: "npm:^3.16.6"
+    react-native-reanimated: "patch:react-native-reanimated@npm%3A3.16.6#~/.yarn/patches/react-native-reanimated-npm-3.16.6-597f489ee0.patch"
     react-test-renderer: "npm:18.3.1"
     semantic-release: "npm:^24.0.0"
     semantic-release-yarn: "npm:^3.0.2"

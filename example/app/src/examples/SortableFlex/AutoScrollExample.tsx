@@ -4,12 +4,12 @@ import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 
-import { FlexCell, Group, Section, TabView } from '@/components';
+import { FlexCell, Group, Screen, Section, TabView } from '@/components';
 import { colors, spacing, style } from '@/theme';
-import { getCategories } from '@/utils';
+import { getCategories, IS_WEB } from '@/utils';
 
-const MANY_CATEGORIES = getCategories(20);
-const FEW_CATEGORIES = getCategories(6);
+const MANY_CATEGORIES = getCategories(IS_WEB ? 30 : 20);
+const FEW_CATEGORIES = getCategories(IS_WEB ? 12 : 6);
 
 const LIST_ITEM_SECTIONS = ['List item 1', 'List item 2', 'List item 3'];
 
@@ -96,27 +96,30 @@ function FlashListExample() {
   const scrollableRef = useAnimatedRef<FlashList<string>>();
 
   return (
-    <AnimatedFlashList
-      contentContainerStyle={style.contentContainer}
-      data={LIST_ITEM_SECTIONS}
-      estimatedItemSize={152}
-      ref={scrollableRef}
-      ListFooterComponent={
-        <Section title='List footer'>
-          <ManyCategories scrollableRef={scrollableRef} />
-        </Section>
-      }
-      ListHeaderComponent={
-        <Section title='List header'>
-          <ManyCategories scrollableRef={scrollableRef} />
-        </Section>
-      }
-      renderItem={({ item }: { item: string }) => (
-        <Section title={item}>
-          <FewCategories scrollableRef={scrollableRef} />
-        </Section>
-      )}
-    />
+    // FlashList doesn't accept width prop in the style property,
+    // hence we wrap it in a Screen component
+    <Screen>
+      <AnimatedFlashList
+        data={LIST_ITEM_SECTIONS}
+        estimatedItemSize={152}
+        ref={scrollableRef}
+        ListFooterComponent={
+          <Section title='List footer'>
+            <ManyCategories scrollableRef={scrollableRef} />
+          </Section>
+        }
+        ListHeaderComponent={
+          <Section title='List header'>
+            <ManyCategories scrollableRef={scrollableRef} />
+          </Section>
+        }
+        renderItem={({ item }: { item: string }) => (
+          <Section title={item}>
+            <FewCategories scrollableRef={scrollableRef} />
+          </Section>
+        )}
+      />
+    </Screen>
   );
 }
 
@@ -172,7 +175,7 @@ const styles = StyleSheet.create({
   },
   section: {
     alignItems: 'center',
-    height: 100,
+    height: IS_WEB ? 250 : 100,
     justifyContent: 'center'
   },
   title: {

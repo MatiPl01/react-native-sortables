@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
-import { DebugOutlet, DebugProvider } from '../debug';
+import { DebugProvider } from '../debug';
 import { useWarnOnPropChange } from '../hooks';
 import type {
   ActiveItemDecorationSettings,
@@ -87,7 +87,6 @@ export default function SharedProvider({
     <ContextProviderComposer providers={providers}>
       <LayoutAnimationConfig skipEntering skipExiting>
         {children}
-        {debug && <DebugOutlet />}
       </LayoutAnimationConfig>
     </ContextProviderComposer>
   );

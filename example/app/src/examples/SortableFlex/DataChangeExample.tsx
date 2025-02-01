@@ -1,17 +1,26 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 
-import { Button, FlexCell, Group, Section, Stagger } from '@/components';
-import { colors, flex, spacing, style } from '@/theme';
-import { getCategories } from '@/utils';
+import {
+  Button,
+  FlexCell,
+  Group,
+  Screen,
+  Section,
+  Stagger
+} from '@/components';
+import { colors, flex, sizes, spacing } from '@/theme';
+import { getCategories, IS_WEB } from '@/utils';
 
-const AVAILABLE_DATA = getCategories(20);
+const AVAILABLE_DATA = getCategories(IS_WEB ? 30 : 15);
 
 export default function DataChangeExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
-  const [data, setData] = useState(AVAILABLE_DATA.slice(0, 10));
+  const [data, setData] = useState(() =>
+    AVAILABLE_DATA.slice(0, AVAILABLE_DATA.length - 5)
+  );
 
   const getNewItemName = useCallback((currentData: Array<string>) => {
     if (currentData.length >= AVAILABLE_DATA.length) {
@@ -102,10 +111,10 @@ export default function DataChangeExample() {
   ];
 
   return (
-    <View style={[flex.fill, style.contentContainer]}>
+    <Screen style={styles.container}>
       {/* Need to set flex: 1 for the ScrollView parent component in order
       to ensure that it occupies the entire available space */}
-      <Stagger wrapperStye={index => (index === 2 ? flex.fill : {})}>
+      <Stagger wrapperStye={index => (!IS_WEB && index === 2 ? flex.fill : {})}>
         {menuSections.map(({ buttons, description, title }) => (
           <Section description={description} key={title} title={title}>
             <View style={styles.row}>
@@ -147,11 +156,14 @@ export default function DataChangeExample() {
           </Animated.ScrollView>
         </Group>
       </Stagger>
-    </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    maxHeight: Dimensions.get('window').height - sizes.xxl
+  },
   row: {
     columnGap: spacing.sm,
     flexDirection: 'row',

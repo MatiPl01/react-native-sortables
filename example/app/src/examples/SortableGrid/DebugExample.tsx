@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
@@ -9,6 +9,7 @@ import {
   GridCard,
   Group,
   OptionGroup,
+  Screen,
   Section,
   Stagger
 } from '@/components';
@@ -30,7 +31,7 @@ export default function DebugExample() {
   );
 
   return (
-    <View style={[flex.fill, style.contentContainer]}>
+    <Screen style={style.contentContainer}>
       <Stagger wrapperStye={index => (index === 3 ? flex.fill : {})}>
         <Section
           description='Press the buttons to change settings'
@@ -86,7 +87,7 @@ export default function DebugExample() {
           </Animated.ScrollView>
         </Group>
       </Stagger>
-    </View>
+    </Screen>
   );
 }
 

@@ -5,7 +5,7 @@ import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 
-import { GridCard, Group, Section, TabView } from '@/components';
+import { GridCard, Group, Screen, Section, TabView } from '@/components';
 import { colors, spacing, style } from '@/theme';
 import { getItems } from '@/utils';
 
@@ -97,27 +97,30 @@ function FlashListExample() {
   const scrollableRef = useAnimatedRef<FlashList<string>>();
 
   return (
-    <AnimatedFlashList
-      contentContainerStyle={style.contentContainer}
-      data={LIST_ITEM_SECTIONS}
-      estimatedItemSize={275}
-      ref={scrollableRef}
-      ListFooterComponent={
-        <Section title='List footer'>
-          <ManyCards scrollableRef={scrollableRef} />
-        </Section>
-      }
-      ListHeaderComponent={
-        <Section title='List header'>
-          <ManyCards scrollableRef={scrollableRef} />
-        </Section>
-      }
-      renderItem={({ item }: { item: string }) => (
-        <Section title={item}>
-          <FewCards scrollableRef={scrollableRef} />
-        </Section>
-      )}
-    />
+    // FlashList doesn't accept width prop in the style property,
+    // hence we wrap it in a Screen component
+    <Screen>
+      <AnimatedFlashList
+        data={LIST_ITEM_SECTIONS}
+        estimatedItemSize={275}
+        ref={scrollableRef}
+        ListFooterComponent={
+          <Section title='List footer'>
+            <ManyCards scrollableRef={scrollableRef} />
+          </Section>
+        }
+        ListHeaderComponent={
+          <Section title='List header'>
+            <ManyCards scrollableRef={scrollableRef} />
+          </Section>
+        }
+        renderItem={({ item }: { item: string }) => (
+          <Section title={item}>
+            <FewCards scrollableRef={scrollableRef} />
+          </Section>
+        )}
+      />
+    </Screen>
   );
 }
 

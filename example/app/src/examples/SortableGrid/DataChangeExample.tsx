@@ -1,11 +1,18 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable, { type SortableGridRenderItem } from 'react-native-sortables';
 
-import { Button, GridCard, Group, Section, Stagger } from '@/components';
-import { colors, flex, spacing, style, text } from '@/theme';
-import { getItems } from '@/utils';
+import {
+  Button,
+  GridCard,
+  Group,
+  Screen,
+  Section,
+  Stagger
+} from '@/components';
+import { colors, flex, sizes, spacing, text } from '@/theme';
+import { getItems, IS_WEB } from '@/utils';
 
 const AVAILABLE_DATA = getItems(18);
 const COLUMNS = 4;
@@ -114,10 +121,10 @@ export default function DataChangeExample() {
   ];
 
   return (
-    <View style={[flex.fill, style.contentContainer]}>
+    <Screen style={styles.container}>
       {/* Need to set flex: 1 for the ScrollView parent component in order
       // to ensure that it occupies the entire available space */}
-      <Stagger wrapperStye={index => (index === 2 ? flex.fill : {})}>
+      <Stagger wrapperStye={index => (!IS_WEB && index === 2 ? flex.fill : {})}>
         {menuSections.map(({ buttons, description, title }) => (
           <Section description={description} key={title} title={title}>
             <View style={styles.row}>
@@ -155,11 +162,14 @@ export default function DataChangeExample() {
           </Animated.ScrollView>
         </Group>
       </Stagger>
-    </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    maxHeight: Dimensions.get('window').height - sizes.xxl
+  },
   row: {
     columnGap: spacing.sm,
     flexDirection: 'row',

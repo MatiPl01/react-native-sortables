@@ -4,9 +4,9 @@ import Sortable from 'react-native-sortables';
 import { FlexCell, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';
 import { radius, spacing, style } from '@/theme';
-import { getCategories } from '@/utils';
+import { getCategories, IS_WEB } from '@/utils';
 
-const DATA = getCategories(9);
+const DATA = getCategories(IS_WEB ? 14 : 9);
 
 export default function DropIndicatorExample() {
   return (

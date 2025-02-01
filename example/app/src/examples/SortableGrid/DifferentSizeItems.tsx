@@ -6,12 +6,14 @@ import Sortable from 'react-native-sortables';
 
 import { Button, GridCard, Group, OptionGroup, Stagger } from '@/components';
 import { colors, flex, sizes, spacing, style } from '@/theme';
-import { getItems } from '@/utils';
+import { getItems, IS_WEB } from '@/utils';
 
 const DATA = getItems(16);
 const COLUMNS = 4;
 
 const ORDERING_STRATEGIES = ['insert', 'swap'] as const;
+
+const getRandomHeight = () => 50 + Math.random() * (IS_WEB ? 175 : 100);
 
 export default function DifferentSizeItems() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
@@ -20,7 +22,7 @@ export default function DifferentSizeItems() {
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
-      <GridCard height={50 + Math.random() * 100} key={counter}>
+      <GridCard height={getRandomHeight()} key={counter}>
         {item}
       </GridCard>
     ),
@@ -31,7 +33,7 @@ export default function DifferentSizeItems() {
 
   return (
     <View style={[flex.fill, style.contentContainer]}>
-      <Stagger wrapperStye={index => (index === 3 ? flex.fill : {})}>
+      <Stagger wrapperStye={index => (!IS_WEB && index === 3 ? flex.fill : {})}>
         <OptionGroup label='Ordering Strategy' value={strategy ?? ''}>
           <Button
             style={styles.button}

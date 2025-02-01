@@ -6,5 +6,6 @@ export function hasRoutes(route: Route): route is { routes: Routes } & Route {
 
 export function getScreenTitle(path: string): string {
   const parts = path.split('/');
-  return parts[parts.length - 1] ?? '';
+  const lastPart = parts[parts.length - 1] ?? '';
+  return lastPart.replace(/([A-Z])/g, ' $1').trim();
 }

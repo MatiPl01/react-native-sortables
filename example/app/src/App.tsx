@@ -1,7 +1,10 @@
 import { PortalProvider } from '@gorhom/portal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { NavigationState } from '@react-navigation/native';
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  getPathFromState,
+  NavigationContainer
+} from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -46,6 +49,19 @@ export default function App() {
       <SafeAreaProvider>
         <NavigationContainer
           initialState={navigationState}
+          linking={{
+            getPathFromState: (state, options) =>
+              getPathFromState(state, options).replace(/%2F/g, '/'),
+            getStateFromPath: path => {
+              const chunks = path.split('/').filter(Boolean);
+              return {
+                routes: chunks.map((_, index, array) => ({
+                  name: array.slice(0, index + 1).join('/')
+                }))
+              };
+            },
+            prefixes: []
+          }}
           onStateChange={persistNavigationState}>
           <PortalProvider>
             <ExamplesStackNavigator />
