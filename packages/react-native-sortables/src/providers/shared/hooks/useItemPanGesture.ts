@@ -21,7 +21,8 @@ export default function useItemPanGesture(
         .manualActivation(true)
         .onTouchesDown((e, manager) => {
           // Ignore touch if another item is already being touched/activated
-          // or sorting is disabled
+          // if the current item is still animated to the drag end position
+          // or sorting is disabled at all
           if (
             touchedItemKey.value !== null ||
             pressProgress.value > 0 ||

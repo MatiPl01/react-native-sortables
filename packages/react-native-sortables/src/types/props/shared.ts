@@ -25,12 +25,12 @@ export type ActiveItemDecorationSettings = AnimatableProps<{
 
 export type Offset = `${number}%` | number;
 
-export type ItemActivationSettings = {
+export type ItemActivationSettings = AnimatableProps<{
   dragActivationDelay: number;
   dragActivationDuration: number;
   dragActivationFailOffset: number;
   dropAnimationDuration: number;
-};
+}>;
 
 export type ActiveItemSnapSettings = AnimatableProps<{
   enableActiveItemSnap: boolean;

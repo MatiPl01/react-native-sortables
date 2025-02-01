@@ -5,7 +5,8 @@ import Animated, {
   interpolate,
   interpolateColor,
   useAnimatedStyle,
-  useDerivedValue
+  useDerivedValue,
+  withTiming
 } from 'react-native-reanimated';
 
 import { useCommonValuesContext } from '../../providers';
@@ -24,10 +25,10 @@ export default function ItemDecoration({
   ...rest
 }: ItemDecorationProps) {
   const {
-    activeItemDropped,
     activeItemOpacity,
     activeItemScale,
     activeItemShadowOpacity,
+    dragActivationDuration,
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
@@ -35,59 +36,48 @@ export default function ItemDecoration({
     prevTouchedItemKey
   } = useCommonValuesContext();
 
-  const resultingProgress = useDerivedValue(() => {
-    if (isBeingActivated.value) {
-      if (activeItemDropped.value) {
-        return pressProgress.value;
-      }
-
-      return interpolate(
-        pressProgress.value,
-        [0, 1],
-        [-inactiveAnimationProgress.value, 1]
-      );
+  const adjustedInactiveProgress = useDerivedValue(() => {
+    if (isBeingActivated.value || prevTouchedItemKey.value === key) {
+      return withTiming(0, { duration: dragActivationDuration.value });
     }
 
-    if (pressProgress.value > 0) {
-      if (prevTouchedItemKey.value === key) {
-        return pressProgress.value;
-      }
-
-      return interpolate(
-        pressProgress.value,
-        [0, 1],
-        [-inactiveAnimationProgress.value, 1]
-      );
-    }
-
-    return -inactiveAnimationProgress.value;
+    return interpolate(
+      pressProgress.value,
+      [0, 1],
+      [inactiveAnimationProgress.value, 0]
+    );
   });
 
   const animatedStyle = useAnimatedStyle(() => {
-    const progress = resultingProgress.value;
+    const progress = pressProgress.value;
+    const zeroProgressOpacity = interpolate(
+      adjustedInactiveProgress.value,
+      [0, 1],
+      [1, inactiveItemOpacity.value]
+    );
+    const zeroProgressScale = interpolate(
+      adjustedInactiveProgress.value,
+      [0, 1],
+      [1, inactiveItemScale.value]
+    );
 
     return {
       opacity: interpolate(
         progress,
-        [-1, 0, 1],
-        [inactiveItemOpacity.value, 1, activeItemOpacity.value]
+        [0, 1],
+        [zeroProgressOpacity, activeItemOpacity.value]
       ),
       shadowColor: interpolateColor(
         progress,
-        [-1, 0, 1],
-        [
-          'transparent',
-          'transparent',
-          `rgba(0, 0, 0, ${activeItemShadowOpacity.value})`
-        ]
+        [0, 1],
+        ['transparent', `rgba(0, 0, 0, ${activeItemShadowOpacity.value})`]
       ),
-      shadowOpacity: interpolate(progress, [-1, 0, 1], [0, 0, 1]),
       transform: [
         {
           scale: interpolate(
             progress,
-            [-1, 0, 1],
-            [inactiveItemScale.value, 1, activeItemScale.value]
+            [0, 1],
+            [zeroProgressScale, activeItemScale.value]
           )
         }
       ],
@@ -105,6 +95,7 @@ const styles = StyleSheet.create({
       height: 0,
       width: 0
     },
+    shadowOpacity: 1,
     shadowRadius: 5
   }
 });

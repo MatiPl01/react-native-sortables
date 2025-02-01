@@ -23,9 +23,6 @@ export default function PlaygroundExample() {
         columnGap={10}
         columns={3}
         data={DATA}
-        dragActivationDelay={100}
-        dragActivationDuration={500}
-        dropAnimationDuration={5000}
         renderItem={renderItem}
         rowGap={10}
       />
