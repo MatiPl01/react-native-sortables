@@ -17,6 +17,7 @@ export default function useItemTranslation(
   const {
     dropAnimationDuration,
     itemPositions,
+    shouldAnimateLayout,
     touchedItemKey,
     touchedItemPosition
   } = useCommonValuesContext();
@@ -48,7 +49,8 @@ export default function useItemTranslation(
 
       if (
         isTouched ||
-        ((layoutX === null || layoutY === null) && !hasProgress)
+        ((layoutX === null || layoutY === null) && !hasProgress) ||
+        !shouldAnimateLayout.value
       ) {
         // Apply the translation immediately if the item is being dragged or
         // the item was mounted with the absolute position and we cannot set

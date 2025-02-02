@@ -20,7 +20,7 @@ export type FlexLayoutContextType = {
   appliedLayout: SharedValue<FlexLayout | null>;
   useFlexLayoutReaction: (
     idxToKey: SharedValue<Array<string> | null>,
-    onChange: (layout: FlexLayout | null) => void
+    onChange: (layout: FlexLayout | null, shouldAnimate: boolean) => void
   ) => void;
   calculateFlexLayout: (idxToKey: Array<string>) => FlexLayout | null;
 };

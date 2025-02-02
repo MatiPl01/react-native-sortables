@@ -56,6 +56,7 @@ export type CommonValuesContextType = {
   containerRef: AnimatedRef<Animated.View>;
   sortEnabled: SharedValue<boolean>;
   canSwitchToAbsoluteLayout: SharedValue<boolean>;
+  shouldAnimateLayout: SharedValue<boolean>;
 } & AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &
   AnimatedValues<ItemActivationSettings>;

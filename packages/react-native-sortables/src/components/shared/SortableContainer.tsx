@@ -30,6 +30,7 @@ export default function SortableContainer({
     activeItemDropped,
     canSwitchToAbsoluteLayout,
     containerHeight,
+    shouldAnimateLayout,
     touchedItemKey
   } = useCommonValuesContext();
 
@@ -38,9 +39,10 @@ export default function SortableContainer({
       return {};
     }
     return {
-      height: animateHeight
-        ? withTiming(containerHeight.value)
-        : containerHeight.value,
+      height:
+        animateHeight && shouldAnimateLayout.value
+          ? withTiming(containerHeight.value)
+          : containerHeight.value,
       overflow:
         touchedItemKey.value !== null || !activeItemDropped.value
           ? 'visible'
