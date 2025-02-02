@@ -25,7 +25,10 @@ export default function DebugExample() {
 
   return (
     <Screen style={style.contentContainer}>
-      <Stagger wrapperStye={index => (!IS_WEB && index === 3 ? flex.fill : {})}>
+      <Stagger
+        wrapperStye={index =>
+          index === 3 ? (IS_WEB ? flex.shrink : flex.fill) : {}
+        }>
         <Section
           description='Press the buttons to change settings'
           title='Settings'

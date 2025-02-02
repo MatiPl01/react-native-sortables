@@ -1,16 +1,16 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Sortable from 'react-native-sortables';
 
-import { FlexCell, Section, Stagger } from '@/components';
+import { FlexCell, ScrollScreen, Section, Stagger } from '@/components';
 import { CustomDropIndicator } from '@/examples/custom';
-import { radius, spacing, style } from '@/theme';
+import { radius, spacing } from '@/theme';
 import { getCategories, IS_WEB } from '@/utils';
 
 const DATA = getCategories(IS_WEB ? 14 : 9);
 
 export default function DropIndicatorExample() {
   return (
-    <ScrollView contentContainerStyle={style.contentContainer}>
+    <ScrollScreen>
       <Stagger ParentComponent={Sortable.Layer}>
         <Section title='Without drop indicator'>
           <Sortable.Flex columnGap={spacing.sm} rowGap={spacing.xs}>
@@ -56,7 +56,7 @@ export default function DropIndicatorExample() {
           </Sortable.Flex>
         </Section>
       </Stagger>
-    </ScrollView>
+    </ScrollScreen>
   );
 }
 

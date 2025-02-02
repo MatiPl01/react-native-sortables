@@ -1,11 +1,18 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { Button, GridCard, Group, OptionGroup, Stagger } from '@/components';
-import { colors, flex, sizes, spacing, style } from '@/theme';
+import {
+  Button,
+  GridCard,
+  Group,
+  OptionGroup,
+  Screen,
+  Stagger
+} from '@/components';
+import { colors, flex, sizes, spacing } from '@/theme';
 import { getItems, IS_WEB } from '@/utils';
 
 const DATA = getItems(16);
@@ -32,8 +39,11 @@ export default function DifferentSizeItems() {
   const strategy = ORDERING_STRATEGIES[strategyIndex];
 
   return (
-    <View style={[flex.fill, style.contentContainer]}>
-      <Stagger wrapperStye={index => (!IS_WEB && index === 3 ? flex.fill : {})}>
+    <Screen>
+      <Stagger
+        wrapperStye={index =>
+          index === 3 ? (IS_WEB ? flex.shrink : flex.fill) : {}
+        }>
         <OptionGroup label='Ordering Strategy' value={strategy ?? ''}>
           <Button
             style={styles.button}
@@ -71,7 +81,7 @@ export default function DifferentSizeItems() {
           </Animated.ScrollView>
         </Group>
       </Stagger>
-    </View>
+    </Screen>
   );
 }
 

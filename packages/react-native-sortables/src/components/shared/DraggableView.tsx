@@ -9,6 +9,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
+import { IS_WEB } from '../../constants';
 import {
   ItemContextProvider,
   useCommonValuesContext,
@@ -19,7 +20,6 @@ import {
   useMeasurementsContext
 } from '../../providers';
 import type { LayoutAnimation } from '../../types';
-import { IS_WEB } from '../../utils';
 import ItemDecoration from './ItemDecoration';
 
 const RELATIVE_STYLE: ViewStyle = {

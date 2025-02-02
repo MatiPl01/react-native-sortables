@@ -3,7 +3,6 @@ import type { ScrollViewProps } from 'react-native';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { flex, spacing } from '@/theme';
-import { IS_WEB } from '@/utils';
 
 export type ScrollProps = {
   fill?: boolean;
@@ -18,7 +17,7 @@ export default function Scroll({
   fill = true,
   horizontal,
   noPadding = false,
-  style,
+  style: customStyle,
   ...rest
 }: ScrollProps) {
   const flattenedStyle = useMemo(
@@ -30,10 +29,10 @@ export default function Scroll({
   return (
     <ScrollView
       horizontal={horizontal}
-      showsVerticalScrollIndicator={false}
-      style={[style, fill && flex.fill, styles.scrollView]}
+      removeClippedSubviews={false}
+      style={[fill && flex.fill, customStyle]}
       contentContainerStyle={[
-        IS_WEB && !horizontal && styles.scrollViewContentWeb,
+        styles.scrollViewContentWeb,
         { gap },
         noPadding
           ? {}
@@ -47,9 +46,6 @@ export default function Scroll({
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    overflow: 'visible'
-  },
   scrollViewContentWeb: {
     marginHorizontal: 'auto',
     maxWidth: '100%',

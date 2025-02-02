@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import Sortable from 'react-native-sortables';
 
-import { Screen } from '@/components';
+import { ScrollScreen } from '@/components';
 import { colors, text } from '@/theme';
 import { getCategories, IS_WEB } from '@/utils';
 
@@ -9,7 +9,7 @@ const DATA = getCategories(IS_WEB ? 30 : 10);
 
 export default function Flex() {
   return (
-    <Screen>
+    <ScrollScreen>
       <Sortable.Flex gap={10} padding={10}>
         {/* You can render anything within the Sortable.Flex component */}
         {DATA.map(item => (
@@ -18,7 +18,7 @@ export default function Flex() {
           </View>
         ))}
       </Sortable.Flex>
-    </Screen>
+    </ScrollScreen>
   );
 }
 

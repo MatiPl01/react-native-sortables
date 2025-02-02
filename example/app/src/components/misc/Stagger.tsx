@@ -24,6 +24,8 @@ export default function Stagger({
     const style =
       wrapperStye instanceof Function ? wrapperStye(index) : wrapperStye;
 
+    console.log(index, style);
+
     const wrappedChild = (
       <Animated.View
         entering={FadeInDown.delay(index * interval)}

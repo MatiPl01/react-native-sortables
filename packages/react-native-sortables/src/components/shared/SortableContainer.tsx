@@ -5,6 +5,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
+import { IS_WEB } from '../../constants';
 import { DebugOutlet } from '../../debug';
 import { useCommonValuesContext } from '../../providers';
 import type { DropIndicatorSettings } from '../../types';
@@ -57,7 +58,9 @@ export default function SortableContainer({
   );
 
   return (
-    <Animated.View style={outerContainerStyle}>
+    <Animated.View
+      // @ts-expect-error - contain is a correct CSS prop on web
+      style={[outerContainerStyle, IS_WEB && { contain: 'layout' }]}>
       {showDropIndicator && (
         <DropIndicator
           DropIndicatorComponent={DropIndicatorComponent}

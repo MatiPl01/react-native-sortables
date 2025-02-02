@@ -98,7 +98,7 @@ function FlashListExample() {
   return (
     // FlashList doesn't accept width prop in the style property,
     // hence we wrap it in a Screen component
-    <Screen>
+    <Screen noPadding>
       <AnimatedFlashList
         data={LIST_ITEM_SECTIONS}
         estimatedItemSize={152}
