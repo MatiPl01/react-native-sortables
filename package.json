@@ -57,6 +57,7 @@
       "example/app",
       "example/fabric",
       "example/paper",
+      "example/expo",
       "example/web",
       "packages/react-native-sortables"
     ]

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 
@@ -11,7 +11,7 @@ import {
   Section,
   Stagger
 } from '@/components';
-import { colors, flex, sizes, spacing } from '@/theme';
+import { colors, flex, spacing } from '@/theme';
 import { getCategories, IS_WEB } from '@/utils';
 
 const AVAILABLE_DATA = getCategories(IS_WEB ? 30 : 15);
@@ -111,7 +111,7 @@ export default function DataChangeExample() {
   ];
 
   return (
-    <Screen style={styles.container}>
+    <Screen>
       {/* Need to set flex: 1 for the ScrollView parent component in order
       to ensure that it occupies the entire available space */}
       <Stagger wrapperStye={index => (!IS_WEB && index === 2 ? flex.fill : {})}>
@@ -161,9 +161,6 @@ export default function DataChangeExample() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    maxHeight: Dimensions.get('window').height - sizes.xxl
-  },
   row: {
     columnGap: spacing.sm,
     flexDirection: 'row',
