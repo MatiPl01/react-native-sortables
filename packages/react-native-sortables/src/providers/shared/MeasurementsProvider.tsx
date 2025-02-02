@@ -1,7 +1,7 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
-import Animated, {
+import {
   measure,
   runOnUI,
   useAnimatedReaction,
@@ -9,6 +9,7 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 
+import AnimatedOnLayoutView from '../../components/shared/AnimatedOnLayoutView';
 import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
 import type { Dimensions, MeasurementsContextType } from '../../types';
@@ -160,7 +161,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   return {
     children: (
       <>
-        <Animated.View
+        <AnimatedOnLayoutView
           ref={containerRef}
           style={[styles.helperContainer, animatedContainerStyle]}
           onLayout={handleHelperContainerMeasurement}
