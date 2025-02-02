@@ -26,7 +26,6 @@ export default function PlaygroundExample() {
         data={DATA}
         renderItem={renderItem}
         rowGap={10}
-        hapticsEnabled
       />
     </Screen>
   );

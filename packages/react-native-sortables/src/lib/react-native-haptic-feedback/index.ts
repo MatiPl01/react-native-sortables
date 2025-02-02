@@ -67,6 +67,7 @@ const load = () => {
         if (isTurboModuleEnabled) {
           nativeTrigger(type, triggerOptions);
         } else {
+          // TODO - try to change this to run on UI if possible
           runOnJS(nativeTrigger)(type, triggerOptions);
         }
       } catch (err) {
