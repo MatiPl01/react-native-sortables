@@ -1,4 +1,5 @@
 import type { Offset, Vector } from '../types';
+import { SortablesError } from './errors';
 
 export const getOffsetDistance = (
   providedOffset: Offset,
@@ -11,9 +12,7 @@ export const getOffsetDistance = (
 
   const match = providedOffset.match(/-?\d+(.\d+)?%$/);
   if (!match) {
-    throw new Error(
-      `[react-native-sortables] Invalid offset: ${providedOffset}`
-    );
+    throw new SortablesError(`Invalid offset: ${providedOffset}`);
   }
 
   const percentage = parseFloat(match[0]) / 100;

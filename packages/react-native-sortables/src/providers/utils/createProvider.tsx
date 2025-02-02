@@ -8,6 +8,7 @@ import {
   useContext,
   useMemo
 } from 'react';
+import { SortablesError } from '../../utils';
 
 export default function createProvider<ProviderName extends string>(
   name: ProviderName,
@@ -74,8 +75,8 @@ export default function createProvider<
       };
 
       if (!value) {
-        throw new Error(
-          `[react-native-sortables] ${name}Context value must be provided. You likely forgot to return it from the factory function.`
+        throw new SortablesError(
+          `${name}Context value must be provided. You likely forgot to return it from the factory function.`
         );
       }
 
@@ -89,8 +90,8 @@ export default function createProvider<
       const context = useContext(Context);
 
       if (guarded && context === null) {
-        throw new Error(
-          `[react-native-sortables] ${name} context must be used within a ${name}Provider`
+        throw new SortablesError(
+          `${name} context must be used within a ${name}Provider`
         );
       }
 
