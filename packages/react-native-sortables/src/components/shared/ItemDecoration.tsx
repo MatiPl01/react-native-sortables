@@ -1,5 +1,5 @@
 import type { ViewProps } from 'react-native';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
   interpolate,
@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useCommonValuesContext } from '../../providers';
+import { IS_WEB } from '../../constants';
 
 type ItemDecorationProps = {
   isBeingActivated: SharedValue<boolean>;
@@ -61,16 +62,22 @@ export default function ItemDecoration({
       [1, inactiveItemScale.value]
     );
 
+    const shadowColor = interpolateColor(
+      progress,
+      [0, 1],
+      ['transparent', `rgba(0, 0, 0, ${activeItemShadowOpacity.value})`]
+    );
+
+    const shadow = IS_WEB
+      ? { filter: `drop-shadow(0px 0px 5px ${shadowColor})` }
+      : { shadowColor };
+
     return {
+      ...shadow,
       opacity: interpolate(
         progress,
         [0, 1],
         [zeroProgressOpacity, activeItemOpacity.value]
-      ),
-      shadowColor: interpolateColor(
-        progress,
-        [0, 1],
-        ['transparent', `rgba(0, 0, 0, ${activeItemShadowOpacity.value})`]
       ),
       transform: [
         {
@@ -89,13 +96,18 @@ export default function ItemDecoration({
 }
 
 const styles = StyleSheet.create({
-  decoration: {
-    elevation: 5,
-    shadowOffset: {
-      height: 0,
-      width: 0
+  decoration: Platform.select<ViewStyle>({
+    android: {
+      elevation: 5
     },
-    shadowOpacity: 1,
-    shadowRadius: 5
-  }
+    native: {
+      shadowOffset: {
+        height: 0,
+        width: 0
+      },
+      shadowOpacity: 1,
+      shadowRadius: 5
+    },
+    default: {}
+  })
 });

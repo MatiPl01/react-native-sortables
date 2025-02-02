@@ -37,9 +37,7 @@ export default function SortableContainer({
       return {};
     }
     return {
-      height: animateHeight
-        ? withTiming(containerHeight.value)
-        : containerHeight.value,
+      height: animateHeight ? containerHeight.value : containerHeight.value,
       overflow:
         touchedItemKey.value !== null || !activeItemDropped.value
           ? 'visible'

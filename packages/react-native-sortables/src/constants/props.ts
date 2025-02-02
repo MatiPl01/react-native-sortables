@@ -3,6 +3,7 @@ import type { ViewStyle } from 'react-native';
 import { DefaultDropIndicator } from '../components/defaults';
 import type {
   DefaultProps,
+  ItemLayoutAnimationSettings,
   SharedProps,
   SortableCallbacks,
   SortableFlexProps,
@@ -11,6 +12,7 @@ import type {
 import { defaultKeyExtractor } from '../utils/keys';
 import { DRAG_ACTIVATION_FAIL_OFFSET } from './layout';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
+import { IS_WEB } from './platform';
 import { DRAG_ACTIVATION_DELAY, DRAG_ANIMATION_DURATION } from './timings';
 
 export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
@@ -20,6 +22,7 @@ export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
  */
 type OptionalSharedProps =
   | 'scrollableRef'
+  | keyof ItemLayoutAnimationSettings
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
 type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
@@ -50,8 +53,11 @@ export const DEFAULT_SHARED_PROPS = {
   hapticsEnabled: false,
   inactiveItemOpacity: 0.5,
   inactiveItemScale: 1,
-  itemEntering: SortableItemEntering,
-  itemExiting: SortableItemExiting,
+  // Layout animations on web don't work properly so we don't provide
+  // default layout animations here. This is an issue that should be
+  // fixed in `react-native-reanimated` in the future.
+  itemEntering: IS_WEB ? undefined : SortableItemEntering,
+  itemExiting: IS_WEB ? undefined : SortableItemExiting,
   onDragStart: undefined,
   onOrderChange: undefined,
   scrollableRef: undefined,
