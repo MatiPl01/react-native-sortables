@@ -43,7 +43,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     indexToKey,
     itemDimensions,
     itemPositions,
-    itemsStyleOverride
+    itemsStyleOverride,
+    shouldAnimateLayout
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
@@ -59,7 +60,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const useGridLayoutReaction = useCallback(
     (
       idxToKey: SharedValue<Array<string>>,
-      onChange: (layout: GridLayout | null) => void
+      onChange: (layout: GridLayout | null, shouldAnimate: boolean) => void
     ) =>
       useAnimatedReaction(
         () => ({
@@ -72,8 +73,13 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           itemDimensions: itemDimensions.value,
           numColumns: columns
         }),
-        layoutProps => {
-          onChange(calculateLayout(layoutProps));
+        (props, previousProps) => {
+          onChange(
+            calculateLayout(props),
+            // Animate layout only if parent container is not resized
+            // (e.g. skip animation when the browser window is resized)
+            !!previousProps && props.columnWidth === previousProps.columnWidth
+          );
         }
       ),
     [columnWidth, columnGap, rowGap, columns, itemDimensions]
@@ -123,8 +129,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   );
 
   // GRID LAYOUT UPDATER
-  useGridLayoutReaction(indexToKey, layout => {
+  useGridLayoutReaction(indexToKey, (layout, shouldAnimate) => {
     'worklet';
+    shouldAnimateLayout.value = shouldAnimate;
     if (!layout) {
       return;
     }

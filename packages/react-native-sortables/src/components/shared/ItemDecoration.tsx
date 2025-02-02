@@ -1,7 +1,7 @@
 import type { ViewProps, ViewStyle } from 'react-native';
 import { Platform, StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import Animated, {
+import {
   interpolate,
   interpolateColor,
   useAnimatedStyle,
@@ -11,11 +11,12 @@ import Animated, {
 
 import { IS_WEB } from '../../constants';
 import { useCommonValuesContext } from '../../providers';
+import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 
 type ItemDecorationProps = {
   isBeingActivated: SharedValue<boolean>;
   pressProgress: SharedValue<number>;
-  onLayout?: ViewProps['onLayout'];
+  onLayout: NonNullable<ViewProps['onLayout']>;
   itemKey: string;
 } & ViewProps;
 
@@ -92,7 +93,12 @@ export default function ItemDecoration({
     };
   });
 
-  return <Animated.View style={[styles.decoration, animatedStyle]} {...rest} />;
+  return (
+    <AnimatedOnLayoutView
+      {...rest}
+      style={[styles.decoration, animatedStyle]}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

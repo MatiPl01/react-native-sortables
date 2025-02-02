@@ -54,7 +54,7 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { canSwitchToAbsoluteLayout, touchedItemKey } =
+  const { canSwitchToAbsoluteLayout, shouldAnimateLayout, touchedItemKey } =
     useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
@@ -84,8 +84,13 @@ export default function DraggableView({
       return NO_TRANSLATION_STYLE;
     }
 
-    const left = layoutX !== null && IS_WEB ? withTiming(layoutX) : layoutX;
-    const top = layoutY !== null && IS_WEB ? withTiming(layoutY) : layoutY;
+    let left = layoutX;
+    let top = layoutY;
+
+    if (IS_WEB && shouldAnimateLayout.value) {
+      left = layoutX !== null ? withTiming(layoutX) : layoutX;
+      top = layoutY !== null ? withTiming(layoutY) : layoutY;
+    }
 
     return {
       left,

@@ -14,6 +14,7 @@ import type {
   RequiredBy,
   SortableFlexStyle
 } from '../../../types';
+import { haveEqualPropValues } from '../../../utils';
 import { useCommonValuesContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';
@@ -55,7 +56,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     containerWidth,
     indexToKey,
     itemDimensions,
-    itemPositions
+    itemPositions,
+    shouldAnimateLayout
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
@@ -94,7 +96,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const useFlexLayoutReaction = useCallback(
     (
       idxToKey: SharedValue<Array<string> | null> | SharedValue<Array<string>>,
-      onChange: (layout: FlexLayout | null) => void
+      onChange: (layout: FlexLayout | null, shouldAnimate: boolean) => void
     ) =>
       useAnimatedReaction(
         () =>
@@ -117,8 +119,17 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
                 limits: dimensionsLimits.value,
                 paddings: paddings.value
               },
-        props => {
-          onChange(props && calculateLayout(props));
+        (props, previousProps) => {
+          onChange(
+            props && calculateLayout(props),
+            // Animate layout only if parent container is not resized
+            // (e.g. skip animation when the browser window is resized)
+            !!(
+              props &&
+              previousProps &&
+              haveEqualPropValues(props.limits, previousProps.limits)
+            )
+          );
         }
       ),
     [
@@ -170,8 +181,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     ]
   );
 
-  useFlexLayoutReaction(indexToKey, layout => {
+  useFlexLayoutReaction(indexToKey, (layout, shouldAnimate) => {
     'worklet';
+    shouldAnimateLayout.value = shouldAnimate;
     if (!layout) {
       return;
     }
