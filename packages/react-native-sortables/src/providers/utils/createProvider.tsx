@@ -75,7 +75,7 @@ export default function createProvider<
 
       if (!value) {
         throw new Error(
-          `${name}Context value must be provided. You likely forgot to return it from the factory function.`
+          `[react-native-sortables] ${name}Context value must be provided. You likely forgot to return it from the factory function.`
         );
       }
 
@@ -90,7 +90,7 @@ export default function createProvider<
 
       if (guarded && context === null) {
         throw new Error(
-          `${name} context must be used within a ${name}Provider`
+          `[react-native-sortables] ${name} context must be used within a ${name}Provider`
         );
       }
 
