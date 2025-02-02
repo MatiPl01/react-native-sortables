@@ -15,8 +15,13 @@
 import { NativeModules, TurboModuleRegistry } from 'react-native';
 // Types can be imported even if the module is not available
 import type { HapticOptions } from 'react-native-haptic-feedback';
-import { HapticFeedbackTypes } from 'react-native-haptic-feedback';
 import { runOnJS } from 'react-native-reanimated';
+
+import { logger } from '../../utils';
+
+export const WARNINGS = {
+  notAvailable: 'react-native-haptic-feedback is not available'
+};
 
 const loadNative = (isTurboModuleEnabled: boolean) => {
   const hapticFeedback = isTurboModuleEnabled
@@ -30,6 +35,13 @@ const load = () => {
     const isTurboModuleEnabled = !!(global as any).__turboModuleProxy;
     const nativeTrigger = loadNative(isTurboModuleEnabled);
 
+    if (!nativeTrigger) {
+      return null;
+    }
+    // Lazy load the HapticFeedbackTypes
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { HapticFeedbackTypes } = require('react-native-haptic-feedback');
+
     const defaultOptions = {
       enableVibrateFallback: false,
       ignoreAndroidSystemSettings: true
@@ -37,7 +49,6 @@ const load = () => {
 
     const createTriggerOptions = (options: HapticOptions) => {
       'worklet';
-      // if options is a boolean we're using an api <=1.6 and we should pass use it to set the enableVibrateFallback option
       if (typeof options === 'boolean') {
         return {
           ...defaultOptions,
@@ -48,9 +59,7 @@ const load = () => {
     };
 
     const trigger = (
-      type:
-        | HapticFeedbackTypes
-        | keyof typeof HapticFeedbackTypes = HapticFeedbackTypes.selection,
+      type: string = HapticFeedbackTypes.selection,
       options: HapticOptions = {}
     ) => {
       'worklet';
@@ -60,12 +69,11 @@ const load = () => {
         if (isTurboModuleEnabled) {
           nativeTrigger(type, triggerOptions);
         } else {
-          // I couldn't get it working right without calling runOnJS on the old
-          // architecture (paper) so I decided to use it here
+          // TODO - try to change this to run on UI if possible
           runOnJS(nativeTrigger)(type, triggerOptions);
         }
       } catch (err) {
-        console.warn('react-native-haptic-feedback is not available');
+        logger.warn(WARNINGS.notAvailable);
       }
     };
 

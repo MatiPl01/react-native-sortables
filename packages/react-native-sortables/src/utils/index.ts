@@ -4,6 +4,7 @@ export * from './equality';
 export * from './helpers';
 export * from './keys';
 export * from './layout';
+export * from './logs';
 export * from './memo';
 export * from './misc';
 export * from './operations';

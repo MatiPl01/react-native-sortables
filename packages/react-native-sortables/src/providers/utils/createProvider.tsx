@@ -9,6 +9,8 @@ import {
   useMemo
 } from 'react';
 
+import { error } from '../../utils';
+
 export default function createProvider<ProviderName extends string>(
   name: ProviderName,
   options: { withContext: false }
@@ -74,7 +76,7 @@ export default function createProvider<
       };
 
       if (!value) {
-        throw new Error(
+        throw error(
           `${name}Context value must be provided. You likely forgot to return it from the factory function.`
         );
       }
@@ -89,9 +91,7 @@ export default function createProvider<
       const context = useContext(Context);
 
       if (guarded && context === null) {
-        throw new Error(
-          `${name} context must be used within a ${name}Provider`
-        );
+        throw error(`${name} context must be used within a ${name}Provider`);
       }
 
       return context;

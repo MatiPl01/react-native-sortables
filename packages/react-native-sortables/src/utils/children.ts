@@ -1,6 +1,8 @@
 import type { ReactElement, ReactNode } from 'react';
 import { Children, isValidElement } from 'react';
 
+import { logger } from './logs';
+
 export const validateChildren = (
   children: ReactNode
 ): Array<[string, ReactElement]> =>
@@ -13,7 +15,7 @@ export const validateChildren = (
       const key = child.key as string;
 
       if (!key) {
-        console.warn(
+        logger.warn(
           `Child at index ${index} is missing a key prop. Using index as fallback.`
         );
       }
