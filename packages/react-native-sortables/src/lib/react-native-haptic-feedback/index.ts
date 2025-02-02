@@ -17,6 +17,8 @@ import { NativeModules, TurboModuleRegistry } from 'react-native';
 import type { HapticOptions } from 'react-native-haptic-feedback';
 import { runOnJS } from 'react-native-reanimated';
 
+import { logger } from '../../utils';
+
 export const WARNINGS = {
   notAvailable: 'react-native-haptic-feedback is not available'
 };
@@ -71,7 +73,7 @@ const load = () => {
           runOnJS(nativeTrigger)(type, triggerOptions);
         }
       } catch (err) {
-        console.warn(`[react-native-sortables] ${WARNINGS.notAvailable}`);
+        logger.warn(WARNINGS.notAvailable);
       }
     };
 

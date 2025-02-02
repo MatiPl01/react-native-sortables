@@ -9198,6 +9198,7 @@ __metadata:
     eslint: "npm:^8.56.0"
     jest: "npm:^29.7.0"
     lint-staged: "npm:^15.2.7"
+    madge: "npm:^8.0.0"
     prettier: "npm:^3.3.2"
     react: "npm:^18.3.1"
     react-native: "npm:0.76.5"
