@@ -20,7 +20,7 @@ export function Screen({ children, style: customStyle }: ScreenProps) {
         flex.fill,
         style.contentContainer,
         IS_WEB && style.webContent,
-        { overflow: 'visible' },
+        style.visible,
         customStyle
       ]}>
       {children}

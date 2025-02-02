@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 
+import { IS_WEB } from '../constants';
 import { ReactNativeHapticFeedback } from '../lib';
 import { WARNINGS } from '../lib/react-native-haptic-feedback';
 import { ensureExists } from '../utils';
-import { IS_WEB } from '../constants';
 
 type HapticImpact = {
   light(): void;

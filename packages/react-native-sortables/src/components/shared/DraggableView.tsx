@@ -9,6 +9,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
+import { IS_WEB } from '../../constants';
 import {
   ItemContextProvider,
   useCommonValuesContext,
@@ -20,7 +21,6 @@ import {
 } from '../../providers';
 import type { LayoutAnimation } from '../../types';
 import ItemDecoration from './ItemDecoration';
-import { IS_WEB } from '../../constants';
 
 const RELATIVE_STYLE: ViewStyle = {
   height: undefined,
@@ -84,8 +84,8 @@ export default function DraggableView({
       return NO_TRANSLATION_STYLE;
     }
 
-    const left = layoutX !== null && IS_WEB ? layoutX : layoutX;
-    const top = layoutY !== null && IS_WEB ? layoutY : layoutY;
+    const left = layoutX !== null && IS_WEB ? withTiming(layoutX) : layoutX;
+    const top = layoutY !== null && IS_WEB ? withTiming(layoutY) : layoutY;
 
     return {
       left,

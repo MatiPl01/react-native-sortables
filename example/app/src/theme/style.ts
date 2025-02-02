@@ -16,5 +16,8 @@ export const style = {
     paddingBottom: spacing.xl,
     ...(IS_WEB && webContent)
   },
+  visible: {
+    overflow: 'visible'
+  },
   webContent
 } satisfies Record<string, ViewStyle>;

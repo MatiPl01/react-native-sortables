@@ -1,5 +1,5 @@
-import type { ViewProps } from 'react-native';
-import { Platform, StyleSheet, ViewStyle } from 'react-native';
+import type { ViewProps, ViewStyle } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
   interpolate,
@@ -9,8 +9,8 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
-import { useCommonValuesContext } from '../../providers';
 import { IS_WEB } from '../../constants';
+import { useCommonValuesContext } from '../../providers';
 
 type ItemDecorationProps = {
   isBeingActivated: SharedValue<boolean>;
@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     android: {
       elevation: 5
     },
+    default: {},
     native: {
       shadowOffset: {
         height: 0,
@@ -107,7 +108,6 @@ const styles = StyleSheet.create({
       },
       shadowOpacity: 1,
       shadowRadius: 5
-    },
-    default: {}
+    }
   })
 });

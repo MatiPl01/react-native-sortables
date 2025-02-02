@@ -1,9 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  withTiming
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { DebugOutlet } from '../../debug';
 import { useCommonValuesContext } from '../../providers';
