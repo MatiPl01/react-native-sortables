@@ -2,11 +2,11 @@ import { useCallback } from 'react';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { GridCard } from '@/components';
 import { useItemOrderChange } from '@/hooks';
 import { spacing } from '@/theme';
 import { getItems } from '@/utils';
 
+import { GridCard } from '../items';
 import type { RouteCardComponent } from './RouteCard';
 import RouteCard from './RouteCard';
 
