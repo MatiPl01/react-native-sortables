@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { ScrollViewProps } from 'react-native';
 import { ScrollView, StyleSheet } from 'react-native';
 
-import { flex, spacing, style } from '@/theme';
+import { flex, spacing } from '@/theme';
 
 export type ScrollProps = {
   fill?: boolean;
@@ -30,10 +30,8 @@ export default function Scroll({
     <ScrollView
       horizontal={horizontal}
       removeClippedSubviews={false}
-      showsVerticalScrollIndicator={false}
-      style={[style.visible, fill && flex.fill, customStyle]}
+      style={[fill && flex.fill, customStyle]}
       contentContainerStyle={[
-        style.visible,
         styles.scrollViewContentWeb,
         { gap },
         noPadding

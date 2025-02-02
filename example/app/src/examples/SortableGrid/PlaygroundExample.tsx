@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { Screen } from '@/components';
+import { ScrollScreen } from '@/components';
 import { colors, radius, sizes, spacing, text } from '@/theme';
 
 const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
@@ -19,7 +19,7 @@ export default function PlaygroundExample() {
   );
 
   return (
-    <Screen style={styles.container}>
+    <ScrollScreen style={styles.container}>
       <Sortable.Grid
         columnGap={10}
         columns={3}
@@ -27,7 +27,7 @@ export default function PlaygroundExample() {
         renderItem={renderItem}
         rowGap={10}
       />
-    </Screen>
+    </ScrollScreen>
   );
 }
 

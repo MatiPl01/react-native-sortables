@@ -10,10 +10,15 @@ import type { ScrollProps } from './Scroll';
 import Scroll from './Scroll';
 
 type ScreenProps = PropsWithChildren<{
+  noPadding?: boolean;
   style?: StyleProp<ViewStyle>;
 }>;
 
-export function Screen({ children, style: customStyle }: ScreenProps) {
+export function Screen({
+  children,
+  noPadding,
+  style: customStyle
+}: ScreenProps) {
   return (
     <View
       style={[
@@ -21,6 +26,7 @@ export function Screen({ children, style: customStyle }: ScreenProps) {
         style.contentContainer,
         IS_WEB && style.webContent,
         style.visible,
+        noPadding && { padding: 0 },
         customStyle
       ]}>
       {children}
@@ -40,15 +46,13 @@ export function ScrollScreen({
   const insets = useSafeAreaInsets();
 
   return (
-    <Screen style={{ paddingBottom: 0 }}>
-      <Scroll
-        {...rest}
-        contentContainerStyle={[
-          { paddingBottom: insets.bottom + spacing.md },
-          contentContainerStyle
-        ]}
-        noPadding
-      />
-    </Screen>
+    <Scroll
+      {...rest}
+      contentContainerStyle={[
+        { paddingBottom: insets.bottom + spacing.md },
+        contentContainerStyle
+      ]}
+      noPadding
+    />
   );
 }

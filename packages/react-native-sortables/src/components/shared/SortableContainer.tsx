@@ -1,6 +1,9 @@
 import type { PropsWithChildren } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  withTiming
+} from 'react-native-reanimated';
 
 import { DebugOutlet } from '../../debug';
 import { useCommonValuesContext } from '../../providers';
@@ -34,7 +37,9 @@ export default function SortableContainer({
       return {};
     }
     return {
-      height: animateHeight ? containerHeight.value : containerHeight.value,
+      height: animateHeight
+        ? withTiming(containerHeight.value)
+        : containerHeight.value,
       overflow:
         touchedItemKey.value !== null || !activeItemDropped.value
           ? 'visible'

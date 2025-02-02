@@ -124,7 +124,10 @@ export default function DataChangeExample() {
     <Screen>
       {/* Need to set flex: 1 for the ScrollView parent component in order
       // to ensure that it occupies the entire available space */}
-      <Stagger wrapperStye={index => (!IS_WEB && index === 2 ? flex.fill : {})}>
+      <Stagger
+        wrapperStye={index =>
+          index === 2 ? (IS_WEB ? flex.shrink : flex.fill) : {}
+        }>
         {menuSections.map(({ buttons, description, title }) => (
           <Section description={description} key={title} title={title}>
             <View style={styles.row}>
