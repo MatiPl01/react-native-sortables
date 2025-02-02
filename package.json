@@ -7,7 +7,6 @@
     "@types/node": "^20.14.9",
     "eslint": "^8.56.0",
     "eslint-config-react-native-matipl01": "2.1.0",
-    "get-yarn-workspaces": "^1.0.2",
     "husky": "^9.1.4",
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.2",
@@ -34,6 +33,7 @@
     "build": "yarn workspace react-native-sortables build",
     "clean": "yarn workspace react-native-sortables clean",
     "example:app": "yarn workspace example-app",
+    "example:expo": "yarn workspace example-expo",
     "example:fabric": "yarn workspace example-fabric",
     "example:paper": "yarn workspace example-paper",
     "example:web": "yarn workspace example-web",
@@ -57,6 +57,7 @@
       "example/app",
       "example/fabric",
       "example/paper",
+      "example/expo",
       "example/web",
       "packages/react-native-sortables"
     ]

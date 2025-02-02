@@ -1,8 +1,9 @@
 import type { PropsWithChildren } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { flex, style } from '@/theme';
+import { flex, spacing, style } from '@/theme';
 import { IS_WEB } from '@/utils';
 
 import type { ScrollProps } from './Scroll';
@@ -17,6 +18,7 @@ export function Screen({ children, style: customStyle }: ScreenProps) {
     <View
       style={[
         flex.fill,
+        style.contentContainer,
         IS_WEB && style.webContent,
         { overflow: 'visible' },
         customStyle
@@ -26,12 +28,27 @@ export function Screen({ children, style: customStyle }: ScreenProps) {
   );
 }
 
-type ScrollScreenProps = Omit<ScrollProps, 'withBottomBarSpacing'>;
+type ScrollScreenProps = Omit<
+  ScrollProps,
+  'noPadding' | 'withBottomBarSpacing'
+>;
 
-export function ScrollScreen(props: ScrollScreenProps) {
+export function ScrollScreen({
+  contentContainerStyle,
+  ...rest
+}: ScrollScreenProps) {
+  const insets = useSafeAreaInsets();
+
   return (
-    <Screen>
-      <Scroll {...props} />
+    <Screen style={{ paddingBottom: 0 }}>
+      <Scroll
+        {...rest}
+        contentContainerStyle={[
+          { paddingBottom: insets.bottom + spacing.md },
+          contentContainerStyle
+        ]}
+        noPadding
+      />
     </Screen>
   );
 }

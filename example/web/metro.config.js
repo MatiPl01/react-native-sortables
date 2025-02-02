@@ -1,15 +1,15 @@
 const path = require('path');
-const getWorkspaces = require('get-yarn-workspaces');
 const { getDefaultConfig } = require('expo/metro-config');
-const { mergeConfig } = require('@react-native/metro-config');
 
-const workspaces = getWorkspaces(__dirname).filter(
-  // Include all workspaces except fabric in the paper example
-  workspaceDir => !workspaceDir.includes('fabric')
-);
+const monorepoRoot = path.resolve(__dirname, '../..');
 
-const customConfig = {
-  watchFolders: [path.resolve(__dirname, '../../node_modules'), ...workspaces]
-};
+const config = getDefaultConfig(__dirname);
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), customConfig);
+config.watchFolders = [__dirname, monorepoRoot];
+config.resolver.nodeModulesPaths = [
+  path.resolve(__dirname, 'node_modules'),
+  path.resolve(__dirname, '../app/node_modules'),
+  path.resolve(monorepoRoot, 'node_modules')
+];
+
+module.exports = config;

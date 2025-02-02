@@ -1,8 +1,5 @@
 const path = require('path');
-const { getDefaultConfig } = require('@react-native/metro-config');
-const {
-  wrapWithReanimatedMetroConfig
-} = require('react-native-reanimated/metro-config');
+const { getDefaultConfig } = require('expo/metro-config');
 
 const monorepoRoot = path.resolve(__dirname, '../..');
 
@@ -14,5 +11,6 @@ config.resolver.nodeModulesPaths = [
   path.resolve(__dirname, '../app/node_modules'),
   path.resolve(monorepoRoot, 'node_modules')
 ];
+config.resolver.disableHierarchicalLookup = true;
 
-module.exports = wrapWithReanimatedMetroConfig(config);
+module.exports = config;
