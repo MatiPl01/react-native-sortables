@@ -12,7 +12,7 @@ export const getOffsetDistance = (
   const match = providedOffset.match(/-?\d+(.\d+)?%$/);
   if (!match) {
     throw new Error(
-      `[react-native-scrollable] Invalid offset: ${providedOffset}`
+      `[react-native-sortables] Invalid offset: ${providedOffset}`
     );
   }
 

@@ -14,7 +14,7 @@ export const validateChildren = (
 
       if (!key) {
         console.warn(
-          `Child at index ${index} is missing a key prop. Using index as fallback.`
+          `[react-native-sortables] Child at index ${index} is missing a key prop. Using index as fallback.`
         );
       }
 

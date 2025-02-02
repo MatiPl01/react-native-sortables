@@ -29,7 +29,9 @@ function OrderUpdaterComponent<P extends PredefinedStrategies>({
     typeof strategy === 'string' ? predefinedStrategies[strategy] : strategy;
 
   if (!factory && typeof strategy === 'string') {
-    throw new Error(`'${strategy}' is not a valid ordering strategy`);
+    throw new Error(
+      `[react-native-sortable] '${strategy}' is not a valid ordering strategy`
+    );
   }
 
   const updater = (factory as AnyStrategyFactory)({
