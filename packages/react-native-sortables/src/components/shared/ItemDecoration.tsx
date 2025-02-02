@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
 import { Platform, StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
@@ -92,7 +93,29 @@ export default function ItemDecoration({
     };
   });
 
-  return <Animated.View style={[styles.decoration, animatedStyle]} {...rest} />;
+  const AnimatedView = IS_WEB ? AnimatedViewWeb : Animated.View;
+
+  return <AnimatedView {...rest} style={[styles.decoration, animatedStyle]} />;
+}
+
+function AnimatedViewWeb({ onLayout, ...rest }: ViewProps) {
+  const ref = useRef<Animated.View>(null);
+
+  return (
+    <Animated.View
+      {...rest}
+      ref={ref}
+      onLayout={e => {
+        const el = ref.current as HTMLElement;
+        // We want to call onLayout only for displayed views to prevent
+        // layout animation on navigation between screens
+        // @ts-expect-error This is a correct HTML element prop on web
+        if (el?.offsetParent) {
+          onLayout?.(e);
+        }
+      }}
+    />
+  );
 }
 
 const styles = StyleSheet.create({
