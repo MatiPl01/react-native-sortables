@@ -59,6 +59,7 @@ export default function SortableContainer({
 
   return (
     <Animated.View
+      // @ts-expect-error - contain is a correct CSS prop on web
       style={[outerContainerStyle, IS_WEB && { contain: 'layout' }]}>
       {showDropIndicator && (
         <DropIndicator

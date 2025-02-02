@@ -1,4 +1,6 @@
 /* eslint-disable import/no-unused-modules */
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+
 import { Pressable, TouchableHighlight, TouchableOpacity } from 'react-native';
 
 import {
