@@ -6,7 +6,7 @@ import type {
   OrderUpdaterProps,
   PredefinedStrategies
 } from '../../../types';
-import { SortablesError, typedMemo } from '../../../utils';
+import { error, typedMemo } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useOrderUpdater } from '../hooks';
 
@@ -29,7 +29,7 @@ function OrderUpdaterComponent<P extends PredefinedStrategies>({
     typeof strategy === 'string' ? predefinedStrategies[strategy] : strategy;
 
   if (!factory && typeof strategy === 'string') {
-    throw new SortablesError(`'${strategy}' is not a valid ordering strategy`);
+    throw error(`'${strategy}' is not a valid ordering strategy`);
   }
 
   const updater = (factory as AnyStrategyFactory)({
