@@ -72,7 +72,7 @@ yarn add react-native-sortables
 
 This library is built with:
 
-- [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) (version 3.x)
+- [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) (version 3.x / 4.x)
 - [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/) (version 2.x)
 
 Make sure to follow their installation instructions for your project.
