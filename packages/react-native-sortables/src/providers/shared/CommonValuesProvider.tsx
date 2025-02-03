@@ -107,7 +107,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const containerRef = useAnimatedRef<Animated.View>();
   const sortEnabled = useAnimatableValue(_sortEnabled);
   const canSwitchToAbsoluteLayout = useSharedValue(false);
-  const shouldAnimateLayout = useSharedValue(false);
+  const shouldAnimateLayout = useSharedValue(true);
 
   useEffect(() => {
     if (areArraysDifferent(itemKeys, prevKeysRef.current)) {
