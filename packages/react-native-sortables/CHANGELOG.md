@@ -1,3 +1,22 @@
+# [1.1.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.0.0...v1.1.0) (2025-02-03)
+
+
+### Bug Fixes
+
+* A bunch of small issues I noticed ([#225](https://github.com/MatiPl01/react-native-sortables/issues/225)) ([fe329bd](https://github.com/MatiPl01/react-native-sortables/commit/fe329bd9c84f4e60a884ee71eb2d72455e9a1f41))
+* Base web-example app issues ([#217](https://github.com/MatiPl01/react-native-sortables/issues/217)) ([4d30f24](https://github.com/MatiPl01/react-native-sortables/commit/4d30f24a306720781bc84be5a3131797eba29136))
+* Crash when haptic feedback is not installed in expo managed app ([#231](https://github.com/MatiPl01/react-native-sortables/issues/231)) ([fd39c71](https://github.com/MatiPl01/react-native-sortables/commit/fd39c71fb1793124d3d9fb0bdc7c1387274e21b1)), closes [#227](https://github.com/MatiPl01/react-native-sortables/issues/227)
+* Invalid layout on web when visibility of sortable changes ([#235](https://github.com/MatiPl01/react-native-sortables/issues/235)) ([fdd750b](https://github.com/MatiPl01/react-native-sortables/commit/fdd750bcae373c64a6290549a392677c3f0b3af1))
+* Major implementation issues ([#234](https://github.com/MatiPl01/react-native-sortables/issues/234)) ([fdb8cbd](https://github.com/MatiPl01/react-native-sortables/commit/fdb8cbdc1cedc008897857f300ddea782ea4b3cb))
+* View drop animation on native after adding shouldAnimateLayout ([#237](https://github.com/MatiPl01/react-native-sortables/issues/237)) ([3b78f83](https://github.com/MatiPl01/react-native-sortables/commit/3b78f830bebf7b07ace62add856db8cafe7aad0c))
+
+
+### Features
+
+* Add missing sortEnabled props in docs, allow to pass shared value ([#222](https://github.com/MatiPl01/react-native-sortables/issues/222)) ([d5b3380](https://github.com/MatiPl01/react-native-sortables/commit/d5b33808fcc7a526d2de7804ade55227fb588032)), closes [#220](https://github.com/MatiPl01/react-native-sortables/issues/220)
+* Make drag activation timings and drop animation duration customizable ([#226](https://github.com/MatiPl01/react-native-sortables/issues/226)) ([dac417e](https://github.com/MatiPl01/react-native-sortables/commit/dac417e931f83ed223bd3ba0c6a437e6ee201078))
+* Web example app ([#214](https://github.com/MatiPl01/react-native-sortables/issues/214)) ([1fd05d3](https://github.com/MatiPl01/react-native-sortables/commit/1fd05d393f8085a220352d508d752106b57fba19))
+
 # 1.0.0 (2025-01-29)
 
 
