@@ -87,7 +87,7 @@ export default function DraggableView({
     let left = layoutX;
     let top = layoutY;
 
-    if (IS_WEB && shouldAnimateLayout.value) {
+    if (shouldAnimateLayout.value) {
       left = layoutX !== null ? withTiming(layoutX) : layoutX;
       top = layoutY !== null ? withTiming(layoutY) : layoutY;
     }

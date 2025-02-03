@@ -6,7 +6,7 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import type { DEFAULT_SORTABLE_FLEX_PROPS } from '../../../constants';
+import { type DEFAULT_SORTABLE_FLEX_PROPS, IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type {
   FlexLayout,
@@ -125,6 +125,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
             // Animate layout only if parent container is not resized
             // (e.g. skip animation when the browser window is resized)
             !!(
+              IS_WEB &&
               props &&
               previousProps &&
               haveEqualPropValues(props.limits, previousProps.limits)

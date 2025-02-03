@@ -6,6 +6,7 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
+import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
 import type {
@@ -78,7 +79,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
             calculateLayout(props),
             // Animate layout only if parent container is not resized
             // (e.g. skip animation when the browser window is resized)
-            !!previousProps && props.columnWidth === previousProps.columnWidth
+            !!(
+              IS_WEB &&
+              previousProps &&
+              props.columnWidth === previousProps.columnWidth
+            )
           );
         }
       ),
