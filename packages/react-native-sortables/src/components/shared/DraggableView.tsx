@@ -9,7 +9,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
-import { IS_WEB } from '../../constants';
+import { EMPTY_OBJECT, IS_WEB } from '../../constants';
 import {
   ItemContextProvider,
   useCommonValuesContext,
@@ -70,19 +70,33 @@ export default function DraggableView({
     return () => handleItemRemoval(key);
   }, [key, handleItemRemoval]);
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedTranslationStyle = useAnimatedStyle(() => {
     if (!canSwitchToAbsoluteLayout.value) {
       return RELATIVE_STYLE;
     }
 
-    const layoutX = layoutPosition.x.value;
-    const layoutY = layoutPosition.y.value;
     const translateX = translation.x.value;
     const translateY = translation.y.value;
 
     if (translateX === null || translateY === null) {
       return NO_TRANSLATION_STYLE;
     }
+
+    return {
+      opacity: 1,
+      position: 'absolute',
+      transform: [{ translateX }, { translateY }],
+      zIndex: zIndex.value
+    };
+  });
+
+  const animatedLayoutStyle = useAnimatedStyle(() => {
+    if (!canSwitchToAbsoluteLayout.value) {
+      return EMPTY_OBJECT;
+    }
+
+    const layoutX = layoutPosition.x.value;
+    const layoutY = layoutPosition.y.value;
 
     let left = layoutX;
     let top = layoutY;
@@ -94,11 +108,7 @@ export default function DraggableView({
 
     return {
       left,
-      opacity: 1,
-      position: 'absolute',
-      top,
-      transform: [{ translateX }, { translateY }],
-      zIndex: zIndex.value
+      top
     };
   });
 
@@ -106,7 +116,7 @@ export default function DraggableView({
     <Animated.View
       {...viewProps}
       layout={IS_WEB ? undefined : LinearTransition}
-      style={[style, animatedStyle]}>
+      style={[style, animatedTranslationStyle, animatedLayoutStyle]}>
       <Animated.View entering={entering} exiting={exiting}>
         <GestureDetector gesture={gesture}>
           <ItemDecoration
