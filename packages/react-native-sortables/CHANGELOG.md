@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.1.0...v1.1.1) (2025-02-05)
+
+
+### Bug Fixes
+
+* Animated sortable container height not working ([#243](https://github.com/MatiPl01/react-native-sortables/issues/243)) ([d4034d6](https://github.com/MatiPl01/react-native-sortables/commit/d4034d60f31bf3f19e44492a9810e1d51bfcd731))
+
 # [1.1.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.0.0...v1.1.0) (2025-02-03)
 
 
