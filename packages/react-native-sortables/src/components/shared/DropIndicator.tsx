@@ -29,11 +29,10 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     activationProgress,
     activeItemDropped,
     indexToKey,
+    itemDimensions,
     itemPositions,
     keyToIndex,
-    touchedItemHeight,
-    touchedItemKey,
-    touchedItemWidth
+    touchedItemKey
   } = useCommonValuesContext();
 
   // Clone the array in order to prevent user from mutating the internal state
@@ -42,6 +41,9 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const dropIndex = useSharedValue(0);
   const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
   const prevUpdateItemKey = useSharedValue<null | string>(null);
+  const touchedItemDimensions = useDerivedValue(
+    () => touchedItemKey.value && itemDimensions.value[touchedItemKey.value]
+  );
 
   const x = useSharedValue<null | number>(null);
   const y = useSharedValue<null | number>(null);
@@ -81,16 +83,21 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const animatedStyle = useAnimatedStyle(() => {
     const translateX = x.value;
     const translateY = y.value;
+    const dimensions = touchedItemDimensions.value;
 
-    if (translateX === null || translateY === null || activeItemDropped.value) {
+    if (
+      !dimensions ||
+      translateX === null ||
+      translateY === null ||
+      activeItemDropped.value
+    ) {
       return DEFAULT_STYLE;
     }
 
     return {
-      height: touchedItemHeight.value,
+      ...dimensions,
       opacity: 1,
-      transform: [{ translateX }, { translateY }],
-      width: touchedItemWidth.value
+      transform: [{ translateX }, { translateY }]
     };
   });
 

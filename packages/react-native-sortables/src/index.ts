@@ -5,9 +5,11 @@ import {
   createSortableTouchable,
   SortableFlex,
   SortableGrid,
+  SortableHandle,
   SortableLayer
 } from './components';
 
+export type { SortableHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
   DragEndCallback,
@@ -30,6 +32,7 @@ export type {
 const Sortable = {
   Flex: SortableFlex,
   Grid: SortableGrid,
+  Handle: SortableHandle,
   Layer: SortableLayer,
   Pressable: createSortableTouchable(Pressable),
   TouchableHighlight: createSortableTouchable(TouchableHighlight),

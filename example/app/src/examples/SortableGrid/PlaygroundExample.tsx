@@ -5,6 +5,8 @@ import Sortable from 'react-native-sortables';
 
 import { ScrollScreen } from '@/components';
 import { colors, radius, sizes, spacing, text } from '@/theme';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
 
 const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
 
@@ -13,6 +15,9 @@ export default function PlaygroundExample() {
     ({ item }) => (
       <View style={styles.card}>
         <Text style={styles.text}>{item}</Text>
+        <Sortable.Handle>
+          <FontAwesomeIcon icon={faGripVertical} />
+        </Sortable.Handle>
       </View>
     ),
     []
@@ -26,6 +31,8 @@ export default function PlaygroundExample() {
         data={DATA}
         renderItem={renderItem}
         rowGap={10}
+        dragActivationDelay={0}
+        customHandle
       />
     </ScrollScreen>
   );

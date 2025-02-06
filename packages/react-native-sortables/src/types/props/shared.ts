@@ -94,6 +94,7 @@ export type SharedProps = Simplify<
     animateHeight?: boolean;
     hapticsEnabled?: boolean;
     sortEnabled?: Animatable<boolean>;
+    customHandle?: boolean;
     debug?: boolean;
   } & Omit<SortableCallbacks, 'onDragEnd'> &
     Partial<ActiveItemDecorationSettings> &

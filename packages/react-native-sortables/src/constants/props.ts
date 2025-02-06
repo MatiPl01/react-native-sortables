@@ -36,6 +36,7 @@ export const DEFAULT_SHARED_PROPS = {
   autoScrollActivationOffset: 75,
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
+  customHandle: false,
   debug: false,
   dragActivationDelay: DRAG_ACTIVATION_DELAY,
   dragActivationDuration: DRAG_ANIMATION_DURATION,
@@ -52,9 +53,9 @@ export const DEFAULT_SHARED_PROPS = {
   enableActiveItemSnap: true,
   hapticsEnabled: false,
   inactiveItemOpacity: 0.5,
-  inactiveItemScale: 1,
   // Layout animations on web don't work properly so we don't provide
   // default layout animations here. This is an issue that should be
+  inactiveItemScale: 1,
   // fixed in `react-native-reanimated` in the future.
   itemEntering: IS_WEB ? undefined : SortableItemEntering,
   itemExiting: IS_WEB ? undefined : SortableItemExiting,

@@ -25,6 +25,7 @@ import { createProvider } from '../utils';
 type CommonValuesProviderProps = PropsWithChildren<
   {
     sortEnabled: Animatable<boolean>;
+    customHandle: boolean;
     itemKeys: Array<string>;
     initialItemsStyleOverride?: ViewStyle;
   } & ActiveItemDecorationSettings &
@@ -38,6 +39,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   activeItemOpacity: _activeItemOpacity,
   activeItemScale: _activeItemScale,
   activeItemShadowOpacity: _activeItemShadowOpacity,
+  customHandle,
   dragActivationDelay: _dragActivationDelay,
   dragActivationDuration: _dragActivationDuration,
   dragActivationFailOffset: _dragActivationFailOffset,
@@ -67,8 +69,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   // DIMENSIONS
   const containerWidth = useSharedValue(-1);
   const containerHeight = useSharedValue(-1);
-  const touchedItemWidth = useSharedValue(-1);
-  const touchedItemHeight = useSharedValue(-1);
+  const touchedHandleDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const itemsStyleOverride = useSharedValue<Maybe<ViewStyle>>(
     initialItemsStyleOverride
@@ -129,6 +130,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       containerHeight,
       containerRef,
       containerWidth,
+      customHandle,
       dragActivationDelay,
       dragActivationDuration,
       dragActivationFailOffset,
@@ -148,10 +150,9 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       snapOffsetY,
       sortEnabled,
       touchPosition,
-      touchedItemHeight,
+      touchedHandleDimensions,
       touchedItemKey,
-      touchedItemPosition,
-      touchedItemWidth
+      touchedItemPosition
     }
   };
 });

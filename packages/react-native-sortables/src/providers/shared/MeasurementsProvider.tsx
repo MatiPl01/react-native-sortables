@@ -39,10 +39,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     containerHeight,
     containerRef,
     containerWidth,
+    customHandle,
     itemDimensions,
-    touchedItemHeight,
-    touchedItemKey,
-    touchedItemWidth
+    touchedHandleDimensions,
+    touchedItemKey
   } = useCommonValuesContext();
 
   const measuredItemsCount = useSharedValue(0);
@@ -73,9 +73,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       itemDimensions.value[key] = dimensions;
-      if (touchedItemKey.value === key) {
-        touchedItemWidth.value = dimensions.width;
-        touchedItemHeight.value = dimensions.height;
+      if (!customHandle && touchedItemKey.value === key) {
+        touchedHandleDimensions.value = dimensions;
       }
 
       // Update the array of item dimensions only after all items have been
@@ -107,14 +106,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
   });
 
-  const updateTouchedItemDimensions = useCallback(
+  /**
+   * Updates the dimensions of the handle that is currently being touched
+   * (only if there is no custom handle and the entire item is treated as a handle)
+   */
+  const maybeUpdateTouchedHandleDimensions = useCallback(
     (key: string) => {
       'worklet';
       const dimensions = itemDimensions.value[key] ?? null;
-      touchedItemWidth.value = dimensions?.width ?? -1;
-      touchedItemHeight.value = dimensions?.height ?? -1;
+      touchedHandleDimensions.value = dimensions;
     },
-    [itemDimensions, touchedItemHeight, touchedItemWidth]
+    [itemDimensions, touchedHandleDimensions]
   );
 
   const checkMeasuredHeight = useCallback(
@@ -172,8 +174,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     value: {
       handleItemMeasurement,
       handleItemRemoval,
-      tryMeasureContainerHeight,
-      updateTouchedItemDimensions
+      maybeUpdateTouchedHandleDimensions,
+      tryMeasureContainerHeight
     }
   };
 });

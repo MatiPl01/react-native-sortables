@@ -28,6 +28,7 @@ type SharedProviderProps = PropsWithChildren<
     itemKeys: Array<string>;
     sortEnabled: Animatable<boolean>;
     hapticsEnabled: boolean;
+    customHandle: boolean;
     debug: boolean;
     initialItemsStyleOverride?: ViewStyle;
     dropIndicatorStyle?: ViewStyle;

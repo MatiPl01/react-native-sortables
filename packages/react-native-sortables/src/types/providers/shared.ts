@@ -38,8 +38,7 @@ export type CommonValuesContextType = {
   // DIMENSIONS
   containerWidth: SharedValue<number>;
   containerHeight: SharedValue<number>;
-  touchedItemWidth: SharedValue<number>;
-  touchedItemHeight: SharedValue<number>;
+  touchedHandleDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
 
@@ -57,6 +56,7 @@ export type CommonValuesContextType = {
   sortEnabled: SharedValue<boolean>;
   canSwitchToAbsoluteLayout: SharedValue<boolean>;
   shouldAnimateLayout: SharedValue<boolean>; // used only on web
+  customHandle: boolean;
 } & AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &
   AnimatedValues<ItemActivationSettings>;
@@ -67,7 +67,7 @@ export type MeasurementsContextType = {
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
   tryMeasureContainerHeight: () => void;
-  updateTouchedItemDimensions: (key: string) => void;
+  maybeUpdateTouchedHandleDimensions: (key: string) => void;
 };
 
 // AUTO SCROLL
@@ -100,6 +100,7 @@ export type DragContextType = {
 // ITEM
 
 export type ItemContextType = {
+  itemKey: string;
   pressProgress: Readonly<SharedValue<number>>;
   isBeingActivated: Readonly<SharedValue<boolean>>;
   dragActivationState: Readonly<SharedValue<DragActivationState>>;

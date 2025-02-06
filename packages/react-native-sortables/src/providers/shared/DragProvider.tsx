@@ -57,12 +57,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     snapOffsetX,
     snapOffsetY,
     touchPosition,
-    touchedItemHeight,
+    touchedHandleDimensions,
     touchedItemKey,
-    touchedItemPosition,
-    touchedItemWidth
+    touchedItemPosition
   } = useCommonValuesContext();
-  const { tryMeasureContainerHeight, updateTouchedItemDimensions } =
+  const { maybeUpdateTouchedHandleDimensions, tryMeasureContainerHeight } =
     useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
@@ -91,28 +90,31 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   // ACTIVE ITEM SNAP UPDATER
   useAnimatedReaction(
     () => ({
+      dimensions: touchedHandleDimensions.value,
       enableSnap: enableActiveItemSnap.value,
-      height: touchedItemHeight.value,
       oX: snapOffsetX.value,
       oY: snapOffsetY.value,
       progress: activationProgress.value,
       touch: startTouch.value && {
         x: startTouch.value.x,
         y: startTouch.value.y
-      },
-      width: touchedItemWidth.value
+      }
     }),
-    ({ enableSnap, height, oX, oY, progress, touch, width }) => {
-      if (!enableSnap || !height || !width || !touch) {
+    ({ dimensions, enableSnap, oX, oY, progress, touch }) => {
+      if (!enableSnap || !dimensions || !touch) {
         snapTranslation.value = null;
         return;
       }
 
       const translation = touchTranslation.value;
       const targetDeltaX =
-        touch.x - getOffsetDistance(oX, width) + (translation?.x ?? 0);
+        touch.x -
+        getOffsetDistance(oX, dimensions.width) +
+        (translation?.x ?? 0);
       const targetDeltaY =
-        touch.y - getOffsetDistance(oY, height) + (translation?.y ?? 0);
+        touch.y -
+        getOffsetDistance(oY, dimensions.height) +
+        (translation?.y ?? 0);
 
       snapTranslation.value = {
         x: progress * targetDeltaX,
@@ -195,7 +197,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateStartScrollOffset?.();
       activeItemKey.value = key;
       dragStartIndex.value = keyToIndex.value[key]!;
-      dragStartTouchTranslation.value = touchTranslation.value;
       activationState.value = DragActivationState.ACTIVE;
 
       haptics.medium();
@@ -205,8 +206,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       });
     },
     [
-      dragStartTouchTranslation,
-      touchTranslation,
       updateStartScrollOffset,
       stableOnDragStart,
       activationState,
@@ -304,7 +303,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // Start handling touch after a delay to prevent accidental activation
       // e.g. while scrolling the ScrollView
       activationTimeoutId.value = setAnimatedTimeout(() => {
-        updateTouchedItemDimensions(key);
+        maybeUpdateTouchedHandleDimensions(key);
         updateLayer?.(LayerState.Focused);
 
         onActivate();
@@ -355,7 +354,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateLayer,
       handleDragStart,
       handleDragEnd,
-      updateTouchedItemDimensions,
+      maybeUpdateTouchedHandleDimensions,
       tryMeasureContainerHeight,
       canSwitchToAbsoluteLayout,
       dragActivationDelay,
@@ -380,22 +379,21 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const dY = firstTouch.absoluteY - startTouch.value.absoluteY;
 
       // Cancel touch if the touch moved too far from the initial position
-      // before the item was activated
+      // before the item activation animation starts
       const r = Math.sqrt(dX * dX + dY * dY);
-      if (activeItemKey.value === null && r >= dragActivationFailOffset.value) {
+      if (
+        // touchedItemKey is set after the drag activation delay passes
+        // and we don't want to cancel the touch anymore after this time
+        touchedItemKey.value === null &&
+        r >= dragActivationFailOffset.value
+      ) {
         onFail();
         return;
       }
 
       touchTranslation.value = { x: dX, y: dY };
     },
-    [
-      startTouch,
-      touchTranslation,
-      touchedItemKey,
-      activeItemKey,
-      dragActivationFailOffset
-    ]
+    [startTouch, touchTranslation, touchedItemKey, dragActivationFailOffset]
   );
 
   const handleOrderChange = useCallback(
