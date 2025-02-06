@@ -7,13 +7,13 @@ export default function useItemZIndex(
   key: string,
   pressProgress: SharedValue<number>
 ): SharedValue<number> {
-  const { prevTouchedItemKey, touchedItemKey } = useCommonValuesContext();
+  const { activeItemKey, prevActiveItemKey } = useCommonValuesContext();
 
   return useDerivedValue<number>(() => {
-    if (touchedItemKey.value === key) {
+    if (activeItemKey.value === key) {
       return 3;
     }
-    if (prevTouchedItemKey.value === key) {
+    if (prevActiveItemKey.value === key) {
       return 2;
     }
     if (pressProgress.value > 0) {

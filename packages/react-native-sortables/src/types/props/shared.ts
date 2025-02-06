@@ -7,8 +7,8 @@ import type { LayoutAnimation } from '../reanimated';
 import type { Animatable, AnimatableProps, Simplify } from '../utils';
 
 export type DropIndicatorComponentProps = {
-  activationProgress: SharedValue<number>;
-  touchedItemKey: SharedValue<null | string>;
+  activeAnimationProgress: SharedValue<number>;
+  activeItemKey: SharedValue<null | string>;
   dropIndex: SharedValue<number>;
   dropPosition: SharedValue<Vector>;
   orderedItemKeys: SharedValue<Array<string>>;
@@ -27,8 +27,8 @@ export type Offset = `${number}%` | number;
 
 export type ItemActivationSettings = AnimatableProps<{
   dragActivationDelay: number;
-  dragActivationDuration: number;
   dragActivationFailOffset: number;
+  activeAnimationDuration: number;
   dropAnimationDuration: number;
 }>;
 

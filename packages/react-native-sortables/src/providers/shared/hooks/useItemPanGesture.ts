@@ -10,7 +10,7 @@ export default function useItemPanGesture(
   key: string,
   pressProgress: SharedValue<number>
 ) {
-  const { sortEnabled, touchedItemKey } = useCommonValuesContext();
+  const { activeItemKey, sortEnabled } = useCommonValuesContext();
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
     useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
@@ -24,7 +24,7 @@ export default function useItemPanGesture(
           // if the current item is still animated to the drag end position
           // or sorting is disabled at all
           if (
-            touchedItemKey.value !== null ||
+            activeItemKey.value !== null ||
             pressProgress.value > 0 ||
             !sortEnabled.value
           ) {
@@ -49,7 +49,7 @@ export default function useItemPanGesture(
     [
       key,
       pressProgress,
-      touchedItemKey,
+      activeItemKey,
       handleTouchStart,
       handleTouchesMove,
       handleDragEnd,

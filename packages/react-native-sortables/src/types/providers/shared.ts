@@ -33,21 +33,20 @@ export type CommonValuesContextType = {
   // POSITIONS
   itemPositions: SharedValue<Record<string, Vector>>;
   touchPosition: SharedValue<Vector | null>;
-  touchedItemPosition: SharedValue<Vector | null>;
+  activeItemPosition: SharedValue<Vector | null>;
 
   // DIMENSIONS
   containerWidth: SharedValue<number>;
   containerHeight: SharedValue<number>;
-  touchedHandleDimensions: SharedValue<Dimensions | null>;
+  snapItemDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
 
   // DRAG STATE
-  touchedItemKey: SharedValue<null | string>;
-  prevTouchedItemKey: SharedValue<null | string>;
+  prevActiveItemKey: SharedValue<null | string>;
   activeItemKey: SharedValue<null | string>;
   activationState: SharedValue<DragActivationState>;
-  activationProgress: SharedValue<number>;
+  activeAnimationProgress: SharedValue<number>;
   inactiveAnimationProgress: SharedValue<number>;
   activeItemDropped: SharedValue<boolean>;
 
@@ -67,7 +66,7 @@ export type MeasurementsContextType = {
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
   tryMeasureContainerHeight: () => void;
-  maybeUpdateTouchedHandleDimensions: (key: string) => void;
+  maybeUpdateSnapDimensions: (key: string) => void;
 };
 
 // AUTO SCROLL

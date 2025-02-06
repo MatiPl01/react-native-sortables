@@ -15,7 +15,7 @@ export type ItemGroupSwapProps = {
   mainGap: number;
 };
 
-export type ItemGroupSwapResult = {
+type ItemGroupSwapResult = {
   indexToKey: Array<string>;
   itemIndex: number;
   itemIndexInGroup: number;

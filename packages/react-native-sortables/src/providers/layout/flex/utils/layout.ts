@@ -12,8 +12,8 @@ import type {
 } from '../../../../types';
 import { reverseArray, sum } from '../../../../utils';
 
-export type AxisDimensions = { cross: Dimension; main: Dimension };
-export type AxisDirections = { cross: Direction; main: Direction };
+type AxisDimensions = { cross: Dimension; main: Dimension };
+type AxisDirections = { cross: Direction; main: Direction };
 
 const createGroups = (
   indexToKey: Array<string>,

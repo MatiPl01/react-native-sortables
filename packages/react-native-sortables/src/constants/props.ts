@@ -29,6 +29,7 @@ type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
 
 export const DEFAULT_SHARED_PROPS = {
   DropIndicatorComponent: DefaultDropIndicator,
+  activeAnimationDuration: DRAG_ANIMATION_DURATION,
   activeItemOpacity: 1,
   activeItemScale: 1.1,
   activeItemShadowOpacity: 0.2,
@@ -39,7 +40,6 @@ export const DEFAULT_SHARED_PROPS = {
   customHandle: false,
   debug: false,
   dragActivationDelay: DRAG_ACTIVATION_DELAY,
-  dragActivationDuration: DRAG_ANIMATION_DURATION,
   dragActivationFailOffset: DRAG_ACTIVATION_FAIL_OFFSET,
   dropAnimationDuration: DRAG_ANIMATION_DURATION,
   dropIndicatorStyle: {

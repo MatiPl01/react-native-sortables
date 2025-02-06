@@ -36,12 +36,12 @@ type CommonValuesProviderProps = PropsWithChildren<
 const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   'CommonValues'
 )<CommonValuesProviderProps, CommonValuesContextType>(({
+  activeAnimationDuration: _activeAnimationDuration,
   activeItemOpacity: _activeItemOpacity,
   activeItemScale: _activeItemScale,
   activeItemShadowOpacity: _activeItemShadowOpacity,
   customHandle,
   dragActivationDelay: _dragActivationDelay,
-  dragActivationDuration: _dragActivationDuration,
   dragActivationFailOffset: _dragActivationFailOffset,
   dropAnimationDuration: _dropAnimationDuration,
   enableActiveItemSnap: _enableActiveItemSnap,
@@ -64,29 +64,28 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   // POSITIONS
   const itemPositions = useSharedValue<Record<string, Vector>>({});
   const touchPosition = useSharedValue<Vector | null>(null);
-  const touchedItemPosition = useSharedValue<Vector | null>(null);
+  const activeItemPosition = useSharedValue<Vector | null>(null);
 
   // DIMENSIONS
   const containerWidth = useSharedValue(-1);
   const containerHeight = useSharedValue(-1);
-  const touchedHandleDimensions = useSharedValue<Dimensions | null>(null);
+  const snapItemDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const itemsStyleOverride = useSharedValue<Maybe<ViewStyle>>(
     initialItemsStyleOverride
   );
 
   // DRAG STATE
-  const touchedItemKey = useSharedValue<null | string>(null);
-  const prevTouchedItemKey = useSharedValue<null | string>(null);
   const activeItemKey = useSharedValue<null | string>(null);
+  const prevActiveItemKey = useSharedValue<null | string>(null);
   const activationState = useSharedValue(DragActivationState.INACTIVE);
-  const activationProgress = useSharedValue(0);
+  const activeAnimationProgress = useSharedValue(0);
   const inactiveAnimationProgress = useSharedValue(0);
   const activeItemDropped = useSharedValue(true);
 
   // ITEM ACTIVATION SETTINGS
   const dragActivationDelay = useAnimatableValue(_dragActivationDelay);
-  const dragActivationDuration = useAnimatableValue(_dragActivationDuration);
+  const activeAnimationDuration = useAnimatableValue(_activeAnimationDuration);
   const dragActivationFailOffset = useAnimatableValue(
     _dragActivationFailOffset
   );
@@ -119,11 +118,13 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   return {
     value: {
-      activationProgress,
       activationState,
+      activeAnimationDuration,
+      activeAnimationProgress,
       activeItemDropped,
       activeItemKey,
       activeItemOpacity,
+      activeItemPosition,
       activeItemScale,
       activeItemShadowOpacity,
       canSwitchToAbsoluteLayout,
@@ -132,7 +133,6 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       containerWidth,
       customHandle,
       dragActivationDelay,
-      dragActivationDuration,
       dragActivationFailOffset,
       dropAnimationDuration,
       enableActiveItemSnap,
@@ -144,15 +144,13 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemPositions,
       itemsStyleOverride,
       keyToIndex,
-      prevTouchedItemKey,
+      prevActiveItemKey,
       shouldAnimateLayout,
+      snapItemDimensions,
       snapOffsetX,
       snapOffsetY,
       sortEnabled,
-      touchPosition,
-      touchedHandleDimensions,
-      touchedItemKey,
-      touchedItemPosition
+      touchPosition
     }
   };
 });

@@ -27,20 +27,20 @@ export default function ItemDecoration({
   ...rest
 }: ItemDecorationProps) {
   const {
+    activeAnimationDuration,
     activeItemOpacity,
     activeItemScale,
     activeItemShadowOpacity,
-    dragActivationDuration,
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
     itemsStyleOverride,
-    prevTouchedItemKey
+    prevActiveItemKey
   } = useCommonValuesContext();
 
   const adjustedInactiveProgress = useDerivedValue(() => {
-    if (isBeingActivated.value || prevTouchedItemKey.value === key) {
-      return withTiming(0, { duration: dragActivationDuration.value });
+    if (isBeingActivated.value || prevActiveItemKey.value === key) {
+      return withTiming(0, { duration: activeAnimationDuration.value });
     }
 
     return interpolate(

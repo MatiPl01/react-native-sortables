@@ -26,13 +26,13 @@ type DropIndicatorProps = {
 
 function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const {
-    activationProgress,
+    activeAnimationProgress,
     activeItemDropped,
+    activeItemKey,
     indexToKey,
     itemDimensions,
     itemPositions,
-    keyToIndex,
-    touchedItemKey
+    keyToIndex
   } = useCommonValuesContext();
 
   // Clone the array in order to prevent user from mutating the internal state
@@ -41,8 +41,8 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const dropIndex = useSharedValue(0);
   const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
   const prevUpdateItemKey = useSharedValue<null | string>(null);
-  const touchedItemDimensions = useDerivedValue(
-    () => touchedItemKey.value && itemDimensions.value[touchedItemKey.value]
+  const activeItemDimensions = useDerivedValue(
+    () => activeItemKey.value && itemDimensions.value[activeItemKey.value]
   );
 
   const x = useSharedValue<null | number>(null);
@@ -52,7 +52,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     () => ({
       dropped: activeItemDropped.value,
       kToI: keyToIndex.value,
-      key: touchedItemKey.value,
+      key: activeItemKey.value,
       positions: itemPositions.value
     }),
     ({ dropped, kToI, key, positions }) => {
@@ -83,7 +83,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const animatedStyle = useAnimatedStyle(() => {
     const translateX = x.value;
     const translateY = y.value;
-    const dimensions = touchedItemDimensions.value;
+    const dimensions = activeItemDimensions.value;
 
     if (
       !dimensions ||
@@ -104,12 +104,12 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
       <DropIndicatorComponent
-        activationProgress={activationProgress}
+        activeAnimationProgress={activeAnimationProgress}
+        activeItemKey={activeItemKey}
         dropIndex={dropIndex}
         dropPosition={dropPosition}
         orderedItemKeys={orderedItemKeys}
         style={style}
-        touchedItemKey={touchedItemKey}
       />
     </Animated.View>
   );

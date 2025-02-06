@@ -35,14 +35,14 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   itemsCount
 }) => {
   const {
+    activeItemKey,
     canSwitchToAbsoluteLayout,
     containerHeight,
     containerRef,
     containerWidth,
     customHandle,
     itemDimensions,
-    touchedHandleDimensions,
-    touchedItemKey
+    snapItemDimensions
   } = useCommonValuesContext();
 
   const measuredItemsCount = useSharedValue(0);
@@ -73,8 +73,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       itemDimensions.value[key] = dimensions;
-      if (!customHandle && touchedItemKey.value === key) {
-        touchedHandleDimensions.value = dimensions;
+      if (!customHandle && activeItemKey.value === key) {
+        snapItemDimensions.value = dimensions;
       }
 
       // Update the array of item dimensions only after all items have been
@@ -110,13 +110,13 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
    * Updates the dimensions of the handle that is currently being touched
    * (only if there is no custom handle and the entire item is treated as a handle)
    */
-  const maybeUpdateTouchedHandleDimensions = useCallback(
+  const maybeUpdateSnapDimensions = useCallback(
     (key: string) => {
       'worklet';
       const dimensions = itemDimensions.value[key] ?? null;
-      touchedHandleDimensions.value = dimensions;
+      snapItemDimensions.value = dimensions;
     },
-    [itemDimensions, touchedHandleDimensions]
+    [itemDimensions, snapItemDimensions]
   );
 
   const checkMeasuredHeight = useCallback(
@@ -174,7 +174,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     value: {
       handleItemMeasurement,
       handleItemRemoval,
-      maybeUpdateTouchedHandleDimensions,
+      maybeUpdateSnapDimensions,
       tryMeasureContainerHeight
     }
   };

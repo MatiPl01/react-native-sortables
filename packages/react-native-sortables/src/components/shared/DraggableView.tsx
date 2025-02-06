@@ -31,10 +31,10 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { customHandle, touchedItemKey } = useCommonValuesContext();
+  const { activeItemKey, customHandle } = useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
-  const isBeingActivated = useDerivedValue(() => touchedItemKey.value === key);
+  const isBeingActivated = useDerivedValue(() => activeItemKey.value === key);
   const pressProgress = useSharedValue(0);
   const layoutStyles = useItemLayoutStyles(key, pressProgress);
 

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules */
 import type { PropsWithChildren } from 'react';
 import { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -20,17 +19,17 @@ export function SortableHandle({
   disabled = false
 }: SortableHandleProps) {
   const { itemKey, pressProgress } = useItemContext();
-  const { touchedHandleDimensions, touchedItemKey } = useCommonValuesContext();
+  const { activeItemKey, snapItemDimensions } = useCommonValuesContext();
 
   const dimensions = useSharedValue<Dimensions | null>(null);
 
   const gesture = useItemPanGesture(itemKey, pressProgress);
 
   useAnimatedReaction(
-    () => touchedItemKey.value,
+    () => activeItemKey.value,
     key => {
       if (key === itemKey) {
-        touchedHandleDimensions.value = dimensions.value;
+        snapItemDimensions.value = dimensions.value;
       }
     }
   );

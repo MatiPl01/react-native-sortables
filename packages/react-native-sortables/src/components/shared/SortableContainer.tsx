@@ -28,10 +28,10 @@ export default function SortableContainer({
 }: AnimatedHeightContainerProps) {
   const {
     activeItemDropped,
+    activeItemKey,
     canSwitchToAbsoluteLayout,
     containerHeight,
-    shouldAnimateLayout,
-    touchedItemKey
+    shouldAnimateLayout
   } = useCommonValuesContext();
 
   const outerContainerStyle = useAnimatedStyle(() => {
@@ -44,7 +44,7 @@ export default function SortableContainer({
           ? withTiming(containerHeight.value)
           : containerHeight.value,
       overflow:
-        touchedItemKey.value !== null || !activeItemDropped.value
+        activeItemKey.value !== null || !activeItemDropped.value
           ? 'visible'
           : 'hidden',
       width: '100%'
