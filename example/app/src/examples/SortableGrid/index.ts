@@ -6,3 +6,4 @@ export { default as DifferentSizeItems } from './DifferentSizeItems';
 export { default as DropIndicatorExample } from './DropIndicatorExample';
 export { default as OrderingStrategyExample } from './OrderingStrategyExample';
 export { default as PlaygroundExample } from './PlaygroundExample';
+export { default as DragHandleExample } from './DragHandleExample';

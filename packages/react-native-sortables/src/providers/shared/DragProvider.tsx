@@ -9,7 +9,6 @@ import {
   interpolate,
   measure,
   useAnimatedReaction,
-  useDerivedValue,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
@@ -67,8 +66,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { maybeUpdateSnapDimensions, tryMeasureContainerHeight } =
     useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
-  const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
-    useAutoScrollContext() ?? {};
+  const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
   const debugCross = debugContext?.useDebugCross();
@@ -79,12 +77,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const dragStartItemTouchOffset = useSharedValue<Vector | null>(null);
   const dragStartIndex = useSharedValue(-1);
   const snapItemOffset = useSharedValue<Vector | null>(null);
-  const scrollOffsetY = useDerivedValue(() => {
-    if (dragStartScrollOffset?.value === -1) {
-      return 0;
-    }
-    return (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0);
-  });
 
   // used for activation and deactivation (drop)
   const activationTimeoutId = useSharedValue(-1);
@@ -95,6 +87,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const stableOnDragEnd = useJSStableCallback(onDragEnd);
   const stableOnOrderChange = useJSStableCallback(onOrderChange);
 
+  // Update touch position based on touch gesture detection
   const handleTouchChange = useCallback(
     (touch: TouchData, handleRef?: AnimatedRef<View>) => {
       'worklet';
@@ -122,6 +115,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           return;
         }
 
+        // TODO - fix this
         snapItemOffset.value = {
           x:
             handleMeasurements.pageX -
@@ -154,7 +148,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       oX: snapOffsetX.value,
       oY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
-      scrollY: scrollOffsetY.value,
       snapOffset: snapItemOffset.value,
       touchPos: touchPosition.value
     }),
@@ -354,13 +347,27 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       'worklet';
       prevActiveItemKey.value = activeItemKey.value;
       activeItemPosition.value = null;
-      activeItemKey.value = null;
       firstTouchBeforeActivation.value = null;
       lastTouchBeforeActivation.value = null;
       touchPosition.value = null;
       dragStartIndex.value = -1;
       dragStartItemTouchOffset.value = null;
       activationState.value = DragActivationState.INACTIVE;
+
+      if (activeItemKey.value !== null) {
+        activeItemKey.value = null;
+        updateLayer?.(LayerState.Intermediate);
+        debugCross?.set({ position: null });
+        haptics.medium();
+
+        stableOnDragEnd({
+          fromIndex: dragStartIndex.value,
+          indexToKey: indexToKey.value,
+          key,
+          keyToIndex: keyToIndex.value,
+          toIndex: keyToIndex.value[key]!
+        });
+      }
 
       const animate = (callback?: (finished: boolean | undefined) => void) =>
         withTiming(0, { duration: dropAnimationDuration.value }, callback);
@@ -377,21 +384,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           updateLayer?.(LayerState.Idle);
         }
       }, dropAnimationDuration.value);
-
-      if (activeItemKey.value !== null) {
-        activeItemKey.value = null;
-        updateLayer?.(LayerState.Intermediate);
-        haptics.medium();
-
-        stableOnDragEnd({
-          fromIndex: dragStartIndex.value,
-          indexToKey: indexToKey.value,
-          key,
-          keyToIndex: keyToIndex.value,
-          toIndex: keyToIndex.value[key]!
-        });
-        dragStartIndex.value = -1;
-      }
     },
     [
       activeItemKey,
@@ -401,6 +393,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemDropped,
       activeAnimationProgress,
       activationState,
+      debugCross,
       dropAnimationDuration,
       dragStartIndex,
       dragStartItemTouchOffset,

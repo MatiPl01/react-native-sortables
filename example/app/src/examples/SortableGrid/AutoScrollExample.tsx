@@ -9,7 +9,7 @@ import { GridCard, Group, Screen, Section, TabView } from '@/components';
 import { colors, spacing, style } from '@/theme';
 import { getItems } from '@/utils';
 
-const MANY_ITEMS = getItems(21);
+const MANY_ITEMS = getItems(30);
 const FEW_ITEMS = getItems(6);
 
 const LIST_ITEM_SECTIONS = ['List item 1', 'List item 2', 'List item 3'];
@@ -141,6 +141,7 @@ function ManyCards({ scrollableRef }: CardsSectionProps) {
       renderItem={({ item }) => <GridCard>{item}</GridCard>}
       rowGap={spacing.xs}
       scrollableRef={scrollableRef}
+      autoScrollSpeed={0.2}
     />
   );
 }
