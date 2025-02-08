@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { ViewProps, ViewStyle } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -13,9 +13,8 @@ import { EMPTY_OBJECT, IS_WEB } from '../../constants';
 import {
   ItemContextProvider,
   useCommonValuesContext,
-  useItemLayoutPosition,
+  useItemLayout,
   useItemPanGesture,
-  useItemTranslation,
   useItemZIndex,
   useMeasurementsContext
 } from '../../providers';
@@ -60,11 +59,17 @@ export default function DraggableView({
 
   const isBeingActivated = useDerivedValue(() => touchedItemKey.value === key);
   const pressProgress = useSharedValue(0);
-
-  const layoutPosition = useItemLayoutPosition(key, pressProgress);
-  const translation = useItemTranslation(key, layoutPosition, pressProgress);
-  const zIndex = useItemZIndex(key, pressProgress);
   const gesture = useItemPanGesture(key, pressProgress);
+
+  const { layoutX, layoutY, translateX, translateY } = useItemLayout(
+    key,
+    pressProgress
+  );
+  const layoutPosition = useMemo(
+    () => ({ x: layoutX, y: layoutY }),
+    [layoutX, layoutY]
+  );
+  const zIndex = useItemZIndex(key, pressProgress);
 
   useEffect(() => {
     return () => handleItemRemoval(key);
@@ -75,17 +80,17 @@ export default function DraggableView({
       return RELATIVE_STYLE;
     }
 
-    const translateX = translation.x.value;
-    const translateY = translation.y.value;
-
-    if (translateX === null || translateY === null) {
+    if (translateX.value === null || translateY.value === null) {
       return NO_TRANSLATION_STYLE;
     }
 
     return {
       opacity: 1,
       position: 'absolute',
-      transform: [{ translateX }, { translateY }],
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value }
+      ],
       zIndex: zIndex.value
     };
   });
@@ -95,15 +100,14 @@ export default function DraggableView({
       return EMPTY_OBJECT;
     }
 
-    const layoutX = layoutPosition.x.value;
-    const layoutY = layoutPosition.y.value;
-
-    let left = layoutX;
-    let top = layoutY;
+    const x = layoutX.value;
+    const y = layoutY.value;
+    let left = x;
+    let top = y;
 
     if (shouldAnimateLayout.value) {
-      left = layoutX !== null ? withTiming(layoutX) : layoutX;
-      top = layoutY !== null ? withTiming(layoutY) : layoutY;
+      left = x !== null ? withTiming(x) : x;
+      top = y !== null ? withTiming(y) : y;
     }
 
     return {

@@ -68,7 +68,8 @@ export default function DifferentSizeItems() {
           <Animated.ScrollView
             contentContainerStyle={styles.scrollViewContent}
             ref={scrollableRef}
-            style={flex.fill}>
+            // @ts-expect-error - overflowY is needed for proper behavior on web
+            style={[flex.fill, { overflowY: 'scroll' }]}>
             <Sortable.Grid
               columnGap={spacing.xs}
               columns={COLUMNS}

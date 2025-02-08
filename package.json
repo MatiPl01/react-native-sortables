@@ -32,6 +32,7 @@
   "scripts": {
     "build": "yarn workspace react-native-sortables build",
     "clean": "yarn workspace react-native-sortables clean",
+    "docs": "cd packages/docs && yarn \"$@\" && cd ../..",
     "example:app": "yarn workspace example-app",
     "example:expo": "yarn workspace example-expo",
     "example:fabric": "yarn workspace example-fabric",
