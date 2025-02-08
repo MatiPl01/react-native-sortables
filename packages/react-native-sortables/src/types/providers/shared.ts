@@ -100,12 +100,7 @@ export type DragContextType = {
 // ITEM
 
 export type ItemContextType = {
-  position: {
-    x: Readonly<SharedValue<null | number>>;
-    y: Readonly<SharedValue<null | number>>;
-  };
   pressProgress: Readonly<SharedValue<number>>;
-  zIndex: Readonly<SharedValue<number>>;
   isBeingActivated: Readonly<SharedValue<boolean>>;
   dragActivationState: Readonly<SharedValue<DragActivationState>>;
 };

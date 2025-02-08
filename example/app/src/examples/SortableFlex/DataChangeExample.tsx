@@ -132,7 +132,8 @@ export default function DataChangeExample() {
           <Animated.ScrollView
             contentContainerStyle={styles.scrollViewContent}
             ref={scrollableRef}
-            style={styles.scrollView}>
+            // @ts-expect-error - overflowY is needed for proper behavior on web
+            style={[flex.fill, IS_WEB && { overflowY: 'scroll' }]}>
             <Group withMargin={false} bordered center>
               <Text style={styles.title}>Above SortableFlex</Text>
             </Group>
@@ -169,9 +170,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     rowGap: spacing.xs
-  },
-  scrollView: {
-    flex: 1
   },
   scrollViewContent: {
     gap: spacing.sm,

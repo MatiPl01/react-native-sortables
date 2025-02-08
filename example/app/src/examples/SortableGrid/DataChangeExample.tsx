@@ -142,7 +142,8 @@ export default function DataChangeExample() {
           <Animated.ScrollView
             contentContainerStyle={styles.scrollViewContent}
             ref={scrollableRef}
-            style={flex.fill}>
+            // @ts-expect-error - overflowY is needed for proper behavior on web
+            style={[flex.fill, IS_WEB && { overflowY: 'scroll' }]}>
             <Group withMargin={false} bordered center>
               <Text style={styles.title}>Above SortableGrid</Text>
             </Group>
