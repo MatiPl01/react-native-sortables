@@ -74,8 +74,9 @@ export type MeasurementsContextType = {
 
 export type AutoScrollContextType = {
   scrollOffset: SharedValue<number>;
-  dragStartScrollOffset: SharedValue<number>;
-  updateStartScrollOffset: (providedOffset?: number) => void;
+  dragStartScrollOffset: SharedValue<null | number>;
+  dragScrollOffsetDiff: SharedValue<number>;
+  updateStartScrollOffset: (providedOffset?: null | number) => void;
 };
 
 // DRAG

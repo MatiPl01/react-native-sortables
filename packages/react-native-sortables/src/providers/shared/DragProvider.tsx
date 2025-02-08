@@ -65,7 +65,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { tryMeasureContainerHeight, updateTouchedItemDimensions } =
     useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
-  const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
+  const { dragScrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
@@ -126,17 +126,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     () => ({
       dragStartTranslation: dragStartTouchTranslation.value,
       itemStartPosition: touchStartItemPosition.value,
-      scrollOffsetY:
-        dragStartScrollOffset?.value === -1
-          ? 0
-          : (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0),
+      scrollOffsetDiff: dragScrollOffsetDiff?.value ?? 0,
       snap: snapTranslation.value,
       translation: touchTranslation.value
     }),
     ({
       dragStartTranslation,
       itemStartPosition,
-      scrollOffsetY,
+      scrollOffsetDiff,
       snap,
       translation
     }) => {
@@ -156,7 +153,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           (translation?.y ?? 0) +
           (snap?.y ?? 0) -
           (dragStartTranslation?.y ?? 0) +
-          scrollOffsetY
+          scrollOffsetDiff
       };
     }
   );
@@ -220,6 +217,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const handleDragEnd = useCallback(
     (key: string, pressProgress: SharedValue<number>) => {
       'worklet';
+      updateStartScrollOffset?.(null);
       prevTouchedItemKey.value = touchedItemKey.value;
       touchedItemKey.value = null;
       startTouch.value = null;
@@ -278,6 +276,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       keyToIndex,
       stableOnDragEnd,
       updateLayer,
+      updateStartScrollOffset,
       haptics
     ]
   );
