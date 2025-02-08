@@ -69,6 +69,7 @@ export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
+    pointerEvents: 'none',
     position: 'absolute',
     transformOrigin: '0 0'
   }

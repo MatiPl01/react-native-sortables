@@ -1,7 +1,6 @@
-import type { ViewStyle } from 'react-native';
+import type { View, ViewStyle } from 'react-native';
 import type { GestureTouchEvent } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
-import type Animated from 'react-native-reanimated';
 
 import type {
   DebugCrossUpdater,
@@ -51,7 +50,7 @@ export type CommonValuesContextType = {
   activeItemDropped: SharedValue<boolean>;
 
   // OTHER
-  containerRef: AnimatedRef<Animated.View>;
+  containerRef: AnimatedRef<View>;
   sortEnabled: SharedValue<boolean>;
   canSwitchToAbsoluteLayout: SharedValue<boolean>;
   shouldAnimateLayout: SharedValue<boolean>; // used only on web
@@ -84,9 +83,15 @@ export type DragContextType = {
     e: GestureTouchEvent,
     key: string,
     pressProgress: SharedValue<number>,
-    onActivate: () => void
+    activate: () => void,
+    fail: () => void,
+    handleRef?: AnimatedRef<View>
   ) => void;
-  handleTouchesMove: (e: GestureTouchEvent, onFail: () => void) => void;
+  handleTouchesMove: (
+    e: GestureTouchEvent,
+    fail: () => void,
+    handleRef?: AnimatedRef<View>
+  ) => void;
   handleDragEnd: (key: string, pressProgress: SharedValue<number>) => void;
   handleOrderChange: (
     key: string,

@@ -21,8 +21,8 @@ export default function createSortableTouchable<P extends AnyPressHandlers>(
         dragState: dragActivationState.value
       }),
       ({ dragState }) => {
-        // Cancels when the item starts being activated
-        if (dragState === DragActivationState.ACTIVATING) {
+        // Cancels when the item is active
+        if (dragState === DragActivationState.ACTIVE) {
           isCancelled.value = true;
         }
         // Resets state when the item is touched again

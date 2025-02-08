@@ -1,14 +1,17 @@
 import type { PropsWithChildren } from 'react';
 import { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
+import {
+  measure,
+  useAnimatedReaction,
+  useAnimatedRef
+} from 'react-native-reanimated';
 
 import {
   useCommonValuesContext,
   useItemContext,
   useItemPanGesture
 } from '../../providers';
-import type { Dimensions } from '../../types';
 
 export type SortableHandleProps = PropsWithChildren<{
   disabled?: boolean;
@@ -18,30 +21,43 @@ export function SortableHandle({
   children,
   disabled = false
 }: SortableHandleProps) {
-  const { itemKey, pressProgress } = useItemContext();
   const { activeItemKey, snapItemDimensions } = useCommonValuesContext();
+  const { itemKey, pressProgress } = useItemContext();
 
-  const dimensions = useSharedValue<Dimensions | null>(null);
-
-  const gesture = useItemPanGesture(itemKey, pressProgress);
+  const viewRef = useAnimatedRef<View>();
+  const gesture = useItemPanGesture(itemKey, pressProgress, viewRef);
 
   useAnimatedReaction(
     () => activeItemKey.value,
-    key => {
-      if (key === itemKey) {
-        snapItemDimensions.value = dimensions.value;
+    activeKey => {
+      if (activeKey !== itemKey) {
+        return;
       }
+
+      const measurements = measure(viewRef);
+      if (!measurements) {
+        return;
+      }
+
+      const { height, width } = measurements;
+      snapItemDimensions.value = {
+        height,
+        width
+      };
     }
   );
 
   return (
     <GestureDetector gesture={gesture.enabled(!disabled)}>
       <View
+        ref={viewRef}
         onLayout={({ nativeEvent: { layout } }) => {
-          dimensions.value = {
-            height: layout.height,
-            width: layout.width
-          };
+          if (activeItemKey.value === itemKey) {
+            snapItemDimensions.value = {
+              height: layout.height,
+              width: layout.width
+            };
+          }
         }}>
         {children}
       </View>

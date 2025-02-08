@@ -1,6 +1,5 @@
 import { type PropsWithChildren, useEffect, useRef } from 'react';
-import type { ViewStyle } from 'react-native';
-import type Animated from 'react-native-reanimated';
+import type { View, ViewStyle } from 'react-native';
 import {
   useAnimatedRef,
   useDerivedValue,
@@ -104,7 +103,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const snapOffsetY = useAnimatableValue(_snapOffsetY);
 
   // OTHER
-  const containerRef = useAnimatedRef<Animated.View>();
+  const containerRef = useAnimatedRef<View>();
   const sortEnabled = useAnimatableValue(_sortEnabled);
   const canSwitchToAbsoluteLayout = useSharedValue(false);
   const shouldAnimateLayout = useSharedValue(true);

@@ -83,6 +83,7 @@ export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
 
 const styles = StyleSheet.create({
   container: {
+    pointerEvents: 'none',
     position: 'absolute'
   }
 });

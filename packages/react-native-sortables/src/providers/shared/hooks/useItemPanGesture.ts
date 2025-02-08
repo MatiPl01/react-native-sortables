@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
+import type { View } from 'react-native';
 import { Gesture } from 'react-native-gesture-handler';
-import { type SharedValue } from 'react-native-reanimated';
+import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
 import { useAutoScrollContext } from '../AutoScrollProvider';
 import { useCommonValuesContext } from '../CommonValuesProvider';
@@ -8,7 +9,8 @@ import { useDragContext } from '../DragProvider';
 
 export default function useItemPanGesture(
   key: string,
-  pressProgress: SharedValue<number>
+  pressProgress: SharedValue<number>,
+  handleRef?: AnimatedRef<View>
 ) {
   const { activeItemKey, sortEnabled } = useCommonValuesContext();
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
@@ -31,16 +33,23 @@ export default function useItemPanGesture(
             manager.fail();
             return;
           }
-          handleTouchStart(e, key, pressProgress, manager.activate);
+          handleTouchStart(
+            e,
+            key,
+            pressProgress,
+            manager.activate,
+            manager.fail,
+            handleRef
+          );
+        })
+        .onTouchesMove((e, manager) => {
+          handleTouchesMove(e, manager.fail, handleRef);
         })
         .onTouchesCancelled((_, manager) => {
           manager.fail();
         })
         .onTouchesUp((_, manager) => {
           manager.end();
-        })
-        .onTouchesMove((e, manager) => {
-          handleTouchesMove(e, manager.fail);
         })
         .onFinalize(() => {
           updateStartScrollOffset?.(-1);
@@ -50,9 +59,10 @@ export default function useItemPanGesture(
       key,
       pressProgress,
       activeItemKey,
+      handleDragEnd,
+      handleRef,
       handleTouchStart,
       handleTouchesMove,
-      handleDragEnd,
       updateStartScrollOffset,
       sortEnabled
     ]

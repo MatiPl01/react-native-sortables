@@ -13,7 +13,11 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useCommonValuesContext } from '../../providers';
-import type { DropIndicatorComponentProps, Vector } from '../../types';
+import type {
+  Dimensions,
+  DropIndicatorComponentProps,
+  Vector
+} from '../../types';
 
 const DEFAULT_STYLE: ViewStyle = {
   opacity: 0
@@ -41,9 +45,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const dropIndex = useSharedValue(0);
   const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
   const prevUpdateItemKey = useSharedValue<null | string>(null);
-  const activeItemDimensions = useDerivedValue(
-    () => activeItemKey.value && itemDimensions.value[activeItemKey.value]
-  );
+  const dimensions = useSharedValue<Dimensions | null>(null);
 
   const x = useSharedValue<null | number>(null);
   const y = useSharedValue<null | number>(null);
@@ -59,6 +61,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
       if (key !== null) {
         dropIndex.value = kToI[key] ?? 0;
         dropPosition.value = positions[key] ?? { x: 0, y: 0 };
+        dimensions.value = itemDimensions.value[key] ?? null;
 
         const update = (target: SharedValue<null | number>, value: number) => {
           if (target.value === null || prevUpdateItemKey.value === null) {
@@ -83,19 +86,13 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const animatedStyle = useAnimatedStyle(() => {
     const translateX = x.value;
     const translateY = y.value;
-    const dimensions = activeItemDimensions.value;
 
-    if (
-      !dimensions ||
-      translateX === null ||
-      translateY === null ||
-      activeItemDropped.value
-    ) {
+    if (translateX === null || translateY === null || activeItemDropped.value) {
       return DEFAULT_STYLE;
     }
 
     return {
-      ...dimensions,
+      ...dimensions.value,
       opacity: 1,
       transform: [{ translateX }, { translateY }]
     };
