@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { Gesture } from 'react-native-gesture-handler';
 import { type SharedValue } from 'react-native-reanimated';
 
-import { useAutoScrollContext } from '../AutoScrollProvider';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
@@ -13,7 +12,6 @@ export default function useItemPanGesture(
   const { sortEnabled, touchedItemKey } = useCommonValuesContext();
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
     useDragContext();
-  const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
 
   return useMemo(
     () =>
@@ -43,7 +41,6 @@ export default function useItemPanGesture(
           handleTouchesMove(e, manager.fail);
         })
         .onFinalize(() => {
-          updateStartScrollOffset?.(-1);
           handleDragEnd(key, pressProgress);
         }),
     [
@@ -53,7 +50,6 @@ export default function useItemPanGesture(
       handleTouchStart,
       handleTouchesMove,
       handleDragEnd,
-      updateStartScrollOffset,
       sortEnabled
     ]
   );
