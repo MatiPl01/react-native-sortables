@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback } from 'react';
+import { type PropsWithChildren, useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
@@ -73,8 +73,13 @@ export function SortableHandle({
   // Measure the handle when the active item key changes
   useAnimatedReaction(() => activeItemKey.value, measureHandle);
 
+  const adjustedGesture = useMemo(
+    () => gesture.enabled(!disabled),
+    [disabled, gesture]
+  );
+
   return (
-    <GestureDetector gesture={gesture.enabled(!disabled)}>
+    <GestureDetector gesture={adjustedGesture}>
       <View ref={viewRef} onLayout={measureHandle}>
         {children}
       </View>

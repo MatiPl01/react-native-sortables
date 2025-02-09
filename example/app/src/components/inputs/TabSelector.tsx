@@ -98,7 +98,6 @@ const Tab = typedMemo(function Tab<T extends string>({
 
   return (
     <AnimatedTouchableOpacity
-      hitSlop={spacing.md}
       key={tab}
       style={[styles.tab, style]}
       onPress={() => onSelectTab(tab)}
