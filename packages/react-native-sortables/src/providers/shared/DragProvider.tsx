@@ -73,6 +73,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     snapItemOffset,
     snapOffsetX,
     snapOffsetY,
+    sortEnabled,
     touchPosition
   } = useCommonValuesContext();
   const { maybeUpdateSnapDimensions, tryMeasureContainerHeight } =
@@ -293,7 +294,15 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     ) => {
       'worklet';
       const touch = e.allTouches[0];
-      if (!touch) {
+      if (
+        !touch ||
+        // Ignore touch if another item is already being touched/activated
+        // if the current item is still animated to the drag end position
+        // or sorting is disabled at all
+        !sortEnabled.value ||
+        pressProgress.value > 0 ||
+        activeItemKey.value !== null
+      ) {
         fail();
         return;
       }
@@ -315,11 +324,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }, dragActivationDelay.value);
     },
     [
+      activeItemKey,
       activationState,
       activationTimeoutId,
       canSwitchToAbsoluteLayout,
       dragActivationDelay,
       handleDragStart,
+      sortEnabled,
       tryMeasureContainerHeight,
       touchStartTouch
     ]
