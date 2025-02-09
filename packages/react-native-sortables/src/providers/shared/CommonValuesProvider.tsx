@@ -13,7 +13,7 @@ import type {
   Animatable,
   CommonValuesContextType,
   Dimensions,
-  ItemActivationSettings,
+  ItemDragSettings,
   Maybe,
   Vector
 } from '../../types';
@@ -29,7 +29,7 @@ type CommonValuesProviderProps = PropsWithChildren<
     initialItemsStyleOverride?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
-    ItemActivationSettings
+    Omit<ItemDragSettings, 'allowOverDrag'>
 >;
 
 const { CommonValuesProvider, useCommonValuesContext } = createProvider(
@@ -67,8 +67,9 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const snapItemOffset = useSharedValue<Vector | null>(null);
 
   // DIMENSIONS
-  const containerWidth = useSharedValue(-1);
-  const containerHeight = useSharedValue(-1);
+  const containerWidth = useSharedValue<null | number>(null);
+  const containerHeight = useSharedValue<null | number>(null);
+  const activeItemDimensions = useSharedValue<Dimensions | null>(null);
   const snapItemDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
   const itemsStyleOverride = useSharedValue<Maybe<ViewStyle>>(
@@ -121,6 +122,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       activationState,
       activeAnimationDuration,
       activeAnimationProgress,
+      activeItemDimensions,
       activeItemDropped,
       activeItemKey,
       activeItemOpacity,

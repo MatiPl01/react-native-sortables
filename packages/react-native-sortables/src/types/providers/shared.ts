@@ -12,7 +12,7 @@ import type { Dimensions, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
-  ItemActivationSettings
+  ItemDragSettings
 } from '../props/shared';
 import type { DragActivationState } from '../state';
 import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
@@ -36,9 +36,10 @@ export type CommonValuesContextType = {
   snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
-  containerWidth: SharedValue<number>;
-  containerHeight: SharedValue<number>;
+  containerWidth: SharedValue<null | number>;
+  containerHeight: SharedValue<null | number>;
   snapItemDimensions: SharedValue<Dimensions | null>;
+  activeItemDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
 
@@ -58,7 +59,7 @@ export type CommonValuesContextType = {
   customHandle: boolean;
 } & AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &
-  AnimatedValues<ItemActivationSettings>;
+  AnimatedValues<Omit<ItemDragSettings, 'allowOverDrag'>>;
 
 // MEASUREMENTS
 
@@ -73,8 +74,8 @@ export type MeasurementsContextType = {
 
 export type AutoScrollContextType = {
   scrollOffset: SharedValue<number>;
-  dragStartScrollOffset: SharedValue<number>;
-  updateStartScrollOffset: (providedOffset?: number) => void;
+  dragStartScrollOffset: SharedValue<null | number>;
+  updateStartScrollOffset: (providedOffset?: null | number) => void;
 };
 
 // DRAG

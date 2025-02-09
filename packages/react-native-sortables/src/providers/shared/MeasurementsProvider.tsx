@@ -35,6 +35,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   itemsCount
 }) => {
   const {
+    activeItemDimensions,
     activeItemKey,
     canSwitchToAbsoluteLayout,
     containerHeight,
@@ -73,8 +74,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       itemDimensions.value[key] = dimensions;
-      if (!customHandle && activeItemKey.value === key) {
-        snapItemDimensions.value = dimensions;
+      if (activeItemKey.value === key) {
+        activeItemDimensions.value = dimensions;
+        if (!customHandle) {
+          snapItemDimensions.value = dimensions;
+        }
       }
 
       // Update the array of item dimensions only after all items have been
@@ -123,7 +127,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     (measuredHeight: number) => {
       'worklet';
       if (
-        containerHeight.value !== -1 &&
+        containerHeight.value !== null &&
         Math.abs(measuredHeight - containerHeight.value) < OFFSET_EPS
       ) {
         containerHeightApplied.value = true;

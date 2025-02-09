@@ -45,14 +45,14 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);
-  const targetScrollOffset = useSharedValue(-1);
-  const dragStartScrollOffset = useAnimatableValue(-1);
-  const startContainerPageY = useSharedValue(-1);
-  const prevScrollToOffset = useSharedValue(-1);
+  const targetScrollOffset = useSharedValue<null | number>(null);
+  const dragStartScrollOffset = useAnimatableValue<null | number>(null);
+  const startContainerPageY = useSharedValue<null | number>(null);
+  const prevScrollToOffset = useSharedValue<null | number>(null);
 
   const activeItemHeight = useDerivedValue(() => {
     const key = activeItemKey.value;
-    return key ? (itemDimensions.value[key]?.height ?? -1) : -1;
+    return (key ? itemDimensions.value[key]?.height : null) ?? null;
   });
   const offsetThreshold = useAnimatableValue(
     autoScrollActivationOffset,
@@ -72,15 +72,15 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   // Updates the scroll position smoothly
   // (quickly at first, then slower if the remaining distance is small)
   const frameCallback = useFrameCallback(() => {
-    if (!isFrameCallbackActive.value) {
+    const targetOffset = targetScrollOffset.value;
+    if (!isFrameCallbackActive.value || targetOffset === null) {
       return;
     }
     const currentOffset = scrollOffset.value;
-    const targetOffset = targetScrollOffset.value;
     const diff = targetOffset - currentOffset;
 
-    if (Math.abs(diff) < OFFSET_EPS || targetOffset === -1) {
-      targetScrollOffset.value = -1;
+    if (Math.abs(diff) < OFFSET_EPS) {
+      targetScrollOffset.value = null;
       return;
     }
 
@@ -95,7 +95,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       Math.abs(nextOffset - currentOffset) < 0.1 * OFFSET_EPS ||
       prevScrollToOffset.value === nextOffset
     ) {
-      targetScrollOffset.value = -1;
+      targetScrollOffset.value = null;
       return;
     }
 
@@ -123,9 +123,9 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       ) {
         return;
       }
-      targetScrollOffset.value = -1;
-      startContainerPageY.value = -1;
-      prevScrollToOffset.value = -1;
+      targetScrollOffset.value = null;
+      startContainerPageY.value = null;
+      prevScrollToOffset.value = null;
       runOnJS(toggleFrameCallback)(shouldBeEnabled);
       isFrameCallbackActive.value = shouldBeEnabled;
     }
@@ -137,7 +137,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     () => {
       if (
         !enabled.value ||
-        activeItemHeight.value === -1 ||
+        activeItemHeight.value === null ||
         !touchPosition.value
       ) {
         return null;
@@ -164,7 +164,11 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       const scrollableMeasurements = measure(scrollableRef);
       const containerMeasurements = measure(containerRef);
 
-      if (!scrollableMeasurements || !containerMeasurements) {
+      if (
+        !scrollableMeasurements ||
+        !containerMeasurements ||
+        dragStartScrollOffset.value === null
+      ) {
         hideDebugViews();
         return;
       }
@@ -173,7 +177,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       const { height: sH, pageY: sY } = scrollableMeasurements;
       const { height: cH, pageY: cY } = containerMeasurements;
 
-      if (startContainerPageY.value === -1) {
+      if (startContainerPageY.value === null) {
         startContainerPageY.value = cY;
       }
 
@@ -218,9 +222,10 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   );
 
   const updateStartScrollOffset = useCallback(
-    (providedOffset?: number) => {
+    (providedOffset?: null | number) => {
       'worklet';
-      dragStartScrollOffset.value = providedOffset ?? scrollOffset.value;
+      dragStartScrollOffset.value =
+        providedOffset === undefined ? scrollOffset.value : providedOffset;
     },
     [dragStartScrollOffset, scrollOffset]
   );

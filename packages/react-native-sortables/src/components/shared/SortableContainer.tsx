@@ -40,7 +40,9 @@ export default function SortableContainer({
     }
     return {
       height:
-        animateHeight && (!IS_WEB || shouldAnimateLayout.value)
+        animateHeight &&
+        (!IS_WEB || shouldAnimateLayout.value) &&
+        containerHeight.value !== null
           ? withTiming(containerHeight.value)
           : containerHeight.value,
       overflow:

@@ -80,7 +80,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     return {
       maxHeight: maxH,
       minHeight: maxHeight ? Math.min(minH, maxH) : minH,
-      width: containerWidth.value
+      width: containerWidth.value ?? 0
     };
   });
 

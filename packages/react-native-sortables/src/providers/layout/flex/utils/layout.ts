@@ -321,7 +321,7 @@ export const calculateLayout = ({
   paddings
 }: FlexLayoutProps): FlexLayout | null => {
   'worklet';
-  if (limits.width === -1) {
+  if (limits.width === 0) {
     return null;
   }
 
