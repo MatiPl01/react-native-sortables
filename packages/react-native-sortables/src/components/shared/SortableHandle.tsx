@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren, useCallback } from 'react';
 import { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
@@ -21,44 +21,61 @@ export function SortableHandle({
   children,
   disabled = false
 }: SortableHandleProps) {
-  const { activeItemKey, snapItemDimensions } = useCommonValuesContext();
+  const {
+    activeItemKey,
+    activeItemPosition,
+    containerRef,
+    snapItemDimensions,
+    snapItemOffset
+  } = useCommonValuesContext();
   const { itemKey, pressProgress } = useItemContext();
 
   const viewRef = useAnimatedRef<View>();
-  const gesture = useItemPanGesture(itemKey, pressProgress, viewRef);
+  const gesture = useItemPanGesture(itemKey, pressProgress);
 
-  useAnimatedReaction(
-    () => activeItemKey.value,
-    activeKey => {
-      if (activeKey !== itemKey) {
-        return;
-      }
-
-      const measurements = measure(viewRef);
-      if (!measurements) {
-        return;
-      }
-
-      const { height, width } = measurements;
-      snapItemDimensions.value = {
-        height,
-        width
-      };
+  const measureHandle = useCallback(() => {
+    'worklet';
+    if (activeItemKey.value !== itemKey) {
+      return;
     }
-  );
+
+    const handleMeasurements = measure(viewRef);
+    const containerMeasurements = measure(containerRef);
+
+    if (
+      !handleMeasurements ||
+      !containerMeasurements ||
+      !activeItemPosition.value
+    ) {
+      return;
+    }
+
+    const { height, pageX, pageY, width } = handleMeasurements;
+    const { pageX: containerPageX, pageY: containerPageY } =
+      containerMeasurements;
+    const { x: activeX, y: activeY } = activeItemPosition.value;
+
+    snapItemDimensions.value = { height, width };
+    snapItemOffset.value = {
+      x: pageX - containerPageX - activeX,
+      y: pageY - containerPageY - activeY
+    };
+  }, [
+    activeItemKey,
+    activeItemPosition,
+    containerRef,
+    itemKey,
+    snapItemDimensions,
+    snapItemOffset,
+    viewRef
+  ]);
+
+  // Measure the handle when the active item key changes
+  useAnimatedReaction(() => activeItemKey.value, measureHandle);
 
   return (
     <GestureDetector gesture={gesture.enabled(!disabled)}>
-      <View
-        ref={viewRef}
-        onLayout={({ nativeEvent: { layout } }) => {
-          if (activeItemKey.value === itemKey) {
-            snapItemDimensions.value = {
-              height: layout.height,
-              width: layout.width
-            };
-          }
-        }}>
+      <View ref={viewRef} onLayout={measureHandle}>
         {children}
       </View>
     </GestureDetector>

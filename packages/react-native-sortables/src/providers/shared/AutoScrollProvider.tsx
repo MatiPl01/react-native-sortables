@@ -34,7 +34,6 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   const {
     activeAnimationProgress,
     activeItemKey,
-    activeItemPosition,
     containerRef,
     itemDimensions,
     touchPosition
@@ -86,7 +85,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     }
 
     const direction = diff > 0 ? 1 : -1;
-    const step = speed.value * direction * Math.sqrt(Math.abs(diff));
+    const step = speed.value * direction * Math.abs(diff);
     const nextOffset =
       targetOffset > currentOffset
         ? Math.min(currentOffset + step, targetOffset)
@@ -103,21 +102,6 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     scrollTo(scrollableRef, 0, nextOffset, false);
     prevScrollToOffset.value = nextOffset;
   }, false);
-
-  // TODO - improve auto scroll later on
-  const lastUpdateScrollOffset = useSharedValue(0);
-  useAnimatedReaction(
-    () => scrollOffset.value,
-    offset => {
-      if (touchPosition.value) {
-        touchPosition.value = {
-          x: touchPosition.value.x,
-          y: touchPosition.value.y + (offset - lastUpdateScrollOffset.value)
-        };
-        lastUpdateScrollOffset.value = offset;
-      }
-    }
-  );
 
   const toggleFrameCallback = useCallback(
     (isEnabled: boolean) => frameCallback.setActive(isEnabled),

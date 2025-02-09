@@ -64,6 +64,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const itemPositions = useSharedValue<Record<string, Vector>>({});
   const touchPosition = useSharedValue<Vector | null>(null);
   const activeItemPosition = useSharedValue<Vector | null>(null);
+  const snapItemOffset = useSharedValue<Vector | null>(null);
 
   // DIMENSIONS
   const containerWidth = useSharedValue(-1);
@@ -146,6 +147,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       prevActiveItemKey,
       shouldAnimateLayout,
       snapItemDimensions,
+      snapItemOffset,
       snapOffsetX,
       snapOffsetY,
       sortEnabled,

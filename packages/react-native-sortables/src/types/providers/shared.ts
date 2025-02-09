@@ -33,6 +33,7 @@ export type CommonValuesContextType = {
   itemPositions: SharedValue<Record<string, Vector>>;
   touchPosition: SharedValue<Vector | null>;
   activeItemPosition: SharedValue<Vector | null>;
+  snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
   containerWidth: SharedValue<number>;
@@ -84,14 +85,9 @@ export type DragContextType = {
     key: string,
     pressProgress: SharedValue<number>,
     activate: () => void,
-    fail: () => void,
-    handleRef?: AnimatedRef<View>
+    fail: () => void
   ) => void;
-  handleTouchesMove: (
-    e: GestureTouchEvent,
-    fail: () => void,
-    handleRef?: AnimatedRef<View>
-  ) => void;
+  handleTouchesMove: (e: GestureTouchEvent, fail: () => void) => void;
   handleDragEnd: (key: string, pressProgress: SharedValue<number>) => void;
   handleOrderChange: (
     key: string,
