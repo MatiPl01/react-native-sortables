@@ -192,7 +192,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: activeX,
         y: activeY
       };
-    }
+    },
+    [allowOverDrag]
   );
 
   /**
