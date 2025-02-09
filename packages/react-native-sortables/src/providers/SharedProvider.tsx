@@ -10,7 +10,7 @@ import type {
   ActiveItemSnapSettings,
   Animatable,
   AutoScrollSettings,
-  ItemActivationSettings,
+  ItemDragSettings,
   PartialBy,
   SortableCallbacks
 } from '../types';
@@ -35,11 +35,12 @@ type SharedProviderProps = PropsWithChildren<
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
-    Required<ItemActivationSettings> &
+    Required<ItemDragSettings> &
     Required<SortableCallbacks>
 >;
 
 export default function SharedProvider({
+  allowOverDrag,
   autoScrollActivationOffset,
   autoScrollEnabled,
   autoScrollSpeed,
@@ -77,6 +78,7 @@ export default function SharedProvider({
     ),
     // Provider used for dragging and item swapping logic
     <DragProvider
+      allowOverDrag={allowOverDrag}
       hapticsEnabled={hapticsEnabled}
       onDragEnd={onDragEnd}
       onDragStart={onDragStart}

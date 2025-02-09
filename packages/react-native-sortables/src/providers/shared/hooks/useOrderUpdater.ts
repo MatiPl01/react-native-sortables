@@ -5,21 +5,18 @@ import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
 export default function useOrderUpdater(updater: OrderUpdater) {
-  const { activeItemKey, itemDimensions, keyToIndex, touchPosition } =
+  const { activeItemDimensions, activeItemKey, keyToIndex, touchPosition } =
     useCommonValuesContext();
   const { handleOrderChange } = useDragContext();
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
+      dimensions: activeItemDimensions.value,
       position: touchPosition.value
     }),
-    ({ activeKey, position }) => {
-      if (!activeKey || !position) {
-        return;
-      }
-      const dimensions = itemDimensions.value[activeKey];
-      if (!dimensions) {
+    ({ activeKey, dimensions, position }) => {
+      if (!activeKey || !dimensions || !position) {
         return;
       }
       const activeIndex = keyToIndex.value[activeKey];

@@ -51,6 +51,7 @@ export default function DragHandleExample() {
           columnGap={10}
           columns={columns}
           data={DATA}
+          allowOverDrag={false}
           dragActivationDelay={0}
           renderItem={renderItem}
           rowGap={10}

@@ -29,7 +29,11 @@ export const createGridStrategy =
 
     return ({ activeIndex, position: { x, y } }) => {
       'worklet';
-      if (!othersLayout.value) {
+      if (
+        !othersLayout.value ||
+        containerHeight.value === null ||
+        containerWidth.value === null
+      ) {
         return;
       }
       const { rowOffsets } = othersLayout.value;
