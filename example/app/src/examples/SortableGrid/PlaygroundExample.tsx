@@ -21,7 +21,6 @@ export default function PlaygroundExample() {
   return (
     <ScrollScreen style={styles.container}>
       <Sortable.Grid
-        debug
         columnGap={10}
         columns={3}
         data={DATA}

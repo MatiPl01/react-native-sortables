@@ -135,14 +135,12 @@ type CardsSectionProps = {
 function ManyCards({ scrollableRef }: CardsSectionProps) {
   return (
     <Sortable.Grid
-      debug
       columnGap={spacing.sm}
       columns={3}
       data={MANY_ITEMS}
       renderItem={({ item }) => <GridCard>{item}</GridCard>}
       rowGap={spacing.xs}
       scrollableRef={scrollableRef}
-      autoScrollSpeed={0.2}
     />
   );
 }

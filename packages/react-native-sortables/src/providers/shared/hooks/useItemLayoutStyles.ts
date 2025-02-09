@@ -39,8 +39,7 @@ export default function useItemLayoutStyles(
     activeItemPosition,
     canSwitchToAbsoluteLayout,
     dropAnimationDuration,
-    itemPositions,
-    shouldAnimateLayout
+    itemPositions
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, pressProgress);
@@ -179,19 +178,9 @@ export default function useItemLayoutStyles(
       return EMPTY_OBJECT;
     }
 
-    const x = layoutX.value;
-    const y = layoutY.value;
-    let left = x;
-    let top = y;
-
-    if (shouldAnimateLayout.value) {
-      left = x !== null ? withTiming(x) : x;
-      top = y !== null ? withTiming(y) : y;
-    }
-
     return {
-      left,
-      top
+      left: layoutX.value,
+      top: layoutY.value
     };
   });
 

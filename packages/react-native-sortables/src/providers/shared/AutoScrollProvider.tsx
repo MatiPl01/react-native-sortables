@@ -92,7 +92,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         : Math.max(currentOffset + step, targetOffset);
 
     if (
-      Math.abs(nextOffset - currentOffset) < OFFSET_EPS ||
+      Math.abs(nextOffset - currentOffset) < 0.1 * OFFSET_EPS ||
       prevScrollToOffset.value === nextOffset
     ) {
       targetScrollOffset.value = -1;

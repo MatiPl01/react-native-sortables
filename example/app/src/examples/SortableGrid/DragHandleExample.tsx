@@ -16,7 +16,7 @@ export default function DragHandleExample() {
       <View style={styles.card}>
         <Text style={styles.text}>{item}</Text>
         <Sortable.Handle>
-          <FontAwesomeIcon icon={faGripVertical} color={colors.white} />
+          <FontAwesomeIcon color={colors.white} icon={faGripVertical} />
         </Sortable.Handle>
       </View>
     ),
@@ -26,14 +26,14 @@ export default function DragHandleExample() {
   return (
     <ScrollScreen style={styles.container}>
       <Sortable.Grid
+        activeItemScale={1}
         columnGap={10}
         columns={1}
         data={DATA}
-        customHandle
         dragActivationDelay={0}
-        activeItemScale={1}
         renderItem={renderItem}
         rowGap={10}
+        customHandle
       />
     </ScrollScreen>
   );
@@ -42,9 +42,9 @@ export default function DragHandleExample() {
 const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
-    flexDirection: 'row',
     backgroundColor: '#36877F',
     borderRadius: radius.md,
+    flexDirection: 'row',
     height: sizes.lg,
     justifyContent: 'space-between',
     padding: spacing.md

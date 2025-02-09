@@ -1,9 +1,9 @@
+/* eslint-disable import/no-unused-modules */
 import type { StyleProp, ViewStyle } from 'react-native';
 import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
@@ -38,11 +38,11 @@ export default function useItemLayoutStyles(
     activeItemPosition,
     canSwitchToAbsoluteLayout,
     dropAnimationDuration,
-    itemPositions
+    itemPositions,
+    shouldAnimateLayout
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, pressProgress);
-  const hasPressProgress = useDerivedValue(() => pressProgress.value > 0);
 
   const translateX = useSharedValue<null | number>(null);
   const translateY = useSharedValue<null | number>(null);
@@ -51,20 +51,24 @@ export default function useItemLayoutStyles(
     () => {
       const isActive = activeItemKey.value === key;
       return {
-        hasProgress: hasPressProgress.value,
         isActive,
         position: isActive ? activeItemPosition.value : itemPositions.value[key]
       };
     },
-    ({ hasProgress, isActive, position }) => {
+    ({ isActive, position }) => {
       if (!position) {
         return;
       }
 
-      if (isActive || translateX.value === null || translateY.value === null) {
+      if (
+        isActive ||
+        translateX.value === null ||
+        translateY.value === null ||
+        !shouldAnimateLayout.value
+      ) {
         translateX.value = position.x;
         translateY.value = position.y;
-      } else if (hasProgress) {
+      } else {
         translateX.value = withTiming(position.x, {
           duration: dropAnimationDuration.value
         });
