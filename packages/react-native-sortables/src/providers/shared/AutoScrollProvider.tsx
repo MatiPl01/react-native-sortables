@@ -85,7 +85,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     }
 
     const direction = diff > 0 ? 1 : -1;
-    const step = speed.value * direction * Math.abs(diff);
+    const step = speed.value * direction * Math.sqrt(Math.abs(diff));
     const nextOffset =
       targetOffset > currentOffset
         ? Math.min(currentOffset + step, targetOffset)
