@@ -1,7 +1,6 @@
-import type { ViewStyle } from 'react-native';
+import type { View, ViewStyle } from 'react-native';
 import type { GestureTouchEvent } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
-import type Animated from 'react-native-reanimated';
 
 import type {
   DebugCrossUpdater,
@@ -33,30 +32,30 @@ export type CommonValuesContextType = {
   // POSITIONS
   itemPositions: SharedValue<Record<string, Vector>>;
   touchPosition: SharedValue<Vector | null>;
-  touchedItemPosition: SharedValue<Vector | null>;
+  activeItemPosition: SharedValue<Vector | null>;
+  snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
   containerWidth: SharedValue<number>;
   containerHeight: SharedValue<number>;
-  touchedItemWidth: SharedValue<number>;
-  touchedItemHeight: SharedValue<number>;
+  snapItemDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
 
   // DRAG STATE
-  touchedItemKey: SharedValue<null | string>;
-  prevTouchedItemKey: SharedValue<null | string>;
+  prevActiveItemKey: SharedValue<null | string>;
   activeItemKey: SharedValue<null | string>;
   activationState: SharedValue<DragActivationState>;
-  activationProgress: SharedValue<number>;
+  activeAnimationProgress: SharedValue<number>;
   inactiveAnimationProgress: SharedValue<number>;
   activeItemDropped: SharedValue<boolean>;
 
   // OTHER
-  containerRef: AnimatedRef<Animated.View>;
+  containerRef: AnimatedRef<View>;
   sortEnabled: SharedValue<boolean>;
   canSwitchToAbsoluteLayout: SharedValue<boolean>;
   shouldAnimateLayout: SharedValue<boolean>; // used only on web
+  customHandle: boolean;
 } & AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &
   AnimatedValues<ItemActivationSettings>;
@@ -67,7 +66,7 @@ export type MeasurementsContextType = {
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
   tryMeasureContainerHeight: () => void;
-  updateTouchedItemDimensions: (key: string) => void;
+  maybeUpdateSnapDimensions: (key: string) => void;
 };
 
 // AUTO SCROLL
@@ -85,9 +84,10 @@ export type DragContextType = {
     e: GestureTouchEvent,
     key: string,
     pressProgress: SharedValue<number>,
-    onActivate: () => void
+    activate: () => void,
+    fail: () => void
   ) => void;
-  handleTouchesMove: (e: GestureTouchEvent, onFail: () => void) => void;
+  handleTouchesMove: (e: GestureTouchEvent, fail: () => void) => void;
   handleDragEnd: (key: string, pressProgress: SharedValue<number>) => void;
   handleOrderChange: (
     key: string,
@@ -100,6 +100,7 @@ export type DragContextType = {
 // ITEM
 
 export type ItemContextType = {
+  itemKey: string;
   pressProgress: Readonly<SharedValue<number>>;
   isBeingActivated: Readonly<SharedValue<boolean>>;
   dragActivationState: Readonly<SharedValue<DragActivationState>>;

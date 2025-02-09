@@ -35,12 +35,11 @@ export default function useItemLayoutStyles(
   pressProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
   const {
+    activeItemKey,
+    activeItemPosition,
     canSwitchToAbsoluteLayout,
     dropAnimationDuration,
-    itemPositions,
-    shouldAnimateLayout,
-    touchedItemKey,
-    touchedItemPosition
+    itemPositions
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, pressProgress);
@@ -106,16 +105,14 @@ export default function useItemLayoutStyles(
 
   useAnimatedReaction(
     () => {
-      const isTouched = touchedItemKey.value === key;
+      const isActive = activeItemKey.value === key;
       return {
         hasProgress: hasPressProgress.value,
-        isTouched,
-        position: isTouched
-          ? touchedItemPosition.value
-          : itemPositions.value[key]
+        isActive,
+        position: isActive ? activeItemPosition.value : itemPositions.value[key]
       };
     },
-    ({ hasProgress, isTouched, position }) => {
+    ({ hasProgress, isActive, position }) => {
       if (!position) {
         return;
       }
@@ -124,7 +121,7 @@ export default function useItemLayoutStyles(
       const newY = position.y - (layoutY.value ?? 0);
 
       if (
-        isTouched ||
+        isActive ||
         ((layoutX.value === null || layoutY.value === null) && !hasProgress)
       ) {
         // Apply the translation immediately if the item is being dragged or
@@ -181,19 +178,9 @@ export default function useItemLayoutStyles(
       return EMPTY_OBJECT;
     }
 
-    const x = layoutX.value;
-    const y = layoutY.value;
-    let left = x;
-    let top = y;
-
-    if (shouldAnimateLayout.value) {
-      left = x !== null ? withTiming(x) : x;
-      top = y !== null ? withTiming(y) : y;
-    }
-
     return {
-      left,
-      top
+      left: layoutX.value,
+      top: layoutY.value
     };
   });
 

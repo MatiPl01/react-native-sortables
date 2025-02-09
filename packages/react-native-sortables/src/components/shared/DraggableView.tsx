@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import type { ViewProps } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   LinearTransition,
   useDerivedValue,
@@ -12,11 +11,11 @@ import {
   ItemContextProvider,
   useCommonValuesContext,
   useItemLayoutStyles,
-  useItemPanGesture,
   useMeasurementsContext
 } from '../../providers';
 import type { LayoutAnimation } from '../../types';
 import ItemDecoration from './ItemDecoration';
+import { SortableHandleInternal } from './SortableHandle';
 
 type DraggableViewProps = {
   itemKey: string;
@@ -32,46 +31,51 @@ export default function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { touchedItemKey } = useCommonValuesContext();
+  const { activeItemKey, customHandle } = useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
-  const isBeingActivated = useDerivedValue(() => touchedItemKey.value === key);
+  const isBeingActivated = useDerivedValue(() => activeItemKey.value === key);
   const pressProgress = useSharedValue(0);
-  const gesture = useItemPanGesture(key, pressProgress);
   const layoutStyles = useItemLayoutStyles(key, pressProgress);
 
   useEffect(() => {
     return () => handleItemRemoval(key);
   }, [key, handleItemRemoval]);
 
+  const innerComponent = (
+    <ItemDecoration
+      isBeingActivated={isBeingActivated}
+      itemKey={key}
+      pressProgress={pressProgress}
+      // Keep onLayout the closest to the children to measure the real item size
+      // (without paddings or other style changes made to the wrapper component)
+      onLayout={({ nativeEvent: { layout } }) => {
+        handleItemMeasurement(key, {
+          height: layout.height,
+          width: layout.width
+        });
+      }}>
+      {children}
+    </ItemDecoration>
+  );
+
   return (
     <Animated.View
       {...viewProps}
       layout={IS_WEB ? undefined : LinearTransition}
       style={[style, layoutStyles]}>
-      <Animated.View entering={entering} exiting={exiting}>
-        <GestureDetector gesture={gesture}>
-          <ItemDecoration
-            isBeingActivated={isBeingActivated}
-            itemKey={key}
-            pressProgress={pressProgress}
-            // Keep onLayout the closest to the children to measure the real item size
-            // (without paddings or other style changes made to the wrapper component)
-            onLayout={({ nativeEvent: { layout } }) => {
-              handleItemMeasurement(key, {
-                height: layout.height,
-                width: layout.width
-              });
-            }}>
-            <ItemContextProvider
-              isBeingActivated={isBeingActivated}
-              itemKey={key}
-              pressProgress={pressProgress}>
-              {children}
-            </ItemContextProvider>
-          </ItemDecoration>
-        </GestureDetector>
-      </Animated.View>
+      <ItemContextProvider
+        isBeingActivated={isBeingActivated}
+        itemKey={key}
+        pressProgress={pressProgress}>
+        <Animated.View entering={entering} exiting={exiting}>
+          {customHandle ? (
+            innerComponent
+          ) : (
+            <SortableHandleInternal>{innerComponent}</SortableHandleInternal>
+          )}
+        </Animated.View>
+      </ItemContextProvider>
     </Animated.View>
   );
 }

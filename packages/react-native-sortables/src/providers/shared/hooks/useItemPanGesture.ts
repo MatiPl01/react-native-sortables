@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Gesture } from 'react-native-gesture-handler';
-import { type SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 
 import { useAutoScrollContext } from '../AutoScrollProvider';
 import { useCommonValuesContext } from '../CommonValuesProvider';
@@ -10,7 +10,7 @@ export default function useItemPanGesture(
   key: string,
   pressProgress: SharedValue<number>
 ) {
-  const { sortEnabled, touchedItemKey } = useCommonValuesContext();
+  const { activeItemKey, sortEnabled } = useCommonValuesContext();
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
     useDragContext();
   const { updateStartScrollOffset } = useAutoScrollContext() ?? {};
@@ -24,23 +24,29 @@ export default function useItemPanGesture(
           // if the current item is still animated to the drag end position
           // or sorting is disabled at all
           if (
-            touchedItemKey.value !== null ||
+            activeItemKey.value !== null ||
             pressProgress.value > 0 ||
             !sortEnabled.value
           ) {
             manager.fail();
             return;
           }
-          handleTouchStart(e, key, pressProgress, manager.activate);
+          handleTouchStart(
+            e,
+            key,
+            pressProgress,
+            manager.activate,
+            manager.fail
+          );
+        })
+        .onTouchesMove((e, manager) => {
+          handleTouchesMove(e, manager.fail);
         })
         .onTouchesCancelled((_, manager) => {
           manager.fail();
         })
         .onTouchesUp((_, manager) => {
           manager.end();
-        })
-        .onTouchesMove((e, manager) => {
-          handleTouchesMove(e, manager.fail);
         })
         .onFinalize(() => {
           updateStartScrollOffset?.(-1);
@@ -49,10 +55,10 @@ export default function useItemPanGesture(
     [
       key,
       pressProgress,
-      touchedItemKey,
+      activeItemKey,
+      handleDragEnd,
       handleTouchStart,
       handleTouchesMove,
-      handleDragEnd,
       updateStartScrollOffset,
       sortEnabled
     ]

@@ -6,15 +6,15 @@ import Animated, {
 import type { DropIndicatorComponentProps } from '../../types';
 
 export default function DefaultDropIndicator({
-  activationProgress,
+  activeAnimationProgress,
   style
 }: DropIndicatorComponentProps): JSX.Element {
   const animatedStyle = useAnimatedStyle(() => ({
-    opacity: style.opacity ?? activationProgress.value,
+    opacity: style.opacity ?? activeAnimationProgress.value,
     transform: style.transform ?? [
       {
         scale: interpolate(
-          Math.pow(activationProgress.value, 1 / 3),
+          Math.pow(activeAnimationProgress.value, 1 / 3),
           [0, 1],
           [1.1, 1]
         )

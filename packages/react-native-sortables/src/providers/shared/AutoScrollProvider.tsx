@@ -32,12 +32,11 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   scrollableRef
 }) => {
   const {
-    activationProgress,
+    activeAnimationProgress,
     activeItemKey,
     containerRef,
     itemDimensions,
-    touchPosition,
-    touchedItemKey
+    touchPosition
   } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
@@ -93,7 +92,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         : Math.max(currentOffset + step, targetOffset);
 
     if (
-      Math.abs(nextOffset - currentOffset) < OFFSET_EPS ||
+      Math.abs(nextOffset - currentOffset) < 0.1 * OFFSET_EPS ||
       prevScrollToOffset.value === nextOffset
     ) {
       targetScrollOffset.value = -1;
@@ -113,8 +112,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   useAnimatedReaction(
     () => ({
       isEnabled: enabled.value,
-      itemKey: touchedItemKey.value,
-      progress: activationProgress.value
+      itemKey: activeItemKey.value,
+      progress: activeAnimationProgress.value
     }),
     ({ isEnabled, itemKey, progress }) => {
       const shouldBeEnabled = isEnabled && itemKey !== null;

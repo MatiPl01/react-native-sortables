@@ -13,7 +13,11 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useCommonValuesContext } from '../../providers';
-import type { DropIndicatorComponentProps, Vector } from '../../types';
+import type {
+  Dimensions,
+  DropIndicatorComponentProps,
+  Vector
+} from '../../types';
 
 const DEFAULT_STYLE: ViewStyle = {
   opacity: 0
@@ -26,14 +30,13 @@ type DropIndicatorProps = {
 
 function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const {
-    activationProgress,
+    activeAnimationProgress,
     activeItemDropped,
+    activeItemKey,
     indexToKey,
+    itemDimensions,
     itemPositions,
-    keyToIndex,
-    touchedItemHeight,
-    touchedItemKey,
-    touchedItemWidth
+    keyToIndex
   } = useCommonValuesContext();
 
   // Clone the array in order to prevent user from mutating the internal state
@@ -42,6 +45,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const dropIndex = useSharedValue(0);
   const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
   const prevUpdateItemKey = useSharedValue<null | string>(null);
+  const dimensions = useSharedValue<Dimensions | null>(null);
 
   const x = useSharedValue<null | number>(null);
   const y = useSharedValue<null | number>(null);
@@ -50,13 +54,14 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     () => ({
       dropped: activeItemDropped.value,
       kToI: keyToIndex.value,
-      key: touchedItemKey.value,
+      key: activeItemKey.value,
       positions: itemPositions.value
     }),
     ({ dropped, kToI, key, positions }) => {
       if (key !== null) {
         dropIndex.value = kToI[key] ?? 0;
         dropPosition.value = positions[key] ?? { x: 0, y: 0 };
+        dimensions.value = itemDimensions.value[key] ?? null;
 
         const update = (target: SharedValue<null | number>, value: number) => {
           if (target.value === null || prevUpdateItemKey.value === null) {
@@ -87,22 +92,21 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     }
 
     return {
-      height: touchedItemHeight.value,
+      ...dimensions.value,
       opacity: 1,
-      transform: [{ translateX }, { translateY }],
-      width: touchedItemWidth.value
+      transform: [{ translateX }, { translateY }]
     };
   });
 
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
       <DropIndicatorComponent
-        activationProgress={activationProgress}
+        activeAnimationProgress={activeAnimationProgress}
+        activeItemKey={activeItemKey}
         dropIndex={dropIndex}
         dropPosition={dropPosition}
         orderedItemKeys={orderedItemKeys}
         style={style}
-        touchedItemKey={touchedItemKey}
       />
     </Animated.View>
   );

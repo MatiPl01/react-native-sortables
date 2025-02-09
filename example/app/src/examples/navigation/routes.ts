@@ -18,6 +18,10 @@ const routes: Routes = {
         Component: SortableGrid.DropIndicatorExample,
         name: 'Drop Indicator'
       },
+      DragHandle: {
+        Component: SortableGrid.DragHandleExample,
+        name: 'Drag Handle'
+      },
       AutoScroll: {
         Component: SortableGrid.AutoScrollExample,
         name: 'Auto Scroll'

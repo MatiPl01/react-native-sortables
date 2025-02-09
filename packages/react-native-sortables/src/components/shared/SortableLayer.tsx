@@ -3,7 +3,9 @@ import type { ViewProps } from 'react-native';
 
 import { LayerProvider } from '../../providers';
 
-type SortableLayerProps = PropsWithChildren<{ disabled?: boolean } & ViewProps>;
+export type SortableLayerProps = PropsWithChildren<
+  { disabled?: boolean } & ViewProps
+>;
 
 export default function SortableLayer({
   children,

@@ -3,9 +3,10 @@ import type {
   GestureTouchEvent,
   TouchData
 } from 'react-native-gesture-handler';
-import { State } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import {
+  interpolate,
+  measure,
   useAnimatedReaction,
   useSharedValue,
   withTiming
@@ -37,13 +38,15 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   DragContextType
 >(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange }) => {
   const {
-    activationProgress,
     activationState,
+    activeAnimationDuration,
+    activeAnimationProgress,
     activeItemDropped,
     activeItemKey,
+    activeItemPosition,
     canSwitchToAbsoluteLayout,
+    containerRef,
     dragActivationDelay,
-    dragActivationDuration,
     dragActivationFailOffset,
     dropAnimationDuration,
     enableActiveItemSnap,
@@ -53,16 +56,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     indexToKey,
     itemPositions,
     keyToIndex,
-    prevTouchedItemKey,
+    prevActiveItemKey,
+    snapItemDimensions,
+    snapItemOffset,
     snapOffsetX,
     snapOffsetY,
-    touchPosition,
-    touchedItemHeight,
-    touchedItemKey,
-    touchedItemPosition,
-    touchedItemWidth
+    touchPosition
   } = useCommonValuesContext();
-  const { tryMeasureContainerHeight, updateTouchedItemDimensions } =
+  const { maybeUpdateSnapDimensions, tryMeasureContainerHeight } =
     useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
@@ -70,17 +71,17 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const debugContext = useDebugContext();
 
   const debugCross = debugContext?.useDebugCross();
-
   const haptics = useHaptics(hapticsEnabled);
 
-  const startTouch = useSharedValue<TouchData | null>(null);
-  const touchStartItemPosition = useSharedValue<Vector | null>(null);
-  const touchTranslation = useSharedValue<Vector | null>(null);
-  const dragStartTouchTranslation = useSharedValue<Vector | null>(null);
-
+  const touchStartTouch = useSharedValue<TouchData | null>(null);
+  const dragStartTouch = useSharedValue<TouchData | null>(null);
+  const dragStartItemTouchOffset = useSharedValue<Vector | null>(null);
+  const dragStartTouchPosition = useSharedValue<Vector | null>(null);
   const dragStartIndex = useSharedValue(-1);
+  const dragTranslation = useSharedValue<Vector | null>(null);
+
+  // used for activation and deactivation (drop)
   const activationTimeoutId = useSharedValue(-1);
-  const snapTranslation = useSharedValue<Vector | null>(null);
 
   // Create stable callbacks to avoid re-rendering when the callback
   // function is not memoized
@@ -88,100 +89,75 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const stableOnDragEnd = useJSStableCallback(onDragEnd);
   const stableOnOrderChange = useJSStableCallback(onOrderChange);
 
-  // ACTIVE ITEM SNAP UPDATER
-  useAnimatedReaction(
-    () => ({
-      enableSnap: enableActiveItemSnap.value,
-      height: touchedItemHeight.value,
-      oX: snapOffsetX.value,
-      oY: snapOffsetY.value,
-      progress: activationProgress.value,
-      touch: startTouch.value && {
-        x: startTouch.value.x,
-        y: startTouch.value.y
-      },
-      width: touchedItemWidth.value
-    }),
-    ({ enableSnap, height, oX, oY, progress, touch, width }) => {
-      if (!enableSnap || !height || !width || !touch) {
-        snapTranslation.value = null;
-        return;
-      }
-
-      const translation = touchTranslation.value;
-      const targetDeltaX =
-        touch.x - getOffsetDistance(oX, width) + (translation?.x ?? 0);
-      const targetDeltaY =
-        touch.y - getOffsetDistance(oY, height) + (translation?.y ?? 0);
-
-      snapTranslation.value = {
-        x: progress * targetDeltaX,
-        y: progress * targetDeltaY
-      };
-    }
-  );
-
   // ACTIVE ITEM POSITION UPDATER
   useAnimatedReaction(
     () => ({
-      dragStartTranslation: dragStartTouchTranslation.value,
-      itemStartPosition: touchStartItemPosition.value,
+      dimensions: snapItemDimensions.value,
+      enableSnap: enableActiveItemSnap.value,
+      itemTouchOffset: dragStartItemTouchOffset.value,
+      key: activeItemKey.value,
+      oX: snapOffsetX.value,
+      oY: snapOffsetY.value,
+      progress: activeAnimationProgress.value,
       scrollOffsetY:
         dragStartScrollOffset?.value === -1
           ? 0
           : (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0),
-      snap: snapTranslation.value,
-      translation: touchTranslation.value
+      snapOffset: snapItemOffset.value,
+      startTouchPosition: dragStartTouchPosition.value,
+      translation: dragTranslation.value
     }),
     ({
-      dragStartTranslation,
-      itemStartPosition,
+      dimensions,
+      enableSnap,
+      itemTouchOffset,
+      key,
+      oX,
+      oY,
+      progress,
       scrollOffsetY,
-      snap,
+      snapOffset,
+      startTouchPosition,
       translation
     }) => {
-      if (!itemStartPosition) {
-        touchedItemPosition.value = null;
-        return;
-      }
-
-      touchedItemPosition.value = {
-        x:
-          itemStartPosition.x +
-          (translation?.x ?? 0) +
-          (snap?.x ?? 0) -
-          (dragStartTranslation?.x ?? 0),
-        y:
-          itemStartPosition.y +
-          (translation?.y ?? 0) +
-          (snap?.y ?? 0) -
-          (dragStartTranslation?.y ?? 0) +
-          scrollOffsetY
-      };
-    }
-  );
-
-  // TOUCH POSITION UPDATER
-  useAnimatedReaction(
-    () => ({
-      itemPosition: touchedItemPosition.value,
-      snap: snapTranslation.value,
-      touch: startTouch.value
-        ? { x: startTouch.value.x, y: startTouch.value.y }
-        : null
-    }),
-    ({ itemPosition, snap, touch }) => {
-      if (!itemPosition || !touch) {
+      if (
+        key === null ||
+        !dimensions ||
+        !itemTouchOffset ||
+        !startTouchPosition
+      ) {
         touchPosition.value = null;
         debugCross?.set({ position: null });
         return;
       }
 
       touchPosition.value = {
-        x: itemPosition.x + touch.x - (snap?.x ?? 0),
-        y: itemPosition.y + touch.y - (snap?.y ?? 0)
+        x: startTouchPosition.x + (translation?.x ?? 0),
+        y: startTouchPosition.y + (translation?.y ?? 0) + scrollOffsetY
       };
-      debugCross?.set({ color: '#00007e', position: touchPosition.value });
+
+      if (debugCross) {
+        debugCross.set({
+          color: '#00007e',
+          position: touchPosition.value
+        });
+      }
+
+      const translate = (from: number, to: number) =>
+        from === to ? from : interpolate(progress, [0, 1], [from, to]);
+
+      let tX = itemTouchOffset.x;
+      let tY = itemTouchOffset.y;
+
+      if (enableSnap) {
+        tX = (snapOffset?.x ?? 0) + getOffsetDistance(oX, dimensions.width);
+        tY = (snapOffset?.y ?? 0) + getOffsetDistance(oY, dimensions.height);
+      }
+
+      activeItemPosition.value = {
+        x: touchPosition.value.x - translate(itemTouchOffset.x, tX),
+        y: touchPosition.value.y - translate(itemTouchOffset.y, tY)
+      };
     }
   );
 
@@ -190,13 +166,53 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
    */
 
   const handleDragStart = useCallback(
-    (key: string) => {
+    (
+      touch: TouchData,
+      key: string,
+      pressProgress: SharedValue<number>,
+      fail: () => void
+    ) => {
       'worklet';
-      updateStartScrollOffset?.();
+      const containerMeasurements = measure(containerRef);
+      const itemPosition = itemPositions.value[key];
+
+      if (!containerMeasurements || !itemPosition) {
+        fail();
+        return;
+      }
+
+      dragStartTouch.value = touch;
+      touchPosition.value = {
+        x: touch.absoluteX - containerMeasurements.pageX,
+        y: touch.absoluteY - containerMeasurements.pageY
+      };
+      dragStartTouchPosition.value = touchPosition.value;
+      dragStartItemTouchOffset.value = {
+        x: touchPosition.value.x - itemPosition.x,
+        y: touchPosition.value.y - itemPosition.y
+      };
+
+      activeAnimationProgress.value = 0;
+      activeItemDropped.value = false;
+      prevActiveItemKey.value = activeItemKey.value;
       activeItemKey.value = key;
-      dragStartIndex.value = keyToIndex.value[key]!;
-      dragStartTouchTranslation.value = touchTranslation.value;
+      dragStartIndex.value = keyToIndex.value[key] ?? -1;
+      activeItemPosition.value = itemPositions.value[key] ?? null;
       activationState.value = DragActivationState.ACTIVE;
+
+      updateLayer?.(LayerState.Focused);
+      maybeUpdateSnapDimensions(key);
+      updateStartScrollOffset?.();
+
+      const hasInactiveAnimation =
+        inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
+
+      const animate = () =>
+        withTiming(1, { duration: activeAnimationDuration.value });
+
+      inactiveAnimationProgress.value = hasInactiveAnimation ? animate() : 0;
+      activeAnimationProgress.value = animate();
+      pressProgress.value = animate();
 
       haptics.medium();
       stableOnDragStart({
@@ -205,48 +221,140 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       });
     },
     [
-      dragStartTouchTranslation,
-      touchTranslation,
-      updateStartScrollOffset,
-      stableOnDragStart,
+      activeAnimationDuration,
+      activeAnimationProgress,
+      activeItemDropped,
       activationState,
       activeItemKey,
+      activeItemPosition,
+      containerRef,
       dragStartIndex,
+      dragStartItemTouchOffset,
+      dragStartTouch,
+      dragStartTouchPosition,
+      haptics,
+      inactiveAnimationProgress,
+      inactiveItemOpacity,
+      inactiveItemScale,
+      itemPositions,
       keyToIndex,
-      haptics
+      maybeUpdateSnapDimensions,
+      prevActiveItemKey,
+      stableOnDragStart,
+      touchPosition,
+      updateLayer,
+      updateStartScrollOffset
+    ]
+  );
+
+  const handleTouchStart = useCallback(
+    (
+      e: GestureTouchEvent,
+      key: string,
+      pressProgress: SharedValue<number>,
+      activate: () => void,
+      fail: () => void
+    ) => {
+      'worklet';
+      const touch = e.allTouches[0];
+      if (!touch) {
+        fail();
+        return;
+      }
+
+      if (!canSwitchToAbsoluteLayout.value) {
+        tryMeasureContainerHeight?.();
+      }
+
+      touchStartTouch.value = touch;
+      activationState.value = DragActivationState.TOUCHED;
+
+      clearAnimatedTimeout(activationTimeoutId.value);
+
+      // Start handling touch after a delay to prevent accidental activation
+      // e.g. while scrolling the ScrollView
+      activationTimeoutId.value = setAnimatedTimeout(() => {
+        activate();
+        handleDragStart(touch, key, pressProgress, fail);
+      }, dragActivationDelay.value);
+    },
+    [
+      activationState,
+      activationTimeoutId,
+      canSwitchToAbsoluteLayout,
+      dragActivationDelay,
+      handleDragStart,
+      tryMeasureContainerHeight,
+      touchStartTouch
+    ]
+  );
+
+  const handleTouchesMove = useCallback(
+    (e: GestureTouchEvent, fail: () => void) => {
+      'worklet';
+      const touch = e.allTouches[0];
+      if (!touch) {
+        fail();
+        return;
+      }
+
+      if (activationState.value === DragActivationState.TOUCHED) {
+        if (!touchStartTouch.value) {
+          fail();
+          return;
+        }
+        const dX = touch.absoluteX - touchStartTouch.value.absoluteX;
+        const dY = touch.absoluteY - touchStartTouch.value.absoluteY;
+
+        // Cancel touch if the touch moved too far from the initial position
+        // before the item activation animation starts
+        const r = Math.sqrt(dX * dX + dY * dY);
+        if (
+          // activeItemKey is set after the drag activation delay passes
+          // and we don't want to cancel the touch anymore after this time
+          activeItemKey.value === null &&
+          r >= dragActivationFailOffset.value
+        ) {
+          fail();
+          return;
+        }
+      } else if (activationState.value === DragActivationState.ACTIVE) {
+        if (!dragStartTouch.value) {
+          fail();
+          return;
+        }
+        const dX = touch.absoluteX - dragStartTouch.value.absoluteX;
+        const dY = touch.absoluteY - dragStartTouch.value.absoluteY;
+        dragTranslation.value = { x: dX, y: dY };
+      }
+    },
+    [
+      activationState,
+      activeItemKey,
+      dragActivationFailOffset,
+      dragStartTouch,
+      dragTranslation,
+      touchStartTouch
     ]
   );
 
   const handleDragEnd = useCallback(
     (key: string, pressProgress: SharedValue<number>) => {
       'worklet';
-      prevTouchedItemKey.value = touchedItemKey.value;
-      touchedItemKey.value = null;
-      startTouch.value = null;
-      touchTranslation.value = null;
-      touchStartItemPosition.value = null;
-      dragStartTouchTranslation.value = null;
+      touchStartTouch.value = null;
+      dragStartTouch.value = null;
+      dragStartItemTouchOffset.value = null;
+      dragStartIndex.value = -1;
+      dragTranslation.value = null;
+      activeItemPosition.value = null;
+      touchPosition.value = null;
       activationState.value = DragActivationState.INACTIVE;
 
-      const animate = (callback?: (finished: boolean | undefined) => void) =>
-        withTiming(0, { duration: dropAnimationDuration.value }, callback);
-
-      pressProgress.value = animate();
-      inactiveAnimationProgress.value = animate();
-
-      clearAnimatedTimeout(activationTimeoutId.value);
-      activationTimeoutId.value = setAnimatedTimeout(() => {
-        activationProgress.value = 0;
-        if (touchedItemKey.value === null) {
-          prevTouchedItemKey.value = null;
-          activeItemDropped.value = true;
-          updateLayer?.(LayerState.Idle);
-        }
-      }, dropAnimationDuration.value);
-
       if (activeItemKey.value !== null) {
+        prevActiveItemKey.value = activeItemKey.value;
         activeItemKey.value = null;
         updateLayer?.(LayerState.Intermediate);
+        debugCross?.set({ position: null });
         haptics.medium();
 
         stableOnDragEnd({
@@ -256,145 +364,46 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           keyToIndex: keyToIndex.value,
           toIndex: keyToIndex.value[key]!
         });
-        dragStartIndex.value = -1;
       }
+
+      const animate = (callback?: (finished: boolean | undefined) => void) =>
+        withTiming(0, { duration: dropAnimationDuration.value }, callback);
+
+      pressProgress.value = animate();
+      inactiveAnimationProgress.value = animate();
+
+      clearAnimatedTimeout(activationTimeoutId.value);
+      activationTimeoutId.value = setAnimatedTimeout(() => {
+        activeAnimationProgress.value = 0;
+        if (activeItemKey.value === null) {
+          prevActiveItemKey.value = null;
+          activeItemDropped.value = true;
+          updateLayer?.(LayerState.Idle);
+        }
+      }, dropAnimationDuration.value);
     },
     [
-      touchedItemKey,
-      prevTouchedItemKey,
-      dragStartTouchTranslation,
-      indexToKey,
-      touchStartItemPosition,
-      startTouch,
-      touchTranslation,
+      activeItemKey,
+      activeItemPosition,
+      prevActiveItemKey,
       activationTimeoutId,
       activeItemDropped,
-      activeItemKey,
-      activationProgress,
+      activeAnimationProgress,
       activationState,
-      inactiveAnimationProgress,
+      debugCross,
       dropAnimationDuration,
       dragStartIndex,
+      dragStartItemTouchOffset,
+      dragStartTouch,
+      dragTranslation,
+      haptics,
+      inactiveAnimationProgress,
+      indexToKey,
       keyToIndex,
       stableOnDragEnd,
-      updateLayer,
-      haptics
-    ]
-  );
-
-  const handleTouchStart = useCallback(
-    (
-      e: GestureTouchEvent,
-      key: string,
-      pressProgress: SharedValue<number>,
-      onActivate: () => void
-    ) => {
-      'worklet';
-      const firstTouch = e.allTouches[0];
-      if (!firstTouch) {
-        return;
-      }
-
-      if (!canSwitchToAbsoluteLayout.value) {
-        tryMeasureContainerHeight?.();
-      }
-
-      activationState.value = DragActivationState.TOUCHED;
-      clearAnimatedTimeout(activationTimeoutId.value);
-      // Start handling touch after a delay to prevent accidental activation
-      // e.g. while scrolling the ScrollView
-      activationTimeoutId.value = setAnimatedTimeout(() => {
-        updateTouchedItemDimensions(key);
-        updateLayer?.(LayerState.Focused);
-
-        onActivate();
-        activationProgress.value = 0;
-        activeItemDropped.value = false;
-        prevTouchedItemKey.value = touchedItemKey.value;
-        touchedItemKey.value = key;
-        startTouch.value = firstTouch;
-        touchStartItemPosition.value = itemPositions.value[key] ?? null;
-        activationState.value = DragActivationState.ACTIVATING;
-
-        const hasInactiveAnimation =
-          inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
-
-        const animate = (callback?: (finished?: boolean) => void) =>
-          withTiming(1, { duration: dragActivationDuration.value }, callback);
-
-        inactiveAnimationProgress.value = hasInactiveAnimation ? animate() : 0;
-        activationProgress.value = animate();
-        pressProgress.value = animate(finished => {
-          if (
-            finished &&
-            e.state !== State.CANCELLED &&
-            e.state !== State.END
-          ) {
-            if (touchedItemKey.value === key && itemPositions.value[key]) {
-              handleDragStart(key);
-            } else {
-              handleDragEnd(key, pressProgress);
-            }
-          }
-        });
-      }, dragActivationDelay.value);
-    },
-    [
-      prevTouchedItemKey,
-      startTouch,
-      touchedItemKey,
-      itemPositions,
-      activationTimeoutId,
-      touchStartItemPosition,
-      activationState,
-      activationProgress,
-      activeItemDropped,
-      inactiveAnimationProgress,
-      inactiveItemOpacity,
-      inactiveItemScale,
-      updateLayer,
-      handleDragStart,
-      handleDragEnd,
-      updateTouchedItemDimensions,
-      tryMeasureContainerHeight,
-      canSwitchToAbsoluteLayout,
-      dragActivationDelay,
-      dragActivationDuration
-    ]
-  );
-
-  const handleTouchesMove = useCallback(
-    (e: GestureTouchEvent, onFail: () => void) => {
-      'worklet';
-      if (!startTouch.value || touchedItemKey.value === null) {
-        return;
-      }
-
-      const firstTouch = e.allTouches[0];
-      if (!firstTouch) {
-        onFail();
-        return;
-      }
-
-      const dX = firstTouch.absoluteX - startTouch.value.absoluteX;
-      const dY = firstTouch.absoluteY - startTouch.value.absoluteY;
-
-      // Cancel touch if the touch moved too far from the initial position
-      // before the item was activated
-      const r = Math.sqrt(dX * dX + dY * dY);
-      if (activeItemKey.value === null && r >= dragActivationFailOffset.value) {
-        onFail();
-        return;
-      }
-
-      touchTranslation.value = { x: dX, y: dY };
-    },
-    [
-      startTouch,
-      touchTranslation,
-      touchedItemKey,
-      activeItemKey,
-      dragActivationFailOffset
+      touchPosition,
+      touchStartTouch,
+      updateLayer
     ]
   );
 
@@ -424,6 +433,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     value: {
       dropAnimationDuration,
       handleDragEnd,
+      handleDragStart,
       handleOrderChange,
       handleTouchStart,
       handleTouchesMove
