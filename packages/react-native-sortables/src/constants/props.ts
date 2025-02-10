@@ -72,7 +72,11 @@ export const DEFAULT_SHARED_PROPS = {
 /**
  * DEFAULT SORTABLE GRID PROPS
  */
-type ExcludedFromDefaultGridProps = 'data' | 'onDragEnd' | 'renderItem';
+type ExcludedFromDefaultGridProps =
+  | 'data'
+  | 'onDragEnd'
+  | 'renderItem'
+  | 'rowHeight';
 
 type DefaultSortableGridProps = DefaultProps<
   Omit<SortableGridProps<unknown>, keyof DefaultSharedProps>,
@@ -82,9 +86,10 @@ type DefaultSortableGridProps = DefaultProps<
 
 export const DEFAULT_SORTABLE_GRID_PROPS = {
   columnGap: 0,
-  columns: 1,
+  columns: 1, // for vertical direction (default)
   keyExtractor: defaultKeyExtractor,
   rowGap: 0,
+  rows: 1, // for horizontal direction
   strategy: 'insert'
 } satisfies DefaultSortableGridProps;
 

@@ -34,6 +34,10 @@ const routes: Routes = {
         Component: SortableGrid.OrderingStrategyExample,
         name: 'Ordering Strategy'
       },
+      HorizontalDirection: {
+        Component: SortableGrid.HorizontalDirectionExample,
+        name: 'Horizontal Direction'
+      },
       DifferentSizeItems: {
         Component: SortableGrid.DifferentSizeItems,
         name: 'Different Size Items'
