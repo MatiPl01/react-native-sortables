@@ -70,7 +70,7 @@ function createRoutesScreen(routes: Routes, path: string): React.ComponentType {
   function RoutesScreen() {
     return (
       <Scroll contentContainerStyle={styles.scrollViewContent}>
-        <Stagger>
+        <Stagger interval={50}>
           {Object.entries(routes).map(
             ([key, { CardComponent = RouteCard, name }]) => (
               <CardComponent key={key} route={`${path}/${key}`} title={name} />

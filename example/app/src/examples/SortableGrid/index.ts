@@ -7,3 +7,4 @@ export { default as DragHandleExample } from './DragHandleExample';
 export { default as DropIndicatorExample } from './DropIndicatorExample';
 export { default as OrderingStrategyExample } from './OrderingStrategyExample';
 export { default as PlaygroundExample } from './PlaygroundExample';
+export { default as HorizontalDirectionExample } from './HorizontalDirectionExample';
