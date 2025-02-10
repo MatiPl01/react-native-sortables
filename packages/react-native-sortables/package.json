@@ -26,7 +26,7 @@
     "prettier": "^3.3.2",
     "react": "^18.3.1",
     "react-native": "0.76.5",
-    "react-native-builder-bob": "^0.23.2",
+    "react-native-builder-bob": "^0.37.0",
     "react-native-gesture-handler": "^2.21.2",
     "react-native-reanimated": "patch:react-native-reanimated@npm%3A3.16.6#~/.yarn/patches/react-native-reanimated-npm-3.16.6-597f489ee0.patch",
     "react-test-renderer": "18.3.1",
