@@ -9202,7 +9202,7 @@ __metadata:
     prettier: "npm:^3.3.2"
     react: "npm:^18.3.1"
     react-native: "npm:0.76.5"
-    react-native-gesture-handler: "npm:^2.21.2"
+    react-native-gesture-handler: "npm:^2.23.0"
     react-native-haptic-feedback: "npm:^2.3.3"
     react-native-reanimated: "patch:react-native-reanimated@npm%3A3.16.6#~/.yarn/patches/react-native-reanimated-npm-3.16.6-597f489ee0.patch"
     react-native-safe-area-context: "npm:^4.14.0"
@@ -9223,7 +9223,7 @@ __metadata:
     expo-status-bar: "npm:~2.0.1"
     react: "npm:18.3.1"
     react-native: "npm:0.76.6"
-    react-native-gesture-handler: "npm:^2.22.1"
+    react-native-gesture-handler: "npm:^2.23.0"
     react-native-reanimated: "npm:^3.16.7"
     typescript: "npm:^5.3.3"
   languageName: unknown
@@ -15368,24 +15368,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:^2.21.2":
-  version: 2.21.2
-  resolution: "react-native-gesture-handler@npm:2.21.2"
-  dependencies:
-    "@egjs/hammerjs": "npm:^2.0.17"
-    hoist-non-react-statics: "npm:^3.3.0"
-    invariant: "npm:^2.2.4"
-    prop-types: "npm:^15.7.2"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 10c0/4eca796efe9e55f312f332c07eee76adf0b29971945b72856d375f7e9a6f21a7ef5363d707b71d030c5ebccc0a3cf085713ee0365c14bc538f2f918a87986e36
-  languageName: node
-  linkType: hard
-
-"react-native-gesture-handler@npm:^2.22.1":
-  version: 2.22.1
-  resolution: "react-native-gesture-handler@npm:2.22.1"
+"react-native-gesture-handler@npm:^2.23.0":
+  version: 2.23.0
+  resolution: "react-native-gesture-handler@npm:2.23.0"
   dependencies:
     "@egjs/hammerjs": "npm:^2.0.17"
     hoist-non-react-statics: "npm:^3.3.0"
@@ -15393,7 +15378,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/f4e1e08a25f4555491d6d2d9428c8f9cda343c6508f2e0f8d212698e5d5dc370cecadf08774243c6502b2c46e85a0d70f7bd426626d3ae27e180950a41415e2f
+  checksum: 10c0/b4bfa9f71990fb5f75225b63878f668a9c6cee29cea6636482b64708432fb46b8c969c570022728fb130bf4e6ce306719dae200d1cb4050fdd2690e34b7b2a78
   languageName: node
   linkType: hard
 
@@ -15552,7 +15537,7 @@ __metadata:
     react: "npm:^18.3.1"
     react-native: "npm:0.76.5"
     react-native-builder-bob: "npm:^0.23.2"
-    react-native-gesture-handler: "npm:^2.21.2"
+    react-native-gesture-handler: "npm:^2.23.0"
     react-native-haptic-feedback: "npm:>=2.0.0"
     react-native-reanimated: "patch:react-native-reanimated@npm%3A3.16.6#~/.yarn/patches/react-native-reanimated-npm-3.16.6-597f489ee0.patch"
     react-test-renderer: "npm:18.3.1"
