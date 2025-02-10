@@ -165,9 +165,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         });
       }
 
-      const translate = (from: number, to: number) =>
-        from === to ? from : interpolate(progress, [0, 1], [from, to]);
-
       let tX = itemTouchOffset.x;
       let tY = itemTouchOffset.y;
 
@@ -179,6 +176,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           (snapOffset?.y ?? 0) +
           getOffsetDistance(offsetY, snapDimensions.height);
       }
+
+      const translate = (from: number, to: number) =>
+        from === to ? from : interpolate(progress, [0, 1], [from, to]);
 
       let activeX = touchPosition.value.x - translate(itemTouchOffset.x, tX);
       let activeY = touchPosition.value.y - translate(itemTouchOffset.y, tY);
@@ -231,9 +231,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemDropped.value = false;
       prevActiveItemKey.value = activeItemKey.value;
       activeItemKey.value = key;
-      dragStartIndex.value = keyToIndex.value[key] ?? -1;
-      activeItemPosition.value = itemPositions.value[key] ?? null;
+      activeItemPosition.value = itemPosition;
       activeItemDimensions.value = itemDimensions.value[key] ?? null;
+      dragStartIndex.value = keyToIndex.value[key] ?? -1;
       activationState.value = DragActivationState.ACTIVE;
 
       updateLayer?.(LayerState.Focused);

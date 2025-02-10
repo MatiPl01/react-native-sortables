@@ -44,8 +44,14 @@ export default function useItemLayoutStyles(
 
   const zIndex = useItemZIndex(key, pressProgress);
   const hasPressProgress = useDerivedValue(() => pressProgress.value > 0);
+  const itemPosition = useDerivedValue(() =>
+    activeItemKey.value === key
+      ? activeItemPosition.value
+      : itemPositions.value[key]
+  );
   const dx = useSharedValue<null | number>(null);
   const dy = useSharedValue<null | number>(null);
+  const hasDropAnimation = useSharedValue(false);
 
   const translateX = useSharedValue<null | number>(null);
   const translateY = useSharedValue<null | number>(null);
@@ -54,7 +60,7 @@ export default function useItemLayoutStyles(
 
   useAnimatedReaction(
     () => ({
-      position: key !== null ? itemPositions.value[key] : null
+      position: itemPosition.value
     }),
     ({ position }) => {
       if (!position) {
@@ -109,7 +115,7 @@ export default function useItemLayoutStyles(
       return {
         hasProgress: hasPressProgress.value,
         isActive,
-        position: isActive ? activeItemPosition.value : itemPositions.value[key]
+        position: itemPosition.value
       };
     },
     ({ hasProgress, isActive, position }) => {
@@ -124,6 +130,7 @@ export default function useItemLayoutStyles(
         isActive ||
         ((layoutX.value === null || layoutY.value === null) && !hasProgress)
       ) {
+        hasDropAnimation.value = false;
         // Apply the translation immediately if the item is being dragged or
         // the item was mounted with the absolute position and we cannot set
         // its top, left values because they will be animated from 0, 0 by the
@@ -137,12 +144,15 @@ export default function useItemLayoutStyles(
       } else if (hasProgress) {
         // If the was released (has press progress but is no longer touched),
         // we animate the translation to the target position.
-        translateX.value = withTiming(newX, {
-          duration: dropAnimationDuration.value
-        });
-        translateY.value = withTiming(newY, {
-          duration: dropAnimationDuration.value
-        });
+        if (!hasDropAnimation.value) {
+          hasDropAnimation.value = true;
+          translateX.value = withTiming(newX, {
+            duration: dropAnimationDuration.value
+          });
+          translateY.value = withTiming(newY, {
+            duration: dropAnimationDuration.value
+          });
+        }
       } else if (translateX.value === null || translateY.value === null) {
         // If the item was mounted with the relative position, we set the
         // translation to 0, 0. This just indicates that transformation values
