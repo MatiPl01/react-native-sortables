@@ -15,7 +15,12 @@ import {
 
 import { useDebugContext } from '../../debug';
 import { useHaptics, useJSStableCallback } from '../../hooks';
-import type { DragContextType, SortableCallbacks, Vector } from '../../types';
+import type {
+  DragContextType,
+  OverDrag,
+  SortableCallbacks,
+  Vector
+} from '../../types';
 import { DragActivationState, LayerState } from '../../types';
 import {
   clearAnimatedTimeout,
@@ -31,20 +36,14 @@ import { useMeasurementsContext } from './MeasurementsProvider';
 type DragProviderProps = PropsWithChildren<
   {
     hapticsEnabled: boolean;
-    allowOverDrag: boolean;
+    overDrag: OverDrag;
   } & Required<SortableCallbacks>
 >;
 
 const { DragProvider, useDragContext } = createProvider('Drag')<
   DragProviderProps,
   DragContextType
->(({
-  allowOverDrag,
-  hapticsEnabled,
-  onDragEnd,
-  onDragStart,
-  onOrderChange
-}) => {
+>(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange, overDrag }) => {
   const {
     activationState,
     activeAnimationDuration,
@@ -85,6 +84,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
   const debugCross = debugContext?.useDebugCross();
   const haptics = useHaptics(hapticsEnabled);
+
+  const hasHorizontalOverDrag =
+    overDrag === 'horizontal' || overDrag === 'both';
+  const hasVerticalOverDrag = overDrag === 'vertical' || overDrag === 'both';
 
   const touchStartTouch = useSharedValue<TouchData | null>(null);
   const dragStartTouch = useSharedValue<TouchData | null>(null);
@@ -183,8 +186,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       let activeX = touchPosition.value.x - translate(itemTouchOffset.x, tX);
       let activeY = touchPosition.value.y - translate(itemTouchOffset.y, tY);
 
-      if (!allowOverDrag) {
+      if (!hasHorizontalOverDrag) {
         activeX = clamp(activeX, 0, containerW - activeDimensions.width);
+      }
+      if (!hasVerticalOverDrag) {
         activeY = clamp(activeY, 0, containerH - activeDimensions.height);
       }
 
@@ -193,7 +198,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         y: activeY
       };
     },
-    [allowOverDrag]
+    [hasHorizontalOverDrag, hasVerticalOverDrag]
   );
 
   /**

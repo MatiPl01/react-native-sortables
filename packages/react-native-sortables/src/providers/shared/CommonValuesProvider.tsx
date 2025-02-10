@@ -29,7 +29,7 @@ type CommonValuesProviderProps = PropsWithChildren<
     initialItemsStyleOverride?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
-    Omit<ItemDragSettings, 'allowOverDrag'>
+    Omit<ItemDragSettings, 'overDrag'>
 >;
 
 const { CommonValuesProvider, useCommonValuesContext } = createProvider(

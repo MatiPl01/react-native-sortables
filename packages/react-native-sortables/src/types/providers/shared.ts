@@ -59,7 +59,7 @@ export type CommonValuesContextType = {
   customHandle: boolean;
 } & AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &
-  AnimatedValues<Omit<ItemDragSettings, 'allowOverDrag'>>;
+  AnimatedValues<Omit<ItemDragSettings, 'overDrag'>>;
 
 // MEASUREMENTS
 

@@ -24,9 +24,10 @@ export type ActiveItemDecorationSettings = AnimatableProps<{
 }>;
 
 export type Offset = `${number}%` | number;
+export type OverDrag = 'both' | 'horizontal' | 'none' | 'vertical';
 
 export type ItemDragSettings = {
-  allowOverDrag: boolean;
+  overDrag: OverDrag;
 } & AnimatableProps<{
   dragActivationDelay: number;
   dragActivationFailOffset: number;
