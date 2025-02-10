@@ -1,3 +1,4 @@
+import { IS_WEB } from '../../../../constants';
 import type {
   AlignContent,
   AlignItems,
@@ -155,7 +156,7 @@ const handleLayoutCalculation = (
 ) => {
   'worklet';
   const isRow = axisDirections.main === 'row';
-  const isMultiColumn = !isRow && groups.length > 1;
+  const expandMultiColumn = !IS_WEB && !isRow && groups.length > 1; // expands to max height
   const paddingHorizontal = paddings.left + paddings.right;
   const paddingVertical = paddings.top + paddings.bottom;
 
@@ -189,7 +190,7 @@ const handleLayoutCalculation = (
 
   let totalHeight = isRow
     ? contentAlignment.totalSize + paddingVertical
-    : isMultiColumn
+    : expandMultiColumn
       ? limits.maxHeight
       : limits.minHeight;
 
@@ -214,13 +215,13 @@ const handleLayoutCalculation = (
     const contentJustification = calculateAlignment(
       justifyContent,
       mainAxisGroupItemSizes,
-      isMultiColumn ? maxMainContainerSize : minMainContainerSize,
+      expandMultiColumn ? maxMainContainerSize : minMainContainerSize,
       maxMainContainerSize,
       shouldWrap,
       gaps[axisDirections.cross]
     );
 
-    if (!isRow && !isMultiColumn) {
+    if (!isRow && !expandMultiColumn) {
       totalHeight = Math.max(
         totalHeight,
         contentJustification.totalSize + paddingVertical
