@@ -88,17 +88,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: spacing.md
   },
-  columnSelector: {
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.md
-  },
-  columnSelectorTitle: {
-    ...text.label2,
-    color: colors.foreground3,
-    fontSize: 16,
-    fontWeight: 'bold'
-  },
   container: {
     padding: spacing.md
   },
