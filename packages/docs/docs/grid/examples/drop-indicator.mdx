@@ -39,7 +39,7 @@ export default function Example() {
         data={DATA}
         renderItem={renderItem}
         rowGap={10}
-        showDropIndicator
+        showDropIndicator // enables drop indicator
       />
     </View>
   );
@@ -97,10 +97,10 @@ export default function Example() {
         columnGap={10}
         columns={3}
         data={DATA}
-        dropIndicatorStyle={styles.dropIndicator} // Custom style
+        dropIndicatorStyle={styles.dropIndicator} // custom drop indicator style
         renderItem={renderItem}
         rowGap={10}
-        showDropIndicator
+        showDropIndicator // enables drop indicator
       />
     </View>
   );
@@ -177,10 +177,10 @@ export default function Example() {
         columnGap={10}
         columns={3}
         data={DATA}
-        DropIndicatorComponent={DropIndicator}
+        DropIndicatorComponent={DropIndicator} // custom drop indicator component
         renderItem={renderItem}
         rowGap={10}
-        showDropIndicator
+        showDropIndicator // enables drop indicator
       />
     </View>
   );
