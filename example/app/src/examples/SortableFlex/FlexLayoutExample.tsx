@@ -15,6 +15,7 @@ import {
   FlexCell,
   Group,
   OptionGroup,
+  Screen,
   SelectListDropdown
 } from '@/components';
 import { colors, flex, radius, sizes, spacing, text } from '@/theme';
@@ -80,7 +81,7 @@ export default function FlexLayoutExample() {
   };
 
   return (
-    <View style={styles.container}>
+    <Screen style={styles.container}>
       <OptionGroup label='alignContent'>
         <Dropdown
           options={ALIGN_CONTENT_OPTIONS}
@@ -138,7 +139,7 @@ export default function FlexLayoutExample() {
           ))}
         </ScrollView>
       </Group>
-    </View>
+    </Screen>
   );
 }
 

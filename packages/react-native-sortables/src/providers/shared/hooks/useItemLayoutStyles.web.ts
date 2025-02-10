@@ -89,8 +89,10 @@ export default function useItemLayoutStyles(
     }
 
     return {
+      left: 0,
       opacity: 1,
       position: 'absolute',
+      top: 0,
       transform: [
         { translateX: translateX.value },
         { translateY: translateY.value }
