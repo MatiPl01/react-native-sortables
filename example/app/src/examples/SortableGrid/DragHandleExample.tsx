@@ -79,9 +79,6 @@ export default function DragHandleExample() {
 }
 
 const styles = StyleSheet.create({
-  options: {
-    paddingBottom: spacing.sm
-  },
   card: {
     alignItems: 'center',
     backgroundColor: '#36877F',
@@ -104,6 +101,9 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: spacing.md
+  },
+  options: {
+    paddingBottom: spacing.sm
   },
   text: {
     ...text.label2,
