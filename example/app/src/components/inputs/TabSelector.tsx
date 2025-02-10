@@ -16,13 +16,13 @@ import { typedMemo } from '@/utils';
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
 
-type TabSelectorProps<T extends string> = {
+type TabSelectorProps<T> = {
   tabs: Readonly<Array<T>>;
   selectedTab: T;
   onSelectTab: (tab: T) => void;
 };
 
-export default function TabSelector<T extends string>({
+export default function TabSelector<T extends number | string>({
   onSelectTab,
   selectedTab,
   tabs
@@ -79,7 +79,7 @@ type TabProps<T> = {
   onMeasureWidth: (width: number) => void;
 };
 
-const Tab = typedMemo(function Tab<T extends string>({
+const Tab = typedMemo(function Tab<T extends number | string>({
   isSelected,
   onMeasureWidth,
   onSelectTab,

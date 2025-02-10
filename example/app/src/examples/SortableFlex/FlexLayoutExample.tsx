@@ -16,7 +16,7 @@ import {
   Group,
   OptionGroup,
   Screen,
-  SelectListDropdown
+  SimpleDropdown
 } from '@/components';
 import { colors, flex, radius, sizes, spacing, text } from '@/theme';
 import { getCategories } from '@/utils';
@@ -83,21 +83,21 @@ export default function FlexLayoutExample() {
   return (
     <Screen style={styles.container}>
       <OptionGroup label='alignContent'>
-        <Dropdown
+        <SimpleDropdown
           options={ALIGN_CONTENT_OPTIONS}
           selected={alignContent}
           onSelect={setAlignContent}
         />
       </OptionGroup>
       <OptionGroup label='justifyContent'>
-        <Dropdown
+        <SimpleDropdown
           options={JUSTIFY_CONTENT_OPTIONS}
           selected={justifyContent}
           onSelect={setJustifyContent}
         />
       </OptionGroup>
       <OptionGroup label='alignItems'>
-        <Dropdown
+        <SimpleDropdown
           options={ALIGN_ITEMS_OPTIONS}
           selected={alignItems}
           onSelect={setAlignItems}
@@ -143,39 +143,11 @@ export default function FlexLayoutExample() {
   );
 }
 
-type DropdownProps<T extends string> = {
-  selected?: T;
-  options: Array<T>;
-  onSelect: (value: T) => void;
-};
-
-function Dropdown<T extends string>({
-  onSelect,
-  options,
-  selected
-}: DropdownProps<T>) {
-  return (
-    <SelectListDropdown
-      alignment='right'
-      selected={selected ?? options[0]!}
-      styleOptions={{ dropdownStyle: styles.dropdown }}
-      options={options.map(option => ({
-        label: option,
-        value: option
-      }))}
-      onSelect={onSelect}
-    />
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     height:
       Dimensions.get('window').height -
       (Platform.OS === 'ios' ? sizes.xxl : sizes.lg)
-  },
-  dropdown: {
-    minWidth: sizes.xxl
   },
   flexWrapper: {
     backgroundColor: colors.background3,

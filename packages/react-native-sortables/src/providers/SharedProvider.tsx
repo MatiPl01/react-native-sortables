@@ -40,7 +40,6 @@ type SharedProviderProps = PropsWithChildren<
 >;
 
 export default function SharedProvider({
-  allowOverDrag,
   autoScrollActivationOffset,
   autoScrollEnabled,
   autoScrollSpeed,
@@ -51,6 +50,7 @@ export default function SharedProvider({
   onDragEnd,
   onDragStart,
   onOrderChange,
+  overDrag,
   scrollableRef,
   ...rest
 }: SharedProviderProps) {
@@ -78,8 +78,8 @@ export default function SharedProvider({
     ),
     // Provider used for dragging and item swapping logic
     <DragProvider
-      allowOverDrag={allowOverDrag}
       hapticsEnabled={hapticsEnabled}
+      overDrag={overDrag}
       onDragEnd={onDragEnd}
       onDragStart={onDragStart}
       onOrderChange={onOrderChange}

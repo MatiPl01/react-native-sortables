@@ -26,7 +26,8 @@ export type {
   SortableGridDragEndParams,
   SortableGridProps,
   SortableGridRenderItem,
-  SortableGridStrategyFactory
+  SortableGridStrategyFactory,
+  OverDrag as SortableOverDrag
 } from './types';
 
 const Sortable = {
