@@ -81,7 +81,7 @@ export default function FlexLayoutExample() {
   };
 
   return (
-    <Screen>
+    <Screen style={styles.container}>
       <OptionGroup label='alignContent'>
         <Dropdown
           options={ALIGN_CONTENT_OPTIONS}
