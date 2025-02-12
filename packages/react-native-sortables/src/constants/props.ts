@@ -37,6 +37,7 @@ export const DEFAULT_SHARED_PROPS = {
   animateHeight: false,
   animateWidth: false,
   autoScrollActivationOffset: 75,
+  autoScrollDirection: 'vertical',
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
   customHandle: false,
@@ -54,6 +55,9 @@ export const DEFAULT_SHARED_PROPS = {
   } as ViewStyle,
   enableActiveItemSnap: true,
   hapticsEnabled: false,
+  onOrderChange: undefined,
+  scrollableRef: undefined,
+  onDragStart: undefined,
   inactiveItemOpacity: 0.5,
   inactiveItemScale: 1,
   // fixed in `react-native-reanimated` in the future.

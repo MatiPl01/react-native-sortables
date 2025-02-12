@@ -54,6 +54,7 @@ export default function SharedProvider({
   onDragStart,
   onOrderChange,
   overDrag,
+  autoScrollDirection,
   scrollableRef,
   ...rest
 }: SharedProviderProps) {
@@ -74,6 +75,7 @@ export default function SharedProvider({
     scrollableRef && (
       <AutoScrollProvider
         autoScrollActivationOffset={autoScrollActivationOffset}
+        autoScrollDirection={autoScrollDirection}
         autoScrollEnabled={autoScrollEnabled}
         autoScrollSpeed={autoScrollSpeed}
         scrollableRef={scrollableRef}
