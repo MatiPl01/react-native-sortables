@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable, { type SortableGridRenderItem } from 'react-native-sortables';
@@ -89,11 +89,7 @@ export default function DataChangeExample() {
   }, []);
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <Sortable.Pressable onPress={onRemoveItem.bind(null, item)}>
-        <GridCard>{item}</GridCard>
-      </Sortable.Pressable>
-    ),
+    ({ item }) => <GridItem item={item} onRemoveItem={onRemoveItem} />,
     [onRemoveItem]
   );
 
@@ -169,6 +165,22 @@ export default function DataChangeExample() {
     </Screen>
   );
 }
+
+type GridItemProps = {
+  item: string;
+  onRemoveItem: (item: string) => void;
+};
+
+// It is recommended to use memo for items to prevent re-renders of the entire grid
+// on item order changes (renderItem takes and index argument, thus it must be called
+// after every order change)
+const GridItem = memo(function GridItem({ item, onRemoveItem }: GridItemProps) {
+  return (
+    <Sortable.Pressable onPress={onRemoveItem.bind(null, item)}>
+      <GridCard>{item}</GridCard>
+    </Sortable.Pressable>
+  );
+});
 
 const styles = StyleSheet.create({
   row: {

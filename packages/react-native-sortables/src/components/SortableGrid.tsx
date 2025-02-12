@@ -170,14 +170,19 @@ type SortableGridItemProps<I> = {
   style: ViewStyle;
 };
 
-const SortableGridItem = typedMemo(function <I>({
+function SortableGridItem<I>({
   index,
   item,
   renderItem,
   ...rest
 }: SortableGridItemProps<I>) {
-  return <DraggableView {...rest}>{renderItem({ index, item })}</DraggableView>;
-});
+  const children = useMemo(
+    () => renderItem({ index, item }),
+    [renderItem, index, item]
+  );
+
+  return <DraggableView {...rest}>{children}</DraggableView>;
+}
 
 const styles = StyleSheet.create({
   gridContainer: {

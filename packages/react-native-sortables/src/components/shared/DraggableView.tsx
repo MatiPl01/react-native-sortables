@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import type { ViewProps } from 'react-native';
 import Animated, {
   LinearTransition,
@@ -23,7 +23,7 @@ type DraggableViewProps = {
   exiting?: LayoutAnimation;
 } & ViewProps;
 
-export default function DraggableView({
+function DraggableView({
   children,
   entering,
   exiting,
@@ -79,3 +79,5 @@ export default function DraggableView({
     </Animated.View>
   );
 }
+
+export default memo(DraggableView);

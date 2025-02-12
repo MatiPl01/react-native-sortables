@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
@@ -146,11 +146,7 @@ export default function DataChangeExample() {
               hapticsEnabled
               onDragEnd={({ order }) => setData(order(data))}>
               {data.map(item => (
-                <Sortable.Pressable
-                  key={item}
-                  onPress={onRemoveItem.bind(null, item)}>
-                  <FlexCell size='large'>{item}</FlexCell>
-                </Sortable.Pressable>
+                <FlexItem item={item} onRemoveItem={onRemoveItem} key={item} />
               ))}
             </Sortable.Flex>
 
@@ -163,6 +159,21 @@ export default function DataChangeExample() {
     </Screen>
   );
 }
+
+type FlexItemProps = {
+  item: string;
+  onRemoveItem: (item: string) => void;
+};
+
+// It is recommended to use memo for items to prevent re-renders of all flex items
+// when the parent component re-renders
+const FlexItem = memo(function FlexItem({ item, onRemoveItem }: FlexItemProps) {
+  return (
+    <Sortable.Pressable key={item} onPress={onRemoveItem.bind(null, item)}>
+      <FlexCell size='large'>{item}</FlexCell>
+    </Sortable.Pressable>
+  );
+});
 
 const styles = StyleSheet.create({
   row: {
