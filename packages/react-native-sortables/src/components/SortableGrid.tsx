@@ -17,6 +17,7 @@ import {
 import type {
   DropIndicatorSettings,
   LayoutAnimation,
+  LayoutTransition,
   SortableGridProps,
   SortableGridRenderItem
 } from '../types';
@@ -47,6 +48,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
+      itemLayout,
       showDropIndicator,
       ...sharedProps
     }
@@ -92,6 +94,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           itemEntering={itemEntering}
           itemExiting={itemExiting}
           itemKeys={itemKeys}
+          itemLayout={itemLayout}
           renderItem={renderItem}
           rowGap={rowGapValue}
           showDropIndicator={showDropIndicator}
@@ -114,6 +117,7 @@ type SortableGridInnerProps<I> = {
       | 'data'
       | 'itemEntering'
       | 'itemExiting'
+      | 'itemLayout'
       | 'renderItem'
     >
   >;
@@ -125,6 +129,7 @@ function SortableGridInner<I>({
   itemEntering,
   itemExiting,
   itemKeys,
+  itemLayout,
   renderItem,
   rowGap,
   ...containerProps
@@ -152,6 +157,7 @@ function SortableGridInner<I>({
           item={item}
           itemKey={key}
           key={key}
+          layout={itemLayout}
           renderItem={renderItem}
           style={animatedItemStyle}
         />
@@ -167,6 +173,7 @@ type SortableGridItemProps<I> = {
   renderItem: SortableGridRenderItem<I>;
   entering: LayoutAnimation;
   exiting: LayoutAnimation;
+  layout: LayoutTransition;
   style: ViewStyle;
 };
 

@@ -32,6 +32,9 @@ export const getPropsWithDefaults = <
   for (const key in props) {
     if (props[key] !== undefined) {
       propsWithDefaults[key] = props[key];
+    } else {
+      // Remove prop if it was explicitly set to undefined by the user
+      delete propsWithDefaults[key];
     }
   }
 

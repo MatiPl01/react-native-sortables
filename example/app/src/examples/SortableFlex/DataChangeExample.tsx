@@ -146,7 +146,7 @@ export default function DataChangeExample() {
               hapticsEnabled
               onDragEnd={({ order }) => setData(order(data))}>
               {data.map(item => (
-                <FlexItem item={item} onRemoveItem={onRemoveItem} key={item} />
+                <FlexItem item={item} key={item} onRemoveItem={onRemoveItem} />
               ))}
             </Sortable.Flex>
 

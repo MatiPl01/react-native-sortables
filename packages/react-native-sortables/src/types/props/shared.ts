@@ -3,7 +3,7 @@ import type { ViewStyle } from 'react-native';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
 import type { Vector } from '../layout/shared';
-import type { LayoutAnimation } from '../reanimated';
+import type { LayoutAnimation, LayoutTransition } from '../reanimated';
 import type { Animatable, AnimatableProps, Simplify } from '../utils';
 
 export type DropIndicatorComponentProps = {
@@ -59,6 +59,7 @@ export type DropIndicatorSettings = {
 export type ItemLayoutAnimationSettings = {
   itemEntering: LayoutAnimation | undefined;
   itemExiting: LayoutAnimation | undefined;
+  itemLayout: LayoutTransition | undefined;
 };
 
 export type DragStartParams = {
