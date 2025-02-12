@@ -1,5 +1,4 @@
-import { SharedValue } from 'react-native-reanimated';
-import type { Dimensions, Offset, Vector } from '../types';
+import type { Offset, Vector } from '../types';
 import { error } from './logs';
 
 export const getOffsetDistance = (

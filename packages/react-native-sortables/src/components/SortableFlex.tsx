@@ -1,5 +1,6 @@
-import { type ReactElement, useMemo } from 'react';
+import { type ReactElement } from 'react';
 import { StyleSheet, type ViewStyle } from 'react-native';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import { useDragEndHandler } from '../hooks';
@@ -34,11 +35,13 @@ function SortableFlex(props: SortableFlexProps) {
   const itemKeys = childrenArray.map(([key]) => key);
 
   const { flexDirection, flexWrap } = styleProps;
-  const controlledContainerDimensions = useMemo(() => {
+  const controlledContainerDimensions = useDerivedValue(() => {
     if (flexWrap === 'nowrap') {
-      return 'both';
+      return { height: true, width: true };
     }
-    return flexDirection === 'row' ? 'height' : 'width';
+    return flexDirection === 'row'
+      ? { height: false, width: true }
+      : { height: true, width: false };
   }, [flexWrap, flexDirection]);
 
   const onDragEnd = useDragEndHandler(_onDragEnd, params => ({
@@ -55,10 +58,7 @@ function SortableFlex(props: SortableFlexProps) {
       initialItemsStyleOverride={styles.styleOverride}
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
-      <FlexLayoutProvider
-        {...styleProps}
-        controlledContainerDimensions={controlledContainerDimensions}
-        itemsCount={itemKeys.length}>
+      <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
         <OrderUpdaterComponent
           key={useStrategyKey(strategy)}
           predefinedStrategies={FLEX_STRATEGIES}

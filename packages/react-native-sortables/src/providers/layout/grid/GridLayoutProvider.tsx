@@ -39,11 +39,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowGap: rowGap_
 }) => {
   const {
+    containerWidth,
     indexToKey,
     itemDimensions,
     itemPositions,
     itemsStyleOverride,
-    measuredContainerDimensions,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
@@ -111,10 +111,10 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   useAnimatedReaction(
     () => ({
       gap: columnGap.value,
-      width: measuredContainerDimensions.value?.width
+      width: containerWidth.value
     }),
     ({ gap, width }) => {
-      if (width === undefined) {
+      if (width === null) {
         return;
       }
       const colWidth = (width + gap) / columns - gap;

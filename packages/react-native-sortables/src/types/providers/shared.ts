@@ -19,6 +19,8 @@ import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
 
 // COMMON VALUES
 
+export type ControlledContainerDimensions = { width: boolean; height: boolean };
+
 /**
  * Context values shared between all providers.
  * (they are stored in a single context to make the access to them easier
@@ -36,8 +38,10 @@ export type CommonValuesContextType = {
   snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
+  controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
   measuredContainerDimensions: SharedValue<Dimensions | null>;
-  appliedContainerDimensions: SharedValue<Partial<Dimensions> | null>;
+  containerWidth: SharedValue<null | number>;
+  containerHeight: SharedValue<null | number>;
   snapItemDimensions: SharedValue<Dimensions | null>;
   activeItemDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
@@ -63,14 +67,12 @@ export type CommonValuesContextType = {
 
 // MEASUREMENTS
 
-export type ControlledContainerDimensions = 'both' | 'height' | 'width';
-
 export type MeasurementsContextType = {
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
-  tryMeasureContainer: () => void;
-  maybeUpdateSnapDimensions: (key: string) => void;
+  measureContainer: () => void;
+  setItemDimensionsAsSnapDimensions: (key: string) => void;
 };
 
 // AUTO SCROLL

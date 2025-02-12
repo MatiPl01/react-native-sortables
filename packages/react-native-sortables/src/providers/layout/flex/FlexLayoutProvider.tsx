@@ -9,7 +9,6 @@ import {
 import { type DEFAULT_SORTABLE_FLEX_PROPS, IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type {
-  ControlledContainerDimensions,
   FlexLayout,
   FlexLayoutContextType,
   RequiredBy,
@@ -23,7 +22,6 @@ import { calculateLayout, updateLayoutDebugRects } from './utils';
 type FlexLayoutProviderProps = PropsWithChildren<
   {
     itemsCount: number;
-    controlledContainerDimensions: ControlledContainerDimensions;
   } & RequiredBy<
     SortableFlexStyle,
     keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
@@ -36,7 +34,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   alignContent,
   alignItems,
   columnGap: columnGap_,
-  controlledContainerDimensions,
   flexDirection,
   flexWrap,
   gap,
@@ -58,6 +55,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   width
 }) => {
   const {
+    controlledContainerDimensions,
     indexToKey,
     itemDimensions,
     itemPositions,
@@ -89,11 +87,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     let minW = Math.max(minWidth ?? 0, width ?? 0);
     let maxW = Math.min(maxWidth ?? Infinity, width ?? Infinity);
 
-    if (controlledContainerDimensions === 'height') {
+    if (controlledContainerDimensions.value.height) {
       // If width is not controlled, we need to use the measured width
       minW = maxW = measuredContainerDimensions.value.width;
     }
-    if (controlledContainerDimensions === 'width') {
+    if (controlledContainerDimensions.value.width) {
       // If height is not controlled, we need to use the measured height
       minH = maxH = measuredContainerDimensions.value.height;
     }

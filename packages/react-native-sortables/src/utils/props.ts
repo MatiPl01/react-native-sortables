@@ -19,7 +19,7 @@ type PropsWithDefaults<
   D extends Record<string, any>
 > = {
   sharedProps: Required<{ [K in keyof SharedProps]: P[K] }>;
-  rest: Omit<Required<P> & Omit<P, keyof D>, keyof SharedProps>;
+  rest: Omit<Omit<P, keyof D> & Required<P>, keyof SharedProps>;
 };
 
 export const getPropsWithDefaults = <

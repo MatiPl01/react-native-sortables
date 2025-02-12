@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { DebugProvider } from '../debug';
@@ -31,7 +32,7 @@ type SharedProviderProps = PropsWithChildren<
     hapticsEnabled: boolean;
     customHandle: boolean;
     debug: boolean;
-    controlledContainerDimensions: ControlledContainerDimensions;
+    controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
     initialItemsStyleOverride?: ViewStyle;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
@@ -46,7 +47,6 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollSpeed,
   children,
-  controlledContainerDimensions,
   debug,
   hapticsEnabled,
   itemKeys,
@@ -68,10 +68,7 @@ export default function SharedProvider({
     // Provider used for shared values between all providers below
     <CommonValuesProvider itemKeys={itemKeys} {...rest} />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider
-      controlledContainerDimensions={controlledContainerDimensions}
-      itemsCount={itemKeys.length}
-    />,
+    <MeasurementsProvider itemsCount={itemKeys.length} />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (

@@ -56,6 +56,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     containerHeight,
     containerRef,
     containerWidth,
+    customHandle,
     dragActivationDelay,
     dragActivationFailOffset,
     dropAnimationDuration,
@@ -72,11 +73,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     snapItemOffset,
     snapOffsetX,
     snapOffsetY,
-    customHandle,
     sortEnabled,
     touchPosition
   } = useCommonValuesContext();
-  const { setItemDimensionsAsSnapDimensions, tryMeasureContainer } =
+  const { measureContainer, setItemDimensionsAsSnapDimensions } =
     useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
@@ -318,7 +318,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       if (!canSwitchToAbsoluteLayout.value) {
-        tryMeasureContainer?.();
+        measureContainer?.();
       }
 
       touchStartTouch.value = touch;
@@ -341,7 +341,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dragActivationDelay,
       handleDragStart,
       sortEnabled,
-      tryMeasureContainer,
+      measureContainer,
       touchStartTouch
     ]
   );

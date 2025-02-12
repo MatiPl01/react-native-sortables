@@ -1,5 +1,6 @@
 import { type PropsWithChildren, useEffect, useRef } from 'react';
 import type { View, ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedRef,
   useDerivedValue,
@@ -12,6 +13,7 @@ import type {
   ActiveItemSnapSettings,
   Animatable,
   CommonValuesContextType,
+  ControlledContainerDimensions,
   Dimensions,
   ItemDragSettings,
   Maybe,
@@ -26,6 +28,7 @@ type CommonValuesProviderProps = PropsWithChildren<
     sortEnabled: Animatable<boolean>;
     customHandle: boolean;
     itemKeys: Array<string>;
+    controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
     initialItemsStyleOverride?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
@@ -39,6 +42,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   activeItemOpacity: _activeItemOpacity,
   activeItemScale: _activeItemScale,
   activeItemShadowOpacity: _activeItemShadowOpacity,
+  controlledContainerDimensions,
   customHandle,
   dragActivationDelay: _dragActivationDelay,
   dragActivationFailOffset: _dragActivationFailOffset,
@@ -67,10 +71,14 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const snapItemOffset = useSharedValue<Vector | null>(null);
 
   // DIMENSIONS
-  const measuredContainerDimensions = useSharedValue<null | Dimensions>(null);
-  const appliedContainerDimensions = useSharedValue<null | Partial<Dimensions>>(
-    null
-  );
+  // measured dimensions via onLayout used to calculate containerWidth and containerHeight
+  // (should be used for layout calculations and to determine if calculated
+  // container dimensions have been applied)
+  const measuredContainerDimensions = useSharedValue<Dimensions | null>(null);
+  // calculated based on measuredContainerDimensions and current layout
+  // (containerWidth and containerHeight should be used in most cases)
+  const containerWidth = useSharedValue<null | number>(null);
+  const containerHeight = useSharedValue<null | number>(null);
   const activeItemDimensions = useSharedValue<Dimensions | null>(null);
   const snapItemDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
@@ -132,9 +140,10 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       activeItemScale,
       activeItemShadowOpacity,
       canSwitchToAbsoluteLayout,
+      containerHeight,
       containerRef,
-      measuredContainerDimensions,
-      appliedContainerDimensions,
+      containerWidth,
+      controlledContainerDimensions,
       customHandle,
       dragActivationDelay,
       dragActivationFailOffset,
@@ -148,6 +157,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemPositions,
       itemsStyleOverride,
       keyToIndex,
+      measuredContainerDimensions,
       prevActiveItemKey,
       shouldAnimateLayout,
       snapItemDimensions,

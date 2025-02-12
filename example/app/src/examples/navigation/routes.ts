@@ -1,5 +1,4 @@
 /* eslint-disable perfectionist/sort-objects */
-import { SortableFlexCard, SortableGridCard } from '@/components';
 import * as SortableFlex from '@/examples/SortableFlex';
 import * as SortableGrid from '@/examples/SortableGrid';
 

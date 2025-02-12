@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
 import { useAnimatableValue, useDragEndHandler } from '../hooks';
@@ -56,6 +56,10 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
   const columnGapValue = useAnimatableValue(columnGap);
   const rowGapValue = useAnimatableValue(rowGap);
+  const controlledContainerDimensions = useSharedValue({
+    height: true,
+    width: false
+  });
 
   const itemKeys = useMemo(
     () => data.map((item, index) => keyExtractor(item, index)),
@@ -70,9 +74,9 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   return (
     <SharedProvider
       {...sharedProps}
+      controlledContainerDimensions={controlledContainerDimensions}
       itemKeys={itemKeys}
       key={columns}
-      controlledContainerDimensions='height' // TODO - add horizontal grid support
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
         columnGap={columnGapValue}

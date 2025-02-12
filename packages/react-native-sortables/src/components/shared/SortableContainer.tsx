@@ -31,25 +31,29 @@ export default function SortableContainer({
   const {
     activeItemDropped,
     activeItemKey,
-    appliedContainerDimensions,
     canSwitchToAbsoluteLayout,
+    containerHeight,
+    containerWidth,
+    controlledContainerDimensions,
     shouldAnimateLayout
   } = useCommonValuesContext();
 
   const outerContainerStyle = useAnimatedStyle(() => {
-    if (!canSwitchToAbsoluteLayout.value || !appliedContainerDimensions.value) {
+    if (!canSwitchToAbsoluteLayout.value) {
       return {};
     }
 
-    const maybeAnimate = (value: number | undefined) =>
+    const maybeAnimate = (value: null | number) =>
       animateContainerDimensions &&
       (!IS_WEB || shouldAnimateLayout.value) &&
-      value !== undefined
+      value !== null
         ? withTiming(value)
         : value;
 
-    const height = maybeAnimate(appliedContainerDimensions.value.height);
-    const width = maybeAnimate(appliedContainerDimensions.value.width);
+    const ctrl = controlledContainerDimensions.value;
+
+    const height = maybeAnimate(ctrl.height ? containerHeight.value : null);
+    const width = maybeAnimate(ctrl.width ? containerWidth.value : null);
     const overflow =
       activeItemKey.value !== null || !activeItemDropped.value
         ? 'visible'
@@ -59,16 +63,16 @@ export default function SortableContainer({
   }, [animateContainerDimensions]);
 
   const innerContainerStyle = useAnimatedStyle(() => {
-    if (!canSwitchToAbsoluteLayout.value || !appliedContainerDimensions.value) {
+    if (!canSwitchToAbsoluteLayout.value) {
       return {};
     }
 
     const minHeight =
       // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      appliedContainerDimensions.value.height || SCREEN_DIMENSIONS.height;
+      containerHeight.value || SCREEN_DIMENSIONS.height;
     const minWidth =
       // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      appliedContainerDimensions.value.width || SCREEN_DIMENSIONS.width;
+      containerWidth.value || SCREEN_DIMENSIONS.width;
 
     return {
       minHeight,
