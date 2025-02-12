@@ -53,18 +53,18 @@ export const DEFAULT_SHARED_PROPS = {
   } as ViewStyle,
   enableActiveItemSnap: true,
   hapticsEnabled: false,
-  onOrderChange: undefined,
-  scrollableRef: undefined,
-  onDragStart: undefined,
   inactiveItemOpacity: 0.5,
   inactiveItemScale: 1,
-  // Layout animations on web don't work properly so we don't provide
-  // default layout animations here. This is an issue that should be
   // fixed in `react-native-reanimated` in the future.
   itemEntering: IS_WEB ? undefined : SortableItemEntering,
   itemExiting: IS_WEB ? undefined : SortableItemExiting,
   itemLayout: IS_WEB ? undefined : LinearTransition,
+  // Layout animations on web don't work properly so we don't provide
+  // default layout animations here. This is an issue that should be
+  onDragStart: undefined,
+  onOrderChange: undefined,
   overDrag: 'both',
+  scrollableRef: undefined,
   showDropIndicator: false,
   snapOffsetX: '50%',
   snapOffsetY: '50%',

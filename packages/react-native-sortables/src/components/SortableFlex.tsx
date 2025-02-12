@@ -43,9 +43,9 @@ function SortableFlex(props: SortableFlexProps) {
   return (
     <SharedProvider
       {...sharedProps}
+      initialItemsStyleOverride={styles.styleOverride}
       itemKeys={itemKeys}
-      onDragEnd={onDragEnd}
-      initialItemsStyleOverride={styles.styleOverride}>
+      onDragEnd={onDragEnd}>
       <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
         <OrderUpdaterComponent
           key={useStrategyKey(strategy)}
