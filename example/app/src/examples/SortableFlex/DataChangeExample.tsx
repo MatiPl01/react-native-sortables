@@ -142,7 +142,7 @@ export default function DataChangeExample() {
               columnGap={spacing.sm}
               rowGap={spacing.xs}
               scrollableRef={scrollableRef}
-              animateHeight
+              animateContainerDimensions
               hapticsEnabled
               onDragEnd={({ order }) => setData(order(data))}>
               {data.map(item => (

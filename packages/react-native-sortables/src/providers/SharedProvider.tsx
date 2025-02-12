@@ -10,6 +10,7 @@ import type {
   ActiveItemSnapSettings,
   Animatable,
   AutoScrollSettings,
+  ControlledContainerDimensions,
   ItemDragSettings,
   PartialBy,
   SortableCallbacks
@@ -30,6 +31,7 @@ type SharedProviderProps = PropsWithChildren<
     hapticsEnabled: boolean;
     customHandle: boolean;
     debug: boolean;
+    controlledContainerDimensions: ControlledContainerDimensions;
     initialItemsStyleOverride?: ViewStyle;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &
@@ -44,6 +46,7 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollSpeed,
   children,
+  controlledContainerDimensions,
   debug,
   hapticsEnabled,
   itemKeys,
@@ -65,7 +68,10 @@ export default function SharedProvider({
     // Provider used for shared values between all providers below
     <CommonValuesProvider itemKeys={itemKeys} {...rest} />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider itemsCount={itemKeys.length} />,
+    <MeasurementsProvider
+      controlledContainerDimensions={controlledContainerDimensions}
+      itemsCount={itemKeys.length}
+    />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (

@@ -95,7 +95,7 @@ export type SortableCallbacks = {
 
 export type SharedProps = Simplify<
   {
-    animateHeight?: boolean;
+    animateContainerDimensions?: boolean;
     hapticsEnabled?: boolean;
     sortEnabled?: Animatable<boolean>;
     customHandle?: boolean;

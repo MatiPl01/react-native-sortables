@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import { Dimensions, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withTiming
@@ -11,16 +11,18 @@ import { useCommonValuesContext } from '../../providers';
 import type { DropIndicatorSettings } from '../../types';
 import DropIndicator from './DropIndicator';
 
+const SCREEN_DIMENSIONS = Dimensions.get('screen');
+
 type AnimatedHeightContainerProps = PropsWithChildren<
   {
-    animateHeight: boolean;
+    animateContainerDimensions: boolean;
     style?: StyleProp<ViewStyle>;
   } & DropIndicatorSettings
 >;
 
 export default function SortableContainer({
   DropIndicatorComponent,
-  animateHeight,
+  animateContainerDimensions,
   children,
   dropIndicatorStyle,
   showDropIndicator,
@@ -29,37 +31,50 @@ export default function SortableContainer({
   const {
     activeItemDropped,
     activeItemKey,
+    appliedContainerDimensions,
     canSwitchToAbsoluteLayout,
-    containerHeight,
     shouldAnimateLayout
   } = useCommonValuesContext();
 
   const outerContainerStyle = useAnimatedStyle(() => {
-    if (!canSwitchToAbsoluteLayout.value) {
+    if (!canSwitchToAbsoluteLayout.value || !appliedContainerDimensions.value) {
       return {};
     }
-    return {
-      height:
-        animateHeight &&
-        (!IS_WEB || shouldAnimateLayout.value) &&
-        containerHeight.value !== null
-          ? withTiming(containerHeight.value)
-          : containerHeight.value,
-      overflow:
-        activeItemKey.value !== null || !activeItemDropped.value
-          ? 'visible'
-          : 'hidden',
-      width: '100%'
-    };
-  }, [animateHeight]);
 
-  const innerContainerStyle = useAnimatedStyle(() =>
-    canSwitchToAbsoluteLayout.value
-      ? {
-          minHeight: containerHeight.value === 0 ? 9999 : containerHeight.value
-        }
-      : {}
-  );
+    const maybeAnimate = (value: number | undefined) =>
+      animateContainerDimensions &&
+      (!IS_WEB || shouldAnimateLayout.value) &&
+      value !== undefined
+        ? withTiming(value)
+        : value;
+
+    const height = maybeAnimate(appliedContainerDimensions.value.height);
+    const width = maybeAnimate(appliedContainerDimensions.value.width);
+    const overflow =
+      activeItemKey.value !== null || !activeItemDropped.value
+        ? 'visible'
+        : 'hidden';
+
+    return { height, overflow, width };
+  }, [animateContainerDimensions]);
+
+  const innerContainerStyle = useAnimatedStyle(() => {
+    if (!canSwitchToAbsoluteLayout.value || !appliedContainerDimensions.value) {
+      return {};
+    }
+
+    const minHeight =
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      appliedContainerDimensions.value.height || SCREEN_DIMENSIONS.height;
+    const minWidth =
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      appliedContainerDimensions.value.width || SCREEN_DIMENSIONS.width;
+
+    return {
+      minHeight,
+      minWidth
+    };
+  });
 
   return (
     <Animated.View

@@ -47,8 +47,10 @@ export const calculateLayout = ({
     : 0;
 
   return {
-    containerHeight,
     itemPositions,
-    rowOffsets
+    rowOffsets,
+    totalDimensions: {
+      height: containerHeight // TODO - add width for horizontal grid
+    }
   };
 };

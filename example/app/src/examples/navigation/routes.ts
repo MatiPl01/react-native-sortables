@@ -7,7 +7,7 @@ import type { Routes } from './types';
 
 const routes: Routes = {
   SortableGrid: {
-    CardComponent: SortableGridCard,
+    // CardComponent: SortableGridCard,
     name: 'Sortable Grid',
     routes: {
       Playground: {
@@ -49,7 +49,7 @@ const routes: Routes = {
     }
   },
   SortableFlex: {
-    CardComponent: SortableFlexCard,
+    // CardComponent: SortableFlexCard,
     name: 'Sortable Flex',
     routes: {
       Playground: {
@@ -63,6 +63,10 @@ const routes: Routes = {
       AutoScroll: {
         Component: SortableFlex.AutoScrollExample,
         name: 'Auto Scroll'
+      },
+      HorizontalAutoScroll: {
+        Component: SortableFlex.HorizontalAutoScrollExample,
+        name: 'Horizontal Auto Scroll'
       },
       DataChange: {
         Component: SortableFlex.DataChangeExample,

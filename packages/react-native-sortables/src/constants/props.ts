@@ -34,7 +34,7 @@ export const DEFAULT_SHARED_PROPS = {
   activeItemOpacity: 1,
   activeItemScale: 1.1,
   activeItemShadowOpacity: 0.2,
-  animateHeight: false,
+  animateContainerDimensions: false,
   autoScrollActivationOffset: 75,
   autoScrollEnabled: true,
   autoScrollSpeed: 1,

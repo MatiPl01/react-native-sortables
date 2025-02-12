@@ -2,7 +2,6 @@ import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
 import {
-  measure,
   runOnUI,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -12,43 +11,46 @@ import {
 import AnimatedOnLayoutView from '../../components/shared/AnimatedOnLayoutView';
 import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
-import type { Dimensions, MeasurementsContextType } from '../../types';
+import type {
+  ControlledContainerDimensions,
+  Dimensions,
+  MeasurementsContextType
+} from '../../types';
 import type { AnimatedTimeoutID } from '../../utils';
 import {
   areDimensionsDifferent,
   clearAnimatedTimeout,
-  maybeUpdateValue,
   setAnimatedTimeout
 } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
-type MeasurementsProviderProps = PropsWithChildren<{
+export type MeasurementsProviderProps = PropsWithChildren<{
+  controlledContainerDimensions: ControlledContainerDimensions;
   itemsCount: number;
-  measureParent?: boolean;
 }>;
 
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
 )<MeasurementsProviderProps, MeasurementsContextType>(({
   children,
+  controlledContainerDimensions,
   itemsCount
 }) => {
   const {
     activeItemDimensions,
     activeItemKey,
+    appliedContainerDimensions,
     canSwitchToAbsoluteLayout,
-    containerHeight,
     containerRef,
-    containerWidth,
     customHandle,
     itemDimensions,
+    measuredContainerDimensions,
     snapItemDimensions
   } = useCommonValuesContext();
 
   const measuredItemsCount = useSharedValue(0);
   const initialItemMeasurementsCompleted = useSharedValue(false);
-  const containerHeightApplied = useSharedValue(false);
   const updateTimeoutId = useSharedValue<AnimatedTimeoutID>(-1);
 
   useEffect(() => {
@@ -114,55 +116,90 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
    * Updates the dimensions of the handle that is currently being touched
    * (only if there is no custom handle and the entire item is treated as a handle)
    */
-  const maybeUpdateSnapDimensions = useCallback(
+  const setItemDimensionsAsSnapDimensions = useCallback(
     (key: string) => {
       'worklet';
-      const dimensions = itemDimensions.value[key] ?? null;
-      snapItemDimensions.value = dimensions;
+      snapItemDimensions.value = itemDimensions.value[key] ?? null;
     },
     [itemDimensions, snapItemDimensions]
   );
 
-  const checkMeasuredHeight = useCallback(
-    (measuredHeight: number) => {
+  const applyControlledContainerDimensions = useCallback(
+    (dimensions: Partial<Dimensions>) => {
       'worklet';
-      if (
-        containerHeight.value !== null &&
-        Math.abs(measuredHeight - containerHeight.value) < OFFSET_EPS
-      ) {
-        containerHeightApplied.value = true;
+      switch (controlledContainerDimensions) {
+        case 'both': {
+          if (
+            appliedContainerDimensions.value?.height !== dimensions.height ||
+            appliedContainerDimensions.value?.width !== dimensions.width
+          ) {
+            appliedContainerDimensions.value = dimensions;
+          }
+          break;
+        }
+        case 'height': {
+          if (appliedContainerDimensions.value?.height !== dimensions.height) {
+            appliedContainerDimensions.value = { height: dimensions.height };
+          }
+          break;
+        }
+        case 'width': {
+          if (appliedContainerDimensions.value?.width !== dimensions.width) {
+            appliedContainerDimensions.value = { width: dimensions.width };
+          }
+          break;
+        }
       }
     },
-    [containerHeight, containerHeightApplied]
+    [appliedContainerDimensions, controlledContainerDimensions]
   );
 
   const handleHelperContainerMeasurement = useCallback(
-    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
-      maybeUpdateValue(containerWidth, layout.width, OFFSET_EPS);
-      runOnUI(checkMeasuredHeight)(layout.height);
+    ({
+      nativeEvent: {
+        layout: { height, width }
+      }
+    }: LayoutChangeEvent) => {
+      runOnUI(() => {
+        const layoutDimensions = { height, width };
+        if (
+          measuredContainerDimensions.value === null ||
+          areDimensionsDifferent(
+            measuredContainerDimensions.value,
+            layoutDimensions
+          )
+        ) {
+          measuredContainerDimensions.value = layoutDimensions;
+        }
+      })();
     },
-    [containerWidth, checkMeasuredHeight]
+    [measuredContainerDimensions]
   );
-
-  const tryMeasureContainerHeight = useCallback(() => {
-    'worklet';
-    const measurements = measure(containerRef);
-    if (measurements) {
-      checkMeasuredHeight(measurements.height);
-    }
-  }, [checkMeasuredHeight, containerRef]);
-
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    minHeight: containerHeight.value === -1 ? undefined : containerHeight.value
-  }));
 
   useAnimatedReaction(
-    () =>
-      containerHeightApplied.value && initialItemMeasurementsCompleted.value,
-    canSwitch => {
-      canSwitchToAbsoluteLayout.value = canSwitch;
+    () => ({
+      appliedDimensions: appliedContainerDimensions.value,
+      itemMeasurementsCompleted: initialItemMeasurementsCompleted.value,
+      measuredDimensions: measuredContainerDimensions.value
+    }),
+    ({ appliedDimensions, itemMeasurementsCompleted, measuredDimensions }) => {
+      canSwitchToAbsoluteLayout.value = !!(
+        measuredDimensions &&
+        appliedDimensions &&
+        itemMeasurementsCompleted &&
+        (appliedDimensions.height === undefined ||
+          Math.abs(measuredDimensions.height - appliedDimensions.height) <
+            OFFSET_EPS) &&
+        (appliedDimensions.width === undefined ||
+          Math.abs(measuredDimensions.width - appliedDimensions.width) <
+            OFFSET_EPS)
+      );
     }
   );
+
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    ...appliedContainerDimensions.value
+  }));
 
   return {
     children: (
@@ -176,10 +213,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       </>
     ),
     value: {
+      applyControlledContainerDimensions,
       handleItemMeasurement,
       handleItemRemoval,
-      maybeUpdateSnapDimensions,
-      tryMeasureContainerHeight
+      setItemDimensionsAsSnapDimensions
     }
   };
 });
@@ -188,7 +225,6 @@ const styles = StyleSheet.create({
   helperContainer: {
     left: 0,
     position: 'absolute',
-    right: 0,
     top: 0
   }
 });

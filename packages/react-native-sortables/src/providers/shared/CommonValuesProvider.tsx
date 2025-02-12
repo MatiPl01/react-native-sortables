@@ -67,8 +67,10 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const snapItemOffset = useSharedValue<Vector | null>(null);
 
   // DIMENSIONS
-  const containerWidth = useSharedValue<null | number>(null);
-  const containerHeight = useSharedValue<null | number>(null);
+  const measuredContainerDimensions = useSharedValue<null | Dimensions>(null);
+  const appliedContainerDimensions = useSharedValue<null | Partial<Dimensions>>(
+    null
+  );
   const activeItemDimensions = useSharedValue<Dimensions | null>(null);
   const snapItemDimensions = useSharedValue<Dimensions | null>(null);
   const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
@@ -130,9 +132,9 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       activeItemScale,
       activeItemShadowOpacity,
       canSwitchToAbsoluteLayout,
-      containerHeight,
       containerRef,
-      containerWidth,
+      measuredContainerDimensions,
+      appliedContainerDimensions,
       customHandle,
       dragActivationDelay,
       dragActivationFailOffset,

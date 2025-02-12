@@ -9,19 +9,21 @@ import {
 import { type DEFAULT_SORTABLE_FLEX_PROPS, IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type {
+  ControlledContainerDimensions,
   FlexLayout,
   FlexLayoutContextType,
   RequiredBy,
   SortableFlexStyle
 } from '../../../types';
 import { haveEqualPropValues } from '../../../utils';
-import { useCommonValuesContext } from '../../shared';
+import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';
 
 type FlexLayoutProviderProps = PropsWithChildren<
   {
     itemsCount: number;
+    controlledContainerDimensions: ControlledContainerDimensions;
   } & RequiredBy<
     SortableFlexStyle,
     keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
@@ -34,6 +36,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   alignContent,
   alignItems,
   columnGap: columnGap_,
+  controlledContainerDimensions,
   flexDirection,
   flexWrap,
   gap,
@@ -41,7 +44,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   itemsCount,
   justifyContent,
   maxHeight,
+  maxWidth,
   minHeight,
+  minWidth,
   padding,
   paddingBottom,
   paddingHorizontal,
@@ -49,16 +54,17 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   paddingRight,
   paddingTop,
   paddingVertical,
-  rowGap: rowGap_
+  rowGap: rowGap_,
+  width
 }) => {
   const {
-    containerHeight,
-    containerWidth,
     indexToKey,
     itemDimensions,
     itemPositions,
+    measuredContainerDimensions,
     shouldAnimateLayout
   } = useCommonValuesContext();
+  const { applyControlledContainerDimensions } = useMeasurementsContext();
   const debugContext = useDebugContext();
 
   const keyToGroup = useSharedValue<Record<string, number>>({});
@@ -74,13 +80,29 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   }));
 
   const dimensionsLimits = useDerivedValue(() => {
-    const minH = Math.max(minHeight ?? 0, height ?? 0);
-    const maxH = Math.max(maxHeight ?? 0, height ?? 0) || Infinity;
+    if (!measuredContainerDimensions.value) {
+      return null;
+    }
+
+    let minH = Math.max(minHeight ?? 0, height ?? 0);
+    let maxH = Math.min(maxHeight ?? Infinity, height ?? Infinity);
+    let minW = Math.max(minWidth ?? 0, width ?? 0);
+    let maxW = Math.min(maxWidth ?? Infinity, width ?? Infinity);
+
+    if (controlledContainerDimensions === 'height') {
+      // If width is not controlled, we need to use the measured width
+      minW = maxW = measuredContainerDimensions.value.width;
+    }
+    if (controlledContainerDimensions === 'width') {
+      // If height is not controlled, we need to use the measured height
+      minH = maxH = measuredContainerDimensions.value.height;
+    }
 
     return {
       maxHeight: maxH,
+      maxWidth: maxW,
       minHeight: maxHeight ? Math.min(minH, maxH) : minH,
-      width: containerWidth.value ?? 0
+      minWidth: maxWidth ? Math.min(minW, maxW) : minW
     };
   });
 
@@ -124,12 +146,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
             props && calculateLayout(props),
             // Animate layout only if parent container is not resized
             // (e.g. skip animation when the browser window is resized)
-            !!(
-              IS_WEB &&
-              props &&
-              previousProps &&
-              haveEqualPropValues(props.limits, previousProps.limits)
-            )
+            IS_WEB && haveEqualPropValues(props?.limits, previousProps?.limits)
           );
         }
       ),
@@ -193,9 +210,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     appliedLayout.value = layout;
     // Update item positions
     itemPositions.value = layout.itemPositions;
-    // Update container height
-    const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
-    containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
+    // Update controlled container dimensions
+    applyControlledContainerDimensions(layout.totalDimensions);
     // Update key to group
     keyToGroup.value = Object.fromEntries(
       layout.itemGroups.flatMap((group, i) => group.map(key => [key, i]))

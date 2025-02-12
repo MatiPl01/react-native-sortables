@@ -72,10 +72,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     snapItemOffset,
     snapOffsetX,
     snapOffsetY,
+    customHandle,
     sortEnabled,
     touchPosition
   } = useCommonValuesContext();
-  const { maybeUpdateSnapDimensions, tryMeasureContainerHeight } =
+  const { setItemDimensionsAsSnapDimensions, tryMeasureContainer } =
     useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
@@ -242,8 +243,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationState.value = DragActivationState.ACTIVE;
 
       updateLayer?.(LayerState.Focused);
-      maybeUpdateSnapDimensions(key);
       updateStartScrollOffset?.();
+      if (!customHandle) {
+        setItemDimensionsAsSnapDimensions(key);
+      }
 
       const hasInactiveAnimation =
         inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
@@ -270,6 +273,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemKey,
       activeItemPosition,
       containerRef,
+      customHandle,
       dragStartIndex,
       dragStartItemTouchOffset,
       dragStartTouch,
@@ -281,8 +285,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       itemDimensions,
       itemPositions,
       keyToIndex,
-      maybeUpdateSnapDimensions,
       prevActiveItemKey,
+      setItemDimensionsAsSnapDimensions,
       stableOnDragStart,
       touchPosition,
       updateLayer,
@@ -314,7 +318,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       if (!canSwitchToAbsoluteLayout.value) {
-        tryMeasureContainerHeight?.();
+        tryMeasureContainer?.();
       }
 
       touchStartTouch.value = touch;
@@ -337,7 +341,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dragActivationDelay,
       handleDragStart,
       sortEnabled,
-      tryMeasureContainerHeight,
+      tryMeasureContainer,
       touchStartTouch
     ]
   );

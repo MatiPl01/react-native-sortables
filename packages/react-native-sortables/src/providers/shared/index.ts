@@ -10,6 +10,7 @@ export { ItemContextProvider, useItemContext } from './ItemContextProvider';
 export { LayerProvider } from './LayerProvider';
 export {
   MeasurementsProvider,
-  useMeasurementsContext
+  useMeasurementsContext,
+  type MeasurementsProviderProps
 } from './MeasurementsProvider';
 export * from './utils';

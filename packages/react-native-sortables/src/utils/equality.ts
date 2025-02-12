@@ -1,4 +1,4 @@
-import type { AnyRecord, Dimensions, Vector } from '../types';
+import type { AnyRecord, Dimensions, Maybe, Vector } from '../types';
 
 export const areArraysDifferent = <T>(
   arr1: Array<T>,
@@ -40,10 +40,14 @@ export const areDimensionsDifferent = (
 };
 
 export const haveEqualPropValues = <T extends AnyRecord>(
-  obj1: T,
-  obj2: T
+  obj1: Maybe<T>,
+  obj2: Maybe<T>
 ): boolean => {
   'worklet';
+  if (!obj1 || !obj2) {
+    return false;
+  }
+
   const obj1Keys = Object.keys(obj1);
   const obj2Keys = Object.keys(obj2);
   return (

@@ -1,4 +1,4 @@
-import { type ReactElement } from 'react';
+import { type ReactElement, useMemo } from 'react';
 import { StyleSheet, type ViewStyle } from 'react-native';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
@@ -20,7 +20,7 @@ function SortableFlex(props: SortableFlexProps) {
     rest: { children, onDragEnd: _onDragEnd, strategy, ...styleProps },
     sharedProps: {
       DropIndicatorComponent,
-      animateHeight,
+      animateContainerDimensions,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
@@ -33,6 +33,14 @@ function SortableFlex(props: SortableFlexProps) {
   const childrenArray = validateChildren(children);
   const itemKeys = childrenArray.map(([key]) => key);
 
+  const { flexDirection, flexWrap } = styleProps;
+  const controlledContainerDimensions = useMemo(() => {
+    if (flexWrap === 'nowrap') {
+      return 'both';
+    }
+    return flexDirection === 'row' ? 'height' : 'width';
+  }, [flexWrap, flexDirection]);
+
   const onDragEnd = useDragEndHandler(_onDragEnd, params => ({
     ...params,
     order<I>(data: Array<I>) {
@@ -43,10 +51,14 @@ function SortableFlex(props: SortableFlexProps) {
   return (
     <SharedProvider
       {...sharedProps}
+      controlledContainerDimensions={controlledContainerDimensions}
       initialItemsStyleOverride={styles.styleOverride}
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
-      <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
+      <FlexLayoutProvider
+        {...styleProps}
+        controlledContainerDimensions={controlledContainerDimensions}
+        itemsCount={itemKeys.length}>
         <OrderUpdaterComponent
           key={useStrategyKey(strategy)}
           predefinedStrategies={FLEX_STRATEGIES}
@@ -54,7 +66,7 @@ function SortableFlex(props: SortableFlexProps) {
           useAdditionalValues={useFlexLayoutContext}
         />
         <SortableFlexInner
-          animateHeight={animateHeight}
+          animateContainerDimensions={animateContainerDimensions}
           childrenArray={childrenArray}
           DropIndicatorComponent={DropIndicatorComponent}
           dropIndicatorStyle={dropIndicatorStyle}
@@ -76,7 +88,10 @@ type SortableFlexInnerProps = {
   Required<
     Pick<
       SortableFlexProps,
-      'animateHeight' | 'itemEntering' | 'itemExiting' | 'itemLayout'
+      | 'animateContainerDimensions'
+      | 'itemEntering'
+      | 'itemExiting'
+      | 'itemLayout'
     >
   >;
 

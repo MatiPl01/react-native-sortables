@@ -36,8 +36,8 @@ export type CommonValuesContextType = {
   snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
-  containerWidth: SharedValue<null | number>;
-  containerHeight: SharedValue<null | number>;
+  measuredContainerDimensions: SharedValue<Dimensions | null>;
+  appliedContainerDimensions: SharedValue<Partial<Dimensions> | null>;
   snapItemDimensions: SharedValue<Dimensions | null>;
   activeItemDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
@@ -63,10 +63,13 @@ export type CommonValuesContextType = {
 
 // MEASUREMENTS
 
+export type ControlledContainerDimensions = 'both' | 'height' | 'width';
+
 export type MeasurementsContextType = {
+  applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
-  tryMeasureContainerHeight: () => void;
+  tryMeasureContainer: () => void;
   maybeUpdateSnapDimensions: (key: string) => void;
 };
 

@@ -14,5 +14,5 @@ export type GridLayoutProps = {
 export type GridLayout = {
   rowOffsets: Array<number>;
   itemPositions: Record<string, Vector>;
-  containerHeight: number;
+  totalDimensions: Partial<Dimensions>;
 };
