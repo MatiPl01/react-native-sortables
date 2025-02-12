@@ -59,7 +59,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     indexToKey,
     itemDimensions,
     itemPositions,
-    measuredContainerDimensions,
+    measuredContainerHeight,
+    measuredContainerWidth,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
@@ -78,7 +79,10 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   }));
 
   const dimensionsLimits = useDerivedValue(() => {
-    if (!measuredContainerDimensions.value) {
+    if (
+      measuredContainerHeight.value === null ||
+      measuredContainerWidth.value === null
+    ) {
       return null;
     }
 
@@ -87,14 +91,34 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     let minW = Math.max(minWidth ?? 0, width ?? 0);
     let maxW = Math.min(maxWidth ?? Infinity, width ?? Infinity);
 
-    if (controlledContainerDimensions.value.height) {
-      // If width is not controlled, we need to use the measured width
-      minW = maxW = measuredContainerDimensions.value.width;
+    console.log(
+      'controlledContainerDimensions.value',
+      controlledContainerDimensions.value,
+      measuredContainerWidth.value,
+      measuredContainerHeight.value
+    );
+
+    if (!controlledContainerDimensions.value.width) {
+      console.log(
+        'not controlled width set to: ',
+        measuredContainerWidth.value
+      );
+      minW = maxW = measuredContainerWidth.value;
     }
-    if (controlledContainerDimensions.value.width) {
-      // If height is not controlled, we need to use the measured height
-      minH = maxH = measuredContainerDimensions.value.height;
+    if (!controlledContainerDimensions.value.height) {
+      console.log(
+        'not controlled height set to: ',
+        measuredContainerHeight.value
+      );
+      minH = maxH = measuredContainerHeight.value;
     }
+
+    console.log({
+      maxHeight: maxH,
+      maxWidth: maxW,
+      minHeight: maxHeight ? Math.min(minH, maxH) : minH,
+      minWidth: maxWidth ? Math.min(minW, maxW) : minW
+    });
 
     return {
       maxHeight: maxH,

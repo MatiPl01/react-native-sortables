@@ -1,7 +1,6 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 import {
   measure,
   runOnUI,
@@ -11,13 +10,8 @@ import {
 } from 'react-native-reanimated';
 
 import AnimatedOnLayoutView from '../../components/shared/AnimatedOnLayoutView';
-import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
-import type {
-  Dimension,
-  Dimensions,
-  MeasurementsContextType
-} from '../../types';
+import type { Dimensions, MeasurementsContextType } from '../../types';
 import type { AnimatedTimeoutID } from '../../utils';
 import {
   areDimensionsDifferent,
@@ -47,7 +41,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     controlledContainerDimensions,
     customHandle,
     itemDimensions,
-    measuredContainerDimensions,
+    measuredContainerHeight,
+    measuredContainerWidth,
     snapItemDimensions
   } = useCommonValuesContext();
 
@@ -130,44 +125,41 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     (dimensions: Partial<Dimensions>) => {
       'worklet';
       // Reset container dimensions to the measured dimensions
-      containerHeight.value = measuredContainerDimensions.value?.height ?? null;
-      containerWidth.value = measuredContainerDimensions.value?.width ?? null;
-
-      const update = (
-        target: SharedValue<null | number>,
-        dimension: Dimension
-      ) => {
-        target.value =
-          dimensions[dimension] ??
-          measuredContainerDimensions.value?.[dimension] ??
-          null;
-      };
+      containerHeight.value = measuredContainerHeight.value ?? null;
+      containerWidth.value = measuredContainerWidth.value ?? null;
 
       // Override controlled dimensions (dimensions that are applied based
       // on the sortable component layout calculations)
-      if (controlledContainerDimensions.value.height) {
-        update(containerHeight, 'height');
+      if (
+        controlledContainerDimensions.value.height &&
+        dimensions.height !== undefined
+      ) {
+        containerHeight.value = dimensions.height;
       }
-      if (controlledContainerDimensions.value.width) {
-        update(containerWidth, 'width');
+      if (
+        controlledContainerDimensions.value.width &&
+        dimensions.width !== undefined
+      ) {
+        console.log('>>>> dimensions.width', dimensions.width);
+        containerWidth.value = dimensions.width;
       }
     },
     [
       containerHeight,
       containerWidth,
       controlledContainerDimensions,
-      measuredContainerDimensions
+      measuredContainerHeight,
+      measuredContainerWidth
     ]
   );
 
   const applyMeasuredContainerDimensions = useCallback(
     (dimensions: Dimensions) => {
       'worklet';
-      if (
-        measuredContainerDimensions.value === null ||
-        areDimensionsDifferent(measuredContainerDimensions.value, dimensions)
-      ) {
-        measuredContainerDimensions.value = dimensions;
+      measuredContainerHeight.value = dimensions.height;
+      measuredContainerWidth.value = dimensions.width;
+
+      if (canSwitchToAbsoluteLayout.value) {
         if (!controlledContainerDimensions.value.height) {
           containerHeight.value = dimensions.height;
         }
@@ -177,9 +169,12 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
     },
     [
+      canSwitchToAbsoluteLayout,
       containerHeight,
+      containerWidth,
       controlledContainerDimensions,
-      measuredContainerDimensions
+      measuredContainerHeight,
+      measuredContainerWidth
     ]
   );
 
@@ -203,30 +198,35 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       containerH: containerHeight.value,
       containerW: containerWidth.value,
       itemMeasurementsCompleted: initialItemMeasurementsCompleted.value,
-      measuredDimensions: measuredContainerDimensions.value
+      measuredHeight: measuredContainerHeight.value,
+      measuredWidth: measuredContainerWidth.value
     }),
     ({
       containerH,
       containerW,
       itemMeasurementsCompleted,
-      measuredDimensions
+      measuredHeight,
+      measuredWidth
     }) => {
-      if (!canSwitchToAbsoluteLayout.value) {
-        canSwitchToAbsoluteLayout.value = !!(
-          itemMeasurementsCompleted &&
-          measuredDimensions &&
-          (containerH === null ||
-            Math.abs(measuredDimensions.height - containerH) < OFFSET_EPS) &&
-          (containerW === null ||
-            Math.abs(measuredDimensions.width - containerW) < OFFSET_EPS)
-        );
+      console.log('?', containerH, containerW, measuredHeight, measuredWidth);
+
+      if (
+        canSwitchToAbsoluteLayout.value ||
+        !itemMeasurementsCompleted ||
+        measuredHeight === null ||
+        measuredWidth === null ||
+        (containerH === null && containerW === null)
+      ) {
+        return;
       }
+
+      canSwitchToAbsoluteLayout.value = true;
     }
   );
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
-    height: containerHeight.value,
-    width: containerWidth.value
+    minHeight: containerHeight.value,
+    minWidth: containerWidth.value
   }));
 
   return {
@@ -234,7 +234,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       <>
         <AnimatedOnLayoutView
           ref={containerRef}
-          style={[styles.helperContainer, animatedContainerStyle]}
+          style={[StyleSheet.absoluteFill, animatedContainerStyle]}
           onLayout={handleHelperContainerMeasurement}
         />
         {children}
@@ -248,14 +248,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       setItemDimensionsAsSnapDimensions
     }
   };
-});
-
-const styles = StyleSheet.create({
-  helperContainer: {
-    left: 0,
-    position: 'absolute',
-    top: 0
-  }
 });
 
 export { MeasurementsProvider, useMeasurementsContext };

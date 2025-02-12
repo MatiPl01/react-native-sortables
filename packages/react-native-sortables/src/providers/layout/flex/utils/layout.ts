@@ -167,15 +167,23 @@ const handleLayoutCalculation = (
 
   if (isRow) {
     minMainContainerSize = limits.minWidth - paddingHorizontal;
-    maxMainContainerSize = minMainContainerSize; // width is the same
+    maxMainContainerSize = limits.maxWidth - paddingHorizontal;
     minCrossContainerSize = limits.minHeight - paddingVertical;
     maxCrossContainerSize = limits.maxHeight - paddingVertical;
   } else {
     minMainContainerSize = limits.minHeight - paddingVertical;
     maxMainContainerSize = limits.maxHeight - paddingVertical;
     minCrossContainerSize = limits.minWidth - paddingHorizontal;
-    maxCrossContainerSize = minCrossContainerSize; // width is the same
+    maxCrossContainerSize = limits.maxWidth - paddingHorizontal;
   }
+
+  console.log('>>>>', {
+    isRow,
+    maxCrossContainerSize,
+    maxMainContainerSize,
+    minCrossContainerSize,
+    minMainContainerSize
+  });
 
   // ALIGN CONTENT
   // position groups on the cross axis

@@ -1,5 +1,5 @@
 import type { FlashList } from '@shopify/flash-list';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, {
   LinearTransition,
@@ -8,7 +8,7 @@ import Animated, {
 import Sortable from 'react-native-sortables';
 
 import { FlexCell, TabView } from '@/components';
-import { spacing } from '@/theme';
+import { spacing, style } from '@/theme';
 import { getCategories, IS_WEB } from '@/utils';
 
 const MANY_CATEGORIES = getCategories(IS_WEB ? 30 : 20);
@@ -30,25 +30,23 @@ function ScrollViewExample() {
   return (
     <>
       <View style={{ backgroundColor: 'red', height: 200, width: 200 }} />
-      {/* <ScrollView
-        ref={scrollableRef}
-        style={{ backgroundColor: 'blue', maxHeight: 200 }}
-        contentContainerStyle={[
-          style.contentContainer,
-          { backgroundColor: 'yellow', maxHeight: 150, maxWidth: 400 }
-        ]}
-        horizontal> */}
-      <View
-        style={{
-          backgroundColor: 'blue',
-          flex: 0,
-          flexDirection: 'row',
-          flexShrink: 1,
-          height: 100
-        }}>
-        <SortableFlex scrollableRef={scrollableRef} />
-      </View>
-      {/* </ScrollView> */}
+      <Sortable.Layer>
+        <Animated.ScrollView
+          ref={scrollableRef}
+          style={{
+            backgroundColor: 'blue',
+            maxHeight: 200,
+            overflow: 'visible'
+          }}
+          contentContainerStyle={[
+            {
+              backgroundColor: 'yellow'
+            }
+          ]}
+          horizontal>
+          <SortableFlex scrollableRef={scrollableRef} />
+        </Animated.ScrollView>
+      </Sortable.Layer>
       <View style={{ backgroundColor: 'green', height: 200, width: 200 }} />
     </>
   );
@@ -63,7 +61,7 @@ type SortableFlexProps = {
 };
 
 function SortableFlex({ scrollableRef }: SortableFlexProps) {
-  if (true) {
+  if (false) {
     return (
       <View
         style={{
@@ -71,7 +69,6 @@ function SortableFlex({ scrollableRef }: SortableFlexProps) {
           alignItems: 'flex-start',
           columnGap: 12,
           flexDirection: 'row',
-          flexWrap: 'wrap',
           gap: 0,
           justifyContent: 'flex-start',
           padding: 0,
@@ -88,15 +85,21 @@ function SortableFlex({ scrollableRef }: SortableFlexProps) {
 
   return (
     <Sortable.Flex
-      columnGap={spacing.sm}
-      flexDirection='row'
-      flexWrap='nowrap'
-      rowGap={spacing.xs}
-      scrollableRef={scrollableRef}>
+      {...{
+        alignContent: 'flex-start',
+        alignItems: 'flex-start',
+        columnGap: 12,
+        flexWrap: 'nowrap',
+        flexDirection: 'row',
+        gap: 0,
+        justifyContent: 'flex-start',
+        padding: 0,
+        rowGap: 8
+      }}>
       {MANY_CATEGORIES.map(item => (
-        <FlexCell key={item} size='large'>
-          {item}
-        </FlexCell>
+        <Animated.View key={item} layout={LinearTransition}>
+          <FlexCell size='large'>{item}</FlexCell>
+        </Animated.View>
       ))}
     </Sortable.Flex>
   );

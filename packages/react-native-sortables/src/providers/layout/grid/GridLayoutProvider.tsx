@@ -39,11 +39,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowGap: rowGap_
 }) => {
   const {
-    containerWidth,
     indexToKey,
     itemDimensions,
     itemPositions,
     itemsStyleOverride,
+    measuredContainerWidth,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
@@ -111,14 +111,16 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   useAnimatedReaction(
     () => ({
       gap: columnGap.value,
-      width: containerWidth.value
+      width: measuredContainerWidth.value
     }),
     ({ gap, width }) => {
-      if (width === null) {
+      if (width === null || width <= 0) {
         return;
       }
       const colWidth = (width + gap) / columns - gap;
       columnWidth.value = colWidth;
+
+      console.log('>>>> colWidth', colWidth);
 
       // DEBUG ONLY
       if (debugColumnGapRects) {
@@ -145,6 +147,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     itemPositions.value = layout.itemPositions;
     // Update controlled container dimensions
     applyControlledContainerDimensions(layout.totalDimensions);
+    console.log('>>>> layout', layout);
     // Update style overrides
     const currentStyleOverride = itemsStyleOverride.value;
     if (currentStyleOverride?.width !== columnWidth.value) {

@@ -40,8 +40,8 @@ function SortableFlex(props: SortableFlexProps) {
       return { height: true, width: true };
     }
     return flexDirection === 'row'
-      ? { height: false, width: true }
-      : { height: true, width: false };
+      ? { height: true, width: false }
+      : { height: false, width: true };
   }, [flexWrap, flexDirection]);
 
   const onDragEnd = useDragEndHandler(_onDragEnd, params => ({

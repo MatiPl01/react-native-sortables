@@ -64,6 +64,8 @@ function DraggableView({
     </ItemDecoration>
   );
 
+  console.log('<<<', key);
+
   return (
     <Animated.View
       {...viewProps}

@@ -74,8 +74,9 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   // measured dimensions via onLayout used to calculate containerWidth and containerHeight
   // (should be used for layout calculations and to determine if calculated
   // container dimensions have been applied)
-  const measuredContainerDimensions = useSharedValue<Dimensions | null>(null);
-  // calculated based on measuredContainerDimensions and current layout
+  const measuredContainerWidth = useSharedValue<null | number>(null);
+  const measuredContainerHeight = useSharedValue<null | number>(null);
+  // calculated based on measuredContainerWidth and measuredContainerHeight and current layout
   // (containerWidth and containerHeight should be used in most cases)
   const containerWidth = useSharedValue<null | number>(null);
   const containerHeight = useSharedValue<null | number>(null);
@@ -157,7 +158,8 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemPositions,
       itemsStyleOverride,
       keyToIndex,
-      measuredContainerDimensions,
+      measuredContainerHeight,
+      measuredContainerWidth,
       prevActiveItemKey,
       shouldAnimateLayout,
       snapItemDimensions,

@@ -39,7 +39,8 @@ export type CommonValuesContextType = {
 
   // DIMENSIONS
   controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
-  measuredContainerDimensions: SharedValue<Dimensions | null>;
+  measuredContainerWidth: SharedValue<null | number>;
+  measuredContainerHeight: SharedValue<null | number>;
   containerWidth: SharedValue<null | number>;
   containerHeight: SharedValue<null | number>;
   snapItemDimensions: SharedValue<Dimensions | null>;
