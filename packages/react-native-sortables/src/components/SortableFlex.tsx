@@ -1,5 +1,5 @@
 import { type ReactElement } from 'react';
-import type { ViewStyle } from 'react-native';
+import { StyleSheet, type ViewStyle } from 'react-native';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import { useDragEndHandler } from '../hooks';
@@ -41,7 +41,11 @@ function SortableFlex(props: SortableFlexProps) {
   }));
 
   return (
-    <SharedProvider {...sharedProps} itemKeys={itemKeys} onDragEnd={onDragEnd}>
+    <SharedProvider
+      {...sharedProps}
+      itemKeys={itemKeys}
+      onDragEnd={onDragEnd}
+      initialItemsStyleOverride={styles.styleOverride}>
       <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
         <OrderUpdaterComponent
           key={useStrategyKey(strategy)}
@@ -99,5 +103,12 @@ function SortableFlexInner({
     </SortableContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  styleOverride: {
+    // This is needed to prevent items from stretching (which is default behavior)
+    alignSelf: 'flex-start'
+  }
+});
 
 export default SortableFlex;

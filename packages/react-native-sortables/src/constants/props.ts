@@ -21,17 +21,12 @@ export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
 /**
  * DEFAULT SHARED PROPS
  */
-type OptionalSharedProps = keyof ItemLayoutAnimationSettings;
-
-type ExcludedSharedProps =
+type OptionalSharedProps =
   | 'scrollableRef'
+  | keyof ItemLayoutAnimationSettings
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
-type DefaultSharedProps = DefaultProps<
-  SharedProps,
-  OptionalSharedProps,
-  ExcludedSharedProps
->;
+type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
 
 export const DEFAULT_SHARED_PROPS = {
   DropIndicatorComponent: DefaultDropIndicator,
@@ -58,6 +53,9 @@ export const DEFAULT_SHARED_PROPS = {
   } as ViewStyle,
   enableActiveItemSnap: true,
   hapticsEnabled: false,
+  onOrderChange: undefined,
+  scrollableRef: undefined,
+  onDragStart: undefined,
   inactiveItemOpacity: 0.5,
   inactiveItemScale: 1,
   // Layout animations on web don't work properly so we don't provide
@@ -76,11 +74,7 @@ export const DEFAULT_SHARED_PROPS = {
 /**
  * DEFAULT SORTABLE GRID PROPS
  */
-type ExcludedFromDefaultGridProps =
-  | 'data'
-  | 'onDragEnd'
-  | 'renderItem'
-  | ExcludedSharedProps;
+type ExcludedFromDefaultGridProps = 'data' | 'onDragEnd' | 'renderItem';
 
 type DefaultSortableGridProps = DefaultProps<
   Omit<SortableGridProps<unknown>, keyof DefaultSharedProps>,
@@ -116,7 +110,7 @@ type OptionalDefaultFlexProps =
   | 'rowGap'
   | 'width';
 
-type ExcludedFromDefaultFlexProps = 'onDragEnd' | ExcludedSharedProps;
+type ExcludedFromDefaultFlexProps = 'onDragEnd';
 
 type DefaultSortableFlexProps = DefaultProps<
   Omit<SortableFlexProps, keyof DefaultSharedProps>,
