@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import { type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withTiming

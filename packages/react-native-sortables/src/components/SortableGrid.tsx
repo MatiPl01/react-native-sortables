@@ -40,6 +40,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       onDragEnd: _onDragEnd,
       renderItem,
       rowGap,
+      rowHeight,
+      rows,
       strategy
     },
     sharedProps: {
@@ -97,6 +99,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           itemLayout={itemLayout}
           renderItem={renderItem}
           rowGap={rowGapValue}
+          rowHeight={rowHeight as number}
+          rows={rows}
           showDropIndicator={showDropIndicator}
         />
       </GridLayoutProvider>
@@ -119,6 +123,8 @@ type SortableGridInnerProps<I> = {
       | 'itemExiting'
       | 'itemLayout'
       | 'renderItem'
+      | 'rowHeight'
+      | 'rows'
     >
   >;
 
@@ -132,15 +138,20 @@ function SortableGridInner<I>({
   itemLayout,
   renderItem,
   rowGap,
+  rowHeight,
+  rows,
   ...containerProps
 }: SortableGridInnerProps<I>) {
+  const isHorizontal = !!rowHeight;
+
   const animatedInnerStyle = useAnimatedStyle(() => ({
+    backgroundColor: 'red',
+    height: isHorizontal ? rows * (rowHeight + rowGap.value) : 'auto',
     marginHorizontal: -columnGap.value / 2,
     marginVertical: -rowGap.value / 2
   }));
 
   const animatedItemStyle = useAnimatedStyle(() => ({
-    flexBasis: `${100 / columns}%`,
     paddingHorizontal: columnGap.value / 2,
     paddingVertical: rowGap.value / 2
   }));
@@ -148,7 +159,12 @@ function SortableGridInner<I>({
   return (
     <SortableContainer
       {...containerProps}
-      style={[styles.gridContainer, animatedInnerStyle]}>
+      style={[
+        isHorizontal
+          ? styles.horizontalGridContainer
+          : styles.verticalGridContainer,
+        animatedInnerStyle
+      ]}>
       {zipArrays(data, itemKeys).map(([item, key], index) => (
         <SortableGridItem
           entering={itemEntering}
@@ -192,7 +208,11 @@ function SortableGridItem<I>({
 }
 
 const styles = StyleSheet.create({
-  gridContainer: {
+  horizontalGridContainer: {
+    flexDirection: 'column',
+    flexWrap: 'wrap'
+  },
+  verticalGridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap'
   }

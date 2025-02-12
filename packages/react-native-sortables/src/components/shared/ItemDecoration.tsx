@@ -88,8 +88,8 @@ export default function ItemDecoration({
             [zeroProgressScale, activeItemScale.value]
           )
         }
-      ],
-      ...itemsStyleOverride.value
+      ]
+      // ...itemsStyleOverride.value
     };
   });
 
