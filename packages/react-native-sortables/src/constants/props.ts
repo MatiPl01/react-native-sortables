@@ -1,4 +1,5 @@
 import type { ViewStyle } from 'react-native';
+import { LinearTransition } from 'react-native-reanimated';
 
 import { DefaultDropIndicator } from '../components/defaults';
 import type {
@@ -20,12 +21,17 @@ export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
 /**
  * DEFAULT SHARED PROPS
  */
-type OptionalSharedProps =
+type OptionalSharedProps = keyof ItemLayoutAnimationSettings;
+
+type ExcludedSharedProps =
   | 'scrollableRef'
-  | keyof ItemLayoutAnimationSettings
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
-type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
+type DefaultSharedProps = DefaultProps<
+  SharedProps,
+  OptionalSharedProps,
+  ExcludedSharedProps
+>;
 
 export const DEFAULT_SHARED_PROPS = {
   DropIndicatorComponent: DefaultDropIndicator,
@@ -59,10 +65,8 @@ export const DEFAULT_SHARED_PROPS = {
   // fixed in `react-native-reanimated` in the future.
   itemEntering: IS_WEB ? undefined : SortableItemEntering,
   itemExiting: IS_WEB ? undefined : SortableItemExiting,
-  onDragStart: undefined,
-  onOrderChange: undefined,
+  itemLayout: IS_WEB ? undefined : LinearTransition,
   overDrag: 'both',
-  scrollableRef: undefined,
   showDropIndicator: false,
   snapOffsetX: '50%',
   snapOffsetY: '50%',
@@ -72,7 +76,11 @@ export const DEFAULT_SHARED_PROPS = {
 /**
  * DEFAULT SORTABLE GRID PROPS
  */
-type ExcludedFromDefaultGridProps = 'data' | 'onDragEnd' | 'renderItem';
+type ExcludedFromDefaultGridProps =
+  | 'data'
+  | 'onDragEnd'
+  | 'renderItem'
+  | ExcludedSharedProps;
 
 type DefaultSortableGridProps = DefaultProps<
   Omit<SortableGridProps<unknown>, keyof DefaultSharedProps>,
@@ -108,7 +116,7 @@ type OptionalDefaultFlexProps =
   | 'rowGap'
   | 'width';
 
-type ExcludedFromDefaultFlexProps = 'onDragEnd';
+type ExcludedFromDefaultFlexProps = 'onDragEnd' | ExcludedSharedProps;
 
 type DefaultSortableFlexProps = DefaultProps<
   Omit<SortableFlexProps, keyof DefaultSharedProps>,
