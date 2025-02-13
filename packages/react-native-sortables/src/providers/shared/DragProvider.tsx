@@ -79,7 +79,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { measureContainer, setItemDimensionsAsSnapDimensions } =
     useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
-  const { dragStartScrollOffset, scrollOffset, updateStartScrollOffset } =
+  const { dragScrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
@@ -118,10 +118,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX: snapOffsetX.value,
       offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
-      scrollOffsetY:
-        dragStartScrollOffset?.value === -1
-          ? 0
-          : (scrollOffset?.value ?? 0) - (dragStartScrollOffset?.value ?? 0),
+      scrollOffsetDiff: dragScrollOffsetDiff?.value ?? 0,
       snapDimensions: snapItemDimensions.value,
       snapOffset: snapItemOffset.value,
       startTouchPosition: dragStartTouchPosition.value,
@@ -137,7 +134,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX,
       offsetY,
       progress,
-      scrollOffsetY,
+      scrollOffsetDiff,
       snapDimensions,
       snapOffset,
       startTouchPosition,
@@ -159,7 +156,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       touchPosition.value = {
         x: startTouchPosition.x + (translation?.x ?? 0),
-        y: startTouchPosition.y + (translation?.y ?? 0) + scrollOffsetY
+        y: startTouchPosition.y + (translation?.y ?? 0) + scrollOffsetDiff
       };
 
       if (debugCross) {
