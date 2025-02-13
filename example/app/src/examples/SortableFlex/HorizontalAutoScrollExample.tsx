@@ -1,9 +1,6 @@
 import type { FlashList } from '@shopify/flash-list';
 import type { AnimatedRef } from 'react-native-reanimated';
-import Animated, {
-  LinearTransition,
-  useAnimatedRef
-} from 'react-native-reanimated';
+import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 
 import { FlexCell, TabView } from '@/components';
@@ -44,14 +41,17 @@ type SortableFlexProps = {
 };
 
 function SortableFlex({ scrollableRef }: SortableFlexProps) {
-  console.log(scrollableRef); // TODO - add support for horizontal scroll
-
   return (
-    <Sortable.Flex flexWrap='nowrap' gap={spacing.xs} padding={spacing.md}>
+    <Sortable.Flex
+      autoScrollDirection='horizontal'
+      autoScrollSpeed={0.4}
+      gap={spacing.xs}
+      padding={spacing.md}
+      scrollableRef={scrollableRef}>
       {MANY_CATEGORIES.map(item => (
-        <Animated.View key={item} layout={LinearTransition}>
-          <FlexCell size='large'>{item}</FlexCell>
-        </Animated.View>
+        <FlexCell key={item} size='large'>
+          {item}
+        </FlexCell>
       ))}
     </Sortable.Flex>
   );

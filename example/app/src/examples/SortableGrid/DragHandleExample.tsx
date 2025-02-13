@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
     padding: spacing.md
   },
   options: {
+    ...style.webContent,
     paddingBottom: spacing.sm
   },
   text: {

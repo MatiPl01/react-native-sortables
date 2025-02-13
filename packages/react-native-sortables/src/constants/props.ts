@@ -66,10 +66,7 @@ export const DEFAULT_SHARED_PROPS = {
   itemLayout: IS_WEB ? undefined : LinearTransition,
   // Layout animations on web don't work properly so we don't provide
   // default layout animations here. This is an issue that should be
-  onDragStart: undefined,
-  onOrderChange: undefined,
   overDrag: 'both',
-  scrollableRef: undefined,
   showDropIndicator: false,
   snapOffsetX: '50%',
   snapOffsetY: '50%',

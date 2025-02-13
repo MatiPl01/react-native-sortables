@@ -38,8 +38,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       return null;
     }
     return {
-      x: scrollOffset.value - dragStartScrollOffset.value,
-      y: 0
+      x: isHorizontal ? scrollOffset.value - dragStartScrollOffset.value : 0,
+      y: isHorizontal ? 0 : scrollOffset.value - dragStartScrollOffset.value
     };
   });
 

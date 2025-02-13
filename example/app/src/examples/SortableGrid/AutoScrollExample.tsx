@@ -1,6 +1,6 @@
 import type { FlashList } from '@shopify/flash-list';
 import { AnimatedFlashList } from '@shopify/flash-list';
-import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
@@ -41,29 +41,25 @@ function ScrollViewExample() {
     <Animated.ScrollView
       contentContainerStyle={style.contentContainer}
       ref={scrollableRef}
-      removeClippedSubviews={false}
-      showsVerticalScrollIndicator={false}
-      horizontal>
+      removeClippedSubviews={false}>
       {/* Sortable.Layer is needed on Old Architecture (Paper) */}
-      <View style={{ width: 2 * Dimensions.get('window').width }}>
-        <Sortable.Layer>
-          <Group>
-            <ManyCards scrollableRef={scrollableRef} />
-          </Group>
-        </Sortable.Layer>
-        <SeparatorSection />
-        <Sortable.Layer>
-          <Group>
-            <FewCards scrollableRef={scrollableRef} />
-          </Group>
-        </Sortable.Layer>
-        <SeparatorSection />
-        <Sortable.Layer>
-          <Group>
-            <ManyCards scrollableRef={scrollableRef} />
-          </Group>
-        </Sortable.Layer>
-      </View>
+      <Sortable.Layer>
+        <Group>
+          <ManyCards scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
+      <SeparatorSection />
+      <Sortable.Layer>
+        <Group>
+          <FewCards scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
+      <SeparatorSection />
+      <Sortable.Layer>
+        <Group>
+          <ManyCards scrollableRef={scrollableRef} />
+        </Group>
+      </Sortable.Layer>
     </Animated.ScrollView>
   );
 }
@@ -139,14 +135,12 @@ type CardsSectionProps = {
 function ManyCards({ scrollableRef }: CardsSectionProps) {
   return (
     <Sortable.Grid
-      autoScrollDirection='horizontal'
       columnGap={spacing.sm}
       columns={3}
       data={MANY_ITEMS}
       renderItem={({ item }) => <GridCard>{item}</GridCard>}
       rowGap={spacing.xs}
       scrollableRef={scrollableRef}
-      debug
     />
   );
 }
