@@ -80,8 +80,7 @@ export type MeasurementsContextType = {
 // AUTO SCROLL
 
 export type AutoScrollContextType = {
-  scrollOffset: SharedValue<number>;
-  dragStartScrollOffset: SharedValue<null | number>;
+  scrollOffsetDiff: SharedValue<Vector | null>;
   updateStartScrollOffset: (providedOffset?: null | number) => void;
 };
 

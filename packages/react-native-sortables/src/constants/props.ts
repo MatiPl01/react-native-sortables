@@ -37,6 +37,7 @@ export const DEFAULT_SHARED_PROPS = {
   animateHeight: false,
   animateWidth: false,
   autoScrollActivationOffset: 75,
+  autoScrollDirection: 'vertical',
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
   customHandle: false,
@@ -60,11 +61,11 @@ export const DEFAULT_SHARED_PROPS = {
   itemEntering: IS_WEB ? undefined : SortableItemEntering,
   itemExiting: IS_WEB ? undefined : SortableItemExiting,
   itemLayout: IS_WEB ? undefined : LinearTransition,
-  // Layout animations on web don't work properly so we don't provide
-  // default layout animations here. This is an issue that should be
   onDragStart: undefined,
   onOrderChange: undefined,
+  // default layout animations here. This is an issue that should be
   overDrag: 'both',
+  // Layout animations on web don't work properly so we don't provide
   scrollableRef: undefined,
   showDropIndicator: false,
   snapOffsetX: '50%',

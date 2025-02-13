@@ -7,7 +7,6 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
 import type { Dimensions, MeasurementsContextType } from '../../types';
 import type { AnimatedTimeoutID } from '../../utils';
@@ -208,10 +207,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         measuredHeight === null ||
         measuredWidth === null ||
         (containerH === null && containerW === null) ||
-        (containerH !== null &&
-          Math.abs(containerH - measuredHeight) > OFFSET_EPS) ||
-        (containerW !== null &&
-          Math.abs(containerW - measuredWidth) > OFFSET_EPS)
+        (containerH !== null && measuredHeight < containerH) ||
+        (containerW !== null && measuredWidth < containerW)
       ) {
         return;
       }

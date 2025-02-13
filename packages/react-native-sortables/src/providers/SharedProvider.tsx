@@ -44,6 +44,7 @@ type SharedProviderProps = PropsWithChildren<
 
 export default function SharedProvider({
   autoScrollActivationOffset,
+  autoScrollDirection,
   autoScrollEnabled,
   autoScrollSpeed,
   children,
@@ -74,6 +75,7 @@ export default function SharedProvider({
     scrollableRef && (
       <AutoScrollProvider
         autoScrollActivationOffset={autoScrollActivationOffset}
+        autoScrollDirection={autoScrollDirection}
         autoScrollEnabled={autoScrollEnabled}
         autoScrollSpeed={autoScrollSpeed}
         scrollableRef={scrollableRef}

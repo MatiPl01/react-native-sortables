@@ -44,6 +44,7 @@ export type ActiveItemSnapSettings = AnimatableProps<{
 export type AutoScrollSettings = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scrollableRef: AnimatedRef<any>; // TODO - type this properly
+  autoScrollDirection: 'horizontal' | 'vertical';
 } & AnimatableProps<{
   autoScrollActivationOffset: [number, number] | number;
   autoScrollSpeed: number;
