@@ -8,6 +8,7 @@ import { getCategories, IS_WEB } from '@/utils';
 import { spacing } from '../../theme/spacing';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const MANY_CATEGORIES_FLEX_WIDTH = 1.5 * Math.min(SCREEN_WIDTH, 600);
 
 const FEW_CATEGORIES = getCategories(10);
 const MANY_CATEGORIES = getCategories(IS_WEB ? 30 : 20);
@@ -75,7 +76,7 @@ function WrapExample() {
           autoScrollDirection='horizontal'
           gap={spacing.xs}
           scrollableRef={scrollableRef}
-          width={1.5 * SCREEN_WIDTH}>
+          width={MANY_CATEGORIES_FLEX_WIDTH}>
           {MANY_CATEGORIES.map(item => (
             <FlexCell key={item} size='large'>
               {item}

@@ -16,7 +16,7 @@ export default function Group({
   bordered,
   center,
   children,
-  padding,
+  padding = 'all',
   style,
   withMargin = true
 }: GroupProps) {
