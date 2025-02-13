@@ -14,16 +14,21 @@ const hasStyleProp = <K extends string, P extends Record<string, any>>(
   return styleKey in props;
 };
 
+type PropsWithDefaults<
+  P extends Record<string, any>,
+  D extends Record<string, any>
+> = {
+  sharedProps: Required<{ [K in keyof SharedProps]: P[K] }>;
+  rest: Omit<Omit<P, keyof D> & Required<P>, keyof SharedProps>;
+};
+
 export const getPropsWithDefaults = <
   P extends Record<string, any>,
   D extends Record<string, any>
 >(
   props: P,
   componentDefaultProps: D
-): {
-  sharedProps: Required<{ [K in keyof SharedProps]: P[K] }>;
-  rest: Omit<D & Omit<P, keyof D>, keyof SharedProps>;
-} => {
+): PropsWithDefaults<P, D> => {
   const propsWithDefaults = {
     ...DEFAULT_SHARED_PROPS,
     ...componentDefaultProps
@@ -75,8 +80,5 @@ export const getPropsWithDefaults = <
     }
   }
 
-  return {
-    rest: rest as Omit<D & Omit<P, keyof D>, keyof SharedProps>,
-    sharedProps: sharedProps as Required<{ [K in keyof SharedProps]: P[K] }>
-  };
+  return { rest, sharedProps } as PropsWithDefaults<P, D>;
 };

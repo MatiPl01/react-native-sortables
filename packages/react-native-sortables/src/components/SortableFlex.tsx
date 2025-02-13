@@ -1,5 +1,7 @@
 import { type ReactElement } from 'react';
-import { StyleSheet, type ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import { useDragEndHandler } from '../hooks';
@@ -17,10 +19,18 @@ import { DraggableView, SortableContainer } from './shared';
 
 function SortableFlex(props: SortableFlexProps) {
   const {
-    rest: { children, onDragEnd: _onDragEnd, strategy, ...styleProps },
+    rest: {
+      children,
+      height,
+      onDragEnd: _onDragEnd,
+      strategy,
+      width,
+      ...styleProps
+    },
     sharedProps: {
       DropIndicatorComponent,
       animateHeight,
+      animateWidth,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
@@ -33,6 +43,16 @@ function SortableFlex(props: SortableFlexProps) {
   const childrenArray = validateChildren(children);
   const itemKeys = childrenArray.map(([key]) => key);
 
+  const { flexDirection, flexWrap } = styleProps;
+  const controlledContainerDimensions = useDerivedValue(() => {
+    if (flexWrap === 'nowrap') {
+      return { height: height === undefined, width: width === undefined };
+    }
+    return flexDirection.startsWith('row')
+      ? { height: height === undefined, width: false }
+      : { height: false, width: width === undefined };
+  }, [flexWrap, flexDirection, height, width]);
+
   const onDragEnd = useDragEndHandler(_onDragEnd, params => ({
     ...params,
     order<I>(data: Array<I>) {
@@ -43,6 +63,7 @@ function SortableFlex(props: SortableFlexProps) {
   return (
     <SharedProvider
       {...sharedProps}
+      controlledContainerDimensions={controlledContainerDimensions}
       initialItemsStyleOverride={styles.styleOverride}
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
@@ -55,6 +76,7 @@ function SortableFlex(props: SortableFlexProps) {
         />
         <SortableFlexInner
           animateHeight={animateHeight}
+          animateWidth={animateWidth}
           childrenArray={childrenArray}
           DropIndicatorComponent={DropIndicatorComponent}
           dropIndicatorStyle={dropIndicatorStyle}
@@ -62,7 +84,13 @@ function SortableFlex(props: SortableFlexProps) {
           itemExiting={itemExiting}
           itemLayout={itemLayout}
           showDropIndicator={showDropIndicator}
-          style={styleProps}
+          style={[
+            styleProps,
+            {
+              height: height === 'fill' ? undefined : height,
+              width: width === 'fill' ? undefined : width
+            }
+          ]}
         />
       </FlexLayoutProvider>
     </SharedProvider>
@@ -71,12 +99,16 @@ function SortableFlex(props: SortableFlexProps) {
 
 type SortableFlexInnerProps = {
   childrenArray: Array<[string, ReactElement]>;
-  style: ViewStyle;
+  style: StyleProp<ViewStyle>;
 } & DropIndicatorSettings &
   Required<
     Pick<
       SortableFlexProps,
-      'animateHeight' | 'itemEntering' | 'itemExiting' | 'itemLayout'
+      | 'animateHeight'
+      | 'animateWidth'
+      | 'itemEntering'
+      | 'itemExiting'
+      | 'itemLayout'
     >
   >;
 

@@ -44,122 +44,85 @@ export default function useItemLayoutStyles(
 
   const zIndex = useItemZIndex(key, pressProgress);
   const hasPressProgress = useDerivedValue(() => pressProgress.value > 0);
-  const itemPosition = useDerivedValue(() =>
-    activeItemKey.value === key
-      ? activeItemPosition.value
-      : itemPositions.value[key]
-  );
-  const dx = useSharedValue<null | number>(null);
-  const dy = useSharedValue<null | number>(null);
-  const hasDropAnimation = useSharedValue(false);
+  const isReleased = useSharedValue(true);
 
   const translateX = useSharedValue<null | number>(null);
   const translateY = useSharedValue<null | number>(null);
   const layoutX = useSharedValue<null | number>(null);
   const layoutY = useSharedValue<null | number>(null);
 
+  // Inactive item updater
   useAnimatedReaction(
     () => ({
-      position: itemPosition.value
+      hasProgress: hasPressProgress.value,
+      isActive: activeItemKey.value === key,
+      position: itemPositions.value[key]
     }),
-    ({ position }) => {
-      if (!position) {
+    ({ hasProgress, isActive, position }) => {
+      if (!canSwitchToAbsoluteLayout.value) {
+        // This affects all items rendered during the initial render when
+        // the absolute layout is not yet enabled. All of these items have
+        // no translation at the beginning and layoutX and layoutY are
+        // corresponding to their render position.
+        translateX.value = 0;
+        translateY.value = 0;
         return;
       }
 
-      if (
-        (layoutX.value === null || layoutY.value === null) &&
-        dx.value !== null &&
-        dy.value !== null
-      ) {
-        layoutX.value = 0;
-        layoutY.value = 0;
+      if (isActive || !position) {
+        // This reaction doesn't update position of the active item.
+        return;
       }
 
-      if (pressProgress?.value) {
-        // If the progress of the item press animation is greater than 0, that means
-        // the item is being dragged or was dropped and haven't reached the final
-        // position yet. In this case, we just update deltas to properly position
-        // the item considering the current translation.
-        dx.value = position.x - (layoutX.value ?? 0);
-        dy.value = position.y - (layoutY.value ?? 0);
-      } else if (
-        !canSwitchToAbsoluteLayout.value ||
-        (dx.value !== null && dy.value !== null)
-      ) {
-        // If transitioning from the relative layout (!canSwitchToAbsoluteLayout.value)
-        // or if deltas are already set (so the item is already in the correct position),
-        // we can react to the position changes and set the position values directly.
-        if (dx.value === null || dy.value === null) {
-          dx.value = 0;
-          dy.value = 0;
+      if (hasProgress) {
+        // When the item is not active and has non-zero press progress,
+        // it must have been dragged and released. In this case, we want
+        // to animate the translation to the final position.
+        if (!isReleased.value) {
+          // This prevents cancellation of the animation when this reaction
+          // is triggered multiple times.
+          isReleased.value = true;
+          translateX.value = withTiming(position.x - (layoutX.value ?? 0), {
+            duration: dropAnimationDuration.value
+          });
+          translateY.value = withTiming(position.y - (layoutY.value ?? 0), {
+            duration: dropAnimationDuration.value
+          });
         }
-        layoutX.value = position.x - dx.value;
-        layoutY.value = position.y - dy.value;
       } else {
-        // If the absolute layout is already applied, the item will be rendered
-        // in the top-left corner by default (so its position is 0, 0). In this
-        // case we can't set x, y position values because they will be animated
-        // from 0, 0 by the layout animation. In such a case, we apply transform
-        // to the item to make it appear in the correct position and set deltas
-        // to make future updates via the layout animation.
-        dx.value = position.x;
-        dy.value = position.y;
+        // When the item is not active and has zero progress, we can
+        if (translateX.value === null || translateY.value === null) {
+          // This is the case that happens for new items added to the sortable
+          // component after the absolute layout is enabled. In this case,
+          // we have to set translation instead of top/left to the item's
+          // position, as the initial render position of the item is the
+          // top left corner of the container and we don't want to animate
+          // it from this position to its correct position when rendered.
+          translateX.value = position.x;
+          translateY.value = position.y;
+        }
+
+        layoutX.value = position.x - (translateX.value ?? 0);
+        layoutY.value = position.y - (translateY.value ?? 0);
       }
     }
   );
 
+  // Active item updater
   useAnimatedReaction(
-    () => {
-      const isActive = activeItemKey.value === key;
-      return {
-        hasProgress: hasPressProgress.value,
-        isActive,
-        position: itemPosition.value
-      };
-    },
-    ({ hasProgress, isActive, position }) => {
-      if (!position) {
+    () => ({
+      isActive: activeItemKey.value === key,
+      position: activeItemPosition.value
+    }),
+    ({ isActive, position }) => {
+      if (!isActive || !position) {
         return;
       }
 
-      const newX = position.x - (layoutX.value ?? 0);
-      const newY = position.y - (layoutY.value ?? 0);
-
-      if (
-        isActive ||
-        ((layoutX.value === null || layoutY.value === null) && !hasProgress)
-      ) {
-        hasDropAnimation.value = false;
-        // Apply the translation immediately if the item is being dragged or
-        // the item was mounted with the absolute position and we cannot set
-        // its top, left values because they will be animated from 0, 0 by the
-        // layout animation.
-        translateX.value = newX;
-        translateY.value = newY;
-        if (layoutX.value === null || layoutY.value === null) {
-          layoutX.value = 0;
-          layoutY.value = 0;
-        }
-      } else if (hasProgress) {
-        // If the was released (has press progress but is no longer touched),
-        // we animate the translation to the target position.
-        if (!hasDropAnimation.value) {
-          hasDropAnimation.value = true;
-          translateX.value = withTiming(newX, {
-            duration: dropAnimationDuration.value
-          });
-          translateY.value = withTiming(newY, {
-            duration: dropAnimationDuration.value
-          });
-        }
-      } else if (translateX.value === null || translateY.value === null) {
-        // If the item was mounted with the relative position, we set the
-        // translation to 0, 0. This just indicates that transformation values
-        // are set to proper values and the absolute position can be applied.
-        translateX.value = 0;
-        translateY.value = 0;
-      }
+      // This updates the translation of the active item.
+      isReleased.value = false;
+      translateX.value = position.x - (layoutX.value ?? 0);
+      translateY.value = position.y - (layoutY.value ?? 0);
     }
   );
 

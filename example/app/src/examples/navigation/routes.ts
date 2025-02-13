@@ -64,6 +64,10 @@ const routes: Routes = {
         Component: SortableFlex.AutoScrollExample,
         name: 'Auto Scroll'
       },
+      HorizontalAutoScroll: {
+        Component: SortableFlex.HorizontalAutoScrollExample,
+        name: 'Horizontal Auto Scroll'
+      },
       DataChange: {
         Component: SortableFlex.DataChangeExample,
         name: 'Data Change'

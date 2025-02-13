@@ -14,7 +14,7 @@ import type {
   GridLayout,
   GridLayoutContextType
 } from '../../../types';
-import { useCommonValuesContext } from '../../shared';
+import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout } from './utils';
 
@@ -39,14 +39,14 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowGap: rowGap_
 }) => {
   const {
-    containerHeight,
-    containerWidth,
     indexToKey,
     itemDimensions,
     itemPositions,
     itemsStyleOverride,
+    measuredContainerWidth,
     shouldAnimateLayout
   } = useCommonValuesContext();
+  const { applyControlledContainerDimensions } = useMeasurementsContext();
   const debugContext = useDebugContext();
 
   const debugRowGapRects = debugContext?.useDebugRects(
@@ -56,7 +56,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
   const columnGap = useAnimatableValue(columnGap_);
   const rowGap = useAnimatableValue(rowGap_);
-  const columnWidth = useSharedValue(-1);
+  const columnWidth = useSharedValue<null | number>(null);
 
   const useGridLayoutReaction = useCallback(
     (
@@ -111,10 +111,10 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   useAnimatedReaction(
     () => ({
       gap: columnGap.value,
-      width: containerWidth.value
+      width: measuredContainerWidth.value
     }),
     ({ gap, width }) => {
-      if (width === null) {
+      if (width === null || width <= 0) {
         return;
       }
       const colWidth = (width + gap) / columns - gap;
@@ -143,8 +143,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
     // Update item positions
     itemPositions.value = layout.itemPositions;
-    // Update container height
-    containerHeight.value = layout.containerHeight;
+    // Update controlled container dimensions
+    applyControlledContainerDimensions(layout.totalDimensions);
     // Update style overrides
     const currentStyleOverride = itemsStyleOverride.value;
     if (currentStyleOverride?.width !== columnWidth.value) {

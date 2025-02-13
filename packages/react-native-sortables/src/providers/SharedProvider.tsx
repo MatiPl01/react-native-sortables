@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { DebugProvider } from '../debug';
@@ -10,6 +11,7 @@ import type {
   ActiveItemSnapSettings,
   Animatable,
   AutoScrollSettings,
+  ControlledContainerDimensions,
   ItemDragSettings,
   PartialBy,
   SortableCallbacks
@@ -30,6 +32,7 @@ type SharedProviderProps = PropsWithChildren<
     hapticsEnabled: boolean;
     customHandle: boolean;
     debug: boolean;
+    controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
     initialItemsStyleOverride?: ViewStyle;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &

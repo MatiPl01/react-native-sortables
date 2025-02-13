@@ -124,7 +124,10 @@ export default function FlexLayoutExample() {
               bordered>
               <Text style={styles.groupTitle}>{direction}</Text>
               <View style={styles.flexWrapper}>
-                <Sortable.Flex flexDirection={direction} {...flexStyle}>
+                <Sortable.Flex
+                  flexDirection={direction}
+                  width='fill'
+                  {...flexStyle}>
                   {DATA.map((item, index) => (
                     <FlexCell
                       height={34 + (index % 3) * 10}

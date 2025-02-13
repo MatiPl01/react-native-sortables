@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
 import { useAnimatableValue, useDragEndHandler } from '../hooks';
@@ -45,6 +45,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     sharedProps: {
       DropIndicatorComponent,
       animateHeight,
+      animateWidth,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
@@ -56,6 +57,10 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
   const columnGapValue = useAnimatableValue(columnGap);
   const rowGapValue = useAnimatableValue(rowGap);
+  const controlledContainerDimensions = useSharedValue({
+    height: true,
+    width: false
+  });
 
   const itemKeys = useMemo(
     () => data.map((item, index) => keyExtractor(item, index)),
@@ -70,6 +75,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   return (
     <SharedProvider
       {...sharedProps}
+      controlledContainerDimensions={controlledContainerDimensions}
       itemKeys={itemKeys}
       key={columns}
       onDragEnd={onDragEnd}>
@@ -86,6 +92,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
         />
         <SortableGridInner
           animateHeight={animateHeight}
+          animateWidth={animateWidth}
           columnGap={columnGapValue}
           columns={columns}
           data={data}
@@ -113,6 +120,7 @@ type SortableGridInnerProps<I> = {
     Pick<
       SortableGridProps<I>,
       | 'animateHeight'
+      | 'animateWidth'
       | 'columns'
       | 'data'
       | 'itemEntering'

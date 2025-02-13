@@ -47,7 +47,7 @@ const { LayerProvider, useLayerContext } = createProvider('Layer', {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%'
+    minWidth: '100%'
   }
 });
 

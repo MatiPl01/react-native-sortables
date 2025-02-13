@@ -42,8 +42,8 @@ export type SortableFlexStyle = {
   gap?: number;
   rowGap?: number;
   columnGap?: number;
-  height?: number;
-  width?: number;
+  height?: 'fill' | number;
+  width?: 'fill' | number;
   minHeight?: number;
   minWidth?: number;
   maxHeight?: number;

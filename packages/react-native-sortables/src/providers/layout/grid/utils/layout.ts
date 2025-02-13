@@ -9,7 +9,7 @@ export const calculateLayout = ({
   numColumns
 }: GridLayoutProps): GridLayout | null => {
   'worklet';
-  if (columnWidth <= 0) {
+  if (columnWidth === null) {
     return null;
   }
 
@@ -47,8 +47,10 @@ export const calculateLayout = ({
     : 0;
 
   return {
-    containerHeight,
     itemPositions,
-    rowOffsets
+    rowOffsets,
+    totalDimensions: {
+      height: containerHeight // TODO - add width for horizontal grid
+    }
   };
 };

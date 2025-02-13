@@ -15,7 +15,7 @@ import type {
   SortableFlexStyle
 } from '../../../types';
 import { haveEqualPropValues } from '../../../utils';
-import { useCommonValuesContext } from '../../shared';
+import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';
 
@@ -41,7 +41,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   itemsCount,
   justifyContent,
   maxHeight,
+  maxWidth,
   minHeight,
+  minWidth,
   padding,
   paddingBottom,
   paddingHorizontal,
@@ -49,16 +51,19 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   paddingRight,
   paddingTop,
   paddingVertical,
-  rowGap: rowGap_
+  rowGap: rowGap_,
+  width
 }) => {
   const {
-    containerHeight,
-    containerWidth,
+    controlledContainerDimensions,
     indexToKey,
     itemDimensions,
     itemPositions,
+    measuredContainerHeight,
+    measuredContainerWidth,
     shouldAnimateLayout
   } = useCommonValuesContext();
+  const { applyControlledContainerDimensions } = useMeasurementsContext();
   const debugContext = useDebugContext();
 
   const keyToGroup = useSharedValue<Record<string, number>>({});
@@ -74,13 +79,33 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   }));
 
   const dimensionsLimits = useDerivedValue(() => {
-    const minH = Math.max(minHeight ?? 0, height ?? 0);
-    const maxH = Math.max(maxHeight ?? 0, height ?? 0) || Infinity;
+    if (
+      measuredContainerHeight.value === null ||
+      measuredContainerWidth.value === null
+    ) {
+      return null;
+    }
+
+    const h = height === 'fill' ? undefined : height;
+    const w = width === 'fill' ? undefined : width;
+
+    let minH = Math.max(minHeight ?? 0, h ?? 0);
+    let maxH = Math.min(maxHeight ?? Infinity, h ?? Infinity);
+    let minW = Math.max(minWidth ?? 0, w ?? 0);
+    let maxW = Math.min(maxWidth ?? Infinity, w ?? Infinity);
+
+    if (!controlledContainerDimensions.value.width) {
+      minW = maxW = measuredContainerWidth.value;
+    }
+    if (!controlledContainerDimensions.value.height) {
+      minH = maxH = measuredContainerHeight.value;
+    }
 
     return {
       maxHeight: maxH,
+      maxWidth: maxW,
       minHeight: maxHeight ? Math.min(minH, maxH) : minH,
-      width: containerWidth.value ?? 0
+      minWidth: maxWidth ? Math.min(minW, maxW) : minW
     };
   });
 
@@ -124,12 +149,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
             props && calculateLayout(props),
             // Animate layout only if parent container is not resized
             // (e.g. skip animation when the browser window is resized)
-            !!(
-              IS_WEB &&
-              props &&
-              previousProps &&
-              haveEqualPropValues(props.limits, previousProps.limits)
-            )
+            IS_WEB && haveEqualPropValues(props?.limits, previousProps?.limits)
           );
         }
       ),
@@ -193,9 +213,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     appliedLayout.value = layout;
     // Update item positions
     itemPositions.value = layout.itemPositions;
-    // Update container height
-    const { maxHeight: max, minHeight: min } = dimensionsLimits.value;
-    containerHeight.value = Math.min(Math.max(min, layout.totalHeight), max);
+    // Update controlled container dimensions
+    applyControlledContainerDimensions(layout.totalDimensions);
     // Update key to group
     keyToGroup.value = Object.fromEntries(
       layout.itemGroups.flatMap((group, i) => group.map(key => [key, i]))

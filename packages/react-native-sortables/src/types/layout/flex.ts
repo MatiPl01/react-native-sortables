@@ -31,8 +31,9 @@ export type FlexLayoutProps = {
   limits: {
     minHeight: number;
     maxHeight: number;
-    width: number;
-  };
+    minWidth: number;
+    maxWidth: number;
+  } | null;
   paddings: {
     bottom: number;
     left: number;
@@ -46,7 +47,7 @@ export type FlexLayout = {
   itemPositions: Record<string, Vector>;
   crossAxisGroupOffsets: Array<number>;
   crossAxisGroupSizes: Array<number>;
-  totalHeight: number;
+  totalDimensions: Dimensions;
   adjustedCrossGap: number;
   groupSizeLimit: number;
 };

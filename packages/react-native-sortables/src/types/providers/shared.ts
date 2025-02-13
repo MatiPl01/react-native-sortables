@@ -1,4 +1,4 @@
-import type { View, ViewStyle } from 'react-native';
+import type { LayoutChangeEvent, View, ViewStyle } from 'react-native';
 import type { GestureTouchEvent } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
@@ -19,6 +19,8 @@ import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
 
 // COMMON VALUES
 
+export type ControlledContainerDimensions = { width: boolean; height: boolean };
+
 /**
  * Context values shared between all providers.
  * (they are stored in a single context to make the access to them easier
@@ -36,6 +38,9 @@ export type CommonValuesContextType = {
   snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
+  controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+  measuredContainerWidth: SharedValue<null | number>;
+  measuredContainerHeight: SharedValue<null | number>;
   containerWidth: SharedValue<null | number>;
   containerHeight: SharedValue<null | number>;
   snapItemDimensions: SharedValue<Dimensions | null>;
@@ -64,10 +69,12 @@ export type CommonValuesContextType = {
 // MEASUREMENTS
 
 export type MeasurementsContextType = {
+  applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
-  tryMeasureContainerHeight: () => void;
-  maybeUpdateSnapDimensions: (key: string) => void;
+  measureContainer: () => void;
+  setItemDimensionsAsSnapDimensions: (key: string) => void;
+  handleHelperContainerMeasurement: (event: LayoutChangeEvent) => void;
 };
 
 // AUTO SCROLL
