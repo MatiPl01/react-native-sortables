@@ -117,10 +117,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       if (width === null || width <= 0) {
         return;
       }
-      const colWidth = width / columns - gap;
+      const colWidth = (width + gap) / columns - gap;
       columnWidth.value = colWidth;
-
-      console.log('>>>> colWidth', colWidth);
 
       // DEBUG ONLY
       if (debugColumnGapRects) {
@@ -147,7 +145,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     itemPositions.value = layout.itemPositions;
     // Update controlled container dimensions
     applyControlledContainerDimensions(layout.totalDimensions);
-    console.log('>>>> layout', layout);
     // Update style overrides
     const currentStyleOverride = itemsStyleOverride.value;
     if (currentStyleOverride?.width !== columnWidth.value) {

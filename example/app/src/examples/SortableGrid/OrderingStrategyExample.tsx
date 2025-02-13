@@ -29,7 +29,7 @@ export default function OrderingStrategyExample() {
             renderItem={renderItem}
             rowGap={spacing.xs}
             strategy='insert'
-            animateContainerDimensions
+            animateHeight
           />
         </Section>
 
@@ -43,7 +43,7 @@ export default function OrderingStrategyExample() {
             renderItem={renderItem}
             rowGap={spacing.xs}
             strategy='swap'
-            animateContainerDimensions
+            animateHeight
           />
         </Section>
       </Stagger>

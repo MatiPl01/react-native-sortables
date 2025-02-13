@@ -7,6 +7,7 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
+import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
 import type { Dimensions, MeasurementsContextType } from '../../types';
 import type { AnimatedTimeoutID } from '../../utils';
@@ -134,7 +135,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         controlledContainerDimensions.value.width &&
         dimensions.width !== undefined
       ) {
-        console.log('>>>> dimensions.width', dimensions.width);
         containerWidth.value = dimensions.width;
       }
     },
@@ -202,16 +202,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       measuredHeight,
       measuredWidth
     }) => {
-      console.log('?', containerH, containerW, measuredHeight, measuredWidth);
-
       if (
         canSwitchToAbsoluteLayout.value ||
         !itemMeasurementsCompleted ||
         measuredHeight === null ||
         measuredWidth === null ||
-        (containerH === null && containerW === null)
+        (containerH === null && containerW === null) ||
+        (containerH !== null &&
+          Math.abs(containerH - measuredHeight) > OFFSET_EPS) ||
+        (containerW !== null &&
+          Math.abs(containerW - measuredWidth) > OFFSET_EPS)
       ) {
-        // TODO - check if dimensions are correct
         return;
       }
 

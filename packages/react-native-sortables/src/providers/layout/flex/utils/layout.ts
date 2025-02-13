@@ -177,14 +177,6 @@ const handleLayoutCalculation = (
     maxCrossContainerSize = limits.maxWidth - paddingHorizontal;
   }
 
-  console.log('>>>>', {
-    isRow,
-    maxCrossContainerSize,
-    maxMainContainerSize,
-    minCrossContainerSize,
-    minMainContainerSize
-  });
-
   // ALIGN CONTENT
   // position groups on the cross axis
   const contentAlignment = calculateAlignment(

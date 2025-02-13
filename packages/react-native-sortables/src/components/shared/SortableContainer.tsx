@@ -24,14 +24,16 @@ const SCREEN_DIMENSIONS = Dimensions.get('screen');
 
 type AnimatedHeightContainerProps = PropsWithChildren<
   {
-    animateContainerDimensions: boolean;
+    animateHeight: boolean;
+    animateWidth: boolean;
     style?: StyleProp<ViewStyle>;
   } & DropIndicatorSettings
 >;
 
 export default function SortableContainer({
   DropIndicatorComponent,
-  animateContainerDimensions,
+  animateHeight,
+  animateWidth,
   children,
   dropIndicatorStyle,
   showDropIndicator,
@@ -54,24 +56,28 @@ export default function SortableContainer({
       return {};
     }
 
-    const maybeAnimate = (value: null | number) =>
-      animateContainerDimensions &&
-      (!IS_WEB || shouldAnimateLayout.value) &&
-      value !== null
+    const maybeAnimate = (value: null | number, animate: boolean) =>
+      animate && (!IS_WEB || shouldAnimateLayout.value) && value !== null
         ? withTiming(value)
         : value;
 
     const ctrl = controlledContainerDimensions.value;
 
-    const height = maybeAnimate(ctrl.height ? containerHeight.value : null);
-    const width = maybeAnimate(ctrl.width ? containerWidth.value : null);
+    const height = maybeAnimate(
+      ctrl.height ? containerHeight.value : null,
+      animateHeight
+    );
+    const width = maybeAnimate(
+      ctrl.width ? containerWidth.value : null,
+      animateWidth
+    );
     const overflow =
       activeItemKey.value !== null || !activeItemDropped.value
         ? 'visible'
         : 'hidden';
 
     return { height, overflow, width };
-  }, [animateContainerDimensions]);
+  }, [animateHeight, animateWidth]);
 
   const innerContainerStyle = useAnimatedStyle(() => {
     if (!canSwitchToAbsoluteLayout.value) {
@@ -106,12 +112,12 @@ export default function SortableContainer({
           style={dropIndicatorStyle}
         />
       )}
+      <AnimatedOnLayoutView
+        ref={containerRef}
+        style={[StyleSheet.absoluteFill, animatedMeasurementsContainerStyle]}
+        onLayout={handleHelperContainerMeasurement}
+      />
       <Animated.View style={[style, innerContainerStyle]}>
-        <AnimatedOnLayoutView
-          ref={containerRef}
-          style={[StyleSheet.absoluteFill, animatedMeasurementsContainerStyle]}
-          onLayout={handleHelperContainerMeasurement}
-        />
         {children}
       </Animated.View>
       {/* Renders an overlay view helpful for debugging */}
