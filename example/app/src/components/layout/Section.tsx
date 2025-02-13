@@ -3,27 +3,35 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { colors, flex, spacing } from '@/theme';
 
+import Description from './Description';
+import type { GroupProps } from './Group';
 import Group from './Group';
 
 type SectionProps = PropsWithChildren<{
   title: string;
-  description?: string;
+  description?: Array<string> | string;
   fill?: boolean;
+  padding?: GroupProps['padding'];
 }>;
 
 export default function Section({
   children,
   description,
   fill,
+  padding,
   title
 }: SectionProps) {
   return (
     <View style={[styles.container, fill && flex.fill]}>
       <View style={styles.textWrapper}>
         <Text style={styles.title}>{title}</Text>
-        {description && <Text style={styles.description}>{description}</Text>}
+        {description && <Description>{description}</Description>}
       </View>
-      {children && <Group style={[fill && flex.fill]}>{children}</Group>}
+      {children && (
+        <Group padding={padding} style={[fill && flex.fill]}>
+          {children}
+        </Group>
+      )}
     </View>
   );
 }
@@ -31,10 +39,6 @@ const styles = StyleSheet.create({
   container: {
     gap: spacing.xxs,
     marginTop: spacing.md
-  },
-  description: {
-    color: colors.foreground3,
-    fontSize: 14
   },
   textWrapper: {
     gap: spacing.xs,
