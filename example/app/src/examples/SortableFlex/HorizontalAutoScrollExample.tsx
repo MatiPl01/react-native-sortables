@@ -44,7 +44,13 @@ function ScrollViewExample() {
             }
           ]}
           horizontal>
-          <SortableFlex scrollableRef={scrollableRef} />
+          <View
+            style={{
+              flexDirection: 'column'
+            }}>
+            <SortableFlex scrollableRef={scrollableRef} />
+            <View style={{ backgroundColor: 'orange', height: 200 }} />
+          </View>
         </Animated.ScrollView>
       </Sortable.Layer>
       <View style={{ backgroundColor: 'green', height: 200, width: 200 }} />

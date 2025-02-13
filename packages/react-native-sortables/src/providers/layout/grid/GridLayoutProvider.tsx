@@ -56,7 +56,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
   const columnGap = useAnimatableValue(columnGap_);
   const rowGap = useAnimatableValue(rowGap_);
-  const columnWidth = useSharedValue(-1);
+  const columnWidth = useSharedValue<null | number>(null);
 
   const useGridLayoutReaction = useCallback(
     (
@@ -117,7 +117,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       if (width === null || width <= 0) {
         return;
       }
-      const colWidth = (width + gap) / columns - gap;
+      const colWidth = width / columns - gap;
       columnWidth.value = colWidth;
 
       console.log('>>>> colWidth', colWidth);

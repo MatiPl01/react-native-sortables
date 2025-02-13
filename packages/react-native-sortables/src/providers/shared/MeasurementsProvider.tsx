@@ -1,15 +1,12 @@
-import { type PropsWithChildren, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { StyleSheet } from 'react-native';
 import {
   measure,
   runOnUI,
   useAnimatedReaction,
-  useAnimatedStyle,
   useSharedValue
 } from 'react-native-reanimated';
 
-import AnimatedOnLayoutView from '../../components/shared/AnimatedOnLayoutView';
 import { useUIStableCallback } from '../../hooks';
 import type { Dimensions, MeasurementsContextType } from '../../types';
 import type { AnimatedTimeoutID } from '../../utils';
@@ -21,16 +18,13 @@ import {
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
-export type MeasurementsProviderProps = PropsWithChildren<{
+export type MeasurementsProviderProps = {
   itemsCount: number;
-}>;
+};
 
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<MeasurementsProviderProps, MeasurementsContextType>(({
-  children,
-  itemsCount
-}) => {
+)<MeasurementsProviderProps, MeasurementsContextType>(({ itemsCount }) => {
   const {
     activeItemDimensions,
     activeItemKey,
@@ -217,6 +211,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         measuredWidth === null ||
         (containerH === null && containerW === null)
       ) {
+        // TODO - check if dimensions are correct
         return;
       }
 
@@ -224,24 +219,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     }
   );
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    minHeight: containerHeight.value,
-    minWidth: containerWidth.value
-  }));
-
   return {
-    children: (
-      <>
-        <AnimatedOnLayoutView
-          ref={containerRef}
-          style={[StyleSheet.absoluteFill, animatedContainerStyle]}
-          onLayout={handleHelperContainerMeasurement}
-        />
-        {children}
-      </>
-    ),
     value: {
       applyControlledContainerDimensions,
+      handleHelperContainerMeasurement,
       handleItemMeasurement,
       handleItemRemoval,
       measureContainer,

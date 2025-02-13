@@ -9,7 +9,7 @@ export const calculateLayout = ({
   numColumns
 }: GridLayoutProps): GridLayout | null => {
   'worklet';
-  if (columnWidth <= 0) {
+  if (columnWidth === null) {
     return null;
   }
 

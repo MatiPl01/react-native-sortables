@@ -1,5 +1,10 @@
 import type { PropsWithChildren } from 'react';
-import { Dimensions, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  Dimensions,
+  type StyleProp,
+  StyleSheet,
+  type ViewStyle
+} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withTiming
@@ -7,8 +12,12 @@ import Animated, {
 
 import { IS_WEB } from '../../constants';
 import { DebugOutlet } from '../../debug';
-import { useCommonValuesContext } from '../../providers';
+import {
+  useCommonValuesContext,
+  useMeasurementsContext
+} from '../../providers';
 import type { DropIndicatorSettings } from '../../types';
+import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 import DropIndicator from './DropIndicator';
 
 const SCREEN_DIMENSIONS = Dimensions.get('screen');
@@ -33,10 +42,12 @@ export default function SortableContainer({
     activeItemKey,
     canSwitchToAbsoluteLayout,
     containerHeight,
+    containerRef,
     containerWidth,
     controlledContainerDimensions,
     shouldAnimateLayout
   } = useCommonValuesContext();
+  const { handleHelperContainerMeasurement } = useMeasurementsContext();
 
   const outerContainerStyle = useAnimatedStyle(() => {
     if (!canSwitchToAbsoluteLayout.value) {
@@ -80,6 +91,11 @@ export default function SortableContainer({
     };
   });
 
+  const animatedMeasurementsContainerStyle = useAnimatedStyle(() => ({
+    minHeight: containerHeight.value,
+    minWidth: containerWidth.value
+  }));
+
   return (
     <Animated.View
       // @ts-expect-error - contain is a correct CSS prop on web
@@ -91,6 +107,11 @@ export default function SortableContainer({
         />
       )}
       <Animated.View style={[style, innerContainerStyle]}>
+        <AnimatedOnLayoutView
+          ref={containerRef}
+          style={[StyleSheet.absoluteFill, animatedMeasurementsContainerStyle]}
+          onLayout={handleHelperContainerMeasurement}
+        />
         {children}
       </Animated.View>
       {/* Renders an overlay view helpful for debugging */}

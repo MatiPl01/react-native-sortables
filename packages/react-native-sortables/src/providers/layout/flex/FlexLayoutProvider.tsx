@@ -86,16 +86,17 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       return null;
     }
 
-    let minH = Math.max(minHeight ?? 0, height ?? 0);
-    let maxH = Math.min(maxHeight ?? Infinity, height ?? Infinity);
-    let minW = Math.max(minWidth ?? 0, width ?? 0);
-    let maxW = Math.min(maxWidth ?? Infinity, width ?? Infinity);
+    const h = height === 'fill' ? undefined : height;
+    const w = width === 'fill' ? undefined : width;
+
+    let minH = Math.max(minHeight ?? 0, h ?? 0);
+    let maxH = Math.min(maxHeight ?? Infinity, h ?? Infinity);
+    let minW = Math.max(minWidth ?? 0, w ?? 0);
+    let maxW = Math.min(maxWidth ?? Infinity, w ?? Infinity);
 
     console.log(
       'controlledContainerDimensions.value',
-      controlledContainerDimensions.value,
-      measuredContainerWidth.value,
-      measuredContainerHeight.value
+      controlledContainerDimensions.value
     );
 
     if (!controlledContainerDimensions.value.width) {

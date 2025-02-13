@@ -1,4 +1,4 @@
-import type { View, ViewStyle } from 'react-native';
+import type { LayoutChangeEvent, View, ViewStyle } from 'react-native';
 import type { GestureTouchEvent } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
@@ -74,6 +74,7 @@ export type MeasurementsContextType = {
   handleItemRemoval: (key: string) => void;
   measureContainer: () => void;
   setItemDimensionsAsSnapDimensions: (key: string) => void;
+  handleHelperContainerMeasurement: (event: LayoutChangeEvent) => void;
 };
 
 // AUTO SCROLL

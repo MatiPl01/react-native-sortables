@@ -3,7 +3,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { FlexDirection, FlexLayout, GridLayout } from '../layout';
 
 export type GridLayoutContextType = {
-  columnWidth: SharedValue<number>;
+  columnWidth: SharedValue<null | number>;
   columnGap: SharedValue<number>;
   rowGap: SharedValue<number>;
   numColumns: number;

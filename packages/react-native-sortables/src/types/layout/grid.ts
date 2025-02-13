@@ -1,7 +1,7 @@
 import type { Dimensions, Vector } from './shared';
 
 export type GridLayoutProps = {
-  columnWidth: number;
+  columnWidth: null | number;
   gaps: {
     row: number;
     column: number;

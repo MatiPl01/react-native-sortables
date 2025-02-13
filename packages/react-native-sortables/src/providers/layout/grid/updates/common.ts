@@ -32,7 +32,8 @@ export const createGridStrategy =
       if (
         !othersLayout.value ||
         containerHeight.value === null ||
-        containerWidth.value === null
+        containerWidth.value === null ||
+        columnWidth.value === null
       ) {
         return;
       }
