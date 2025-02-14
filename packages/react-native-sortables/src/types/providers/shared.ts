@@ -61,6 +61,7 @@ export type CommonValuesContextType = {
   sortEnabled: SharedValue<boolean>;
   canSwitchToAbsoluteLayout: SharedValue<boolean>;
   shouldAnimateLayout: SharedValue<boolean>; // used only on web
+  animateLayoutOnReorderOnly: SharedValue<boolean>;
   customHandle: boolean;
 } & AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &

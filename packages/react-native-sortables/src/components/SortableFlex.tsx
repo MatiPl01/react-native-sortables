@@ -34,7 +34,7 @@ function SortableFlex(props: SortableFlexProps) {
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
-      itemLayout,
+      itemsLayout,
       showDropIndicator,
       ...sharedProps
     }
@@ -82,7 +82,7 @@ function SortableFlex(props: SortableFlexProps) {
           dropIndicatorStyle={dropIndicatorStyle}
           itemEntering={itemEntering}
           itemExiting={itemExiting}
-          itemLayout={itemLayout}
+          itemsLayout={itemsLayout}
           showDropIndicator={showDropIndicator}
           style={[
             styleProps,
@@ -108,7 +108,7 @@ type SortableFlexInnerProps = {
       | 'animateWidth'
       | 'itemEntering'
       | 'itemExiting'
-      | 'itemLayout'
+      | 'itemsLayout'
     >
   >;
 
@@ -116,7 +116,7 @@ function SortableFlexInner({
   childrenArray,
   itemEntering,
   itemExiting,
-  itemLayout,
+  itemsLayout,
   style,
   ...containerProps
 }: SortableFlexInnerProps) {
@@ -124,11 +124,11 @@ function SortableFlexInner({
     <SortableContainer {...containerProps} style={style}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
-          entering={itemEntering}
-          exiting={itemExiting}
+          entering={itemEntering ?? undefined}
+          exiting={itemExiting ?? undefined}
           itemKey={key}
           key={key}
-          layout={itemLayout}>
+          layout={itemsLayout ?? undefined}>
           {child}
         </DraggableView>
       ))}

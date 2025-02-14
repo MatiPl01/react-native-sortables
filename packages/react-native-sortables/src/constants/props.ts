@@ -23,7 +23,7 @@ export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
  */
 type OptionalSharedProps =
   | 'scrollableRef'
-  | keyof ItemLayoutAnimationSettings
+  | keyof Omit<ItemLayoutAnimationSettings, 'itemsLayoutTransitionMode'>
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
 type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
@@ -60,7 +60,8 @@ export const DEFAULT_SHARED_PROPS = {
   // fixed in `react-native-reanimated` in the future.
   itemEntering: IS_WEB ? undefined : SortableItemEntering,
   itemExiting: IS_WEB ? undefined : SortableItemExiting,
-  itemLayout: IS_WEB ? undefined : LinearTransition,
+  itemsLayout: IS_WEB ? undefined : LinearTransition,
+  itemsLayoutTransitionMode: 'all',
   onDragStart: undefined,
   onOrderChange: undefined,
   // default layout animations here. This is an issue that should be
