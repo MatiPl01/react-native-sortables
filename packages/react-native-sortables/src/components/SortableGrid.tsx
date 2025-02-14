@@ -172,11 +172,11 @@ function SortableGridInner<I>({
   );
 }
 
-type SortableGridItemProps<I> = DraggableViewProps & {
+type SortableGridItemProps<I> = {
   index: number;
   item: I;
   renderItem: SortableGridRenderItem<I>;
-};
+} & DraggableViewProps;
 
 function SortableGridItem<I>({
   index,

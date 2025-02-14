@@ -57,7 +57,7 @@ export type DropIndicatorSettings = {
   dropIndicatorStyle: ViewStyle;
 };
 
-export type ItemsLayoutTransitionMode = 'reorder' | 'all';
+export type ItemsLayoutTransitionMode = 'all' | 'reorder';
 
 export type ItemLayoutAnimationSettings = {
   itemEntering: LayoutAnimation | null;

@@ -37,9 +37,9 @@ export default function useItemLayoutStyles(
   const {
     activeItemKey,
     activeItemPosition,
+    animateLayoutOnReorderOnly,
     canSwitchToAbsoluteLayout,
     dropAnimationDuration,
-    animateLayoutOnReorderOnly,
     itemPositions
   } = useCommonValuesContext();
 
