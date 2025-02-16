@@ -213,21 +213,35 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       'worklet';
       const containerMeasurements = measure(containerRef);
       const itemPosition = itemPositions.value[key];
+      const dimensions = itemDimensions.value[key];
 
-      if (!containerMeasurements || !itemPosition) {
+      if (!containerMeasurements || !itemPosition || !dimensions) {
+        fail();
+        return;
+      }
+
+      const touchX = touch.absoluteX - containerMeasurements.pageX;
+      const touchY = touch.absoluteY - containerMeasurements.pageY;
+
+      // Validate the touch position (must be within the item's bounds)
+      // (we need this because of this bug in react-native-gesture-handler on Fabric:
+      // https://github.com/software-mansion/react-native-gesture-handler/issues/3411)
+      if (
+        touchX < itemPosition.x ||
+        touchX > itemPosition.x + dimensions.width ||
+        touchY < itemPosition.y ||
+        touchY > itemPosition.y + dimensions.height
+      ) {
         fail();
         return;
       }
 
       dragStartTouch.value = touch;
-      touchPosition.value = {
-        x: touch.absoluteX - containerMeasurements.pageX,
-        y: touch.absoluteY - containerMeasurements.pageY
-      };
+      touchPosition.value = { x: touchX, y: touchY };
       dragStartTouchPosition.value = touchPosition.value;
       dragStartItemTouchOffset.value = {
-        x: touchPosition.value.x - itemPosition.x,
-        y: touchPosition.value.y - itemPosition.y
+        x: touchX - itemPosition.x,
+        y: touchY - itemPosition.y
       };
 
       activeAnimationProgress.value = 0;
