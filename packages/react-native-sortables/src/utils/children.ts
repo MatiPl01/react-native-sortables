@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
-import { Children, isValidElement } from 'react';
+import { Children, Fragment, isValidElement } from 'react';
 
 import { logger } from './logs';
 
@@ -10,6 +10,14 @@ export const validateChildren = (
     (acc: Array<[string, ReactElement]>, child, index) => {
       if (!isValidElement(child)) {
         return acc;
+      }
+
+      // Handle React Fragments by recursively processing their children
+      if (child.type === Fragment) {
+        const fragmentChildren = validateChildren(
+          (child.props as { children: ReactNode }).children
+        );
+        return [...acc, ...fragmentChildren];
       }
 
       const key = child.key as string;

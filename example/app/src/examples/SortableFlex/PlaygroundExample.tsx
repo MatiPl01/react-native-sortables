@@ -10,13 +10,30 @@ const DATA = getCategories(IS_WEB ? 30 : 10);
 export default function Flex() {
   return (
     <ScrollScreen>
-      <Sortable.Flex gap={10} padding={10}>
+      <Sortable.Flex
+        gap={10}
+        padding={10}
+        onDragEnd={a => {
+          console.log('onDragEnd', a);
+        }}>
         {/* You can render anything within the Sortable.Flex component */}
-        {DATA.map(item => (
-          <View key={item} style={styles.cell}>
-            <Text style={styles.text}>{item}</Text>
-          </View>
-        ))}
+        <>
+          <>
+            {DATA.map(item => (
+              <View key={item} style={styles.cell}>
+                <Text style={styles.text}>{item}</Text>
+              </View>
+            ))}
+          </>
+          <></>
+          <></>
+          <></>
+          {DATA.slice(0, 3).map(item => (
+            <View key={item} style={styles.cell}>
+              <Text style={styles.text}>{item}</Text>
+            </View>
+          ))}
+        </>
       </Sortable.Flex>
     </ScrollScreen>
   );
