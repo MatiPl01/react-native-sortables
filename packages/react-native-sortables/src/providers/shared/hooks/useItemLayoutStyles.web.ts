@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unused-modules */
 import type { StyleProp, ViewStyle } from 'react-native';
 import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import {
@@ -67,6 +68,15 @@ export default function useItemLayoutStyles(
           animateLayoutOnReorderOnly.value &&
           activeItemDropped.value)
       ) {
+        console.log(
+          '>',
+          translateX.value,
+          translateY.value,
+          !shouldAnimateLayout.value,
+          activeItemKey.value === null &&
+            animateLayoutOnReorderOnly.value &&
+            activeItemDropped.value
+        );
         translateX.value = position.x;
         translateY.value = position.y;
       } else {
