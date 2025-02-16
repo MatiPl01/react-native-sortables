@@ -224,8 +224,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const touchY = touch.absoluteY - containerMeasurements.pageY;
 
       // Validate the touch position (must be within the item's bounds)
-      // (we need this because of this bug in react-native-gesture-handler on Fabric:
-      // https://github.com/software-mansion/react-native-gesture-handler/issues/3411)
+      // (we need this because measure returns wrong position on Fabric
+      // when the container was scrolled a while before the drag activation)
       if (
         touchX < itemPosition.x ||
         touchX > itemPosition.x + dimensions.width ||
