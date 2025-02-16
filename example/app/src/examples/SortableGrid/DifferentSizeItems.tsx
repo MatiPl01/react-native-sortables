@@ -64,7 +64,7 @@ export default function DifferentSizeItems() {
 
         <Text style={styles.title}>With &quot;{strategy}&quot; strategy</Text>
 
-        <Group style={[flex.fill, styles.scrollViewGroup]}>
+        <Group style={[flex.fill, styles.scrollViewGroup]} padding='none'>
           <Animated.ScrollView
             contentContainerStyle={styles.scrollViewContent}
             ref={scrollableRef}

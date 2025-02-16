@@ -97,10 +97,14 @@ export default function SortableContainer({
     };
   });
 
-  const animatedMeasurementsContainerStyle = useAnimatedStyle(() => ({
-    minHeight: containerHeight.value,
-    minWidth: containerWidth.value
-  }));
+  const animatedMeasurementsContainerStyle = useAnimatedStyle(() => {
+    const ctrl = controlledContainerDimensions.value;
+
+    return {
+      minHeight: ctrl.height ? containerHeight.value : undefined,
+      minWidth: ctrl.width ? containerWidth.value : undefined
+    };
+  });
 
   return (
     <Animated.View
