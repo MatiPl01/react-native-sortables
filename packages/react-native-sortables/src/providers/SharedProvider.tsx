@@ -13,6 +13,7 @@ import type {
   AutoScrollSettings,
   ControlledContainerDimensions,
   ItemDragSettings,
+  ItemsLayoutTransitionMode,
   PartialBy,
   SortableCallbacks
 } from '../types';
@@ -33,6 +34,7 @@ type SharedProviderProps = PropsWithChildren<
     customHandle: boolean;
     debug: boolean;
     controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+    itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
     initialItemsStyleOverride?: ViewStyle;
     dropIndicatorStyle?: ViewStyle;
   } & ActiveItemDecorationSettings &

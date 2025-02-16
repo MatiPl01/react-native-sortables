@@ -57,10 +57,13 @@ export type DropIndicatorSettings = {
   dropIndicatorStyle: ViewStyle;
 };
 
+export type ItemsLayoutTransitionMode = 'all' | 'reorder';
+
 export type ItemLayoutAnimationSettings = {
-  itemEntering: LayoutAnimation | undefined;
-  itemExiting: LayoutAnimation | undefined;
-  itemLayout: LayoutTransition | undefined;
+  itemEntering: LayoutAnimation | null;
+  itemExiting: LayoutAnimation | null;
+  itemsLayout: LayoutTransition | null;
+  itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
 };
 
 export type DragStartParams = {

@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
@@ -16,8 +15,6 @@ import {
 } from '../providers';
 import type {
   DropIndicatorSettings,
-  LayoutAnimation,
-  LayoutTransition,
   SortableGridProps,
   SortableGridRenderItem
 } from '../types';
@@ -29,6 +26,7 @@ import {
   zipArrays
 } from '../utils';
 import { DraggableView, SortableContainer } from './shared';
+import { type DraggableViewProps } from './shared';
 
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
@@ -49,7 +47,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
-      itemLayout,
+      itemsLayout,
       showDropIndicator,
       ...sharedProps
     }
@@ -101,7 +99,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           itemEntering={itemEntering}
           itemExiting={itemExiting}
           itemKeys={itemKeys}
-          itemLayout={itemLayout}
+          itemsLayout={itemsLayout}
           renderItem={renderItem}
           rowGap={rowGapValue}
           showDropIndicator={showDropIndicator}
@@ -125,7 +123,7 @@ type SortableGridInnerProps<I> = {
       | 'data'
       | 'itemEntering'
       | 'itemExiting'
-      | 'itemLayout'
+      | 'itemsLayout'
       | 'renderItem'
     >
   >;
@@ -137,7 +135,7 @@ function SortableGridInner<I>({
   itemEntering,
   itemExiting,
   itemKeys,
-  itemLayout,
+  itemsLayout,
   renderItem,
   rowGap,
   ...containerProps
@@ -159,13 +157,13 @@ function SortableGridInner<I>({
       style={[styles.gridContainer, animatedInnerStyle]}>
       {zipArrays(data, itemKeys).map(([item, key], index) => (
         <SortableGridItem
-          entering={itemEntering}
-          exiting={itemExiting}
+          entering={itemEntering ?? undefined}
+          exiting={itemExiting ?? undefined}
           index={index}
           item={item}
           itemKey={key}
           key={key}
-          layout={itemLayout}
+          layout={itemsLayout ?? undefined}
           renderItem={renderItem}
           style={animatedItemStyle}
         />
@@ -176,14 +174,9 @@ function SortableGridInner<I>({
 
 type SortableGridItemProps<I> = {
   index: number;
-  itemKey: string;
   item: I;
   renderItem: SortableGridRenderItem<I>;
-  entering: LayoutAnimation;
-  exiting: LayoutAnimation;
-  layout: LayoutTransition;
-  style: ViewStyle;
-};
+} & DraggableViewProps;
 
 function SortableGridItem<I>({
   index,

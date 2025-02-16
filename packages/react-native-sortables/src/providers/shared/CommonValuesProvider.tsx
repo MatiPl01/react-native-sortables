@@ -16,6 +16,7 @@ import type {
   ControlledContainerDimensions,
   Dimensions,
   ItemDragSettings,
+  ItemsLayoutTransitionMode,
   Maybe,
   Vector
 } from '../../types';
@@ -29,6 +30,7 @@ type CommonValuesProviderProps = PropsWithChildren<
     customHandle: boolean;
     itemKeys: Array<string>;
     controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+    itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
     initialItemsStyleOverride?: ViewStyle;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
@@ -52,6 +54,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   inactiveItemScale: _inactiveItemScale,
   initialItemsStyleOverride,
   itemKeys,
+  itemsLayoutTransitionMode,
   snapOffsetX: _snapOffsetX,
   snapOffsetY: _snapOffsetY,
   sortEnabled: _sortEnabled
@@ -120,6 +123,10 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   const sortEnabled = useAnimatableValue(_sortEnabled);
   const canSwitchToAbsoluteLayout = useSharedValue(false);
   const shouldAnimateLayout = useSharedValue(true);
+  const animateLayoutOnReorderOnly = useDerivedValue(
+    () => itemsLayoutTransitionMode === 'reorder',
+    [itemsLayoutTransitionMode]
+  );
 
   useEffect(() => {
     if (areArraysDifferent(itemKeys, prevKeysRef.current)) {
@@ -140,6 +147,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       activeItemPosition,
       activeItemScale,
       activeItemShadowOpacity,
+      animateLayoutOnReorderOnly,
       canSwitchToAbsoluteLayout,
       containerHeight,
       containerRef,
@@ -156,6 +164,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       indexToKey,
       itemDimensions,
       itemPositions,
+      itemsLayoutTransitionMode,
       itemsStyleOverride,
       keyToIndex,
       measuredContainerHeight,

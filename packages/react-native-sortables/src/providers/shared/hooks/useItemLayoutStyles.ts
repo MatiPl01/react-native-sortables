@@ -37,6 +37,7 @@ export default function useItemLayoutStyles(
   const {
     activeItemKey,
     activeItemPosition,
+    animateLayoutOnReorderOnly,
     canSwitchToAbsoluteLayout,
     dropAnimationDuration,
     itemPositions
@@ -90,7 +91,6 @@ export default function useItemLayoutStyles(
           });
         }
       } else {
-        // When the item is not active and has zero progress, we can
         if (translateX.value === null || translateY.value === null) {
           // This is the case that happens for new items added to the sortable
           // component after the absolute layout is enabled. In this case,
@@ -102,8 +102,18 @@ export default function useItemLayoutStyles(
           translateY.value = position.y;
         }
 
-        layoutX.value = position.x - (translateX.value ?? 0);
-        layoutY.value = position.y - (translateY.value ?? 0);
+        if (
+          !animateLayoutOnReorderOnly.value ||
+          activeItemKey.value !== null ||
+          layoutX.value === null ||
+          layoutY.value === null
+        ) {
+          layoutX.value = position.x - (translateX.value ?? 0);
+          layoutY.value = position.y - (translateY.value ?? 0);
+        } else {
+          translateX.value = position.x - (layoutX.value ?? 0);
+          translateY.value = position.y - (layoutY.value ?? 0);
+        }
       }
     }
   );

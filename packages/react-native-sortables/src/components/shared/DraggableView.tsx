@@ -16,11 +16,11 @@ import type { LayoutAnimation, LayoutTransition } from '../../types';
 import ItemDecoration from './ItemDecoration';
 import { SortableHandleInternal } from './SortableHandle';
 
-type DraggableViewProps = {
+export type DraggableViewProps = {
   itemKey: string;
-  entering?: LayoutAnimation;
-  exiting?: LayoutAnimation;
-  layout?: LayoutTransition;
+  entering: LayoutAnimation | undefined;
+  exiting: LayoutAnimation | undefined;
+  layout: LayoutTransition | undefined;
 } & ViewProps;
 
 function DraggableView({
