@@ -1,3 +1,26 @@
+# [1.2.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.1.1...v1.2.0) (2025-02-17)
+
+
+### Bug Fixes
+
+* Flex layout flickering, lower drag fail offset ([#258](https://github.com/MatiPl01/react-native-sortables/issues/258)) ([3d381a3](https://github.com/MatiPl01/react-native-sortables/commit/3d381a3ba32d45ceaabc4826fec166136dac6e9a))
+* Invalid item activation on iOS Fabric after container scroll ([#266](https://github.com/MatiPl01/react-native-sortables/issues/266)) ([3ae207d](https://github.com/MatiPl01/react-native-sortables/commit/3ae207d9ff822a552f65c900712efbc8c4d730a3))
+* Remaining web implementation issues ([#247](https://github.com/MatiPl01/react-native-sortables/issues/247)) ([d48820b](https://github.com/MatiPl01/react-native-sortables/commit/d48820b36babbbd8c7351937ebf54283ae01daf4))
+* Sortable flex fragment children ([#265](https://github.com/MatiPl01/react-native-sortables/issues/265)) ([4352be9](https://github.com/MatiPl01/react-native-sortables/commit/4352be97f919be71e7613bc91084386d69a43220)), closes [#36877](https://github.com/MatiPl01/react-native-sortables/issues/36877)
+* Sortable flex sizing in horizontal scrollable ([#259](https://github.com/MatiPl01/react-native-sortables/issues/259)) ([468baeb](https://github.com/MatiPl01/react-native-sortables/commit/468baeb5245cc33c3480a8fa97bb6be4f70256a8)), closes [#257](https://github.com/MatiPl01/react-native-sortables/issues/257)
+* Web flex layout and mobile drop animation issues ([#250](https://github.com/MatiPl01/react-native-sortables/issues/250)) ([c2dc5aa](https://github.com/MatiPl01/react-native-sortables/commit/c2dc5aa23e84c5f916615064a6d0e2dcaaaa89ad))
+* Web sortables resizing and drop animation on web, change to absolute layout on Android ([#267](https://github.com/MatiPl01/react-native-sortables/issues/267)) ([44d66db](https://github.com/MatiPl01/react-native-sortables/commit/44d66db6698e99354e542962fffca7eb75df328b))
+
+
+### Features
+
+* Add a possibility to disable layout transition on item addition/removal ([#262](https://github.com/MatiPl01/react-native-sortables/issues/262)) ([385b196](https://github.com/MatiPl01/react-native-sortables/commit/385b196798096383841ef87cf1dd4ca8991826f1)), closes [#36877](https://github.com/MatiPl01/react-native-sortables/issues/36877)
+* Custom drag handle, better drag gesture handling ([#246](https://github.com/MatiPl01/react-native-sortables/issues/246)) ([0bbedff](https://github.com/MatiPl01/react-native-sortables/commit/0bbedfff0991288ceaa016431daa534c1f5127e0))
+* Expose layout transition prop ([#256](https://github.com/MatiPl01/react-native-sortables/issues/256)) ([df109fa](https://github.com/MatiPl01/react-native-sortables/commit/df109fa4f31e967e77fe76a1a7ccb937eff081e6))
+* Horizontal auto scroll and horizontal parent scrollables support ([#257](https://github.com/MatiPl01/react-native-sortables/issues/257)) ([538d99b](https://github.com/MatiPl01/react-native-sortables/commit/538d99bb352fc9179e395ee1d1a166536ec15ba2)), closes [#244](https://github.com/MatiPl01/react-native-sortables/issues/244)
+* OverDrag disabling per direction ([#252](https://github.com/MatiPl01/react-native-sortables/issues/252)) ([c239fa3](https://github.com/MatiPl01/react-native-sortables/commit/c239fa3183fa68b954025dbd3db068b2cb7712bb)), closes [#249](https://github.com/MatiPl01/react-native-sortables/issues/249)
+* Possibility to disable container overflow by the dragged item ([#249](https://github.com/MatiPl01/react-native-sortables/issues/249)) ([57cdab6](https://github.com/MatiPl01/react-native-sortables/commit/57cdab616119a889a23eefb9c5e9411788c5b154))
+
 ## [1.1.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.1.0...v1.1.1) (2025-02-05)
 
 
