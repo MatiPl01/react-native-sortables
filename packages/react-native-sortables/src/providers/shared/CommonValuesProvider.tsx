@@ -139,8 +139,8 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   return {
     value: {
-      activationState,
       activationAnimationDuration,
+      activationState,
       activeAnimationProgress,
       activeItemDimensions,
       activeItemDropped,

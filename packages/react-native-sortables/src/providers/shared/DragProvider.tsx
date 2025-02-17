@@ -45,8 +45,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   DragContextType
 >(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange, overDrag }) => {
   const {
-    activationState,
     activationAnimationDuration,
+    activationState,
     activeAnimationProgress,
     activeItemDimensions,
     activeItemDropped,

@@ -378,9 +378,26 @@ Controls whether the drop indicator is shown.
 
 Style of the drop indicator. This is typically used to **customize the appearance** of the default drop indicator component.
 
-| type        | default | required |
-| ----------- | ------- | -------- |
-| `ViewStyle` | \{}     | NO       |
+| type        | default   | required |
+| ----------- | --------- | -------- |
+| `ViewStyle` | See below | NO       |
+
+**Default value:**
+
+```ts
+{
+  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  borderColor: 'black',
+  borderRadius: 10,
+  borderStyle: 'dashed',
+  borderWidth: 2,
+  flex: 1
+}
+```
+
+:::important
+Values you provide in the `dropIndicatorStyle` prop will be **merged** with the default values.
+:::
 
 ---
 
@@ -417,11 +434,13 @@ type DropIndicatorComponentProps = {
 Layout animations control the **appearance or disappearance animations** of items **added or removed from the grid**.
 
 :::warning
+
 There are some **differences** in the **layout animations** implementation on **Web**:
 
 - `itemLayout` is **ignored** since Web implementation doesn't use **Reanimated** layout transitions for items reordering
 - `itemEntering` and `itemExiting` don't have default values due to the inconsistent behavior, but you can provide your own animations that will be used instead
-  :::
+
+:::
 
 ### itemEntering
 
@@ -518,9 +537,9 @@ Controls when items positions are animated.
 - `'all'` - items positions are animated when new items are **added** or **removed** from the grid and when items are **reordered**
 - `'reorder'` - items positions are animated **only** when items are **reordered**
 
-import allVideo from '@site/static/video/layout-transition-mode-all.mp4';
+import allVideo from '@site/static/video/grid-layout-transition-mode-all.mp4';
 
-import reorderVideo from '@site/static/video/layout-transition-mode-reorder.mp4';
+import reorderVideo from '@site/static/video/grid-layout-transition-mode-reorder.mp4';
 
 | `'all'`                                                   | `'reorder'`                                                   |
 | --------------------------------------------------------- | ------------------------------------------------------------- |
