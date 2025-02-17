@@ -40,7 +40,7 @@ type CommonValuesProviderProps = PropsWithChildren<
 const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   'CommonValues'
 )<CommonValuesProviderProps, CommonValuesContextType>(({
-  activeAnimationDuration: _activeAnimationDuration,
+  activationAnimationDuration: _activationAnimationDuration,
   activeItemOpacity: _activeItemOpacity,
   activeItemScale: _activeItemScale,
   activeItemShadowOpacity: _activeItemShadowOpacity,
@@ -100,7 +100,9 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
 
   // ITEM ACTIVATION SETTINGS
   const dragActivationDelay = useAnimatableValue(_dragActivationDelay);
-  const activeAnimationDuration = useAnimatableValue(_activeAnimationDuration);
+  const activationAnimationDuration = useAnimatableValue(
+    _activationAnimationDuration
+  );
   const dragActivationFailOffset = useAnimatableValue(
     _dragActivationFailOffset
   );
@@ -138,7 +140,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   return {
     value: {
       activationState,
-      activeAnimationDuration,
+      activationAnimationDuration,
       activeAnimationProgress,
       activeItemDimensions,
       activeItemDropped,

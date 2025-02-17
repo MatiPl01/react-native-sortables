@@ -27,7 +27,7 @@ export default function ItemDecoration({
   ...rest
 }: ItemDecorationProps) {
   const {
-    activeAnimationDuration,
+    activationAnimationDuration,
     activeItemOpacity,
     activeItemScale,
     activeItemShadowOpacity,
@@ -40,7 +40,7 @@ export default function ItemDecoration({
 
   const adjustedInactiveProgress = useDerivedValue(() => {
     if (isBeingActivated.value || prevActiveItemKey.value === key) {
-      return withTiming(0, { duration: activeAnimationDuration.value });
+      return withTiming(0, { duration: activationAnimationDuration.value });
     }
 
     return interpolate(

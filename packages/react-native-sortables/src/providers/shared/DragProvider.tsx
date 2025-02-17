@@ -46,7 +46,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 >(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange, overDrag }) => {
   const {
     activationState,
-    activeAnimationDuration,
+    activationAnimationDuration,
     activeAnimationProgress,
     activeItemDimensions,
     activeItemDropped,
@@ -263,7 +263,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
 
       const animate = () =>
-        withTiming(1, { duration: activeAnimationDuration.value });
+        withTiming(1, { duration: activationAnimationDuration.value });
 
       inactiveAnimationProgress.value = hasInactiveAnimation ? animate() : 0;
       activeAnimationProgress.value = animate();
@@ -276,7 +276,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       });
     },
     [
-      activeAnimationDuration,
+      activationAnimationDuration,
       activeAnimationProgress,
       activeItemDimensions,
       activeItemDropped,

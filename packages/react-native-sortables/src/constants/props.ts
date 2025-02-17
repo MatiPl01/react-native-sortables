@@ -10,10 +10,8 @@ import type {
   SortableGridProps
 } from '../types';
 import { defaultKeyExtractor } from '../utils/keys';
-import { DRAG_ACTIVATION_FAIL_OFFSET } from './layout';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
 import { IS_WEB } from './platform';
-import { DRAG_ACTIVATION_DELAY, DRAG_ANIMATION_DURATION } from './timings';
 
 export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
 
@@ -28,7 +26,7 @@ type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
 
 export const DEFAULT_SHARED_PROPS = {
   DropIndicatorComponent: DefaultDropIndicator,
-  activeAnimationDuration: DRAG_ANIMATION_DURATION,
+  activationAnimationDuration: 300,
   activeItemOpacity: 1,
   activeItemScale: 1.1,
   activeItemShadowOpacity: 0.2,
@@ -40,9 +38,9 @@ export const DEFAULT_SHARED_PROPS = {
   autoScrollSpeed: 1,
   customHandle: false,
   debug: false,
-  dragActivationDelay: DRAG_ACTIVATION_DELAY,
-  dragActivationFailOffset: DRAG_ACTIVATION_FAIL_OFFSET,
-  dropAnimationDuration: DRAG_ANIMATION_DURATION,
+  dragActivationDelay: 200,
+  dragActivationFailOffset: 5,
+  dropAnimationDuration: 300,
   dropIndicatorStyle: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     borderColor: 'black',
