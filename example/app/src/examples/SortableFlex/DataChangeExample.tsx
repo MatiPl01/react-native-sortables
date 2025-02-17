@@ -128,7 +128,7 @@ export default function DataChangeExample() {
           </Section>
         ))}
 
-        <Group style={[flex.fill, styles.scrollViewGroup]}>
+        <Group padding='none' style={[flex.fill, styles.scrollViewGroup]}>
           <Animated.ScrollView
             contentContainerStyle={styles.scrollViewContent}
             ref={scrollableRef}

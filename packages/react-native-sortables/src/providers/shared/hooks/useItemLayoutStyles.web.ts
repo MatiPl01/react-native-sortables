@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unused-modules */
 import type { StyleProp, ViewStyle } from 'react-native';
 import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import {

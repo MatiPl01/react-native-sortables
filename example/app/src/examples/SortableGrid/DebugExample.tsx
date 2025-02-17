@@ -58,7 +58,7 @@ export default function DebugExample() {
           />
         </OptionGroup>
 
-        <Group style={[flex.fill, styles.scrollViewGroup]}>
+        <Group padding='none' style={[flex.fill, styles.scrollViewGroup]}>
           <Animated.ScrollView
             // We set key here to dismiss the property change on the fly warning
             // (scrollableRef and debug properties of the sortable component

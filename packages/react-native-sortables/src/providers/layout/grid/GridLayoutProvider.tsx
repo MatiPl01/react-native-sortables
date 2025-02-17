@@ -79,11 +79,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
             calculateLayout(props),
             // Animate layout only if parent container is not resized
             // (e.g. skip animation when the browser window is resized)
-            !!(
-              IS_WEB &&
-              previousProps &&
-              props.columnWidth === previousProps.columnWidth
-            )
+            IS_WEB &&
+              (!previousProps?.columnWidth ||
+                props.columnWidth === previousProps.columnWidth)
           );
         }
       ),
