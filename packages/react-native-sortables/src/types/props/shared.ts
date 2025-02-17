@@ -30,9 +30,9 @@ export type ItemDragSettings = {
   overDrag: OverDrag;
 } & AnimatableProps<{
   dragActivationDelay: number;
-  dragActivationFailOffset: number;
-  activeAnimationDuration: number;
+  activationAnimationDuration: number;
   dropAnimationDuration: number;
+  dragActivationFailOffset: number;
 }>;
 
 export type ActiveItemSnapSettings = AnimatableProps<{

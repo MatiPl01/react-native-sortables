@@ -63,6 +63,10 @@ hr {
   background-color: var(--ifm-color-emphasis-200);
 }
 
+video {
+  border-radius: var(--ifm-global-radius);
+}
+
 /**
  * Table styles
  */

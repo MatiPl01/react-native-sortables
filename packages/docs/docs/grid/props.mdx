@@ -132,6 +132,63 @@ This may sometimes cause **performance issues** as it requires layout recalculat
 
 ---
 
+## Item Drag Settings
+
+### overDrag
+
+Whether the **active item position** should be **clamped to the grid boundaries** or **dragging outside** of the grid is **allowed**.
+
+| type                                             | default  | required |
+| ------------------------------------------------ | -------- | -------- |
+| `'both' \| 'horizontal' \| 'none' \| 'vertical'` | `'both'` | NO       |
+
+- `'both'` - allowed in both directions
+- `'horizontal'` - allowed in horizontal direction
+- `'vertical'` - allowed in vertical direction
+- `'none'` - not allowed
+
+---
+
+### dragActivationDelay
+
+The delay (in milliseconds) between when an item is initially pressed and when the drag gesture becomes active.
+
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 200     | NO       |
+
+---
+
+### activationAnimationDuration
+
+Duration (in milliseconds) of the animation after the item becomes active (by default, the item is scaled up and snapped to the finger).
+
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 300     | NO       |
+
+---
+
+### dropAnimationDuration
+
+Duration (in milliseconds) of the animation after the item is dropped (the finger is released).
+
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 300     | NO       |
+
+---
+
+### dragActivationFailOffset
+
+The maximum distance (in pixels) the finger can move from the touch start position without cancelling the activation of the drag gesture.
+
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `Animatable<number>` | 5       | NO       |
+
+---
+
 ## Active Item Decoration
 
 All active item decoration settings are applied when the **item becomes active** (when drag gesture starts being handled).
@@ -189,6 +246,10 @@ Scale to which all items except the pressed one are animated when pressed item b
 ## Active Item Snap
 
 Active item snap settings determine how the active item will be **positioned in relation to the finger** when the drag gesture starts. They control **snapping of the active item to the user's finger**.
+
+:::info
+When a custom drag handle component is used, the active item snap is **relative** to the **drag handle** and not the item itself.
+:::
 
 ### enableActiveItemSnap
 
@@ -317,9 +378,26 @@ Controls whether the drop indicator is shown.
 
 Style of the drop indicator. This is typically used to **customize the appearance** of the default drop indicator component.
 
-| type        | default | required |
-| ----------- | ------- | -------- |
-| `ViewStyle` | \{}     | NO       |
+| type        | default   | required |
+| ----------- | --------- | -------- |
+| `ViewStyle` | See below | NO       |
+
+**Default value:**
+
+```ts
+{
+  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  borderColor: 'black',
+  borderRadius: 10,
+  borderStyle: 'dashed',
+  borderWidth: 2,
+  flex: 1
+}
+```
+
+:::important
+Values you provide in the `dropIndicatorStyle` prop will be **merged** with the default values.
+:::
 
 ---
 
@@ -355,15 +433,38 @@ type DropIndicatorComponentProps = {
 
 Layout animations control the **appearance or disappearance animations** of items **added or removed from the grid**.
 
+:::warning
+
+There are some **differences** in the **layout animations** implementation on **Web**:
+
+- `itemLayout` is **ignored** since Web implementation doesn't use **Reanimated** layout transitions for items reordering
+- `itemEntering` and `itemExiting` don't have default values due to the inconsistent behavior, but you can provide your own animations that will be used instead
+
+:::
+
 ### itemEntering
 
 Layout animation to use when an item is added to the grid.
 
-| type              | default                | required |
-| ----------------- | ---------------------- | -------- |
-| `LayoutAnimation` | SortableItemEntering\* | NO       |
+| type              | default                           | required |
+| ----------------- | --------------------------------- | -------- |
+| `LayoutAnimation` | SortableItemEntering\* / null\*\* | NO       |
 
-\*Library default `itemEntering` implementation.
+\*Library default `itemEntering` implementation for native platforms
+
+\*\*No default value on Web
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type LayoutAnimation =
+  | BaseAnimationBuilder
+  | EntryExitAnimationFunction
+  | typeof BaseAnimationBuilder;
+```
+
+</details>
 
 ---
 
@@ -371,11 +472,78 @@ Layout animation to use when an item is added to the grid.
 
 Layout animation to use when an item is removed from the grid.
 
-| type              | default               | required |
-| ----------------- | --------------------- | -------- |
-| `LayoutAnimation` | SortableItemExiting\* | NO       |
+| type              | default                          | required |
+| ----------------- | -------------------------------- | -------- |
+| `LayoutAnimation` | SortableItemExiting\* / null\*\* | NO       |
 
-\*Library default `itemExiting` implementation.
+\*Library default `itemExiting` implementation for native platforms
+
+\*\*No default value on Web
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type LayoutAnimation =
+  | BaseAnimationBuilder
+  | EntryExitAnimationFunction
+  | typeof BaseAnimationBuilder;
+```
+
+</details>
+
+---
+
+### itemsLayout
+
+Layout transition to use when items are reordered.
+
+| type               | default                       | required |
+| ------------------ | ----------------------------- | -------- |
+| `LayoutTransition` | LinearTransition\* / null\*\* | NO       |
+
+\*Library default `itemsLayout` implementation for native platforms
+
+\*\*No default value on Web
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type LayoutTransition =
+  | BaseAnimationBuilder
+  | LayoutAnimationFunction
+  | typeof BaseAnimationBuilder;
+```
+
+</details>
+
+:::warning
+
+This prop is **not supported** on Web.
+
+:::
+
+---
+
+### itemsLayoutTransitionMode
+
+Controls when items positions are animated.
+
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `'all' \| 'reorder'` | `'all'` | NO       |
+
+- `'all'` - items positions are animated when new items are **added** or **removed** from the grid and when items are **reordered**
+- `'reorder'` - items positions are animated **only** when items are **reordered**
+
+import allVideo from '@site/static/video/grid-layout-transition-mode-all.mp4';
+
+import reorderVideo from '@site/static/video/grid-layout-transition-mode-reorder.mp4';
+
+| `'all'`                                                   | `'reorder'`                                                   |
+| --------------------------------------------------------- | ------------------------------------------------------------- |
+| <video autoPlay loop muted width='100%' src={allVideo} /> | <video autoPlay loop muted width='100%' src={reorderVideo} /> |
 
 ---
 
@@ -485,6 +653,22 @@ type SortableGridStrategy = 'insert' | 'swap' | SortableGridStrategyFactory;
 
 ---
 
+### customHandle
+
+Controls whether drag gestures should be restricted to a custom handle component.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | false   | NO       |
+
+When set to `true`, items can only be dragged using a dedicated handle component.
+
+:::important
+When `customHandle` is enabled, you **must** include a `Sortable.Handle` component within each grid item, otherwise items will not be draggable.
+:::
+
+---
+
 ### hapticsEnabled
 
 Whether haptics are enabled. Vibrations are fired when the **pressed item becomes active**, the **order of items changes** or the drag gesture ends and the **item is dropped**.
@@ -497,7 +681,9 @@ Whether haptics are enabled. Vibrations are fired when the **pressed item become
 
 :::important
 
-To use haptics, you have to install `react-native-haptic-feedback` package. See this [Getting Started](../getting-started#optional-dependencies) section for more details.
+To use built-in haptics, you have to install `react-native-haptic-feedback` package. See this [Getting Started](../getting-started#optional-dependencies) section for more details.
+
+You can also use any other haptics library but you will have to trigger haptics manually when callbacks are called. See the [Callbacks](#callbacks) section for more details.
 
 :::
 

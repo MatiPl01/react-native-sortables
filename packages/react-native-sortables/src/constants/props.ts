@@ -4,17 +4,14 @@ import { LinearTransition } from 'react-native-reanimated';
 import { DefaultDropIndicator } from '../components/defaults';
 import type {
   DefaultProps,
-  ItemLayoutAnimationSettings,
   SharedProps,
   SortableCallbacks,
   SortableFlexProps,
   SortableGridProps
 } from '../types';
 import { defaultKeyExtractor } from '../utils/keys';
-import { DRAG_ACTIVATION_FAIL_OFFSET } from './layout';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
 import { IS_WEB } from './platform';
-import { DRAG_ACTIVATION_DELAY, DRAG_ANIMATION_DURATION } from './timings';
 
 export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
 
@@ -23,14 +20,13 @@ export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
  */
 type OptionalSharedProps =
   | 'scrollableRef'
-  | keyof Omit<ItemLayoutAnimationSettings, 'itemsLayoutTransitionMode'>
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
 type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
 
 export const DEFAULT_SHARED_PROPS = {
   DropIndicatorComponent: DefaultDropIndicator,
-  activeAnimationDuration: DRAG_ANIMATION_DURATION,
+  activationAnimationDuration: 300,
   activeItemOpacity: 1,
   activeItemScale: 1.1,
   activeItemShadowOpacity: 0.2,
@@ -42,9 +38,9 @@ export const DEFAULT_SHARED_PROPS = {
   autoScrollSpeed: 1,
   customHandle: false,
   debug: false,
-  dragActivationDelay: DRAG_ACTIVATION_DELAY,
-  dragActivationFailOffset: DRAG_ACTIVATION_FAIL_OFFSET,
-  dropAnimationDuration: DRAG_ANIMATION_DURATION,
+  dragActivationDelay: 200,
+  dragActivationFailOffset: 5,
+  dropAnimationDuration: 300,
   dropIndicatorStyle: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     borderColor: 'black',
@@ -57,16 +53,16 @@ export const DEFAULT_SHARED_PROPS = {
   hapticsEnabled: false,
   inactiveItemOpacity: 0.5,
   inactiveItemScale: 1,
+  // Layout animations on web don't work properly so we don't provide
+  // default layout animations here. This is an issue that should be
   // fixed in `react-native-reanimated` in the future.
-  itemEntering: IS_WEB ? undefined : SortableItemEntering,
-  itemExiting: IS_WEB ? undefined : SortableItemExiting,
-  itemsLayout: IS_WEB ? undefined : LinearTransition,
+  itemEntering: IS_WEB ? null : SortableItemEntering,
+  itemExiting: IS_WEB ? null : SortableItemExiting,
+  itemsLayout: IS_WEB ? null : LinearTransition,
   itemsLayoutTransitionMode: 'all',
   onDragStart: undefined,
   onOrderChange: undefined,
-  // default layout animations here. This is an issue that should be
   overDrag: 'both',
-  // Layout animations on web don't work properly so we don't provide
   scrollableRef: undefined,
   showDropIndicator: false,
   snapOffsetX: '50%',

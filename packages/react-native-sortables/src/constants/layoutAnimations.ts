@@ -1,6 +1,6 @@
 import { type LayoutAnimation, withTiming } from 'react-native-reanimated';
 
-import { ITEM_LAYOUT_ANIMATION_DURATION } from './timings';
+const ITEM_LAYOUT_ANIMATION_DURATION = 300;
 
 export const SortableItemExiting = (): LayoutAnimation => {
   'worklet';
