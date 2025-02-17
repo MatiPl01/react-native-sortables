@@ -112,7 +112,7 @@ export default function FlexLayoutExample() {
         />
       </OptionGroup>
 
-      <Group style={[flex.fill, styles.scrollViewGroup]}>
+      <Group padding='none' style={[flex.fill, styles.scrollViewGroup]}>
         <ScrollView
           contentContainerStyle={styles.scrollViewContent}
           style={flex.fill}>
