@@ -355,15 +355,36 @@ type DropIndicatorComponentProps = {
 
 Layout animations control the **appearance or disappearance animations** of items **added or removed from the grid**.
 
+:::warning
+There are some **differences** in the **layout animations** implementation on **Web**:
+
+- `itemLayout` is **ignored** since Web implementation doesn't use **Reanimated** layout transitions for items reordering
+- `itemEntering` and `itemExiting` don't have default values due to the inconsistent behavior, but you can provide your own animations that will be used instead
+  :::
+
 ### itemEntering
 
 Layout animation to use when an item is added to the grid.
 
-| type              | default                | required |
-| ----------------- | ---------------------- | -------- |
-| `LayoutAnimation` | SortableItemEntering\* | NO       |
+| type              | default                           | required |
+| ----------------- | --------------------------------- | -------- |
+| `LayoutAnimation` | SortableItemEntering\* / null\*\* | NO       |
 
-\*Library default `itemEntering` implementation.
+\*Library default `itemEntering` implementation for native platforms
+
+\*\*No default value on Web
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type LayoutAnimation =
+  | BaseAnimationBuilder
+  | EntryExitAnimationFunction
+  | typeof BaseAnimationBuilder;
+```
+
+</details>
 
 ---
 
@@ -371,11 +392,78 @@ Layout animation to use when an item is added to the grid.
 
 Layout animation to use when an item is removed from the grid.
 
-| type              | default               | required |
-| ----------------- | --------------------- | -------- |
-| `LayoutAnimation` | SortableItemExiting\* | NO       |
+| type              | default                          | required |
+| ----------------- | -------------------------------- | -------- |
+| `LayoutAnimation` | SortableItemExiting\* / null\*\* | NO       |
 
-\*Library default `itemExiting` implementation.
+\*Library default `itemExiting` implementation for native platforms
+
+\*\*No default value on Web
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type LayoutAnimation =
+  | BaseAnimationBuilder
+  | EntryExitAnimationFunction
+  | typeof BaseAnimationBuilder;
+```
+
+</details>
+
+---
+
+### itemsLayout
+
+Layout transition to use when items are reordered.
+
+| type               | default                       | required |
+| ------------------ | ----------------------------- | -------- |
+| `LayoutTransition` | LinearTransition\* / null\*\* | NO       |
+
+\*Library default `itemsLayout` implementation for native platforms
+
+\*\*No default value on Web
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type LayoutTransition =
+  | BaseAnimationBuilder
+  | LayoutAnimationFunction
+  | typeof BaseAnimationBuilder;
+```
+
+</details>
+
+:::warning
+
+This prop is **not supported** on Web.
+
+:::
+
+---
+
+### itemsLayoutTransitionMode
+
+Controls when items positions are animated.
+
+| type                 | default | required |
+| -------------------- | ------- | -------- |
+| `'all' \| 'reorder'` | `'all'` | NO       |
+
+- `'all'` - items positions are animated when new items are **added** or **removed** from the grid and when items are **reordered**
+- `'reorder'` - items positions are animated **only** when items are **reordered**
+
+import allVideo from '@site/static/video/layout-transition-mode-all.mp4';
+
+import reorderVideo from '@site/static/video/layout-transition-mode-reorder.mp4';
+
+| `'all'`                                                   | `'reorder'`                                                   |
+| --------------------------------------------------------- | ------------------------------------------------------------- |
+| <video autoPlay loop muted width='100%' src={allVideo} /> | <video autoPlay loop muted width='100%' src={reorderVideo} /> |
 
 ---
 
