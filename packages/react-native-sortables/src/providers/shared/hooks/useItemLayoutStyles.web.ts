@@ -31,7 +31,7 @@ const NO_TRANSLATION_STYLE: ViewStyle = {
 
 export default function useItemLayoutStyles(
   key: string,
-  pressProgress: SharedValue<number>
+  activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
   const {
     activeItemDropped,
@@ -44,7 +44,7 @@ export default function useItemLayoutStyles(
     shouldAnimateLayout
   } = useCommonValuesContext();
 
-  const zIndex = useItemZIndex(key, pressProgress);
+  const zIndex = useItemZIndex(key, activationAnimationProgress);
 
   const translateX = useSharedValue<null | number>(null);
   const translateY = useSharedValue<null | number>(null);

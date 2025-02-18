@@ -1,6 +1,7 @@
 import { memo, useEffect } from 'react';
 import type { ViewProps } from 'react-native';
 import Animated, {
+  LayoutAnimationConfig,
   useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
@@ -35,9 +36,9 @@ function DraggableView({
   const { activeItemKey, customHandle } = useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
-  const isBeingActivated = useDerivedValue(() => activeItemKey.value === key);
-  const pressProgress = useSharedValue(0);
-  const layoutStyles = useItemLayoutStyles(key, pressProgress);
+  const activationAnimationProgress = useSharedValue(0);
+  const isActive = useDerivedValue(() => activeItemKey.value === key);
+  const layoutStyles = useItemLayoutStyles(key, activationAnimationProgress);
 
   useEffect(() => {
     return () => handleItemRemoval(key);
@@ -45,9 +46,9 @@ function DraggableView({
 
   const innerComponent = (
     <ItemDecoration
-      isBeingActivated={isBeingActivated}
+      isActive={isActive}
       itemKey={key}
-      pressProgress={pressProgress}
+      activationAnimationProgress={activationAnimationProgress}
       // Keep onLayout the closest to the children to measure the real item size
       // (without paddings or other style changes made to the wrapper component)
       onLayout={({
@@ -60,7 +61,9 @@ function DraggableView({
           width
         });
       }}>
-      {children}
+      <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
+        {children}
+      </LayoutAnimationConfig>
     </ItemDecoration>
   );
 
@@ -70,9 +73,9 @@ function DraggableView({
       layout={IS_WEB ? undefined : layout}
       style={[style, layoutStyles]}>
       <ItemContextProvider
-        isBeingActivated={isBeingActivated}
+        isActive={isActive}
         itemKey={key}
-        pressProgress={pressProgress}>
+        activationAnimationProgress={activationAnimationProgress}>
         <Animated.View entering={entering} exiting={exiting}>
           {customHandle ? (
             innerComponent

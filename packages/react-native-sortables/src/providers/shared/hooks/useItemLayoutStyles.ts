@@ -32,7 +32,7 @@ const NO_TRANSLATION_STYLE: ViewStyle = {
 
 export default function useItemLayoutStyles(
   key: string,
-  pressProgress: SharedValue<number>
+  activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
   const {
     activeItemKey,
@@ -43,9 +43,11 @@ export default function useItemLayoutStyles(
     itemPositions
   } = useCommonValuesContext();
 
-  const zIndex = useItemZIndex(key, pressProgress);
-  const hasPressProgress = useDerivedValue(() => pressProgress.value > 0);
+  const zIndex = useItemZIndex(key, activationAnimationProgress);
   const isReleased = useSharedValue(true);
+  const hasProgress = useDerivedValue(
+    () => activationAnimationProgress.value > 0
+  );
 
   const translateX = useSharedValue<null | number>(null);
   const translateY = useSharedValue<null | number>(null);
@@ -55,7 +57,7 @@ export default function useItemLayoutStyles(
   // Inactive item updater
   useAnimatedReaction(
     () => ({
-      hasProgress: hasPressProgress.value,
+      hasProgress: hasProgress.value,
       isActive: activeItemKey.value === key,
       position: itemPositions.value[key]
     }),
