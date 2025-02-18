@@ -28,10 +28,10 @@ export function SortableHandle({
     snapItemDimensions,
     snapItemOffset
   } = useCommonValuesContext();
-  const { itemKey, pressProgress } = useItemContext();
+  const { activationAnimationProgress, itemKey } = useItemContext();
 
   const viewRef = useAnimatedRef<View>();
-  const gesture = useItemPanGesture(itemKey, pressProgress);
+  const gesture = useItemPanGesture(itemKey, activationAnimationProgress);
 
   const measureHandle = useCallback(() => {
     'worklet';
@@ -92,9 +92,9 @@ export function SortableHandleInternal({
 }: {
   children: React.ReactNode;
 }) {
-  const { itemKey, pressProgress } = useItemContext();
+  const { activationAnimationProgress, itemKey } = useItemContext();
 
-  const gesture = useItemPanGesture(itemKey, pressProgress);
+  const gesture = useItemPanGesture(itemKey, activationAnimationProgress);
 
   return <GestureDetector gesture={gesture}>{children}</GestureDetector>;
 }

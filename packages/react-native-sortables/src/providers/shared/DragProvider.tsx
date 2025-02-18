@@ -207,7 +207,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     (
       touch: TouchData,
       key: string,
-      pressProgress: SharedValue<number>,
+      activationAnimationProgress: SharedValue<number>,
       fail: () => void
     ) => {
       'worklet';
@@ -267,7 +267,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       inactiveAnimationProgress.value = hasInactiveAnimation ? animate() : 0;
       activeAnimationProgress.value = animate();
-      pressProgress.value = animate();
+      activationAnimationProgress.value = animate();
 
       haptics.medium();
       stableOnDragStart({
@@ -309,7 +309,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     (
       e: GestureTouchEvent,
       key: string,
-      pressProgress: SharedValue<number>,
+      activationAnimationProgress: SharedValue<number>,
       activate: () => void,
       fail: () => void
     ) => {
@@ -321,7 +321,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         // if the current item is still animated to the drag end position
         // or sorting is disabled at all
         !sortEnabled.value ||
-        pressProgress.value > 0 ||
+        activationAnimationProgress.value > 0 ||
         activeItemKey.value !== null
       ) {
         fail();
@@ -341,7 +341,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // e.g. while scrolling the ScrollView
       activationTimeoutId.value = setAnimatedTimeout(() => {
         activate();
-        handleDragStart(touch, key, pressProgress, fail);
+        handleDragStart(touch, key, activationAnimationProgress, fail);
       }, dragActivationDelay.value);
     },
     [
@@ -407,7 +407,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   );
 
   const handleDragEnd = useCallback(
-    (key: string, pressProgress: SharedValue<number>) => {
+    (key: string, activationAnimationProgress: SharedValue<number>) => {
       'worklet';
       dragStartIndex.value = -1;
       touchStartTouch.value = null;
@@ -440,7 +440,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const animate = (callback?: (finished: boolean | undefined) => void) =>
         withTiming(0, { duration: dropAnimationDuration.value }, callback);
 
-      pressProgress.value = animate();
+      activationAnimationProgress.value = animate();
       inactiveAnimationProgress.value = animate();
 
       clearAnimatedTimeout(activationTimeoutId.value);

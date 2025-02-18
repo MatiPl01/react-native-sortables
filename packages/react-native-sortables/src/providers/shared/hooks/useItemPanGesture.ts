@@ -6,7 +6,7 @@ import { useDragContext } from '../DragProvider';
 
 export default function useItemPanGesture(
   key: string,
-  pressProgress: SharedValue<number>
+  activationAnimationProgress: SharedValue<number>
 ) {
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
     useDragContext();
@@ -19,7 +19,7 @@ export default function useItemPanGesture(
           handleTouchStart(
             e,
             key,
-            pressProgress,
+            activationAnimationProgress,
             manager.activate,
             manager.fail
           );
@@ -34,8 +34,14 @@ export default function useItemPanGesture(
           manager.end();
         })
         .onFinalize(() => {
-          handleDragEnd(key, pressProgress);
+          handleDragEnd(key, activationAnimationProgress);
         }),
-    [key, pressProgress, handleDragEnd, handleTouchStart, handleTouchesMove]
+    [
+      key,
+      activationAnimationProgress,
+      handleDragEnd,
+      handleTouchStart,
+      handleTouchesMove
+    ]
   );
 }

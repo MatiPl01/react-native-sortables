@@ -14,16 +14,16 @@ import { useCommonValuesContext } from '../../providers';
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 
 type ItemDecorationProps = {
-  isBeingActivated: SharedValue<boolean>;
-  pressProgress: SharedValue<number>;
+  isActive: SharedValue<boolean>;
+  activationAnimationProgress: SharedValue<number>;
   onLayout: NonNullable<ViewProps['onLayout']>;
   itemKey: string;
 } & ViewProps;
 
 export default function ItemDecoration({
-  isBeingActivated,
+  activationAnimationProgress,
+  isActive,
   itemKey: key,
-  pressProgress,
   ...rest
 }: ItemDecorationProps) {
   const {
@@ -39,19 +39,19 @@ export default function ItemDecoration({
   } = useCommonValuesContext();
 
   const adjustedInactiveProgress = useDerivedValue(() => {
-    if (isBeingActivated.value || prevActiveItemKey.value === key) {
+    if (isActive.value || prevActiveItemKey.value === key) {
       return withTiming(0, { duration: activationAnimationDuration.value });
     }
 
     return interpolate(
-      pressProgress.value,
+      activationAnimationProgress.value,
       [0, 1],
       [inactiveAnimationProgress.value, 0]
     );
   });
 
   const animatedStyle = useAnimatedStyle(() => {
-    const progress = pressProgress.value;
+    const progress = activationAnimationProgress.value;
     const zeroProgressOpacity = interpolate(
       adjustedInactiveProgress.value,
       [0, 1],

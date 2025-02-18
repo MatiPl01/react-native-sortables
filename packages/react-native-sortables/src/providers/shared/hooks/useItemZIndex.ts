@@ -5,7 +5,7 @@ import { useCommonValuesContext } from '../CommonValuesProvider';
 
 export default function useItemZIndex(
   key: string,
-  pressProgress: SharedValue<number>
+  activationAnimationProgress: SharedValue<number>
 ): SharedValue<number> {
   const { activeItemKey, prevActiveItemKey } = useCommonValuesContext();
 
@@ -16,7 +16,7 @@ export default function useItemZIndex(
     if (prevActiveItemKey.value === key) {
       return 2;
     }
-    if (pressProgress.value > 0) {
+    if (activationAnimationProgress.value > 0) {
       return 1;
     }
     return 0;

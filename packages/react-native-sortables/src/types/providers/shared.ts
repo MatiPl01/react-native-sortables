@@ -91,12 +91,15 @@ export type DragContextType = {
   handleTouchStart: (
     e: GestureTouchEvent,
     key: string,
-    pressProgress: SharedValue<number>,
+    activationAnimationProgress: SharedValue<number>,
     activate: () => void,
     fail: () => void
   ) => void;
   handleTouchesMove: (e: GestureTouchEvent, fail: () => void) => void;
-  handleDragEnd: (key: string, pressProgress: SharedValue<number>) => void;
+  handleDragEnd: (
+    key: string,
+    activationAnimationProgress: SharedValue<number>
+  ) => void;
   handleOrderChange: (
     key: string,
     fromIndex: number,
@@ -109,9 +112,9 @@ export type DragContextType = {
 
 export type ItemContextType = {
   itemKey: string;
-  pressProgress: Readonly<SharedValue<number>>;
-  isBeingActivated: Readonly<SharedValue<boolean>>;
+  isActive: Readonly<SharedValue<boolean>>;
   dragActivationState: Readonly<SharedValue<DragActivationState>>;
+  activationAnimationProgress: Readonly<SharedValue<number>>;
 };
 
 // LAYER

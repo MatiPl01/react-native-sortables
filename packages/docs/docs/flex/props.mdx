@@ -551,9 +551,16 @@ type DropIndicatorComponentProps = {
 
 ## Layout Animations
 
-Layout animations control the **appearance or disappearance animations** of items **added or removed from the flex container**.
+Layout animations control how items animate when their positions change and when they are added or removed from the flex container.
 
-:::warning
+:::note
+
+- Item **entering** animations are **not** triggered during the **initial render** of the flex container
+- Item **exiting** animations are **not** triggered when the **entire flex container is unmounted**
+
+:::
+
+:::warning Warning (Web)
 
 There are some **differences** in the **layout animations** implementation on **Web**:
 
@@ -563,6 +570,8 @@ There are some **differences** in the **layout animations** implementation on **
 :::
 
 ### itemEntering
+
+Layout animation to use when an item is added to the flex container after the initial render.
 
 | type              | default                           | required |
 | ----------------- | --------------------------------- | -------- |
@@ -587,6 +596,8 @@ type LayoutAnimation =
 ---
 
 ### itemExiting
+
+Layout animation to use when an item is removed from the flex container (except when the entire flex container is unmounted).
 
 | type              | default                          | required |
 | ----------------- | -------------------------------- | -------- |
@@ -634,7 +645,7 @@ type LayoutTransition =
 
 </details>
 
-:::warning
+:::warning Warning (Web)
 
 This prop is **not supported** on Web.
 
@@ -767,16 +778,6 @@ type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
 
 ---
 
-### hapticsEnabled
-
-Whether haptics are enabled. Vibrations are fired when the **pressed item becomes active**, the **order of items changes** or the drag gesture ends and the **item is dropped**.
-
-| type      | default | required |
-| --------- | ------- | -------- |
-| `boolean` | false   | NO       |
-
----
-
 ### customHandle
 
 Controls whether drag gestures should be restricted to a custom handle component.
@@ -792,6 +793,14 @@ When `customHandle` is enabled, you **must** include a `Sortable.Handle` compone
 :::
 
 ---
+
+### hapticsEnabled
+
+Whether haptics are enabled. Vibrations are fired when the **pressed item becomes active**, the **order of items changes** or the drag gesture ends and the **item is dropped**.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | false   | NO       |
 
 :::important
 
