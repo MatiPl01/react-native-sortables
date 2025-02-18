@@ -60,6 +60,10 @@ const routes: Routes = {
         Component: SortableFlex.DropIndicatorExample,
         name: 'Drop Indicator'
       },
+      DragHandle: {
+        Component: SortableFlex.DragHandleExample,
+        name: 'Drag Handle'
+      },
       AutoScroll: {
         Component: SortableFlex.AutoScrollExample,
         name: 'Auto Scroll'
