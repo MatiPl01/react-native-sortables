@@ -431,20 +431,25 @@ type DropIndicatorComponentProps = {
 
 ## Layout Animations
 
-Layout animations control the **appearance or disappearance animations** of items **added or removed from the grid**.
+Layout animations control how items animate when their positions change and when they are added or removed from the grid.
 
-:::warning
+:::note
 
+- Item **entering** animations are **not** triggered during the **initial render** of the grid
+- Item **exiting** animations are **not** triggered when the **entire grid is unmounted**
+
+:::
+
+:::warning Warning (Web)
 There are some **differences** in the **layout animations** implementation on **Web**:
 
 - `itemLayout` is **ignored** since Web implementation doesn't use **Reanimated** layout transitions for items reordering
 - `itemEntering` and `itemExiting` don't have default values due to the inconsistent behavior, but you can provide your own animations that will be used instead
-
-:::
+  :::
 
 ### itemEntering
 
-Layout animation to use when an item is added to the grid.
+Layout animation to use when an item is added to the grid after the initial render of the grid.
 
 | type              | default                           | required |
 | ----------------- | --------------------------------- | -------- |
@@ -470,7 +475,7 @@ type LayoutAnimation =
 
 ### itemExiting
 
-Layout animation to use when an item is removed from the grid.
+Layout animation to use when an item is removed from the grid (except when the entire grid is unmounted).
 
 | type              | default                          | required |
 | ----------------- | -------------------------------- | -------- |
@@ -502,7 +507,7 @@ Layout transition to use when items are reordered.
 | ------------------ | ----------------------------- | -------- |
 | `LayoutTransition` | LinearTransition\* / null\*\* | NO       |
 
-\*Library default `itemsLayout` implementation for native platforms
+\*Used as a default value on native platforms
 
 \*\*No default value on Web
 
@@ -518,7 +523,7 @@ type LayoutTransition =
 
 </details>
 
-:::warning
+:::warning Warning (Web)
 
 This prop is **not supported** on Web.
 
