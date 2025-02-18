@@ -46,9 +46,9 @@ function DraggableView({
 
   const innerComponent = (
     <ItemDecoration
+      activationAnimationProgress={activationAnimationProgress}
       isActive={isActive}
       itemKey={key}
-      activationAnimationProgress={activationAnimationProgress}
       // Keep onLayout the closest to the children to measure the real item size
       // (without paddings or other style changes made to the wrapper component)
       onLayout={({
@@ -73,9 +73,9 @@ function DraggableView({
       layout={IS_WEB ? undefined : layout}
       style={[style, layoutStyles]}>
       <ItemContextProvider
+        activationAnimationProgress={activationAnimationProgress}
         isActive={isActive}
-        itemKey={key}
-        activationAnimationProgress={activationAnimationProgress}>
+        itemKey={key}>
         <Animated.View entering={entering} exiting={exiting}>
           {customHandle ? (
             innerComponent

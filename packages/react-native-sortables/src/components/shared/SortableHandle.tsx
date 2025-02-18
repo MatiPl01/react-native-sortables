@@ -28,7 +28,7 @@ export function SortableHandle({
     snapItemDimensions,
     snapItemOffset
   } = useCommonValuesContext();
-  const { itemKey, activationAnimationProgress } = useItemContext();
+  const { activationAnimationProgress, itemKey } = useItemContext();
 
   const viewRef = useAnimatedRef<View>();
   const gesture = useItemPanGesture(itemKey, activationAnimationProgress);
@@ -92,7 +92,7 @@ export function SortableHandleInternal({
 }: {
   children: React.ReactNode;
 }) {
-  const { itemKey, activationAnimationProgress } = useItemContext();
+  const { activationAnimationProgress, itemKey } = useItemContext();
 
   const gesture = useItemPanGesture(itemKey, activationAnimationProgress);
 

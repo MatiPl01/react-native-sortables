@@ -21,9 +21,9 @@ type ItemDecorationProps = {
 } & ViewProps;
 
 export default function ItemDecoration({
+  activationAnimationProgress,
   isActive,
   itemKey: key,
-  activationAnimationProgress,
   ...rest
 }: ItemDecorationProps) {
   const {

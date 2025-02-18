@@ -45,7 +45,7 @@ export default function useItemLayoutStyles(
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
   const isReleased = useSharedValue(true);
-  const hasProgress = useDerivedValue(
+  const hasActivationProgress = useDerivedValue(
     () => activationAnimationProgress.value > 0
   );
 
@@ -57,7 +57,7 @@ export default function useItemLayoutStyles(
   // Inactive item updater
   useAnimatedReaction(
     () => ({
-      hasProgress: hasProgress.value,
+      hasProgress: hasActivationProgress.value,
       isActive: activeItemKey.value === key,
       position: itemPositions.value[key]
     }),
