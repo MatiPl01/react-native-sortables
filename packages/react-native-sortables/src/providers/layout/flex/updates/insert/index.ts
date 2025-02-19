@@ -166,23 +166,27 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
       swapGroupBeforeOffset =
         currentLayout.crossAxisGroupOffsets[groupIndex] ?? 0;
-      const swapOffset =
-        ((nextLayout?.crossAxisGroupOffsets[groupIndex - 1] ?? 0) +
-          swapGroupBeforeOffset +
-          (currentLayout.crossAxisGroupSizes[groupIndex - 1] ?? 0)) /
-        2;
-      const additionalSwapOffset = getAdditionalSwapOffset(
-        crossGap.value,
-        nextLayout?.crossAxisGroupSizes?.[groupIndex - 1] ?? 0
-      );
-      swapGroupBeforeBound = swapOffset - additionalSwapOffset;
+      if (groupIndex === 0) {
+        swapGroupBeforeBound = swapGroupBeforeOffset;
+      } else {
+        const swapOffset =
+          ((nextLayout?.crossAxisGroupOffsets[groupIndex - 1] ?? 0) +
+            swapGroupBeforeOffset +
+            (currentLayout.crossAxisGroupSizes[groupIndex] ?? 0)) /
+          2;
+        const additionalSwapOffset = getAdditionalSwapOffset(
+          crossGap.value,
+          nextLayout?.crossAxisGroupSizes?.[groupIndex - 1] ?? 0
+        );
+        swapGroupBeforeBound = swapOffset - additionalSwapOffset;
+      }
     } while (
       swapGroupBeforeBound > 0 &&
       crossAxisPosition < swapGroupBeforeBound
     );
 
     // Group after
-    let swappedAfteGroupsCount =
+    let swappedAfterGroupsCount =
       swappedAfterLayout.value?.itemGroups.length ?? 0;
     let swapGroupAfterOffset = -Infinity;
     let swapGroupAfterBound = -Infinity;
@@ -198,7 +202,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
         if (indexes === null) break;
         if (nextLayout) currentLayout = nextLayout;
         swappedAfterLayout.value = calculateFlexLayout(indexes.indexToKey);
-        swappedAfteGroupsCount =
+        swappedAfterGroupsCount =
           swappedAfterLayout.value?.itemGroups.length ?? 0;
         groupIndex = indexes.groupIndex;
         firstGroupItemIndex = indexes.itemIndex;
@@ -227,7 +231,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       swapGroupAfterBound = swapOffset + additionalSwapOffset;
     } while (
       crossAxisPosition > swapGroupAfterBound &&
-      groupIndex < swappedAfteGroupsCount &&
+      groupIndex < swappedAfterGroupsCount &&
       groupIndex >= activeGroupIndex.value
     );
 
@@ -235,7 +239,14 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     // currentGroup is the updated group after new layout calculation
     // that contains the active item
     const currentGroup = currentLayout.itemGroups[groupIndex];
-    if (!currentGroup) return;
+    if (!currentGroup) {
+      const lastItemIndex = indexToKey.value.length - 1;
+      if (activeIndex === lastItemIndex) {
+        return null;
+      }
+      console.log('1 reorderInsert', activeIndex, lastItemIndex);
+      return reorderInsert(indexToKey.value, activeIndex, lastItemIndex);
+    }
     const mainAxisPosition = position[mainCoordinate];
 
     // Find the itemIndexInGroup of the active item if it is in the same group
@@ -275,7 +286,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
       const nextItemPosition = currentLayout.itemPositions[nextItemKey];
       const nextItemDimensions = itemDimensions.value[nextItemKey];
-      if (!nextItemPosition || !nextItemDimensions) return;
+      if (!nextItemPosition || !nextItemDimensions) break;
 
       const currentItemMainAxisPosition = currentItemPosition[mainCoordinate];
       const nextItemMainAxisPosition = nextItemPosition[mainCoordinate];
@@ -369,6 +380,19 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     // DEBUG ONLY
     if (debugBox) {
+      if (swapGroupAfterOffset > swapGroupAfterBound) {
+        swapGroupAfterOffset = swapGroupAfterBound;
+      }
+      if (swapGroupBeforeOffset < swapGroupBeforeBound) {
+        swapGroupBeforeOffset = swapGroupBeforeBound;
+      }
+      if (swapItemAfterOffset > swapItemAfterBound) {
+        swapItemAfterOffset = swapItemAfterBound;
+      }
+      if (swapItemBeforeOffset < swapItemBeforeBound) {
+        swapItemBeforeOffset = swapItemBeforeBound;
+      }
+
       if (isColumn) {
         debugBox.top.update(
           { x: swapGroupBeforeBound, y: swapItemBeforeBound },
@@ -411,6 +435,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     if (newActiveIndex === activeIndex) return;
 
+    console.log('2 reorderInsert', activeIndex, newActiveIndex);
     return reorderInsert(indexToKey.value, activeIndex, newActiveIndex);
   };
 };
