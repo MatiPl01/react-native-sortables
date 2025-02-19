@@ -9,7 +9,7 @@ const routes: Routes = {
   SortableGrid: {
     CardComponent: SortableGridCard,
     name: 'Sortable Grid',
-
+    flatten: true,
     routes: {
       Playground: {
         Component: SortableGrid.PlaygroundExample,
@@ -66,6 +66,7 @@ const routes: Routes = {
   SortableFlex: {
     CardComponent: SortableFlexCard,
     name: 'Sortable Flex',
+    flatten: true,
     routes: {
       Playground: {
         Component: SortableFlex.PlaygroundExample,
