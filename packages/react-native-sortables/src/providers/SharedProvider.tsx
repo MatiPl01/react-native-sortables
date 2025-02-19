@@ -40,7 +40,7 @@ type SharedProviderProps = PropsWithChildren<
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
-    Required<ItemDragSettings> &
+    Required<Omit<ItemDragSettings, 'reorderTriggerOrigin'>> &
     Required<SortableCallbacks>
 >;
 

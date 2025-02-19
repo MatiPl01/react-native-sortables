@@ -1,27 +1,60 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
-import type { OrderUpdater } from '../../../types';
+import type {
+  OrderUpdater,
+  ReorderTriggerOrigin,
+  Vector
+} from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
-export default function useOrderUpdater(updater: OrderUpdater) {
-  const { activeItemDimensions, activeItemKey, keyToIndex, touchPosition } =
-    useCommonValuesContext();
+export default function useOrderUpdater(
+  updater: OrderUpdater,
+  triggerOrigin: ReorderTriggerOrigin
+) {
+  const {
+    activeItemDimensions,
+    activeItemKey,
+    activeItemPosition,
+    keyToIndex,
+    touchPosition
+  } = useCommonValuesContext();
   const { handleOrderChange } = useDragContext();
+
+  const isCenter = triggerOrigin === 'center';
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
       dimensions: activeItemDimensions.value,
-      position: touchPosition.value
+      positions: {
+        activeItem: activeItemPosition.value,
+        touch: touchPosition.value
+      }
     }),
-    ({ activeKey, dimensions, position }) => {
-      if (!activeKey || !dimensions || !position) {
+    ({ activeKey, dimensions, positions }) => {
+      if (
+        !activeKey ||
+        !dimensions ||
+        !positions.touch ||
+        !positions.activeItem
+      ) {
         return;
       }
+
       const activeIndex = keyToIndex.value[activeKey];
       if (activeIndex === undefined) {
         return;
+      }
+
+      let position: Vector;
+      if (isCenter) {
+        position = {
+          x: positions.activeItem.x + dimensions.width / 2,
+          y: positions.activeItem.y + dimensions.height / 2
+        };
+      } else {
+        position = positions.touch;
       }
 
       const newOrder = updater({

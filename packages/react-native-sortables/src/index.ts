@@ -19,6 +19,8 @@ export type {
   DropIndicatorComponentProps,
   OrderChangeCallback,
   OrderChangeParams,
+  OverDrag,
+  ReorderTriggerOrigin,
   SortableFlexProps,
   SortableFlexStrategyFactory,
   SortableFlexStyle,
@@ -26,8 +28,7 @@ export type {
   SortableGridDragEndParams,
   SortableGridProps,
   SortableGridRenderItem,
-  SortableGridStrategyFactory,
-  OverDrag as SortableOverDrag
+  SortableGridStrategyFactory
 } from './types';
 
 const Sortable = {

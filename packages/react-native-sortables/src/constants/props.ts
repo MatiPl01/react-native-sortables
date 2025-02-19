@@ -63,6 +63,7 @@ export const DEFAULT_SHARED_PROPS = {
   onDragStart: undefined,
   onOrderChange: undefined,
   overDrag: 'both',
+  reorderTriggerOrigin: 'center',
   scrollableRef: undefined,
   showDropIndicator: false,
   snapOffsetX: '50%',

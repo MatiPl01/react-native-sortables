@@ -35,6 +35,7 @@ function SortableFlex(props: SortableFlexProps) {
       itemEntering,
       itemExiting,
       itemsLayout,
+      reorderTriggerOrigin,
       showDropIndicator,
       ...sharedProps
     }
@@ -72,6 +73,7 @@ function SortableFlex(props: SortableFlexProps) {
           key={useStrategyKey(strategy)}
           predefinedStrategies={FLEX_STRATEGIES}
           strategy={strategy}
+          triggerOrigin={reorderTriggerOrigin}
           useAdditionalValues={useFlexLayoutContext}
         />
         <SortableFlexInner
