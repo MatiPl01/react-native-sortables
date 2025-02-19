@@ -57,12 +57,13 @@ export default function useItemLayoutStyles(
   // Inactive item updater
   useAnimatedReaction(
     () => ({
+      canSwitchToAbsolute: canSwitchToAbsoluteLayout.value,
       hasProgress: hasActivationProgress.value,
       isActive: activeItemKey.value === key,
       position: itemPositions.value[key]
     }),
-    ({ hasProgress, isActive, position }) => {
-      if (!canSwitchToAbsoluteLayout.value) {
+    ({ canSwitchToAbsolute, hasProgress, isActive, position }) => {
+      if (!canSwitchToAbsolute) {
         // This affects all items rendered during the initial render when
         // the absolute layout is not yet enabled. All of these items have
         // no translation at the beginning and layoutX and layoutY are
@@ -77,7 +78,7 @@ export default function useItemLayoutStyles(
         return;
       }
 
-      if (hasProgress) {
+      if (hasProgress && layoutX.value !== null && layoutY.value !== null) {
         // When the item is not active and has non-zero press progress,
         // it must have been dragged and released. In this case, we want
         // to animate the translation to the final position.
@@ -139,7 +140,7 @@ export default function useItemLayoutStyles(
   );
 
   const animatedTranslationStyle = useAnimatedStyle(() => {
-    if (!canSwitchToAbsoluteLayout.value) {
+    if (layoutX.value === null || layoutY.value === null) {
       return RELATIVE_STYLE;
     }
 
