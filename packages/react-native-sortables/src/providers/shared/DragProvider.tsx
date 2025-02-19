@@ -13,7 +13,6 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import { useDebugContext } from '../../debug';
 import { useHaptics, useJSStableCallback } from '../../hooks';
 import type {
   DragContextType,
@@ -81,9 +80,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { updateLayer } = useLayerContext() ?? {};
   const { scrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
-  const debugContext = useDebugContext();
 
-  const debugCross = debugContext?.useDebugCross();
   const haptics = useHaptics(hapticsEnabled);
 
   const hasHorizontalOverDrag =
@@ -150,7 +147,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         !startTouchPosition
       ) {
         touchPosition.value = null;
-        if (debugCross) debugCross.set({ position: null });
         return;
       }
 
@@ -158,13 +154,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: startTouchPosition.x + (translation?.x ?? 0) + (offsetDiff?.x ?? 0),
         y: startTouchPosition.y + (translation?.y ?? 0) + (offsetDiff?.y ?? 0)
       };
-
-      if (debugCross) {
-        debugCross.set({
-          color: '#00007e',
-          position: touchPosition.value
-        });
-      }
 
       let tX = itemTouchOffset.x;
       let tY = itemTouchOffset.y;
@@ -425,7 +414,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         prevActiveItemKey.value = activeItemKey.value;
         activeItemKey.value = null;
         updateLayer?.(LayerState.Intermediate);
-        debugCross?.set({ position: null });
         haptics.medium();
 
         stableOnDragEnd({
@@ -462,7 +450,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationTimeoutId,
       activeAnimationProgress,
       activationState,
-      debugCross,
       dropAnimationDuration,
       dragStartIndex,
       dragStartItemTouchOffset,

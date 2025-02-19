@@ -1,5 +1,6 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
+import { useDebugContext } from '../../../debug';
 import type {
   OrderUpdater,
   ReorderTriggerOrigin,
@@ -20,6 +21,9 @@ export default function useOrderUpdater(
     touchPosition
   } = useCommonValuesContext();
   const { handleOrderChange } = useDragContext();
+  const debugContext = useDebugContext();
+
+  const debugCross = debugContext?.useDebugCross();
 
   const isCenter = triggerOrigin === 'center';
 
@@ -39,6 +43,7 @@ export default function useOrderUpdater(
         !positions.touch ||
         !positions.activeItem
       ) {
+        if (debugCross) debugCross.set({ position: null });
         return;
       }
 
@@ -55,6 +60,10 @@ export default function useOrderUpdater(
         };
       } else {
         position = positions.touch;
+      }
+
+      if (debugCross) {
+        debugCross.set({ color: '#00007e', position });
       }
 
       const newOrder = updater({

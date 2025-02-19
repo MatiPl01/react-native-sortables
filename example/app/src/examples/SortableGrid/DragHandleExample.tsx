@@ -3,10 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import type {
-  SortableGridRenderItem,
-  SortableOverDrag
-} from 'react-native-sortables';
+import type { OverDrag, SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
 import { OptionGroup, SimpleDropdown, TabSelector } from '@/components';
@@ -15,16 +12,11 @@ import { colors, flex, radius, sizes, spacing, style, text } from '@/theme';
 const DATA = Array.from({ length: 20 }, (_, index) => `Item ${index + 1}`);
 
 const COLUMNS = [1, 2, 3, 4];
-const OVER_DRAG: Array<SortableOverDrag> = [
-  'both',
-  'horizontal',
-  'vertical',
-  'none'
-];
+const OVER_DRAG: Array<OverDrag> = ['both', 'horizontal', 'vertical', 'none'];
 
 export default function DragHandleExample() {
   const [columns, setColumns] = useState(1);
-  const [overDrag, setOverDrag] = useState<SortableOverDrag>('both');
+  const [overDrag, setOverDrag] = useState<OverDrag>('both');
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
