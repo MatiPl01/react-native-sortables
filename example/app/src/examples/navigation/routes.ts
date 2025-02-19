@@ -2,6 +2,7 @@
 import { SortableFlexCard, SortableGridCard } from '@/components';
 import * as SortableFlex from '@/examples/SortableFlex';
 import * as SortableGrid from '@/examples/SortableGrid';
+import { IS_WEB } from '@/utils';
 
 import type { Routes } from './types';
 
@@ -52,15 +53,17 @@ const routes: Routes = {
           }
         }
       },
-      Miscellaneous: {
-        name: 'Miscellaneous',
-        routes: {
-          StaggerAnimation: {
-            Component: SortableGrid.miscellaneous.StaggerAnimationExample,
-            name: 'Stagger Animation'
+      ...(!IS_WEB && {
+        Miscellaneous: {
+          name: 'Miscellaneous',
+          routes: {
+            StaggerAnimation: {
+              Component: SortableGrid.miscellaneous.StaggerAnimationExample,
+              name: 'Stagger Animation'
+            }
           }
         }
-      }
+      })
     }
   },
   SortableFlex: {
