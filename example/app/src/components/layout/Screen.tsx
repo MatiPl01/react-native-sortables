@@ -3,33 +3,39 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useBottomNavBarHeight } from '@/contexts';
 import { flex, spacing, style } from '@/theme';
 import { IS_WEB } from '@/utils';
 
 import type { ScrollProps } from './Scroll';
 import Scroll from './Scroll';
+import Spacer from './Spacer';
 
 type ScreenProps = PropsWithChildren<{
   noPadding?: boolean;
   style?: StyleProp<ViewStyle>;
+  includeNavBarHeight?: boolean;
 }>;
 
 export function Screen({
   children,
+  includeNavBarHeight,
   noPadding,
   style: customStyle
 }: ScreenProps) {
+  const bottomNavBarHeight = useBottomNavBarHeight();
+
   return (
     <View
       style={[
         flex.fill,
-        style.contentContainer,
         IS_WEB && style.webContent,
         style.visible,
         noPadding && { padding: 0 },
         customStyle
       ]}>
       {children}
+      {includeNavBarHeight && <Spacer height={bottomNavBarHeight} />}
     </View>
   );
 }
@@ -41,6 +47,7 @@ type ScrollScreenProps = Omit<
 
 export function ScrollScreen({
   contentContainerStyle,
+  includeNavBarHeight,
   ...rest
 }: ScrollScreenProps) {
   const insets = useSafeAreaInsets();
@@ -48,8 +55,9 @@ export function ScrollScreen({
   return (
     <Scroll
       {...rest}
+      includeNavBarHeight={includeNavBarHeight}
       contentContainerStyle={[
-        { paddingBottom: insets.bottom + spacing.md },
+        !includeNavBarHeight && { marginBottom: insets.bottom + spacing.md },
         contentContainerStyle
       ]}
       noPadding

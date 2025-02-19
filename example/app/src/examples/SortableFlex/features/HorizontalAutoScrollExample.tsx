@@ -15,7 +15,7 @@ const MANY_CATEGORIES = getCategories(IS_WEB ? 30 : 20);
 
 export default function HorizontalAutoScrollExample() {
   return (
-    <ScrollScreen>
+    <ScrollScreen includeNavBarHeight>
       <NoWrapExample />
       <WrapExample />
     </ScrollScreen>

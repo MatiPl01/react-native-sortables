@@ -13,7 +13,7 @@ import {
   Section,
   Stagger
 } from '@/components';
-import { colors, flex, sizes, spacing, style, text } from '@/theme';
+import { colors, flex, sizes, spacing, text } from '@/theme';
 import { getItems } from '@/utils';
 
 const DATA = getItems(12);
@@ -31,7 +31,7 @@ export default function DebugExample() {
   );
 
   return (
-    <Screen style={style.contentContainer}>
+    <Screen includeNavBarHeight>
       <Stagger wrapperStye={index => (index === 3 ? flex.fill : {})}>
         <Section
           description='Press the buttons to change settings'

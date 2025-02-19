@@ -39,7 +39,7 @@ export default function DifferentSizeItems() {
   const strategy = ORDERING_STRATEGIES[strategyIndex];
 
   return (
-    <Screen>
+    <Screen includeNavBarHeight>
       <Stagger
         wrapperStye={index =>
           index === 3 ? (IS_WEB ? flex.shrink : flex.fill) : {}

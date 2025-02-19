@@ -6,8 +6,10 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { OverDrag, SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { OptionGroup, SimpleDropdown, TabSelector } from '@/components';
+import { OptionGroup, SimpleDropdown, Spacer, TabSelector } from '@/components';
+import { useBottomNavBarHeight } from '@/contexts';
 import { colors, flex, radius, sizes, spacing, style, text } from '@/theme';
+import { IS_WEB } from '@/utils';
 
 const DATA = Array.from({ length: 20 }, (_, index) => `Item ${index + 1}`);
 
@@ -15,6 +17,7 @@ const COLUMNS = [1, 2, 3, 4];
 const OVER_DRAG: Array<OverDrag> = ['both', 'horizontal', 'vertical', 'none'];
 
 export default function DragHandleExample() {
+  const bottomNavBarHeight = useBottomNavBarHeight();
   const [columns, setColumns] = useState(1);
   const [overDrag, setOverDrag] = useState<OverDrag>('both');
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
@@ -50,7 +53,7 @@ export default function DragHandleExample() {
         </OptionGroup>
       </View>
       <Animated.ScrollView
-        contentContainerStyle={[style.contentContainer, styles.container]}
+        contentContainerStyle={[IS_WEB && style.webContent, styles.container]}
         ref={scrollableRef}
         style={flex.fill}>
         <Sortable.Grid
@@ -65,6 +68,7 @@ export default function DragHandleExample() {
           scrollableRef={scrollableRef}
           customHandle
         />
+        <Spacer height={bottomNavBarHeight} />
       </Animated.ScrollView>
     </>
   );
@@ -84,7 +88,7 @@ const styles = StyleSheet.create({
     padding: spacing.md
   },
   options: {
-    ...style.webContent,
+    ...(IS_WEB && style.webContent),
     paddingBottom: spacing.sm
   },
   text: {

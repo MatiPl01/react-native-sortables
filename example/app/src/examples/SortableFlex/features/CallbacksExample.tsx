@@ -38,7 +38,7 @@ export default function CallbacksExample() {
   );
 
   return (
-    <Screen>
+    <Screen includeNavBarHeight>
       <Stagger wrapperStye={index => (index === 0 ? flex.fill : {})}>
         <Section title='Callback output' fill>
           <AnimatedText style={flex.fill} text={text} multiline />

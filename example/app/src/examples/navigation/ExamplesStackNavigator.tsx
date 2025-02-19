@@ -5,8 +5,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { memo, useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
+import { useSharedValue } from 'react-native-reanimated';
 
-import { RouteCard, Scroll, Stagger } from '@/components';
+import { RouteCard, ScrollScreen, Stagger } from '@/components';
+import { BottomNavBarContext } from '@/contexts';
 import { colors, spacing } from '@/theme';
 import { IS_WEB } from '@/utils';
 
@@ -53,17 +55,21 @@ const BackButton = memo(function BackButton() {
 
 function createStackNavigator(routes: Routes): React.ComponentType {
   return function Navigator() {
+    const height = useSharedValue(0);
+
     return (
-      <View style={styles.container}>
-        <StackNavigator.Navigator
-          screenOptions={{
-            headerLeft: () => <BackButton />,
-            headerTitleAlign: 'center'
-          }}>
-          {createNavigationScreens(routes, 'Examples', 'Examples')}
-        </StackNavigator.Navigator>
-        <BottomNavBar homeRouteName='Examples' routes={routes} />
-      </View>
+      <BottomNavBarContext.Provider value={{ height }}>
+        <View style={styles.container}>
+          <StackNavigator.Navigator
+            screenOptions={{
+              headerLeft: () => <BackButton />,
+              headerTitleAlign: 'center'
+            }}>
+            {createNavigationScreens(routes, 'Examples', 'Examples')}
+          </StackNavigator.Navigator>
+          <BottomNavBar homeRouteName='Examples' routes={routes} />
+        </View>
+      </BottomNavBarContext.Provider>
     );
   };
 }
@@ -75,7 +81,9 @@ function createRoutesScreen(
 ): React.ComponentType {
   function RoutesScreen() {
     return (
-      <Scroll contentContainerStyle={styles.scrollViewContent}>
+      <ScrollScreen
+        contentContainerStyle={styles.scrollViewContent}
+        includeNavBarHeight>
         <Stagger delay={staggerDelay} interval={50}>
           {Object.entries(routes).map(
             ([key, { CardComponent = RouteCard, name }]) => (
@@ -83,7 +91,7 @@ function createRoutesScreen(
             )
           )}
         </Stagger>
-      </Scroll>
+      </ScrollScreen>
     );
   }
 
@@ -154,7 +162,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background3
   },
   scrollViewContent: {
-    gap: spacing.md
+    gap: spacing.md,
+    padding: spacing.md,
+    paddingBottom: 0
   }
 });
 

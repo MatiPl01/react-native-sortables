@@ -2,13 +2,18 @@ import { useMemo } from 'react';
 import type { ScrollViewProps } from 'react-native';
 import { ScrollView, StyleSheet } from 'react-native';
 
-import { flex, spacing } from '@/theme';
+import { useBottomNavBarHeight } from '@/contexts';
+import { flex, spacing, style } from '@/theme';
+import { IS_WEB } from '@/utils';
+
+import Spacer from './Spacer';
 
 export type ScrollProps = {
   fill?: boolean;
   noPadding?: boolean;
   gap?: number;
   rowGap?: number;
+  includeNavBarHeight?: boolean;
 } & Omit<ScrollViewProps, 'gap' | 'rowGap'>;
 
 export default function Scroll({
@@ -16,10 +21,12 @@ export default function Scroll({
   contentContainerStyle,
   fill = true,
   horizontal,
+  includeNavBarHeight = false,
   noPadding = false,
   style: customStyle,
   ...rest
 }: ScrollProps) {
+  const bottomNavBarHeight = useBottomNavBarHeight();
   const flattenedStyle = useMemo(
     () => StyleSheet.flatten(contentContainerStyle),
     [contentContainerStyle]
@@ -32,7 +39,7 @@ export default function Scroll({
       removeClippedSubviews={false}
       style={[fill && flex.fill, customStyle]}
       contentContainerStyle={[
-        styles.scrollViewContentWeb,
+        IS_WEB && style.webContent,
         { gap },
         noPadding
           ? {}
@@ -41,14 +48,7 @@ export default function Scroll({
       ]}
       {...rest}>
       {children}
+      {includeNavBarHeight && <Spacer height={bottomNavBarHeight} />}
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollViewContentWeb: {
-    marginHorizontal: 'auto',
-    maxWidth: '100%',
-    width: 600
-  }
-});

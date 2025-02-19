@@ -10,7 +10,7 @@ const DATA = getCategories(IS_WEB ? 14 : 9);
 
 export default function DropIndicatorExample() {
   return (
-    <ScrollScreen>
+    <ScrollScreen includeNavBarHeight>
       <Stagger ParentComponent={Sortable.Layer}>
         <Section title='Without drop indicator'>
           <Sortable.Flex columnGap={spacing.sm} rowGap={spacing.xs}>

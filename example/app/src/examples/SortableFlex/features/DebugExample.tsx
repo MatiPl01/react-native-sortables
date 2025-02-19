@@ -12,7 +12,7 @@ import {
   Section,
   Stagger
 } from '@/components';
-import { colors, flex, sizes, spacing, style, text } from '@/theme';
+import { colors, flex, sizes, spacing, text } from '@/theme';
 import { getCategories, IS_WEB } from '@/utils';
 
 const DATA = getCategories(30);
@@ -24,7 +24,7 @@ export default function DebugExample() {
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
   return (
-    <Screen style={style.contentContainer}>
+    <Screen includeNavBarHeight>
       <Stagger
         wrapperStye={index =>
           index === 3 ? (IS_WEB ? flex.shrink : flex.fill) : {}

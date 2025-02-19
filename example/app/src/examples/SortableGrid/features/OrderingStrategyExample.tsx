@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
-import { ScrollView } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { GridCard, Section, Stagger } from '@/components';
-import { spacing, style } from '@/theme';
+import { GridCard, ScrollScreen, Section, Stagger } from '@/components';
+import { spacing } from '@/theme';
 import { getItems } from '@/utils';
 
 const DATA = getItems(12);
@@ -17,7 +16,7 @@ export default function OrderingStrategyExample() {
   );
 
   return (
-    <ScrollView contentContainerStyle={style.contentContainer}>
+    <ScrollScreen includeNavBarHeight>
       <Stagger ParentComponent={Sortable.Layer}>
         <Section
           description='The relative order of items is preserved. The active item is inserted into the new position.'
@@ -47,6 +46,6 @@ export default function OrderingStrategyExample() {
           />
         </Section>
       </Stagger>
-    </ScrollView>
+    </ScrollScreen>
   );
 }

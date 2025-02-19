@@ -81,7 +81,7 @@ export default function FlexLayoutExample() {
   };
 
   return (
-    <Screen style={styles.container}>
+    <Screen style={styles.container} includeNavBarHeight>
       <OptionGroup label='alignContent'>
         <SimpleDropdown
           options={ALIGN_CONTENT_OPTIONS}

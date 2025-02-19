@@ -6,17 +6,26 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import type { OverDrag } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { OptionGroup, SimpleDropdown } from '@/components';
-import { colors, flex, radius, sizes, spacing, style, text } from '@/theme';
-import { getCategories } from '@/utils';
-
-import { iconSizes } from '../../../theme/icons';
+import { OptionGroup, SimpleDropdown, Spacer } from '@/components';
+import { useBottomNavBarHeight } from '@/contexts';
+import {
+  colors,
+  flex,
+  iconSizes,
+  radius,
+  sizes,
+  spacing,
+  style,
+  text
+} from '@/theme';
+import { getCategories, IS_WEB } from '@/utils';
 
 const DATA = getCategories(30);
 
 const OVER_DRAG: Array<OverDrag> = ['both', 'horizontal', 'vertical', 'none'];
 
 export default function DragHandleExample() {
+  const bottomNavBarHeight = useBottomNavBarHeight();
   const [overDrag, setOverDrag] = useState<OverDrag>('both');
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
@@ -32,7 +41,7 @@ export default function DragHandleExample() {
         </OptionGroup>
       </View>
       <Animated.ScrollView
-        contentContainerStyle={[style.contentContainer, styles.container]}
+        contentContainerStyle={[IS_WEB && style.webContent, styles.container]}
         ref={scrollableRef}
         style={flex.fill}>
         <Sortable.Flex
@@ -56,6 +65,7 @@ export default function DragHandleExample() {
             </View>
           ))}
         </Sortable.Flex>
+        <Spacer height={bottomNavBarHeight} />
       </Animated.ScrollView>
     </>
   );

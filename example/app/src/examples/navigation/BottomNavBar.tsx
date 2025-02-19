@@ -2,12 +2,25 @@ import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import Animated, {
+  Easing,
+  LinearTransition,
+  SlideInDown,
+  SlideOutDown
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SelectListDropdown } from '@/components';
+import { useBottomNavBarHeight } from '@/contexts';
 import { colors, radius, sizes, spacing, text } from '@/theme';
+import { IS_WEB } from '@/utils';
 
 import type { Routes } from './types';
 
@@ -22,6 +35,7 @@ export default function BottomNavBar({
 }: BottomNavBarProps) {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const height = useBottomNavBarHeight();
 
   const [routesGroup, setRoutesGroup] = useState<string | undefined>(() => {
     const state = navigation.getState();
@@ -69,11 +83,21 @@ export default function BottomNavBar({
   }
 
   return (
-    <View style={[styles.container, { bottom: insets.bottom }]}>
+    <View
+      style={[
+        styles.container,
+        { paddingBottom: insets.bottom + (IS_WEB ? spacing.md : spacing.xs) }
+      ]}
+      onLayout={e => {
+        height.value = e.nativeEvent.layout.height;
+      }}>
       <Animated.View
-        entering={SlideInDown.delay(100)}
         exiting={SlideOutDown}
-        style={styles.bar}>
+        layout={IS_WEB ? undefined : LinearTransition}
+        style={styles.bar}
+        entering={SlideInDown.delay(100)
+          .duration(500)
+          .easing(Easing.out(Easing.quad))}>
         <TouchableOpacity style={styles.homeButton} onPress={handleHomePress}>
           <FontAwesomeIcon
             color={colors.primary}
@@ -107,28 +131,33 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     flexDirection: 'row',
     gap: spacing.xs,
-    padding: spacing.xs
+    padding: spacing.xs,
+    shadowColor: colors.black,
+    ...Platform.select({
+      android: {
+        elevation: spacing.xxs
+      },
+      default: {
+        shadowOffset: { height: spacing.xxs, width: 0 },
+        shadowOpacity: 0.1,
+        shadowRadius: spacing.xs
+      },
+      web: {
+        boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)'
+      }
+    })
   },
   container: {
     alignItems: 'center',
     bottom: 0,
     elevation: spacing.xxs,
     left: 0,
-    marginBottom: spacing.xs,
     pointerEvents: 'box-none',
     position: 'absolute',
-    right: 0,
-    shadowColor: colors.black,
-    shadowOffset: { height: spacing.xxs, width: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: spacing.xs
+    right: 0
   },
   dropdown: {
-    backgroundColor: colors.background1,
-    elevation: spacing.xxs,
-    shadowOffset: { height: spacing.xxs, width: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: spacing.xs
+    backgroundColor: colors.background1
   },
   homeButton: {
     backgroundColor: colors.background3,
