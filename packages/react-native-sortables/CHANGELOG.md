@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.2.0...v1.2.1) (2025-02-19)
+
+
+### Bug Fixes
+
+* Don't skip entering and exiting animations on user's views, improve layout animations docs ([#271](https://github.com/MatiPl01/react-native-sortables/issues/271)) ([464756a](https://github.com/MatiPl01/react-native-sortables/commit/464756a0b0b27931e52f631b224111ef07117180))
+* Items stacking issue ([#273](https://github.com/MatiPl01/react-native-sortables/issues/273)) ([3fa07c6](https://github.com/MatiPl01/react-native-sortables/commit/3fa07c60f551676c6d8016a84ee77c6a2dbc82ab)), closes [#270](https://github.com/MatiPl01/react-native-sortables/issues/270) [#272](https://github.com/MatiPl01/react-native-sortables/issues/272)
+
 # [1.2.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.1.1...v1.2.0) (2025-02-17)
 
 
