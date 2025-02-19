@@ -7,9 +7,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 
 import { RouteCard, Scroll, Stagger } from '@/components';
-import { colors, flex, spacing } from '@/theme';
+import { colors, spacing } from '@/theme';
 import { IS_WEB } from '@/utils';
 
+import BottomNavBar from './BottomNavBar';
 import exampleRoutes from './routes';
 import type { Routes } from './types';
 import { getScreenTitle, hasRoutes } from './utils';
@@ -53,7 +54,7 @@ const BackButton = memo(function BackButton() {
 function createStackNavigator(routes: Routes): React.ComponentType {
   return function Navigator() {
     return (
-      <View style={flex.fill}>
+      <View style={styles.container}>
         <StackNavigator.Navigator
           screenOptions={{
             headerLeft: () => <BackButton />,
@@ -61,16 +62,21 @@ function createStackNavigator(routes: Routes): React.ComponentType {
           }}>
           {createNavigationScreens(routes, 'Examples', 'Examples')}
         </StackNavigator.Navigator>
+        <BottomNavBar homeRouteName='Examples' routes={routes} />
       </View>
     );
   };
 }
 
-function createRoutesScreen(routes: Routes, path: string): React.ComponentType {
+function createRoutesScreen(
+  routes: Routes,
+  path: string,
+  staggerDelay = 0
+): React.ComponentType {
   function RoutesScreen() {
     return (
       <Scroll contentContainerStyle={styles.scrollViewContent}>
-        <Stagger>
+        <Stagger delay={staggerDelay} interval={50}>
           {Object.entries(routes).map(
             ([key, { CardComponent = RouteCard, name }]) => (
               <CardComponent key={key} route={`${path}/${key}`} title={name} />
@@ -89,15 +95,17 @@ function createRoutesScreen(routes: Routes, path: string): React.ComponentType {
 function createNavigationScreens(
   routes: Routes,
   name: string,
-  path: string
+  path: string,
+  depth = 0
 ): Array<React.ReactNode> {
   return [
     // Create a screen for the navigation routes
     <StackNavigator.Screen
-      component={createRoutesScreen(routes, path)}
+      component={createRoutesScreen(routes, path, depth === 1 ? 150 : 0)}
       key={path}
       name={path}
       options={{
+        animation: depth > 1 ? 'slide_from_right' : 'fade',
         contentStyle: styles.content,
         title: name
       }}
@@ -106,7 +114,12 @@ function createNavigationScreens(
     ...Object.entries(routes).flatMap(([key, value]) => {
       const newPath = `${path}/${key}`;
       if (hasRoutes(value)) {
-        return createNavigationScreens(value.routes, value.name, newPath);
+        return createNavigationScreens(
+          value.routes,
+          value.name,
+          newPath,
+          depth + 1
+        );
       }
       return (
         <StackNavigator.Screen
@@ -132,6 +145,10 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: colors.primary,
     fontSize: 16
+  },
+  container: {
+    backgroundColor: colors.background3,
+    flex: 1
   },
   content: {
     backgroundColor: colors.background3

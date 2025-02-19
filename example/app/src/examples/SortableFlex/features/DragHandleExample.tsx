@@ -10,7 +10,7 @@ import { OptionGroup, SimpleDropdown } from '@/components';
 import { colors, flex, radius, sizes, spacing, style, text } from '@/theme';
 import { getCategories } from '@/utils';
 
-import { iconSizes } from '../../theme/icons';
+import { iconSizes } from '../../../theme/icons';
 
 const DATA = getCategories(30);
 

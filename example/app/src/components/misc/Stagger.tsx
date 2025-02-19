@@ -5,6 +5,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 type StaggerProps = PropsWithChildren<{
   interval?: number;
+  delay?: number;
   ParentComponent?: React.ComponentType<{
     children: ReactNode;
     style?: ViewStyle;
@@ -15,6 +16,7 @@ type StaggerProps = PropsWithChildren<{
 export default function Stagger({
   ParentComponent,
   children,
+  delay = 0,
   interval = 100,
   wrapperStye
 }: StaggerProps) {
@@ -26,7 +28,7 @@ export default function Stagger({
 
     const wrappedChild = (
       <Animated.View
-        entering={FadeInDown.delay(index * interval)}
+        entering={FadeInDown.delay(delay + index * interval)}
         key={index}
         style={style}>
         {child}

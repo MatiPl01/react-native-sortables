@@ -9,42 +9,57 @@ const routes: Routes = {
   SortableGrid: {
     CardComponent: SortableGridCard,
     name: 'Sortable Grid',
+
     routes: {
       Playground: {
         Component: SortableGrid.PlaygroundExample,
         name: 'Playground'
       },
-      DropIndicator: {
-        Component: SortableGrid.DropIndicatorExample,
-        name: 'Drop Indicator'
+      Features: {
+        name: 'Features',
+        routes: {
+          DropIndicator: {
+            Component: SortableGrid.features.DropIndicatorExample,
+            name: 'Drop Indicator'
+          },
+          DragHandle: {
+            Component: SortableGrid.features.DragHandleExample,
+            name: 'Drag Handle'
+          },
+          AutoScroll: {
+            Component: SortableGrid.features.AutoScrollExample,
+            name: 'Auto Scroll'
+          },
+          DataChange: {
+            Component: SortableGrid.features.DataChangeExample,
+            name: 'Data Change'
+          },
+          OrderingStrategy: {
+            Component: SortableGrid.features.OrderingStrategyExample,
+            name: 'Ordering Strategy'
+          },
+          DifferentSizeItems: {
+            Component: SortableGrid.features.DifferentSizeItems,
+            name: 'Different Size Items'
+          },
+          CallbacksExample: {
+            Component: SortableGrid.features.CallbacksExample,
+            name: 'Callbacks'
+          },
+          DebugExample: {
+            Component: SortableGrid.features.DebugExample,
+            name: 'Debug'
+          }
+        }
       },
-      DragHandle: {
-        Component: SortableGrid.DragHandleExample,
-        name: 'Drag Handle'
-      },
-      AutoScroll: {
-        Component: SortableGrid.AutoScrollExample,
-        name: 'Auto Scroll'
-      },
-      DataChange: {
-        Component: SortableGrid.DataChangeExample,
-        name: 'Data Change'
-      },
-      OrderingStrategy: {
-        Component: SortableGrid.OrderingStrategyExample,
-        name: 'Ordering Strategy'
-      },
-      DifferentSizeItems: {
-        Component: SortableGrid.DifferentSizeItems,
-        name: 'Different Size Items'
-      },
-      CallbacksExample: {
-        Component: SortableGrid.CallbacksExample,
-        name: 'Callbacks'
-      },
-      DebugExample: {
-        Component: SortableGrid.DebugExample,
-        name: 'Debug'
+      Miscellaneous: {
+        name: 'Miscellaneous',
+        routes: {
+          StaggerAnimation: {
+            Component: SortableGrid.miscellaneous.StaggerAnimationExample,
+            name: 'Stagger Animation'
+          }
+        }
       }
     }
   },
@@ -56,37 +71,42 @@ const routes: Routes = {
         Component: SortableFlex.PlaygroundExample,
         name: 'Playground'
       },
-      DropIndicator: {
-        Component: SortableFlex.DropIndicatorExample,
-        name: 'Drop Indicator'
-      },
-      DragHandle: {
-        Component: SortableFlex.DragHandleExample,
-        name: 'Drag Handle'
-      },
-      AutoScroll: {
-        Component: SortableFlex.AutoScrollExample,
-        name: 'Auto Scroll'
-      },
-      HorizontalAutoScroll: {
-        Component: SortableFlex.HorizontalAutoScrollExample,
-        name: 'Horizontal Auto Scroll'
-      },
-      DataChange: {
-        Component: SortableFlex.DataChangeExample,
-        name: 'Data Change'
-      },
-      FlexLayout: {
-        Component: SortableFlex.FlexLayoutExample,
-        name: 'Flex Layout'
-      },
-      CallbacksExample: {
-        Component: SortableFlex.CallbacksExample,
-        name: 'Callbacks'
-      },
-      DebugExample: {
-        Component: SortableFlex.DebugExample,
-        name: 'Debug'
+      Features: {
+        name: 'Features',
+        routes: {
+          DropIndicator: {
+            Component: SortableFlex.features.DropIndicatorExample,
+            name: 'Drop Indicator'
+          },
+          DragHandle: {
+            Component: SortableFlex.features.DragHandleExample,
+            name: 'Drag Handle'
+          },
+          AutoScroll: {
+            Component: SortableFlex.features.AutoScrollExample,
+            name: 'Auto Scroll'
+          },
+          HorizontalAutoScroll: {
+            Component: SortableFlex.features.HorizontalAutoScrollExample,
+            name: 'Horizontal Auto Scroll'
+          },
+          DataChange: {
+            Component: SortableFlex.features.DataChangeExample,
+            name: 'Data Change'
+          },
+          FlexLayout: {
+            Component: SortableFlex.features.FlexLayoutExample,
+            name: 'Flex Layout'
+          },
+          CallbacksExample: {
+            Component: SortableFlex.features.CallbacksExample,
+            name: 'Callbacks'
+          },
+          DebugExample: {
+            Component: SortableFlex.features.DebugExample,
+            name: 'Debug'
+          }
+        }
       }
     }
   }

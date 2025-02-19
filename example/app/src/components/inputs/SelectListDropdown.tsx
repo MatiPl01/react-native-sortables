@@ -14,16 +14,20 @@ type SelectListsDropdownProps<T> = {
   options: Array<SelectListOption<T>>;
   selected: T;
   alignment?: 'left' | 'right';
+  dropdownPosition?: 'bottom' | 'top';
   styleOptions?: {
     dropdownStyle?: StyleProp<ViewStyle>;
     inputStyle?: StyleProp<ViewStyle>;
+    inputTextStyle?: StyleProp<TextStyle>;
     optionTextStyle?: StyleProp<TextStyle>;
+    chevronColor?: string;
   };
   onSelect: (value: T) => void;
 };
 
 export default function SelectListDropdown<T>({
   alignment,
+  dropdownPosition = 'bottom',
   onSelect,
   options,
   selected,
@@ -51,17 +55,25 @@ export default function SelectListDropdown<T>({
       options={dropdownOptions}
       styleOptions={{
         alignment,
-        dropdownStyle: [styles.dropdown, styleOptions?.dropdownStyle]
+        dropdownStyle: [styles.dropdown, styleOptions?.dropdownStyle],
+        position: dropdownPosition
       }}
       onClose={() => (isExpanded.value = false)}
       onOpen={() => (isExpanded.value = true)}>
       <View style={[styles.input, styleOptions?.inputStyle]}>
         <Text
           numberOfLines={1}
-          style={[styles.optionText, styleOptions?.optionTextStyle]}>
+          style={[
+            styles.optionText,
+            styleOptions?.optionTextStyle,
+            styleOptions?.inputTextStyle
+          ]}>
           {selectedLabel}
         </Text>
-        <RotatableChevron color={colors.foreground2} open={isExpanded} />
+        <RotatableChevron
+          color={styleOptions?.chevronColor ?? colors.foreground2}
+          open={isExpanded}
+        />
       </View>
     </ActionSheetDropdown>
   );
