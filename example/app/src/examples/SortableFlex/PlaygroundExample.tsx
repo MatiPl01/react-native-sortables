@@ -9,7 +9,7 @@ const DATA = getCategories(IS_WEB ? 30 : 10);
 
 export default function Flex() {
   return (
-    <ScrollScreen>
+    <ScrollScreen includeNavBarHeight>
       <Sortable.Flex gap={10} padding={10}>
         {/* You can render anything within the Sortable.Flex component */}
         {DATA.map(item => (

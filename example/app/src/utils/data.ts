@@ -1,4 +1,4 @@
-import type { Range } from '@/types/utils';
+import type { Range } from '@/types';
 
 const CATEGORIES = [
   'sports',

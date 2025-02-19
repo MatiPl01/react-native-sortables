@@ -17,7 +17,7 @@ export default function DropIndicatorExample() {
   );
 
   return (
-    <ScrollScreen>
+    <ScrollScreen includeNavBarHeight>
       <Stagger ParentComponent={Sortable.Layer}>
         <Section title='Without drop indicator'>
           <Sortable.Grid

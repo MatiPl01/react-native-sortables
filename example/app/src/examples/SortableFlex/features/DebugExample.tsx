@@ -1,23 +1,21 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
 import {
   Button,
-  GridCard,
+  FlexCell,
   Group,
   OptionGroup,
   Screen,
   Section,
   Stagger
 } from '@/components';
-import { colors, flex, sizes, spacing, style, text } from '@/theme';
-import { getItems } from '@/utils';
+import { colors, flex, sizes, spacing, text } from '@/theme';
+import { getCategories, IS_WEB } from '@/utils';
 
-const DATA = getItems(12);
-const COLUMNS = 3;
+const DATA = getCategories(30);
 
 export default function DebugExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
@@ -25,14 +23,12 @@ export default function DebugExample() {
   const [debugEnabled, setDebugEnabled] = useState(true);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => <GridCard>{item}</GridCard>,
-    []
-  );
-
   return (
-    <Screen style={style.contentContainer}>
-      <Stagger wrapperStye={index => (index === 3 ? flex.fill : {})}>
+    <Screen includeNavBarHeight>
+      <Stagger
+        wrapperStye={index =>
+          index === 3 ? (IS_WEB ? flex.shrink : flex.fill) : {}
+        }>
         <Section
           description='Press the buttons to change settings'
           title='Settings'
@@ -68,21 +64,23 @@ export default function DebugExample() {
             ref={scrollableRef}
             style={flex.fill}>
             <Group style={styles.boundGroup} withMargin={false} bordered center>
-              <Text style={styles.title}>Above SortableGrid</Text>
+              <Text style={styles.title}>Above SortableFlex</Text>
             </Group>
 
-            <Sortable.Grid
+            <Sortable.Flex
               columnGap={spacing.sm}
-              columns={COLUMNS}
-              data={DATA}
               debug={debugEnabled}
-              renderItem={renderItem}
               rowGap={spacing.xs}
-              scrollableRef={autoScrollEnabled ? scrollableRef : undefined}
-            />
+              scrollableRef={autoScrollEnabled ? scrollableRef : undefined}>
+              {DATA.map(item => (
+                <FlexCell key={item} size='large'>
+                  {item}
+                </FlexCell>
+              ))}
+            </Sortable.Flex>
 
             <Group style={styles.boundGroup} withMargin={false} bordered center>
-              <Text style={styles.title}>Below SortableGrid</Text>
+              <Text style={styles.title}>Below SortableFlex</Text>
             </Group>
           </Animated.ScrollView>
         </Group>

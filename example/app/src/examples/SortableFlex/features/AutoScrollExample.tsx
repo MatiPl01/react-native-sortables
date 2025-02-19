@@ -4,8 +4,16 @@ import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 
-import { FlexCell, Group, Screen, Section, TabView } from '@/components';
-import { colors, spacing, style } from '@/theme';
+import {
+  FlexCell,
+  Group,
+  Screen,
+  Section,
+  Spacer,
+  TabView
+} from '@/components';
+import { useBottomNavBarHeight } from '@/contexts';
+import { colors, spacing } from '@/theme';
 import { getCategories, IS_WEB } from '@/utils';
 
 const MANY_CATEGORIES = getCategories(IS_WEB ? 30 : 20);
@@ -37,10 +45,7 @@ function ScrollViewExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   return (
-    <Animated.ScrollView
-      contentContainerStyle={style.contentContainer}
-      ref={scrollableRef}
-      removeClippedSubviews={false}>
+    <Animated.ScrollView ref={scrollableRef} removeClippedSubviews={false}>
       {/* Sortable.Layer is needed on Old Architecture (Paper) */}
       <Sortable.Layer>
         <Group>
@@ -59,6 +64,7 @@ function ScrollViewExample() {
           <ManyCategories scrollableRef={scrollableRef} />
         </Group>
       </Sortable.Layer>
+      <BottomBarSpacer />
     </Animated.ScrollView>
   );
 }
@@ -69,14 +75,16 @@ function FlatListExample() {
   return (
     <AnimatedFlatList
       CellRendererComponent={Sortable.Layer}
-      contentContainerStyle={style.contentContainer}
       data={LIST_ITEM_SECTIONS}
       ListHeaderComponentStyle={styles.foreground}
       ref={scrollableRef}
       ListFooterComponent={
-        <Section title='List footer'>
-          <ManyCategories scrollableRef={scrollableRef} />
-        </Section>
+        <>
+          <Section title='List footer'>
+            <ManyCategories scrollableRef={scrollableRef} />
+          </Section>
+          <BottomBarSpacer />
+        </>
       }
       ListHeaderComponent={
         <Section title='List header'>
@@ -104,9 +112,12 @@ function FlashListExample() {
         estimatedItemSize={152}
         ref={scrollableRef}
         ListFooterComponent={
-          <Section title='List footer'>
-            <ManyCategories scrollableRef={scrollableRef} />
-          </Section>
+          <>
+            <Section title='List footer'>
+              <ManyCategories scrollableRef={scrollableRef} />
+            </Section>
+            <BottomBarSpacer />
+          </>
         }
         ListHeaderComponent={
           <Section title='List header'>
@@ -167,6 +178,12 @@ function SeparatorSection() {
       <Text style={styles.title}>Between SortableFlex components</Text>
     </Group>
   );
+}
+
+function BottomBarSpacer() {
+  const bottomNavBarHeight = useBottomNavBarHeight();
+
+  return <Spacer height={bottomNavBarHeight} />;
 }
 
 const styles = StyleSheet.create({

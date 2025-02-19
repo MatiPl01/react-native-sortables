@@ -1,4 +1,4 @@
-import type { FontStyle, FontVariant } from '@/types/fonts';
+import type { FontStyle, FontVariant } from '@/types';
 
 export const text: Record<FontVariant, FontStyle> = {
   body1: {

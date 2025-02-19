@@ -62,12 +62,12 @@ type LayoutMeasurements = {
 
 type DropdownState = {
   isOpen: boolean;
-  toggleMeasurements: ({ sticky?: boolean } & LayoutMeasurements) | null;
+  toggleMeasurements: LayoutMeasurements | null;
 };
 
 type ActionSheetDropdownStyleOptions = {
   alignment?: 'left' | 'right';
-  sticky?: boolean;
+  position?: 'bottom' | 'top';
   offsetX?: number;
   offsetY?: number;
   dropdownMaxHeight?: number;
@@ -112,7 +112,6 @@ export default function ActionSheetDropdown({
           isOpen: true,
           toggleMeasurements: {
             height,
-            sticky: styleOptions?.sticky,
             width,
             x,
             y: y - (Platform.OS === 'android' ? insets.top : 0)
@@ -153,6 +152,7 @@ export default function ActionSheetDropdown({
                 handleClose={closeDropdown}
                 offsetX={styleOptions?.offsetX}
                 offsetY={styleOptions?.offsetY}
+                position={styleOptions?.position}
                 style={styleOptions?.dropdownStyle}
                 toggleMeasurements={toggleMeasurements}
               />
@@ -168,6 +168,7 @@ type DropdownContentProps = {
   options: Array<ActionSheetOption>;
   toggleMeasurements: LayoutMeasurements;
   alignment?: 'left' | 'right';
+  position?: 'bottom' | 'top';
   offsetX?: number;
   offsetY?: number;
   dropdownMaxHeight?: number;
@@ -184,6 +185,7 @@ function DropdownContent({
   offsetX = 0,
   offsetY = spacing.xxs,
   options,
+  position = 'bottom',
   style,
   toggleMeasurements
 }: DropdownContentProps): JSX.Element {
@@ -196,11 +198,14 @@ function DropdownContent({
   const contentHeight = useSharedValue(0);
   const containerHeight = useSharedValue(0);
 
-  const maxHeight =
-    windowDimensions.height -
-    toggleMeasurements.y -
-    toggleMeasurements.height -
-    spacing.xxl;
+  const isBottom = position === 'bottom';
+
+  const maxHeight = isBottom
+    ? windowDimensions.height -
+      toggleMeasurements.y -
+      toggleMeasurements.height -
+      spacing.xxl
+    : toggleMeasurements.y - 2 * spacing.xxl;
 
   const animatedDropdownStyle = useAnimatedStyle(() => {
     if (!contentWidth.value) {
@@ -252,9 +257,12 @@ function DropdownContent({
   const dropdownStyle: ViewStyle = {
     maxHeight,
     position: 'absolute',
-    top: toggleMeasurements.y + toggleMeasurements.height + offsetY
+    ...(isBottom
+      ? { top: toggleMeasurements.y + toggleMeasurements.height + offsetY }
+      : {
+          bottom: windowDimensions.height - toggleMeasurements.y + offsetY
+        })
   };
-
   const [paddingAndMargin, rest] = filterPaddingAndMarginProps(flattenedStyle);
 
   return (

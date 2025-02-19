@@ -19,7 +19,7 @@ export default function PlaygroundExample() {
   );
 
   return (
-    <ScrollScreen style={styles.container}>
+    <ScrollScreen contentContainerStyle={styles.container} includeNavBarHeight>
       <Sortable.Grid
         columnGap={10}
         columns={3}

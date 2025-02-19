@@ -5,7 +5,7 @@ import Sortable from 'react-native-sortables';
 import { FlexCell, ScrollScreen, Section } from '@/components';
 import { getCategories, IS_WEB } from '@/utils';
 
-import { spacing } from '../../theme/spacing';
+import { spacing } from '../../../theme/spacing';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const MANY_CATEGORIES_FLEX_WIDTH = 1.5 * Math.min(SCREEN_WIDTH, 600);
@@ -15,7 +15,7 @@ const MANY_CATEGORIES = getCategories(IS_WEB ? 30 : 20);
 
 export default function HorizontalAutoScrollExample() {
   return (
-    <ScrollScreen>
+    <ScrollScreen includeNavBarHeight>
       <NoWrapExample />
       <WrapExample />
     </ScrollScreen>

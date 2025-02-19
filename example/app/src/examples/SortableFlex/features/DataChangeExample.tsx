@@ -111,7 +111,7 @@ export default function DataChangeExample() {
   ];
 
   return (
-    <Screen>
+    <Screen includeNavBarHeight>
       {/* Need to set flex: 1 for the ScrollView parent component in order
       to ensure that it occupies the entire available space */}
       <Stagger
