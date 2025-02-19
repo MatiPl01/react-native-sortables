@@ -13,13 +13,11 @@ import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
 const RELATIVE_STYLE: ViewStyle = {
-  height: undefined,
   left: undefined,
   opacity: 1,
   position: 'relative',
   top: undefined,
   transform: [],
-  width: undefined,
   zIndex: 0
 };
 
@@ -140,7 +138,10 @@ export default function useItemLayoutStyles(
   );
 
   const animatedTranslationStyle = useAnimatedStyle(() => {
-    if (layoutX.value === null || layoutY.value === null) {
+    if (
+      !canSwitchToAbsoluteLayout.value &&
+      (layoutX.value === null || layoutY.value === null)
+    ) {
       return RELATIVE_STYLE;
     }
 
