@@ -3,37 +3,31 @@ import { StyleSheet, Text, View } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
+import { ScrollScreen } from '@/components';
 import { colors, radius, sizes, spacing, text } from '@/theme';
-import Animated, { useAnimatedRef } from 'react-native-reanimated';
 
 const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
 
 export default function PlaygroundExample() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
-      <View style={[styles.card, { height: Math.random() * 400 + 100 }]}>
+      <View style={styles.card}>
         <Text style={styles.text}>{item}</Text>
       </View>
     ),
     []
   );
 
-  const ref = useAnimatedRef<Animated.ScrollView>();
-
   return (
-    <Animated.ScrollView style={styles.container} ref={ref}>
+    <ScrollScreen style={styles.container}>
       <Sortable.Grid
-        debug
+        columnGap={10}
+        columns={3}
         data={DATA}
         renderItem={renderItem}
-        scrollableRef={ref}
-        columns={1}
-        enableActiveItemSnap={false}
-        activeItemScale={1.03}
-        hapticsEnabled
         rowGap={10}
       />
-    </Animated.ScrollView>
+    </ScrollScreen>
   );
 }
 
