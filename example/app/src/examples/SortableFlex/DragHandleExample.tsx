@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
-import type { SortableOverDrag } from 'react-native-sortables';
+import type { OverDrag } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
 import { OptionGroup, SimpleDropdown } from '@/components';
@@ -14,15 +14,10 @@ import { iconSizes } from '../../theme/icons';
 
 const DATA = getCategories(30);
 
-const OVER_DRAG: Array<SortableOverDrag> = [
-  'both',
-  'horizontal',
-  'vertical',
-  'none'
-];
+const OVER_DRAG: Array<OverDrag> = ['both', 'horizontal', 'vertical', 'none'];
 
 export default function DragHandleExample() {
-  const [overDrag, setOverDrag] = useState<SortableOverDrag>('both');
+  const [overDrag, setOverDrag] = useState<OverDrag>('both');
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   return (

@@ -25,9 +25,11 @@ export type ActiveItemDecorationSettings = AnimatableProps<{
 
 export type Offset = `${number}%` | number;
 export type OverDrag = 'both' | 'horizontal' | 'none' | 'vertical';
+export type ReorderTriggerOrigin = 'center' | 'touch';
 
 export type ItemDragSettings = {
   overDrag: OverDrag;
+  reorderTriggerOrigin: ReorderTriggerOrigin;
 } & AnimatableProps<{
   dragActivationDelay: number;
   activationAnimationDuration: number;

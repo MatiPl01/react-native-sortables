@@ -12,7 +12,8 @@ import type { Dimensions, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
-  ItemDragSettings
+  ItemDragSettings,
+  ReorderTriggerOrigin
 } from '../props/shared';
 import type { DragActivationState } from '../state';
 import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
@@ -65,7 +66,7 @@ export type CommonValuesContextType = {
   customHandle: boolean;
 } & AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &
-  AnimatedValues<Omit<ItemDragSettings, 'overDrag'>>;
+  AnimatedValues<Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>>;
 
 // MEASUREMENTS
 
@@ -169,5 +170,6 @@ export type OrderUpdaterProps<
 > = {
   predefinedStrategies: P;
   strategy: AnyStrategyFactory | keyof P;
+  triggerOrigin: ReorderTriggerOrigin;
   useAdditionalValues: () => AnyRecord;
 };
