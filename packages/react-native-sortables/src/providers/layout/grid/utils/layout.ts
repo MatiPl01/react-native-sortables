@@ -1,56 +1,78 @@
-import type { GridLayout, GridLayoutProps, Vector } from '../../../../types';
-import { getColumnIndex, getRowIndex } from './helpers';
+import type {
+  Coordinate,
+  Dimension,
+  GridLayout,
+  GridLayoutProps,
+  Vector
+} from '../../../../types';
+import { getCrossIndex, getMainIndex } from './helpers';
 
 export const calculateLayout = ({
-  columnWidth,
   gaps,
   indexToKey,
+  isVertical,
   itemDimensions,
-  numColumns
+  mainGroupSize,
+  numGroups
 }: GridLayoutProps): GridLayout | null => {
   'worklet';
-  if (columnWidth === null) {
+  if (!mainGroupSize) {
     return null;
   }
 
-  const rowOffsets = [0];
+  const crossAxisOffsets = [0];
   const itemPositions: Record<string, Vector> = {};
 
-  for (const [itemIndex, itemKey] of Object.entries(indexToKey)) {
-    const itemHeight = itemDimensions[itemKey]?.height;
+  let crossDimension: Dimension;
+  let mainCoordinate: Coordinate;
+  let crossCoordinate: Coordinate;
 
-    // Return if the item height is not yet measured
-    if (itemHeight === undefined) {
+  if (isVertical) {
+    // grid with specified number of columns (vertical orientation)
+    crossDimension = 'height'; // items can grow vertically
+    mainCoordinate = 'x';
+    crossCoordinate = 'y';
+  } else {
+    // grid with specified number of rows (horizontal orientation)
+    crossDimension = 'width'; // items can grow horizontally
+    mainCoordinate = 'y';
+    crossCoordinate = 'x';
+  }
+
+  for (const [itemIndex, itemKey] of indexToKey.entries()) {
+    const crossItemSize = itemDimensions[itemKey]?.[crossDimension];
+
+    // Return if the item is not yet measured
+    if (crossItemSize === undefined) {
       return null;
     }
 
-    const rowIndex = getRowIndex(itemIndex, numColumns);
-    const columnIndex = getColumnIndex(itemIndex, numColumns);
-    const currentRowOffset = rowOffsets[rowIndex] ?? 0;
+    const mainIndex = getMainIndex(itemIndex, numGroups);
+    const crossIndex = getCrossIndex(itemIndex, numGroups);
+    const crossAxisOffset = crossAxisOffsets[mainIndex] ?? 0;
 
-    // Update offset of the next row
-    rowOffsets[rowIndex + 1] = Math.max(
-      rowOffsets[rowIndex + 1] ?? 0,
-      currentRowOffset + itemHeight + gaps.row
+    // Update offset of the next group
+    crossAxisOffsets[crossIndex + 1] = Math.max(
+      crossAxisOffsets[crossIndex + 1] ?? 0,
+      crossAxisOffset + crossItemSize + gaps.cross
     );
 
     // Update item position
     itemPositions[itemKey] = {
-      x: columnIndex * (columnWidth + gaps.column),
-      y: currentRowOffset
-    };
+      [crossCoordinate]: crossAxisOffset,
+      [mainCoordinate]: mainIndex * (mainGroupSize + gaps.main)
+    } as Vector;
   }
 
-  const offsetAfterLastRow = rowOffsets[rowOffsets.length - 1];
-  const containerHeight = offsetAfterLastRow
-    ? Math.max(offsetAfterLastRow - gaps.row, 0)
-    : 0;
+  const lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
 
   return {
-    itemPositions,
-    rowOffsets,
-    totalDimensions: {
-      height: containerHeight // TODO - add width for horizontal grid
-    }
+    calculatedDimensions: {
+      [crossDimension]: lastCrossOffset
+        ? Math.max(lastCrossOffset - gaps.cross, 0)
+        : 0
+    },
+    crossAxisOffsets,
+    itemPositions
   };
 };

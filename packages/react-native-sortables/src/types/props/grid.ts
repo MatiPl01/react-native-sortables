@@ -15,12 +15,20 @@ export type SortableGridDragEndCallback<I> = (
   params: SortableGridDragEndParams<I>
 ) => void;
 
-export type SortableGridLayoutSettings = {
-  columns: number;
-} & AnimatableProps<{
-  rowGap: number;
-  columnGap: number;
-}>;
+export type SortableGridLayoutSettings = (
+  | {
+      columns: number;
+      rows?: never;
+    }
+  | {
+      rows: number;
+      columns?: number;
+    }
+) &
+  AnimatableProps<{
+    rowGap: number;
+    columnGap: number;
+  }>;
 
 export type SortableGridRenderItemInfo<I> = {
   item: I;

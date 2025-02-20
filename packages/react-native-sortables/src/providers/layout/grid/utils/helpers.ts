@@ -1,15 +1,9 @@
-export const getRowIndex = (
-  index: number | string,
-  numColumns: number
-): number => {
+export const getMainIndex = (index: number, numGroups: number): number => {
   'worklet';
-  return Math.floor(+index / numColumns);
+  return Math.floor(+index / numGroups);
 };
 
-export const getColumnIndex = (
-  index: number | string,
-  numColumns: number
-): number => {
+export const getCrossIndex = (index: number, numGroups: number): number => {
   'worklet';
-  return +index % numColumns;
+  return +index % numGroups;
 };
