@@ -1,6 +1,9 @@
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { SortableGridStrategyFactory } from '../../../../types';
+import type {
+  Coordinate,
+  SortableGridStrategyFactory
+} from '../../../../types';
 import { getAdditionalSwapOffset, useDebugBoundingBox } from '../../../shared';
 import { getCrossIndex, getMainIndex } from '../utils';
 
@@ -30,16 +33,22 @@ export const createGridStrategy =
 
     let mainContainerSize: SharedValue<null | number>;
     let crossContainerSize: SharedValue<null | number>;
+    let mainCoordinate: Coordinate;
+    let crossCoordinate: Coordinate;
 
     if (isVertical) {
-      mainContainerSize = containerHeight;
-      crossContainerSize = containerWidth;
-    } else {
       mainContainerSize = containerWidth;
       crossContainerSize = containerHeight;
+      mainCoordinate = 'x';
+      crossCoordinate = 'y';
+    } else {
+      mainContainerSize = containerHeight;
+      crossContainerSize = containerWidth;
+      mainCoordinate = 'y';
+      crossCoordinate = 'x';
     }
 
-    return ({ activeIndex, position: { x, y } }) => {
+    return ({ activeIndex, position }) => {
       'worklet';
       if (
         !othersLayout.value ||
@@ -76,7 +85,10 @@ export const createGridStrategy =
           crossBeforeHeight
         );
         crossBeforeBound = crossBeforeOffset - additionalBeforeOffset;
-      } while (crossBeforeBound > 0 && y < crossBeforeBound);
+      } while (
+        crossBeforeBound > 0 &&
+        position[crossCoordinate] < crossBeforeBound
+      );
 
       // After bound
       let crossAfterOffset = Infinity;
@@ -104,7 +116,7 @@ export const createGridStrategy =
           crossAfterOffset - crossGap.value + additionalAfterOffset;
       } while (
         crossAfterBound < crossContainerSize.value &&
-        y > crossAfterBound
+        position[crossCoordinate] > crossAfterBound
       );
 
       // HORIZONTAL BOUNDS
@@ -123,7 +135,10 @@ export const createGridStrategy =
         }
         mainBeforeOffset = mainIndex * (mainGroupSize.value + mainGap.value);
         mainBeforeBound = mainBeforeOffset - additionalOffsetX;
-      } while (mainBeforeBound > 0 && x < mainBeforeBound);
+      } while (
+        mainBeforeBound > 0 &&
+        position[mainCoordinate] < mainBeforeBound
+      );
 
       // Right bound
       let mainAfterOffset = Infinity;
@@ -133,9 +148,14 @@ export const createGridStrategy =
         if (mainAfterBound !== -Infinity) {
           mainIndex++;
         }
-        mainAfterOffset = mainIndex * (mainGroupSize.value + mainGap.value);
+        mainAfterOffset =
+          mainIndex * (mainGroupSize.value + mainGap.value) +
+          mainGroupSize.value;
         mainAfterBound = mainAfterOffset + additionalOffsetX;
-      } while (mainAfterBound < mainContainerSize.value && x > mainAfterBound);
+      } while (
+        mainAfterBound < mainContainerSize.value &&
+        position[mainCoordinate] > mainAfterBound
+      );
 
       // DEBUG ONLY
       if (debugBox) {

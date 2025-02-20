@@ -49,13 +49,15 @@ export const calculateLayout = ({
 
     const mainIndex = getMainIndex(itemIndex, numGroups);
     const crossIndex = getCrossIndex(itemIndex, numGroups);
-    const crossAxisOffset = crossAxisOffsets[mainIndex] ?? 0;
+    const crossAxisOffset = crossAxisOffsets[crossIndex] ?? 0;
 
     // Update offset of the next group
     crossAxisOffsets[crossIndex + 1] = Math.max(
       crossAxisOffsets[crossIndex + 1] ?? 0,
       crossAxisOffset + crossItemSize + gaps.cross
     );
+
+    console.log(itemKey, crossAxisOffset, crossItemSize, gaps.cross);
 
     // Update item position
     itemPositions[itemKey] = {
@@ -65,6 +67,16 @@ export const calculateLayout = ({
   }
 
   const lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
+
+  console.log({
+    calculatedDimensions: {
+      [crossDimension]: lastCrossOffset
+        ? Math.max(lastCrossOffset - gaps.cross, 0)
+        : 0
+    },
+    crossAxisOffsets,
+    itemPositions
+  });
 
   return {
     calculatedDimensions: {

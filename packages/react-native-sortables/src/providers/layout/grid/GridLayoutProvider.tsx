@@ -52,10 +52,10 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const { applyControlledContainerDimensions } = useMeasurementsContext();
   const debugContext = useDebugContext();
 
-  const debugGroupGapRects = debugContext?.useDebugRects(
+  const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
+  const debugCrossGapRects = debugContext?.useDebugRects(
     Math.ceil(numItems / numGroups) - 1
   );
-  const debugGroupItemGapRects = debugContext?.useDebugRects(numGroups - 1);
 
   const columnGap = useAnimatableValue(columnGap_);
   const rowGap = useAnimatableValue(rowGap_);
@@ -135,13 +135,13 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       mainGroupSize.value = (mainContainerSize + gap) / numGroups - gap;
 
       // DEBUG ONLY
-      if (debugGroupGapRects) {
+      if (debugMainGapRects) {
         for (let i = 0; i < numGroups - 1; i++) {
           const size = mainGroupSize.value * (i + 1) + gap * i;
 
-          debugGroupGapRects[i]?.set({
+          debugMainGapRects[i]?.set({
             ...DEBUG_COLORS,
-            ...(isVertical ? { height: gap, y: size } : { width: gap, x: size })
+            ...(isVertical ? { width: gap, x: size } : { height: gap, y: size })
           });
         }
       }
@@ -170,12 +170,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     }
 
     // DEBUG ONLY
-    if (debugGroupItemGapRects) {
+    if (debugCrossGapRects) {
       for (let i = 0; i < layout.crossAxisOffsets.length - 1; i++) {
-        const size = mainGap.value;
+        const size = crossGap.value;
         const pos = layout.crossAxisOffsets[i + 1]! - crossGap.value;
 
-        debugGroupItemGapRects[i]?.set({
+        debugCrossGapRects[i]?.set({
           ...DEBUG_COLORS,
           ...(isVertical ? { height: size, y: pos } : { width: size, x: pos })
         });
