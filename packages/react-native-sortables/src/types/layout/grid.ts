@@ -1,18 +1,19 @@
 import type { Dimensions, Vector } from './shared';
 
 export type GridLayoutProps = {
-  columnWidth: null | number;
+  mainGroupSize: null | number;
   gaps: {
-    row: number;
-    column: number;
+    main: number;
+    cross: number;
   };
   itemDimensions: Record<string, Dimensions>;
   indexToKey: Array<string>;
-  numColumns: number;
+  numGroups: number;
+  isVertical: boolean;
 };
 
 export type GridLayout = {
-  rowOffsets: Array<number>;
   itemPositions: Record<string, Vector>;
-  totalDimensions: Partial<Dimensions>;
+  crossAxisOffsets: Array<number>;
+  calculatedDimensions: Partial<Dimensions>;
 };
