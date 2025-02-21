@@ -67,6 +67,7 @@ export default function StaggerAnimationExample() {
         columnGap={10}
         columns={3}
         data={data}
+        overflow='visible'
         renderItem={renderItem}
         rowGap={10}
         animateHeight

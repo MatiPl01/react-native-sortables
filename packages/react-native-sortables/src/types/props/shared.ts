@@ -99,19 +99,24 @@ export type SortableCallbacks = {
   onOrderChange?: OrderChangeCallback;
 };
 
+export type Overflow = 'hidden' | 'visible';
+
 export type SharedProps = Simplify<
-  {
-    animateHeight?: boolean;
-    animateWidth?: boolean;
-    hapticsEnabled?: boolean;
-    sortEnabled?: Animatable<boolean>;
-    customHandle?: boolean;
-    debug?: boolean;
-  } & Omit<SortableCallbacks, 'onDragEnd'> &
-    Partial<ActiveItemDecorationSettings> &
-    Partial<ActiveItemSnapSettings> &
-    Partial<AutoScrollSettings> &
-    Partial<DropIndicatorSettings> &
-    Partial<ItemDragSettings> &
-    Partial<ItemLayoutAnimationSettings>
+  Omit<SortableCallbacks, 'onDragEnd'> &
+    Partial<
+      {
+        animateHeight: boolean;
+        animateWidth: boolean;
+        hapticsEnabled: boolean;
+        sortEnabled: Animatable<boolean>;
+        customHandle: boolean;
+        overflow: Overflow;
+        debug: boolean;
+      } & ActiveItemDecorationSettings &
+        ActiveItemSnapSettings &
+        AutoScrollSettings &
+        DropIndicatorSettings &
+        ItemDragSettings &
+        ItemLayoutAnimationSettings
+    >
 >;

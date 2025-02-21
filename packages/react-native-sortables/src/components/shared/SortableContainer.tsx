@@ -16,7 +16,7 @@ import {
   useCommonValuesContext,
   useMeasurementsContext
 } from '../../providers';
-import type { DropIndicatorSettings } from '../../types';
+import type { DropIndicatorSettings, Overflow } from '../../types';
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 import DropIndicator from './DropIndicator';
 
@@ -26,6 +26,7 @@ type AnimatedHeightContainerProps = PropsWithChildren<
   {
     animateHeight: boolean;
     animateWidth: boolean;
+    overflow: Overflow;
     style?: StyleProp<ViewStyle>;
   } & DropIndicatorSettings
 >;
@@ -36,6 +37,7 @@ export default function SortableContainer({
   animateWidth,
   children,
   dropIndicatorStyle,
+  overflow,
   showDropIndicator,
   style
 }: AnimatedHeightContainerProps) {
@@ -63,20 +65,20 @@ export default function SortableContainer({
 
     const ctrl = controlledContainerDimensions.value;
 
-    const height = maybeAnimate(
-      ctrl.height ? containerHeight.value : null,
-      animateHeight
-    );
-    const width = maybeAnimate(
-      ctrl.width ? containerWidth.value : null,
-      animateWidth
-    );
-    const overflow =
-      activeItemKey.value !== null || !activeItemDropped.value
-        ? 'visible'
-        : 'hidden';
-
-    return { height, overflow, width };
+    return {
+      height: maybeAnimate(
+        ctrl.height ? containerHeight.value : null,
+        animateHeight
+      ),
+      overflow:
+        activeItemKey.value !== null || !activeItemDropped.value
+          ? 'visible'
+          : overflow,
+      width: maybeAnimate(
+        ctrl.width ? containerWidth.value : null,
+        animateWidth
+      )
+    };
   }, [animateHeight, animateWidth]);
 
   const innerContainerStyle = useAnimatedStyle(() => {
