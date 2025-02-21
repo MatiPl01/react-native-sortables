@@ -57,8 +57,6 @@ export const calculateLayout = ({
       crossAxisOffset + crossItemSize + gaps.cross
     );
 
-    console.log(itemKey, crossAxisOffset, crossItemSize, gaps.cross);
-
     // Update item position
     itemPositions[itemKey] = {
       [crossCoordinate]: crossAxisOffset,
@@ -67,16 +65,6 @@ export const calculateLayout = ({
   }
 
   const lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
-
-  console.log({
-    calculatedDimensions: {
-      [crossDimension]: lastCrossOffset
-        ? Math.max(lastCrossOffset - gaps.cross, 0)
-        : 0
-    },
-    crossAxisOffsets,
-    itemPositions
-  });
 
   return {
     calculatedDimensions: {

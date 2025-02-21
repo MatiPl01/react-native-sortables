@@ -177,22 +177,22 @@ export const createGridStrategy =
             { x: mainAfterBound, y: crossAfterBound }
           );
         } else {
-          debugBox.top.update(
-            { x: crossBeforeBound, y: mainBeforeBound },
-            { x: crossAfterBound, y: mainAfterBound }
-          );
-          debugBox.bottom.update(
-            { x: crossBeforeBound, y: mainAfterBound },
-            { x: crossAfterBound, y: mainBeforeBound }
-          );
-          debugBox.left.update(
-            { x: crossBeforeBound, y: mainBeforeBound },
-            { x: crossAfterBound, y: mainAfterBound }
-          );
-          debugBox.right.update(
-            { x: crossBeforeBound, y: mainAfterBound },
-            { x: crossAfterBound, y: mainBeforeBound }
-          );
+          // debugBox.top.update(
+          //   { x: crossBeforeBound, y: mainBeforeBound },
+          //   { x: crossAfterBound, y: mainAfterBound }
+          // );
+          // debugBox.bottom.update(
+          //   { x: crossBeforeBound, y: mainAfterBound },
+          //   { x: crossAfterBound, y: mainBeforeBound }
+          // );
+          // debugBox.left.update(
+          //   { x: crossBeforeBound, y: mainBeforeBound },
+          //   { x: crossAfterBound, y: mainAfterBound }
+          // );
+          // debugBox.right.update(
+          //   { x: crossBeforeBound, y: mainAfterBound },
+          //   { x: crossAfterBound, y: mainBeforeBound }
+          // );
         }
       }
 

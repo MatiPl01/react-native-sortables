@@ -9,9 +9,9 @@ import Sortable from 'react-native-sortables';
 import { OptionGroup, SimpleDropdown, Spacer, TabSelector } from '@/components';
 import { useBottomNavBarHeight } from '@/contexts';
 import { colors, flex, radius, sizes, spacing, style, text } from '@/theme';
-import { IS_WEB } from '@/utils';
+import { getItems, IS_WEB } from '@/utils';
 
-const DATA = Array.from({ length: 20 }, (_, index) => `Item ${index + 1}`);
+const DATA = getItems(20);
 
 const COLUMNS = [1, 2, 3, 4];
 const OVER_DRAG: Array<OverDrag> = ['both', 'horizontal', 'vertical', 'none'];

@@ -20,6 +20,7 @@ import type {
 } from '../types';
 import {
   defaultKeyExtractor,
+  error,
   getPropsWithDefaults,
   orderItems,
   typedMemo,
@@ -38,6 +39,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       onDragEnd: _onDragEnd,
       renderItem,
       rowGap,
+      rowHeight,
       rows,
       strategy
     },
@@ -57,6 +59,10 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
   const isVertical = rows === undefined;
   const groups = rows ?? columns;
+
+  if (!isVertical && !rowHeight) {
+    throw error('rowHeight is required for horizontal Sortable.Grid');
+  }
 
   // this allows changing the number of columns/rows while developing
   // code with no necessity to reload the app
@@ -86,13 +92,18 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       controlledContainerDimensions={controlledContainerDimensions}
       itemKeys={itemKeys}
       key={key}
+      initialItemsStyleOverride={
+        isVertical ? undefined : styles.horizontalStyleOverride
+      }
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
         columnGap={columnGapValue}
         isVertical={isVertical}
         numGroups={groups}
         numItems={data.length}
-        rowGap={rowGapValue}>
+        rowGap={rowGapValue}
+        rowHeight={rowHeight} // horizontal grid only
+      >
         <OrderUpdaterComponent
           key={useStrategyKey(strategy)}
           predefinedStrategies={GRID_STRATEGIES}
@@ -115,6 +126,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           itemsLayout={itemsLayout}
           renderItem={renderItem}
           rowGap={rowGapValue}
+          rowHeight={rowHeight!} // must be specified for horizontal grids
           showDropIndicator={showDropIndicator}
         />
       </GridLayoutProvider>
@@ -139,6 +151,7 @@ type SortableGridInnerProps<I> = {
       | 'itemExiting'
       | 'itemsLayout'
       | 'renderItem'
+      | 'rowHeight'
     >
   >;
 
@@ -153,10 +166,12 @@ function SortableGridInner<I>({
   itemsLayout,
   renderItem,
   rowGap,
+  rowHeight,
   ...containerProps
 }: SortableGridInnerProps<I>) {
   const animatedInnerStyle = useAnimatedStyle(() => ({
     flexDirection: isVertical ? 'row' : 'column',
+    height: isVertical ? undefined : groups * (rowHeight + rowGap.value),
     marginHorizontal: -columnGap.value / 2,
     marginVertical: -rowGap.value / 2
   }));
@@ -211,6 +226,10 @@ function SortableGridItem<I>({
 const styles = StyleSheet.create({
   gridContainer: {
     flexWrap: 'wrap'
+  },
+  horizontalStyleOverride: {
+    // This is needed to properly adjust the wrapper size to the item width
+    alignSelf: 'flex-start'
   }
 });
 

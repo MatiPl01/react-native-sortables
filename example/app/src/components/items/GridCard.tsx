@@ -1,20 +1,32 @@
 import type { PropsWithChildren } from 'react';
+import type { DimensionValue, StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius } from '@/theme';
 
 type GridCardProps = PropsWithChildren<{
   active?: boolean;
-  height?: number;
+  height?: DimensionValue;
+  width?: DimensionValue;
+  style?: StyleProp<ViewStyle>;
 }>;
 
-export default function GridCard({ active, children, height }: GridCardProps) {
+export default function GridCard({
+  active,
+  children,
+  height,
+  style,
+  width
+}: GridCardProps) {
   return (
     <View
       style={[
         styles.card,
         active && styles.activeCard,
-        height !== undefined ? { aspectRatio: 'auto', height } : {}
+        height !== undefined || width !== undefined
+          ? { aspectRatio: 'auto', height, width }
+          : {},
+        style
       ]}>
       {typeof children === 'string' ? (
         <Text style={styles.text}>{children}</Text>

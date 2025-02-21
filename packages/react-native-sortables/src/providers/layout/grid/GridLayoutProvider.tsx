@@ -29,6 +29,7 @@ type GridLayoutProviderProps = PropsWithChildren<{
   isVertical: boolean;
   rowGap: Animatable<number>;
   columnGap: Animatable<number>;
+  rowHeight?: number;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createProvider(
@@ -38,14 +39,14 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   isVertical,
   numGroups,
   numItems,
-  rowGap: rowGap_
+  rowGap: rowGap_,
+  rowHeight
 }) => {
   const {
     indexToKey,
     itemDimensions,
     itemPositions,
     itemsStyleOverride,
-    measuredContainerHeight,
     measuredContainerWidth,
     shouldAnimateLayout
   } = useCommonValuesContext();
@@ -68,7 +69,44 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
    * width - in vertical orientation (default) (columns are groups)
    * height - in horizontal orientation (rows are groups)
    */
-  const mainGroupSize = useSharedValue<null | number>(null);
+  const mainGroupSize = useSharedValue<null | number>(rowHeight ?? null);
+
+  // MAIN GROUP SIZE UPDATER
+  useAnimatedReaction(
+    () => {
+      if (!isVertical) {
+        return rowHeight ?? null;
+      }
+
+      const mainContainerWidth = measuredContainerWidth.value;
+      if (!mainContainerWidth) {
+        return null;
+      }
+
+      return (mainContainerWidth + mainGap.value) / numGroups - mainGap.value;
+    },
+    value => {
+      if (!value) {
+        return;
+      }
+
+      mainGroupSize.value = value;
+
+      // DEBUG ONLY
+      if (debugMainGapRects) {
+        const gap = mainGap.value;
+
+        for (let i = 0; i < numGroups - 1; i++) {
+          const size = value * (i + 1) + gap * i;
+
+          debugMainGapRects[i]?.set({
+            ...DEBUG_COLORS,
+            ...(isVertical ? { width: gap, x: size } : { height: gap, y: size })
+          });
+        }
+      }
+    }
+  );
 
   const useGridLayoutReaction = useCallback(
     (
@@ -117,35 +155,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         })
       ),
     [mainGroupSize, mainGap, crossGap, numGroups, isVertical, itemDimensions]
-  );
-
-  // TARGET COLUMN WIDTH UPDATER
-  useAnimatedReaction(
-    () => ({
-      gap: mainGap.value,
-      mainContainerSize: isVertical
-        ? measuredContainerWidth.value
-        : measuredContainerHeight.value
-    }),
-    ({ gap, mainContainerSize }) => {
-      if (!mainContainerSize) {
-        return;
-      }
-
-      mainGroupSize.value = (mainContainerSize + gap) / numGroups - gap;
-
-      // DEBUG ONLY
-      if (debugMainGapRects) {
-        for (let i = 0; i < numGroups - 1; i++) {
-          const size = mainGroupSize.value * (i + 1) + gap * i;
-
-          debugMainGapRects[i]?.set({
-            ...DEBUG_COLORS,
-            ...(isVertical ? { width: gap, x: size } : { height: gap, y: size })
-          });
-        }
-      }
-    }
   );
 
   // GRID LAYOUT UPDATER

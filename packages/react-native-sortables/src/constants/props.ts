@@ -78,7 +78,7 @@ type ExcludedFromDefaultGridProps = 'data' | 'onDragEnd' | 'renderItem';
 
 type DefaultSortableGridProps = DefaultProps<
   Omit<SortableGridProps<unknown>, keyof DefaultSharedProps>,
-  'rows',
+  'rows' | 'rowHeight',
   ExcludedFromDefaultGridProps
 >;
 
