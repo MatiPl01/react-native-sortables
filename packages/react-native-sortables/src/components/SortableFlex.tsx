@@ -35,6 +35,7 @@ function SortableFlex(props: SortableFlexProps) {
       itemEntering,
       itemExiting,
       itemsLayout,
+      overflow,
       reorderTriggerOrigin,
       showDropIndicator,
       ...sharedProps
@@ -85,6 +86,7 @@ function SortableFlex(props: SortableFlexProps) {
           itemEntering={itemEntering}
           itemExiting={itemExiting}
           itemsLayout={itemsLayout}
+          overflow={overflow}
           showDropIndicator={showDropIndicator}
           style={[
             styleProps,
@@ -111,6 +113,7 @@ type SortableFlexInnerProps = {
       | 'itemEntering'
       | 'itemExiting'
       | 'itemsLayout'
+      | 'overflow'
     >
   >;
 

@@ -48,6 +48,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       itemEntering,
       itemExiting,
       itemsLayout,
+      overflow,
       reorderTriggerOrigin,
       showDropIndicator,
       ...sharedProps
@@ -102,6 +103,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           itemExiting={itemExiting}
           itemKeys={itemKeys}
           itemsLayout={itemsLayout}
+          overflow={overflow}
           renderItem={renderItem}
           rowGap={rowGapValue}
           showDropIndicator={showDropIndicator}
@@ -126,6 +128,7 @@ type SortableGridInnerProps<I> = {
       | 'itemEntering'
       | 'itemExiting'
       | 'itemsLayout'
+      | 'overflow'
       | 'renderItem'
     >
   >;
