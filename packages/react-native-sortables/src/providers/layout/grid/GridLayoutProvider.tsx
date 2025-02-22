@@ -174,7 +174,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     const mainDimension = isVertical ? 'width' : 'height';
     if (currentStyleOverride?.[mainDimension] !== mainGroupSize.value) {
       itemsStyleOverride.value = {
-        [mainDimension]: mainGroupSize.value + mainGap.value
+        [mainDimension]: mainGroupSize.value
       };
     }
 

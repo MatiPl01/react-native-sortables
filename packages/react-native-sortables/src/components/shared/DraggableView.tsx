@@ -33,8 +33,7 @@ function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const { activeItemKey, customHandle, itemsOverridesStyle } =
-    useCommonValuesContext();
+  const { activeItemKey, customHandle } = useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
   const activationAnimationProgress = useSharedValue(0);
@@ -72,7 +71,7 @@ function DraggableView({
     <Animated.View
       {...viewProps}
       layout={IS_WEB ? undefined : layout}
-      style={[style, itemsOverridesStyle, layoutStyles]}>
+      style={[style, layoutStyles]}>
       <ItemContextProvider
         activationAnimationProgress={activationAnimationProgress}
         isActive={isActive}

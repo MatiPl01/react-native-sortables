@@ -17,7 +17,7 @@ const ROW_HEIGHT = 75;
 
 // Vertical grid
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const VERTICAL_GRID_WIDTH = 1.2 * Math.min(SCREEN_WIDTH, MAX_CONTENT_WIDTH);
+const VERTICAL_GRID_WIDTH = 1.1 * Math.min(SCREEN_WIDTH, MAX_CONTENT_WIDTH);
 const COLUMNS = 4;
 
 const getRandomWidth = () => 50 + Math.random() * (IS_WEB ? 175 : 100);
