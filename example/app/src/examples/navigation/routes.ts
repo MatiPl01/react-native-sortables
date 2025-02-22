@@ -31,6 +31,10 @@ const routes: Routes = {
             Component: SortableGrid.features.AutoScrollExample,
             name: 'Auto Scroll'
           },
+          HorizontalGridAutoscroll: {
+            Component: SortableGrid.features.HorizontalGridAutoScrollExample,
+            name: 'Horizontal Grid & Auto Scroll'
+          },
           DataChange: {
             Component: SortableGrid.features.DataChangeExample,
             name: 'Data Change'

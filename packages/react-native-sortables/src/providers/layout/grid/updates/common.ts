@@ -1,8 +1,11 @@
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { SortableGridStrategyFactory } from '../../../../types';
+import type {
+  Coordinate,
+  SortableGridStrategyFactory
+} from '../../../../types';
 import { getAdditionalSwapOffset, useDebugBoundingBox } from '../../../shared';
-import { getColumnIndex, getRowIndex } from '../utils';
+import { getCrossIndex, getMainIndex } from '../utils';
 
 export const createGridStrategy =
   (
@@ -14,141 +17,194 @@ export const createGridStrategy =
     ) => Array<string>
   ): SortableGridStrategyFactory =>
   ({
-    columnGap,
-    columnWidth,
     containerHeight,
     containerWidth,
+    crossGap,
     indexToKey,
-    numColumns,
-    rowGap,
+    isVertical,
+    mainGap,
+    mainGroupSize,
+    numGroups,
     useGridLayout
   }) => {
     const othersIndexToKey = useInactiveIndexToKey();
     const othersLayout = useGridLayout(othersIndexToKey);
     const debugBox = useDebugBoundingBox();
 
-    return ({ activeIndex, position: { x, y } }) => {
+    let mainContainerSize: SharedValue<null | number>;
+    let crossContainerSize: SharedValue<null | number>;
+    let mainCoordinate: Coordinate;
+    let crossCoordinate: Coordinate;
+
+    if (isVertical) {
+      mainContainerSize = containerWidth;
+      crossContainerSize = containerHeight;
+      mainCoordinate = 'x';
+      crossCoordinate = 'y';
+    } else {
+      mainContainerSize = containerHeight;
+      crossContainerSize = containerWidth;
+      mainCoordinate = 'y';
+      crossCoordinate = 'x';
+    }
+
+    return ({ activeIndex, position }) => {
       'worklet';
       if (
         !othersLayout.value ||
-        containerHeight.value === null ||
-        containerWidth.value === null ||
-        columnWidth.value === null
+        crossContainerSize.value === null ||
+        mainContainerSize.value === null ||
+        mainGroupSize.value === null
       ) {
         return;
       }
-      const { rowOffsets } = othersLayout.value;
-      const startRowIndex = getRowIndex(activeIndex, numColumns);
-      const startColumnIndex = getColumnIndex(activeIndex, numColumns);
-      let rowIndex = startRowIndex;
-      let columnIndex = startColumnIndex;
+      const { crossAxisOffsets } = othersLayout.value;
+      const startCrossIndex = getCrossIndex(activeIndex, numGroups);
+      const startMainIndex = getMainIndex(activeIndex, numGroups);
+      let crossIndex = startCrossIndex;
+      let mainIndex = startMainIndex;
 
-      // VERTICAL BOUNDS
-      // Top bound
-      let rowOffsetAbove = -Infinity;
-      let topBound = Infinity;
+      // CROSS AXIS BOUNDS
+      // Before bound
+      let crossBeforeOffset = -Infinity;
+      let crossBeforeBound = Infinity;
 
       do {
-        if (topBound !== Infinity) {
-          rowIndex--;
+        if (crossBeforeBound !== Infinity) {
+          crossIndex--;
         }
-        rowOffsetAbove = rowOffsets[rowIndex] ?? 0;
-        const rowAboveHeight =
-          rowOffsets[rowIndex - 1] !== undefined
-            ? rowOffsetAbove - rowOffsets[rowIndex - 1]! - rowGap.value
+        crossBeforeOffset = crossAxisOffsets[crossIndex] ?? 0;
+        const crossBeforeHeight =
+          crossAxisOffsets[crossIndex - 1] !== undefined
+            ? crossBeforeOffset -
+              crossAxisOffsets[crossIndex - 1]! -
+              crossGap.value
             : 0;
-        const additionalOffsetTop = getAdditionalSwapOffset(
-          rowGap.value,
-          rowAboveHeight
+        const additionalBeforeOffset = getAdditionalSwapOffset(
+          crossGap.value,
+          crossBeforeHeight
         );
-        topBound = rowOffsetAbove - additionalOffsetTop;
-      } while (topBound > 0 && y < topBound);
+        crossBeforeBound = crossBeforeOffset - additionalBeforeOffset;
+      } while (
+        crossBeforeBound > 0 &&
+        position[crossCoordinate] < crossBeforeBound
+      );
 
-      // Bottom bound
-      let rowOffsetBelow = Infinity;
-      let bottomBound = -Infinity;
+      // After bound
+      let crossAfterOffset = Infinity;
+      let crossAfterBound = -Infinity;
 
       do {
-        if (bottomBound !== -Infinity) {
-          rowIndex++;
+        if (crossAfterBound !== -Infinity) {
+          crossIndex++;
         }
-        const nextRowOffset = rowOffsets[rowIndex + 1];
-        if (!nextRowOffset) {
+        const nextCrossAxisOffset = crossAxisOffsets[crossIndex + 1];
+        if (!nextCrossAxisOffset) {
           break;
         }
-        rowOffsetBelow = nextRowOffset;
-        const rowBelowHeight =
-          rowOffsets[rowIndex + 2] !== undefined && rowOffsetBelow !== undefined
-            ? rowOffsets[rowIndex + 2]! - rowOffsetBelow - rowGap.value
+        crossAfterOffset = nextCrossAxisOffset;
+        const crossAfterHeight =
+          crossAxisOffsets[crossIndex + 2] !== undefined &&
+          crossAfterOffset !== undefined
+            ? crossAfterOffset - crossAfterOffset - crossGap.value
             : 0;
-        const additionalOffsetBottom = getAdditionalSwapOffset(
-          rowGap.value,
-          rowBelowHeight
+        const additionalAfterOffset = getAdditionalSwapOffset(
+          crossGap.value,
+          crossAfterHeight
         );
-        bottomBound = rowOffsetBelow - rowGap.value + additionalOffsetBottom;
-      } while (bottomBound < containerHeight.value && y > bottomBound);
+        crossAfterBound =
+          crossAfterOffset - crossGap.value + additionalAfterOffset;
+      } while (
+        crossAfterBound < crossContainerSize.value &&
+        position[crossCoordinate] > crossAfterBound
+      );
 
       // HORIZONTAL BOUNDS
       const additionalOffsetX = getAdditionalSwapOffset(
-        rowGap.value,
-        columnWidth.value
+        mainGap.value,
+        mainContainerSize.value
       );
 
-      // Left bound
-      let columnOffsetLeft = -Infinity;
-      let leftBound = Infinity;
+      // Before bound
+      let mainBeforeOffset = -Infinity;
+      let mainBeforeBound = Infinity;
 
       do {
-        if (leftBound !== Infinity) {
-          columnIndex--;
+        if (mainBeforeBound !== Infinity) {
+          mainIndex--;
         }
-        columnOffsetLeft = columnIndex * (columnWidth.value + columnGap.value);
-        leftBound = columnOffsetLeft - additionalOffsetX;
-      } while (leftBound > 0 && x < leftBound);
+        mainBeforeOffset = mainIndex * (mainGroupSize.value + mainGap.value);
+        mainBeforeBound = mainBeforeOffset - additionalOffsetX;
+      } while (
+        mainBeforeBound > 0 &&
+        position[mainCoordinate] < mainBeforeBound
+      );
 
       // Right bound
-      let columnOffsetRight = Infinity;
-      let rightBound = -Infinity;
+      let mainAfterOffset = Infinity;
+      let mainAfterBound = -Infinity;
 
       do {
-        if (rightBound !== -Infinity) {
-          columnIndex++;
+        if (mainAfterBound !== -Infinity) {
+          mainIndex++;
         }
-        columnOffsetRight =
-          columnIndex * (columnWidth.value + columnGap.value) +
-          columnWidth.value;
-        rightBound = columnOffsetRight + additionalOffsetX;
-      } while (rightBound < containerWidth.value && x > rightBound);
+        mainAfterOffset =
+          mainIndex * (mainGroupSize.value + mainGap.value) +
+          mainGroupSize.value;
+        mainAfterBound = mainAfterOffset + additionalOffsetX;
+      } while (
+        mainAfterBound < mainContainerSize.value &&
+        position[mainCoordinate] > mainAfterBound
+      );
 
       // DEBUG ONLY
       if (debugBox) {
-        debugBox.top.update(
-          { x: leftBound, y: topBound },
-          { x: rightBound, y: rowOffsetAbove }
-        );
-        debugBox.bottom.update(
-          { x: leftBound, y: rowOffsetBelow - rowGap.value },
-          { x: rightBound, y: bottomBound }
-        );
-        debugBox.left.update(
-          { x: leftBound, y: topBound },
-          { x: columnOffsetLeft, y: bottomBound }
-        );
-        debugBox.right.update(
-          { x: columnOffsetRight, y: topBound },
-          { x: rightBound, y: bottomBound }
-        );
+        if (isVertical) {
+          debugBox.top.update(
+            { x: mainBeforeBound, y: crossBeforeBound },
+            { x: mainAfterBound, y: crossBeforeOffset }
+          );
+          debugBox.bottom.update(
+            { x: mainBeforeBound, y: crossAfterOffset },
+            { x: mainAfterBound, y: crossAfterBound }
+          );
+          debugBox.left.update(
+            { x: mainBeforeBound, y: crossBeforeBound },
+            { x: mainBeforeOffset, y: crossAfterBound }
+          );
+          debugBox.right.update(
+            { x: mainAfterOffset, y: crossBeforeBound },
+            { x: mainAfterBound, y: crossAfterBound }
+          );
+        } else {
+          // debugBox.top.update(
+          //   { x: crossBeforeBound, y: mainBeforeBound },
+          //   { x: crossAfterBound, y: mainAfterBound }
+          // );
+          // debugBox.bottom.update(
+          //   { x: crossBeforeBound, y: mainAfterBound },
+          //   { x: crossAfterBound, y: mainBeforeBound }
+          // );
+          // debugBox.left.update(
+          //   { x: crossBeforeBound, y: mainBeforeBound },
+          //   { x: crossAfterBound, y: mainAfterBound }
+          // );
+          // debugBox.right.update(
+          //   { x: crossBeforeBound, y: mainAfterBound },
+          //   { x: crossAfterBound, y: mainBeforeBound }
+          // );
+        }
       }
 
       // Swap the active item with the item at the new index
       const itemsCount = indexToKey.value.length;
-      const limitedRowIndex = Math.max(
+      const limitedCrossIndex = Math.max(
         0,
-        Math.min(rowIndex, Math.floor((itemsCount - 1) / numColumns))
+        Math.min(crossIndex, Math.floor((itemsCount - 1) / numGroups))
       );
       const newIndex = Math.max(
         0,
-        Math.min(limitedRowIndex * numColumns + columnIndex, itemsCount - 1)
+        Math.min(limitedCrossIndex * numGroups + mainIndex, itemsCount - 1)
       );
       if (newIndex === activeIndex) {
         return;

@@ -5,7 +5,7 @@ import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 
 import { DEFAULT_SHARED_PROPS, STYLE_PROPS } from '../constants/props';
-import type { SharedProps } from '../types';
+import type { RequiredBy, SharedProps } from '../types';
 
 const hasStyleProp = <K extends string, P extends Record<string, any>>(
   styleKey: K,
@@ -19,7 +19,10 @@ type PropsWithDefaults<
   D extends Record<string, any>
 > = {
   sharedProps: Required<{ [K in keyof SharedProps]: P[K] }>;
-  rest: Omit<Omit<P, keyof D> & Required<P>, keyof SharedProps>;
+  rest: Omit<
+    Omit<P, keyof D> & RequiredBy<P, keyof D & keyof P>,
+    keyof SharedProps
+  >;
 };
 
 export const getPropsWithDefaults = <

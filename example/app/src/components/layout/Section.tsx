@@ -12,12 +12,14 @@ type SectionProps = PropsWithChildren<{
   description?: Array<string> | string;
   fill?: boolean;
   padding?: GroupProps['padding'];
+  group?: boolean;
 }>;
 
 export default function Section({
   children,
   description,
   fill,
+  group = true,
   padding,
   title
 }: SectionProps) {
@@ -27,11 +29,14 @@ export default function Section({
         <Text style={styles.title}>{title}</Text>
         {description && <Description>{description}</Description>}
       </View>
-      {children && (
-        <Group padding={padding} style={[fill && flex.fill]}>
-          {children}
-        </Group>
-      )}
+      {children &&
+        (group ? (
+          <Group padding={padding} style={[fill && flex.fill]}>
+            {children}
+          </Group>
+        ) : (
+          children
+        ))}
     </View>
   );
 }

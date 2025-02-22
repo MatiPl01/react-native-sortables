@@ -24,19 +24,23 @@ const DEBUG_COLORS = {
 };
 
 type GridLayoutProviderProps = PropsWithChildren<{
-  itemsCount: number;
-  columns: number;
+  numItems: number;
+  numGroups: number;
+  isVertical: boolean;
   rowGap: Animatable<number>;
   columnGap: Animatable<number>;
+  rowHeight?: number;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   'GridLayout'
 )<GridLayoutProviderProps, GridLayoutContextType>(({
   columnGap: columnGap_,
-  columns,
-  itemsCount,
-  rowGap: rowGap_
+  isVertical,
+  numGroups,
+  numItems,
+  rowGap: rowGap_,
+  rowHeight
 }) => {
   const {
     indexToKey,
@@ -49,14 +53,60 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const { applyControlledContainerDimensions } = useMeasurementsContext();
   const debugContext = useDebugContext();
 
-  const debugRowGapRects = debugContext?.useDebugRects(
-    Math.ceil(itemsCount / columns) - 1
+  const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
+  const debugCrossGapRects = debugContext?.useDebugRects(
+    Math.ceil(numItems / numGroups) - 1
   );
-  const debugColumnGapRects = debugContext?.useDebugRects(columns - 1);
 
   const columnGap = useAnimatableValue(columnGap_);
   const rowGap = useAnimatableValue(rowGap_);
-  const columnWidth = useSharedValue<null | number>(null);
+
+  const mainGap = isVertical ? columnGap : rowGap;
+  const crossGap = isVertical ? rowGap : columnGap;
+
+  /**
+   * Size of the group of items determined by the parent container size.
+   * width - in vertical orientation (default) (columns are groups)
+   * height - in horizontal orientation (rows are groups)
+   */
+  const mainGroupSize = useSharedValue<null | number>(rowHeight ?? null);
+
+  // MAIN GROUP SIZE UPDATER
+  useAnimatedReaction(
+    () => {
+      if (!isVertical) {
+        return rowHeight ?? null;
+      }
+
+      const mainContainerWidth = measuredContainerWidth.value;
+      if (!mainContainerWidth) {
+        return null;
+      }
+
+      return (mainContainerWidth + mainGap.value) / numGroups - mainGap.value;
+    },
+    value => {
+      if (!value) {
+        return;
+      }
+
+      mainGroupSize.value = value;
+
+      // DEBUG ONLY
+      if (debugMainGapRects) {
+        const gap = mainGap.value;
+
+        for (let i = 0; i < numGroups - 1; i++) {
+          const size = value * (i + 1) + gap * i;
+
+          debugMainGapRects[i]?.set({
+            ...DEBUG_COLORS,
+            ...(isVertical ? { width: gap, x: size } : { height: gap, y: size })
+          });
+        }
+      }
+    }
+  );
 
   const useGridLayoutReaction = useCallback(
     (
@@ -65,14 +115,15 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     ) =>
       useAnimatedReaction(
         () => ({
-          columnWidth: columnWidth.value,
           gaps: {
-            column: columnGap.value,
-            row: rowGap.value
+            cross: crossGap.value,
+            main: mainGap.value
           },
           indexToKey: idxToKey.value,
+          isVertical,
           itemDimensions: itemDimensions.value,
-          numColumns: columns
+          mainGroupSize: mainGroupSize.value,
+          numGroups
         }),
         (props, previousProps) => {
           onChange(
@@ -80,55 +131,30 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
             // Animate layout only if parent container is not resized
             // (e.g. skip animation when the browser window is resized)
             IS_WEB &&
-              (!previousProps?.columnWidth ||
-                props.columnWidth === previousProps.columnWidth)
+              (!previousProps?.mainGroupSize ||
+                props.mainGroupSize === previousProps.mainGroupSize)
           );
         }
       ),
-    [columnWidth, columnGap, rowGap, columns, itemDimensions]
+    [mainGroupSize, mainGap, crossGap, numGroups, isVertical, itemDimensions]
   );
 
   const useGridLayout = useCallback(
     (idxToKey: SharedValue<Array<string>>) =>
       useDerivedValue(() =>
         calculateLayout({
-          columnWidth: columnWidth.value,
           gaps: {
-            column: columnGap.value,
-            row: rowGap.value
+            cross: crossGap.value,
+            main: mainGap.value
           },
           indexToKey: idxToKey.value,
+          isVertical,
           itemDimensions: itemDimensions.value,
-          numColumns: columns
+          mainGroupSize: mainGroupSize.value,
+          numGroups
         })
       ),
-    [columnWidth, columnGap, rowGap, columns, itemDimensions]
-  );
-
-  // TARGET COLUMN WIDTH UPDATER
-  useAnimatedReaction(
-    () => ({
-      gap: columnGap.value,
-      width: measuredContainerWidth.value
-    }),
-    ({ gap, width }) => {
-      if (width === null || width <= 0) {
-        return;
-      }
-      const colWidth = (width + gap) / columns - gap;
-      columnWidth.value = colWidth;
-
-      // DEBUG ONLY
-      if (debugColumnGapRects) {
-        for (let i = 0; i < columns - 1; i++) {
-          debugColumnGapRects[i]?.set({
-            ...DEBUG_COLORS,
-            width: gap,
-            x: colWidth * (i + 1) + gap * i
-          });
-        }
-      }
-    }
+    [mainGroupSize, mainGap, crossGap, numGroups, isVertical, itemDimensions]
   );
 
   // GRID LAYOUT UPDATER
@@ -142,22 +168,25 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     // Update item positions
     itemPositions.value = layout.itemPositions;
     // Update controlled container dimensions
-    applyControlledContainerDimensions(layout.totalDimensions);
+    applyControlledContainerDimensions(layout.calculatedDimensions);
     // Update style overrides
     const currentStyleOverride = itemsStyleOverride.value;
-    if (currentStyleOverride?.width !== columnWidth.value) {
+    const mainDimension = isVertical ? 'width' : 'height';
+    if (currentStyleOverride?.[mainDimension] !== mainGroupSize.value) {
       itemsStyleOverride.value = {
-        width: columnWidth.value
+        [mainDimension]: mainGroupSize.value
       };
     }
 
     // DEBUG ONLY
-    if (debugRowGapRects) {
-      for (let i = 0; i < layout.rowOffsets.length - 1; i++) {
-        debugRowGapRects[i]?.set({
+    if (debugCrossGapRects) {
+      for (let i = 0; i < layout.crossAxisOffsets.length - 1; i++) {
+        const size = crossGap.value;
+        const pos = layout.crossAxisOffsets[i + 1]! - crossGap.value;
+
+        debugCrossGapRects[i]?.set({
           ...DEBUG_COLORS,
-          height: rowGap.value,
-          y: layout.rowOffsets[i + 1]! - rowGap.value
+          ...(isVertical ? { height: size, y: pos } : { width: size, x: pos })
         });
       }
     }
@@ -165,10 +194,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
   return {
     value: {
-      columnGap,
-      columnWidth,
-      numColumns: columns,
-      rowGap,
+      crossGap,
+      isVertical,
+      mainGap,
+      mainGroupSize,
+      numGroups,
       useGridLayout
     }
   };

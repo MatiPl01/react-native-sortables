@@ -15,12 +15,24 @@ export type SortableGridDragEndCallback<I> = (
   params: SortableGridDragEndParams<I>
 ) => void;
 
-export type SortableGridLayoutSettings = {
-  columns: number;
-} & AnimatableProps<{
-  rowGap: number;
-  columnGap: number;
-}>;
+export type SortableGridLayoutSettings = (
+  | {
+      columns: number;
+      rows?: never;
+      rowHeight?: number;
+    }
+  | {
+      rows: number;
+      rowHeight: number;
+      columns?: number;
+    }
+) &
+  Partial<
+    AnimatableProps<{
+      rowGap: number;
+      columnGap: number;
+    }>
+  >;
 
 export type SortableGridRenderItemInfo<I> = {
   item: I;
@@ -51,5 +63,5 @@ export type SortableGridProps<I> = Simplify<
     onDragEnd?: SortableGridDragEndCallback<I>;
     keyExtractor?: (item: I, index: number) => string;
   } & Omit<SharedProps, 'onDragEnd'> &
-    Partial<SortableGridLayoutSettings>
+    SortableGridLayoutSettings
 >;

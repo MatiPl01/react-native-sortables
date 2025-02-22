@@ -13,7 +13,7 @@ import {
   TabView
 } from '@/components';
 import { useBottomNavBarHeight } from '@/contexts';
-import { colors, spacing } from '@/theme';
+import { colors, spacing, style } from '@/theme';
 import { getCategories, IS_WEB } from '@/utils';
 
 const MANY_CATEGORIES = getCategories(IS_WEB ? 30 : 20);
@@ -45,7 +45,10 @@ function ScrollViewExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   return (
-    <Animated.ScrollView ref={scrollableRef} removeClippedSubviews={false}>
+    <Animated.ScrollView
+      contentContainerStyle={IS_WEB && style.webContent}
+      ref={scrollableRef}
+      removeClippedSubviews={false}>
       {/* Sortable.Layer is needed on Old Architecture (Paper) */}
       <Sortable.Layer>
         <Group>
@@ -75,6 +78,7 @@ function FlatListExample() {
   return (
     <AnimatedFlatList
       CellRendererComponent={Sortable.Layer}
+      contentContainerStyle={IS_WEB && style.webContent}
       data={LIST_ITEM_SECTIONS}
       ListHeaderComponentStyle={styles.foreground}
       ref={scrollableRef}
