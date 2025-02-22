@@ -161,7 +161,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   useGridLayoutReaction(indexToKey, (layout, shouldAnimate) => {
     'worklet';
     shouldAnimateLayout.value = shouldAnimate;
-    if (!layout) {
+    if (!layout || mainGroupSize.value === null) {
       return;
     }
 

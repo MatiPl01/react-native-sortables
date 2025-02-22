@@ -34,7 +34,7 @@ export default function ItemDecoration({
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
-    itemsStyleOverride,
+    itemsOverridesStyle,
     prevActiveItemKey
   } = useCommonValuesContext();
 
@@ -88,15 +88,14 @@ export default function ItemDecoration({
             [zeroProgressScale, activeItemScale.value]
           )
         }
-      ],
-      ...itemsStyleOverride.value
+      ]
     };
   });
 
   return (
     <AnimatedOnLayoutView
       {...rest}
-      style={[styles.decoration, animatedStyle]}
+      style={[styles.decoration, animatedStyle, itemsOverridesStyle]}
     />
   );
 }

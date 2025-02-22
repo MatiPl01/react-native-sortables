@@ -17,7 +17,7 @@ export type SortableGridDragEndCallback<I> = (
 
 export type SortableGridLayoutSettings = (
   | {
-      columns: number;
+      columns?: number;
       rows?: never;
       rowHeight?: number;
     }

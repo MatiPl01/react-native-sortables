@@ -3,6 +3,7 @@ import type { View, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedRef,
+  useAnimatedStyle,
   useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
@@ -137,6 +138,10 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
     }
   }, [itemKeys, indexToKey]);
 
+  const itemsOverridesStyle = useAnimatedStyle(() => ({
+    ...itemsStyleOverride.value
+  }));
+
   return {
     value: {
       activationAnimationDuration,
@@ -167,6 +172,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       itemDimensions,
       itemPositions,
       itemsLayoutTransitionMode,
+      itemsOverridesStyle,
       itemsStyleOverride,
       keyToIndex,
       measuredContainerHeight,

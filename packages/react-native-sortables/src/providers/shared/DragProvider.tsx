@@ -329,6 +329,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // Start handling touch after a delay to prevent accidental activation
       // e.g. while scrolling the ScrollView
       activationTimeoutId.value = setAnimatedTimeout(() => {
+        if (!canSwitchToAbsoluteLayout.value) {
+          fail();
+          return;
+        }
         activate();
         handleDragStart(touch, key, activationAnimationProgress, fail);
       }, dragActivationDelay.value);
