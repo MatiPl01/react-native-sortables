@@ -161,7 +161,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   useGridLayoutReaction(indexToKey, (layout, shouldAnimate) => {
     'worklet';
     shouldAnimateLayout.value = shouldAnimate;
-    if (!layout) {
+    if (!layout || mainGroupSize.value === null) {
       return;
     }
 
@@ -174,7 +174,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     const mainDimension = isVertical ? 'width' : 'height';
     if (currentStyleOverride?.[mainDimension] !== mainGroupSize.value) {
       itemsStyleOverride.value = {
-        [mainDimension]: mainGroupSize.value
+        [mainDimension]: mainGroupSize.value + mainGap.value
       };
     }
 

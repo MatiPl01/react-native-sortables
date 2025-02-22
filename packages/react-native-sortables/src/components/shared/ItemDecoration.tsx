@@ -34,7 +34,6 @@ export default function ItemDecoration({
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
-    itemsStyleOverride,
     prevActiveItemKey
   } = useCommonValuesContext();
 
@@ -88,8 +87,7 @@ export default function ItemDecoration({
             [zeroProgressScale, activeItemScale.value]
           )
         }
-      ],
-      ...itemsStyleOverride.value
+      ]
     };
   });
 

@@ -1,6 +1,10 @@
 import type { LayoutChangeEvent, View, ViewStyle } from 'react-native';
 import type { GestureTouchEvent } from 'react-native-gesture-handler';
-import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
+import type {
+  AnimatedRef,
+  AnimatedStyle,
+  SharedValue
+} from 'react-native-reanimated';
 
 import type {
   DebugCrossUpdater,
@@ -64,6 +68,8 @@ export type CommonValuesContextType = {
   shouldAnimateLayout: SharedValue<boolean>; // used only on web
   animateLayoutOnReorderOnly: SharedValue<boolean>;
   customHandle: boolean;
+
+  itemsOverridesStyle: AnimatedStyle<ViewStyle>;
 } & AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &
   AnimatedValues<Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>>;
