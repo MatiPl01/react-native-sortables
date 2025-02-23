@@ -2,6 +2,7 @@ import type { SharedValue } from 'react-native-reanimated';
 
 import type {
   Coordinate,
+  Dimension,
   SortableGridStrategyFactory
 } from '../../../../types';
 import { getAdditionalSwapOffset, useDebugBoundingBox } from '../../../shared';
@@ -35,20 +36,23 @@ export const createGridStrategy =
     let crossContainerSize: SharedValue<null | number>;
     let mainCoordinate: Coordinate;
     let crossCoordinate: Coordinate;
+    let crossDimension: Dimension;
 
     if (isVertical) {
       mainContainerSize = containerWidth;
       crossContainerSize = containerHeight;
       mainCoordinate = 'x';
       crossCoordinate = 'y';
+      crossDimension = 'height';
     } else {
       mainContainerSize = containerHeight;
       crossContainerSize = containerWidth;
       mainCoordinate = 'y';
       crossCoordinate = 'x';
+      crossDimension = 'width';
     }
 
-    return ({ activeIndex, position }) => {
+    return ({ activeIndex, position, dimensions }) => {
       'worklet';
       if (
         !othersLayout.value ||
@@ -58,33 +62,51 @@ export const createGridStrategy =
       ) {
         return;
       }
+
       const { crossAxisOffsets } = othersLayout.value;
       const startCrossIndex = getCrossIndex(activeIndex, numGroups);
       const startMainIndex = getMainIndex(activeIndex, numGroups);
+      const startCrossSize = dimensions[crossDimension];
       let crossIndex = startCrossIndex;
       let mainIndex = startMainIndex;
+
+      const getItemCrossSize = (index: number) =>
+        crossAxisOffsets[index] !== undefined
+          ? crossAxisOffsets[index + 1]! -
+            crossAxisOffsets[index]! -
+            crossGap.value
+          : 0;
 
       // CROSS AXIS BOUNDS
       // Before bound
       let crossBeforeOffset = -Infinity;
       let crossBeforeBound = Infinity;
+      let crossCurrentSize = startCrossSize;
 
       do {
         if (crossBeforeBound !== Infinity) {
           crossIndex--;
         }
         crossBeforeOffset = crossAxisOffsets[crossIndex] ?? 0;
-        const crossBeforeHeight =
-          crossAxisOffsets[crossIndex - 1] !== undefined
-            ? crossBeforeOffset -
-              crossAxisOffsets[crossIndex - 1]! -
-              crossGap.value
+        const swapOffset =
+          crossIndex > 0
+            ? ((crossAxisOffsets[crossIndex - 1] ?? 0) +
+                crossBeforeOffset +
+                crossCurrentSize) /
+              2
             : 0;
-        const additionalBeforeOffset = getAdditionalSwapOffset(
-          crossGap.value,
-          crossBeforeHeight
-        );
-        crossBeforeBound = crossBeforeOffset - additionalBeforeOffset;
+        console.log('bef', swapOffset, '  ', crossCurrentSize);
+        const crossBeforeSize = getItemCrossSize(crossIndex - 1);
+        if (crossBeforeSize) {
+          const additionalBeforeOffset = getAdditionalSwapOffset(
+            crossGap.value,
+            crossBeforeSize
+          );
+          crossBeforeBound = swapOffset - additionalBeforeOffset;
+          crossCurrentSize = crossBeforeSize;
+        } else {
+          crossBeforeBound = 0;
+        }
       } while (
         crossBeforeBound > 0 &&
         position[crossCoordinate] < crossBeforeBound
@@ -93,6 +115,7 @@ export const createGridStrategy =
       // After bound
       let crossAfterOffset = Infinity;
       let crossAfterBound = -Infinity;
+      crossCurrentSize = startCrossSize;
 
       do {
         if (crossAfterBound !== -Infinity) {
@@ -102,18 +125,24 @@ export const createGridStrategy =
         if (!nextCrossAxisOffset) {
           break;
         }
-        crossAfterOffset = nextCrossAxisOffset;
-        const crossAfterHeight =
-          crossAxisOffsets[crossIndex + 2] !== undefined &&
-          crossAfterOffset !== undefined
-            ? crossAfterOffset - crossAfterOffset - crossGap.value
-            : 0;
-        const additionalAfterOffset = getAdditionalSwapOffset(
-          crossGap.value,
-          crossAfterHeight
-        );
-        crossAfterBound =
-          crossAfterOffset - crossGap.value + additionalAfterOffset;
+        crossAfterOffset = nextCrossAxisOffset - crossGap.value;
+        const swapOffset =
+          ((crossAxisOffsets[crossIndex] ?? 0) +
+            nextCrossAxisOffset +
+            crossCurrentSize) /
+          2;
+        console.log('aft', swapOffset, '  ', crossCurrentSize);
+        const crossAfterSize = getItemCrossSize(crossIndex + 1);
+        if (crossAfterSize) {
+          const additionalAfterOffset = getAdditionalSwapOffset(
+            crossGap.value,
+            crossAfterSize
+          );
+          crossAfterBound = swapOffset + additionalAfterOffset;
+          crossCurrentSize = crossAfterSize;
+        } else {
+          crossAfterBound = swapOffset;
+        }
       } while (
         crossAfterBound < crossContainerSize.value &&
         position[crossCoordinate] > crossAfterBound
@@ -162,10 +191,16 @@ export const createGridStrategy =
         if (isVertical) {
           debugBox.top.update(
             { x: mainBeforeBound, y: crossBeforeBound },
-            { x: mainAfterBound, y: crossBeforeOffset }
+            {
+              x: mainAfterBound,
+              y: Math.max(crossBeforeOffset, crossBeforeBound)
+            }
           );
           debugBox.bottom.update(
-            { x: mainBeforeBound, y: crossAfterOffset },
+            {
+              x: mainBeforeBound,
+              y: Math.min(crossAfterOffset, crossAfterBound)
+            },
             { x: mainAfterBound, y: crossAfterBound }
           );
           debugBox.left.update(
@@ -177,22 +212,28 @@ export const createGridStrategy =
             { x: mainAfterBound, y: crossAfterBound }
           );
         } else {
-          // debugBox.top.update(
-          //   { x: crossBeforeBound, y: mainBeforeBound },
-          //   { x: crossAfterBound, y: mainAfterBound }
-          // );
-          // debugBox.bottom.update(
-          //   { x: crossBeforeBound, y: mainAfterBound },
-          //   { x: crossAfterBound, y: mainBeforeBound }
-          // );
-          // debugBox.left.update(
-          //   { x: crossBeforeBound, y: mainBeforeBound },
-          //   { x: crossAfterBound, y: mainAfterBound }
-          // );
-          // debugBox.right.update(
-          //   { x: crossBeforeBound, y: mainAfterBound },
-          //   { x: crossAfterBound, y: mainBeforeBound }
-          // );
+          debugBox.top.update(
+            { x: crossBeforeBound, y: mainBeforeBound },
+            { x: crossAfterBound, y: mainBeforeOffset }
+          );
+          debugBox.bottom.update(
+            { x: crossBeforeBound, y: mainAfterBound },
+            { x: crossAfterBound, y: mainAfterOffset }
+          );
+          debugBox.left.update(
+            { x: crossBeforeBound, y: mainBeforeBound },
+            {
+              x: Math.max(crossBeforeOffset, crossBeforeBound),
+              y: mainAfterBound
+            }
+          );
+          debugBox.right.update(
+            {
+              x: Math.min(crossAfterOffset, crossAfterBound),
+              y: mainAfterBound
+            },
+            { x: crossAfterBound, y: mainBeforeBound }
+          );
         }
       }
 
