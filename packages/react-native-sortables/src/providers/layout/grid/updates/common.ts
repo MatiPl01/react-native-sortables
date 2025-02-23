@@ -52,7 +52,7 @@ export const createGridStrategy =
       crossDimension = 'width';
     }
 
-    return ({ activeIndex, position, dimensions }) => {
+    return ({ activeIndex, dimensions, position }) => {
       'worklet';
       if (
         !othersLayout.value ||
@@ -95,7 +95,6 @@ export const createGridStrategy =
                 crossCurrentSize) /
               2
             : 0;
-        console.log('bef', swapOffset, '  ', crossCurrentSize);
         const crossBeforeSize = getItemCrossSize(crossIndex - 1);
         if (crossBeforeSize) {
           const additionalBeforeOffset = getAdditionalSwapOffset(
@@ -131,7 +130,6 @@ export const createGridStrategy =
             nextCrossAxisOffset +
             crossCurrentSize) /
           2;
-        console.log('aft', swapOffset, '  ', crossCurrentSize);
         const crossAfterSize = getItemCrossSize(crossIndex + 1);
         if (crossAfterSize) {
           const additionalAfterOffset = getAdditionalSwapOffset(

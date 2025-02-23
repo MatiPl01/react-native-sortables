@@ -82,7 +82,6 @@ function HorizontalSameSizeItems() {
           rowHeight={ROW_HEIGHT}
           rows={ROWS}
           scrollableRef={scrollableRef}
-          debug
         />
       </Animated.ScrollView>
     </>
@@ -117,7 +116,6 @@ function HorizontalDifferentSizeItems() {
           rowHeight={ROW_HEIGHT}
           rows={ROWS}
           scrollableRef={scrollableRef}
-          debug
         />
       </Animated.ScrollView>
     </>
