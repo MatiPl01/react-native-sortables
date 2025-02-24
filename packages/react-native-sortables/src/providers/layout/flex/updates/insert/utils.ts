@@ -97,29 +97,30 @@ const getIndexesWhenSwappedToGroupBefore = ({
     );
 
     if (totalGroupBeforeBeforeSize + activeMainSize <= groupSizeLimit) {
-      if (firstInGroupBeforeIndex + 1 >= lastInGroupBeforeIndex) {
-        // If the active item fits in the group before the group before,
-        // and it doesn't fit in the group before the active group,
-        // we want to put it in the 2nd group before the active group.
+      if (firstInGroupBeforeIndex < lastInGroupBeforeIndex) {
+        // If the active item fits in the group before the group before
+        // the active group, we want to put it in the second position of
+        // the group before the active group to prevent it from wrapping
+        // to the group before it (we cannot put it as the first one as
+        // it will be wrapped in this case).
         return {
-          groupIndex: currentGroupIndex - 2,
-          itemIndex: getFirstItemIndex(
-            itemGroups[currentGroupIndex - 2]!,
-            keyToIndex
-          )!,
-          itemIndexInGroup: 0
+          groupIndex: currentGroupIndex - 1,
+          itemIndex: firstInGroupBeforeIndex + 1,
+          itemIndexInGroup: 1
         };
       }
 
-      // If the active item fits in the group before the group before
-      // the active group, we want to put it in the second position of
-      // the group before the active group to prevent it from wrapping
-      // to the group before it (we cannot put it as the first one as
-      // it will be wrapped in this case).
+      // If the active item fits in the group before the group before,
+      // and it doesn't fit in the group before the active group,
+      // we want to put it in the 2nd group before the active group.
       return {
-        groupIndex: currentGroupIndex - 1,
-        itemIndex: firstInGroupBeforeIndex + 1,
-        itemIndexInGroup: 1
+        groupIndex: currentGroupIndex - 2,
+        itemIndex:
+          getFirstItemIndex(
+            itemGroups[currentGroupIndex - 2] ?? [],
+            keyToIndex
+          ) ?? 0,
+        itemIndexInGroup: 0
       };
     }
   }
@@ -188,34 +189,32 @@ const getIndexesWhenSwappedToGroupAfter = ({
   }
   targetItemIndex--;
 
-  if (
-    targetItemIndex <= lastInActiveGroupIndex &&
-    targetItemIndex + 1 < indexToKey.length
-  ) {
-    // If the active item cannot be swapped to the group after the current
-    // group, we want to put it in the 2nd group after the active group.
+  const activeMainSize = itemDimensions[activeItemKey]?.[mainDimension] ?? 0;
+
+  if (totalGroupSize + activeMainSize <= groupSizeLimit) {
+    // If the active item fits at the end of the current group after
+    // being swapped to the group after the active one
+    const firstGroupAfterItemMainSize =
+      itemDimensions[indexToKey[targetItemIndex + 1]!]?.[mainDimension] ?? 0;
+    if (
+      targetItemIndex + 2 < indexToKey.length &&
+      firstGroupAfterItemMainSize + activeMainSize + mainGap <= groupSizeLimit
+    ) {
+      // And if it fits on the 2nd position of the group after the active one,
+      // we place it on the 2nd of that group
+      return {
+        groupIndex: currentGroupIndex + 1,
+        itemIndex: targetItemIndex + 2,
+        itemIndexInGroup: 1
+      };
+    }
+
+    // Otherwise, we place it on the 1st position of the 2nd group after
+    // the active one
     return {
       groupIndex: currentGroupIndex + 2,
       itemIndex: targetItemIndex + 1,
       itemIndexInGroup: 0
-    };
-  }
-
-  const activeMainSize = itemDimensions[activeItemKey]?.[mainDimension] ?? 0;
-
-  if (
-    totalGroupSize + activeMainSize <= groupSizeLimit &&
-    targetItemIndex + 1 > activeItemIndex &&
-    targetItemIndex + 1 < indexToKey.length
-  ) {
-    // If the active item fits in the group at the currentGroupIndex,
-    // we have to put it in the second element of the group after this group
-    // ro prevent it from wrapping back to the current group (we cannot
-    // place it as the first one as it will be wrapped in this case).
-    return {
-      groupIndex: currentGroupIndex + 1,
-      itemIndex: targetItemIndex + 1,
-      itemIndexInGroup: 1
     };
   }
 
