@@ -46,7 +46,6 @@ export default function DropIndicatorExample() {
             DropIndicatorComponent={CustomDropIndicator}
             dropIndicatorStyle={styles.dropIndicatorStyle}
             inactiveItemOpacity={1}
-            debug
             rowGap={spacing.xs}
             showDropIndicator>
             {DATA.map(item => (
