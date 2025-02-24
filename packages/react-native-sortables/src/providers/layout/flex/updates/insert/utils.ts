@@ -58,11 +58,9 @@ export const getTotalGroupSize = (
 };
 
 const getIndexesWhenSwappedToGroupBefore = ({
-  activeItemIndex,
   activeItemKey,
   currentGroupIndex,
   groupSizeLimit,
-  indexToKey,
   itemDimensions,
   itemGroups,
   keyToIndex,
@@ -75,11 +73,11 @@ const getIndexesWhenSwappedToGroupBefore = ({
   }
 
   const firstInGroupBeforeIndex = getFirstItemIndex(
-    itemGroups[currentGroupIndex]!,
+    itemGroups[currentGroupIndex - 1]!,
     keyToIndex
   );
   const lastInGroupBeforeIndex = getLastItemIndex(
-    itemGroups[currentGroupIndex]!,
+    itemGroups[currentGroupIndex - 1]!,
     keyToIndex
   );
   if (firstInGroupBeforeIndex === null || lastInGroupBeforeIndex === null) {
@@ -99,25 +97,38 @@ const getIndexesWhenSwappedToGroupBefore = ({
     );
 
     if (totalGroupBeforeBeforeSize + activeMainSize <= groupSizeLimit) {
-      if (
-        firstInGroupBeforeIndex + 1 < activeItemIndex &&
-        firstInGroupBeforeIndex + 1 < lastInGroupBeforeIndex
-      ) {
-        // If the active item fits in the group before the group before
-        // the active group, we want to put it in the second position of
-        // the group before the active group to prevent it from wrapping
-        // to the group before it (we cannot put it as the first one as
-        // it will be wrapped in this case).
+      if (firstInGroupBeforeIndex + 1 >= lastInGroupBeforeIndex) {
+        // If the active item fits in the group before the group before,
+        // and it doesn't fit in the group before the active group,
+        // we want to put it in the 2nd group before the active group.
         return {
-          groupIndex: currentGroupIndex - 1,
-          itemIndex: firstInGroupBeforeIndex + 1,
-          itemIndexInGroup: 1
+          groupIndex: currentGroupIndex - 2,
+          itemIndex: getFirstItemIndex(
+            itemGroups[currentGroupIndex - 2]!,
+            keyToIndex
+          )!,
+          itemIndexInGroup: 0
         };
       }
+
+      // If the active item fits in the group before the group before
+      // the active group, we want to put it in the second position of
+      // the group before the active group to prevent it from wrapping
+      // to the group before it (we cannot put it as the first one as
+      // it will be wrapped in this case).
+      return {
+        groupIndex: currentGroupIndex - 1,
+        itemIndex: firstInGroupBeforeIndex + 1,
+        itemIndexInGroup: 1
+      };
     }
   }
 
-  return null;
+  return {
+    groupIndex: currentGroupIndex - 1,
+    itemIndex: firstInGroupBeforeIndex,
+    itemIndexInGroup: 0
+  };
 };
 
 const getIndexesWhenSwappedToGroupAfter = ({
@@ -176,8 +187,6 @@ const getIndexesWhenSwappedToGroupAfter = ({
     totalGroupSize += itemMainSize + mainGap;
   }
   targetItemIndex--;
-
-  console.log('<>', targetItemIndex, lastInActiveGroupIndex, indexToKey.length);
 
   if (
     targetItemIndex <= lastInActiveGroupIndex &&

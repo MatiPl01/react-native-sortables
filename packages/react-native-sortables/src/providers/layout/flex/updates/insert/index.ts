@@ -134,7 +134,6 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       indexToKey: indexToKey.value,
       itemDimensions: itemDimensions.value,
       itemGroups: currentLayout.itemGroups,
-      keyToGroup: keyToGroup.value,
       keyToIndex: keyToIndex.value,
       mainDimension,
       mainGap: mainGap.value
