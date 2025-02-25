@@ -48,18 +48,27 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     return isReverse ? a > b : a < b;
   };
 
-  let mainCoordinate: Coordinate = 'x';
-  let crossCoordinate: Coordinate = 'y';
-  let mainDimension: Dimension = 'width';
-  let mainGap: SharedValue<number> = columnGap;
-  let crossGap: SharedValue<number> = rowGap;
+  let mainCoordinate: Coordinate;
+  let crossCoordinate: Coordinate;
+  let mainDimension: Dimension;
+  let crossDimension: Dimension;
+  let mainGap: SharedValue<number>;
+  let crossGap: SharedValue<number>;
 
   if (isColumn) {
     mainCoordinate = 'y';
     crossCoordinate = 'x';
     mainDimension = 'height';
+    crossDimension = 'width';
     mainGap = rowGap;
     crossGap = columnGap;
+  } else {
+    mainCoordinate = 'x';
+    crossCoordinate = 'y';
+    mainDimension = 'width';
+    crossDimension = 'height';
+    mainGap = columnGap;
+    crossGap = rowGap;
   }
 
   const swappedBeforeIndexes = useSharedValue<ItemGroupSwapResult | null>(null);
@@ -152,7 +161,15 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     let swapGroupBeforeBound = Infinity;
 
     do {
+      if (!beforeIndexes) {
+        break;
+      }
+
       if (swapGroupBeforeBound !== Infinity) {
+        groupIndex = beforeIndexes.groupIndex;
+        firstGroupItemIndex = beforeIndexes.itemIndex;
+        itemIndexInGroup = beforeIndexes.itemIndexInGroup;
+
         if (beforeLayout) currentLayout = beforeLayout;
         beforeIndexes = getSwappedToGroupBeforeIndices({
           ...sharedSwapProps,
@@ -163,11 +180,6 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
         swappedBeforeLayout.value = calculateFlexLayout(
           beforeIndexes.indexToKey
         );
-        groupIndex = beforeIndexes.groupIndex;
-        firstGroupItemIndex = beforeIndexes.itemIndex;
-        itemIndexInGroup = beforeIndexes.itemIndexInGroup;
-      } else if (!beforeIndexes) {
-        break;
       }
 
       beforeLayout = swappedBeforeLayout.value;
@@ -202,7 +214,17 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     let swapGroupAfterBound = -Infinity;
 
     do {
+      if (!afterIndexes) {
+        break;
+      }
+
       if (swapGroupAfterBound !== -Infinity) {
+        swappedAfterGroupsCount =
+          swappedAfterLayout.value?.itemGroups.length ?? 0;
+        groupIndex = afterIndexes.groupIndex;
+        firstGroupItemIndex = afterIndexes.itemIndex;
+        itemIndexInGroup = afterIndexes.itemIndexInGroup;
+
         if (afterLayout) currentLayout = afterLayout;
         afterIndexes = getSwappedToGroupAfterIndices({
           ...sharedSwapProps,
@@ -211,13 +233,6 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
         });
         if (!afterIndexes) break;
         swappedAfterLayout.value = calculateFlexLayout(afterIndexes.indexToKey);
-        swappedAfterGroupsCount =
-          swappedAfterLayout.value?.itemGroups.length ?? 0;
-        groupIndex = afterIndexes.groupIndex;
-        firstGroupItemIndex = afterIndexes.itemIndex;
-        itemIndexInGroup = afterIndexes.itemIndexInGroup;
-      } else if (!afterIndexes) {
-        break;
       }
 
       afterLayout = swappedAfterLayout.value;
@@ -226,11 +241,17 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       swapGroupAfterOffset =
         currentGroupBeforeOffset +
         (currentLayout.crossAxisGroupSizes[groupIndex] ?? 0);
-      const swappedAfterOffset =
-        (afterLayout?.crossAxisGroupOffsets[afterIndexes.groupIndex] ?? 0) +
-        (afterLayout?.crossAxisGroupSizes[afterIndexes.groupIndex] ?? 0);
-      const swapOffset = swappedAfterOffset
-        ? (currentGroupBeforeOffset + swappedAfterOffset) / 2
+      const afterSwapGroupBeforeOffset =
+        afterLayout?.crossAxisGroupOffsets[afterIndexes.groupIndex] ?? 0;
+      const afterSwapGroupSize = Math.max(
+        afterLayout?.crossAxisGroupSizes?.[afterIndexes.groupIndex] ?? 0,
+        activeItemDimensions[crossDimension]
+      );
+      const swapOffset = afterSwapGroupBeforeOffset
+        ? (currentGroupBeforeOffset +
+            afterSwapGroupBeforeOffset +
+            afterSwapGroupSize) /
+          2
         : swapGroupAfterOffset;
       const additionalSwapOffset = getAdditionalSwapOffset(
         crossGap.value,

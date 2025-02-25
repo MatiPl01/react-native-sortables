@@ -182,7 +182,6 @@ const getIndexesWhenSwappedToGroupAfter = ({
 
     targetItemIndex++;
   }
-  targetItemIndex--;
 
   if (targetItemIndex > lastInActiveGroupIndex) {
     const activeMainSize = itemDimensions[activeItemKey]?.[mainDimension] ?? 0;
