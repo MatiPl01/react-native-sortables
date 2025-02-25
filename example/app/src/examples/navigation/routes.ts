@@ -115,6 +115,15 @@ const routes: Routes = {
             name: 'Debug'
           }
         }
+      },
+      Tests: {
+        name: 'Test examples',
+        routes: {
+          ComplexLayout: {
+            Component: SortableFlex.tests.ComplexLayoutExample,
+            name: 'Complex Layout'
+          }
+        }
       }
     }
   }
