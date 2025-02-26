@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.3.0...v1.3.1) (2025-02-26)
+
+
+### Bug Fixes
+
+* Invalid fromIndex in onDragEnd callback ([#284](https://github.com/MatiPl01/react-native-sortables/issues/284)) ([8ac4ea3](https://github.com/MatiPl01/react-native-sortables/commit/8ac4ea337ae5fad53594a72a9adc2603b4ffd2e2))
+
 # [1.3.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.2.1...v1.3.0) (2025-02-26)
 
 
