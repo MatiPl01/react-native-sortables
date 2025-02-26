@@ -37,7 +37,7 @@ export const DEFAULT_SHARED_PROPS = {
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
   customHandle: false,
-  debug: true,
+  debug: false,
   dragActivationDelay: 200,
   dragActivationFailOffset: 5,
   dropAnimationDuration: 300,
