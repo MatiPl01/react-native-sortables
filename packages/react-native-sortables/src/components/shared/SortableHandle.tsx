@@ -31,7 +31,11 @@ export function SortableHandle({
   const { activationAnimationProgress, itemKey } = useItemContext();
 
   const viewRef = useAnimatedRef<View>();
-  const gesture = useItemPanGesture(itemKey, activationAnimationProgress);
+  const gesture = useItemPanGesture(
+    itemKey,
+    activationAnimationProgress,
+    viewRef
+  );
 
   const measureHandle = useCallback(() => {
     'worklet';
