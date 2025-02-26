@@ -413,7 +413,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const handleDragEnd = useCallback(
     (key: string, activationAnimationProgress: SharedValue<number>) => {
       'worklet';
-      dragStartIndex.value = -1;
       touchStartTouch.value = null;
       dragStartTouch.value = null;
       dragStartItemTouchOffset.value = null;
@@ -443,6 +442,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const animate = (callback?: (finished: boolean | undefined) => void) =>
         withTiming(0, { duration: dropAnimationDuration.value }, callback);
 
+      dragStartIndex.value = -1;
       activationAnimationProgress.value = animate();
       inactiveAnimationProgress.value = animate();
 
