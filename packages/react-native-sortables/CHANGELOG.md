@@ -1,3 +1,20 @@
+# [1.3.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.2.1...v1.3.0) (2025-02-26)
+
+
+### Bug Fixes
+
+* Incorrect touch position measurement in modals ([#282](https://github.com/MatiPl01/react-native-sortables/issues/282)) ([c67ee84](https://github.com/MatiPl01/react-native-sortables/commit/c67ee84725ba6a8e96b60ae07e875d196d479484))
+* Quick fix for added item flickering ([#275](https://github.com/MatiPl01/react-native-sortables/issues/275)) ([286cac2](https://github.com/MatiPl01/react-native-sortables/commit/286cac2ebf9f0e0c34a13316eda915598a4831ba))
+* Some flex reordering issues ([#224](https://github.com/MatiPl01/react-native-sortables/issues/224)) ([54ac234](https://github.com/MatiPl01/react-native-sortables/commit/54ac23408fe561c23020d38ff549fc7161c51f9c))
+
+
+### Features
+
+* Add horizontal direction support to the Sortable Grid ([#277](https://github.com/MatiPl01/react-native-sortables/issues/277)) ([8706955](https://github.com/MatiPl01/react-native-sortables/commit/8706955254962951aa49e9aed75950b94c2552f3))
+* Container overflow customization ([#278](https://github.com/MatiPl01/react-native-sortables/issues/278)) ([fb6de0f](https://github.com/MatiPl01/react-native-sortables/commit/fb6de0fe63fd369282d4e7c7173e9d1236fe93e0))
+* Customizable reorder trigger origin ([#274](https://github.com/MatiPl01/react-native-sortables/issues/274)) ([21a23ce](https://github.com/MatiPl01/react-native-sortables/commit/21a23ce4cf3246bee5710e15263f48cb9e866a31))
+* Implement better grid reordering ([#280](https://github.com/MatiPl01/react-native-sortables/issues/280)) ([c7e5daf](https://github.com/MatiPl01/react-native-sortables/commit/c7e5dafaec90bd85ddf38741ba239aaab282b91a))
+
 ## [1.2.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.2.0...v1.2.1) (2025-02-19)
 
 
