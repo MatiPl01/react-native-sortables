@@ -1,4 +1,5 @@
 import { type PropsWithChildren, useCallback } from 'react';
+import type { View } from 'react-native';
 import type {
   GestureTouchEvent,
   TouchData
@@ -31,7 +32,6 @@ import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
-import { View } from 'react-native';
 
 type DragProviderProps = PropsWithChildren<
   {

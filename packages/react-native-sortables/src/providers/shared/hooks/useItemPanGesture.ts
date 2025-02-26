@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
+import type { View } from 'react-native';
 import { Gesture } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
 import { useDragContext } from '../DragProvider';
-import { View } from 'react-native';
 
 export default function useItemPanGesture(
   key: string,
