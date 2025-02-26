@@ -3,7 +3,7 @@ import type {
   GestureTouchEvent,
   TouchData
 } from 'react-native-gesture-handler';
-import type { SharedValue } from 'react-native-reanimated';
+import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 import {
   clamp,
   interpolate,
@@ -31,6 +31,7 @@ import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
+import { View } from 'react-native';
 
 type DragProviderProps = PropsWithChildren<
   {
@@ -197,33 +198,36 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       touch: TouchData,
       key: string,
       activationAnimationProgress: SharedValue<number>,
-      fail: () => void
+      fail: () => void,
+      handleRef?: AnimatedRef<View>
     ) => {
       'worklet';
-      const containerMeasurements = measure(containerRef);
       const itemPosition = itemPositions.value[key];
       const dimensions = itemDimensions.value[key];
 
-      if (!containerMeasurements || !itemPosition || !dimensions) {
+      if (!itemPosition || !dimensions) {
         fail();
         return;
       }
 
-      const touchX = touch.absoluteX - containerMeasurements.pageX;
-      const touchY = touch.absoluteY - containerMeasurements.pageY;
+      let handlePosition = itemPosition;
 
-      // Validate the touch position (must be within the item's bounds)
-      // (we need this because measure returns wrong position on Fabric
-      // when the container was scrolled a while before the drag activation)
-      if (
-        touchX < itemPosition.x ||
-        touchX > itemPosition.x + dimensions.width ||
-        touchY < itemPosition.y ||
-        touchY > itemPosition.y + dimensions.height
-      ) {
-        fail();
-        return;
+      if (handleRef) {
+        const handleMeasurements = measure(handleRef);
+        const containerMeasurements = measure(containerRef);
+        if (!handleMeasurements || !containerMeasurements) {
+          fail();
+          return;
+        }
+
+        handlePosition = {
+          x: handleMeasurements.pageX - containerMeasurements.pageX,
+          y: handleMeasurements.pageY - containerMeasurements.pageY
+        };
       }
+
+      const touchX = handlePosition.x + touch.x;
+      const touchY = handlePosition.y + touch.y;
 
       dragStartTouch.value = touch;
       touchPosition.value = { x: touchX, y: touchY };
@@ -300,7 +304,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       key: string,
       activationAnimationProgress: SharedValue<number>,
       activate: () => void,
-      fail: () => void
+      fail: () => void,
+      handleRef: AnimatedRef<View> | undefined
     ) => {
       'worklet';
       const touch = e.allTouches[0];
@@ -334,7 +339,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           return;
         }
         activate();
-        handleDragStart(touch, key, activationAnimationProgress, fail);
+        handleDragStart(
+          touch,
+          key,
+          activationAnimationProgress,
+          fail,
+          handleRef
+        );
       }, dragActivationDelay.value);
     },
     [

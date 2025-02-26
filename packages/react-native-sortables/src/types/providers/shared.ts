@@ -100,7 +100,8 @@ export type DragContextType = {
     key: string,
     activationAnimationProgress: SharedValue<number>,
     activate: () => void,
-    fail: () => void
+    fail: () => void,
+    handleRef: AnimatedRef<View> | undefined
   ) => void;
   handleTouchesMove: (e: GestureTouchEvent, fail: () => void) => void;
   handleDragEnd: (

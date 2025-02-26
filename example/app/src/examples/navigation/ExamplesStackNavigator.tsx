@@ -63,7 +63,8 @@ function createStackNavigator(routes: Routes): React.ComponentType {
           <StackNavigator.Navigator
             screenOptions={{
               headerLeft: () => <BackButton />,
-              headerTitleAlign: 'center'
+              headerTitleAlign: 'center',
+              presentation: 'modal'
             }}>
             {createNavigationScreens(routes, 'Examples', ['Examples'])}
           </StackNavigator.Navigator>
