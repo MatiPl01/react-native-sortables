@@ -1,5 +1,5 @@
 diff --git a/package.json b/package.json
-index 14325c8aa9dbca41c5bb35f4e5b5322bf2d4da7e..68b9cf3629c4334d9de41d1a2cc9ccf8062a3ac7 100644
+index 0ca6e73a4ff68b4a36431ff81c92f3a2556b622b..7969dd1d42881e7e91a20b6248cdb7a6ae9455e8 100644
 --- a/package.json
 +++ b/package.json
 @@ -26,6 +26,7 @@
@@ -11,7 +11,7 @@ index 14325c8aa9dbca41c5bb35f4e5b5322bf2d4da7e..68b9cf3629c4334d9de41d1a2cc9ccf8
    "scripts": {
      "up": "bundle install && yarn fixture:rn:up && yarn e2e:up && yarn build",
 diff --git a/src/FlashList.tsx b/src/FlashList.tsx
-index fa851f0db2bcc7eac4b8be3fbca84db12144511d..bb75a36e882b8451275f3f244ac411280df0ffac 100644
+index 0e9f071a53d113e85f3099ccf239d1f3d06361b6..0d8da0f444a5cc291621732369e71e0b693b4ff3 100644
 --- a/src/FlashList.tsx
 +++ b/src/FlashList.tsx
 @@ -4,6 +4,7 @@ import {
@@ -22,13 +22,13 @@ index fa851f0db2bcc7eac4b8be3fbca84db12144511d..bb75a36e882b8451275f3f244ac41128
    StyleSheet,
    NativeScrollEvent,
  } from "react-native";
-@@ -840,6 +841,12 @@ class FlashList<T> extends React.PureComponent<
+@@ -842,6 +843,12 @@ class FlashList<T> extends React.PureComponent<
      return this.rlvRef?.getScrollableNode?.() || null;
    }
  
 +  public getNativeScrollRef(): React.ElementRef<
-+    typeof ScrollViewComponent
-+  > | null {
++    typeof ScrollViewComponent | null
++  > {
 +    return this.rlvRef?.getNativeScrollRef?.() || null;
 +  }
 +
