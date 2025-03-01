@@ -187,18 +187,18 @@ export default function Example() {
 }
 
 function DropIndicator({
-  activationProgress,
+  activeAnimationProgress,
+  activeItemKey,
   dropIndex,
   orderedItemKeys,
-  style,
-  touchedItemKey
+  style
 }: DropIndicatorComponentProps) {
   const itemsCount = useDerivedValue(() => orderedItemKeys.value.length);
   const indexes = useDerivedValue(() =>
     Array.from({ length: itemsCount.value }, (_, i) => i)
   );
   const colors = useDerivedValue(() =>
-    Array.from({ length: itemsCount.value }, (_, i) => {
+    new Array(itemsCount.value).fill(null).map((_, i) => {
       const hue = (360 / itemsCount.value) * i;
       return `hsl(${hue}, 100%, 50%)`;
     })
@@ -207,7 +207,7 @@ function DropIndicator({
   const scale = useSharedValue(0);
   const colorIndex = useSharedValue(0);
   const showIndicator = useDerivedValue(
-    () => activationProgress.value > 0.2 && touchedItemKey.value !== null
+    () => activeAnimationProgress.value > 0.2 && activeItemKey.value !== null
   );
 
   useAnimatedReaction(
