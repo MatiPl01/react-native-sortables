@@ -1,9 +1,9 @@
-import { forwardRef } from 'react';
 import type { View, ViewProps } from 'react-native';
 import type { AnimatedProps } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
 
 import { IS_WEB } from '../../constants';
+import { componentWithRef } from '../../utils/react';
 
 /**
  * We have to use a custom view if we want to properly handle view layout
@@ -11,7 +11,7 @@ import { IS_WEB } from '../../constants';
  * (onLayout is called with 0 dimensions for views which have display: none,
  * so it gets called on navigation between screens)
  */
-const AnimatedViewWeb = forwardRef<
+const AnimatedViewWeb = componentWithRef<
   View,
   {
     onLayout: NonNullable<ViewProps['onLayout']>;
