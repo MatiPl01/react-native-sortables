@@ -14,6 +14,10 @@ const DEBUG_COLORS = {
 const DEBUG_RECT_KEYS = ['bottom', 'left', 'right', 'top'];
 
 export default function useLayoutDebugRects() {
+  if (!__DEV__) {
+    return undefined;
+  }
+
   const { activeItemKey } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
@@ -44,5 +48,5 @@ export default function useLayoutDebugRects() {
     }
   );
 
-  return debugRects ? { updateDebugRect } : {};
+  return debugRects ? { updateDebugRect } : undefined;
 }

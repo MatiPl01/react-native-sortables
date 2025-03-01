@@ -15,7 +15,8 @@
     "typescript": "^5.8.2"
   },
   "installConfig": {
-    "hoistingLimits": "workspaces"
+    "hoistingLimits": "workspaces",
+    "selfReferences": false
   },
   "main": "index.ts",
   "private": true,

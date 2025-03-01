@@ -5,6 +5,9 @@
     "react-native": "0.78.0",
     "react-native-sortables": "workspace:*"
   },
+  "installConfig": {
+    "selfReferences": false
+  },
   "private": true,
   "scripts": {
     "android": "react-native run-android",
