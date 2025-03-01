@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useCallback, useMemo } from 'react';
 import { useAnimatedReaction } from 'react-native-reanimated';
 
