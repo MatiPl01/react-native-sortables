@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import type {
   CommonValuesContextType,
   DebugProviderContextType,
@@ -41,7 +43,7 @@ export type SortableGridRenderItemInfo<I> = {
 
 export type SortableGridRenderItem<I> = (
   info: SortableGridRenderItemInfo<I>
-) => JSX.Element;
+) => ReactNode;
 
 export type SortableGridStrategyFactory = (
   props: Simplify<
