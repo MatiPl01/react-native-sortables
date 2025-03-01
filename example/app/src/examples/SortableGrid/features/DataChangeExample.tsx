@@ -11,8 +11,9 @@ import {
   Section,
   Stagger
 } from '@/components';
+import { IS_WEB } from '@/constants';
 import { colors, flex, spacing, text } from '@/theme';
-import { getItems, IS_WEB } from '@/utils';
+import { getItems } from '@/utils';
 
 const AVAILABLE_DATA = getItems(18);
 const COLUMNS = 4;

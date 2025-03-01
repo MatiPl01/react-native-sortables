@@ -21,8 +21,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { IS_ANDROID } from '@/constants';
 import { radius, spacing } from '@/theme';
-import { IS_ANDROID } from '@/utils';
 
 const filterPaddingAndMarginProps = (
   style: ViewStyle

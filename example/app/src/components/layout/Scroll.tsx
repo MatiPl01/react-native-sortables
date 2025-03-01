@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import type { ScrollViewProps } from 'react-native';
 import { ScrollView, StyleSheet } from 'react-native';
 
+import { IS_WEB } from '@/constants';
 import { useBottomNavBarHeight } from '@/contexts';
 import { flex, spacing, style } from '@/theme';
-import { IS_WEB } from '@/utils';
 
 import Spacer from './Spacer';
 

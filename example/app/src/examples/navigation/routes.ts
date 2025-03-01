@@ -1,8 +1,8 @@
 /* eslint-disable perfectionist/sort-objects */
 import { SortableFlexCard, SortableGridCard } from '@/components';
+import { IS_WEB } from '@/constants';
 import * as SortableFlex from '@/examples/SortableFlex';
 import * as SortableGrid from '@/examples/SortableGrid';
-import { IS_WEB } from '@/utils';
 
 import type { Routes } from './types';
 

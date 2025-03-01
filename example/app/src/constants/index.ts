@@ -1,1 +1,2 @@
-export const MAX_CONTENT_WIDTH = 600;
+export * from './platform';
+export * from './values';

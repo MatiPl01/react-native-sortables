@@ -8,9 +8,9 @@ import { Pressable } from 'react-native-gesture-handler';
 import { useSharedValue } from 'react-native-reanimated';
 
 import { RouteCard, ScrollScreen, Stagger } from '@/components';
+import { IS_REACT_19, IS_WEB } from '@/constants';
 import { BottomNavBarContext } from '@/contexts';
 import { colors, iconSizes, radius, spacing, text } from '@/theme';
-import { IS_WEB } from '@/utils';
 
 import BottomNavBar from './BottomNavBar';
 import exampleRoutes from './routes';
@@ -57,8 +57,12 @@ function createStackNavigator(routes: Routes): React.ComponentType {
   return function Navigator() {
     const height = useSharedValue(0);
 
+    const Provider = IS_REACT_19
+      ? BottomNavBarContext
+      : BottomNavBarContext.Provider;
+
     return (
-      <BottomNavBarContext.Provider value={{ height }}>
+      <Provider value={{ height }}>
         <View style={styles.container}>
           <StackNavigator.Navigator
             screenOptions={{
@@ -69,7 +73,7 @@ function createStackNavigator(routes: Routes): React.ComponentType {
           </StackNavigator.Navigator>
           <BottomNavBar homeRouteName='Examples' routes={routes} />
         </View>
-      </BottomNavBarContext.Provider>
+      </Provider>
     );
   };
 }

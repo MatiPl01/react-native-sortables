@@ -13,9 +13,10 @@ import {
   Spacer,
   TabView
 } from '@/components';
+import { IS_WEB } from '@/constants';
 import { useBottomNavBarHeight } from '@/contexts';
 import { colors, spacing, style } from '@/theme';
-import { getItems, IS_WEB } from '@/utils';
+import { getItems } from '@/utils';
 
 const MANY_ITEMS = getItems(21);
 const FEW_ITEMS = getItems(6);

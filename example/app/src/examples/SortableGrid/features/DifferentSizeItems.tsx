@@ -12,8 +12,9 @@ import {
   Screen,
   Stagger
 } from '@/components';
+import { IS_WEB } from '@/constants';
 import { colors, flex, sizes, spacing } from '@/theme';
-import { getItems, IS_WEB } from '@/utils';
+import { getItems } from '@/utils';
 
 const DATA = getItems(16);
 const COLUMNS = 4;

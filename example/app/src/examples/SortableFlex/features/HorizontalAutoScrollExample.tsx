@@ -3,10 +3,9 @@ import Animated, { useAnimatedRef } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 
 import { FlexCell, ScrollScreen, Section } from '@/components';
-import { MAX_CONTENT_WIDTH } from '@/constants';
-import { getCategories, IS_WEB } from '@/utils';
-
-import { spacing } from '../../../theme/spacing';
+import { IS_WEB, MAX_CONTENT_WIDTH } from '@/constants';
+import { spacing } from '@/theme';
+import { getCategories } from '@/utils';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const MANY_CATEGORIES_FLEX_WIDTH =

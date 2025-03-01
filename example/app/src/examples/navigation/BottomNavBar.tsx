@@ -12,9 +12,9 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SelectListDropdown } from '@/components';
+import { IS_WEB } from '@/constants';
 import { useBottomNavBarHeight } from '@/contexts';
 import { colors, radius, sizes, spacing, text } from '@/theme';
-import { IS_WEB } from '@/utils';
 
 import type { Routes } from './types';
 

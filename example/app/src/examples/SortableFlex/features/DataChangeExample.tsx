@@ -11,8 +11,9 @@ import {
   Section,
   Stagger
 } from '@/components';
+import { IS_WEB } from '@/constants';
 import { colors, flex, spacing } from '@/theme';
-import { getCategories, IS_WEB } from '@/utils';
+import { getCategories } from '@/utils';
 
 const AVAILABLE_DATA = getCategories(IS_WEB ? 30 : 15);
 
