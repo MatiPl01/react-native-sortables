@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useCallback, useMemo } from 'react';
 import { useAnimatedReaction } from 'react-native-reanimated';
 
@@ -24,6 +25,10 @@ type DebugBox = {
 >;
 
 export default function useDebugBoundingBox(): DebugBox | undefined {
+  if (!__DEV__) {
+    return undefined;
+  }
+
   const { activeItemKey } = useCommonValuesContext();
   const debugContext = useDebugContext();
 

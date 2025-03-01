@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
@@ -60,14 +61,16 @@ export default function SharedProvider({
   scrollableRef,
   ...rest
 }: SharedProviderProps) {
-  useWarnOnPropChange('debug', debug);
-  useWarnOnPropChange('scrollableRef', scrollableRef);
+  if (__DEV__) {
+    useWarnOnPropChange('debug', debug);
+    useWarnOnPropChange('scrollableRef', scrollableRef);
+  }
 
   const providers = [
     // Provider used for proper zIndex management
     <LayerProvider />,
-    // Provider used for layout debugging
-    debug && <DebugProvider />,
+    // Provider used for layout debugging (can be used only in dev mode)
+    __DEV__ && debug && <DebugProvider />,
     // Provider used for shared values between all providers below
     <CommonValuesProvider itemKeys={itemKeys} {...rest} />,
     // Provider used for measurements of items and the container
