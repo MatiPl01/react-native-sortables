@@ -3677,7 +3677,7 @@ __metadata:
 
 "@shopify/flash-list@patch:@shopify/flash-list@npm%3A1.7.3#~/.yarn/patches/@shopify-flash-list-npm-1.7.3-7375409ff4.patch":
   version: 1.7.3
-  resolution: "@shopify/flash-list@patch:@shopify/flash-list@npm%3A1.7.3#~/.yarn/patches/@shopify-flash-list-npm-1.7.3-7375409ff4.patch::version=1.7.3&hash=3af439"
+  resolution: "@shopify/flash-list@patch:@shopify/flash-list@npm%3A1.7.3#~/.yarn/patches/@shopify-flash-list-npm-1.7.3-7375409ff4.patch::version=1.7.3&hash=cd94de"
   dependencies:
     recyclerlistview: "npm:4.2.1"
     tslib: "npm:2.8.1"
@@ -3685,7 +3685,7 @@ __metadata:
     "@babel/runtime": "*"
     react: "*"
     react-native: "*"
-  checksum: 10c0/2fba3b6167a714288e25c96d1966188350ff026200a82874619f1e39b5a78dabc85148a2bf3d72a7e13ae0450a6af77154979647d5998b6a3d65b21700d86293
+  checksum: 10c0/1d85058be49d417390698f3afd9c944df0318652b4439defbd5846999ce348f2f4d8c3d134e6fbd2f95e172712140403640bf2b34e9e65ed136c71d34fe5b760
   languageName: node
   linkType: hard
 

@@ -27,8 +27,8 @@ index 0e9f071a53d113e85f3099ccf239d1f3d06361b6..0d8da0f444a5cc291621732369e71e0b
    }
  
 +  public getNativeScrollRef(): React.ElementRef<
-+    typeof ScrollViewComponent | null
-+  > {
++    typeof ScrollViewComponent
++  > | null {
 +    return this.rlvRef?.getNativeScrollRef?.() || null;
 +  }
 +
