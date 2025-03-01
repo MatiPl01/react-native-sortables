@@ -1,5 +1,5 @@
 import { Portal } from '@gorhom/portal';
-import type { PropsWithChildren, ReactNode } from 'react';
+import type { JSX, PropsWithChildren, ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import {
@@ -38,7 +38,8 @@ const filterPaddingAndMarginProps = (
   for (const key in style) {
     const k = key as keyof ViewStyle;
     if (key.startsWith('padding') || key.startsWith('margin')) {
-      paddingAndMargin[k] = style[k] as undefined;
+      // @ts-expect-error This is fine
+      paddingAndMargin[k] = style[k];
     } else {
       rest[k] = style[k] as undefined;
     }

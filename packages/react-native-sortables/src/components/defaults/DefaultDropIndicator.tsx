@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Animated, {
   interpolate,
   useAnimatedStyle
@@ -8,7 +9,7 @@ import type { DropIndicatorComponentProps } from '../../types';
 export default function DefaultDropIndicator({
   activeAnimationProgress,
   style
-}: DropIndicatorComponentProps): JSX.Element {
+}: DropIndicatorComponentProps): ReactNode {
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: style.opacity ?? activeAnimationProgress.value,
     transform: style.transform ?? [

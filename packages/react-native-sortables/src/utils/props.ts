@@ -60,7 +60,8 @@ export const getPropsWithDefaults = <
       // Only override defaultStyle with defined values from propsStyle
       Object.entries(propsStyle).forEach(([key, value]) => {
         if (value !== undefined) {
-          style[key as keyof ViewStyle] = value;
+          // @ts-expect-error This is fine
+          style[key] = value;
         }
       });
 

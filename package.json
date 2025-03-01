@@ -13,7 +13,7 @@
     "syncpack": "^12.3.3",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
-    "typescript": "5.3.3"
+    "typescript": "^5.8.2"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -47,6 +47,7 @@
     "lint": "yarn workspaces foreach -A -p run lint",
     "lint:all": "yarn lint && yarn lint:docs",
     "lint:docs": "cd packages/docs && yarn lint && cd ../..",
+    "pod": "yarn workspaces foreach -A -p run pod",
     "postinstall": "yarn husky:install",
     "prepare": "husky",
     "test": "yarn lib test && yarn example:app test",

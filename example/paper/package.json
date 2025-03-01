@@ -2,7 +2,7 @@
   "name": "example-paper",
   "version": "1.0.0",
   "dependencies": {
-    "react-native": "0.76.5",
+    "react-native": "0.78.0",
     "react-native-sortables": "workspace:*"
   },
   "private": true,
@@ -11,7 +11,7 @@
     "ios": "react-native run-ios",
     "pod": "cd ios && bundle install && bundle exec pod install && rm -f .xcode.env.local && cd ..",
     "postinstall": "yarn watchman:clear",
-    "start": "react-native start",
+    "start": "react-native start --reset-cache --client-logs",
     "watchman:clear": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all || echo 'Watchman not found, skipping...'"
   }
 }
