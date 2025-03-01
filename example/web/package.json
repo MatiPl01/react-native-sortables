@@ -2,8 +2,8 @@
   "name": "example-web",
   "version": "0.0.1",
   "dependencies": {
-    "expo": "^52.0.28",
-    "react-dom": "18.3.1",
+    "expo": "~52.0.36",
+    "react-dom": "19.0.0",
     "react-native": "0.78.0",
     "react-native-sortables": "workspace:*",
     "react-native-web": "0.19.13"
@@ -16,6 +16,6 @@
   "private": true,
   "scripts": {
     "production": "yarn expo export -p web && yarn serve dist --single",
-    "start": "expo start --web --reset-cache --client-logs"
+    "start": "expo start --web --reset-cache"
   }
 }

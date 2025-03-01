@@ -2,13 +2,7 @@ import { Portal } from '@gorhom/portal';
 import type { JSX, PropsWithChildren, ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import {
-  Dimensions,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -27,6 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { IS_ANDROID } from '@/constants';
 import { radius, spacing } from '@/theme';
 
 const filterPaddingAndMarginProps = (
@@ -115,7 +110,7 @@ export default function ActionSheetDropdown({
             height,
             width,
             x,
-            y: y - (Platform.OS === 'android' ? insets.top : 0)
+            y: y + (IS_ANDROID ? insets.top : 0)
           }
         });
       });
@@ -191,7 +186,7 @@ function DropdownContent({
   toggleMeasurements
 }: DropdownContentProps): JSX.Element {
   const flattenedStyle = StyleSheet.flatten(style);
-  const windowDimensions = Dimensions.get('window');
+  const screenDimensions = Dimensions.get('screen');
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
 
@@ -202,7 +197,7 @@ function DropdownContent({
   const isBottom = position === 'bottom';
 
   const maxHeight = isBottom
-    ? windowDimensions.height -
+    ? screenDimensions.height -
       toggleMeasurements.y -
       toggleMeasurements.height -
       spacing.xxl
@@ -216,7 +211,7 @@ function DropdownContent({
     if (alignment === 'left') {
       const maxWidth =
         flattenedStyle.maxWidth ??
-        windowDimensions.width - toggleMeasurements.x - spacing.sm;
+        screenDimensions.width - toggleMeasurements.x - spacing.sm;
       const calculatedPosition = toggleMeasurements.x + offsetX;
 
       return {
@@ -225,7 +220,7 @@ function DropdownContent({
               spacing.md,
               Math.min(
                 calculatedPosition,
-                windowDimensions.width - contentWidth.value - spacing.md
+                screenDimensions.width - contentWidth.value - spacing.md
               )
             )
           : calculatedPosition,
@@ -247,7 +242,7 @@ function DropdownContent({
       left: fitInScreen
         ? Math.min(
             Math.max(calculatedPosition, spacing.md),
-            windowDimensions.width - contentWidth.value - spacing.md
+            screenDimensions.width - contentWidth.value - spacing.md
           )
         : calculatedPosition,
       maxWidth,
@@ -261,7 +256,11 @@ function DropdownContent({
     ...(isBottom
       ? { top: toggleMeasurements.y + toggleMeasurements.height + offsetY }
       : {
-          bottom: windowDimensions.height - toggleMeasurements.y + offsetY
+          bottom:
+            screenDimensions.height -
+            toggleMeasurements.y +
+            offsetY -
+            (IS_ANDROID ? spacing.lg : 0)
         })
   };
   const [paddingAndMargin, rest] = filterPaddingAndMarginProps(flattenedStyle);
@@ -271,7 +270,7 @@ function DropdownContent({
       <Animated.View
         entering={FadeIn}
         exiting={FadeOut}
-        pointerEvents='box-none'>
+        style={styles.boxNoneEvents}>
         <View style={[{ maxHeight: dropdownMaxHeight }, rest]}>
           <Animated.ScrollView
             contentContainerStyle={paddingAndMargin}
@@ -367,8 +366,7 @@ function Backdrop({ handleClose }: BackdropProps): JSX.Element {
     <Animated.View
       entering={FadeIn}
       exiting={FadeOut}
-      pointerEvents='box-none'
-      style={StyleSheet.absoluteFill}>
+      style={[styles.backdrop, styles.boxNoneEvents]}>
       <Pressable style={styles.backdrop} onPress={handleClose} />
     </Animated.View>
   );
@@ -378,6 +376,9 @@ const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.2)'
+  },
+  boxNoneEvents: {
+    pointerEvents: 'box-none'
   },
   scrollBarThumb: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

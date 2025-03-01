@@ -1,9 +1,10 @@
 import Sortable from 'react-native-sortables';
 
 import { FlexCell } from '@/components/items';
+import { IS_WEB } from '@/constants';
 import { useItemOrderChange } from '@/hooks';
 import { spacing } from '@/theme';
-import { getCategories, IS_WEB } from '@/utils';
+import { getCategories } from '@/utils';
 
 import type { RouteCardComponent } from './RouteCard';
 import RouteCard from './RouteCard';

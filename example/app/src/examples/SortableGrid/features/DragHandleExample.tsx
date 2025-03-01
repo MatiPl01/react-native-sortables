@@ -7,9 +7,10 @@ import type { OverDrag, SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
 import { OptionGroup, SimpleDropdown, Spacer, TabSelector } from '@/components';
+import { IS_WEB } from '@/constants';
 import { useBottomNavBarHeight } from '@/contexts';
 import { colors, flex, radius, sizes, spacing, style, text } from '@/theme';
-import { getItems, IS_WEB } from '@/utils';
+import { getItems } from '@/utils';
 
 const DATA = getItems(20);
 

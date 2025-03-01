@@ -1,23 +1,31 @@
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Sortable from 'react-native-sortables';
 
-const WINDOW_WIDTH = Dimensions.get('window').width;
+import { ScrollScreen } from '@/components';
+import { MAX_CONTENT_WIDTH } from '@/constants';
+
+const CONTAINER_WIDTH = Math.min(
+  Dimensions.get('window').width,
+  MAX_CONTENT_WIDTH
+);
 const PADDING = 20;
 const GAP = 15;
-const COLUMN_WIDTH = (WINDOW_WIDTH - 2 * PADDING - GAP) / 2;
+const COLUMN_WIDTH = (CONTAINER_WIDTH - 2 * PADDING - GAP) / 2;
 
 export default function ComplexLayoutExample() {
   return (
-    <Sortable.Flex
-      justifyContent='space-between'
-      padding={PADDING}
-      rowGap={GAP}
-      debug>
-      <SingleColumnTile />
-      <SingleColumnTile />
-      <TwoColumnsTile />
-      <TwoColumnsTile />
-    </Sortable.Flex>
+    <ScrollScreen>
+      <Sortable.Flex
+        justifyContent='space-between'
+        padding={PADDING}
+        rowGap={GAP}
+        debug>
+        <SingleColumnTile />
+        <SingleColumnTile />
+        <TwoColumnsTile />
+        <TwoColumnsTile />
+      </Sortable.Flex>
+    </ScrollScreen>
   );
 }
 

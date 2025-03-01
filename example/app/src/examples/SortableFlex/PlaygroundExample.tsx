@@ -2,8 +2,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import Sortable from 'react-native-sortables';
 
 import { ScrollScreen } from '@/components';
+import { IS_WEB } from '@/constants';
 import { colors, text } from '@/theme';
-import { getCategories, IS_WEB } from '@/utils';
+import { getCategories } from '@/utils';
 
 const DATA = getCategories(IS_WEB ? 30 : 10);
 

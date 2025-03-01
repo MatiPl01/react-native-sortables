@@ -7,6 +7,7 @@ import type { OverDrag } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
 import { OptionGroup, SimpleDropdown, Spacer } from '@/components';
+import { IS_WEB } from '@/constants';
 import { useBottomNavBarHeight } from '@/contexts';
 import {
   colors,
@@ -18,7 +19,7 @@ import {
   style,
   text
 } from '@/theme';
-import { getCategories, IS_WEB } from '@/utils';
+import { getCategories } from '@/utils';
 
 const DATA = getCategories(30);
 

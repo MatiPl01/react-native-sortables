@@ -12,8 +12,9 @@ import {
   Section,
   Stagger
 } from '@/components';
+import { IS_WEB } from '@/constants';
 import { colors, flex, sizes, spacing, text } from '@/theme';
-import { getCategories, IS_WEB } from '@/utils';
+import { getCategories } from '@/utils';
 
 const DATA = getCategories(30);
 

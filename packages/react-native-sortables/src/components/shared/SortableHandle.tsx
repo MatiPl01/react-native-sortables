@@ -100,5 +100,9 @@ export function SortableHandleInternal({
 
   const gesture = useItemPanGesture(itemKey, activationAnimationProgress);
 
-  return <GestureDetector gesture={gesture}>{children}</GestureDetector>;
+  return (
+    <GestureDetector gesture={gesture} userSelect='none'>
+      {children}
+    </GestureDetector>
+  );
 }

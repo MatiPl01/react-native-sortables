@@ -2,13 +2,7 @@ import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
   Easing,
   LinearTransition,
@@ -18,9 +12,9 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SelectListDropdown } from '@/components';
+import { IS_WEB } from '@/constants';
 import { useBottomNavBarHeight } from '@/contexts';
 import { colors, radius, sizes, spacing, text } from '@/theme';
-import { IS_WEB } from '@/utils';
 
 import type { Routes } from './types';
 
@@ -53,7 +47,7 @@ export default function BottomNavBar({
 
   useEffect(() => {
     return navigation.addListener('state', e => {
-      setRoutesGroup(e.data.state.routes[1]?.name);
+      setRoutesGroup(e?.data?.state?.routes[1]?.name);
     });
   }, [navigation]);
 
@@ -97,7 +91,7 @@ export default function BottomNavBar({
         style={styles.bar}
         entering={SlideInDown.delay(100)
           .duration(500)
-          .easing(Easing.out(Easing.quad))}>
+          .easing(IS_WEB ? Easing.bounce : Easing.out(Easing.quad))}>
         <TouchableOpacity style={styles.homeButton} onPress={handleHomePress}>
           <FontAwesomeIcon
             color={colors.primary}
@@ -129,23 +123,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.background1,
     borderRadius: radius.lg,
+    boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)',
     flexDirection: 'row',
     gap: spacing.xs,
-    padding: spacing.xs,
-    shadowColor: colors.black,
-    ...Platform.select({
-      android: {
-        elevation: spacing.xxs
-      },
-      default: {
-        shadowOffset: { height: spacing.xxs, width: 0 },
-        shadowOpacity: 0.1,
-        shadowRadius: spacing.xs
-      },
-      web: {
-        boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)'
-      }
-    })
+    padding: spacing.xs
   },
   container: {
     alignItems: 'center',

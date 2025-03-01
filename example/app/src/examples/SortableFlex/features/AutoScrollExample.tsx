@@ -12,9 +12,10 @@ import {
   Spacer,
   TabView
 } from '@/components';
+import { IS_WEB } from '@/constants';
 import { useBottomNavBarHeight } from '@/contexts';
 import { colors, spacing, style } from '@/theme';
-import { getCategories, IS_WEB } from '@/utils';
+import { getCategories } from '@/utils';
 
 const MANY_CATEGORIES = getCategories(IS_WEB ? 30 : 20);
 const FEW_CATEGORIES = getCategories(IS_WEB ? 12 : 6);

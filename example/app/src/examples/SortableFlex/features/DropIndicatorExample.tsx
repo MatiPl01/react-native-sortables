@@ -2,9 +2,10 @@ import { StyleSheet } from 'react-native';
 import Sortable from 'react-native-sortables';
 
 import { FlexCell, ScrollScreen, Section, Stagger } from '@/components';
+import { IS_WEB } from '@/constants';
 import { CustomDropIndicator } from '@/examples/custom';
 import { radius, spacing } from '@/theme';
-import { getCategories, IS_WEB } from '@/utils';
+import { getCategories } from '@/utils';
 
 const DATA = getCategories(IS_WEB ? 14 : 9);
 

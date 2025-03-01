@@ -4,9 +4,9 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { Dimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { IS_IOS, IS_WEB } from '@/constants';
 import { useBottomNavBarHeight } from '@/contexts';
 import { flex, spacing, style } from '@/theme';
-import { IS_IOS, IS_WEB } from '@/utils';
 
 import type { ScrollProps } from './Scroll';
 import Scroll from './Scroll';

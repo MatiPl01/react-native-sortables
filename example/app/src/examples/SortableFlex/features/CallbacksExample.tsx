@@ -8,8 +8,9 @@ import Sortable, {
 
 import { AnimatedText, FlexCell, Section, Stagger } from '@/components';
 import { Screen } from '@/components/layout/Screen';
+import { IS_WEB } from '@/constants';
 import { flex, spacing } from '@/theme';
-import { formatCallbackParams, getCategories, IS_WEB } from '@/utils';
+import { formatCallbackParams, getCategories } from '@/utils';
 
 const DATA = getCategories(IS_WEB ? 14 : 9);
 

@@ -5,9 +5,8 @@ import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
 import { GridCard, Group, ScrollScreen, Section } from '@/components';
-import { MAX_CONTENT_WIDTH } from '@/constants';
+import { IS_WEB, MAX_CONTENT_WIDTH } from '@/constants';
 import { spacing, text } from '@/theme';
-import { IS_WEB } from '@/utils';
 
 const DATA = Array.from({ length: 18 }, (_, index) => `Item ${index + 1}`);
 
