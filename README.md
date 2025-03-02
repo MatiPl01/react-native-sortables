@@ -10,11 +10,11 @@
 
 [Documentation](https://react-native-sortables-docs.vercel.app/) | [Examples](https://react-native-sortables-docs.vercel.app/grid/examples) | [Contributing](./CONTRIBUTING.md)
 
-![npm](https://img.shields.io/npm/dw/react-native-sortables?color=ffd53e)
-![GitHub issues](https://img.shields.io/github/issues/MatiPl01/react-native-sortables?color=ffd53e)
-![GitHub contributors](https://img.shields.io/github/contributors/MatiPl01/react-native-sortables?color=ffd53e)
-![GitHub Release Date](https://img.shields.io/github/release-date/MatiPl01/react-native-sortables?color=ffd53e)
-![GitHub](https://img.shields.io/github/license/MatiPl01/react-native-sortables?color=ffd53e)
+![npm](https://img.shields.io/npm/dw/react-native-sortables?color=36877F)
+![GitHub issues](https://img.shields.io/github/issues/MatiPl01/react-native-sortables?color=36877F)
+![GitHub contributors](https://img.shields.io/github/contributors/MatiPl01/react-native-sortables?color=36877F)
+![GitHub Release Date](https://img.shields.io/github/release-date/MatiPl01/react-native-sortables?color=36877F)
+![GitHub](https://img.shields.io/github/license/MatiPl01/react-native-sortables?color=36877F)
 
 ![GitHub forks](https://img.shields.io/github/forks/MatiPl01/react-native-sortables?style=social)
 ![GitHub Repo stars](https://img.shields.io/github/stars/MatiPl01/react-native-sortables?style=social)
