@@ -7,85 +7,142 @@ import type { LayoutAnimation, LayoutTransition } from '../reanimated';
 import type { Animatable, AnimatableProps, Simplify } from '../utils';
 
 export type DropIndicatorComponentProps = {
+  /** Progress of the active drag animation (0 to 1) */
   activeAnimationProgress: SharedValue<number>;
+  /** Key of the currently dragged item, or null if no item is being dragged */
   activeItemKey: SharedValue<null | string>;
+  /** Current index where the dragged item would be dropped */
   dropIndex: SharedValue<number>;
+  /** Current position where the item would be dropped */
   dropPosition: SharedValue<Vector>;
+  /** Array of item keys in their current order */
   orderedItemKeys: SharedValue<Array<string>>;
+  /** Style to be applied to the drop indicator (will be merged with the default style) */
   style: ViewStyle;
 };
 
 export type ActiveItemDecorationSettings = AnimatableProps<{
+  /** Scale factor applied to the item being dragged */
   activeItemScale: number;
+  /** Opacity of the item being dragged */
   activeItemOpacity: number;
+  /** Shadow opacity of the item being dragged */
   activeItemShadowOpacity: number;
+  /** Opacity of items that are not being dragged */
   inactiveItemOpacity: number;
+  /** Scale factor applied to items that are not being dragged */
   inactiveItemScale: number;
 }>;
 
+/**
+ * Percentage (relative to the container size) or number (absolute value) distance
+ * @example
+ * - '10%' - 10% of the container width/height
+ * - 50 - 50 pixels
+ * - [10, 20] - 10% of the container width/height and 20 pixels
+ */
 export type Offset = `${number}%` | number;
+/** Direction in which items can be dragged beyond container bounds */
 export type OverDrag = 'both' | 'horizontal' | 'none' | 'vertical';
+/** Position of the reordering trigger point */
 export type ReorderTriggerOrigin = 'center' | 'touch';
 
 export type ItemDragSettings = {
+  /** Controls in which directions items can be dragged beyond container bounds */
   overDrag: OverDrag;
+  /** Determines whether reordering is triggered from item center or touch point */
   reorderTriggerOrigin: ReorderTriggerOrigin;
 } & AnimatableProps<{
+  /** Delay in ms before drag gesture is activated */
   dragActivationDelay: number;
+  /** Duration of the animation when item becomes active */
   activationAnimationDuration: number;
+  /** Duration of the animation when item is dropped */
   dropAnimationDuration: number;
+  /** Maximum distance in pixels that the pointer can move from the drag start
+   * point before the drag is cancelled (only before drag starts)
+   */
   dragActivationFailOffset: number;
 }>;
 
 export type ActiveItemSnapSettings = AnimatableProps<{
+  /** Whether the active item should snap to the finger */
   enableActiveItemSnap: boolean;
+  /** Horizontal snap offset of the item */
   snapOffsetX: Offset;
+  /** Vertical snap offset of the item */
   snapOffsetY: Offset;
 }>;
 
 export type AutoScrollSettings = {
+  /** Reference to the animated scrollable container which will be scrolled
+   * automatically when the active item is dragged near the edges of the container
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scrollableRef: AnimatedRef<any>; // TODO - type this properly
+  /** Direction in which auto-scrolling should occur */
   autoScrollDirection: 'horizontal' | 'vertical';
 } & AnimatableProps<{
+  /** Distance from the edge of the container that triggers auto-scrolling. Can be a single number or [top/left, bottom/right] tuple */
   autoScrollActivationOffset: [number, number] | number;
+  /** Speed at which auto-scrolling occurs */
   autoScrollSpeed: number;
+  /** Whether auto-scrolling is enabled */
   autoScrollEnabled: boolean;
 }>;
 
 export type DropIndicatorSettings = {
+  /** Component to render as the drop indicator */
   DropIndicatorComponent: ComponentType<DropIndicatorComponentProps>;
+  /** Whether to show the drop indicator while dragging */
   showDropIndicator: boolean;
+  /** Style to apply to the drop indicator */
   dropIndicatorStyle: ViewStyle;
 };
 
 export type ItemsLayoutTransitionMode = 'all' | 'reorder';
 
 export type ItemLayoutAnimationSettings = {
+  /** Animation to play when an item enters the list */
   itemEntering: LayoutAnimation | null;
+  /** Animation to play when an item exits the list */
   itemExiting: LayoutAnimation | null;
+  /** Animation to play when items are reordered */
   itemsLayout: LayoutTransition | null;
+  /** Controls when layout transitions are applied */
   itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
 };
 
 export type DragStartParams = {
+  /** Unique identifier of the dragged item */
   key: string;
+  /** Original index of the dragged item */
   fromIndex: number;
 };
 
 export type DragEndParams = {
+  /** Unique identifier of the dragged item */
   key: string;
+  /** Original index of the dragged item */
   fromIndex: number;
+  /** Final index where the item was dropped */
   toIndex: number;
+  /** Array mapping indices to item keys */
   indexToKey: Array<string>;
+  /** Object mapping item keys to their indices */
   keyToIndex: Record<string, number>;
 };
 
 export type OrderChangeParams = {
+  /** Original index of the moved item */
   fromIndex: number;
+  /** New index of the moved item */
   toIndex: number;
+  /** Unique identifier of the moved item */
   key: string;
+  /** Array mapping indices to item keys */
   indexToKey: Array<string>;
+  /** Object mapping item keys to their indices */
   keyToIndex: Record<string, number>;
 };
 
@@ -105,12 +162,19 @@ export type SharedProps = Simplify<
   Omit<SortableCallbacks, 'onDragEnd'> &
     Partial<
       {
+        /** Whether to animate container height changes when items are moved */
         animateHeight: boolean;
+        /** Whether to animate container width changes when items are moved */
         animateWidth: boolean;
+        /** Enable haptic feedback when sorting items */
         hapticsEnabled: boolean;
+        /** Controls whether sorting functionality is enabled */
         sortEnabled: Animatable<boolean>;
+        /** Whether to use a custom handle component for dragging */
         customHandle: boolean;
+        /** Specifies how content overflowing the container should be handled */
         overflow: Overflow;
+        /** Enable debug mode to show additional visual helpers and console logs */
         debug: boolean;
       } & ActiveItemDecorationSettings &
         ActiveItemSnapSettings &
