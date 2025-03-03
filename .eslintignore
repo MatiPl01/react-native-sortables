@@ -6,3 +6,4 @@ example/*
 **/dist
 **/README.md
 **/CONTRIBUTING.md
+.eslintrc.cjs
