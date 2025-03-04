@@ -8,12 +8,10 @@ import { GridCard, Group, ScrollScreen, Section } from '@/components';
 import { IS_WEB, MAX_CONTENT_WIDTH } from '@/constants';
 import { spacing, text } from '@/theme';
 
-const DATA = Array.from({ length: 2 }, (_, index) => `Item ${index + 1}`);
+const DATA = Array.from({ length: 18 }, (_, index) => `Item ${index + 1}`);
 
 // Horizontal grid
-const ROWS = 1;
-
-// Horizontal grid
+const ROWS = 3;
 const ROW_HEIGHT = 75;
 
 // Vertical grid
