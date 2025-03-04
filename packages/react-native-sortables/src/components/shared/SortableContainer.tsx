@@ -103,8 +103,8 @@ export default function SortableContainer({
     const ctrl = controlledContainerDimensions.value;
 
     return {
-      minHeight: ctrl.height ? containerHeight.value : undefined,
-      minWidth: ctrl.width ? containerWidth.value : undefined
+      height: ctrl.height ? containerHeight.value : undefined,
+      width: ctrl.width ? containerWidth.value : undefined
     };
   });
 

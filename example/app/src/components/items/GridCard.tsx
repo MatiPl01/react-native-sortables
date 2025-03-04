@@ -20,14 +20,16 @@ export default function GridCard({
 }: GridCardProps) {
   return (
     <View
-      style={[
+      // Need to flatten the style manually as something broke in react native
+      // 0.78 and properties specified later on don't override previous ones
+      style={StyleSheet.flatten([
         styles.card,
         active && styles.activeCard,
         height !== undefined || width !== undefined
           ? { aspectRatio: 'auto', height, width }
           : {},
         style
-      ]}>
+      ])}>
       {typeof children === 'string' ? (
         <Text style={styles.text}>{children}</Text>
       ) : (
