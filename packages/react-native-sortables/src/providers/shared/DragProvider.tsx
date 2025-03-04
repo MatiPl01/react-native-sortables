@@ -335,7 +335,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // e.g. while scrolling the ScrollView
       activationTimeoutId.value = setAnimatedTimeout(() => {
         if (!canSwitchToAbsoluteLayout.value) {
-          fail();
           return;
         }
         activate();
