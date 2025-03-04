@@ -130,7 +130,7 @@ function VerticalSameSizeItems() {
   );
   return (
     <>
-      <Text style={styles.subTitle}>Same width items</Text>
+      <Text style={styles.subTitle}>Same height items</Text>
       <Animated.ScrollView
         contentContainerStyle={styles.container}
         ref={scrollableRef}
