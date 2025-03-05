@@ -72,7 +72,7 @@ yarn add react-native-sortables
 
 This library is built with:
 
-- [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) (version 3.x)
+- [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) (version 3.x, 4.x)
 - [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/) (version 2.x)
 
 Make sure to follow their installation instructions for your project.
@@ -120,6 +120,43 @@ const styles = StyleSheet.create({
 ```
 
 For detailed usage and examples, check out the [Documentation](https://react-native-sortables-docs.vercel.app/).
+
+## Local Library Development
+
+1. Clone and setup:
+
+   ```bash
+   git clone https://github.com/MatiPl01/react-native-sortables.git
+   cd react-native-sortables
+   yarn
+   yarn pod  # iOS only
+   ```
+
+2. Start an example app:
+
+   ```bash
+   cd example/fabric  # or any other example
+   yarn start
+   ```
+
+   Available example apps:
+
+   - `fabric` - React Native Fabric example
+   - `paper` - React Native Paper example
+   - `expo` - Expo example
+   - `web` - Web example
+
+   You can also run commands from the project root using the `yarn example:<name> <command>` syntax, e.g.:
+
+   ```bash
+   yarn example:fabric start
+   yarn example:paper android
+   yarn example:expo ios
+   ```
+
+3. Build and run:
+   - iOS: `yarn ios` or build in Xcode
+   - Android: `yarn android` or build in Android Studio
 
 ## Contributing
 
