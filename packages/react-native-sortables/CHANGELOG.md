@@ -1,3 +1,11 @@
+## [1.3.2](https://github.com/MatiPl01/react-native-sortables/compare/v1.3.1...v1.3.2) (2025-03-05)
+
+
+### Bug Fixes
+
+* Add missing changes after deps upgrade, fix example app issues ([#288](https://github.com/MatiPl01/react-native-sortables/issues/288)) ([f4ca42c](https://github.com/MatiPl01/react-native-sortables/commit/f4ca42c0eeb15ec8103a80ca5d915f5d4562d330))
+* Android crashes on gesture failure, horizontal scrollable issues ([#294](https://github.com/MatiPl01/react-native-sortables/issues/294)) ([ef3e39f](https://github.com/MatiPl01/react-native-sortables/commit/ef3e39fea5279aa21e890428aa024c608eadba52)), closes [#291](https://github.com/MatiPl01/react-native-sortables/issues/291)
+
 ## [1.3.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.3.0...v1.3.1) (2025-02-26)
 
 
