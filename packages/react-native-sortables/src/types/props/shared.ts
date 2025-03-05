@@ -6,6 +6,10 @@ import type { Vector } from '../layout/shared';
 import type { LayoutAnimation, LayoutTransition } from '../reanimated';
 import type { Animatable, AnimatableProps, Simplify } from '../utils';
 
+/** Props passed to a custom drop indicator component.
+ * The drop indicator shows where the dragged item will be placed when dropped.
+ * Almost all values are provided as Reanimated shared values for fast updates.
+ */
 export type DropIndicatorComponentProps = {
   /** Progress of the active drag animation (0 to 1) */
   activeAnimationProgress: SharedValue<number>;
@@ -120,6 +124,7 @@ export type ItemLayoutAnimationSettings = {
   itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
 };
 
+/** Parameters provided when an item starts being dragged */
 export type DragStartParams = {
   /** Unique identifier of the dragged item */
   key: string;
@@ -127,6 +132,7 @@ export type DragStartParams = {
   fromIndex: number;
 };
 
+/** Parameters provided when drag gesture completes and item is dropped */
 export type DragEndParams = {
   /** Unique identifier of the dragged item */
   key: string;
@@ -140,6 +146,7 @@ export type DragEndParams = {
   keyToIndex: Record<string, number>;
 };
 
+/** Parameters provided when items change their positions during dragging. */
 export type OrderChangeParams = {
   /** Original index of the moved item */
   fromIndex: number;

@@ -13,7 +13,11 @@ import {
   useItemPanGesture
 } from '../../providers';
 
+/** Props for the Sortable Handle component */
 export type SortableHandleProps = PropsWithChildren<{
+  /** When true, the handle will not activate drag gesture
+   * @default false
+   */
   disabled?: boolean;
 }>;
 
