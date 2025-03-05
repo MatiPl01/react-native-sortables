@@ -100,6 +100,13 @@ export type DropIndicatorSettings = {
   dropIndicatorStyle: ViewStyle;
 };
 
+/**
+ * Controls when layout transitions are applied
+ * - 'all' - layout transitions are applied to all layout changes
+ *   (items order change and position change caused by addition or removal
+ *   of items)
+ * - 'reorder' - layout transitions are only applied when items are reordered
+ */
 export type ItemsLayoutTransitionMode = 'all' | 'reorder';
 
 export type ItemLayoutAnimationSettings = {
@@ -146,13 +153,41 @@ export type OrderChangeParams = {
   keyToIndex: Record<string, number>;
 };
 
+/**
+ * Callback function called when the item drag starts
+ * @param params - Parameters for the drag start event
+ */
 export type DragStartCallback = (params: DragStartParams) => void;
+
+/**
+ * Callback function called when the item drag ends
+ * @param params - Parameters for the drag end event
+ */
 export type DragEndCallback = (params: DragEndParams) => void;
+
+/**
+ * Callback function called when the items order changes
+ * @param params - Parameters for the order change event
+ */
 export type OrderChangeCallback = (params: OrderChangeParams) => void;
 
 export type SortableCallbacks = {
+  /** Called when an item starts being dragged
+   * @param params Parameters for the drag start event
+   */
   onDragStart?: DragStartCallback;
+
+  /** Called once when the drag gesture ends.
+   * You can use this callback to update items order in state.
+   * @param params Parameters for the drag end event
+   */
   onDragEnd?: DragEndCallback;
+
+  /** Called multiple times during dragging when items positions are swapped.
+   * @param params Parameters for the order change event
+   * @warning Don't use this callback to update items order in state because
+   * it's called frequently during dragging. Use `onDragEnd` instead.
+   */
   onOrderChange?: OrderChangeCallback;
 };
 
@@ -174,7 +209,9 @@ export type SharedProps = Simplify<
         customHandle: boolean;
         /** Specifies how content overflowing the container should be handled */
         overflow: Overflow;
-        /** Enable debug mode to show additional visual helpers and console logs */
+        /** Enable debug mode to show additional visual helpers and console logs.
+         * @note This only works in development builds and has no effect in production.
+         */
         debug: boolean;
       } & ActiveItemDecorationSettings &
         ActiveItemSnapSettings &
