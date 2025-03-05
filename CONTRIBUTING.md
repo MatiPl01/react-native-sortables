@@ -33,20 +33,44 @@ This project uses GitHub to host code, track issues and feature requests, and ac
 1. Fork the repo and create your branch from `main`
 2. Clone your forked repo
 3. Set up the development environment:
-   - Run `yarn` in the repo root to install dependencies
-   - For iOS: Run `yarn example:fabric pod`
+
+   ```bash
+   yarn
+   yarn pod  # iOS only
+   ```
+
 4. Start development:
-   - Run `yarn example:fabric start` to start metro bundler
-   - Build project:
-     - Using IDE: Open in Xcode/Android Studio
-     - Using command line:
-       - Android: `yarn example:fabric android`
-       - iOS: `yarn example:fabric ios`
+
+   ```bash
+   cd example/fabric  # or any other example
+   yarn start
+   ```
+
+   Available example apps:
+
+   - `fabric` - React Native Fabric example
+   - `paper` - React Native Paper example
+   - `expo` - Expo example
+   - `web` - Web example
+
+   You can also run commands from root using `yarn example:<name> <command>`, e.g.:
+
+   ```bash
+   yarn example:fabric start
+   yarn example:paper android
+   yarn example:expo ios
+   ```
+
+   Build and run:
+
+   - iOS: `yarn ios` or build in Xcode
+   - Android: `yarn android` or build in Android Studio
+
 5. Make your changes
 6. If you've changed APIs, update the documentation
-7. Make sure your code lints
-8. Update the example project if needed
-9. Submit that pull request!
+7. Make sure your code passes prettier/eslint/typescript checks
+8. Update or create a new example in the example app if applicable
+9. Submit that pull request
 
 > [!TIP]  
 > All example commands shown above can also be run with the **Old Architecture (Paper)** example app by replacing `example:fabric` with `example:paper` in the commands.
