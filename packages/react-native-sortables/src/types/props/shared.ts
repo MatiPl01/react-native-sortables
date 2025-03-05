@@ -209,7 +209,7 @@ export type SharedProps = Simplify<
         customHandle: boolean;
         /** Specifies how content overflowing the container should be handled */
         overflow: Overflow;
-        /** Enable debug mode to show additional visual helpers and console logs.
+        /** Enables debug mode to show additional visual helpers and console logs.
          * @note This only works in development builds and has no effect in production.
          */
         debug: boolean;
