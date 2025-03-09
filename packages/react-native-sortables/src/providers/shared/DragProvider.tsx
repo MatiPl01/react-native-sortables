@@ -32,6 +32,7 @@ import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
+import { usePortalContext } from './PortalProvider';
 
 type DragProviderProps = PropsWithChildren<
   {
@@ -81,6 +82,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { updateLayer } = useLayerContext() ?? {};
   const { scrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
+  const { activeItemAbsolutePosition } = usePortalContext() ?? {};
 
   const haptics = useHaptics(hapticsEnabled);
 
@@ -118,9 +120,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       progress: activeAnimationProgress.value,
       snapDimensions: snapItemDimensions.value,
       snapOffset: snapItemOffset.value,
+      startTouch: touchStartTouch.value,
       startTouchPosition: dragStartTouchPosition.value,
-      touch: currentTouch.value,
-      startTouch: touchStartTouch.value
+      touch: currentTouch.value
     }),
     ({
       activeDimensions,
@@ -135,8 +137,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       progress,
       snapDimensions,
       snapOffset,
-      startTouchPosition,
       startTouch,
+      startTouchPosition,
       touch
     }) => {
       if (
@@ -194,8 +196,16 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: activeX,
         y: activeY
       };
+
+      if (activeItemAbsolutePosition) {
+        // TODO - support clamping (overDrag)
+        activeItemAbsolutePosition.value = {
+          x: touch.absoluteX - translate(itemTouchOffset.x, tX),
+          y: touch.absoluteY - translate(itemTouchOffset.y, tY)
+        };
+      }
     },
-    [hasHorizontalOverDrag, hasVerticalOverDrag]
+    [hasHorizontalOverDrag, hasVerticalOverDrag, activeItemAbsolutePosition]
   );
 
   /**
@@ -359,6 +369,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemKey,
       activationState,
       activationTimeoutId,
+      currentTouch,
       canSwitchToAbsoluteLayout,
       dragActivationDelay,
       handleDragStart,

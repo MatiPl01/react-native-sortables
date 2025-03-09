@@ -1,12 +1,7 @@
-import { memo, PropsWithChildren, useEffect } from 'react';
-import type { StyleProp, View, ViewProps, ViewStyle } from 'react-native';
+import { memo, useEffect } from 'react';
+import type { ViewProps } from 'react-native';
 import Animated, {
-  AnimatedRef,
-  AnimatedStyle,
   LayoutAnimationConfig,
-  measure,
-  SharedValue,
-  useAnimatedStyle,
   useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
@@ -20,15 +15,10 @@ import {
   useMeasurementsContext,
   usePortalContext
 } from '../../providers';
-import type {
-  Dimensions,
-  LayoutAnimation,
-  LayoutTransition,
-  Vector
-} from '../../types';
-import { SortableHandleInternal } from './SortableHandle';
+import type { LayoutAnimation, LayoutTransition } from '../../types';
+import ActiveItemPortal from './ActiveItemPortal';
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
-import MaybeActiveItemPortal from './MaybeActiveItemPortal';
+import { SortableHandleInternal } from './SortableHandle';
 
 export type DraggableViewProps = {
   itemKey: string;
@@ -46,13 +36,8 @@ function DraggableView({
   style,
   ...viewProps
 }: DraggableViewProps) {
-  const {
-    activeItemKey,
-    customHandle,
-    activeItemDimensions,
-    containerRef,
-    activeItemPosition
-  } = useCommonValuesContext();
+  const hasPortal = !!usePortalContext();
+  const { activeItemKey, customHandle } = useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
   const activationAnimationProgress = useSharedValue(0);
@@ -68,7 +53,7 @@ function DraggableView({
     return () => handleItemRemoval(key);
   }, [key, handleItemRemoval]);
 
-  const itemComponent = (
+  const innerComponent = (
     <Animated.View
       {...viewProps}
       layout={IS_WEB ? undefined : layout}
@@ -94,103 +79,24 @@ function DraggableView({
     </Animated.View>
   );
 
-  const maybeTeleportedComponent = (
-    <MaybeActiveItemPortal
-      activationProgress={activationAnimationProgress}
-      itemKey={key}
-      renderTeleportedComponent={() => (
-        <TeleportedComponent
-          activeItemDimensions={activeItemDimensions}
-          activationAnimationProgress={activationAnimationProgress}
-          activeItemPosition={activeItemPosition}
-          containerRef={containerRef}
-          decorationStyles={decorationStyles}
-          layoutStyles={layoutStyles}>
-          {children}
-        </TeleportedComponent>
-      )}>
-      {itemComponent}
-    </MaybeActiveItemPortal>
-  );
-
   return (
     <ItemContextProvider
       activationAnimationProgress={activationAnimationProgress}
       isActive={isActive}
       itemKey={key}>
       {customHandle ? (
-        maybeTeleportedComponent
+        innerComponent
       ) : (
-        <SortableHandleInternal>
-          {maybeTeleportedComponent}
-        </SortableHandleInternal>
+        <SortableHandleInternal>{innerComponent}</SortableHandleInternal>
+      )}
+      {hasPortal && (
+        <ActiveItemPortal
+          activationAnimationProgress={activationAnimationProgress}>
+          {/* TODO - fix grid style */}
+          <Animated.View style={decorationStyles}>{children}</Animated.View>
+        </ActiveItemPortal>
       )}
     </ItemContextProvider>
-  );
-}
-
-type TeleportedComponentProps = PropsWithChildren<{
-  activeItemDimensions: SharedValue<Dimensions | null>;
-  activationAnimationProgress: SharedValue<number>;
-  decorationStyles: StyleProp<AnimatedStyle<ViewStyle>>;
-  containerRef: AnimatedRef<View>;
-  activeItemPosition: SharedValue<Vector | null>;
-  layoutStyles: StyleProp<AnimatedStyle<ViewStyle>>;
-}>;
-
-function TeleportedComponent({
-  children,
-  activeItemDimensions,
-  activationAnimationProgress,
-  decorationStyles,
-  containerRef,
-  layoutStyles,
-  activeItemPosition
-}: TeleportedComponentProps) {
-  const { portalOutletRef } = usePortalContext()!;
-
-  const animatedStyle = useAnimatedStyle(() => {
-    const position = activeItemPosition.value;
-    const dimensions = activeItemDimensions.value;
-
-    const containerMeasurements = measure(containerRef);
-    const portalOutletMeasurements = measure(portalOutletRef);
-
-    if (
-      !position ||
-      !dimensions ||
-      !containerMeasurements ||
-      !portalOutletMeasurements
-    ) {
-      return { display: 'none' };
-    }
-
-    return {
-      display: 'flex',
-      opacity: activationAnimationProgress.value,
-      transform: [
-        {
-          translateX:
-            containerMeasurements.pageX - portalOutletMeasurements.pageX
-        },
-        {
-          translateY:
-            containerMeasurements.pageY - portalOutletMeasurements.pageY
-        }
-      ]
-    };
-  });
-
-  return (
-    <Animated.View style={animatedStyle}>
-      <Animated.View style={layoutStyles}>
-        <Animated.View style={decorationStyles}>
-          <LayoutAnimationConfig skipEntering skipExiting>
-            {children}
-          </LayoutAnimationConfig>
-        </Animated.View>
-      </Animated.View>
-    </Animated.View>
   );
 }
 

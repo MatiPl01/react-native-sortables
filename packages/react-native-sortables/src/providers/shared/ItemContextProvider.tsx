@@ -11,7 +11,7 @@ type ItemContextProviderProps = PropsWithChildren<
 >;
 
 const { ItemContextProvider, useItemContextContext: useItemContext } =
-  createProvider('ItemContext', { guarded: false })<
+  createProvider('ItemContext', { guarded: true })<
     ItemContextProviderProps,
     ItemContextType
   >(props => {

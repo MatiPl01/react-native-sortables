@@ -1,8 +1,8 @@
 import { Fragment, type ReactNode, useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useAnimatedRef } from 'react-native-reanimated';
+import { useAnimatedRef, useSharedValue } from 'react-native-reanimated';
 
-import type { PortalContextType } from '../../types';
+import type { PortalContextType, Vector } from '../../types';
 import { createProvider } from '../utils';
 
 type PortalProviderProps = {
@@ -13,24 +13,38 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
   guarded: false
 })<PortalProviderProps, PortalContextType>(({ children }) => {
   const portalOutletRef = useAnimatedRef<View>();
+  const activeItemAbsolutePosition = useSharedValue<Vector | null>(null);
   const [teleportedNodes, setTeleportedNodes] = useState<
     Record<string, ReactNode>
   >({});
 
-  const teleport = useCallback((itemKey: string, node: ReactNode) => {
-    if (node === null) {
-      setTeleportedNodes(prev => {
-        if (!prev[itemKey]) {
-          return prev;
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { [itemKey]: _, ...rest } = prev;
-        return rest;
-      });
-    } else {
-      setTeleportedNodes(prev => ({ ...prev, [itemKey]: node }));
-    }
+  const addTeleportedNode = useCallback((itemKey: string, node: ReactNode) => {
+    setTeleportedNodes(prev => ({ ...prev, [itemKey]: node }));
   }, []);
+
+  const removeTeleportedNode = useCallback((itemKey: string) => {
+    setTeleportedNodes(prev => {
+      if (!prev[itemKey]) {
+        return prev;
+      }
+
+      delete prev[itemKey];
+      return { ...prev };
+    });
+  }, []);
+
+  const teleport = useCallback(
+    (itemKey: string, node: ReactNode) => {
+      if (node) {
+        addTeleportedNode(itemKey, node);
+      } else {
+        removeTeleportedNode(itemKey);
+      }
+
+      return () => removeTeleportedNode(itemKey);
+    },
+    [addTeleportedNode, removeTeleportedNode]
+  );
 
   return {
     children: (
@@ -43,10 +57,7 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
         </View>
       </>
     ),
-    value: {
-      portalOutletRef,
-      teleport
-    }
+    value: { activeItemAbsolutePosition, portalOutletRef, teleport }
   };
 });
 
