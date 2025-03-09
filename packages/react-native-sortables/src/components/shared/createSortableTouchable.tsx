@@ -44,25 +44,27 @@ type AnyPressHandlers = {
 export default function createSortableTouchable<P extends AnyPressHandlers>(
   Component: ComponentType<P>
 ): ComponentType<P> {
+  // TODO: Add support for portal
+
   function Wrapper({ onPress, ...rest }: P) {
-    const { dragActivationState } = useItemContext();
+    // const { dragActivationState } = useItemContext();
     const isCancelled = useSharedValue(false);
 
-    useAnimatedReaction(
-      () => ({
-        dragState: dragActivationState.value
-      }),
-      ({ dragState }) => {
-        // Cancels when the item is active
-        if (dragState === DragActivationState.ACTIVE) {
-          isCancelled.value = true;
-        }
-        // Resets state when the item is touched again
-        else if (dragState === DragActivationState.TOUCHED) {
-          isCancelled.value = false;
-        }
-      }
-    );
+    // useAnimatedReaction(
+    //   () => ({
+    //     dragState: dragActivationState.value
+    //   }),
+    //   ({ dragState }) => {
+    //     // Cancels when the item is active
+    //     if (dragState === DragActivationState.ACTIVE) {
+    //       isCancelled.value = true;
+    //     }
+    //     // Resets state when the item is touched again
+    //     else if (dragState === DragActivationState.TOUCHED) {
+    //       isCancelled.value = false;
+    //     }
+    //   }
+    // );
 
     const handlePress = useCallback(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

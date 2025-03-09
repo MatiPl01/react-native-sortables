@@ -112,53 +112,59 @@ export default function DataChangeExample() {
   ];
 
   return (
-    <Screen includeNavBarHeight>
-      {/* Need to set flex: 1 for the ScrollView parent component in order
+    <Sortable.PortalProvider>
+      <Screen includeNavBarHeight>
+        {/* Need to set flex: 1 for the ScrollView parent component in order
       to ensure that it occupies the entire available space */}
-      <Stagger
-        wrapperStye={index =>
-          index === 2 ? (IS_WEB ? flex.shrink : flex.fill) : {}
-        }>
-        {menuSections.map(({ buttons, description, title }) => (
-          <Section description={description} key={title} title={title}>
-            <View style={styles.row}>
-              {buttons.map(btnProps => (
-                <Button {...btnProps} key={btnProps.title} />
-              ))}
-            </View>
-          </Section>
-        ))}
+        <Stagger
+          wrapperStye={index =>
+            index === 2 ? (IS_WEB ? flex.shrink : flex.fill) : {}
+          }>
+          {menuSections.map(({ buttons, description, title }) => (
+            <Section description={description} key={title} title={title}>
+              <View style={styles.row}>
+                {buttons.map(btnProps => (
+                  <Button {...btnProps} key={btnProps.title} />
+                ))}
+              </View>
+            </Section>
+          ))}
 
-        <Group padding='none' style={[flex.fill, styles.scrollViewGroup]}>
-          <Animated.ScrollView
-            contentContainerStyle={styles.scrollViewContent}
-            ref={scrollableRef}
-            // @ts-expect-error - overflowY is needed for proper behavior on web
-            style={[flex.fill, IS_WEB && { overflowY: 'scroll' }]}>
-            <Group withMargin={false} bordered center>
-              <Text style={styles.title}>Above SortableFlex</Text>
-            </Group>
+          <Group padding='none' style={[flex.fill, styles.scrollViewGroup]}>
+            <Animated.ScrollView
+              contentContainerStyle={styles.scrollViewContent}
+              ref={scrollableRef}
+              // @ts-expect-error - overflowY is needed for proper behavior on web
+              style={[flex.fill, IS_WEB && { overflowY: 'scroll' }]}>
+              <Group withMargin={false} bordered center>
+                <Text style={styles.title}>Above SortableFlex</Text>
+              </Group>
 
-            <Sortable.Flex
-              columnGap={spacing.sm}
-              rowGap={spacing.xs}
-              scrollableRef={scrollableRef}
-              animateHeight
-              hapticsEnabled
-              // itemsLayoutTransitionMode='reorder'
-              onDragEnd={({ order }) => setData(order(data))}>
-              {data.map(item => (
-                <FlexItem item={item} key={item} onRemoveItem={onRemoveItem} />
-              ))}
-            </Sortable.Flex>
+              <Sortable.Flex
+                columnGap={spacing.sm}
+                rowGap={spacing.xs}
+                scrollableRef={scrollableRef}
+                animateHeight
+                hapticsEnabled
+                // itemsLayoutTransitionMode='reorder'
+                onDragEnd={({ order }) => setData(order(data))}>
+                {data.map(item => (
+                  <FlexItem
+                    item={item}
+                    key={item}
+                    onRemoveItem={onRemoveItem}
+                  />
+                ))}
+              </Sortable.Flex>
 
-            <Group withMargin={false} bordered center>
-              <Text style={styles.title}>Below SortableFlex</Text>
-            </Group>
-          </Animated.ScrollView>
-        </Group>
-      </Stagger>
-    </Screen>
+              <Group withMargin={false} bordered center>
+                <Text style={styles.title}>Below SortableFlex</Text>
+              </Group>
+            </Animated.ScrollView>
+          </Group>
+        </Stagger>
+      </Screen>
+    </Sortable.PortalProvider>
   );
 }
 

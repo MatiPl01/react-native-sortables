@@ -14,3 +14,4 @@ export {
   useMeasurementsContext
 } from './MeasurementsProvider';
 export * from './utils';
+export { PortalProvider, usePortalContext } from './PortalProvider';

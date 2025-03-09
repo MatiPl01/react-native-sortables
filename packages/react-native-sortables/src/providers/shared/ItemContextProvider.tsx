@@ -11,12 +11,13 @@ type ItemContextProviderProps = PropsWithChildren<
 >;
 
 const { ItemContextProvider, useItemContextContext: useItemContext } =
-  createProvider('ItemContext')<ItemContextProviderProps, ItemContextType>(
-    props => {
-      const { activationState } = useCommonValuesContext();
+  createProvider('ItemContext', { guarded: false })<
+    ItemContextProviderProps,
+    ItemContextType
+  >(props => {
+    const { activationState } = useCommonValuesContext();
 
-      return { value: { ...props, dragActivationState: activationState } };
-    }
-  );
+    return { value: { ...props, dragActivationState: activationState } };
+  });
 
 export { ItemContextProvider, useItemContext };

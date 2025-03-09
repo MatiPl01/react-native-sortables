@@ -11,7 +11,7 @@ import { cancelAnimation, makeMutable, runOnUI } from 'react-native-reanimated';
 
 import { useDebouncedStableCallback } from '../../hooks';
 import { createProvider } from '../../providers/utils';
-import type { DebugProviderContextType } from '../../types';
+import type { DebugContextType } from '../../types';
 import type { DebugComponentUpdater, DebugViews } from '../../types/debug';
 import { DebugComponentType } from '../../types/debug';
 
@@ -19,7 +19,7 @@ type DebugProviderProps = PropsWithChildren<unknown>;
 
 const { DebugProvider, useDebugContext } = createProvider('Debug', {
   guarded: false
-})<DebugProviderProps, DebugProviderContextType>(() => {
+})<DebugProviderProps, DebugContextType>(() => {
   const debugIdRef = useRef(0);
   const debugViewsRef = useRef<DebugViews>({});
   const observersRef = useRef(new Set<(views: DebugViews) => void>());
@@ -205,9 +205,9 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
     value: {
       useDebugCross,
       useDebugLine,
-      useDebugLines: useDebugLines as DebugProviderContextType['useDebugLines'],
+      useDebugLines: useDebugLines as DebugContextType['useDebugLines'],
       useDebugRect,
-      useDebugRects: useDebugRects as DebugProviderContextType['useDebugRects'],
+      useDebugRects: useDebugRects as DebugContextType['useDebugRects'],
       useObserver
     }
   };

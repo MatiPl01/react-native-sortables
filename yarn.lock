@@ -14165,7 +14165,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-native-sortables-monorepo@workspace:."
   dependencies:
-    "@gorhom/portal": "npm:^1.0.14"
     "@types/eslint": "npm:^8.56.10"
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:^20.14.9"

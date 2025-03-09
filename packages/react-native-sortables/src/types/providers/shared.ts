@@ -21,6 +21,7 @@ import type {
 } from '../props/shared';
 import type { DragActivationState } from '../state';
 import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
+import { ReactNode, RefObject } from 'react';
 
 // COMMON VALUES
 
@@ -133,13 +134,20 @@ export enum LayerState {
   Intermediate = 1
 }
 
-export type LayerProviderContextType = {
+export type LayerContextType = {
   updateLayer: (state: LayerState) => void;
+};
+
+// PORTAL
+
+export type PortalContextType = {
+  portalOutletRef: AnimatedRef<View>;
+  teleport: (itemKey: string, node: ReactNode) => void;
 };
 
 // DEBUG
 
-export type DebugProviderContextType = {
+export type DebugContextType = {
   // Overloaded signatures for useDebugLines
   useDebugLines<K extends string>(keys: Array<K>): Record<K, DebugLineUpdater>;
   useDebugLines(count: number): Array<DebugLineUpdater>;

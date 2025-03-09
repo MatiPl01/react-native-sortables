@@ -1,9 +1,6 @@
 {
   "name": "react-native-sortables-monorepo",
   "version": "1.0.0",
-  "dependencies": {
-    "@gorhom/portal": "^1.0.14"
-  },
   "devDependencies": {
     "@types/eslint": "^8.56.10",
     "@types/jest": "^29.5.12",

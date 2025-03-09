@@ -41,6 +41,8 @@ export default function createProvider<
   [P in ProviderName as `use${P}Context`]: () => Guarded extends true
     ? ContextValue
     : ContextValue | null;
+} & {
+  [P in ProviderName as `${P}Context`]: React.Context<ContextValue>;
 };
 
 export default function createProvider<
@@ -102,7 +104,8 @@ export default function createProvider<
 
     return {
       [`${name}Provider`]: Provider,
-      [`use${name}Context`]: useEnhancedContext
+      [`use${name}Context`]: useEnhancedContext,
+      [`${name}Context`]: Context
     } as any;
   };
 }

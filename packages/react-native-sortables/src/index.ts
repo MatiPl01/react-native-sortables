@@ -8,6 +8,7 @@ import {
   SortableHandle,
   SortableLayer
 } from './components';
+import { PortalProvider } from './providers';
 
 export type { SortableHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
@@ -215,7 +216,8 @@ const Sortable = {
    * );
    * ```
    */
-  TouchableOpacity: createSortableTouchable(TouchableOpacity)
+  TouchableOpacity: createSortableTouchable(TouchableOpacity),
+  PortalProvider
 };
 
 export default Sortable;

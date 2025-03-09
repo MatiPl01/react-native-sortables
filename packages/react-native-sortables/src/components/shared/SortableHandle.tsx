@@ -25,6 +25,7 @@ export function SortableHandle({
   children,
   disabled = false
 }: SortableHandleProps) {
+  // TODO: Render just a handle with no logic if rendered in a portal
   const {
     activeItemKey,
     activeItemPosition,
