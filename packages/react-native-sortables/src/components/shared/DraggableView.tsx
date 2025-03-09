@@ -10,12 +10,13 @@ import { IS_WEB } from '../../constants';
 import {
   ItemContextProvider,
   useCommonValuesContext,
+  useItemDecorationStyles,
   useItemLayoutStyles,
   useMeasurementsContext
 } from '../../providers';
 import type { LayoutAnimation, LayoutTransition } from '../../types';
-import ItemDecoration from './ItemDecoration';
 import { SortableHandleInternal } from './SortableHandle';
+import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 
 export type DraggableViewProps = {
   itemKey: string;
@@ -39,16 +40,19 @@ function DraggableView({
   const activationAnimationProgress = useSharedValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
   const layoutStyles = useItemLayoutStyles(key, activationAnimationProgress);
+  const decorationStyles = useItemDecorationStyles(
+    key,
+    isActive,
+    activationAnimationProgress
+  );
 
   useEffect(() => {
     return () => handleItemRemoval(key);
   }, [key, handleItemRemoval]);
 
   const innerComponent = (
-    <ItemDecoration
-      activationAnimationProgress={activationAnimationProgress}
-      isActive={isActive}
-      itemKey={key}
+    <AnimatedOnLayoutView
+      style={decorationStyles}
       // Keep onLayout the closest to the children to measure the real item size
       // (without paddings or other style changes made to the wrapper component)
       onLayout={({
@@ -64,7 +68,7 @@ function DraggableView({
       <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
         {children}
       </LayoutAnimationConfig>
-    </ItemDecoration>
+    </AnimatedOnLayoutView>
   );
 
   return (
@@ -72,18 +76,18 @@ function DraggableView({
       {...viewProps}
       layout={IS_WEB ? undefined : layout}
       style={[style, layoutStyles]}>
-      <ItemContextProvider
-        activationAnimationProgress={activationAnimationProgress}
-        isActive={isActive}
-        itemKey={key}>
-        <Animated.View entering={entering} exiting={exiting}>
+      <Animated.View entering={entering} exiting={exiting}>
+        <ItemContextProvider
+          activationAnimationProgress={activationAnimationProgress}
+          isActive={isActive}
+          itemKey={key}>
           {customHandle ? (
             innerComponent
           ) : (
             <SortableHandleInternal>{innerComponent}</SortableHandleInternal>
           )}
-        </Animated.View>
-      </ItemContextProvider>
+        </ItemContextProvider>
+      </Animated.View>
     </Animated.View>
   );
 }

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import {
@@ -171,5 +172,8 @@ export default function useItemLayoutStyles(
     };
   });
 
-  return [animatedTranslationStyle, animatedLayoutStyle];
+  return useMemo(
+    () => [animatedTranslationStyle, animatedLayoutStyle],
+    [animatedLayoutStyle, animatedTranslationStyle]
+  );
 }
