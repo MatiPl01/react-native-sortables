@@ -3,7 +3,7 @@ export { default as createSortableTouchable } from './createSortableTouchable';
 export {
   default as DraggableView,
   type DraggableViewProps
-} from './DraggableView';
+} from './DraggableView/DraggableView';
 export { default as SortableContainer } from './SortableContainer';
 export * from './SortableHandle';
 export {

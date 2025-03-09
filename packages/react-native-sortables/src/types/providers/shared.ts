@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { LayoutChangeEvent, View, ViewStyle } from 'react-native';
 import type { GestureTouchEvent } from 'react-native-gesture-handler';
 import type {
@@ -19,9 +20,9 @@ import type {
   ItemDragSettings,
   ReorderTriggerOrigin
 } from '../props/shared';
+import type { LayoutAnimation, LayoutTransition } from '../reanimated';
 import type { DragActivationState } from '../state';
 import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
-import { ReactNode, RefObject } from 'react';
 
 // COMMON VALUES
 
@@ -61,6 +62,11 @@ export type CommonValuesContextType = {
   activeAnimationProgress: SharedValue<number>;
   inactiveAnimationProgress: SharedValue<number>;
   activeItemDropped: SharedValue<boolean>;
+
+  // LAYOUT ANIMATION
+  itemEntering: LayoutAnimation | undefined;
+  itemExiting: LayoutAnimation | undefined;
+  itemsLayout: LayoutTransition | undefined;
 
   // OTHER
   containerRef: AnimatedRef<View>;

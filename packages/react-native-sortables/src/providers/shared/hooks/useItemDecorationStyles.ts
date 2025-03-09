@@ -26,7 +26,6 @@ export default function useItemDecorationStyles(
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
-    itemsOverridesStyle,
     prevActiveItemKey
   } = useCommonValuesContext();
 
@@ -84,10 +83,7 @@ export default function useItemDecorationStyles(
     };
   });
 
-  return useMemo(
-    () => [styles.decoration, animatedStyle, itemsOverridesStyle],
-    [animatedStyle, itemsOverridesStyle]
-  );
+  return useMemo(() => [styles.decoration, animatedStyle], [animatedStyle]);
 }
 
 const styles = StyleSheet.create({

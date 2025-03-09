@@ -182,15 +182,18 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const translate = (from: number, to: number) =>
         from === to ? from : interpolate(progress, [0, 1], [from, to]);
 
-      let activeX = touchPosition.value.x - translate(itemTouchOffset.x, tX);
-      let activeY = touchPosition.value.y - translate(itemTouchOffset.y, tY);
+      const snapX = translate(itemTouchOffset.x, tX);
+      const snapY = translate(itemTouchOffset.y, tY);
 
-      if (!hasHorizontalOverDrag) {
-        activeX = clamp(activeX, 0, containerW - activeDimensions.width);
-      }
-      if (!hasVerticalOverDrag) {
-        activeY = clamp(activeY, 0, containerH - activeDimensions.height);
-      }
+      const unclampedActiveX = touchPosition.value.x - snapX;
+      const unclampedActiveY = touchPosition.value.y - snapY;
+
+      const activeX = hasHorizontalOverDrag
+        ? unclampedActiveX
+        : clamp(unclampedActiveX, 0, containerW - activeDimensions.width);
+      const activeY = hasVerticalOverDrag
+        ? unclampedActiveY
+        : clamp(unclampedActiveY, 0, containerH - activeDimensions.height);
 
       activeItemPosition.value = {
         x: activeX,
@@ -198,10 +201,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       };
 
       if (activeItemAbsolutePosition) {
-        // TODO - support clamping (overDrag)
+        const dX = unclampedActiveX - activeX;
+        const dY = unclampedActiveY - activeY;
+
         activeItemAbsolutePosition.value = {
-          x: touch.absoluteX - translate(itemTouchOffset.x, tX),
-          y: touch.absoluteY - translate(itemTouchOffset.y, tY)
+          x: touch.absoluteX - snapX - dX,
+          y: touch.absoluteY - snapY - dY
         };
       }
     },
@@ -224,7 +229,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const itemPosition = itemPositions.value[key];
       const dimensions = itemDimensions.value[key];
 
-      if (!itemPosition || !dimensions) {
+      if (
+        !itemPosition ||
+        !dimensions ||
+        !activeItemDropped.value // Fail if previous item hasn't been dropped yet
+      ) {
         fail();
         return;
       }
@@ -459,11 +468,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       clearAnimatedTimeout(activationTimeoutId.value);
       activationTimeoutId.value = setAnimatedTimeout(() => {
         activeAnimationProgress.value = 0;
-        if (activeItemKey.value === null) {
-          prevActiveItemKey.value = null;
-          activeItemDropped.value = true;
-          updateLayer?.(LayerState.Idle);
-        }
+        prevActiveItemKey.value = null;
+        activeItemDropped.value = true;
+        updateLayer?.(LayerState.Idle);
       }, dropAnimationDuration.value);
     },
     [

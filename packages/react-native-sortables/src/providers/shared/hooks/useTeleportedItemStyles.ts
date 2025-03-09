@@ -6,24 +6,24 @@ import {
   measure,
   useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
 import type { Vector } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { usePortalContext } from '../PortalProvider';
+import useItemZIndex from './useItemZIndex';
 
 export default function useTeleportedItemStyles(
   key: string,
-  activeAnimationProgress: SharedValue<number>
+  isActive: SharedValue<boolean>,
+  activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
   const { activeItemAbsolutePosition, portalOutletRef } = usePortalContext()!;
-  const { activeItemKey, containerRef, itemDimensions, itemPositions } =
+  const { activeItemKey, containerRef, itemPositions } =
     useCommonValuesContext();
 
-  const isActive = useDerivedValue(() => activeItemKey.value === key);
-  const dimensions = useDerivedValue(() => itemDimensions.value[key]);
+  const zIndex = useItemZIndex(key, activationAnimationProgress);
   const dropStartTranslation = useSharedValue<Vector | null>(null);
 
   const absoluteX = useSharedValue<null | number>(null);
@@ -32,7 +32,7 @@ export default function useTeleportedItemStyles(
   // Inactive item updater (for drop animation)
   useAnimatedReaction(
     () => ({
-      activationProgress: activeAnimationProgress.value,
+      activationProgress: activationAnimationProgress.value,
       active: isActive.value,
       position: itemPositions.value[key]
     }),
@@ -101,12 +101,12 @@ export default function useTeleportedItemStyles(
     const dY = portalOutletMeasurements.pageY;
 
     return {
-      ...dimensions.value,
       opacity: 1,
       transform: [
         { translateX: absoluteX.value - dX },
         { translateY: absoluteY.value - dY }
-      ]
+      ],
+      zIndex: zIndex.value
     };
   });
 

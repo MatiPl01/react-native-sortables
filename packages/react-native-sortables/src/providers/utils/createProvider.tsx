@@ -36,13 +36,13 @@ export default function createProvider<
     children?: ReactNode;
   }
 ) => {
+  [P in ProviderName as `${P}Context`]: React.Context<ContextValue>;
+} & {
   [P in ProviderName as `${P}Provider`]: React.FC<ProviderProps>;
 } & {
   [P in ProviderName as `use${P}Context`]: () => Guarded extends true
     ? ContextValue
     : ContextValue | null;
-} & {
-  [P in ProviderName as `${P}Context`]: React.Context<ContextValue>;
 };
 
 export default function createProvider<
@@ -103,9 +103,9 @@ export default function createProvider<
     };
 
     return {
+      [`${name}Context`]: Context,
       [`${name}Provider`]: Provider,
-      [`use${name}Context`]: useEnhancedContext,
-      [`${name}Context`]: Context
+      [`use${name}Context`]: useEnhancedContext
     } as any;
   };
 }

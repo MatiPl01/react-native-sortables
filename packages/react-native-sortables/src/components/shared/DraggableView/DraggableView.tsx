@@ -1,12 +1,11 @@
 import { memo, useEffect } from 'react';
 import type { ViewProps } from 'react-native';
-import Animated, {
+import {
   LayoutAnimationConfig,
   useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
-import { IS_WEB } from '../../constants';
 import {
   ItemContextProvider,
   useCommonValuesContext,
@@ -14,11 +13,11 @@ import {
   useItemLayoutStyles,
   useMeasurementsContext,
   usePortalContext
-} from '../../providers';
-import type { LayoutAnimation, LayoutTransition } from '../../types';
+} from '../../../providers';
+import type { LayoutAnimation, LayoutTransition } from '../../../types';
+import { SortableHandleInternal } from '../SortableHandle';
 import ActiveItemPortal from './ActiveItemPortal';
-import AnimatedOnLayoutView from './AnimatedOnLayoutView';
-import { SortableHandleInternal } from './SortableHandle';
+import { CellComponent } from './CellComponent';
 
 export type DraggableViewProps = {
   itemKey: string;
@@ -29,15 +28,13 @@ export type DraggableViewProps = {
 
 function DraggableView({
   children,
-  entering,
-  exiting,
   itemKey: key,
-  layout,
   style,
-  ...viewProps
+  ...cellProps
 }: DraggableViewProps) {
   const hasPortal = !!usePortalContext();
-  const { activeItemKey, customHandle } = useCommonValuesContext();
+  const { activeItemKey, customHandle, itemsOverridesStyle } =
+    useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
 
   const activationAnimationProgress = useSharedValue(0);
@@ -54,29 +51,17 @@ function DraggableView({
   }, [key, handleItemRemoval]);
 
   const innerComponent = (
-    <Animated.View
-      {...viewProps}
-      layout={IS_WEB ? undefined : layout}
-      style={[style, layoutStyles]}>
-      <AnimatedOnLayoutView
-        entering={entering}
-        exiting={exiting}
-        style={decorationStyles}
-        onLayout={({
-          nativeEvent: {
-            layout: { height, width }
-          }
-        }) => {
-          handleItemMeasurement(key, {
-            height,
-            width
-          });
-        }}>
-        <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
-          {children}
-        </LayoutAnimationConfig>
-      </AnimatedOnLayoutView>
-    </Animated.View>
+    <CellComponent
+      {...cellProps}
+      cellStyle={[style, layoutStyles]}
+      decorationStyle={decorationStyles}
+      handleItemMeasurement={handleItemMeasurement}
+      itemKey={key}
+      itemsOverridesStyle={itemsOverridesStyle}>
+      <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
+        {children}
+      </LayoutAnimationConfig>
+    </CellComponent>
   );
 
   return (
@@ -90,10 +75,8 @@ function DraggableView({
         <SortableHandleInternal>{innerComponent}</SortableHandleInternal>
       )}
       {hasPortal && (
-        <ActiveItemPortal
-          activationAnimationProgress={activationAnimationProgress}>
-          {/* TODO - fix grid style */}
-          <Animated.View style={decorationStyles}>{children}</Animated.View>
+        <ActiveItemPortal cellStyle={style} decorationStyle={decorationStyles}>
+          {children}
         </ActiveItemPortal>
       )}
     </ItemContextProvider>
