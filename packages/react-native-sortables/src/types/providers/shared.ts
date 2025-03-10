@@ -149,7 +149,7 @@ export type LayerContextType = {
 export type PortalContextType = {
   activeItemAbsolutePosition: SharedValue<Vector | null>;
   portalOutletRef: AnimatedRef<View>;
-  teleport: (itemKey: string, node: ReactNode) => void;
+  teleport: (itemKey: string, node: ReactNode, onRender?: () => void) => void;
 };
 
 // DEBUG

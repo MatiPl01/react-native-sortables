@@ -1,106 +1,64 @@
-import type { PropsWithChildren } from 'react';
-import { useEffect, useState } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
-import {
-  LayoutAnimationConfig,
-  runOnJS,
-  useAnimatedReaction
-} from 'react-native-reanimated';
+import type { ReactNode } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import type { SharedValue } from 'react-native-reanimated';
+import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
-import {
-  useCommonValuesContext,
-  useItemContext,
-  useMeasurementsContext,
-  usePortalContext,
-  useTeleportedItemStyles
-} from '../../../providers';
-import { CellComponent } from './CellComponent';
-
-type ActiveItemPortalProps = PropsWithChildren<{
-  cellStyle: StyleProp<AnimatedStyle<ViewStyle>>;
-  decorationStyle: StyleProp<AnimatedStyle<ViewStyle>>;
-}>;
+type ActiveItemPortalProps = {
+  activationAnimationProgress: SharedValue<number>;
+  renderItemCell: () => ReactNode;
+  renderPlaceholderCell: () => ReactNode;
+  renderTeleportedItemCell: (onRender: () => void) => ReactNode;
+};
 
 export default function ActiveItemPortal({
-  children,
-  ...rest
+  activationAnimationProgress,
+  renderItemCell,
+  renderPlaceholderCell,
+  renderTeleportedItemCell
 }: ActiveItemPortalProps) {
-  const { activationAnimationProgress, isActive, itemKey } = useItemContext();
+  const [teleportEnabled, setTeleportEnabled] = useState(false);
   const [isTeleported, setIsTeleported] = useState(false);
+
+  const enableTeleport = () => {
+    setTeleportEnabled(true);
+  };
+
+  const disableTeleport = () => {
+    setTeleportEnabled(false);
+    setIsTeleported(false);
+  };
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,
     progress => {
-      if (progress > 0 && !isTeleported) {
-        runOnJS(setIsTeleported)(true);
-      } else if (progress === 0 && isTeleported) {
-        runOnJS(setIsTeleported)(false);
+      if (progress > 0 && !teleportEnabled) {
+        runOnJS(enableTeleport)();
+      } else if (progress === 0 && teleportEnabled) {
+        runOnJS(disableTeleport)();
       }
     }
   );
 
-  return isTeleported ? (
-    <TeleportedCell
-      {...rest}
-      activationAnimationProgress={activationAnimationProgress}
-      isActive={isActive}
-      itemKey={itemKey}>
-      {children}
-    </TeleportedCell>
-  ) : null;
-}
+  const handleTeleportRender = useCallback(() => {
+    console.log('call onRender from ActiveItemPortal');
+    setIsTeleported(true);
+  }, []);
 
-type TeleportedCellProps = {
-  itemKey: string;
-  isActive: SharedValue<boolean>;
-  activationAnimationProgress: SharedValue<number>;
-} & ActiveItemPortalProps;
+  console.log({ isTeleported, teleportEnabled });
 
-function TeleportedCell({
-  activationAnimationProgress,
-  cellStyle,
-  children,
-  decorationStyle,
-  isActive,
-  itemKey
-}: TeleportedCellProps) {
-  const { teleport } = usePortalContext()!;
-  const { itemsOverridesStyle } = useCommonValuesContext();
-  const { handleItemMeasurement } = useMeasurementsContext();
-
-  const teleportedItemStyles = useTeleportedItemStyles(
-    itemKey,
-    isActive,
-    activationAnimationProgress
+  const item = useMemo(
+    () => (isTeleported ? renderPlaceholderCell() : renderItemCell()),
+    [isTeleported, renderItemCell, renderPlaceholderCell]
+  );
+  const teleportedItem = useMemo(
+    () => teleportEnabled && renderTeleportedItemCell(handleTeleportRender),
+    [handleTeleportRender, renderTeleportedItemCell, teleportEnabled]
   );
 
-  useEffect(() => {
-    teleport(
-      itemKey,
-      <LayoutAnimationConfig skipEntering skipExiting>
-        <CellComponent
-          cellStyle={[cellStyle, teleportedItemStyles]}
-          decorationStyle={decorationStyle}
-          handleItemMeasurement={handleItemMeasurement}
-          itemKey={itemKey}
-          itemsOverridesStyle={itemsOverridesStyle}>
-          {children}
-        </CellComponent>
-      </LayoutAnimationConfig>
-    );
-
-    return () => teleport(itemKey, null);
-  }, [
-    cellStyle,
-    itemKey,
-    teleport,
-    teleportedItemStyles,
-    decorationStyle,
-    handleItemMeasurement,
-    itemsOverridesStyle,
-    children
-  ]);
-
-  return null;
+  return (
+    <>
+      {item}
+      {teleportedItem}
+    </>
+  );
 }
