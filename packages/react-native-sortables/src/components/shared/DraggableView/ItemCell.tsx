@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { PropsWithChildren } from 'react';
+import type { LayoutChangeEvent, ViewStyle } from 'react-native';
 import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated, {
   useAnimatedStyle,
@@ -9,35 +9,24 @@ import Animated, {
 import { IS_WEB } from '../../../constants';
 import { useCommonValuesContext } from '../../../providers';
 import type {
+  AnimatedStyleProp,
   Dimensions,
   LayoutAnimation,
   LayoutTransition
 } from '../../../types';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
-type ItemCellProps = {
+export type ItemCellProps = PropsWithChildren<{
   itemKey: string;
-  cellStyle: StyleProp<AnimatedStyle<ViewStyle>>;
-} & (
-  | {
-      children: ReactNode;
-      decorationStyle: StyleProp<AnimatedStyle<ViewStyle>>;
-      itemsOverridesStyle: AnimatedStyle<ViewStyle>;
-      entering?: LayoutAnimation;
-      exiting?: LayoutAnimation;
-      layout?: LayoutTransition;
-      handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
-    }
-  | {
-      children?: undefined;
-      decorationStyle?: never;
-      entering?: never;
-      exiting?: never;
-      handleItemMeasurement?: never;
-      itemsOverridesStyle?: never;
-      layout?: never;
-    }
-);
+  decorationStyle: AnimatedStyleProp;
+  itemsOverridesStyle: AnimatedStyle<ViewStyle>;
+  cellStyle: AnimatedStyleProp;
+  entering?: LayoutAnimation;
+  exiting?: LayoutAnimation;
+  layout?: LayoutTransition;
+  visible?: boolean;
+  handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
+}>;
 
 export default function ItemCell({
   cellStyle,
@@ -50,30 +39,28 @@ export default function ItemCell({
   itemsOverridesStyle,
   layout
 }: ItemCellProps) {
+  console.log('>>>> has children', !!children);
+
+  const onLayout = children
+    ? ({
+        nativeEvent: {
+          layout: { height, width }
+        }
+      }: LayoutChangeEvent) => {
+        console.log('>>>> onLayout', itemKey, height, width);
+        handleItemMeasurement(itemKey, { height, width });
+      }
+    : undefined;
+
   return (
     <Animated.View layout={IS_WEB ? undefined : layout} style={cellStyle}>
-      {children ? (
-        <AnimatedOnLayoutView
-          entering={entering}
-          exiting={exiting}
-          style={[itemsOverridesStyle, decorationStyle]}
-          onLayout={({
-            nativeEvent: {
-              layout: { height, width }
-            }
-          }) => {
-            handleItemMeasurement(itemKey, {
-              height,
-              width
-            });
-          }}>
-          {children}
-        </AnimatedOnLayoutView>
-      ) : (
-        <Animated.View style={itemsOverridesStyle}>
-          <PlaceholderItem itemKey={itemKey} />
-        </Animated.View>
-      )}
+      <AnimatedOnLayoutView
+        entering={entering}
+        exiting={exiting}
+        style={[itemsOverridesStyle, decorationStyle]}
+        onLayout={onLayout}>
+        {children ?? <PlaceholderItem itemKey={itemKey} />}
+      </AnimatedOnLayoutView>
     </Animated.View>
   );
 }
@@ -84,6 +71,7 @@ type PlaceholderItemProps = {
 
 function PlaceholderItem({ itemKey }: PlaceholderItemProps) {
   const { itemDimensions } = useCommonValuesContext();
+  console.log('>>>> placeholder item', itemKey);
 
   const dimensions = useDerivedValue(() => itemDimensions.value[itemKey]);
 

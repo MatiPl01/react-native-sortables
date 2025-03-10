@@ -1,4 +1,6 @@
+import type { StyleProp, ViewStyle } from 'react-native';
 import type {
+  AnimatedStyle,
   BaseAnimationBuilder,
   EntryExitAnimationFunction,
   LayoutAnimationFunction
@@ -13,3 +15,5 @@ export type LayoutTransition =
   | BaseAnimationBuilder
   | LayoutAnimationFunction
   | typeof BaseAnimationBuilder;
+
+export type AnimatedStyleProp = StyleProp<AnimatedStyle<ViewStyle>>;

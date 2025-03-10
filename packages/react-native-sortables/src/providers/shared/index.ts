@@ -1,5 +1,6 @@
 export { AutoScrollProvider, useAutoScrollContext } from './AutoScrollProvider';
 export {
+  CommonValuesContext,
   CommonValuesProvider,
   useCommonValuesContext
 } from './CommonValuesProvider';
@@ -13,5 +14,5 @@ export {
   type MeasurementsProviderProps,
   useMeasurementsContext
 } from './MeasurementsProvider';
-export * from './utils';
 export { PortalProvider, usePortalContext } from './PortalProvider';
+export * from './utils';

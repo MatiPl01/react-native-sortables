@@ -20,7 +20,6 @@ import type {
   ItemDragSettings,
   ReorderTriggerOrigin
 } from '../props/shared';
-import type { LayoutAnimation, LayoutTransition } from '../reanimated';
 import type { DragActivationState } from '../state';
 import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
 
@@ -62,11 +61,6 @@ export type CommonValuesContextType = {
   activeAnimationProgress: SharedValue<number>;
   inactiveAnimationProgress: SharedValue<number>;
   activeItemDropped: SharedValue<boolean>;
-
-  // LAYOUT ANIMATION
-  itemEntering: LayoutAnimation | undefined;
-  itemExiting: LayoutAnimation | undefined;
-  itemsLayout: LayoutTransition | undefined;
 
   // OTHER
   containerRef: AnimatedRef<View>;
@@ -149,7 +143,11 @@ export type LayerContextType = {
 export type PortalContextType = {
   activeItemAbsolutePosition: SharedValue<Vector | null>;
   portalOutletRef: AnimatedRef<View>;
-  teleport: (itemKey: string, node: ReactNode, onRender?: () => void) => void;
+  teleport: (itemKey: string, node: ReactNode) => void;
+  subscribe: (
+    itemKey: string,
+    callback: (isTeleported: boolean) => void
+  ) => void;
 };
 
 // DEBUG

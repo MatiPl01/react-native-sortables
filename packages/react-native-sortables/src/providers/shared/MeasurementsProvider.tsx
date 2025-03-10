@@ -58,7 +58,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
       if (
         storedDimensions &&
-        !areDimensionsDifferent(storedDimensions, dimensions, 0.1)
+        !areDimensionsDifferent(storedDimensions, dimensions, 1)
       ) {
         return;
       }

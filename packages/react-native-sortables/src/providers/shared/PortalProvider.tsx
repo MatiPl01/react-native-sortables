@@ -1,5 +1,5 @@
-import type { PropsWithChildren, ReactNode } from 'react';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { Fragment, useCallback, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useAnimatedRef, useSharedValue } from 'react-native-reanimated';
 
@@ -10,85 +10,76 @@ type PortalProviderProps = {
   children: ReactNode;
 };
 
+type Subscriber = (isTeleported: boolean) => void;
+
 const { PortalProvider, usePortalContext } = createProvider('Portal', {
   guarded: false
 })<PortalProviderProps, PortalContextType>(({ children }) => {
   const portalOutletRef = useAnimatedRef<View>();
+  const subscribersRef = useRef<Record<string, Set<Subscriber>>>({});
   const activeItemAbsolutePosition = useSharedValue<Vector | null>(null);
   const [teleportedNodes, setTeleportedNodes] = useState<
-    Record<string, { node: ReactNode; onRender?: () => void }>
+    Record<string, React.ReactNode>
   >({});
 
-  const addTeleportedNode = useCallback(
-    (itemKey: string, node: ReactNode, onRender?: () => void) => {
-      setTeleportedNodes(prev => ({ ...prev, [itemKey]: { node, onRender } }));
+  const notifySubscribers = useCallback(
+    (itemKey: string, isTeleported: boolean) => {
+      // Schedule for the next render
+      setTimeout(() => {
+        subscribersRef.current[itemKey]?.forEach(callback =>
+          callback(isTeleported)
+        );
+      }, 0);
     },
     []
   );
 
-  const removeTeleportedNode = useCallback((itemKey: string) => {
-    setTeleportedNodes(prev => {
-      if (!prev[itemKey]) {
-        return prev;
-      }
-
-      delete prev[itemKey];
-      return { ...prev };
-    });
-  }, []);
-
   const teleport = useCallback(
-    (itemKey: string, node: ReactNode, onRender?: () => void) => {
+    (itemKey: string, node: React.ReactNode) => {
+      console.log('> teleport', itemKey, !!node);
       if (node) {
-        addTeleportedNode(itemKey, node, onRender);
+        setTeleportedNodes(prev => {
+          const newState = { ...prev, [itemKey]: node };
+          notifySubscribers(itemKey, true);
+          return newState;
+        });
       } else {
-        removeTeleportedNode(itemKey);
+        setTeleportedNodes(prev => {
+          if (!prev[itemKey]) return prev;
+          const newState = { ...prev };
+          delete newState[itemKey];
+          notifySubscribers(itemKey, false);
+          return newState;
+        });
       }
-
-      return () => removeTeleportedNode(itemKey);
     },
-    [addTeleportedNode, removeTeleportedNode]
+    [notifySubscribers]
   );
+
+  const subscribe = useCallback((itemKey: string, callback: Subscriber) => {
+    if (!subscribersRef.current[itemKey]) {
+      subscribersRef.current[itemKey] = new Set();
+    }
+    subscribersRef.current[itemKey].add(callback);
+
+    return () => {
+      subscribersRef.current[itemKey]?.delete(callback);
+    };
+  }, []);
 
   return {
     children: (
       <>
         {children}
         <View ref={portalOutletRef} style={StyleSheet.absoluteFill}>
-          {Object.entries(teleportedNodes).map(
-            ([itemKey, { node, onRender }]) => (
-              <TeleportedComponent key={itemKey} onRender={onRender}>
-                {node}
-              </TeleportedComponent>
-            )
-          )}
+          {Object.entries(teleportedNodes).map(([key, node]) => (
+            <Fragment key={key}>{node}</Fragment>
+          ))}
         </View>
       </>
     ),
-    value: { activeItemAbsolutePosition, portalOutletRef, teleport }
+    value: { activeItemAbsolutePosition, portalOutletRef, subscribe, teleport }
   };
 });
-
-type TeleportedComponentProps = PropsWithChildren<{
-  onRender?: () => void;
-}>;
-
-function TeleportedComponent({ children, onRender }: TeleportedComponentProps) {
-  const isRenderedRef = useRef(false);
-
-  useEffect(() => {
-    if (isRenderedRef.current) {
-      return;
-    }
-
-    isRenderedRef.current = true;
-    console.log('call onRender');
-    onRender?.();
-  }, [onRender]);
-
-  console.log('render teleported component');
-
-  return children;
-}
 
 export { PortalProvider, usePortalContext };

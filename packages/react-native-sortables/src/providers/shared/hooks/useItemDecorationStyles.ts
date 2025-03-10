@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { Platform, StyleSheet } from 'react-native';
-import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import {
   interpolate,
   interpolateColor,
@@ -11,13 +11,14 @@ import {
 } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
+import type { AnimatedStyleProp } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
 export default function useItemDecorationStyles(
   itemKey: string,
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
-): StyleProp<AnimatedStyle<ViewStyle>> {
+): AnimatedStyleProp {
   const {
     activationAnimationDuration,
     activeItemOpacity,

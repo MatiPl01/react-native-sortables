@@ -83,7 +83,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         return null;
       }
 
-      return (mainContainerWidth + mainGap.value) / numGroups - mainGap.value;
+      return mainContainerWidth / numGroups - mainGap.value;
     },
     value => {
       if (!value) {

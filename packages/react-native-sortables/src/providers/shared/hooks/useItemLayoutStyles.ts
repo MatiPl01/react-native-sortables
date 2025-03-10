@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import type { ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import {
   interpolate,
   useAnimatedReaction,
@@ -9,7 +9,7 @@ import {
 } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
-import type { Vector } from '../../../types';
+import type { AnimatedStyleProp, Vector } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
@@ -32,7 +32,7 @@ const NO_TRANSLATION_STYLE: ViewStyle = {
 export default function useItemLayoutStyles(
   key: string,
   activationAnimationProgress: SharedValue<number>
-): StyleProp<AnimatedStyle<ViewStyle>> {
+): AnimatedStyleProp {
   const {
     activeItemKey,
     activeItemPosition,

@@ -1,14 +1,14 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { memo, useEffect } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { AnimatedStyle } from 'react-native-reanimated';
 import {
   LayoutAnimationConfig,
   useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
+import { IS_REACT_19 } from '../../../constants';
 import {
+  CommonValuesContext,
   ItemContextProvider,
   useCommonValuesContext,
   useItemDecorationStyles,
@@ -16,7 +16,11 @@ import {
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
-import type { LayoutAnimation, LayoutTransition } from '../../../types';
+import type {
+  AnimatedStyleProp,
+  LayoutAnimation,
+  LayoutTransition
+} from '../../../types';
 import { SortableHandleInternal } from '../SortableHandle';
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
@@ -27,7 +31,7 @@ export type DraggableViewProps = PropsWithChildren<{
   entering: LayoutAnimation | undefined;
   exiting: LayoutAnimation | undefined;
   layout: LayoutTransition | undefined;
-  style: StyleProp<AnimatedStyle<ViewStyle>>; // TODO: add helper type
+  style: AnimatedStyleProp;
 }>;
 
 function DraggableView({
@@ -37,9 +41,10 @@ function DraggableView({
   ...layoutAnimations
 }: DraggableViewProps) {
   const hasPortal = !!usePortalContext();
-  const { activeItemKey, customHandle, itemsOverridesStyle } =
-    useCommonValuesContext();
+  const commonValuesContext = useCommonValuesContext();
   const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
+  const { activeItemKey, customHandle, itemsOverridesStyle } =
+    commonValuesContext;
 
   const activationAnimationProgress = useSharedValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
@@ -54,6 +59,13 @@ function DraggableView({
     return () => handleItemRemoval(key);
   }, [key, handleItemRemoval]);
 
+  const sharedCellProps = {
+    decorationStyle,
+    handleItemMeasurement,
+    itemKey: key,
+    itemsOverridesStyle
+  };
+
   const wrapComponent = (innerComponent: ReactNode) => (
     <ItemContextProvider
       activationAnimationProgress={activationAnimationProgress}
@@ -67,49 +79,60 @@ function DraggableView({
     </ItemContextProvider>
   );
 
-  const renderItemCell = () => (
-    <ItemCell
-      {...layoutAnimations}
-      cellStyle={[style, layoutStyles]}
-      decorationStyle={decorationStyle}
-      handleItemMeasurement={handleItemMeasurement}
-      itemKey={key}
-      itemsOverridesStyle={itemsOverridesStyle}>
-      <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
-        {children}
-      </LayoutAnimationConfig>
-    </ItemCell>
-  );
+  const renderItemCell = (cellChildren: ReactNode) => {
+    console.log('>>>> renderItemCell', key, !!cellChildren);
+
+    return (
+      <ItemCell
+        {...layoutAnimations}
+        {...sharedCellProps}
+        cellStyle={[style, layoutStyles]}>
+        {cellChildren && (
+          <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
+            {cellChildren}
+          </LayoutAnimationConfig>
+        )}
+      </ItemCell>
+    );
+  };
+
+  // NORMAL CASE (no portal)
 
   if (!hasPortal) {
-    return wrapComponent(renderItemCell());
+    return wrapComponent(renderItemCell(children));
   }
 
-  const renderPlaceholderCell = () => (
-    <ItemCell cellStyle={[style, layoutStyles]} itemKey={key} />
-  );
+  // PORTAL CASE
 
-  const renderTeleportedItemCell = (onRender: () => void) => (
-    <TeleportedItemCell
-      activationAnimationProgress={activationAnimationProgress}
-      baseCellStyle={style}
-      decorationStyle={decorationStyle}
-      isActive={isActive}
-      itemKey={key}
-      onRender={onRender}>
-      <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
-        {children}
-      </LayoutAnimationConfig>
-    </TeleportedItemCell>
-  );
+  const renderTeleportedItemCell = (cellChildren: ReactNode) => {
+    const CommonValuesContextProvider = IS_REACT_19
+      ? CommonValuesContext
+      : CommonValuesContext.Provider;
+
+    return (
+      // We have to wrap the TeleportedItemCell in a CommonValuesContext provider
+      // as it won't be accessible otherwise, when the item is rendered in the
+      // portal outlet
+      <CommonValuesContextProvider value={commonValuesContext}>
+        <TeleportedItemCell
+          {...sharedCellProps}
+          activationAnimationProgress={activationAnimationProgress}
+          baseCellStyle={style}
+          isActive={isActive}>
+          {cellChildren}
+        </TeleportedItemCell>
+      </CommonValuesContextProvider>
+    );
+  };
 
   return wrapComponent(
     <ActiveItemPortal
       activationAnimationProgress={activationAnimationProgress}
+      itemKey={key}
       renderItemCell={renderItemCell}
-      renderPlaceholderCell={renderPlaceholderCell}
-      renderTeleportedItemCell={renderTeleportedItemCell}
-    />
+      renderTeleportedItemCell={renderTeleportedItemCell}>
+      {children}
+    </ActiveItemPortal>
   );
 }
 

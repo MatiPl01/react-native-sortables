@@ -1,39 +1,30 @@
-/* eslint-disable import/no-unused-modules */
-import type { PropsWithChildren } from 'react';
-import { useEffect } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import {
   useCommonValuesContext,
-  useMeasurementsContext,
-  usePortalContext,
   useTeleportedItemStyles
 } from '../../../providers';
+import type { AnimatedStyleProp } from '../../../types';
+import type { ItemCellProps } from './ItemCell';
 import ItemCell from './ItemCell';
 
-type TeleportedItemCellProps = PropsWithChildren<{
-  itemKey: string;
-  isActive: SharedValue<boolean>;
+type TeleportedItemCellProps = {
   activationAnimationProgress: SharedValue<number>;
-  baseCellStyle: StyleProp<AnimatedStyle<ViewStyle>>;
-  decorationStyle: StyleProp<AnimatedStyle<ViewStyle>>;
-  onRender: () => void;
-}>;
+  baseCellStyle: AnimatedStyleProp;
+  isActive: SharedValue<boolean>;
+} & Omit<ItemCellProps, 'cellStyle' | 'entering' | 'exiting' | 'layout'>;
 
 export default function TeleportedItemCell({
   activationAnimationProgress,
   baseCellStyle,
   children,
   decorationStyle,
+  handleItemMeasurement,
   isActive,
-  itemKey,
-  onRender
+  itemKey
 }: TeleportedItemCellProps) {
-  const { teleport } = usePortalContext()!;
   const { itemsOverridesStyle } = useCommonValuesContext();
-  const { handleItemMeasurement } = useMeasurementsContext();
 
   const teleportedItemStyles = useTeleportedItemStyles(
     itemKey,
@@ -41,34 +32,14 @@ export default function TeleportedItemCell({
     activationAnimationProgress
   );
 
-  useEffect(() => {
-    teleport(
-      itemKey,
-      <LayoutAnimationConfig skipEntering skipExiting>
-        <ItemCell
-          cellStyle={[baseCellStyle, teleportedItemStyles]}
-          decorationStyle={decorationStyle}
-          handleItemMeasurement={handleItemMeasurement}
-          itemKey={itemKey}
-          itemsOverridesStyle={itemsOverridesStyle}>
-          {children}
-        </ItemCell>
-      </LayoutAnimationConfig>,
-      onRender
-    );
-
-    return () => teleport(itemKey, null);
-  }, [
-    baseCellStyle,
-    itemKey,
-    teleport,
-    onRender,
-    teleportedItemStyles,
-    decorationStyle,
-    handleItemMeasurement,
-    itemsOverridesStyle,
-    children
-  ]);
-
-  return null;
+  return (
+    <ItemCell
+      cellStyle={[baseCellStyle, teleportedItemStyles]}
+      decorationStyle={decorationStyle}
+      handleItemMeasurement={handleItemMeasurement}
+      itemKey={itemKey}
+      itemsOverridesStyle={itemsOverridesStyle}>
+      <LayoutAnimationConfig skipEntering>{children}</LayoutAnimationConfig>
+    </ItemCell>
+  );
 }

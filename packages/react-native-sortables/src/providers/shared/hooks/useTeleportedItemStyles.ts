@@ -94,6 +94,7 @@ export default function useTeleportedItemStyles(
       absoluteY.value === null ||
       !portalOutletMeasurements
     ) {
+      console.log('>>>> opacity: 0', key);
       return { opacity: 0 };
     }
 
