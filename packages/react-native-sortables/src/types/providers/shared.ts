@@ -140,14 +140,14 @@ export type LayerContextType = {
 
 // PORTAL
 
+export type PortalSubscription = (isTeleported: boolean) => void;
+
 export type PortalContextType = {
   activeItemAbsolutePosition: SharedValue<Vector | null>;
   portalOutletRef: AnimatedRef<View>;
   teleport: (itemKey: string, node: ReactNode) => void;
-  subscribe: (
-    itemKey: string,
-    callback: (isTeleported: boolean) => void
-  ) => void;
+  subscribe: (itemKey: string, callback: PortalSubscription) => void;
+  notifyRendered: (itemKey: string) => void;
 };
 
 // DEBUG

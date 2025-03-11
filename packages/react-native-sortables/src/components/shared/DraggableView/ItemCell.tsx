@@ -39,15 +39,12 @@ export default function ItemCell({
   itemsOverridesStyle,
   layout
 }: ItemCellProps) {
-  console.log('>>>> has children', !!children);
-
   const onLayout = children
     ? ({
         nativeEvent: {
           layout: { height, width }
         }
       }: LayoutChangeEvent) => {
-        console.log('>>>> onLayout', itemKey, height, width);
         handleItemMeasurement(itemKey, { height, width });
       }
     : undefined;
@@ -71,7 +68,6 @@ type PlaceholderItemProps = {
 
 function PlaceholderItem({ itemKey }: PlaceholderItemProps) {
   const { itemDimensions } = useCommonValuesContext();
-  console.log('>>>> placeholder item', itemKey);
 
   const dimensions = useDerivedValue(() => itemDimensions.value[itemKey]);
 

@@ -80,8 +80,6 @@ function DraggableView({
   );
 
   const renderItemCell = (cellChildren: ReactNode) => {
-    console.log('>>>> renderItemCell', key, !!cellChildren);
-
     return (
       <ItemCell
         {...layoutAnimations}

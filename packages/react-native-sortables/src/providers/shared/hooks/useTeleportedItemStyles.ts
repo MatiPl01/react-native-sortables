@@ -94,15 +94,17 @@ export default function useTeleportedItemStyles(
       absoluteY.value === null ||
       !portalOutletMeasurements
     ) {
-      console.log('>>>> opacity: 0', key);
-      return { opacity: 0 };
+      console.log('>>>> hidden', key);
+      return { display: 'none' };
     }
 
     const dX = portalOutletMeasurements.pageX;
     const dY = portalOutletMeasurements.pageY;
 
+    console.log('>>>> displayed', key);
+
     return {
-      opacity: 1,
+      display: 'flex',
       transform: [
         { translateX: absoluteX.value - dX },
         { translateY: absoluteY.value - dY }

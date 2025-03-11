@@ -55,9 +55,10 @@ export default function ActiveItemPortal({
     }
   }, [key, renderTeleportedItemCell, teleport, teleportRequested, children]);
 
-  console.log('isTeleported', key, isTeleported ? null : children);
+  console.log('isTeleported', key, isTeleported);
 
   // Renders a component within the sortable container
-  // (it cannot be unmounted as it is responsible for gesture handling)
+  // (it cannot be unmounted as it is responsible for gesture handling,
+  // we can just remove its children when they are already teleported)
   return renderItemCell(isTeleported ? null : children);
 }
