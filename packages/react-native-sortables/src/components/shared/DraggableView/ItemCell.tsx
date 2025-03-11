@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren, useEffect } from 'react';
 import type { LayoutChangeEvent, ViewStyle } from 'react-native';
 import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated, {
@@ -7,7 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
-import { useCommonValuesContext } from '../../../providers';
+import { useCommonValuesContext, usePortalContext } from '../../../providers';
 import type {
   AnimatedStyleProp,
   Dimensions,
@@ -67,9 +67,19 @@ type PlaceholderItemProps = {
 };
 
 function PlaceholderItem({ itemKey }: PlaceholderItemProps) {
+  const { teleport } = usePortalContext()!;
   const { itemDimensions } = useCommonValuesContext();
 
   const dimensions = useDerivedValue(() => itemDimensions.value[itemKey]);
+
+  useEffect(() => {
+    return () => {
+      // We can safely remove the teleported item only when the the
+      // placeholder item is not needed anymore, because the item is
+      // already rendered in the sortable container
+      teleport(itemKey, null);
+    };
+  }, [itemKey, teleport]);
 
   const animatedPlaceholderStyle = useAnimatedStyle(
     () => dimensions.value ?? {}

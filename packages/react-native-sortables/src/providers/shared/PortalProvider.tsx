@@ -46,8 +46,18 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
         subscribersRef.current[itemKey] = new Set();
       }
       subscribersRef.current[itemKey].add(callback);
+      console.log(
+        'subscribing',
+        itemKey,
+        subscribersRef.current[itemKey]?.size
+      );
       return () => {
         subscribersRef.current[itemKey]?.delete(callback);
+        console.log(
+          'unsubscribing',
+          itemKey,
+          subscribersRef.current[itemKey]?.size
+        );
       };
     },
     []
@@ -55,15 +65,22 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
 
   const notifySubscribers = useCallback(
     (itemKey: string, isTeleported: boolean) => {
-      subscribersRef.current[itemKey]?.forEach(callback =>
-        callback(isTeleported)
-      );
+      subscribersRef.current[itemKey]?.forEach(callback => {
+        console.log(
+          'notify',
+          itemKey,
+          isTeleported,
+          subscribersRef.current[itemKey]?.size
+        );
+        callback(isTeleported);
+      });
     },
     []
   );
 
   const notifyRendered = useCallback(
     (itemKey: string) => {
+      console.log('<> notifyRendered', itemKey);
       notifySubscribers(itemKey, true);
     },
     [notifySubscribers]

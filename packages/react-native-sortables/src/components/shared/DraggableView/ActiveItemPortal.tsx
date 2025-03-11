@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   runOnJS,
@@ -7,7 +7,7 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { useIsTeleported, usePortalContext } from '../../../providers';
+import { usePortalContext } from '../../../providers';
 
 type ActiveItemPortalProps = PropsWithChildren<{
   itemKey: string;
@@ -23,16 +23,26 @@ export default function ActiveItemPortal({
   renderItemCell,
   renderTeleportedItemCell
 }: ActiveItemPortalProps) {
-  const { teleport } = usePortalContext()!;
+  const { subscribe, teleport } = usePortalContext()!;
+  const [isTeleported, setIsTeleported] = useState(false);
   const teleportRequested = useSharedValue(false);
-  const isTeleported = useIsTeleported(key);
+
+  useEffect(() => {
+    console.log('subscribing', key);
+    return subscribe(key, setIsTeleported);
+  }, [key, subscribe]);
+
+  useEffect(() => {
+    if (teleportRequested.value) {
+      // Renders a component in the portal outlet
+      console.log('teleporting useEffect', key);
+      teleport(key, renderTeleportedItemCell(children));
+    }
+  }, [key, renderTeleportedItemCell, teleport, teleportRequested, children]);
 
   const requestTeleport = () => {
+    console.log('requestTeleport', key);
     teleport(key, renderTeleportedItemCell(children));
-  };
-
-  const cancelTeleport = () => {
-    teleport(key, null);
   };
 
   useAnimatedReaction(
@@ -42,18 +52,13 @@ export default function ActiveItemPortal({
         runOnJS(requestTeleport)();
         teleportRequested.value = true;
       } else if (progress === 0 && teleportRequested.value) {
-        runOnJS(cancelTeleport)();
+        // We have to make sure that the item was rendered back in the
+        // sortable container before removing the teleported item
+        runOnJS(setIsTeleported)(false);
         teleportRequested.value = false;
       }
     }
   );
-
-  useEffect(() => {
-    if (teleportRequested.value) {
-      // Renders a component in the portal outlet
-      teleport(key, renderTeleportedItemCell(children));
-    }
-  }, [key, renderTeleportedItemCell, teleport, teleportRequested, children]);
 
   console.log('isTeleported', key, isTeleported);
 

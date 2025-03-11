@@ -94,14 +94,11 @@ export default function useTeleportedItemStyles(
       absoluteY.value === null ||
       !portalOutletMeasurements
     ) {
-      console.log('>>>> hidden', key);
       return { display: 'none' };
     }
 
     const dX = portalOutletMeasurements.pageX;
     const dY = portalOutletMeasurements.pageY;
-
-    console.log('>>>> displayed', key);
 
     return {
       display: 'flex',

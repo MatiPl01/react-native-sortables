@@ -1,5 +1,4 @@
 export { default as useDebugBoundingBox } from './useDebugBoundingBox';
-export { default as useIsTeleported } from './useIsTeleported';
 export { default as useItemDecorationStyles } from './useItemDecorationStyles';
 export { default as useItemLayoutStyles } from './useItemLayoutStyles';
 export { default as useItemPanGesture } from './useItemPanGesture';
