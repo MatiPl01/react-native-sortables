@@ -4,6 +4,7 @@ import { LayoutAnimationConfig } from 'react-native-reanimated';
 import {
   useCommonValuesContext,
   usePortalContext,
+  useTeleportedItemId,
   useTeleportedItemStyles
 } from '../../../providers';
 import type { AnimatedStyleProp } from '../../../types';
@@ -25,6 +26,7 @@ export default function TeleportedItemCell({
   isActive,
   itemKey
 }: TeleportedItemCellProps) {
+  const teleportedItemId = useTeleportedItemId(itemKey);
   const { notifyRendered } = usePortalContext()!;
   const { itemsOverridesStyle } = useCommonValuesContext();
 
@@ -46,7 +48,7 @@ export default function TeleportedItemCell({
         // on the screen and its layout calculation is completed
         // (see useTeleportedItemStyles in which we set display property
         // to 'none' when the animated style is not ready)
-        notifyRendered(key);
+        notifyRendered(teleportedItemId);
       }}>
       <LayoutAnimationConfig skipEntering>{children}</LayoutAnimationConfig>
     </ItemCell>

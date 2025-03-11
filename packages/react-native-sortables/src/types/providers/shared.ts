@@ -33,6 +33,8 @@ export type ControlledContainerDimensions = { width: boolean; height: boolean };
  * between different providers)
  */
 export type CommonValuesContextType = {
+  componentId: number;
+
   // ORDER
   indexToKey: SharedValue<Array<string>>;
   keyToIndex: SharedValue<Record<string, number>>;
@@ -41,6 +43,7 @@ export type CommonValuesContextType = {
   itemPositions: SharedValue<Record<string, Vector>>;
   touchPosition: SharedValue<Vector | null>;
   activeItemPosition: SharedValue<Vector | null>;
+  activeItemAbsolutePosition: SharedValue<Vector | null>;
   snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
@@ -143,11 +146,15 @@ export type LayerContextType = {
 export type PortalSubscription = (isTeleported: boolean) => void;
 
 export type PortalContextType = {
-  activeItemAbsolutePosition: SharedValue<Vector | null>;
+  teleport: (id: string, node: ReactNode) => void;
+  subscribe: (id: string, callback: PortalSubscription) => void;
+  notifyRendered: (id: string) => void;
+};
+
+// PORTAL OUTLET
+
+export type PortalOutletContextType = {
   portalOutletRef: AnimatedRef<View>;
-  teleport: (itemKey: string, node: ReactNode) => void;
-  subscribe: (itemKey: string, callback: PortalSubscription) => void;
-  notifyRendered: (itemKey: string) => void;
 };
 
 // DEBUG

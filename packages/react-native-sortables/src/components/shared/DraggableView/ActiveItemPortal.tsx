@@ -7,13 +7,13 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { usePortalContext } from '../../../providers';
+import { usePortalContext, useTeleportedItemId } from '../../../providers';
 
 type ActiveItemPortalProps = PropsWithChildren<{
   itemKey: string;
   activationAnimationProgress: SharedValue<number>;
-  renderItemCell: (cellChildren: ReactNode) => ReactNode;
-  renderTeleportedItemCell: (cellChildren: ReactNode) => ReactNode;
+  renderItemCell: (displayed?: boolean) => ReactNode;
+  renderTeleportedItemCell: (displayed?: boolean) => ReactNode;
 }>;
 
 export default function ActiveItemPortal({
@@ -23,26 +23,30 @@ export default function ActiveItemPortal({
   renderItemCell,
   renderTeleportedItemCell
 }: ActiveItemPortalProps) {
+  const teleportedItemId = useTeleportedItemId(key);
   const { subscribe, teleport } = usePortalContext()!;
   const [isTeleported, setIsTeleported] = useState(false);
   const teleportRequested = useSharedValue(false);
 
   useEffect(() => {
-    console.log('subscribing', key);
-    return subscribe(key, setIsTeleported);
-  }, [key, subscribe]);
+    return subscribe(teleportedItemId, setIsTeleported);
+  }, [teleportedItemId, subscribe]);
 
   useEffect(() => {
     if (teleportRequested.value) {
       // Renders a component in the portal outlet
-      console.log('teleporting useEffect', key);
-      teleport(key, renderTeleportedItemCell(children));
+      teleport(teleportedItemId, renderTeleportedItemCell());
     }
-  }, [key, renderTeleportedItemCell, teleport, teleportRequested, children]);
+  }, [
+    teleportedItemId,
+    renderTeleportedItemCell,
+    teleport,
+    teleportRequested,
+    children
+  ]);
 
   const requestTeleport = () => {
-    console.log('requestTeleport', key);
-    teleport(key, renderTeleportedItemCell(children));
+    teleport(teleportedItemId, renderTeleportedItemCell());
   };
 
   useAnimatedReaction(
@@ -60,10 +64,34 @@ export default function ActiveItemPortal({
     }
   );
 
-  console.log('isTeleported', key, isTeleported);
-
   // Renders a component within the sortable container
   // (it cannot be unmounted as it is responsible for gesture handling,
   // we can just remove its children when they are already teleported)
-  return renderItemCell(isTeleported ? null : children);
+  return (
+    <>
+      {renderItemCell(!isTeleported)}
+      {isTeleported && (
+        <TeleportRemovalHelper
+          teleport={teleport}
+          teleportedItemId={teleportedItemId}
+        />
+      )}
+    </>
+  );
+}
+
+type TeleportRemovalHelperProps = {
+  teleportedItemId: string;
+  teleport: (id: string, node: ReactNode) => void;
+};
+
+function TeleportRemovalHelper({
+  teleport,
+  teleportedItemId
+}: TeleportRemovalHelperProps) {
+  useEffect(() => {
+    return () => teleport(teleportedItemId, null);
+  }, [teleport, teleportedItemId]);
+
+  return null;
 }

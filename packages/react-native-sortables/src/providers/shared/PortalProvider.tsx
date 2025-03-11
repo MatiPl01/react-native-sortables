@@ -1,14 +1,9 @@
 import type { ReactNode } from 'react';
 import { Fragment, useCallback, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useAnimatedRef, useSharedValue } from 'react-native-reanimated';
 
-import type {
-  PortalContextType,
-  PortalSubscription,
-  Vector
-} from '../../types';
+import type { PortalContextType, PortalSubscription } from '../../types';
 import { createProvider } from '../utils';
+import { PortalOutletProvider } from './PoralOutletProvider';
 
 type PortalProviderProps = {
   children: ReactNode;
@@ -17,71 +12,46 @@ type PortalProviderProps = {
 const { PortalProvider, usePortalContext } = createProvider('Portal', {
   guarded: false
 })<PortalProviderProps, PortalContextType>(({ children }) => {
-  const portalOutletRef = useAnimatedRef<View>();
   const subscribersRef = useRef<Record<string, Set<PortalSubscription>>>({});
-  const activeItemAbsolutePosition = useSharedValue<Vector | null>(null);
   const [teleportedNodes, setTeleportedNodes] = useState<
     Record<string, React.ReactNode>
   >({});
 
-  const teleport = useCallback((itemKey: string, node: React.ReactNode) => {
+  const teleport = useCallback((id: string, node: React.ReactNode) => {
     if (node) {
       setTeleportedNodes(prev => {
-        const newState = { ...prev, [itemKey]: node };
+        const newState = { ...prev, [id]: node };
         return newState;
       });
     } else {
       setTeleportedNodes(prev => {
-        if (!prev[itemKey]) return prev;
+        if (!prev[id]) return prev;
         const newState = { ...prev };
-        delete newState[itemKey];
+        delete newState[id];
         return newState;
       });
     }
   }, []);
 
-  const subscribe = useCallback(
-    (itemKey: string, callback: PortalSubscription) => {
-      if (!subscribersRef.current[itemKey]) {
-        subscribersRef.current[itemKey] = new Set();
-      }
-      subscribersRef.current[itemKey].add(callback);
-      console.log(
-        'subscribing',
-        itemKey,
-        subscribersRef.current[itemKey]?.size
-      );
-      return () => {
-        subscribersRef.current[itemKey]?.delete(callback);
-        console.log(
-          'unsubscribing',
-          itemKey,
-          subscribersRef.current[itemKey]?.size
-        );
-      };
-    },
-    []
-  );
+  const subscribe = useCallback((id: string, callback: PortalSubscription) => {
+    if (!subscribersRef.current[id]) {
+      subscribersRef.current[id] = new Set();
+    }
+    subscribersRef.current[id].add(callback);
+    return () => {
+      subscribersRef.current[id]?.delete(callback);
+    };
+  }, []);
 
-  const notifySubscribers = useCallback(
-    (itemKey: string, isTeleported: boolean) => {
-      subscribersRef.current[itemKey]?.forEach(callback => {
-        console.log(
-          'notify',
-          itemKey,
-          isTeleported,
-          subscribersRef.current[itemKey]?.size
-        );
-        callback(isTeleported);
-      });
-    },
-    []
-  );
+  const notifySubscribers = useCallback((id: string, isTeleported: boolean) => {
+    subscribersRef.current[id]?.forEach(callback => {
+      callback(isTeleported);
+    });
+  }, []);
 
   const notifyRendered = useCallback(
-    (itemKey: string) => {
-      console.log('<> notifyRendered', itemKey);
-      notifySubscribers(itemKey, true);
+    (id: string) => {
+      notifySubscribers(id, true);
     },
     [notifySubscribers]
   );
@@ -90,17 +60,15 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     children: (
       <>
         {children}
-        <View ref={portalOutletRef} style={StyleSheet.absoluteFill}>
+        <PortalOutletProvider>
           {Object.entries(teleportedNodes).map(([key, node]) => (
             <Fragment key={key}>{node}</Fragment>
           ))}
-        </View>
+        </PortalOutletProvider>
       </>
     ),
     value: {
-      activeItemAbsolutePosition,
       notifyRendered,
-      portalOutletRef,
       subscribe,
       teleport
     }

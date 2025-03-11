@@ -1,9 +1,10 @@
 import { useCallback, useEffect } from 'react';
-import type { LayoutChangeEvent } from 'react-native';
+import type { LayoutChangeEvent, View } from 'react-native';
 import {
   measure,
   runOnUI,
   useAnimatedReaction,
+  useAnimatedRef,
   useSharedValue
 } from 'react-native-reanimated';
 
@@ -31,7 +32,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     activeItemKey,
     canSwitchToAbsoluteLayout,
     containerHeight,
-    containerRef,
     containerWidth,
     controlledContainerDimensions,
     customHandle,
@@ -41,6 +41,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     snapItemDimensions
   } = useCommonValuesContext();
 
+  const measurementsContainerRef = useAnimatedRef<View>();
   const measuredItemsCount = useSharedValue(0);
   const initialItemMeasurementsCompleted = useSharedValue(false);
   const updateTimeoutId = useSharedValue<AnimatedTimeoutID>(-1);
@@ -181,11 +182,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const measureContainer = useCallback(() => {
     'worklet';
-    const measurements = measure(containerRef);
+    const measurements = measure(measurementsContainerRef);
     if (measurements) {
       applyMeasuredContainerDimensions(measurements);
     }
-  }, [applyMeasuredContainerDimensions, containerRef]);
+  }, [applyMeasuredContainerDimensions, measurementsContainerRef]);
 
   useAnimatedReaction(
     () => ({
@@ -227,6 +228,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       handleItemMeasurement,
       handleItemRemoval,
       measureContainer,
+      measurementsContainerRef,
       setItemDimensionsAsSnapDimensions
     }
   };

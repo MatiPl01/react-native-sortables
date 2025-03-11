@@ -10,7 +10,8 @@ import {
 import {
   useCommonValuesContext,
   useItemContext,
-  useItemPanGesture
+  useItemPanGesture,
+  usePortalOutletContext
 } from '../../providers';
 
 /** Props for the Sortable Handle component */
@@ -21,11 +22,25 @@ export type SortableHandleProps = PropsWithChildren<{
   disabled?: boolean;
 }>;
 
-export function SortableHandle({
+export function SortableHandle(props: SortableHandleProps) {
+  // The item is teleported when it is rendered within the PortalOutlet
+  // component. Because PortalOutlet creates a context, we can use it to
+  // check if the item is teleported
+  const isTeleported = !!usePortalOutletContext();
+
+  // In case of teleported handle items, we want to render just the
+  // handle component without any functionality
+  return isTeleported ? (
+    <View>{props.children}</View>
+  ) : (
+    <SortableHandleComponent {...props} />
+  );
+}
+
+function SortableHandleComponent({
   children,
   disabled = false
 }: SortableHandleProps) {
-  // TODO: Render just a handle with no logic if rendered in a portal
   const {
     activeItemKey,
     activeItemPosition,
@@ -88,7 +103,7 @@ export function SortableHandle({
   );
 
   return (
-    <GestureDetector gesture={adjustedGesture}>
+    <GestureDetector gesture={adjustedGesture} userSelect='none'>
       <View ref={viewRef} onLayout={measureHandle}>
         {children}
       </View>

@@ -6,7 +6,6 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { IS_REACT_19 } from '../../../constants';
 import {
   CommonValuesContext,
   ItemContextProvider,
@@ -21,17 +20,20 @@ import type {
   LayoutAnimation,
   LayoutTransition
 } from '../../../types';
+import { getContextProvider } from '../../../utils';
 import { SortableHandleInternal } from '../SortableHandle';
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
 import TeleportedItemCell from './TeleportedItemCell';
+
+const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
 export type DraggableViewProps = PropsWithChildren<{
   itemKey: string;
   entering: LayoutAnimation | undefined;
   exiting: LayoutAnimation | undefined;
   layout: LayoutTransition | undefined;
-  style: AnimatedStyleProp;
+  style?: AnimatedStyleProp;
 }>;
 
 function DraggableView({
@@ -79,51 +81,44 @@ function DraggableView({
     </ItemContextProvider>
   );
 
-  const renderItemCell = (cellChildren: ReactNode) => {
-    return (
+  const renderItemCell = (displayed?: boolean) =>
+    wrapComponent(
       <ItemCell
         {...layoutAnimations}
         {...sharedCellProps}
-        cellStyle={[style, layoutStyles]}>
-        {cellChildren && (
-          <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
-            {cellChildren}
-          </LayoutAnimationConfig>
-        )}
+        cellStyle={[style, layoutStyles]}
+        displayed={displayed}>
+        <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
+          {children}
+        </LayoutAnimationConfig>
       </ItemCell>
     );
-  };
 
   // NORMAL CASE (no portal)
 
   if (!hasPortal) {
-    return wrapComponent(renderItemCell(children));
+    return renderItemCell();
   }
 
   // PORTAL CASE
 
-  const renderTeleportedItemCell = (cellChildren: ReactNode) => {
-    const CommonValuesContextProvider = IS_REACT_19
-      ? CommonValuesContext
-      : CommonValuesContext.Provider;
+  const renderTeleportedItemCell = (displayed?: boolean) => (
+    // We have to wrap the TeleportedItemCell in a CommonValuesContext provider
+    // as it won't be accessible otherwise, when the item is rendered in the
+    // portal outlet
+    <CommonValuesContextProvider value={commonValuesContext}>
+      <TeleportedItemCell
+        {...sharedCellProps}
+        activationAnimationProgress={activationAnimationProgress}
+        baseCellStyle={style}
+        displayed={displayed}
+        isActive={isActive}>
+        {children}
+      </TeleportedItemCell>
+    </CommonValuesContextProvider>
+  );
 
-    return (
-      // We have to wrap the TeleportedItemCell in a CommonValuesContext provider
-      // as it won't be accessible otherwise, when the item is rendered in the
-      // portal outlet
-      <CommonValuesContextProvider value={commonValuesContext}>
-        <TeleportedItemCell
-          {...sharedCellProps}
-          activationAnimationProgress={activationAnimationProgress}
-          baseCellStyle={style}
-          isActive={isActive}>
-          {cellChildren}
-        </TeleportedItemCell>
-      </CommonValuesContextProvider>
-    );
-  };
-
-  return wrapComponent(
+  return (
     <ActiveItemPortal
       activationAnimationProgress={activationAnimationProgress}
       itemKey={key}

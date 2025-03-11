@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useEffect, useRef } from 'react';
+import { type PropsWithChildren, useEffect, useMemo, useRef } from 'react';
 import type { View, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
@@ -24,6 +24,8 @@ import type {
 import { DragActivationState } from '../../types';
 import { areArraysDifferent } from '../../utils';
 import { createProvider } from '../utils';
+
+let nextId = 0;
 
 type CommonValuesProviderProps = PropsWithChildren<
   {
@@ -62,6 +64,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     snapOffsetY: _snapOffsetY,
     sortEnabled: _sortEnabled
   }) => {
+    const componentId = useMemo(() => nextId++, []);
     const prevKeysRef = useRef<Array<string>>([]);
 
     // ORDER
@@ -74,6 +77,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const itemPositions = useSharedValue<Record<string, Vector>>({});
     const touchPosition = useSharedValue<Vector | null>(null);
     const activeItemPosition = useSharedValue<Vector | null>(null);
+    const activeItemAbsolutePosition = useSharedValue<Vector | null>(null);
     const snapItemOffset = useSharedValue<Vector | null>(null);
 
     // DIMENSIONS
@@ -151,6 +155,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activationAnimationDuration,
         activationState,
         activeAnimationProgress,
+        activeItemAbsolutePosition,
         activeItemDimensions,
         activeItemDropped,
         activeItemKey,
@@ -160,6 +165,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activeItemShadowOpacity,
         animateLayoutOnReorderOnly,
         canSwitchToAbsoluteLayout,
+        componentId,
         containerHeight,
         containerRef,
         containerWidth,

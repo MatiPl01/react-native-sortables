@@ -141,6 +141,7 @@ function VerticalSameSizeItems() {
             columnGap={10}
             columns={COLUMNS}
             data={DATA}
+            dropAnimationDuration={1000}
             renderItem={renderItem}
             rowGap={10}
             scrollableRef={scrollableRef}

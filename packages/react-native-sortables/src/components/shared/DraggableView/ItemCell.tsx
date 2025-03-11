@@ -1,13 +1,13 @@
-import { type PropsWithChildren, useEffect } from 'react';
-import type { LayoutChangeEvent, ViewStyle } from 'react-native';
+import { type PropsWithChildren } from 'react';
+import {
+  type LayoutChangeEvent,
+  StyleSheet,
+  type ViewStyle
+} from 'react-native';
 import type { AnimatedStyle } from 'react-native-reanimated';
-import Animated, {
-  useAnimatedStyle,
-  useDerivedValue
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
-import { useCommonValuesContext, usePortalContext } from '../../../providers';
 import type {
   AnimatedStyleProp,
   Dimensions,
@@ -24,7 +24,7 @@ export type ItemCellProps = PropsWithChildren<{
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
   layout?: LayoutTransition;
-  visible?: boolean;
+  displayed?: boolean;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
 }>;
 
@@ -32,6 +32,7 @@ export default function ItemCell({
   cellStyle,
   children,
   decorationStyle,
+  displayed = true,
   entering,
   exiting,
   handleItemMeasurement,
@@ -39,7 +40,7 @@ export default function ItemCell({
   itemsOverridesStyle,
   layout
 }: ItemCellProps) {
-  const onLayout = children
+  const onLayout = displayed
     ? ({
         nativeEvent: {
           layout: { height, width }
@@ -54,36 +55,23 @@ export default function ItemCell({
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={[itemsOverridesStyle, decorationStyle]}
+        style={[
+          itemsOverridesStyle,
+          decorationStyle,
+          !displayed && styles.hidden
+        ]}
         onLayout={onLayout}>
-        {children ?? <PlaceholderItem itemKey={itemKey} />}
+        {children}
       </AnimatedOnLayoutView>
     </Animated.View>
   );
 }
 
-type PlaceholderItemProps = {
-  itemKey: string;
-};
-
-function PlaceholderItem({ itemKey }: PlaceholderItemProps) {
-  const { teleport } = usePortalContext()!;
-  const { itemDimensions } = useCommonValuesContext();
-
-  const dimensions = useDerivedValue(() => itemDimensions.value[itemKey]);
-
-  useEffect(() => {
-    return () => {
-      // We can safely remove the teleported item only when the the
-      // placeholder item is not needed anymore, because the item is
-      // already rendered in the sortable container
-      teleport(itemKey, null);
-    };
-  }, [itemKey, teleport]);
-
-  const animatedPlaceholderStyle = useAnimatedStyle(
-    () => dimensions.value ?? {}
-  );
-
-  return <Animated.View style={animatedPlaceholderStyle} />;
-}
+const styles = StyleSheet.create({
+  hidden: {
+    maxHeight: 0,
+    maxWidth: 0,
+    overflow: 'hidden',
+    pointerEvents: 'none'
+  }
+});

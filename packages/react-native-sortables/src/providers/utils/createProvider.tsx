@@ -9,8 +9,7 @@ import {
   useMemo
 } from 'react';
 
-import { IS_REACT_19 } from '../../constants';
-import { error } from '../../utils';
+import { error, getContextProvider } from '../../utils';
 
 export default function createProvider<ProviderName extends string>(
   name: ProviderName,
@@ -87,7 +86,7 @@ export default function createProvider<
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, react-hooks/exhaustive-deps
       const memoValue = useMemo(() => value, [...Object.values(value)]);
 
-      const ContextProvider = IS_REACT_19 ? Context : Context.Provider;
+      const ContextProvider = getContextProvider(Context);
 
       return <ContextProvider value={memoValue}>{children}</ContextProvider>;
     };
