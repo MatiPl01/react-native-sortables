@@ -60,9 +60,9 @@ type SortableGridRenderItemInfo<T> = {
 
 Used to extract a unique key for each item. Key is used for the identification of the item when items are reordered.
 
-| type                                 | default | required |
-| ------------------------------------ | ------- | -------- |
-| `(item: T, index: number) => string` | YES\*   | NO       |
+| type                  | default | required |
+| --------------------- | ------- | -------- |
+| `(item: T) => string` | YES\*   | NO       |
 
 \*Default `keyExtractor` implementation works as follows:
 
