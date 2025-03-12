@@ -77,10 +77,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     width: !isVertical // width is controlled for horizontal grids
   }));
 
-  const itemKeys = useMemo(
-    () => data.map((item, index) => keyExtractor(item, index)),
-    [data, keyExtractor]
-  );
+  const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
 
   const onDragEnd = useDragEndHandler(_onDragEnd, params => ({
     ...params,

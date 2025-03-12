@@ -99,16 +99,14 @@ export type SortableGridProps<I> = Simplify<
     onDragEnd?: SortableGridDragEndCallback<I>;
     /** Function to extract a unique key for each item
      * @param item The item to get key from
-     * @param index Index of the item in the data array
      * @returns Unique string key
      * @default Returns:
-     * - the item itself if it's a string
-     * - item.id or item.key if the object has either property
-     * - stringified item otherwise
+     * - If item is an object with id or key property, returns that property value
+     * - Otherwise returns stringified item (inefficient for large objects, custom implementation recommended)
      * @important If your data items are objects that have neither id nor key properties,
-     * it is recommended to provide a custom keyExtractor implementation.
+     * it is strongly recommended to provide a custom keyExtractor implementation.
      */
-    keyExtractor?: (item: I, index: number) => string;
+    keyExtractor?: (item: I) => string;
 
     /** Number of columns in the grid.
      *

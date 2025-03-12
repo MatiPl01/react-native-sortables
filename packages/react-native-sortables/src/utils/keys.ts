@@ -5,11 +5,7 @@ const hasProp = <O extends object, P extends string>(
   return prop in object;
 };
 
-export const defaultKeyExtractor = <I>(item: I, index: number): string => {
-  if (typeof item === 'string') {
-    return item;
-  }
-
+export const defaultKeyExtractor = <I>(item: I): string => {
   if (typeof item === 'object' && item !== null) {
     if (hasProp(item, 'id')) {
       return String(item.id);
@@ -19,5 +15,5 @@ export const defaultKeyExtractor = <I>(item: I, index: number): string => {
     }
   }
 
-  return String(index);
+  return String(item);
 };
