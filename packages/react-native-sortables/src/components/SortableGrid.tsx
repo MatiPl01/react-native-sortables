@@ -78,7 +78,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   }));
 
   const itemKeys = useMemo(
-    () => data.map((item, index) => keyExtractor(item, index)),
+    () => data.map(item => keyExtractor(item)),
     [data, keyExtractor]
   );
 

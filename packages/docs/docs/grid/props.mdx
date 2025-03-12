@@ -64,11 +64,14 @@ Used to extract a unique key for each item. Key is used for the identification o
 | ------------------------------------ | ------- | -------- |
 | `(item: T, index: number) => string` | YES\*   | NO       |
 
-\*Default `keyExtractor` implementation returns item if it is a string, `id` or `key` property if the item is an object and has one of those properties or stringified item in all other cases.
+\*Default `keyExtractor` implementation works as follows:
+
+- If item is an object and has `id` or `key` property, the value of that property is returned
+- Otherwise, item is stringified and returned (inefficient for large objects, a custom `keyExtractor` implementation is recommended)
 
 :::important
 
-If your data items are **objects** that have neither `id` nor `key` properties, you **should always** provide a custom `keyExtractor` implementation.
+If your data items are **objects** that have neither `id` nor `key` properties, it is **strongly recommended** to provide a custom `keyExtractor` implementation returning a unique string for each item.
 
 :::
 
