@@ -202,10 +202,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: touch.absoluteX + activeX - unclampedActiveX - snapX,
         y: touch.absoluteY + activeY - unclampedActiveY - snapY
       };
-
-      console.log('activeDimensions', activeDimensions);
-      console.log('containerH', containerH);
-      console.log('containerW', containerW);
     },
     [hasHorizontalOverDrag, hasVerticalOverDrag, activeItemAbsolutePosition]
   );

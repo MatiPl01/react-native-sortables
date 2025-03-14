@@ -2,7 +2,6 @@ import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import {
-  useCommonValuesContext,
   usePortalContext,
   useTeleportedItemId,
   useTeleportedItemStyles
@@ -15,6 +14,7 @@ type TeleportedItemCellProps = {
   activationAnimationProgress: SharedValue<number>;
   baseCellStyle: AnimatedStyleProp;
   isActive: SharedValue<boolean>;
+  itemKey: string;
 } & Omit<ItemCellProps, 'cellStyle' | 'entering' | 'exiting' | 'layout'>;
 
 export default function TeleportedItemCell({
@@ -22,13 +22,13 @@ export default function TeleportedItemCell({
   baseCellStyle,
   children,
   decorationStyle,
-  handleItemMeasurement: handleItemMeasurement_,
   isActive,
-  itemKey
+  itemKey,
+  itemsOverridesStyle,
+  onMeasure
 }: TeleportedItemCellProps) {
   const teleportedItemId = useTeleportedItemId(itemKey);
   const { notifyRendered } = usePortalContext()!;
-  const { itemsOverridesStyle } = useCommonValuesContext();
 
   const teleportedItemStyles = useTeleportedItemStyles(
     itemKey,
@@ -40,10 +40,9 @@ export default function TeleportedItemCell({
     <ItemCell
       cellStyle={[baseCellStyle, teleportedItemStyles]}
       decorationStyle={decorationStyle}
-      itemKey={itemKey}
       itemsOverridesStyle={itemsOverridesStyle}
-      handleItemMeasurement={(key, dimensions) => {
-        handleItemMeasurement_(key, dimensions);
+      onMeasure={(width, height) => {
+        onMeasure(width, height);
         // Mark the teleported item as rendered only after it appeared
         // on the screen and its layout calculation is completed
         // (see useTeleportedItemStyles in which we set display property

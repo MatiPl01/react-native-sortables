@@ -152,6 +152,11 @@ export default function useItemLayoutStyles(
       return NO_TRANSLATION_STYLE;
     }
 
+    console.log([
+      { translateX: translateX.value },
+      { translateY: translateY.value }
+    ]);
+
     return {
       opacity: 1,
       position: 'absolute',
