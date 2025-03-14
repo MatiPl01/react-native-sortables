@@ -1,14 +1,15 @@
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import { useMemo } from 'react';
+import type { ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import {
+  interpolate,
   useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-  withTiming
+  useSharedValue
 } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
+import type { AnimatedStyleProp, Vector } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
@@ -31,21 +32,17 @@ const NO_TRANSLATION_STYLE: ViewStyle = {
 export default function useItemLayoutStyles(
   key: string,
   activationAnimationProgress: SharedValue<number>
-): StyleProp<AnimatedStyle<ViewStyle>> {
+): AnimatedStyleProp {
   const {
     activeItemKey,
     activeItemPosition,
     animateLayoutOnReorderOnly,
     canSwitchToAbsoluteLayout,
-    dropAnimationDuration,
     itemPositions
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
-  const isReleased = useSharedValue(true);
-  const hasActivationProgress = useDerivedValue(
-    () => activationAnimationProgress.value > 0
-  );
+  const dropStartTranslation = useSharedValue<Vector | null>(null);
 
   const translateX = useSharedValue<null | number>(null);
   const translateY = useSharedValue<null | number>(null);
@@ -55,12 +52,12 @@ export default function useItemLayoutStyles(
   // Inactive item updater
   useAnimatedReaction(
     () => ({
+      activationProgress: activationAnimationProgress.value,
       canSwitchToAbsolute: canSwitchToAbsoluteLayout.value,
-      hasProgress: hasActivationProgress.value,
       isActive: activeItemKey.value === key,
       position: itemPositions.value[key]
     }),
-    ({ canSwitchToAbsolute, hasProgress, isActive, position }) => {
+    ({ activationProgress, canSwitchToAbsolute, isActive, position }) => {
       if (!canSwitchToAbsolute) {
         // This affects all items rendered during the initial render when
         // the absolute layout is not yet enabled. All of these items have
@@ -73,24 +70,31 @@ export default function useItemLayoutStyles(
 
       if (isActive || !position) {
         // This reaction doesn't update position of the active item.
+        dropStartTranslation.value = null;
         return;
       }
 
-      if (hasProgress && layoutX.value !== null && layoutY.value !== null) {
-        // When the item is not active and has non-zero press progress,
-        // it must have been dragged and released. In this case, we want
-        // to animate the translation to the final position.
-        if (!isReleased.value) {
-          // This prevents cancellation of the animation when this reaction
-          // is triggered multiple times.
-          isReleased.value = true;
-          translateX.value = withTiming(position.x - (layoutX.value ?? 0), {
-            duration: dropAnimationDuration.value
-          });
-          translateY.value = withTiming(position.y - (layoutY.value ?? 0), {
-            duration: dropAnimationDuration.value
-          });
+      if (
+        activationProgress &&
+        layoutX.value !== null &&
+        layoutY.value !== null &&
+        translateX.value !== null &&
+        translateY.value !== null
+      ) {
+        // Drop animation
+        if (!dropStartTranslation.value) {
+          dropStartTranslation.value = {
+            x: translateX.value,
+            y: translateY.value
+          };
         }
+
+        const animate = (from: number, to: number) =>
+          interpolate(activationProgress, [1, 0], [from, to]);
+
+        const { x, y } = dropStartTranslation.value;
+        translateX.value = animate(x, position.x - (layoutX.value ?? 0));
+        translateY.value = animate(y, position.y - (layoutY.value ?? 0));
       } else {
         if (translateX.value === null || translateY.value === null) {
           // This is the case that happens for new items added to the sortable
@@ -131,7 +135,6 @@ export default function useItemLayoutStyles(
       }
 
       // This updates the translation of the active item.
-      isReleased.value = false;
       translateX.value = position.x - (layoutX.value ?? 0);
       translateY.value = position.y - (layoutY.value ?? 0);
     }
@@ -171,5 +174,8 @@ export default function useItemLayoutStyles(
     };
   });
 
-  return [animatedTranslationStyle, animatedLayoutStyle];
+  return useMemo(
+    () => [animatedTranslationStyle, animatedLayoutStyle],
+    [animatedLayoutStyle, animatedTranslationStyle]
+  );
 }

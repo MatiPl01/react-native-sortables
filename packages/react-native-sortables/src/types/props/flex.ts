@@ -9,7 +9,7 @@ import type {
 } from '../layout/flex';
 import type {
   CommonValuesContextType,
-  DebugProviderContextType,
+  DebugContextType,
   FlexLayoutContextType,
   OrderUpdater
 } from '../providers';
@@ -42,7 +42,7 @@ export type SortableFlexDragEndCallback = (
  */
 export type SortableFlexStrategyFactory = (
   props: Simplify<
-    { debugContext?: DebugProviderContextType } & CommonValuesContextType &
+    { debugContext?: DebugContextType } & CommonValuesContextType &
       FlexLayoutContextType
   >
 ) => OrderUpdater;

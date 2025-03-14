@@ -5,7 +5,7 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 
-import type { LayerProviderContextType, LayerState } from '../../types';
+import type { LayerContextType, LayerState } from '../../types';
 import { createProvider } from '../utils';
 
 type LayerProviderProps = PropsWithChildren<{
@@ -14,9 +14,9 @@ type LayerProviderProps = PropsWithChildren<{
 
 const { LayerProvider, useLayerContext } = createProvider('Layer', {
   guarded: false
-})<LayerProviderProps, LayerProviderContextType>(({ children, disabled }) => {
+})<LayerProviderProps, LayerContextType>(({ children, disabled }) => {
   const { updateLayer: updateParentLayer } = (useLayerContext() ??
-    {}) as Partial<LayerProviderContextType>;
+    {}) as Partial<LayerContextType>;
 
   const zIndex = useSharedValue(0);
 

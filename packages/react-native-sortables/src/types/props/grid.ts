@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import type {
   CommonValuesContextType,
-  DebugProviderContextType,
+  DebugContextType,
   GridLayoutContextType,
   OrderUpdater
 } from '../providers';
@@ -65,7 +65,7 @@ export type SortableGridRenderItem<I> = (
  */
 export type SortableGridStrategyFactory = (
   props: Simplify<
-    { debugContext?: DebugProviderContextType } & CommonValuesContextType &
+    { debugContext?: DebugContextType } & CommonValuesContextType &
       GridLayoutContextType
   >
 ) => OrderUpdater;

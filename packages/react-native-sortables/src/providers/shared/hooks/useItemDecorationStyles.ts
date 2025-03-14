@@ -1,4 +1,5 @@
-import type { ViewProps, ViewStyle } from 'react-native';
+import { useMemo } from 'react';
+import type { ViewStyle } from 'react-native';
 import { Platform, StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
@@ -9,23 +10,15 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import { IS_WEB } from '../../constants';
-import { useCommonValuesContext } from '../../providers';
-import AnimatedOnLayoutView from './AnimatedOnLayoutView';
+import { IS_WEB } from '../../../constants';
+import type { AnimatedStyleProp } from '../../../types';
+import { useCommonValuesContext } from '../CommonValuesProvider';
 
-type ItemDecorationProps = {
-  isActive: SharedValue<boolean>;
-  activationAnimationProgress: SharedValue<number>;
-  onLayout: NonNullable<ViewProps['onLayout']>;
-  itemKey: string;
-} & ViewProps;
-
-export default function ItemDecoration({
-  activationAnimationProgress,
-  isActive,
-  itemKey: key,
-  ...rest
-}: ItemDecorationProps) {
+export default function useItemDecorationStyles(
+  itemKey: string,
+  isActive: SharedValue<boolean>,
+  activationAnimationProgress: SharedValue<number>
+): AnimatedStyleProp {
   const {
     activationAnimationDuration,
     activeItemOpacity,
@@ -34,12 +27,11 @@ export default function ItemDecoration({
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
-    itemsOverridesStyle,
     prevActiveItemKey
   } = useCommonValuesContext();
 
   const adjustedInactiveProgress = useDerivedValue(() => {
-    if (isActive.value || prevActiveItemKey.value === key) {
+    if (isActive.value || prevActiveItemKey.value === itemKey) {
       return withTiming(0, { duration: activationAnimationDuration.value });
     }
 
@@ -92,12 +84,7 @@ export default function ItemDecoration({
     };
   });
 
-  return (
-    <AnimatedOnLayoutView
-      {...rest}
-      style={[styles.decoration, animatedStyle, itemsOverridesStyle]}
-    />
-  );
+  return useMemo(() => [styles.decoration, animatedStyle], [animatedStyle]);
 }
 
 const styles = StyleSheet.create({

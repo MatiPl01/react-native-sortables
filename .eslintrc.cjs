@@ -1,6 +1,7 @@
 module.exports = {
   extends: 'react-native-matipl01',
   rules: {
+
     'lines-around-comment': [
       'error',
       {
