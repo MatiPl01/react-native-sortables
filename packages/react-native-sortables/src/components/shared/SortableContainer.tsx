@@ -51,8 +51,7 @@ export default function SortableContainer({
     controlledContainerDimensions,
     shouldAnimateLayout
   } = useCommonValuesContext();
-  const { handleHelperContainerMeasurement, measurementsContainerRef } =
-    useMeasurementsContext();
+  const { handleHelperContainerMeasurement } = useMeasurementsContext();
 
   const outerContainerStyle = useAnimatedStyle(() => {
     if (!canSwitchToAbsoluteLayout.value) {
@@ -120,7 +119,6 @@ export default function SortableContainer({
         />
       )}
       <AnimatedOnLayoutView
-        ref={measurementsContainerRef}
         style={[StyleSheet.absoluteFill, animatedMeasurementsContainerStyle]}
         onLayout={handleHelperContainerMeasurement}
       />

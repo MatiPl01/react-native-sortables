@@ -36,10 +36,15 @@ export default function ActiveItemPortal({
   const isTeleported = useSharedValue(false);
 
   useEffect(() => {
-    return subscribe(teleportedItemId, () => {
+    const unsubscribe = subscribe(teleportedItemId, () => {
       isTeleported.value = true;
     });
-  }, [isTeleported, subscribe, teleportedItemId]);
+
+    return () => {
+      unsubscribe();
+      teleport(teleportedItemId, null);
+    };
+  }, [isTeleported, subscribe, teleport, teleportedItemId]);
 
   useEffect(() => {
     if (isTeleported.value) {
@@ -70,17 +75,10 @@ export default function ActiveItemPortal({
     }
   };
 
-  const animatedItemStyle = useAnimatedStyle(() =>
-    isTeleported.value
-      ? {
-          maxHeight: 0,
-          overflow: 'hidden'
-        }
-      : {
-          maxHeight: 'auto',
-          overflow: 'visible'
-        }
-  );
+  const animatedItemStyle = useAnimatedStyle(() => ({
+    maxHeight: isTeleported.value ? 0 : 'auto',
+    overflow: isTeleported.value ? 'hidden' : 'visible'
+  }));
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,

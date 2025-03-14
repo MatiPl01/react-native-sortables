@@ -147,7 +147,7 @@ export type PortalSubscription = (isTeleported: boolean) => void;
 
 export type PortalContextType = {
   teleport: (id: string, node: ReactNode) => void;
-  subscribe: (id: string, callback: PortalSubscription) => void;
+  subscribe: (id: string, callback: PortalSubscription) => () => void;
   notifyRendered: (id: string) => void;
 };
 

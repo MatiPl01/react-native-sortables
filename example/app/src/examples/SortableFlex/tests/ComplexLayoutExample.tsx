@@ -19,6 +19,8 @@ export default function ComplexLayoutExample() {
         justifyContent='space-between'
         padding={PADDING}
         rowGap={GAP}
+        activeItemScale={1.05}
+        enableActiveItemSnap={false}
         debug>
         <SingleColumnTile />
         <SingleColumnTile />
