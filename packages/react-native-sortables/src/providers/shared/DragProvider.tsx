@@ -222,11 +222,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const itemPosition = itemPositions.value[key];
       const dimensions = itemDimensions.value[key];
 
-      if (
-        !itemPosition ||
-        !dimensions ||
-        !activeItemDropped.value // Fail if previous item hasn't been dropped yet
-      ) {
+      if (!itemPosition || !dimensions) {
         fail();
         return;
       }
