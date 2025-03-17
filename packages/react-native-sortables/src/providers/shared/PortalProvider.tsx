@@ -37,7 +37,7 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     if (!subscribersRef.current[id]) {
       subscribersRef.current[id] = new Set();
     }
-    subscribersRef.current[id].add(callback);
+    subscribersRef.current[id]?.add(callback);
     return () => {
       subscribersRef.current[id]?.delete(callback);
     };

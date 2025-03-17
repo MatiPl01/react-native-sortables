@@ -36,8 +36,8 @@ export default function ActiveItemPortal({
   const isTeleported = useSharedValue(false);
 
   useEffect(() => {
-    const unsubscribe = subscribe(teleportedItemId, () => {
-      isTeleported.value = true;
+    const unsubscribe = subscribe(teleportedItemId, teleported => {
+      isTeleported.value = teleported;
     });
 
     return () => {

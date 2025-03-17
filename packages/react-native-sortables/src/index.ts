@@ -161,6 +161,34 @@ const Sortable = {
    */
   Layer: SortableLayer,
 
+  /** Optional provider that renders dragged items above all other components that are
+   * wrapped within the PortalProvider.
+   *
+   * @note This component is optional. Use it when you want dragged items to appear
+   * above other components on the screen, such as modals, or render dragged item
+   * outside of the ScrollView bounds.
+   *
+   * @props
+   * - children: Components over which dragged items should be rendered
+   *
+   * @example
+   * ```tsx
+   * export default function SomeComponent() {
+   *   return (
+   *     <Sortable.PortalProvider>
+   *       <OtherComponent />
+   *       <Sortable.Grid
+   *         data={items}
+   *         renderItem={renderItem}
+   *       />
+   *       <AnotherComponent />
+   *     </Sortable.PortalProvider>
+   *   );
+   * }
+   * ```
+   */
+  PortalProvider,
+
   /** Pressable component for use within sortable items.
    * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
    *
@@ -198,7 +226,6 @@ const Sortable = {
    * ```
    */
   TouchableHighlight: createSortableTouchable(TouchableHighlight),
-
   /** TouchableOpacity component for use within sortable items.
    * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
    *
@@ -216,8 +243,7 @@ const Sortable = {
    * );
    * ```
    */
-  TouchableOpacity: createSortableTouchable(TouchableOpacity),
-  PortalProvider
+  TouchableOpacity: createSortableTouchable(TouchableOpacity)
 };
 
 export default Sortable;
