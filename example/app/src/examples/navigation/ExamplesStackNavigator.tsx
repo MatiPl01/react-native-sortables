@@ -16,7 +16,6 @@ import BottomNavBar from './BottomNavBar';
 import exampleRoutes from './routes';
 import type { Routes } from './types';
 import { getScreenTitle, isRouteWithRoutes } from './utils';
-import Sortable from 'react-native-sortables';
 
 const StackNavigator =
   createNativeStackNavigator<Record<string, React.ComponentType>>();
@@ -65,16 +64,14 @@ function createStackNavigator(routes: Routes): React.ComponentType {
     return (
       <Provider value={{ height }}>
         <View style={styles.container}>
-          <Sortable.PortalProvider>
-            <StackNavigator.Navigator
-              screenOptions={{
-                headerLeft: () => <BackButton />,
-                headerTitleAlign: 'center'
-              }}>
-              {createNavigationScreens(routes, 'Examples', ['Examples'])}
-            </StackNavigator.Navigator>
-            <BottomNavBar homeRouteName='Examples' routes={routes} />
-          </Sortable.PortalProvider>
+          <StackNavigator.Navigator
+            screenOptions={{
+              headerLeft: () => <BackButton />,
+              headerTitleAlign: 'center'
+            }}>
+            {createNavigationScreens(routes, 'Examples', ['Examples'])}
+          </StackNavigator.Navigator>
+          <BottomNavBar homeRouteName='Examples' routes={routes} />
         </View>
       </Provider>
     );
