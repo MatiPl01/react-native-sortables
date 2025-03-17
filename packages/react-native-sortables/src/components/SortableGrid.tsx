@@ -20,6 +20,7 @@ import type {
 } from '../types';
 import {
   defaultKeyExtractor,
+  defaultSortableExtractor,
   error,
   getPropsWithDefaults,
   orderItems,
@@ -28,6 +29,7 @@ import {
 } from '../utils';
 import { DraggableView, SortableContainer } from './shared';
 import { type DraggableViewProps } from './shared';
+import NonDraggableView from './shared/NonDraggableView';
 
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
@@ -41,6 +43,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       rowGap,
       rowHeight,
       rows,
+      sortableExtractor = defaultSortableExtractor,
       strategy
     },
     sharedProps: {
@@ -78,6 +81,10 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   }));
 
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
+  const sortableKeys = useMemo(
+    () => data.filter(sortableExtractor).map(keyExtractor),
+    [data, keyExtractor, sortableExtractor]
+  );
 
   const onDragEnd = useDragEndHandler(_onDragEnd, params => ({
     ...params,
@@ -90,6 +97,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       controlledContainerDimensions={controlledContainerDimensions}
       itemKeys={itemKeys}
       key={key}
+      sortableKeys={sortableKeys}
       initialItemsStyleOverride={
         isVertical ? undefined : styles.horizontalStyleOverride
       }
@@ -127,6 +135,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           rowGap={rowGapValue}
           rowHeight={rowHeight!} // must be specified for horizontal grids
           showDropIndicator={showDropIndicator}
+          sortableKeys={sortableKeys}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -135,6 +144,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
 type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
+  sortableKeys: Array<string>;
   rowGap: SharedValue<number>;
   columnGap: SharedValue<number>;
   groups: number;
@@ -167,6 +177,7 @@ function SortableGridInner<I>({
   renderItem,
   rowGap,
   rowHeight,
+  sortableKeys,
   ...containerProps
 }: SortableGridInnerProps<I>) {
   const animatedInnerStyle = useAnimatedStyle(() => ({
@@ -196,6 +207,7 @@ function SortableGridInner<I>({
           key={key}
           layout={itemsLayout ?? undefined}
           renderItem={renderItem}
+          sortable={sortableKeys.includes(key)}
           style={animatedItemStyle}
         />
       ))}
@@ -207,12 +219,14 @@ type SortableGridItemProps<I> = {
   index: number;
   item: I;
   renderItem: SortableGridRenderItem<I>;
+  sortable: boolean;
 } & DraggableViewProps;
 
 function SortableGridItem<I>({
   index,
   item,
   renderItem,
+  sortable = true,
   ...rest
 }: SortableGridItemProps<I>) {
   const children = useMemo(
@@ -220,7 +234,11 @@ function SortableGridItem<I>({
     [renderItem, index, item]
   );
 
-  return <DraggableView {...rest}>{children}</DraggableView>;
+  return sortable ? (
+    <DraggableView {...rest}>{children}</DraggableView>
+  ) : (
+    <NonDraggableView {...rest}>{children}</NonDraggableView>
+  );
 }
 
 const styles = StyleSheet.create({

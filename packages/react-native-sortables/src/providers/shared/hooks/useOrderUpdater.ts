@@ -18,6 +18,7 @@ export default function useOrderUpdater(
     activeItemKey,
     activeItemPosition,
     keyToIndex,
+    sortableKeys,
     touchPosition
   } = useCommonValuesContext();
   const { handleOrderChange } = useDragContext();
@@ -34,9 +35,10 @@ export default function useOrderUpdater(
       positions: {
         activeItem: activeItemPosition.value,
         touch: touchPosition.value
-      }
+      },
+      sortableKeys
     }),
-    ({ activeKey, dimensions, positions }) => {
+    ({ activeKey, dimensions, positions, sortableKeys }) => {
       if (
         !activeKey ||
         !dimensions ||
@@ -66,6 +68,12 @@ export default function useOrderUpdater(
         debugCross.set({ color: '#00007e', position });
       }
 
+      // Don't allow updating order if the active item is not sortable.
+      if (!sortableKeys.includes(activeKey)) {
+        return;
+      }
+
+      const oldOrder = Object.keys(keyToIndex.value);
       const newOrder = updater({
         activeIndex,
         activeKey,
@@ -73,12 +81,36 @@ export default function useOrderUpdater(
         position
       });
 
+      const updateOrderWithNonSortables = (
+        newOrder: string[],
+        oldOrder: string[],
+        sortableKeys: string[]
+      ) => {
+        const newOrderWithoutNonSortables = newOrder.filter(key =>
+          sortableKeys.includes(key)
+        );
+        // insert non sortables to their respective positions.
+        const nonSortables = oldOrder.filter(
+          key => !sortableKeys.includes(key)
+        );
+        nonSortables.forEach(key => {
+          newOrderWithoutNonSortables.splice(+key, 0, key);
+        });
+        return newOrderWithoutNonSortables;
+      };
+
       if (newOrder) {
+        const newOrderSorted = updateOrderWithNonSortables(
+          newOrder,
+          oldOrder,
+          sortableKeys
+        );
+
         handleOrderChange(
           activeKey,
           activeIndex,
-          newOrder.indexOf(activeKey),
-          newOrder
+          newOrderSorted.indexOf(activeKey),
+          newOrderSorted
         );
       }
     }

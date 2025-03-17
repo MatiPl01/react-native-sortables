@@ -30,6 +30,7 @@ import { ContextProviderComposer } from './utils';
 type SharedProviderProps = PropsWithChildren<
   {
     itemKeys: Array<string>;
+    sortableKeys?: Array<string>;
     sortEnabled: Animatable<boolean>;
     hapticsEnabled: boolean;
     customHandle: boolean;

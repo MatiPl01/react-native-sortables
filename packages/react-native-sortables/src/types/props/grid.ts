@@ -108,6 +108,15 @@ export type SortableGridProps<I> = Simplify<
      */
     keyExtractor?: (item: I) => string;
 
+    /** Function to extract a sortable property for each item
+     * @param item The item to get sortable property from
+     * @returns Boolean value indicating whether the item is sortable
+     * @default Returns:
+     * - If item is an object with sortable property, returns that property value
+     * - Otherwise returns true
+     */
+    sortableExtractor?: (item: I) => boolean;
+
     /** Number of columns in the grid.
      *
      * Used to create a vertical grid layout where items flow from top to bottom,

@@ -35,6 +35,7 @@ export type CommonValuesContextType = {
   // ORDER
   indexToKey: SharedValue<Array<string>>;
   keyToIndex: SharedValue<Record<string, number>>;
+  sortableKeys: Array<string>;
 
   // POSITIONS
   itemPositions: SharedValue<Record<string, Vector>>;

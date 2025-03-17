@@ -4,6 +4,7 @@ import { IS_WEB } from '@/constants';
 import * as SortableFlex from '@/examples/SortableFlex';
 import * as SortableGrid from '@/examples/SortableGrid';
 
+import { NonSortablesExample } from '../SortableGrid/features';
 import type { Routes } from './types';
 
 const routes: Routes = {
@@ -30,6 +31,10 @@ const routes: Routes = {
           DataChange: {
             Component: SortableGrid.features.DataChangeExample,
             name: 'Data Change'
+          },
+          NonSortablesExample: {
+            Component: NonSortablesExample,
+            name: 'Non Sortables'
           },
           DifferentSizeItems: {
             Component: SortableGrid.features.DifferentSizeItems,

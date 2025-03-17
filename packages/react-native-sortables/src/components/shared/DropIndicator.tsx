@@ -36,8 +36,11 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     indexToKey,
     itemDimensions,
     itemPositions,
-    keyToIndex
+    keyToIndex,
+    sortableKeys
   } = useCommonValuesContext();
+
+  console.log(sortableKeys);
 
   // Clone the array in order to prevent user from mutating the internal state
   const orderedItemKeys = useDerivedValue(() => [...indexToKey.value]);
@@ -55,31 +58,37 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
       dropped: activeItemDropped.value,
       kToI: keyToIndex.value,
       key: activeItemKey.value,
-      positions: itemPositions.value
+      positions: itemPositions.value,
+      sortableKeys: sortableKeys
     }),
-    ({ dropped, kToI, key, positions }) => {
-      if (key !== null) {
-        dropIndex.value = kToI[key] ?? 0;
-        dropPosition.value = positions[key] ?? { x: 0, y: 0 };
-        dimensions.value = itemDimensions.value[key] ?? null;
+    ({ dropped, kToI, key, positions, sortableKeys }) => {
+      if (sortableKeys.includes(key ?? '')) {
+        if (key !== null) {
+          dropIndex.value = kToI[key] ?? 0;
+          dropPosition.value = positions[key] ?? { x: 0, y: 0 };
+          dimensions.value = itemDimensions.value[key] ?? null;
 
-        const update = (target: SharedValue<null | number>, value: number) => {
-          if (target.value === null || prevUpdateItemKey.value === null) {
-            target.value = value;
-          } else {
-            target.value = withTiming(value, {
-              easing: Easing.out(Easing.ease)
-            });
-          }
-        };
+          const update = (
+            target: SharedValue<null | number>,
+            value: number
+          ) => {
+            if (target.value === null || prevUpdateItemKey.value === null) {
+              target.value = value;
+            } else {
+              target.value = withTiming(value, {
+                easing: Easing.out(Easing.ease)
+              });
+            }
+          };
 
-        update(x, dropPosition.value.x);
-        update(y, dropPosition.value.y);
-      } else if (dropped) {
-        x.value = null;
-        y.value = null;
+          update(x, dropPosition.value.x);
+          update(y, dropPosition.value.y);
+        } else if (dropped) {
+          x.value = null;
+          y.value = null;
+        }
+        prevUpdateItemKey.value = key;
       }
-      prevUpdateItemKey.value = key;
     }
   );
 

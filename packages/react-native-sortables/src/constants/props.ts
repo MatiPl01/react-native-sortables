@@ -9,7 +9,7 @@ import type {
   SortableFlexProps,
   SortableGridProps
 } from '../types';
-import { defaultKeyExtractor } from '../utils/keys';
+import { defaultKeyExtractor, defaultSortableExtractor } from '../utils/keys';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
 import { IS_WEB } from './platform';
 
@@ -88,6 +88,7 @@ export const DEFAULT_SORTABLE_GRID_PROPS = {
   columns: 1,
   keyExtractor: defaultKeyExtractor,
   rowGap: 0,
+  sortableExtractor: defaultSortableExtractor,
   strategy: 'insert'
 } satisfies DefaultSortableGridProps;
 

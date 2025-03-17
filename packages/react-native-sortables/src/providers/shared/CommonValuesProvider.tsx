@@ -33,6 +33,7 @@ type CommonValuesProviderProps = PropsWithChildren<
     controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
     itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
     initialItemsStyleOverride?: ViewStyle;
+    sortableKeys?: Array<string>;
   } & ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>
@@ -58,7 +59,8 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
   itemsLayoutTransitionMode,
   snapOffsetX: _snapOffsetX,
   snapOffsetY: _snapOffsetY,
-  sortEnabled: _sortEnabled
+  sortEnabled: _sortEnabled,
+  sortableKeys = itemKeys
 }) => {
   const prevKeysRef = useRef<Array<string>>([]);
 
@@ -184,6 +186,7 @@ const { CommonValuesProvider, useCommonValuesContext } = createProvider(
       snapOffsetX,
       snapOffsetY,
       sortEnabled,
+      sortableKeys,
       touchPosition
     }
   };

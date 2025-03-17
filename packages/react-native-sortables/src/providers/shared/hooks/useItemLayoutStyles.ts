@@ -38,7 +38,8 @@ export default function useItemLayoutStyles(
     animateLayoutOnReorderOnly,
     canSwitchToAbsoluteLayout,
     dropAnimationDuration,
-    itemPositions
+    itemPositions,
+    sortableKeys
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
@@ -57,7 +58,7 @@ export default function useItemLayoutStyles(
     () => ({
       canSwitchToAbsolute: canSwitchToAbsoluteLayout.value,
       hasProgress: hasActivationProgress.value,
-      isActive: activeItemKey.value === key,
+      isActive: activeItemKey.value === key && sortableKeys.includes(key),
       position: itemPositions.value[key]
     }),
     ({ canSwitchToAbsolute, hasProgress, isActive, position }) => {
@@ -122,7 +123,7 @@ export default function useItemLayoutStyles(
   // Active item updater
   useAnimatedReaction(
     () => ({
-      isActive: activeItemKey.value === key,
+      isActive: activeItemKey.value === key && sortableKeys.includes(key),
       position: activeItemPosition.value
     }),
     ({ isActive, position }) => {

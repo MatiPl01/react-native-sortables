@@ -67,6 +67,7 @@ function SortableFlex(props: SortableFlexProps) {
       controlledContainerDimensions={controlledContainerDimensions}
       initialItemsStyleOverride={styles.styleOverride}
       itemKeys={itemKeys}
+      sortableKeys={itemKeys}
       onDragEnd={onDragEnd}>
       <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
         <OrderUpdaterComponent

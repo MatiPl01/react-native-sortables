@@ -6,4 +6,5 @@ export { default as DifferentSizeItems } from './DifferentSizeItems';
 export { default as DragHandleExample } from './DragHandleExample';
 export { default as DropIndicatorExample } from './DropIndicatorExample';
 export { default as HorizontalAutoScrollExample } from './HorizontalAutoScrollExample';
+export { default as NonSortablesExample } from './NonSortablesExample';
 export { default as OrderingStrategyExample } from './OrderingStrategyExample';

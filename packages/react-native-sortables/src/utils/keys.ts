@@ -17,3 +17,12 @@ export const defaultKeyExtractor = <I>(item: I): string => {
 
   return String(item);
 };
+
+export const defaultSortableExtractor = <I>(item: I): boolean => {
+  if (typeof item === 'object' && item !== null) {
+    if (hasProp(item, 'sortable')) {
+      return Boolean(item.sortable);
+    }
+  }
+  return true;
+};
