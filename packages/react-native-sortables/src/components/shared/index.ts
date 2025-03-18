@@ -1,9 +1,6 @@
 export { default as AnimatedOnLayoutView } from './AnimatedOnLayoutView';
 export { default as createSortableTouchable } from './createSortableTouchable';
-export {
-  default as DraggableView,
-  type DraggableViewProps
-} from './DraggableView';
+export * from './DraggableView';
 export { default as SortableContainer } from './SortableContainer';
 export * from './SortableHandle';
 export {

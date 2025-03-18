@@ -48,6 +48,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationAnimationDuration,
     activationState,
     activeAnimationProgress,
+    activeItemAbsolutePosition,
     activeItemDimensions,
     activeItemDropped,
     activeItemKey,
@@ -89,10 +90,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const hasVerticalOverDrag = overDrag === 'vertical' || overDrag === 'both';
 
   const touchStartTouch = useSharedValue<TouchData | null>(null);
-  const dragStartTouch = useSharedValue<TouchData | null>(null);
+  const currentTouch = useSharedValue<TouchData | null>(null);
   const dragStartItemTouchOffset = useSharedValue<Vector | null>(null);
   const dragStartTouchPosition = useSharedValue<Vector | null>(null);
-  const dragTranslation = useSharedValue<Vector | null>(null);
   const dragStartIndex = useSharedValue(-1);
 
   // used for activation and deactivation (drop)
@@ -119,8 +119,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       progress: activeAnimationProgress.value,
       snapDimensions: snapItemDimensions.value,
       snapOffset: snapItemOffset.value,
+      startTouch: touchStartTouch.value,
       startTouchPosition: dragStartTouchPosition.value,
-      translation: dragTranslation.value
+      touch: currentTouch.value
     }),
     ({
       activeDimensions,
@@ -135,8 +136,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       progress,
       snapDimensions,
       snapOffset,
+      startTouch,
       startTouchPosition,
-      translation
+      touch
     }) => {
       if (
         key === null ||
@@ -145,15 +147,23 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         !activeDimensions ||
         !snapDimensions ||
         !itemTouchOffset ||
-        !startTouchPosition
+        !startTouchPosition ||
+        !touch ||
+        !startTouch
       ) {
         touchPosition.value = null;
         return;
       }
 
       touchPosition.value = {
-        x: startTouchPosition.x + (translation?.x ?? 0) + (offsetDiff?.x ?? 0),
-        y: startTouchPosition.y + (translation?.y ?? 0) + (offsetDiff?.y ?? 0)
+        x:
+          startTouchPosition.x +
+          (touch.absoluteX - startTouch.absoluteX) +
+          (offsetDiff?.x ?? 0),
+        y:
+          startTouchPosition.y +
+          (touch.absoluteY - startTouch.absoluteY) +
+          (offsetDiff?.y ?? 0)
       };
 
       let tX = itemTouchOffset.x;
@@ -171,22 +181,29 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const translate = (from: number, to: number) =>
         from === to ? from : interpolate(progress, [0, 1], [from, to]);
 
-      let activeX = touchPosition.value.x - translate(itemTouchOffset.x, tX);
-      let activeY = touchPosition.value.y - translate(itemTouchOffset.y, tY);
+      const snapX = translate(itemTouchOffset.x, tX);
+      const snapY = translate(itemTouchOffset.y, tY);
 
-      if (!hasHorizontalOverDrag) {
-        activeX = clamp(activeX, 0, containerW - activeDimensions.width);
-      }
-      if (!hasVerticalOverDrag) {
-        activeY = clamp(activeY, 0, containerH - activeDimensions.height);
-      }
+      const unclampedActiveX = touchPosition.value.x - snapX;
+      const unclampedActiveY = touchPosition.value.y - snapY;
+
+      const activeX = hasHorizontalOverDrag
+        ? unclampedActiveX
+        : clamp(unclampedActiveX, 0, containerW - activeDimensions.width);
+      const activeY = hasVerticalOverDrag
+        ? unclampedActiveY
+        : clamp(unclampedActiveY, 0, containerH - activeDimensions.height);
 
       activeItemPosition.value = {
         x: activeX,
         y: activeY
       };
+      activeItemAbsolutePosition.value = {
+        x: touch.absoluteX + activeX - unclampedActiveX - snapX,
+        y: touch.absoluteY + activeY - unclampedActiveY - snapY
+      };
     },
-    [hasHorizontalOverDrag, hasVerticalOverDrag]
+    [hasHorizontalOverDrag, hasVerticalOverDrag, activeItemAbsolutePosition]
   );
 
   /**
@@ -229,7 +246,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const touchX = handlePosition.x + touch.x;
       const touchY = handlePosition.y + touch.y;
 
-      dragStartTouch.value = touch;
       touchPosition.value = { x: touchX, y: touchY };
       dragStartTouchPosition.value = touchPosition.value;
       dragStartItemTouchOffset.value = {
@@ -280,7 +296,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       customHandle,
       dragStartIndex,
       dragStartItemTouchOffset,
-      dragStartTouch,
       dragStartTouchPosition,
       haptics,
       inactiveAnimationProgress,
@@ -327,6 +342,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       touchStartTouch.value = touch;
+      currentTouch.value = touch;
       activationState.value = DragActivationState.TOUCHED;
 
       clearAnimatedTimeout(activationTimeoutId.value);
@@ -351,6 +367,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemKey,
       activationState,
       activationTimeoutId,
+      currentTouch,
       canSwitchToAbsoluteLayout,
       dragActivationDelay,
       handleDragStart,
@@ -364,6 +381,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     (e: GestureTouchEvent, fail: () => void) => {
       'worklet';
       const touch = e.allTouches[0];
+      currentTouch.value = touch ?? null;
+
       if (!touch) {
         fail();
         return;
@@ -389,22 +408,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           fail();
           return;
         }
-      } else if (activationState.value === DragActivationState.ACTIVE) {
-        if (!dragStartTouch.value) {
-          fail();
-          return;
-        }
-        const dX = touch.absoluteX - dragStartTouch.value.absoluteX;
-        const dY = touch.absoluteY - dragStartTouch.value.absoluteY;
-        dragTranslation.value = { x: dX, y: dY };
       }
     },
     [
       activationState,
       activeItemKey,
+      currentTouch,
       dragActivationFailOffset,
-      dragStartTouch,
-      dragTranslation,
       touchStartTouch
     ]
   );
@@ -413,10 +423,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     (key: string, activationAnimationProgress: SharedValue<number>) => {
       'worklet';
       touchStartTouch.value = null;
-      dragStartTouch.value = null;
+      currentTouch.value = null;
       dragStartItemTouchOffset.value = null;
       dragStartTouchPosition.value = null;
-      dragTranslation.value = null;
       activeItemPosition.value = null;
       activeItemDimensions.value = null;
       touchPosition.value = null;
@@ -448,11 +457,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       clearAnimatedTimeout(activationTimeoutId.value);
       activationTimeoutId.value = setAnimatedTimeout(() => {
         activeAnimationProgress.value = 0;
-        if (activeItemKey.value === null) {
-          prevActiveItemKey.value = null;
-          activeItemDropped.value = true;
-          updateLayer?.(LayerState.Idle);
-        }
+        prevActiveItemKey.value = null;
+        activeItemDropped.value = true;
+        updateLayer?.(LayerState.Idle);
       }, dropAnimationDuration.value);
     },
     [
@@ -464,12 +471,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationTimeoutId,
       activeAnimationProgress,
       activationState,
+      currentTouch,
       dropAnimationDuration,
       dragStartIndex,
       dragStartItemTouchOffset,
-      dragStartTouch,
       dragStartTouchPosition,
-      dragTranslation,
       haptics,
       inactiveAnimationProgress,
       indexToKey,

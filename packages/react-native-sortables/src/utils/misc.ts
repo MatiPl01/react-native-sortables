@@ -1,4 +1,5 @@
 import type { Maybe } from '../types/utils';
+
 export const noop = () => {
   // do nothing
 };

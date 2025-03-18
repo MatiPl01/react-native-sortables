@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { LayoutChangeEvent, View, ViewStyle } from 'react-native';
 import type { GestureTouchEvent } from 'react-native-gesture-handler';
 import type {
@@ -32,6 +33,8 @@ export type ControlledContainerDimensions = { width: boolean; height: boolean };
  * between different providers)
  */
 export type CommonValuesContextType = {
+  componentId: number;
+
   // ORDER
   indexToKey: SharedValue<Array<string>>;
   keyToIndex: SharedValue<Record<string, number>>;
@@ -40,6 +43,7 @@ export type CommonValuesContextType = {
   itemPositions: SharedValue<Record<string, Vector>>;
   touchPosition: SharedValue<Vector | null>;
   activeItemPosition: SharedValue<Vector | null>;
+  activeItemAbsolutePosition: SharedValue<Vector | null>;
   snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
@@ -133,13 +137,29 @@ export enum LayerState {
   Intermediate = 1
 }
 
-export type LayerProviderContextType = {
+export type LayerContextType = {
   updateLayer: (state: LayerState) => void;
+};
+
+// PORTAL
+
+export type PortalSubscription = (isTeleported: boolean) => void;
+
+export type PortalContextType = {
+  teleport: (id: string, node: ReactNode) => void;
+  subscribe: (id: string, callback: PortalSubscription) => () => void;
+  notifyRendered: (id: string) => void;
+};
+
+// PORTAL OUTLET
+
+export type PortalOutletContextType = {
+  portalOutletRef: AnimatedRef<View>;
 };
 
 // DEBUG
 
-export type DebugProviderContextType = {
+export type DebugContextType = {
   // Overloaded signatures for useDebugLines
   useDebugLines<K extends string>(keys: Array<K>): Record<K, DebugLineUpdater>;
   useDebugLines(count: number): Array<DebugLineUpdater>;

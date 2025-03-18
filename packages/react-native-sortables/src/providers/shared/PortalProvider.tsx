@@ -1,0 +1,78 @@
+import type { ReactNode } from 'react';
+import { Fragment, useCallback, useRef, useState } from 'react';
+
+import type { PortalContextType, PortalSubscription } from '../../types';
+import { createProvider } from '../utils';
+import { PortalOutletProvider } from './PoralOutletProvider';
+
+type PortalProviderProps = {
+  children: ReactNode;
+};
+
+const { PortalProvider, usePortalContext } = createProvider('Portal', {
+  guarded: false
+})<PortalProviderProps, PortalContextType>(({ children }) => {
+  const subscribersRef = useRef<Record<string, Set<PortalSubscription>>>({});
+  const [teleportedNodes, setTeleportedNodes] = useState<
+    Record<string, React.ReactNode>
+  >({});
+
+  const teleport = useCallback((id: string, node: React.ReactNode) => {
+    if (node) {
+      setTeleportedNodes(prev => {
+        const newState = { ...prev, [id]: node };
+        return newState;
+      });
+    } else {
+      setTeleportedNodes(prev => {
+        if (!prev[id]) return prev;
+        const newState = { ...prev };
+        delete newState[id];
+        return newState;
+      });
+    }
+  }, []);
+
+  const subscribe = useCallback((id: string, callback: PortalSubscription) => {
+    if (!subscribersRef.current[id]) {
+      subscribersRef.current[id] = new Set();
+    }
+    subscribersRef.current[id]?.add(callback);
+    return () => {
+      subscribersRef.current[id]?.delete(callback);
+    };
+  }, []);
+
+  const notifySubscribers = useCallback((id: string, isTeleported: boolean) => {
+    subscribersRef.current[id]?.forEach(callback => {
+      callback(isTeleported);
+    });
+  }, []);
+
+  const notifyRendered = useCallback(
+    (id: string) => {
+      notifySubscribers(id, true);
+    },
+    [notifySubscribers]
+  );
+
+  return {
+    children: (
+      <>
+        {children}
+        <PortalOutletProvider>
+          {Object.entries(teleportedNodes).map(([key, node]) => (
+            <Fragment key={key}>{node}</Fragment>
+          ))}
+        </PortalOutletProvider>
+      </>
+    ),
+    value: {
+      notifyRendered,
+      subscribe,
+      teleport
+    }
+  };
+});
+
+export { PortalProvider, usePortalContext };

@@ -119,11 +119,10 @@ export default function SortableContainer({
         />
       )}
       <AnimatedOnLayoutView
-        ref={containerRef}
         style={[StyleSheet.absoluteFill, animatedMeasurementsContainerStyle]}
         onLayout={handleHelperContainerMeasurement}
       />
-      <Animated.View style={[style, innerContainerStyle]}>
+      <Animated.View ref={containerRef} style={[style, innerContainerStyle]}>
         {children}
       </Animated.View>
       {/* Renders an overlay view helpful for debugging */}

@@ -1,7 +1,7 @@
 import { type ComponentType, useCallback } from 'react';
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
-import { useItemContext } from '../../providers';
+import { useCommonValuesContext } from '../../providers';
 import type { AnyFunction, Maybe } from '../../types';
 import { DragActivationState } from '../../types';
 
@@ -45,12 +45,12 @@ export default function createSortableTouchable<P extends AnyPressHandlers>(
   Component: ComponentType<P>
 ): ComponentType<P> {
   function Wrapper({ onPress, ...rest }: P) {
-    const { dragActivationState } = useItemContext();
+    const { activationState } = useCommonValuesContext();
     const isCancelled = useSharedValue(false);
 
     useAnimatedReaction(
       () => ({
-        dragState: dragActivationState.value
+        dragState: activationState.value
       }),
       ({ dragState }) => {
         // Cancels when the item is active

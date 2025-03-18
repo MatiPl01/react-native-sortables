@@ -16,6 +16,8 @@ export default function ComplexLayoutExample() {
   return (
     <ScrollScreen>
       <Sortable.Flex
+        activeItemScale={1.05}
+        enableActiveItemSnap={false}
         justifyContent='space-between'
         padding={PADDING}
         rowGap={GAP}

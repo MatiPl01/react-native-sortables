@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unused-modules */
-import type { StyleProp, ViewStyle } from 'react-native';
-import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import type { ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedReaction,
   useAnimatedStyle,
@@ -8,6 +8,7 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
+import type { AnimatedStyleProp } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
@@ -32,7 +33,7 @@ const NO_TRANSLATION_STYLE: ViewStyle = {
 export default function useItemLayoutStyles(
   key: string,
   activationAnimationProgress: SharedValue<number>
-): StyleProp<AnimatedStyle<ViewStyle>> {
+): AnimatedStyleProp {
   const {
     activeItemDropped,
     activeItemKey,

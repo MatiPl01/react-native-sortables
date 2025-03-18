@@ -1,4 +1,5 @@
 import type {
+  Context,
   ForwardedRef,
   ForwardRefExoticComponent,
   ForwardRefRenderFunction,
@@ -10,9 +11,9 @@ import { forwardRef } from 'react';
 import { IS_REACT_19 } from '../constants';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function componentWithRef<T, P = {}>(
+export const componentWithRef = <T, P = {}>(
   render: ForwardRefRenderFunction<T, P>
-): ForwardRefExoticComponent<P & RefAttributes<T>> {
+): ForwardRefExoticComponent<P & RefAttributes<T>> => {
   if (IS_REACT_19) {
     return (({ ref, ...props }) =>
       render(props as P, ref as ForwardedRef<T>)) as ForwardRefExoticComponent<
@@ -23,4 +24,8 @@ export function componentWithRef<T, P = {}>(
   return forwardRef(
     render as ForwardRefRenderFunction<T, PropsWithoutRef<P>>
   ) as ForwardRefExoticComponent<P & RefAttributes<T>>;
-}
+};
+
+export const getContextProvider = <T>(Context: Context<T>) => {
+  return IS_REACT_19 ? Context : Context.Provider;
+};
