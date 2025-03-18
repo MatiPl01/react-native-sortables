@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
+import {
+  useAnimatedStyle,
+  useDerivedValue
+} from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
 import { useAnimatableValue, useDragEndHandler } from '../hooks';
@@ -10,6 +13,7 @@ import {
   GridLayoutProvider,
   OrderUpdaterComponent,
   SharedProvider,
+  useCommonValuesContext,
   useGridLayoutContext,
   useStrategyKey
 } from '../providers';
@@ -135,7 +139,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           rowGap={rowGapValue}
           rowHeight={rowHeight!} // must be specified for horizontal grids
           showDropIndicator={showDropIndicator}
-          sortableKeys={sortableKeys}
         />
       </GridLayoutProvider>
     </SharedProvider>
@@ -144,7 +147,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
 type SortableGridInnerProps<I> = {
   itemKeys: Array<string>;
-  sortableKeys: Array<string>;
   rowGap: SharedValue<number>;
   columnGap: SharedValue<number>;
   groups: number;
@@ -177,7 +179,6 @@ function SortableGridInner<I>({
   renderItem,
   rowGap,
   rowHeight,
-  sortableKeys,
   ...containerProps
 }: SortableGridInnerProps<I>) {
   const animatedInnerStyle = useAnimatedStyle(() => ({
@@ -186,6 +187,8 @@ function SortableGridInner<I>({
     marginHorizontal: -columnGap.value / 2,
     marginVertical: -rowGap.value / 2
   }));
+
+  const { sortableKeys } = useCommonValuesContext();
 
   const animatedItemStyle = useAnimatedStyle(() => ({
     flexBasis: `${100 / groups}%`,
@@ -226,7 +229,7 @@ function SortableGridItem<I>({
   index,
   item,
   renderItem,
-  sortable = true,
+  sortable,
   ...rest
 }: SortableGridItemProps<I>) {
   const children = useMemo(

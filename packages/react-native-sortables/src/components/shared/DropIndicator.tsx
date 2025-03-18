@@ -36,11 +36,8 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     indexToKey,
     itemDimensions,
     itemPositions,
-    keyToIndex,
-    sortableKeys
+    keyToIndex
   } = useCommonValuesContext();
-
-  console.log(sortableKeys);
 
   // Clone the array in order to prevent user from mutating the internal state
   const orderedItemKeys = useDerivedValue(() => [...indexToKey.value]);
@@ -58,20 +55,15 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
       dropped: activeItemDropped.value,
       kToI: keyToIndex.value,
       key: activeItemKey.value,
-      positions: itemPositions.value,
-      sortableKeys: sortableKeys
+      positions: itemPositions.value
     }),
-    ({ dropped, kToI, key, positions, sortableKeys }) => {
-      if (sortableKeys.includes(key ?? '')) {
+    ({ dropped, kToI, key, positions }) => {
         if (key !== null) {
           dropIndex.value = kToI[key] ?? 0;
           dropPosition.value = positions[key] ?? { x: 0, y: 0 };
           dimensions.value = itemDimensions.value[key] ?? null;
 
-          const update = (
-            target: SharedValue<null | number>,
-            value: number
-          ) => {
+        const update = (target: SharedValue<null | number>, value: number) => {
             if (target.value === null || prevUpdateItemKey.value === null) {
               target.value = value;
             } else {
@@ -89,7 +81,6 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
         }
         prevUpdateItemKey.value = key;
       }
-    }
   );
 
   const animatedStyle = useAnimatedStyle(() => {
