@@ -110,7 +110,7 @@ function SortableHandleComponent({
 
   return (
     <GestureDetector gesture={adjustedGesture} userSelect='none'>
-      <View ref={viewRef} onLayout={measureHandle}>
+      <View ref={viewRef} onLayout={disabled ? undefined : measureHandle}>
         {children}
       </View>
     </GestureDetector>
