@@ -1,5 +1,4 @@
 import { type ComponentType, useCallback } from 'react';
-import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { useCommonValuesContext } from '../../providers';
 import type { AnyFunction, Maybe } from '../../types';
@@ -46,32 +45,15 @@ export default function createSortableTouchable<P extends AnyPressHandlers>(
 ): ComponentType<P> {
   function Wrapper({ onPress, ...rest }: P) {
     const { activationState } = useCommonValuesContext();
-    const isCancelled = useSharedValue(false);
-
-    useAnimatedReaction(
-      () => ({
-        dragState: activationState.value
-      }),
-      ({ dragState }) => {
-        // Cancels when the item is active
-        if (dragState === DragActivationState.ACTIVE) {
-          isCancelled.value = true;
-        }
-        // Resets state when the item is touched again
-        else if (dragState === DragActivationState.TOUCHED) {
-          isCancelled.value = false;
-        }
-      }
-    );
 
     const handlePress = useCallback(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (...args: Array<any>) => {
-        if (isCancelled.value) return;
+        if (activationState.value !== DragActivationState.INACTIVE) return;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         onPress?.(...args);
       },
-      [isCancelled, onPress]
+      [activationState, onPress]
     );
 
     return <Component {...(rest as P)} onPress={handlePress} />;
