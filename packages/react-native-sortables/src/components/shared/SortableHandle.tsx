@@ -9,10 +9,12 @@ import {
 
 import {
   useCommonValuesContext,
+  useCustomHandleContext,
   useItemContext,
   useItemPanGesture,
-  usePortalContext
+  usePortalOutletContext
 } from '../../providers';
+import { error } from '../../utils';
 
 /** Props for the Sortable Handle component */
 export type SortableHandleProps = PropsWithChildren<{
@@ -26,7 +28,7 @@ export function SortableHandle(props: SortableHandleProps) {
   // The item is teleported when it is rendered within the PortalOutlet
   // component. Because PortalOutlet creates a context, we can use it to
   // check if the item is teleported
-  const isTeleported = !!usePortalContext();
+  const isTeleported = !!usePortalOutletContext();
 
   // In case of teleported handle items, we want to render just the
   // handle component without any functionality
@@ -41,14 +43,18 @@ function SortableHandleComponent({
   children,
   disabled = false
 }: SortableHandleProps) {
-  const {
-    activeItemKey,
-    activeItemPosition,
-    containerRef,
-    snapItemDimensions,
-    snapItemOffset
-  } = useCommonValuesContext();
+  const { activeItemKey, activeItemPosition, containerRef } =
+    useCommonValuesContext();
   const { activationAnimationProgress, itemKey } = useItemContext();
+  const customHandleContext = useCustomHandleContext();
+
+  if (!customHandleContext) {
+    throw error(
+      'Please add a `customHandle` property on the Sortable component to use a custom handle component.'
+    );
+  }
+
+  const { handleDimensions, handleOffset } = customHandleContext;
 
   const viewRef = useAnimatedRef<View>();
   const gesture = useItemPanGesture(
@@ -79,8 +85,8 @@ function SortableHandleComponent({
       containerMeasurements;
     const { x: activeX, y: activeY } = activeItemPosition.value;
 
-    snapItemDimensions.value = { height, width };
-    snapItemOffset.value = {
+    handleDimensions.value = { height, width };
+    handleOffset.value = {
       x: pageX - containerPageX - activeX,
       y: pageY - containerPageY - activeY
     };
@@ -89,8 +95,8 @@ function SortableHandleComponent({
     activeItemPosition,
     containerRef,
     itemKey,
-    snapItemDimensions,
-    snapItemOffset,
+    handleDimensions,
+    handleOffset,
     viewRef
   ]);
 

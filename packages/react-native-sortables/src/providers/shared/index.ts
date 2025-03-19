@@ -5,6 +5,10 @@ export {
   useCommonValuesContext
 } from './CommonValuesProvider';
 export * from './components';
+export {
+  CustomHandleProvider,
+  useCustomHandleContext
+} from './CustomHandleProvider';
 export { DragProvider, useDragContext } from './DragProvider';
 export * from './hooks';
 export { ItemContextProvider, useItemContext } from './ItemContextProvider';
@@ -14,5 +18,6 @@ export {
   type MeasurementsProviderProps,
   useMeasurementsContext
 } from './MeasurementsProvider';
+export { usePortalOutletContext } from './PortalOutletProvider';
 export { PortalProvider, usePortalContext } from './PortalProvider';
 export * from './utils';

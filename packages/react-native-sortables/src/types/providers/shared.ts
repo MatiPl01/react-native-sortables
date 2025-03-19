@@ -43,7 +43,6 @@ export type CommonValuesContextType = {
   itemPositions: SharedValue<Record<string, Vector>>;
   touchPosition: SharedValue<Vector | null>;
   activeItemPosition: SharedValue<Vector | null>;
-  snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
   controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
@@ -51,7 +50,6 @@ export type CommonValuesContextType = {
   measuredContainerHeight: SharedValue<null | number>;
   containerWidth: SharedValue<null | number>;
   containerHeight: SharedValue<null | number>;
-  snapItemDimensions: SharedValue<Dimensions | null>;
   activeItemDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
@@ -84,7 +82,6 @@ export type MeasurementsContextType = {
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   handleItemRemoval: (key: string) => void;
   measureContainer: () => void;
-  setItemDimensionsAsSnapDimensions: (key: string) => void;
   handleHelperContainerMeasurement: (event: LayoutChangeEvent) => void;
 };
 
@@ -140,16 +137,28 @@ export type LayerContextType = {
   updateLayer: (state: LayerState) => void;
 };
 
+// CUSTOM HANDLE
+
+export type CustomHandleContextType = {
+  handleOffset: SharedValue<Vector | null>;
+  handleDimensions: SharedValue<Dimensions | null>;
+};
+
 // PORTAL
 
 export type PortalSubscription = (isTeleported: boolean) => void;
 
 export type PortalContextType = {
   activeItemAbsolutePosition: SharedValue<Vector | null>;
-  portalOutletRef: AnimatedRef<View>;
   teleport: (id: string, node: ReactNode) => void;
   subscribe: (id: string, callback: PortalSubscription) => () => void;
   notifyRendered: (id: string) => void;
+};
+
+// PORTAL OUTLET
+
+export type PortalOutletContextType = {
+  portalOutletRef: AnimatedRef<View>;
 };
 
 // DEBUG

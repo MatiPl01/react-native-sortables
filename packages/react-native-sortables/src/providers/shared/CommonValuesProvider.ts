@@ -77,7 +77,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const itemPositions = useSharedValue<Record<string, Vector>>({});
     const touchPosition = useSharedValue<Vector | null>(null);
     const activeItemPosition = useSharedValue<Vector | null>(null);
-    const snapItemOffset = useSharedValue<Vector | null>(null);
 
     // DIMENSIONS
     // measured dimensions via onLayout used to calculate containerWidth and containerHeight
@@ -90,7 +89,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const containerWidth = useSharedValue<null | number>(null);
     const containerHeight = useSharedValue<null | number>(null);
     const activeItemDimensions = useSharedValue<Dimensions | null>(null);
-    const snapItemDimensions = useSharedValue<Dimensions | null>(null);
     const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
     const itemsStyleOverride = useSharedValue<Maybe<ViewStyle>>(
       initialItemsStyleOverride
@@ -187,8 +185,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         measuredContainerWidth,
         prevActiveItemKey,
         shouldAnimateLayout,
-        snapItemDimensions,
-        snapItemOffset,
         snapOffsetX,
         snapOffsetY,
         sortEnabled,
