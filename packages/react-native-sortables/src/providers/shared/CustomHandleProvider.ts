@@ -12,13 +12,15 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
   'CustomHandle',
   { guarded: false }
 )<CustomHandleProviderProps, CustomHandleContextType>(() => {
-  const handleOffset = useSharedValue<Vector | null>(null);
-  const handleDimensions = useSharedValue<Dimensions | null>(null);
+  const activeHandleOffset = useSharedValue<Vector | null>(null);
+  const activeHandleDimensions = useSharedValue<Dimensions | null>(null);
+  const fixedItemKeys = useSharedValue<Record<string, boolean>>({});
 
   return {
     value: {
-      handleDimensions,
-      handleOffset
+      activeHandleDimensions,
+      activeHandleOffset,
+      fixedItemKeys
     }
   };
 });

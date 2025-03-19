@@ -140,8 +140,9 @@ export type LayerContextType = {
 // CUSTOM HANDLE
 
 export type CustomHandleContextType = {
-  handleOffset: SharedValue<Vector | null>;
-  handleDimensions: SharedValue<Dimensions | null>;
+  activeHandleOffset: SharedValue<Vector | null>;
+  activeHandleDimensions: SharedValue<Dimensions | null>;
+  fixedItemKeys: SharedValue<Record<string, boolean>>;
 };
 
 // PORTAL

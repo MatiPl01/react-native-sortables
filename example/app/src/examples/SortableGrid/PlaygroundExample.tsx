@@ -10,10 +10,13 @@ const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
 
 export default function PlaygroundExample() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <View style={styles.card}>
-        <Text style={styles.text}>{item}</Text>
-      </View>
+    ({ item, index }) => (
+      <Sortable.Handle
+        mode={index === 0 || index === DATA.length - 1 ? 'fixed' : 'draggable'}>
+        <View style={styles.card}>
+          <Text style={styles.text}>{item}</Text>
+        </View>
+      </Sortable.Handle>
     ),
     []
   );
@@ -24,6 +27,7 @@ export default function PlaygroundExample() {
         columnGap={10}
         columns={3}
         data={DATA}
+        customHandle
         renderItem={renderItem}
         rowGap={10}
       />
