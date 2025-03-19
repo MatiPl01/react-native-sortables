@@ -43,7 +43,6 @@ export type CommonValuesContextType = {
   itemPositions: SharedValue<Record<string, Vector>>;
   touchPosition: SharedValue<Vector | null>;
   activeItemPosition: SharedValue<Vector | null>;
-  activeItemAbsolutePosition: SharedValue<Vector | null>;
   snapItemOffset: SharedValue<Vector | null>;
 
   // DIMENSIONS
@@ -146,15 +145,11 @@ export type LayerContextType = {
 export type PortalSubscription = (isTeleported: boolean) => void;
 
 export type PortalContextType = {
+  activeItemAbsolutePosition: SharedValue<Vector | null>;
+  portalOutletRef: AnimatedRef<View>;
   teleport: (id: string, node: ReactNode) => void;
   subscribe: (id: string, callback: PortalSubscription) => () => void;
   notifyRendered: (id: string) => void;
-};
-
-// PORTAL OUTLET
-
-export type PortalOutletContextType = {
-  portalOutletRef: AnimatedRef<View>;
 };
 
 // DEBUG

@@ -32,6 +32,7 @@ import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
+import { usePortalContext } from './PortalProvider';
 
 type DragProviderProps = PropsWithChildren<
   {
@@ -48,7 +49,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationAnimationDuration,
     activationState,
     activeAnimationProgress,
-    activeItemAbsolutePosition,
     activeItemDimensions,
     activeItemDropped,
     activeItemKey,
@@ -82,6 +82,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { updateLayer } = useLayerContext() ?? {};
   const { scrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
+  const { activeItemAbsolutePosition } = usePortalContext() ?? {};
 
   const haptics = useHaptics(hapticsEnabled);
 
@@ -198,10 +199,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: activeX,
         y: activeY
       };
-      activeItemAbsolutePosition.value = {
-        x: touch.absoluteX + activeX - unclampedActiveX - snapX,
-        y: touch.absoluteY + activeY - unclampedActiveY - snapY
-      };
+      if (activeItemAbsolutePosition) {
+        activeItemAbsolutePosition.value = {
+          x: touch.absoluteX + activeX - unclampedActiveX - snapX,
+          y: touch.absoluteY + activeY - unclampedActiveY - snapY
+        };
+      }
     },
     [hasHorizontalOverDrag, hasVerticalOverDrag, activeItemAbsolutePosition]
   );

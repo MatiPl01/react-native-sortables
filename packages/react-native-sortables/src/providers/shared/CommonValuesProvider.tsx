@@ -77,7 +77,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const itemPositions = useSharedValue<Record<string, Vector>>({});
     const touchPosition = useSharedValue<Vector | null>(null);
     const activeItemPosition = useSharedValue<Vector | null>(null);
-    const activeItemAbsolutePosition = useSharedValue<Vector | null>(null);
     const snapItemOffset = useSharedValue<Vector | null>(null);
 
     // DIMENSIONS
@@ -155,7 +154,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activationAnimationDuration,
         activationState,
         activeAnimationProgress,
-        activeItemAbsolutePosition,
         activeItemDimensions,
         activeItemDropped,
         activeItemKey,

@@ -11,7 +11,7 @@ import {
   useCommonValuesContext,
   useItemContext,
   useItemPanGesture,
-  usePortalOutletContext
+  usePortalContext
 } from '../../providers';
 
 /** Props for the Sortable Handle component */
@@ -26,7 +26,7 @@ export function SortableHandle(props: SortableHandleProps) {
   // The item is teleported when it is rendered within the PortalOutlet
   // component. Because PortalOutlet creates a context, we can use it to
   // check if the item is teleported
-  const isTeleported = !!usePortalOutletContext();
+  const isTeleported = !!usePortalContext();
 
   // In case of teleported handle items, we want to render just the
   // handle component without any functionality

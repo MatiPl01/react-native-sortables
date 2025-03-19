@@ -14,6 +14,5 @@ export {
   type MeasurementsProviderProps,
   useMeasurementsContext
 } from './MeasurementsProvider';
-export { usePortalOutletContext } from './PoralOutletProvider';
 export { PortalProvider, usePortalContext } from './PortalProvider';
 export * from './utils';
