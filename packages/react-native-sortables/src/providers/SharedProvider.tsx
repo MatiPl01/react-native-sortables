@@ -21,6 +21,7 @@ import type {
 import {
   AutoScrollProvider,
   CommonValuesProvider,
+  CustomHandleProvider,
   DragProvider,
   LayerProvider,
   MeasurementsProvider
@@ -51,6 +52,7 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollSpeed,
   children,
+  customHandle,
   debug,
   hapticsEnabled,
   itemKeys,
@@ -63,6 +65,7 @@ export default function SharedProvider({
 }: SharedProviderProps) {
   if (__DEV__) {
     useWarnOnPropChange('debug', debug);
+    useWarnOnPropChange('customHandle', customHandle);
     useWarnOnPropChange('scrollableRef', scrollableRef);
   }
 
@@ -72,7 +75,11 @@ export default function SharedProvider({
     // Provider used for layout debugging (can be used only in dev mode)
     __DEV__ && debug && <DebugProvider />,
     // Provider used for shared values between all providers below
-    <CommonValuesProvider itemKeys={itemKeys} {...rest} />,
+    <CommonValuesProvider
+      customHandle={customHandle}
+      itemKeys={itemKeys}
+      {...rest}
+    />,
     // Provider used for measurements of items and the container
     <MeasurementsProvider itemsCount={itemKeys.length} />,
     // Provider used for auto-scrolling when dragging an item near the
@@ -86,6 +93,8 @@ export default function SharedProvider({
         scrollableRef={scrollableRef}
       />
     ),
+    // Provider used for custom handle component related values
+    customHandle && <CustomHandleProvider />,
     // Provider used for dragging and item swapping logic
     <DragProvider
       hapticsEnabled={hapticsEnabled}

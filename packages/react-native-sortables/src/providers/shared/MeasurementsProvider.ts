@@ -34,11 +34,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     containerHeight,
     containerWidth,
     controlledContainerDimensions,
-    customHandle,
     itemDimensions,
     measuredContainerHeight,
-    measuredContainerWidth,
-    snapItemDimensions
+    measuredContainerWidth
   } = useCommonValuesContext();
 
   const measurementsContainerRef = useAnimatedRef<View>();
@@ -71,9 +69,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       itemDimensions.value[key] = dimensions;
       if (activeItemKey.value === key) {
         activeItemDimensions.value = dimensions;
-        if (!customHandle) {
-          snapItemDimensions.value = dimensions;
-        }
       }
 
       // Update the array of item dimensions only after all items have been
@@ -104,18 +99,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     delete itemDimensions.value[key];
     measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
   });
-
-  /**
-   * Updates the dimensions of the handle that is currently being touched
-   * (only if there is no custom handle and the entire item is treated as a handle)
-   */
-  const setItemDimensionsAsSnapDimensions = useCallback(
-    (key: string) => {
-      'worklet';
-      snapItemDimensions.value = itemDimensions.value[key] ?? null;
-    },
-    [itemDimensions, snapItemDimensions]
-  );
 
   const applyControlledContainerDimensions = useCallback(
     (dimensions: Partial<Dimensions>) => {
@@ -228,8 +211,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       handleItemMeasurement,
       handleItemRemoval,
       measureContainer,
-      measurementsContainerRef,
-      setItemDimensionsAsSnapDimensions
+      measurementsContainerRef
     }
   };
 });

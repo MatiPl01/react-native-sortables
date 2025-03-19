@@ -30,8 +30,10 @@ import {
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
+import { useCustomHandleContext } from './CustomHandleProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
+import { usePortalContext } from './PortalProvider';
 
 type DragProviderProps = PropsWithChildren<
   {
@@ -48,7 +50,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationAnimationDuration,
     activationState,
     activeAnimationProgress,
-    activeItemAbsolutePosition,
     activeItemDimensions,
     activeItemDropped,
     activeItemKey,
@@ -57,7 +58,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     containerHeight,
     containerRef,
     containerWidth,
-    customHandle,
     dragActivationDelay,
     dragActivationFailOffset,
     dropAnimationDuration,
@@ -70,18 +70,17 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     itemPositions,
     keyToIndex,
     prevActiveItemKey,
-    snapItemDimensions,
-    snapItemOffset,
     snapOffsetX,
     snapOffsetY,
     sortEnabled,
     touchPosition
   } = useCommonValuesContext();
-  const { measureContainer, setItemDimensionsAsSnapDimensions } =
-    useMeasurementsContext();
+  const { measureContainer } = useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { scrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
+  const { handleDimensions, handleOffset } = useCustomHandleContext() ?? {};
+  const { activeItemAbsolutePosition } = usePortalContext() ?? {};
 
   const haptics = useHaptics(hapticsEnabled);
 
@@ -117,8 +116,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX: snapOffsetX.value,
       offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
-      snapDimensions: snapItemDimensions.value,
-      snapOffset: snapItemOffset.value,
+      snapDimensions: handleDimensions?.value ?? activeItemDimensions.value,
+      snapOffset: handleOffset?.value,
       startTouch: touchStartTouch.value,
       startTouchPosition: dragStartTouchPosition.value,
       touch: currentTouch.value
@@ -198,12 +197,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: activeX,
         y: activeY
       };
-      activeItemAbsolutePosition.value = {
-        x: touch.absoluteX + activeX - unclampedActiveX - snapX,
-        y: touch.absoluteY + activeY - unclampedActiveY - snapY
-      };
-    },
-    [hasHorizontalOverDrag, hasVerticalOverDrag, activeItemAbsolutePosition]
+      if (activeItemAbsolutePosition) {
+        activeItemAbsolutePosition.value = {
+          x: touch.absoluteX + activeX - unclampedActiveX - snapX,
+          y: touch.absoluteY + activeY - unclampedActiveY - snapY
+        };
+      }
+    }
   );
 
   /**
@@ -264,9 +264,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       updateLayer?.(LayerState.Focused);
       updateStartScrollOffset?.();
-      if (!customHandle) {
-        setItemDimensionsAsSnapDimensions(key);
-      }
 
       const hasInactiveAnimation =
         inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
@@ -293,7 +290,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemKey,
       activeItemPosition,
       containerRef,
-      customHandle,
       dragStartIndex,
       dragStartItemTouchOffset,
       dragStartTouchPosition,
@@ -305,7 +301,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       itemPositions,
       keyToIndex,
       prevActiveItemKey,
-      setItemDimensionsAsSnapDimensions,
       stableOnDragStart,
       touchPosition,
       updateLayer,
