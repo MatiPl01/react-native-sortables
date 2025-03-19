@@ -30,10 +30,10 @@ import {
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
+import { useCustomHandleContext } from './CustomHandleProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
 import { usePortalContext } from './PortalProvider';
-import { useCustomHandleContext } from './CustomHandleProvider';
 
 type DragProviderProps = PropsWithChildren<
   {
