@@ -273,7 +273,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       if (activeIndex === lastItemIndex) {
         return null;
       }
-      return reorderInsert(indexToKey.value, activeIndex, lastItemIndex);
+      // TODO - add fixed items support in flex
+      return reorderInsert(indexToKey.value, activeIndex, lastItemIndex, {});
     }
     const mainAxisPosition = position[mainCoordinate];
 
@@ -463,7 +464,13 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     if (newActiveIndex === activeIndex) return;
 
-    return reorderInsert(indexToKey.value, activeIndex, newActiveIndex);
+    return reorderInsert(
+      indexToKey.value,
+      activeIndex,
+      newActiveIndex,
+      {}
+      // TODO - add fixed items support in flex
+    );
   };
 };
 

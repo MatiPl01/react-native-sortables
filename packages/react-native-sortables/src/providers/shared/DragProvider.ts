@@ -79,7 +79,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { updateLayer } = useLayerContext() ?? {};
   const { scrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
-  const { handleDimensions, handleOffset } = useCustomHandleContext() ?? {};
+  const { activeHandleDimensions, activeHandleOffset } =
+    useCustomHandleContext() ?? {};
   const { activeItemAbsolutePosition } = usePortalContext() ?? {};
 
   const haptics = useHaptics(hapticsEnabled);
@@ -116,8 +117,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX: snapOffsetX.value,
       offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
-      snapDimensions: handleDimensions?.value ?? activeItemDimensions.value,
-      snapOffset: handleOffset?.value,
+      snapDimensions:
+        activeHandleDimensions?.value ?? activeItemDimensions.value,
+      snapOffset: activeHandleOffset?.value,
       startTouch: touchStartTouch.value,
       startTouchPosition: dragStartTouchPosition.value,
       touch: currentTouch.value

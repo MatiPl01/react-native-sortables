@@ -94,7 +94,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     }
   );
 
-  const handleItemRemoval = useUIStableCallback((key: string) => {
+  const removeItemMeasurements = useUIStableCallback((key: string) => {
     'worklet';
     delete itemDimensions.value[key];
     measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
@@ -209,9 +209,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       applyControlledContainerDimensions,
       handleHelperContainerMeasurement,
       handleItemMeasurement,
-      handleItemRemoval,
       measureContainer,
-      measurementsContainerRef
+      measurementsContainerRef,
+      removeItemMeasurements
     }
   };
 });

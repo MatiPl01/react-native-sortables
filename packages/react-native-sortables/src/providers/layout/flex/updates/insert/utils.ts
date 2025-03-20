@@ -232,7 +232,8 @@ export const getSwappedToGroupBeforeIndices = (
     indexToKey: reorderInsert(
       props.indexToKey,
       props.activeItemIndex,
-      indexes.itemIndex
+      indexes.itemIndex,
+      {} // TODO - add fixed items support in flex
     )
   };
 };
@@ -249,7 +250,8 @@ export const getSwappedToGroupAfterIndices = (
     indexToKey: reorderInsert(
       props.indexToKey,
       props.activeItemIndex,
-      indexes.itemIndex
+      indexes.itemIndex,
+      {} // TODO - add fixed items support in flex
     )
   };
 };

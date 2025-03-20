@@ -1,5 +1,15 @@
 import type { AnyRecord, Dimensions, Maybe, Vector } from '../types';
 
+export function lt(a: number, b: number): boolean {
+  'worklet';
+  return a < b;
+}
+
+export function gt(a: number, b: number): boolean {
+  'worklet';
+  return a > b;
+}
+
 export const areArraysDifferent = <T>(
   arr1: Array<T>,
   arr2: Array<T>,

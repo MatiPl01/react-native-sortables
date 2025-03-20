@@ -80,7 +80,7 @@ export type CommonValuesContextType = {
 export type MeasurementsContextType = {
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
-  handleItemRemoval: (key: string) => void;
+  removeItemMeasurements: (key: string) => void;
   measureContainer: () => void;
   handleHelperContainerMeasurement: (event: LayoutChangeEvent) => void;
 };
@@ -140,8 +140,11 @@ export type LayerContextType = {
 // CUSTOM HANDLE
 
 export type CustomHandleContextType = {
-  handleOffset: SharedValue<Vector | null>;
-  handleDimensions: SharedValue<Dimensions | null>;
+  activeHandleOffset: SharedValue<Vector | null>;
+  activeHandleDimensions: SharedValue<Dimensions | null>;
+  fixedItemKeys: SharedValue<Record<string, boolean>>;
+  makeItemFixed: (key: string) => void;
+  removeFixedItem: (key: string) => void;
 };
 
 // PORTAL

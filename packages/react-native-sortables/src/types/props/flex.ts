@@ -9,6 +9,7 @@ import type {
 } from '../layout/flex';
 import type {
   CommonValuesContextType,
+  CustomHandleContextType,
   DebugContextType,
   FlexLayoutContextType,
   OrderUpdater
@@ -43,7 +44,8 @@ export type SortableFlexDragEndCallback = (
 export type SortableFlexStrategyFactory = (
   props: Simplify<
     { debugContext?: DebugContextType } & CommonValuesContextType &
-      FlexLayoutContextType
+      FlexLayoutContextType &
+      Partial<CustomHandleContextType>
   >
 ) => OrderUpdater;
 
