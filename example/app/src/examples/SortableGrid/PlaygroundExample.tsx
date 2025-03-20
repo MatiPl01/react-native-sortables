@@ -10,14 +10,23 @@ const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
 
 export default function PlaygroundExample() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item, index }) => (
-      <Sortable.Handle
-        mode={index === 0 || index === DATA.length - 1 ? 'fixed' : 'draggable'}>
-        <View style={styles.card}>
-          <Text style={styles.text}>{item}</Text>
-        </View>
-      </Sortable.Handle>
-    ),
+    ({ item, index }) => {
+      const fixed =
+        index === 0 || index === 4 || index === 9 || index === DATA.length - 1;
+      return (
+        <Sortable.Handle mode={fixed ? 'fixed' : 'draggable'}>
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: fixed ? colors.secondary : colors.primary
+              }
+            ]}>
+            <Text style={styles.text}>{item}</Text>
+          </View>
+        </Sortable.Handle>
+      );
+    },
     []
   );
 
@@ -38,7 +47,6 @@ export default function PlaygroundExample() {
 const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
-    backgroundColor: '#36877F',
     borderRadius: radius.md,
     height: sizes.xl,
     justifyContent: 'center'

@@ -1,4 +1,5 @@
 import type { Offset, Vector } from '../types';
+import { gt, lt } from './equality';
 import { error } from './logs';
 
 export const getOffsetDistance = (
@@ -19,50 +20,46 @@ export const getOffsetDistance = (
   return distance * percentage;
 };
 
-export const reorderInsert = <T>(
-  array: Array<T>,
+export const reorderInsert = (
+  indexToKey: Array<string>,
   fromIndex: number,
-  toIndex: number
-): Array<T> => {
+  toIndex: number,
+  fixedItemKeys: Record<string, boolean> | undefined
+) => {
   'worklet';
-  const activeItem = array[fromIndex];
+  const direction = toIndex > fromIndex ? -1 : 1;
+  const fromKey = indexToKey[fromIndex]!;
+  const op = direction < 0 ? lt : gt;
+  const result = [...indexToKey];
 
-  if (activeItem === undefined) {
-    return array;
+  if (fixedItemKeys) {
+    let k = fromIndex;
+    for (let i = fromIndex; op(i, toIndex); i -= direction) {
+      const itemKey = result[i - direction]!;
+      if (!fixedItemKeys[itemKey]) {
+        result[k] = itemKey;
+        k = i - direction;
+      }
+    }
+  } else {
+    for (let i = fromIndex; op(i, toIndex); i -= direction) {
+      result[i] = result[i - direction]!;
+    }
   }
 
-  if (toIndex < fromIndex) {
-    return [
-      ...array.slice(0, toIndex),
-      activeItem,
-      ...array.slice(toIndex, fromIndex),
-      ...array.slice(fromIndex + 1)
-    ];
-  }
-  return [
-    ...array.slice(0, fromIndex),
-    ...array.slice(fromIndex + 1, toIndex + 1),
-    activeItem,
-    ...array.slice(toIndex + 1)
-  ];
+  result[toIndex] = fromKey;
+
+  return result;
 };
 
-export const reorderSwap = <T>(
-  array: Array<T>,
+export const reorderSwap = (
+  indexToKey: Array<string>,
   fromIndex: number,
   toIndex: number
-): Array<T> => {
+) => {
   'worklet';
-  const draggedItem = array[fromIndex];
-  const swappedItem = array[toIndex];
-
-  if (draggedItem === undefined || swappedItem === undefined) {
-    return array;
-  }
-
-  const result = [...array];
-  result[fromIndex] = swappedItem;
-  result[toIndex] = draggedItem;
+  const result = [...indexToKey];
+  [result[fromIndex], result[toIndex]] = [result[toIndex]!, result[fromIndex]!];
   return result;
 };
 

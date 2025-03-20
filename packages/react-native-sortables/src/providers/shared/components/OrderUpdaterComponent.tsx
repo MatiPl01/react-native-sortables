@@ -8,6 +8,7 @@ import type {
 } from '../../../types';
 import { error, typedMemo } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
+import { useCustomHandleContext } from '../CustomHandleProvider';
 import { useOrderUpdater } from '../hooks';
 
 export function useStrategyKey(strategy: AnyStrategyFactory | string) {
@@ -36,6 +37,7 @@ function OrderUpdaterComponent<P extends PredefinedStrategies>({
   const updater = (factory as AnyStrategyFactory)({
     debugContext: useDebugContext(),
     ...useCommonValuesContext(),
+    ...useCustomHandleContext(),
     ...useAdditionalValues()
   });
 

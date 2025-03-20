@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import type {
   CommonValuesContextType,
+  CustomHandleContextType,
   DebugContextType,
   GridLayoutContextType,
   OrderUpdater
@@ -66,7 +67,8 @@ export type SortableGridRenderItem<I> = (
 export type SortableGridStrategyFactory = (
   props: Simplify<
     { debugContext?: DebugContextType } & CommonValuesContextType &
-      GridLayoutContextType
+      GridLayoutContextType &
+      Partial<CustomHandleContextType>
   >
 ) => OrderUpdater;
 

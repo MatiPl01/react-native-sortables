@@ -57,8 +57,13 @@ function SortableHandleComponent({
     );
   }
 
-  const { activeHandleDimensions, activeHandleOffset, fixedItemKeys } =
-    customHandleContext;
+  const {
+    activeHandleDimensions,
+    activeHandleOffset,
+    fixedItemKeys,
+    makeItemFixed,
+    removeFixedItem
+  } = customHandleContext;
   const dragEnabled = mode === 'draggable';
 
   const viewRef = useAnimatedRef<View>();
@@ -69,12 +74,13 @@ function SortableHandleComponent({
   );
 
   useEffect(() => {
-    fixedItemKeys.value[itemKey] = mode === 'fixed';
+    console.log('handle', itemKey);
+    if (mode === 'fixed') {
+      makeItemFixed(itemKey);
+    }
 
-    return () => {
-      delete fixedItemKeys.value[itemKey];
-    };
-  }, [mode, itemKey, fixedItemKeys]);
+    return () => removeFixedItem(itemKey);
+  }, [mode, itemKey, fixedItemKeys, makeItemFixed, removeFixedItem]);
 
   const measureHandle = useCallback(() => {
     'worklet';

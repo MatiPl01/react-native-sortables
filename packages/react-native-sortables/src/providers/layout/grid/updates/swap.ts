@@ -30,41 +30,40 @@ function useInactiveIndexToKey() {
 
   useAnimatedReaction(
     () => ({
-      activeKey: activeItemKey.value,
+      excludedKey: activeItemKey.value,
       idxToKey: indexToKey.value,
       keyToIdx: keyToIndex.value
     }),
-    ({ activeKey, idxToKey, keyToIdx }) => {
-      const activeIndex = activeKey && keyToIdx[activeKey];
-
-      if (activeKey === null || activeIndex === undefined) {
+    ({ excludedKey, idxToKey, keyToIdx }) => {
+      const excludedIndex = excludedKey ? keyToIdx[excludedKey] : undefined;
+      if (excludedIndex === undefined) {
         result.value = EMPTY_ARRAY;
-      } else {
-        const othersArray = [...idxToKey];
-        const activeIdx = activeIndex as number;
+        return;
+      }
 
-        for (
-          let i = activeIdx;
-          i + numGroups < othersArray.length;
-          i += numGroups
-        ) {
-          othersArray[i] = othersArray[i + numGroups]!;
-        }
+      const othersArray = [...idxToKey];
 
-        const activeColumnIndex = getMainIndex(activeIdx, numGroups);
-        const lastRowIndex = Math.floor((othersArray.length - 1) / numGroups);
-        for (
-          let i = lastRowIndex * numGroups + activeColumnIndex;
-          i < othersArray.length;
-          i++
-        ) {
-          othersArray[i] = othersArray[i + 1]!;
-        }
-        othersArray.pop();
+      for (
+        let i = excludedIndex;
+        i + numGroups < othersArray.length;
+        i += numGroups
+      ) {
+        othersArray[i] = othersArray[i + numGroups]!;
+      }
 
-        if (areArraysDifferent(othersArray, result.value)) {
-          result.value = othersArray;
-        }
+      const activeColumnIndex = getMainIndex(excludedIndex, numGroups);
+      const lastRowIndex = Math.floor((othersArray.length - 1) / numGroups);
+      for (
+        let i = lastRowIndex * numGroups + activeColumnIndex;
+        i < othersArray.length;
+        i++
+      ) {
+        othersArray[i] = othersArray[i + 1]!;
+      }
+      othersArray.pop();
+
+      if (areArraysDifferent(othersArray, result.value)) {
+        result.value = othersArray;
       }
     }
   );

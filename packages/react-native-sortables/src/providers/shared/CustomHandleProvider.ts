@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 
+import { useUIStableCallback } from '../../hooks';
 import type { CustomHandleContextType, Dimensions, Vector } from '../../types';
 import { createProvider } from '../utils';
 
@@ -16,11 +17,23 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
   const activeHandleDimensions = useSharedValue<Dimensions | null>(null);
   const fixedItemKeys = useSharedValue<Record<string, boolean>>({});
 
+  const makeItemFixed = useUIStableCallback((key: string) => {
+    'worklet';
+    fixedItemKeys.value[key] = true;
+  });
+
+  const removeFixedItem = useUIStableCallback((key: string) => {
+    'worklet';
+    delete fixedItemKeys.value[key];
+  });
+
   return {
     value: {
       activeHandleDimensions,
       activeHandleOffset,
-      fixedItemKeys
+      fixedItemKeys,
+      makeItemFixed,
+      removeFixedItem
     }
   };
 });

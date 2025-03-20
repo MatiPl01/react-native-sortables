@@ -45,7 +45,8 @@ function DraggableView({
 }: DraggableViewProps) {
   const hasPortal = !!usePortalContext();
   const commonValuesContext = useCommonValuesContext();
-  const { handleItemMeasurement, handleItemRemoval } = useMeasurementsContext();
+  const { handleItemMeasurement, removeItemMeasurements } =
+    useMeasurementsContext();
   const { activeItemKey, customHandle, itemsOverridesStyle } =
     commonValuesContext;
 
@@ -59,8 +60,9 @@ function DraggableView({
   );
 
   useEffect(() => {
-    return () => handleItemRemoval(key);
-  }, [key, handleItemRemoval]);
+    console.log('DraggableView', key);
+    return () => removeItemMeasurements(key);
+  }, [key, removeItemMeasurements]);
 
   const sharedCellProps = {
     decorationStyle,
