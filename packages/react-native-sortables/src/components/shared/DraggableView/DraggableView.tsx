@@ -60,7 +60,6 @@ function DraggableView({
   );
 
   useEffect(() => {
-    console.log('DraggableView', key);
     return () => removeItemMeasurements(key);
   }, [key, removeItemMeasurements]);
 

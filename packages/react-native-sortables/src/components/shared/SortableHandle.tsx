@@ -74,7 +74,6 @@ function SortableHandleComponent({
   );
 
   useEffect(() => {
-    console.log('handle', itemKey);
     if (mode === 'fixed') {
       makeItemFixed(itemKey);
     }
