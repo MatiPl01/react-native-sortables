@@ -1,5 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { useEffect } from 'react';
+import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   runOnJS,
@@ -8,10 +9,9 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
+import { IS_WEB } from '../../../constants';
 import { usePortalContext, useTeleportedItemId } from '../../../providers';
 import type { AnimatedStyleProp, MeasureCallback } from '../../../types';
-import { ViewStyle } from 'react-native';
-import { IS_WEB } from '../../../constants';
 
 const TELEPORTED_ITEM_STYLE: ViewStyle = {
   maxHeight: 0,
