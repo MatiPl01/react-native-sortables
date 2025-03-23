@@ -240,18 +240,20 @@ export const createGridStrategy =
         0,
         Math.min(crossIndex, Math.floor((itemsCount - 1) / numGroups))
       );
-      const newIndex = Math.max(
+      const newActiveIndex = Math.max(
         0,
         Math.min(limitedCrossIndex * numGroups + mainIndex, itemsCount - 1)
       );
+      const fixedKeys = fixedItemKeys?.value;
+
       if (
-        newIndex === activeIndex ||
-        fixedItemKeys?.value[idxToKey[newIndex]!]
+        newActiveIndex === activeIndex ||
+        fixedKeys?.[idxToKey[newActiveIndex]!]
       ) {
         return;
       }
 
       // return the new order of items
-      return reorder(idxToKey, activeIndex, newIndex, fixedItemKeys?.value);
+      return reorder(idxToKey, activeIndex, newActiveIndex, fixedKeys);
     };
   };

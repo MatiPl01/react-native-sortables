@@ -28,6 +28,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
   appliedLayout,
   calculateFlexLayout,
   columnGap,
+  fixedItemKeys,
   flexDirection,
   indexToKey,
   itemDimensions,
@@ -86,6 +87,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
             activeItemIndex: keyToIndex.value[activeItemKey.value]!,
             activeItemKey: activeItemKey.value,
             currentGroupIndex: activeGroupIndex.value,
+            fixedItemKeys: fixedItemKeys?.value,
             groupSizeLimit: appliedLayout.value.groupSizeLimit,
             indexToKey: indexToKey.value,
             itemDimensions: itemDimensions.value,
@@ -128,11 +130,13 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     let currentLayout = appliedLayout.value;
 
+    const fixedKeys = fixedItemKeys?.value;
     const sharedSwapProps: Omit<
       ItemGroupSwapProps,
       'activeItemIndex' | 'currentGroupIndex'
     > = {
       activeItemKey: activeKey,
+      fixedItemKeys: fixedKeys,
       groupSizeLimit: currentLayout.groupSizeLimit,
       indexToKey: indexToKey.value,
       itemDimensions: itemDimensions.value,
@@ -267,8 +271,12 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       if (activeIndex === lastItemIndex) {
         return null;
       }
-      // TODO - add fixed items support in flex
-      return reorderInsert(indexToKey.value, activeIndex, lastItemIndex, {});
+      return reorderInsert(
+        indexToKey.value,
+        activeIndex,
+        lastItemIndex,
+        fixedKeys
+      );
     }
     const mainAxisPosition = position[mainCoordinate];
 
@@ -455,16 +463,18 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     const newActiveIndex =
       firstGroupItemIndex + (itemIndexInGroup - initialItemIndexInGroup);
+    const idxToKey = indexToKey.value;
 
-    if (newActiveIndex === activeIndex) return;
+    if (
+      newActiveIndex === activeIndex ||
+      fixedKeys?.[idxToKey[newActiveIndex]!]
+    ) {
+      return;
+    }
 
-    return reorderInsert(
-      indexToKey.value,
-      activeIndex,
-      newActiveIndex,
-      {}
-      // TODO - add fixed items support in flex
-    );
+    console.log('>>>', activeIndex, newActiveIndex);
+
+    return reorderInsert(idxToKey, activeIndex, newActiveIndex, fixedKeys);
   };
 };
 
