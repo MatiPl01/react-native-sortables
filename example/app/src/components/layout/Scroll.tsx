@@ -3,7 +3,7 @@ import type { ScrollViewProps } from 'react-native';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { IS_WEB } from '@/constants';
-import { useBottomNavBarHeight } from '@/contexts';
+import { useBottomNavBarHeight } from '@/providers';
 import { flex, spacing, style } from '@/theme';
 
 import Spacer from './Spacer';

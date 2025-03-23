@@ -8,7 +8,7 @@ import Sortable from 'react-native-sortables';
 
 import { OptionGroup, SimpleDropdown, Spacer } from '@/components';
 import { IS_WEB } from '@/constants';
-import { useBottomNavBarHeight } from '@/contexts';
+import { useBottomNavBarHeight } from '@/providers';
 import {
   colors,
   flex,

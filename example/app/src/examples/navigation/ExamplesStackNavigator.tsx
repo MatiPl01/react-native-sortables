@@ -2,14 +2,18 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
-import { useSharedValue } from 'react-native-reanimated';
+import Sortable from 'react-native-sortables';
 
 import { RouteCard, ScrollScreen, Stagger } from '@/components';
-import { IS_REACT_19, IS_WEB } from '@/constants';
-import { BottomNavBarContext } from '@/contexts';
+import { IS_WEB } from '@/constants';
+import {
+  BottomNavBarHeightProvider,
+  BottomNavBarSettingsProvider,
+  useBottomNavBarSettings
+} from '@/providers';
 import { colors, iconSizes, radius, spacing, text } from '@/theme';
 
 import BottomNavBar from './BottomNavBar';
@@ -54,26 +58,43 @@ const BackButton = memo(function BackButton() {
 });
 
 function createStackNavigator(routes: Routes): React.ComponentType {
-  return function Navigator() {
-    const height = useSharedValue(0);
+  function Navigator() {
+    const { settings } = useBottomNavBarSettings();
 
-    const Provider = IS_REACT_19
-      ? BottomNavBarContext
-      : BottomNavBarContext.Provider;
+    const navigatorComponent = useMemo(
+      () => (
+        <StackNavigator.Navigator
+          screenOptions={{
+            headerLeft: () => <BackButton />,
+            headerTitleAlign: 'center'
+          }}>
+          {createNavigationScreens(routes, 'Examples', ['Examples'])}
+        </StackNavigator.Navigator>
+      ),
+      []
+    );
 
-    return (
-      <Provider value={{ height }}>
+    const content = (
+      <BottomNavBarHeightProvider>
         <View style={styles.container}>
-          <StackNavigator.Navigator
-            screenOptions={{
-              headerLeft: () => <BackButton />,
-              headerTitleAlign: 'center'
-            }}>
-            {createNavigationScreens(routes, 'Examples', ['Examples'])}
-          </StackNavigator.Navigator>
+          {navigatorComponent}
           <BottomNavBar homeRouteName='Examples' routes={routes} />
         </View>
-      </Provider>
+      </BottomNavBarHeightProvider>
+    );
+
+    if (settings.activeItemPortalEnabled) {
+      return <Sortable.PortalProvider>{content}</Sortable.PortalProvider>;
+    }
+
+    return content;
+  }
+
+  return function WrappedNavigator() {
+    return (
+      <BottomNavBarSettingsProvider>
+        <Navigator />
+      </BottomNavBarSettingsProvider>
     );
   };
 }
