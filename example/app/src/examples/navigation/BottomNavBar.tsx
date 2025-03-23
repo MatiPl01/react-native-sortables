@@ -105,19 +105,13 @@ export default function BottomNavBar({
     return null;
   }
 
+  const paddingBottom = insets.bottom + (IS_WEB ? spacing.md : spacing.xs);
   const layout = IS_WEB
     ? undefined
     : LinearTransition.duration(200).easing(bezierEasing);
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingBottom: insets.bottom + (IS_WEB ? spacing.md : spacing.xs) }
-      ]}
-      onLayout={e => {
-        height.value = e.nativeEvent.layout.height;
-      }}>
+    <View style={[styles.container, { paddingBottom }]}>
       <Animated.View
         exiting={SlideOutDown}
         layout={layout}
@@ -128,7 +122,12 @@ export default function BottomNavBar({
         {settingsShown && (
           <BottomNavBarSettings onClose={handleSettingsClose} />
         )}
-        <Animated.View layout={layout} style={styles.barOptions}>
+        <Animated.View
+          layout={layout}
+          style={styles.barOptions}
+          onLayout={e => {
+            height.value = e.nativeEvent.layout.height + paddingBottom;
+          }}>
           <TouchableOpacity style={styles.button} onPress={handleHomePress}>
             <FontAwesomeIcon
               color={colors.primary}
