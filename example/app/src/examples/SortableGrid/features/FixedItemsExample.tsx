@@ -1,11 +1,5 @@
 import { memo, useCallback, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useDerivedValue,
-  withTiming
-} from 'react-native-reanimated';
+import { StyleSheet, Text, View } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
@@ -49,6 +43,16 @@ export default function FixedItemsExample() {
 
   return (
     <ScrollScreen contentContainerStyle={styles.container} includeNavBarHeight>
+      <View style={styles.usageSection}>
+        <Text style={text.heading2}>How to use this example?</Text>
+        <Text style={text.body1}>
+          Press on items to make them fixed or draggable.
+        </Text>
+        <Text style={text.body1}>
+          Drag items that aren&apos;t grayed out to see that fixed items stay in
+          place.
+        </Text>
+      </View>
       <Sortable.Grid
         columnGap={10}
         columns={3}
@@ -67,20 +71,14 @@ type GridItemProps = {
 };
 
 const GridItem = memo(function GridItem({ fixed, item }: GridItemProps) {
-  const progress = useDerivedValue(() => withTiming(+fixed));
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [colors.primary, '#555']
-    )
-  }));
-
   return (
-    <Animated.View style={[styles.card, animatedStyle]}>
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: fixed ? '#555' : colors.primary }
+      ]}>
       <Text style={styles.text}>{item}</Text>
-    </Animated.View>
+    </View>
   );
 });
 
@@ -98,5 +96,9 @@ const styles = StyleSheet.create({
   text: {
     ...text.label2,
     color: colors.white
+  },
+  usageSection: {
+    gap: spacing.xs,
+    marginBottom: spacing.md
   }
 });

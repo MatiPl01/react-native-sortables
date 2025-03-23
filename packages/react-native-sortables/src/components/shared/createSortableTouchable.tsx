@@ -1,5 +1,6 @@
 import { type ComponentType, useCallback } from 'react';
 
+import { IS_WEB } from '../../constants';
 import { useCommonValuesContext } from '../../providers';
 import type { AnyFunction, Maybe } from '../../types';
 import { DragActivationState } from '../../types';
@@ -44,16 +45,22 @@ export default function createSortableTouchable<P extends AnyPressHandlers>(
   Component: ComponentType<P>
 ): ComponentType<P> {
   function Wrapper({ onPress, ...rest }: P) {
-    const { activationState } = useCommonValuesContext();
+    const { activationState, activeItemDropped } = useCommonValuesContext();
 
     const handlePress = useCallback(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (...args: Array<any>) => {
-        if (activationState.value !== DragActivationState.INACTIVE) return;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        onPress?.(...args);
+        if (
+          activationState.value === DragActivationState.INACTIVE &&
+          // onPress on web was triggered after the active item was released,
+          // thus wen need this key check
+          (!IS_WEB || activeItemDropped.value)
+        ) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          onPress?.(...args);
+        }
       },
-      [activationState, onPress]
+      [activationState, onPress, activeItemDropped]
     );
 
     return <Component {...(rest as P)} onPress={handlePress} />;
