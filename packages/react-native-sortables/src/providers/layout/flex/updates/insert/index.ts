@@ -11,7 +11,12 @@ import type {
   FlexLayout,
   SortableFlexStrategyFactory
 } from '../../../../../types';
-import { gt as gt_, lt as lt_, reorderInsert } from '../../../../../utils';
+import {
+  error,
+  gt as gt_,
+  lt as lt_,
+  reorderInsert
+} from '../../../../../utils';
 import {
   getAdditionalSwapOffset,
   useDebugBoundingBox
@@ -31,11 +36,16 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
   flexDirection,
   indexToKey,
   itemDimensions,
+  fixedItemKeys,
   keyToGroup,
   keyToIndex,
   rowGap,
   useFlexLayoutReaction
 }) => {
+  if (fixedItemKeys) {
+    throw error('Fixed items are not yet supported in flex layout');
+  }
+
   const isColumn = flexDirection.startsWith('column');
   const isReverse = flexDirection.endsWith('reverse');
 
@@ -268,7 +278,12 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
         return null;
       }
       // TODO - add fixed items support in flex
-      return reorderInsert(indexToKey.value, activeIndex, lastItemIndex, {});
+      return reorderInsert(
+        indexToKey.value,
+        activeIndex,
+        lastItemIndex,
+        undefined
+      );
     }
     const mainAxisPosition = position[mainCoordinate];
 
@@ -462,7 +477,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       indexToKey.value,
       activeIndex,
       newActiveIndex,
-      {}
+      undefined
       // TODO - add fixed items support in flex
     );
   };
