@@ -14,7 +14,7 @@ import {
   TabView
 } from '@/components';
 import { IS_WEB } from '@/constants';
-import { useBottomNavBarHeight } from '@/contexts';
+import { useBottomNavBarHeight } from '@/providers';
 import { colors, spacing, style } from '@/theme';
 import { getItems } from '@/utils';
 

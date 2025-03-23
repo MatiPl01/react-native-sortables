@@ -5,7 +5,7 @@ import { Dimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { IS_IOS, IS_WEB } from '@/constants';
-import { useBottomNavBarHeight } from '@/contexts';
+import { useBottomNavBarHeight } from '@/providers';
 import { flex, spacing, style } from '@/theme';
 
 import type { ScrollProps } from './Scroll';
