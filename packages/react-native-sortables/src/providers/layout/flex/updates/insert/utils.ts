@@ -168,49 +168,47 @@ const getIndexesWhenSwappedToGroupAfter = ({
   // and then insert the active item in the target group
   let targetItemIndex = firstInActiveGroupIndex;
   let totalGroupSize = 0;
+  let nextGroupFirstItemKey: null | string = null;
 
-  while (targetItemIndex < indexToKey.length) {
-    const key = indexToKey[targetItemIndex]!;
+  for (let i = firstInActiveGroupIndex; i < indexToKey.length; i++) {
+    const key = indexToKey[i]!;
+    if (key === activeItemKey) continue;
 
-    if (key !== activeItemKey) {
-      const itemMainSize = itemDimensions[key]?.[mainDimension] ?? 0;
-      if (totalGroupSize + itemMainSize > groupSizeLimit) {
-        break;
-      }
-      totalGroupSize += itemMainSize + mainGap;
+    const itemMainSize = itemDimensions[key]?.[mainDimension] ?? 0;
+    if (totalGroupSize + itemMainSize > groupSizeLimit) {
+      nextGroupFirstItemKey = key;
+      break;
     }
 
+    totalGroupSize += itemMainSize + mainGap;
     targetItemIndex++;
   }
 
-  if (targetItemIndex > lastInActiveGroupIndex) {
-    const activeMainSize = itemDimensions[activeItemKey]?.[mainDimension] ?? 0;
-    if (totalGroupSize + activeMainSize > groupSizeLimit) {
-      // If the active item can be the first element of the next group (it won't
-      // wrap to the current group), we put it in the 1st position of the next group
-      return {
-        groupIndex: currentGroupIndex + 1,
-        itemIndex: targetItemIndex, // is the first item of the next group
-        itemIndexInGroup: 0
-      };
-    }
+  const activeMainSize = itemDimensions[activeItemKey]?.[mainDimension] ?? 0;
+  if (totalGroupSize + activeMainSize > groupSizeLimit) {
+    // If the active item can be the first element of the next group (it won't
+    // wrap to the current group), we put it in the 1st position of the next group
+    return {
+      groupIndex: currentGroupIndex + 1,
+      itemIndex: targetItemIndex, // is the first item of the next group
+      itemIndexInGroup: 0
+    };
+  }
 
-    const nextGroupFirstItemKey = indexToKey[targetItemIndex]!;
-    const nextGroupFirstItemMainSize =
-      itemDimensions[nextGroupFirstItemKey]?.[mainDimension] ?? 0;
-
-    if (
-      nextGroupFirstItemMainSize + mainGap + activeMainSize <=
+  if (
+    nextGroupFirstItemKey &&
+    (itemDimensions[nextGroupFirstItemKey]?.[mainDimension] ?? 0) +
+      mainGap +
+      activeMainSize <=
       groupSizeLimit
-    ) {
-      // Otherwise, if it can be the second item of the next group, we put it there
-      // to prevent wrapping to the current group
-      return {
-        groupIndex: currentGroupIndex + 1,
-        itemIndex: targetItemIndex + 1, // is the second item of the next group
-        itemIndexInGroup: 1
-      };
-    }
+  ) {
+    // Otherwise, if it can be the second item of the next group, we put it there
+    // to prevent wrapping to the current group
+    return {
+      groupIndex: currentGroupIndex + 1,
+      itemIndex: targetItemIndex + 1, // is the second item of the next group
+      itemIndexInGroup: 1
+    };
   }
 
   return {
