@@ -12,6 +12,7 @@ export type ItemGroupSwapProps = {
   itemGroups: Array<Array<string>>;
   mainDimension: Dimension;
   mainGap: number;
+  fixedItemKeys: Record<string, boolean> | undefined;
 };
 
 export type ItemGroupSwapResult = {
@@ -231,7 +232,7 @@ export const getSwappedToGroupBeforeIndices = (
       props.indexToKey,
       props.activeItemIndex,
       indexes.itemIndex,
-      {} // TODO - add fixed items support in flex
+      props.fixedItemKeys
     )
   };
 };
@@ -249,7 +250,7 @@ export const getSwappedToGroupAfterIndices = (
       props.indexToKey,
       props.activeItemIndex,
       indexes.itemIndex,
-      {} // TODO - add fixed items support in flex
+      props.fixedItemKeys
     )
   };
 };
