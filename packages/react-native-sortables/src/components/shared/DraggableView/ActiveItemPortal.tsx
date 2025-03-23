@@ -10,6 +10,18 @@ import {
 
 import { usePortalContext, useTeleportedItemId } from '../../../providers';
 import type { AnimatedStyleProp, MeasureCallback } from '../../../types';
+import { ViewStyle } from 'react-native';
+import { IS_WEB } from '../../../constants';
+
+const TELEPORTED_ITEM_STYLE: ViewStyle = {
+  maxHeight: 0,
+  overflow: 'hidden'
+};
+
+const NOT_TELEPORTED_ITEM_STYLE: ViewStyle = {
+  maxHeight: IS_WEB ? 9999 : 'auto', // 'auto' doesn't trigger onLayout on web
+  overflow: 'visible'
+};
 
 type ActiveItemPortalProps = PropsWithChildren<{
   itemKey: string;
@@ -75,10 +87,9 @@ export default function ActiveItemPortal({
     }
   };
 
-  const animatedItemStyle = useAnimatedStyle(() => ({
-    maxHeight: isTeleported.value ? 0 : 'auto',
-    overflow: isTeleported.value ? 'hidden' : 'visible'
-  }));
+  const animatedItemStyle = useAnimatedStyle(() =>
+    isTeleported.value ? TELEPORTED_ITEM_STYLE : NOT_TELEPORTED_ITEM_STYLE
+  );
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,
