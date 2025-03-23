@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import type { LayoutChangeEvent, View } from 'react-native';
 import {
   measure,
@@ -11,12 +11,7 @@ import {
 import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
 import type { Dimensions, MeasurementsContextType } from '../../types';
-import type { AnimatedTimeoutID } from '../../utils';
-import {
-  areDimensionsDifferent,
-  clearAnimatedTimeout,
-  setAnimatedTimeout
-} from '../../utils';
+import { areDimensionsDifferent, useAnimatedDebounce } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
@@ -42,13 +37,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   const measurementsContainerRef = useAnimatedRef<View>();
   const measuredItemsCount = useSharedValue(0);
   const initialItemMeasurementsCompleted = useSharedValue(false);
-  const updateTimeoutId = useSharedValue<AnimatedTimeoutID>(-1);
-
-  useEffect(() => {
-    return () => {
-      clearAnimatedTimeout(updateTimeoutId.value);
-    };
-  }, [updateTimeoutId]);
+  const debounce = useAnimatedDebounce();
 
   const handleItemMeasurement = useUIStableCallback(
     (key: string, dimensions: Dimensions) => {
@@ -78,23 +67,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         // dimensions immediately to avoid unnecessary delays
         if (!initialItemMeasurementsCompleted.value) {
           initialItemMeasurementsCompleted.value = true;
-          itemDimensions.value = { ...itemDimensions.value };
+          itemDimensions.modify();
         } else {
           // In all other cases, debounce the update in case multiple items
           // change their size at the same time
-          if (updateTimeoutId.value !== -1) {
-            clearAnimatedTimeout(updateTimeoutId.value);
-          }
-          updateTimeoutId.value = setAnimatedTimeout(() => {
-            itemDimensions.value = { ...itemDimensions.value };
-            updateTimeoutId.value = -1;
-          }, 100);
+          debounce(itemDimensions.modify, 100);
         }
       }
     }
   );
 
-  const handleItemRemoval = useUIStableCallback((key: string) => {
+  const removeItemMeasurements = useUIStableCallback((key: string) => {
     'worklet';
     delete itemDimensions.value[key];
     measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
@@ -209,9 +192,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       applyControlledContainerDimensions,
       handleHelperContainerMeasurement,
       handleItemMeasurement,
-      handleItemRemoval,
       measureContainer,
-      measurementsContainerRef
+      measurementsContainerRef,
+      removeItemMeasurements
     }
   };
 });

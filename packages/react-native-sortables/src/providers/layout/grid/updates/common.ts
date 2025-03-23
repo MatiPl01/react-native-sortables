@@ -3,6 +3,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import type {
   Coordinate,
   Dimension,
+  ReorderFunction,
   SortableGridStrategyFactory
 } from '../../../../types';
 import { getAdditionalSwapOffset, useDebugBoundingBox } from '../../../shared';
@@ -11,16 +12,13 @@ import { getCrossIndex, getMainIndex } from '../utils';
 export const createGridStrategy =
   (
     useInactiveIndexToKey: () => SharedValue<Array<string>>,
-    reorder: (
-      indexToKey: Array<string>,
-      activeIndex: number,
-      newIndex: number
-    ) => Array<string>
+    reorder: ReorderFunction
   ): SortableGridStrategyFactory =>
   ({
     containerHeight,
     containerWidth,
     crossGap,
+    fixedItemKeys,
     indexToKey,
     isVertical,
     mainGap,
@@ -236,7 +234,8 @@ export const createGridStrategy =
       }
 
       // Swap the active item with the item at the new index
-      const itemsCount = indexToKey.value.length;
+      const idxToKey = indexToKey.value;
+      const itemsCount = idxToKey.length;
       const limitedCrossIndex = Math.max(
         0,
         Math.min(crossIndex, Math.floor((itemsCount - 1) / numGroups))
@@ -245,11 +244,14 @@ export const createGridStrategy =
         0,
         Math.min(limitedCrossIndex * numGroups + mainIndex, itemsCount - 1)
       );
-      if (newIndex === activeIndex) {
+      if (
+        newIndex === activeIndex ||
+        fixedItemKeys?.value[idxToKey[newIndex]!]
+      ) {
         return;
       }
 
       // return the new order of items
-      return reorder(indexToKey.value, activeIndex, newIndex);
+      return reorder(idxToKey, activeIndex, newIndex, fixedItemKeys?.value);
     };
   };

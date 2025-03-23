@@ -11,7 +11,7 @@ import type {
   FlexLayout,
   SortableFlexStrategyFactory
 } from '../../../../../types';
-import { reorderInsert } from '../../../../../utils';
+import { gt as gt_, lt as lt_, reorderInsert } from '../../../../../utils';
 import {
   getAdditionalSwapOffset,
   useDebugBoundingBox
@@ -39,14 +39,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
   const isColumn = flexDirection.startsWith('column');
   const isReverse = flexDirection.endsWith('reverse');
 
-  const gt = (a: number, b: number) => {
-    'worklet';
-    return isReverse ? a < b : a > b;
-  };
-  const lt = (a: number, b: number) => {
-    'worklet';
-    return isReverse ? a > b : a < b;
-  };
+  const gt = isReverse ? lt_ : gt_;
+  const lt = isReverse ? gt_ : lt_;
 
   let mainCoordinate: Coordinate;
   let crossCoordinate: Coordinate;
@@ -273,7 +267,8 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       if (activeIndex === lastItemIndex) {
         return null;
       }
-      return reorderInsert(indexToKey.value, activeIndex, lastItemIndex);
+      // TODO - add fixed items support in flex
+      return reorderInsert(indexToKey.value, activeIndex, lastItemIndex, {});
     }
     const mainAxisPosition = position[mainCoordinate];
 
@@ -463,7 +458,13 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
 
     if (newActiveIndex === activeIndex) return;
 
-    return reorderInsert(indexToKey.value, activeIndex, newActiveIndex);
+    return reorderInsert(
+      indexToKey.value,
+      activeIndex,
+      newActiveIndex,
+      {}
+      // TODO - add fixed items support in flex
+    );
   };
 };
 

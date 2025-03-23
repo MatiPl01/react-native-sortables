@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback, useMemo } from 'react';
+import { type PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
@@ -18,10 +18,13 @@ import { error } from '../../utils';
 
 /** Props for the Sortable Handle component */
 export type SortableHandleProps = PropsWithChildren<{
-  /** When true, the handle will not activate drag gesture
-   * @default false
+  /** Controls how the item behaves in the sortable component
+   * - 'draggable': Item can be dragged and moves with reordering (default)
+   * - 'non-draggable': Item cannot be dragged but moves with reordering
+   * - 'fixed': Item stays in place and cannot be dragged
+   * @default 'draggable'
    */
-  disabled?: boolean;
+  mode?: 'draggable' | 'fixed' | 'non-draggable';
 }>;
 
 export function SortableHandle(props: SortableHandleProps) {
@@ -41,7 +44,7 @@ export function SortableHandle(props: SortableHandleProps) {
 
 function SortableHandleComponent({
   children,
-  disabled = false
+  mode = 'draggable'
 }: SortableHandleProps) {
   const { activeItemKey, activeItemPosition, containerRef } =
     useCommonValuesContext();
@@ -54,7 +57,13 @@ function SortableHandleComponent({
     );
   }
 
-  const { handleDimensions, handleOffset } = customHandleContext;
+  const {
+    activeHandleDimensions,
+    activeHandleOffset,
+    makeItemFixed,
+    removeFixedItem
+  } = customHandleContext;
+  const dragEnabled = mode === 'draggable';
 
   const viewRef = useAnimatedRef<View>();
   const gesture = useItemPanGesture(
@@ -62,6 +71,14 @@ function SortableHandleComponent({
     activationAnimationProgress,
     viewRef
   );
+
+  useEffect(() => {
+    if (mode === 'fixed') {
+      makeItemFixed(itemKey);
+    }
+
+    return () => removeFixedItem(itemKey);
+  }, [mode, itemKey, makeItemFixed, removeFixedItem]);
 
   const measureHandle = useCallback(() => {
     'worklet';
@@ -85,8 +102,8 @@ function SortableHandleComponent({
       containerMeasurements;
     const { x: activeX, y: activeY } = activeItemPosition.value;
 
-    handleDimensions.value = { height, width };
-    handleOffset.value = {
+    activeHandleDimensions.value = { height, width };
+    activeHandleOffset.value = {
       x: pageX - containerPageX - activeX,
       y: pageY - containerPageY - activeY
     };
@@ -95,8 +112,8 @@ function SortableHandleComponent({
     activeItemPosition,
     containerRef,
     itemKey,
-    handleDimensions,
-    handleOffset,
+    activeHandleDimensions,
+    activeHandleOffset,
     viewRef
   ]);
 
@@ -104,13 +121,13 @@ function SortableHandleComponent({
   useAnimatedReaction(() => activeItemKey.value, measureHandle);
 
   const adjustedGesture = useMemo(
-    () => gesture.enabled(!disabled),
-    [disabled, gesture]
+    () => gesture.enabled(dragEnabled),
+    [dragEnabled, gesture]
   );
 
   return (
     <GestureDetector gesture={adjustedGesture} userSelect='none'>
-      <View ref={viewRef} onLayout={disabled ? undefined : measureHandle}>
+      <View ref={viewRef} onLayout={dragEnabled ? measureHandle : undefined}>
         {children}
       </View>
     </GestureDetector>
