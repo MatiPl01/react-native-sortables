@@ -1,7 +1,7 @@
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 import { EMPTY_ARRAY } from '../../../../constants';
-import { reorderInsert } from '../../../../utils';
+import { areArraysDifferent, reorderInsert } from '../../../../utils';
 import {
   useCommonValuesContext,
   useCustomHandleContext
@@ -58,7 +58,7 @@ function useInactiveIndexToKey() {
         othersArray = idxToKey.filter(key => key !== excludedKey);
       }
 
-      if (othersArray.length !== result.value.length) {
+      if (areArraysDifferent(result.value, othersArray)) {
         result.value = othersArray;
       }
     }

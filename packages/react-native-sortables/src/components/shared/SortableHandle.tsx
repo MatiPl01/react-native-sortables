@@ -60,7 +60,6 @@ function SortableHandleComponent({
   const {
     activeHandleDimensions,
     activeHandleOffset,
-    fixedItemKeys,
     makeItemFixed,
     removeFixedItem
   } = customHandleContext;
@@ -79,7 +78,7 @@ function SortableHandleComponent({
     }
 
     return () => removeFixedItem(itemKey);
-  }, [mode, itemKey, fixedItemKeys, makeItemFixed, removeFixedItem]);
+  }, [mode, itemKey, makeItemFixed, removeFixedItem]);
 
   const measureHandle = useCallback(() => {
     'worklet';
