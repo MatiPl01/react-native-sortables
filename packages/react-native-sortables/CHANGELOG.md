@@ -1,3 +1,19 @@
+# [1.4.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.3.2...v1.4.0) (2025-03-23)
+
+
+### Bug Fixes
+
+* Active item portal provider on web ([#312](https://github.com/MatiPl01/react-native-sortables/issues/312)) ([d9660d2](https://github.com/MatiPl01/react-native-sortables/commit/d9660d2bb444c5338b9c40a75462aa8c424295f6))
+* Default keyExtractor behavior for numeric values ([#301](https://github.com/MatiPl01/react-native-sortables/issues/301)) ([d7cf171](https://github.com/MatiPl01/react-native-sortables/commit/d7cf171314187c0c173e7b70d6472beb325f1562))
+* Flex ordering after recent changes ([#313](https://github.com/MatiPl01/react-native-sortables/issues/313)) ([9df1fa5](https://github.com/MatiPl01/react-native-sortables/commit/9df1fa540ee3ce7401171c5ac113467394bfadeb)), closes [#310](https://github.com/MatiPl01/react-native-sortables/issues/310)
+* onPress not working after disabling drag ([#307](https://github.com/MatiPl01/react-native-sortables/issues/307)) ([d1cbdc9](https://github.com/MatiPl01/react-native-sortables/commit/d1cbdc9120e92e7b3987655ea1b6702432d60116)), closes [#306](https://github.com/MatiPl01/react-native-sortables/issues/306)
+
+
+### Features
+
+* Active item portal to render item over all other content ([#299](https://github.com/MatiPl01/react-native-sortables/issues/299)) ([ecfe289](https://github.com/MatiPl01/react-native-sortables/commit/ecfe28943bbffcd26f9964e775271a25df7b0d64))
+* Fixed items support for Sortable.Grid ([#310](https://github.com/MatiPl01/react-native-sortables/issues/310)) ([d0cb59e](https://github.com/MatiPl01/react-native-sortables/commit/d0cb59efaf2f82cbf6fdc0fb6d9a9a9497361e8e)), closes [#305](https://github.com/MatiPl01/react-native-sortables/issues/305) [#999](https://github.com/MatiPl01/react-native-sortables/issues/999)
+
 ## [1.3.2](https://github.com/MatiPl01/react-native-sortables/compare/v1.3.1...v1.3.2) (2025-03-05)
 
 
