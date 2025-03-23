@@ -231,7 +231,7 @@ export const getSwappedToGroupBeforeIndices = (
       props.indexToKey,
       props.activeItemIndex,
       indexes.itemIndex,
-      {} // TODO - add fixed items support in flex
+      undefined // TODO - add fixed items support in flex
     )
   };
 };
@@ -249,7 +249,7 @@ export const getSwappedToGroupAfterIndices = (
       props.indexToKey,
       props.activeItemIndex,
       indexes.itemIndex,
-      {} // TODO - add fixed items support in flex
+      undefined // TODO - add fixed items support in flex
     )
   };
 };

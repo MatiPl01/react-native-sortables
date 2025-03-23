@@ -47,6 +47,10 @@ const routes: Routes = {
             Component: SortableGrid.features.OrderingStrategyExample,
             name: 'Ordering Strategy'
           },
+          FixedItems: {
+            Component: SortableGrid.features.FixedItemsExample,
+            name: 'Fixed Items'
+          },
           CallbacksExample: {
             Component: SortableGrid.features.CallbacksExample,
             name: 'Callbacks'

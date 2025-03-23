@@ -21,7 +21,7 @@ import { createGridStrategy } from './common';
  * to the top. Items in the last row are shifted to the left to fill
  * the blank space.
  *
- * The same applies to the horizontal grid but ... // TODO
+ * The same applies to the horizontal grid but with direction changes.
  */
 function useInactiveIndexToKey() {
   const { activeItemKey, indexToKey, keyToIndex } = useCommonValuesContext();
