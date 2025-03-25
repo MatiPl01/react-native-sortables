@@ -9,6 +9,7 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
+  withSpring,
   withTiming
 } from 'react-native-reanimated';
 
@@ -25,10 +26,11 @@ const DEFAULT_STYLE: ViewStyle = {
 
 type DropIndicatorProps = {
   DropIndicatorComponent: ComponentType<DropIndicatorComponentProps>;
+  fadeDropIndicatorOnSnap: boolean;
   style: ViewStyle;
 };
 
-function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
+function DropIndicator({ DropIndicatorComponent, fadeDropIndicatorOnSnap, style }: DropIndicatorProps) {
   const {
     activeAnimationProgress,
     activeItemDropped,
@@ -43,6 +45,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   const orderedItemKeys = useDerivedValue(() => [...indexToKey.value]);
 
   const dropIndex = useSharedValue(0);
+  const opacity = useSharedValue(1);
   const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
   const prevUpdateItemKey = useSharedValue<null | string>(null);
   const dimensions = useSharedValue<Dimensions | null>(null);
@@ -59,6 +62,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     }),
     ({ dropped, kToI, key, positions }) => {
       if (key !== null) {
+        opacity.value = 1;
         dropIndex.value = kToI[key] ?? 0;
         dropPosition.value = positions[key] ?? { x: 0, y: 0 };
         dimensions.value = itemDimensions.value[key] ?? null;
@@ -78,6 +82,9 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
       } else if (dropped) {
         x.value = null;
         y.value = null;
+      } else if (fadeDropIndicatorOnSnap) {
+        // Fade out indicator when snapping to position
+        opacity.value = withSpring(0);
       }
       prevUpdateItemKey.value = key;
     }
@@ -93,7 +100,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
 
     return {
       ...dimensions.value,
-      opacity: 1,
+      opacity: opacity.value,
       transform: [{ translateX }, { translateY }]
     };
   });

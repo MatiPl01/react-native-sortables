@@ -54,6 +54,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       overflow,
       reorderTriggerOrigin,
       showDropIndicator,
+      fadeDropIndicatorOnSnap,
       ...sharedProps
     }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_GRID_PROPS);
@@ -127,6 +128,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           rowGap={rowGapValue}
           rowHeight={rowHeight!} // must be specified for horizontal grids
           showDropIndicator={showDropIndicator}
+          fadeDropIndicatorOnSnap={fadeDropIndicatorOnSnap}
         />
       </GridLayoutProvider>
     </SharedProvider>

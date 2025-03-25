@@ -33,6 +33,7 @@ type AnimatedHeightContainerProps = PropsWithChildren<
 
 export default function SortableContainer({
   DropIndicatorComponent,
+  fadeDropIndicatorOnSnap,
   animateHeight,
   animateWidth,
   children,
@@ -115,6 +116,7 @@ export default function SortableContainer({
       {showDropIndicator && (
         <DropIndicator
           DropIndicatorComponent={DropIndicatorComponent}
+          fadeDropIndicatorOnSnap={fadeDropIndicatorOnSnap}
           style={dropIndicatorStyle}
         />
       )}

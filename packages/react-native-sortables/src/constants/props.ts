@@ -67,6 +67,7 @@ export const DEFAULT_SHARED_PROPS = {
   reorderTriggerOrigin: 'center',
   scrollableRef: undefined,
   showDropIndicator: false,
+  fadeDropIndicatorOnSnap: false,
   snapOffsetX: '50%',
   snapOffsetY: '50%',
   sortEnabled: true

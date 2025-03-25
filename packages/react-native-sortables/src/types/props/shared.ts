@@ -100,6 +100,8 @@ export type DropIndicatorSettings = {
   DropIndicatorComponent: ComponentType<DropIndicatorComponentProps>;
   /** Whether to show the drop indicator while dragging */
   showDropIndicator: boolean;
+  /** Whether to fade out the drop indicator when it snaps to position */
+  fadeDropIndicatorOnSnap : boolean;
   /** Style to apply to the drop indicator */
   dropIndicatorStyle: ViewStyle;
 };
