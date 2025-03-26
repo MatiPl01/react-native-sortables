@@ -9,6 +9,7 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
+  withSpring,
   withTiming
 } from 'react-native-reanimated';
 
@@ -83,7 +84,7 @@ function DropIndicator({ DropIndicatorComponent, fadeDropIndicatorOnSnap, style 
         y.value = null;
       } else if (fadeDropIndicatorOnSnap) {
         // Fade out indicator when snapping to position
-        opacity.value = withTiming(0);
+        opacity.value = withSpring(0);
       }
       prevUpdateItemKey.value = key;
     }
