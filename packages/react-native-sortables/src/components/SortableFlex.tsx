@@ -37,7 +37,6 @@ function SortableFlex(props: SortableFlexProps) {
       overflow,
       reorderTriggerOrigin,
       showDropIndicator,
-      fadeDropIndicatorOnSnap,
       ...sharedProps
     }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
@@ -83,7 +82,6 @@ function SortableFlex(props: SortableFlexProps) {
           childrenArray={childrenArray}
           DropIndicatorComponent={DropIndicatorComponent}
           dropIndicatorStyle={dropIndicatorStyle}
-          fadeDropIndicatorOnSnap={fadeDropIndicatorOnSnap}
           itemEntering={itemEntering}
           itemExiting={itemExiting}
           itemsLayout={itemsLayout}
