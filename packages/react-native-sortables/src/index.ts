@@ -14,8 +14,8 @@ export type { SortableHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
   DragEndCallback,
+  DragMoveCallback,
   DragStartCallback,
-  DragStartParams,
   DropIndicatorComponentProps,
   OrderChangeCallback,
   OrderChangeParams,

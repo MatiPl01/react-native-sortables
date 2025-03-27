@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import Sortable, {
   type DragEndCallback,
+  type DragMoveCallback,
   type DragStartCallback,
   type OrderChangeCallback,
   type SortableGridRenderItem
@@ -38,6 +39,13 @@ export default function CallbacksExample() {
     [text]
   );
 
+  const onDragMove = useCallback<DragMoveCallback>(
+    params => {
+      text.value = `onDragMove:${formatCallbackParams(params)}`;
+    },
+    [text]
+  );
+
   const renderItem = useCallback<SortableGridRenderItem<(typeof DATA)[number]>>(
     ({ item }) => <GridCard>{item}</GridCard>,
     []
@@ -59,6 +67,7 @@ export default function CallbacksExample() {
             renderItem={renderItem}
             rowGap={spacing.xs}
             onDragEnd={onDragEnd}
+            onDragMove={onDragMove}
             onDragStart={onDragStart}
             onOrderChange={onOrderChange}
           />

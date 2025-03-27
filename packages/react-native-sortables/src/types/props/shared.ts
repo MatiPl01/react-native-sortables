@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import type { ViewStyle } from 'react-native';
+import type { TouchData } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
 import type { Vector } from '../layout/shared';
@@ -132,6 +133,16 @@ export type DragStartParams = {
   fromIndex: number;
 };
 
+/** Parameters provided when an item is being dragged. */
+export type DragMoveParams = {
+  /** Unique identifier of the dragged item */
+  key: string;
+  /** Original index of the dragged item */
+  fromIndex: number;
+  /** Touch data */
+  touchData: TouchData;
+};
+
 /** Parameters provided when drag gesture completes and item is dropped */
 export type DragEndParams = {
   /** Unique identifier of the dragged item */
@@ -167,6 +178,12 @@ export type OrderChangeParams = {
 export type DragStartCallback = (params: DragStartParams) => void;
 
 /**
+ * Callback function called when the item is being dragged
+ * @param params - Parameters for the drag move event
+ */
+export type DragMoveCallback = (params: DragMoveParams) => void;
+
+/**
  * Callback function called when the item drag ends
  * @param params - Parameters for the drag end event
  */
@@ -183,6 +200,11 @@ export type SortableCallbacks = {
    * @param params Parameters for the drag start event
    */
   onDragStart?: DragStartCallback;
+
+  /** Called multiple times during dragging when an item is being dragged.
+   * @param params Parameters for the drag move event
+   */
+  onDragMove?: DragMoveCallback;
 
   /** Called once when the drag gesture ends.
    * You can use this callback to update items order in state.

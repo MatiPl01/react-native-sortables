@@ -57,6 +57,7 @@ export default function SharedProvider({
   hapticsEnabled,
   itemKeys,
   onDragEnd,
+  onDragMove,
   onDragStart,
   onOrderChange,
   overDrag,
@@ -100,6 +101,7 @@ export default function SharedProvider({
       hapticsEnabled={hapticsEnabled}
       overDrag={overDrag}
       onDragEnd={onDragEnd}
+      onDragMove={onDragMove}
       onDragStart={onDragStart}
       onOrderChange={onOrderChange}
     />

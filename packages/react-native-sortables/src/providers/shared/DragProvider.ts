@@ -45,7 +45,14 @@ type DragProviderProps = PropsWithChildren<
 const { DragProvider, useDragContext } = createProvider('Drag')<
   DragProviderProps,
   DragContextType
->(({ hapticsEnabled, onDragEnd, onDragStart, onOrderChange, overDrag }) => {
+>(({
+  hapticsEnabled,
+  onDragEnd,
+  onDragMove,
+  onDragStart,
+  onOrderChange,
+  overDrag
+}) => {
   const {
     activationAnimationDuration,
     activationState,
@@ -102,6 +109,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   // function is not memoized
   const stableOnDragStart = useJSStableCallback(onDragStart);
   const stableOnDragEnd = useJSStableCallback(onDragEnd);
+  const stableOnDragMove = useJSStableCallback(onDragMove);
   const stableOnOrderChange = useJSStableCallback(onOrderChange);
 
   // ACTIVE ITEM POSITION UPDATER
@@ -385,6 +393,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
+      if (activeItemKey.value) {
+        stableOnDragMove({
+          fromIndex: dragStartIndex.value,
+          key: activeItemKey.value,
+          touchData: touch
+        });
+      }
+
       if (activationState.value === DragActivationState.TOUCHED) {
         if (!touchStartTouch.value) {
           fail();
@@ -412,7 +428,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemKey,
       currentTouch,
       dragActivationFailOffset,
-      touchStartTouch
+      touchStartTouch,
+      dragStartIndex,
+      stableOnDragMove
     ]
   );
 
