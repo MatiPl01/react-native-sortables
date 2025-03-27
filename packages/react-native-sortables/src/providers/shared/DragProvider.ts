@@ -450,10 +450,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dragStartIndex.value = -1;
       activationAnimationProgress.value = animate();
       inactiveAnimationProgress.value = animate();
+      activeAnimationProgress.value = animate();
 
       clearAnimatedTimeout(activationTimeoutId.value);
       activationTimeoutId.value = setAnimatedTimeout(() => {
-        activeAnimationProgress.value = 0;
         prevActiveItemKey.value = null;
         activeItemDropped.value = true;
         updateLayer?.(LayerState.Idle);
