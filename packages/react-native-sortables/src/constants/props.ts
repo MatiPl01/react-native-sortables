@@ -60,6 +60,7 @@ export const DEFAULT_SHARED_PROPS = {
   itemExiting: IS_WEB ? null : SortableItemExiting,
   itemsLayout: IS_WEB ? null : LinearTransition,
   itemsLayoutTransitionMode: 'all',
+  onDragMove: undefined,
   onDragStart: undefined,
   onOrderChange: undefined,
   overDrag: 'both',

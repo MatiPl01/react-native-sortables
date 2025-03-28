@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import Sortable, {
   type DragEndCallback,
+  type DragMoveCallback,
   type DragStartCallback,
   type OrderChangeCallback
 } from 'react-native-sortables';
@@ -38,6 +39,13 @@ export default function CallbacksExample() {
     [text]
   );
 
+  const onDragMove = useCallback<DragMoveCallback>(
+    params => {
+      text.value = `onDragMove:${formatCallbackParams(params)}`;
+    },
+    [text]
+  );
+
   return (
     <Screen includeNavBarHeight>
       <Stagger wrapperStye={index => (index === 0 ? flex.fill : {})}>
@@ -51,6 +59,7 @@ export default function CallbacksExample() {
             columnGap={spacing.sm}
             rowGap={spacing.xs}
             onDragEnd={onDragEnd}
+            onDragMove={onDragMove}
             onDragStart={onDragStart}
             onOrderChange={onOrderChange}>
             {DATA.map(item => (
