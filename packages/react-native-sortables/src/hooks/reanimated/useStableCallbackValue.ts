@@ -7,6 +7,10 @@ import {
 
 import type { AnyFunction } from '../../types';
 
+// We cannot store a function as a SharedValue because reanimated will treat
+// it as an animation and will try to execute the animation when assigned
+// to the SharedValue. Since we want the function to be treated as a value,
+// we wrap it in an object and store the object in the SharedValue.
 type WrappedCallback<C extends AnyFunction> = {
   call: C;
 };
