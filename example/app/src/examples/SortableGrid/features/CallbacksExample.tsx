@@ -20,8 +20,7 @@ export default function CallbacksExample() {
 
   const onDragStart = useCallback<DragStartCallback>(
     params => {
-      'worklet';
-      console.log(_WORKLET);
+      console.log('onDragStart', _WORKLET); // called from JS
       text.value = `onDragStart:${formatCallbackParams(params)}`;
     },
     [text]
@@ -29,7 +28,7 @@ export default function CallbacksExample() {
 
   const onDragEnd = useCallback<DragEndCallback>(
     params => {
-      console.log(_WORKLET);
+      console.log('onDragEnd', _WORKLET); // called from JS
       text.value = `onDragEnd:${formatCallbackParams(params)}`;
     },
     [text]
@@ -38,7 +37,7 @@ export default function CallbacksExample() {
   const onOrderChange = useCallback<OrderChangeCallback>(
     params => {
       'worklet';
-      console.log(_WORKLET);
+      console.log('onOrderChange', _WORKLET); // called from UI because of 'worklet' directive
       text.value = `onOrderChange:${formatCallbackParams(params)}`;
     },
     [text]
@@ -47,7 +46,7 @@ export default function CallbacksExample() {
   const onDragMove = useCallback<DragMoveCallback>(
     params => {
       'worklet';
-      console.log(_WORKLET);
+      console.log('onDragMove', _WORKLET); // called from UI because of 'worklet' directive
       text.value = `onDragMove:${formatCallbackParams(params)}`;
     },
     [text]
