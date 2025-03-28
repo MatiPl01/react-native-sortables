@@ -16,6 +16,7 @@ export const isInternalFunction = <T extends AnyFunction>(
   fn: T,
   key?: string
 ): boolean => {
+  'worklet';
   if (typeof fn !== 'function') {
     return false;
   }
