@@ -14,7 +14,7 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import { useHaptics, useJSStableCallback } from '../../hooks';
+import { useHaptics, useStableCallbackValue } from '../../hooks';
 import type {
   DragContextType,
   OverDrag,
@@ -47,7 +47,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   DragContextType
 >(({
   hapticsEnabled,
-  onDragEnd,
+  onDragEnd: stableOnDragEnd,
   onDragMove,
   onDragStart,
   onOrderChange,
@@ -107,10 +107,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
   // Create stable callbacks to avoid re-rendering when the callback
   // function is not memoized
-  const stableOnDragStart = useJSStableCallback(onDragStart);
-  const stableOnDragEnd = useJSStableCallback(onDragEnd);
-  const stableOnDragMove = useJSStableCallback(onDragMove);
-  const stableOnOrderChange = useJSStableCallback(onOrderChange);
+  const stableOnDragStart = useStableCallbackValue(onDragStart);
+  const stableOnDragMove = useStableCallbackValue(onDragMove);
+  const stableOnOrderChange = useStableCallbackValue(onOrderChange);
 
   // ACTIVE ITEM POSITION UPDATER
   useAnimatedReaction(
