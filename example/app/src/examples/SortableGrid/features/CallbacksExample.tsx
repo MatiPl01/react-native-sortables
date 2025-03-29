@@ -1,5 +1,6 @@
+/* eslint-disable perfectionist/sort-objects */
 /* eslint-disable no-console */
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import Sortable, {
   type DragEndCallback,
@@ -9,46 +10,92 @@ import Sortable, {
   type SortableGridRenderItem
 } from 'react-native-sortables';
 
-import { AnimatedText, GridCard, Screen, Section, Stagger } from '@/components';
+import type { SwitchSettings } from '@/components';
+import {
+  AnimatedText,
+  GridCard,
+  Group,
+  Screen,
+  Section,
+  Stagger,
+  useSettingsList
+} from '@/components';
 import { flex, spacing } from '@/theme';
-import { formatCallbackParams, getItems } from '@/utils';
+import { formatCallbackResult, getItems } from '@/utils';
 
 const DATA = getItems(8);
 const COLUMNS = 4;
 
+function sw<T>(value1: T, value2: T): SwitchSettings<T> {
+  return [
+    { label: 'js', value: value1 },
+    { label: 'ui', value: value2 }
+  ];
+}
+
 export default function CallbacksExample() {
   const text = useSharedValue('Callback output will be displayed here');
 
-  const onDragStart = useCallback<DragStartCallback>(
+  /* Callbacks executed on the JS thread */
+
+  const onDragStartJS = useCallback<DragStartCallback>(
     params => {
-      console.log('onDragStart', _WORKLET); // called from JS
-      text.value = `onDragStart:${formatCallbackParams(params)}`;
+      text.value = formatCallbackResult('onDragStart', params);
     },
     [text]
   );
 
-  const onDragEnd = useCallback<DragEndCallback>(
+  const onDragEndJS = useCallback<DragEndCallback>(
     params => {
-      console.log('onDragEnd', _WORKLET); // called from JS
-      text.value = `onDragEnd:${formatCallbackParams(params)}`;
+      text.value = formatCallbackResult('onDragEnd', params);
     },
     [text]
   );
 
-  const onOrderChange = useCallback<OrderChangeCallback>(
+  const onOrderChangeJS = useCallback<OrderChangeCallback>(
+    params => {
+      text.value = formatCallbackResult('onOrderChange', params);
+    },
+    [text]
+  );
+
+  const onDragMoveJS = useCallback<DragMoveCallback>(
+    params => {
+      text.value = formatCallbackResult('onDragMove', params);
+    },
+    [text]
+  );
+
+  /* Callbacks executed on the UI thread */
+
+  const onDragStartUI = useCallback<DragStartCallback>(
     params => {
       'worklet';
-      console.log('onOrderChange', _WORKLET); // called from UI because of 'worklet' directive
-      text.value = `onOrderChange:${formatCallbackParams(params)}`;
+      text.value = formatCallbackResult('onDragStart', params);
     },
     [text]
   );
 
-  const onDragMove = useCallback<DragMoveCallback>(
+  const onDragEndUI = useCallback<DragEndCallback>(
     params => {
       'worklet';
-      console.log('onDragMove', _WORKLET); // called from UI because of 'worklet' directive
-      text.value = `onDragMove:${formatCallbackParams(params)}`;
+      text.value = formatCallbackResult('onDragEnd', params);
+    },
+    [text]
+  );
+
+  const onOrderChangeUI = useCallback<OrderChangeCallback>(
+    params => {
+      'worklet';
+      text.value = formatCallbackResult('onOrderChange', params);
+    },
+    [text]
+  );
+
+  const onDragMoveUI = useCallback<DragMoveCallback>(
+    params => {
+      'worklet';
+      text.value = formatCallbackResult('onDragMove', params);
     },
     [text]
   );
@@ -58,25 +105,44 @@ export default function CallbacksExample() {
     []
   );
 
+  const options = useMemo(
+    () => ({
+      onDragStart: sw(onDragStartJS, onDragStartUI),
+      onDragEnd: sw(onDragEndJS, onDragEndUI),
+      onOrderChange: sw(onOrderChangeJS, onOrderChangeUI),
+      onDragMove: sw(onDragMoveJS, onDragMoveUI)
+    }),
+    [
+      onDragEndJS,
+      onDragEndUI,
+      onDragMoveJS,
+      onDragMoveUI,
+      onDragStartJS,
+      onDragStartUI,
+      onOrderChangeJS,
+      onOrderChangeUI
+    ]
+  );
+
+  const { values: callbacks, settingsComponent } = useSettingsList(options);
+
   return (
     <Screen includeNavBarHeight>
       <Stagger wrapperStye={index => (index === 0 ? flex.fill : {})}>
         <Section title='Callback output' fill>
           <AnimatedText style={flex.fill} text={text} multiline />
         </Section>
+        <Group>{settingsComponent}</Group>
         <Section
           description='Drag items around to see callbacks output'
-          title='SortableGrid'>
+          title='Sortable.Grid'>
           <Sortable.Grid
             columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
             renderItem={renderItem}
             rowGap={spacing.xs}
-            onDragEnd={onDragEnd}
-            onDragMove={onDragMove}
-            onDragStart={onDragStart}
-            onOrderChange={onOrderChange}
+            {...callbacks}
           />
         </Section>
       </Stagger>

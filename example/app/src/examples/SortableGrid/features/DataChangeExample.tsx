@@ -142,7 +142,7 @@ export default function DataChangeExample() {
             // @ts-expect-error - overflowY is needed for proper behavior on web
             style={[flex.fill, IS_WEB && { overflowY: 'scroll' }]}>
             <Group withMargin={false} bordered center>
-              <Text style={styles.title}>Above SortableGrid</Text>
+              <Text style={styles.title}>Above Sortable.Grid</Text>
             </Group>
 
             <Sortable.Grid
@@ -158,7 +158,7 @@ export default function DataChangeExample() {
             />
 
             <Group withMargin={false} bordered center>
-              <Text style={styles.title}>Below SortableGrid</Text>
+              <Text style={styles.title}>Below Sortable.Grid</Text>
             </Group>
           </Animated.ScrollView>
         </Group>

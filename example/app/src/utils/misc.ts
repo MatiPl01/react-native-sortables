@@ -2,7 +2,10 @@ export function noop() {
   // Do nothing
 }
 
-export function formatCallbackParams(params: { [key: string]: unknown }) {
+export function formatCallbackResult(
+  name: string,
+  params: { [key: string]: unknown }
+) {
   'worklet';
-  return JSON.stringify(params, null, 2);
+  return `[${_WORKLET ? 'UI' : 'JS'}] ${name}: ${JSON.stringify(params, null, 2)}`;
 }

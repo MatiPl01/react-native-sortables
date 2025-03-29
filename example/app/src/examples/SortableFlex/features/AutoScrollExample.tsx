@@ -180,7 +180,7 @@ function FewCategories({ scrollableRef }: CategoriesSectionProps) {
 function SeparatorSection() {
   return (
     <Group style={styles.section}>
-      <Text style={styles.title}>Between SortableFlex components</Text>
+      <Text style={styles.title}>Between Sortable.Flex components</Text>
     </Group>
   );
 }
