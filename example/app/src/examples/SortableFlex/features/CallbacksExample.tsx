@@ -8,13 +8,7 @@ import Sortable, {
   type OrderChangeCallback
 } from 'react-native-sortables';
 
-import {
-  AnimatedText,
-  ExpandableSettingsTabs,
-  FlexCell,
-  Section,
-  Stagger
-} from '@/components';
+import { AnimatedText, FlexCell, Section, Stagger } from '@/components';
 import { Screen } from '@/components/layout/Screen';
 import { IS_WEB } from '@/constants';
 import { flex, spacing } from '@/theme';

@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 /* eslint-disable no-console */
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import Sortable, {
   type DragEndCallback,
@@ -10,11 +10,11 @@ import Sortable, {
   type SortableGridRenderItem
 } from 'react-native-sortables';
 
-import type { SwitchSettings } from '@/components';
+import type { SwitchOptions } from '@/components';
 import {
   AnimatedText,
+  Button,
   GridCard,
-  Group,
   Screen,
   Section,
   Stagger,
@@ -26,7 +26,7 @@ import { formatCallbackResult, getItems } from '@/utils';
 const DATA = getItems(8);
 const COLUMNS = 4;
 
-function sw<T>(value1: T, value2: T): SwitchSettings<T> {
+function sw<T>(value1: T, value2: T): SwitchOptions<T> {
   return [
     { label: 'js', value: value1 },
     { label: 'ui', value: value2 }
@@ -34,6 +34,7 @@ function sw<T>(value1: T, value2: T): SwitchSettings<T> {
 }
 
 export default function CallbacksExample() {
+  const [showSettings, setShowSettings] = useState(false);
   const text = useSharedValue('Callback output will be displayed here');
 
   /* Callbacks executed on the JS thread */
@@ -124,7 +125,17 @@ export default function CallbacksExample() {
     ]
   );
 
-  const { values: callbacks, settingsComponent } = useSettingsList(options);
+  const defaultSettings = useMemo(
+    () => ({
+      onDragMove: onDragMoveUI
+    }),
+    [onDragMoveUI]
+  );
+
+  const { values: callbacks, settingsComponent } = useSettingsList(
+    options,
+    defaultSettings
+  );
 
   return (
     <Screen includeNavBarHeight>
@@ -132,7 +143,18 @@ export default function CallbacksExample() {
         <Section title='Callback output' fill>
           <AnimatedText style={flex.fill} text={text} multiline />
         </Section>
-        <Group>{settingsComponent}</Group>
+        <Section
+          title='Settings'
+          titleRight={
+            <Button
+              title={showSettings ? 'Hide' : 'Show'}
+              variant='small'
+              onPress={() => setShowSettings(prev => !prev)}
+            />
+          }
+          noOverflow>
+          {showSettings && settingsComponent}
+        </Section>
         <Section
           description='Drag items around to see callbacks output'
           title='Sortable.Grid'>

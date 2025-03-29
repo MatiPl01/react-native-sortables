@@ -1,23 +1,25 @@
 import { memo, type ReactNode, useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Animated, { FadeOut } from 'react-native-reanimated';
 
-import { spacing } from '@/theme';
+import { spacing, text } from '@/theme';
 
-import { CheckBox } from '../inputs';
+import type { SwitchOptions } from '../inputs';
+import { CheckBox, Switch } from '../inputs';
 
-type SwitchOption<V> = { label: string; value: V };
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type SwitchSettings<T = any> = [SwitchOption<T>, SwitchOption<T>];
-
-type AnySettings = Record<string, SwitchSettings>;
+type AnySettings = Record<string, SwitchOptions>;
 
 type SelectedValues<O extends AnySettings> = {
   [K in keyof O]: O[K][0]['value'] | undefined;
 };
 
+type DefaultSettings<O extends AnySettings> = {
+  [K in keyof O]?: O[K][0]['value'] | undefined;
+};
+
 export function useSettingsList<O extends AnySettings>(
-  options: O
+  options: O,
+  defaultSettings?: DefaultSettings<O>
 ): {
   values: SelectedValues<O>;
   settingsComponent: ReactNode;
@@ -26,7 +28,12 @@ export function useSettingsList<O extends AnySettings>(
   const [values, setValues] = useState(
     () =>
       Object.fromEntries(
-        entries.map(([key, [option]]) => [key, option.value])
+        entries.map(([key, [option]]) => [
+          key,
+          defaultSettings && key in defaultSettings
+            ? defaultSettings[key]
+            : option.value
+        ])
       ) as SelectedValues<O>
   );
 
@@ -39,7 +46,7 @@ export function useSettingsList<O extends AnySettings>(
 
   return {
     settingsComponent: (
-      <View style={styles.container}>
+      <Animated.View exiting={FadeOut} style={styles.container}>
         {entries.map(([key, settings]) => (
           <SettingsOption
             key={key}
@@ -49,7 +56,7 @@ export function useSettingsList<O extends AnySettings>(
             onChange={handleValueChange}
           />
         ))}
-      </View>
+      </Animated.View>
     ),
     values
   };
@@ -57,7 +64,7 @@ export function useSettingsList<O extends AnySettings>(
 
 type SettingsOptionProps<K, V> = {
   label: K;
-  settings: SwitchSettings<V>;
+  settings: SwitchOptions<V>;
   value: V | undefined;
   onChange: (key: K, value: V | undefined) => void;
 };
@@ -68,16 +75,27 @@ const SettingsOption = memo(function SettingsOption<K extends string, V>({
   settings,
   value
 }: SettingsOptionProps<K, V>) {
-  const [switchValue, setSwitchValue] = useState(() => settings[0].value);
+  const [prevValue, setPrevValue] = useState<V | undefined>(
+    () => settings[0].value
+  );
+
+  const handleChange = (newValue: V | undefined) => {
+    setPrevValue(() => value);
+    onChange(label, newValue);
+  };
 
   return (
     <View style={styles.option}>
       <CheckBox
         label={label}
+        labelStyle={text.label2}
         selected={!!value}
-        onChange={selected =>
-          onChange(label, selected ? switchValue : undefined)
-        }
+        onChange={selected => handleChange(selected ? prevValue : undefined)}
+      />
+      <Switch
+        options={settings}
+        value={value ?? prevValue}
+        onChange={handleChange}
       />
     </View>
   );
@@ -88,6 +106,8 @@ const styles = StyleSheet.create({
     gap: spacing.xxxs
   },
   option: {
-    flexDirection: 'row'
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   }
 });
