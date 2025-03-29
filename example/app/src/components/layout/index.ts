@@ -1,4 +1,3 @@
-export { default as Grid } from './Grid';
 export { default as Group } from './Group';
 export { default as OptionGroup } from './OptionGroup';
 export * from './Screen';

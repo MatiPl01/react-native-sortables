@@ -13,9 +13,7 @@ type SelectedValues<O extends AnySettings> = {
   [K in keyof O]: O[K][0]['value'] | undefined;
 };
 
-type DefaultSettings<O extends AnySettings> = {
-  [K in keyof O]?: O[K][0]['value'] | undefined;
-};
+type DefaultSettings<O extends AnySettings> = Partial<SelectedValues<O>>;
 
 export function useSettingsList<O extends AnySettings>(
   options: O,
@@ -36,10 +34,17 @@ export function useSettingsList<O extends AnySettings>(
         ])
       ) as SelectedValues<O>
   );
+  const [prevValues, setPrevValues] = useState<SelectedValues<O>>(values);
 
   const handleValueChange = useCallback(
     (key: keyof O, value: O[keyof O][0]['value']) => {
-      setValues(prev => ({ ...prev, [key]: value }));
+      setValues(prev => {
+        const prevValue = prev[key];
+        if (prevValue) {
+          setPrevValues(prevPrev => ({ ...prevPrev, [key]: prevValue }));
+        }
+        return { ...prev, [key]: value };
+      });
     },
     []
   );
@@ -51,6 +56,7 @@ export function useSettingsList<O extends AnySettings>(
           <SettingsOption
             key={key}
             label={key}
+            prevValue={prevValues[key]}
             settings={settings}
             value={values[key]}
             onChange={handleValueChange}
@@ -66,36 +72,29 @@ type SettingsOptionProps<K, V> = {
   label: K;
   settings: SwitchOptions<V>;
   value: V | undefined;
+  prevValue: V | undefined;
   onChange: (key: K, value: V | undefined) => void;
 };
 
 const SettingsOption = memo(function SettingsOption<K extends string, V>({
   label,
   onChange,
+  prevValue,
   settings,
   value
 }: SettingsOptionProps<K, V>) {
-  const [prevValue, setPrevValue] = useState<V | undefined>(
-    () => settings[0].value
-  );
-
-  const handleChange = (newValue: V | undefined) => {
-    setPrevValue(() => value);
-    onChange(label, newValue);
-  };
-
   return (
     <View style={styles.option}>
       <CheckBox
         label={label}
         labelStyle={text.label2}
         selected={!!value}
-        onChange={selected => handleChange(selected ? prevValue : undefined)}
+        onChange={selected => onChange(label, selected ? prevValue : undefined)}
       />
       <Switch
         options={settings}
         value={value ?? prevValue}
-        onChange={handleChange}
+        onChange={onChange.bind(null, label)}
       />
     </View>
   );
