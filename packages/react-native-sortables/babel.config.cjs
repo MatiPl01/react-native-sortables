@@ -3,5 +3,5 @@
  */
 module.exports = {
   presets: ['react-native-builder-bob/babel-preset'],
-  plugins: ["react-require"]
+  plugins: ['react-require']
 };
