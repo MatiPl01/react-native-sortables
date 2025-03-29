@@ -1,6 +1,7 @@
 import { type PropsWithChildren, useMemo } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import { colors, radius, spacing } from '@/theme';
 
@@ -29,7 +30,8 @@ export default function Group({
   }, [padding]);
 
   return (
-    <View
+    <Animated.View
+      layout={LinearTransition}
       style={[
         styles.group,
         bordered && styles.bordered,
@@ -39,7 +41,7 @@ export default function Group({
         style
       ]}>
       {children}
-    </View>
+    </Animated.View>
   );
 }
 
@@ -60,6 +62,6 @@ const styles = StyleSheet.create({
   },
   margin: {
     marginHorizontal: spacing.sm,
-    marginVertical: spacing.sm
+    marginVertical: spacing.xs
   }
 });

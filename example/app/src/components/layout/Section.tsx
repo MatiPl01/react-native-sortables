@@ -1,5 +1,6 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import { colors, flex, spacing } from '@/theme';
 
@@ -13,6 +14,8 @@ type SectionProps = PropsWithChildren<{
   fill?: boolean;
   padding?: GroupProps['padding'];
   group?: boolean;
+  titleRight?: ReactNode;
+  noOverflow?: boolean;
 }>;
 
 export default function Section({
@@ -20,13 +23,28 @@ export default function Section({
   description,
   fill,
   group = true,
+  noOverflow,
   padding,
-  title
+  title,
+  titleRight
 }: SectionProps) {
   return (
-    <View style={[styles.container, fill && flex.fill]}>
+    <Animated.View
+      layout={LinearTransition}
+      style={[
+        styles.container,
+        fill && flex.fill,
+        noOverflow && { overflow: 'hidden' }
+      ]}>
       <View style={styles.textWrapper}>
-        <Text style={styles.title}>{title}</Text>
+        {titleRight ? (
+          <View style={styles.titleWrapper}>
+            <Text style={styles.title}>{title}</Text>
+            {titleRight}
+          </View>
+        ) : (
+          <Text style={styles.title}>{title}</Text>
+        )}
         {description && <Description>{description}</Description>}
       </View>
       {children &&
@@ -37,7 +55,7 @@ export default function Section({
         ) : (
           children
         ))}
-    </View>
+    </Animated.View>
   );
 }
 const styles = StyleSheet.create({
@@ -53,5 +71,10 @@ const styles = StyleSheet.create({
     color: colors.foreground1,
     fontSize: 16,
     fontWeight: 'bold'
+  },
+  titleWrapper: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm
   }
 });
