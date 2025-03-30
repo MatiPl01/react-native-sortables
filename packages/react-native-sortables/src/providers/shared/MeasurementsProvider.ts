@@ -35,7 +35,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     controlledContainerDimensions,
     itemDimensions,
     measuredContainerHeight,
-    measuredContainerWidth
+    measuredContainerWidth,
+    sortEnabled
   } = useCommonValuesContext();
 
   const measurementsContainerRef = useAnimatedRef<View>();
@@ -162,6 +163,21 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       applyMeasuredContainerDimensions(measurements);
     }
   }, [applyMeasuredContainerDimensions, measurementsContainerRef]);
+
+  useAnimatedReaction(
+    () => sortEnabled.value,
+    enabled => {
+      if (
+        absoluteLayoutState.value === AbsoluteLayoutState.PENDING &&
+        enabled
+      ) {
+        // Transition from the relative (Pending) to the Absolute (Complete)
+        // layout when sorting is enabled for the first time
+        absoluteLayoutState.value = AbsoluteLayoutState.TRANSITION;
+        itemDimensions.modify();
+      }
+    }
+  );
 
   useAnimatedReaction(
     () => ({

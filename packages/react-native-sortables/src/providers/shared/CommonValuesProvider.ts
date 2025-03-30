@@ -2,7 +2,6 @@ import { type PropsWithChildren, useEffect, useMemo, useRef } from 'react';
 import type { View, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
-  useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
@@ -143,20 +142,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         prevKeysRef.current = itemKeys;
       }
     }, [itemKeys, indexToKey]);
-
-    useAnimatedReaction(
-      () => sortEnabled.value,
-      enabled => {
-        if (
-          enabled &&
-          absoluteLayoutState.value === AbsoluteLayoutState.PENDING
-        ) {
-          // Transition from the relative (Pending) to the Absolute (Complete)
-          // layout when sorting is enabled for the first time
-          absoluteLayoutState.value = AbsoluteLayoutState.TRANSITION;
-        }
-      }
-    );
 
     const itemsOverridesStyle = useAnimatedStyle(() => ({
       ...itemsStyleOverride.value
