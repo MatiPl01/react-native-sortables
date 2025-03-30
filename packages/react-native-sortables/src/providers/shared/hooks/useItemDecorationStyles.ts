@@ -11,13 +11,24 @@ import {
 } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
-import { type AnimatedStyleProp } from '../../../types';
+import type { AnimatedStyleProp } from '../../../types';
+import { ItemPortalState } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
+
+const TELEPORTED_ITEM_STYLE: ViewStyle = {
+  maxHeight: 0,
+  opacity: 0
+};
+
+const NOT_TELEPORTED_ITEM_STYLE: ViewStyle = {
+  maxHeight: 9999 // 'auto' doesn't trigger onLayout on web/android
+};
 
 export default function useItemDecorationStyles(
   itemKey: string,
   isActive: SharedValue<boolean>,
-  activationAnimationProgress: SharedValue<number>
+  activationAnimationProgress: SharedValue<number>,
+  portalState?: SharedValue<ItemPortalState>
 ): AnimatedStyleProp {
   const {
     activationAnimationDuration,
@@ -31,6 +42,10 @@ export default function useItemDecorationStyles(
   } = useCommonValuesContext();
 
   const adjustedInactiveProgress = useDerivedValue(() => {
+    if (portalState?.value === ItemPortalState.TELEPORTED) {
+      return 0;
+    }
+
     if (isActive.value || prevActiveItemKey.value === itemKey) {
       return withTiming(0, { duration: activationAnimationDuration.value });
     }
@@ -43,6 +58,10 @@ export default function useItemDecorationStyles(
   });
 
   const animatedStyle = useAnimatedStyle(() => {
+    if (portalState?.value === ItemPortalState.TELEPORTED) {
+      return TELEPORTED_ITEM_STYLE;
+    }
+
     const progress = activationAnimationProgress.value;
     const zeroProgressOpacity = interpolate(
       adjustedInactiveProgress.value,
@@ -66,6 +85,7 @@ export default function useItemDecorationStyles(
       : { shadowColor };
 
     return {
+      ...NOT_TELEPORTED_ITEM_STYLE,
       ...shadow,
       opacity: interpolate(
         progress,

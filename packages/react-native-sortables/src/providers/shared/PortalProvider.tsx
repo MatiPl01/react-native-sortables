@@ -12,11 +12,12 @@ import { PortalOutletProvider } from './PortalOutletProvider';
 
 type PortalProviderProps = {
   children: ReactNode;
+  enabled?: boolean;
 };
 
 const { PortalProvider, usePortalContext } = createProvider('Portal', {
   guarded: false
-})<PortalProviderProps, PortalContextType>(({ children }) => {
+})<PortalProviderProps, PortalContextType>(({ children, enabled }) => {
   const subscribersRef = useRef<Record<string, Set<PortalSubscription>>>({});
   const [teleportedNodes, setTeleportedNodes] = useState<
     Record<string, React.ReactNode>
@@ -74,6 +75,7 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
         </PortalOutletProvider>
       </Fragment>
     ),
+    enabled,
     value: {
       activeItemAbsolutePosition,
       notifyRendered,

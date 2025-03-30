@@ -9,6 +9,10 @@ import Animated, {
 import { colors, radius, sizes, spacing, text } from '@/theme';
 import { lighten } from '@/utils';
 
+const TRACK_HEIGHT = sizes.xxs;
+const TRACK_PADDING = spacing.xxxs;
+const THUMB_SIZE = TRACK_HEIGHT - 2 * TRACK_PADDING;
+
 type SwitchOption<V> = { label: string; value: V };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,7 +44,7 @@ export default function Switch<V>({
 
   const animatedThumbStyle = useAnimatedStyle(() => ({
     left: `${progress.value * 100}%`,
-    transform: [{ translateX: `${-progress.value * 100}%` }]
+    transform: [{ translateX: -progress.value * THUMB_SIZE }]
   }));
 
   return (
@@ -80,8 +84,8 @@ const styles = StyleSheet.create({
   track: {
     backgroundColor: colors.background3,
     borderRadius: radius.full,
-    height: sizes.xxs,
-    padding: spacing.xxxs,
+    height: TRACK_HEIGHT,
+    padding: TRACK_PADDING,
     width: sizes.sm
   }
 });
