@@ -11,7 +11,7 @@ import {
 } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
-import type { AnimatedStyleProp } from '../../../types';
+import { type AnimatedStyleProp } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
 export default function useItemDecorationStyles(

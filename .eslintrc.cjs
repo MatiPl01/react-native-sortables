@@ -13,6 +13,7 @@ module.exports = {
         allowObjectStart: true,
         allowArrayStart: true
       }
-    ]
+    ],
+    'perfectionist/sort-enums': 'off'
   }
 };

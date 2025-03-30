@@ -1,10 +1,14 @@
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import { colors, radius, spacing, text } from '@/theme';
 import { lighten } from '@/utils';
 
 type ButtonVariant = 'big' | 'small';
+
+const AnimatedTouchableOpacity =
+  Animated.createAnimatedComponent(TouchableOpacity);
 
 const VARIANT_STYLES: Record<
   ButtonVariant,
@@ -44,8 +48,9 @@ export default function Button({
   const variantStyles = VARIANT_STYLES[variant];
 
   return (
-    <TouchableOpacity
+    <AnimatedTouchableOpacity
       disabled={disabled}
+      layout={LinearTransition}
       style={[
         styles.button,
         disabled && styles.disabled,
@@ -53,8 +58,10 @@ export default function Button({
         style
       ]}
       onPress={onPress}>
-      <Text style={[styles.text, variantStyles.text]}>{title}</Text>
-    </TouchableOpacity>
+      <Text key={title} style={[styles.text, variantStyles.text]}>
+        {title}
+      </Text>
+    </AnimatedTouchableOpacity>
   );
 }
 

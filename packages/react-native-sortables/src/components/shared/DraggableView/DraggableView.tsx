@@ -53,7 +53,7 @@ function DraggableView({
   const activationAnimationProgress = useSharedValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
   const layoutStyles = useItemLayoutStyles(key, activationAnimationProgress);
-  const decorationStyle = useItemDecorationStyles(
+  const decorationStyles = useItemDecorationStyles(
     key,
     isActive,
     activationAnimationProgress
@@ -64,7 +64,7 @@ function DraggableView({
   }, [key, removeItemMeasurements]);
 
   const sharedCellProps = {
-    decorationStyle,
+    decorationStyles,
     handleItemMeasurement,
     itemKey: key,
     itemsOverridesStyle

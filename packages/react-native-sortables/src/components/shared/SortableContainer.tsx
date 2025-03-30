@@ -10,13 +10,17 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
-import { IS_WEB } from '../../constants';
+import { EMPTY_OBJECT, IS_WEB } from '../../constants';
 import { DebugOutlet } from '../../debug';
 import {
   useCommonValuesContext,
   useMeasurementsContext
 } from '../../providers';
-import type { DropIndicatorSettings, Overflow } from '../../types';
+import {
+  AbsoluteLayoutState,
+  type DropIndicatorSettings,
+  type Overflow
+} from '../../types';
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 import DropIndicator from './DropIndicator';
 
@@ -42,20 +46,21 @@ export default function SortableContainer({
   style
 }: AnimatedHeightContainerProps) {
   const {
+    absoluteLayoutState,
     activeItemDropped,
     activeItemKey,
-    canSwitchToAbsoluteLayout,
     containerHeight,
     containerRef,
     containerWidth,
     controlledContainerDimensions,
     shouldAnimateLayout
   } = useCommonValuesContext();
-  const { handleHelperContainerMeasurement } = useMeasurementsContext();
+  const { handleHelperContainerMeasurement, measurementsContainerRef } =
+    useMeasurementsContext();
 
   const outerContainerStyle = useAnimatedStyle(() => {
-    if (!canSwitchToAbsoluteLayout.value) {
-      return {};
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
+      return EMPTY_OBJECT;
     }
 
     const maybeAnimate = (value: null | number, animate: boolean) =>
@@ -82,8 +87,8 @@ export default function SortableContainer({
   }, [animateHeight, animateWidth]);
 
   const innerContainerStyle = useAnimatedStyle(() => {
-    if (!canSwitchToAbsoluteLayout.value) {
-      return {};
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
+      return EMPTY_OBJECT;
     }
 
     const minHeight =
@@ -100,6 +105,10 @@ export default function SortableContainer({
   });
 
   const animatedMeasurementsContainerStyle = useAnimatedStyle(() => {
+    if (absoluteLayoutState.value === AbsoluteLayoutState.PENDING) {
+      return EMPTY_OBJECT;
+    }
+
     const ctrl = controlledContainerDimensions.value;
 
     return {
@@ -119,6 +128,7 @@ export default function SortableContainer({
         />
       )}
       <AnimatedOnLayoutView
+        ref={measurementsContainerRef}
         style={[StyleSheet.absoluteFill, animatedMeasurementsContainerStyle]}
         onLayout={handleHelperContainerMeasurement}
       />

@@ -163,29 +163,29 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
   );
 
   const useDebugLine = useCallback(
-    () => useDebugComponent(DebugComponentType.Line),
+    () => useDebugComponent(DebugComponentType.LINE),
     [useDebugComponent]
   );
 
   const useDebugRect = useCallback(
-    () => useDebugComponent(DebugComponentType.Rect),
+    () => useDebugComponent(DebugComponentType.RECT),
     [useDebugComponent]
   );
 
   const useDebugCross = useCallback(
-    () => useDebugComponent(DebugComponentType.Cross),
+    () => useDebugComponent(DebugComponentType.CROSS),
     [useDebugComponent]
   );
 
   const useDebugLines = useCallback(
     (keysOrCount: Array<string> | number) =>
-      useDebugComponents(DebugComponentType.Line, keysOrCount),
+      useDebugComponents(DebugComponentType.LINE, keysOrCount),
     [useDebugComponents]
   );
 
   const useDebugRects = useCallback(
     (keysOrCount: Array<string> | number) =>
-      useDebugComponents(DebugComponentType.Rect, keysOrCount),
+      useDebugComponents(DebugComponentType.RECT, keysOrCount),
     [useDebugComponents]
   );
 

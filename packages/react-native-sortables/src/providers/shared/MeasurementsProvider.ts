@@ -10,7 +10,11 @@ import {
 
 import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
-import type { Dimensions, MeasurementsContextType } from '../../types';
+import {
+  AbsoluteLayoutState,
+  type Dimensions,
+  type MeasurementsContextType
+} from '../../types';
 import { areDimensionsDifferent, useAnimatedDebounce } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
@@ -23,15 +27,16 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
 )<MeasurementsProviderProps, MeasurementsContextType>(({ itemsCount }) => {
   const {
+    absoluteLayoutState,
     activeItemDimensions,
     activeItemKey,
-    canSwitchToAbsoluteLayout,
     containerHeight,
     containerWidth,
     controlledContainerDimensions,
     itemDimensions,
     measuredContainerHeight,
-    measuredContainerWidth
+    measuredContainerWidth,
+    sortEnabled
   } = useCommonValuesContext();
 
   const measurementsContainerRef = useAnimatedRef<View>();
@@ -63,12 +68,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       // Update the array of item dimensions only after all items have been
       // measured to reduce the number of times animated reactions are triggered
       if (measuredItemsCount.value === itemsCount) {
+        // Don't update dimensions if the sortable component is first rendered
+        // and the layout cannot be changed to absolute (e.g. because sorting
+        // hasn't been enabled yet)
+        const canUpdateDimensions =
+          absoluteLayoutState.value !== AbsoluteLayoutState.PENDING;
         // If this is the first time all items have been measured, update
         // dimensions immediately to avoid unnecessary delays
         if (!initialItemMeasurementsCompleted.value) {
           initialItemMeasurementsCompleted.value = true;
-          itemDimensions.modify();
-        } else {
+          if (canUpdateDimensions) itemDimensions.modify();
+        } else if (canUpdateDimensions) {
           // In all other cases, debounce the update in case multiple items
           // change their size at the same time
           debounce(itemDimensions.modify, 100);
@@ -120,7 +130,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       measuredContainerHeight.value = dimensions.height;
       measuredContainerWidth.value = dimensions.width;
 
-      if (canSwitchToAbsoluteLayout.value) {
+      if (absoluteLayoutState.value === AbsoluteLayoutState.COMPLETE) {
         if (!controlledContainerDimensions.value.height) {
           containerHeight.value = dimensions.height;
         }
@@ -130,7 +140,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
     },
     [
-      canSwitchToAbsoluteLayout,
+      absoluteLayoutState,
       containerHeight,
       containerWidth,
       controlledContainerDimensions,
@@ -155,6 +165,21 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   }, [applyMeasuredContainerDimensions, measurementsContainerRef]);
 
   useAnimatedReaction(
+    () => sortEnabled.value,
+    enabled => {
+      if (
+        absoluteLayoutState.value === AbsoluteLayoutState.PENDING &&
+        enabled
+      ) {
+        // Transition from the relative (Pending) to the Absolute (Complete)
+        // layout when sorting is enabled for the first time
+        absoluteLayoutState.value = AbsoluteLayoutState.TRANSITION;
+        itemDimensions.modify();
+      }
+    }
+  );
+
+  useAnimatedReaction(
     () => ({
       containerH: containerHeight.value,
       containerW: containerWidth.value,
@@ -170,7 +195,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       measuredWidth
     }) => {
       if (
-        canSwitchToAbsoluteLayout.value ||
+        // Update only if absolute layout is during the transition state
+        absoluteLayoutState.value !== AbsoluteLayoutState.TRANSITION ||
         !itemMeasurementsCompleted ||
         measuredHeight === null ||
         measuredWidth === null ||
@@ -183,7 +209,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         return;
       }
 
-      canSwitchToAbsoluteLayout.value = true;
+      absoluteLayoutState.value = AbsoluteLayoutState.COMPLETE;
     }
   );
 

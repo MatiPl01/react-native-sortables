@@ -21,7 +21,7 @@ export default function TeleportedItemCell({
   activationAnimationProgress,
   baseCellStyle,
   children,
-  decorationStyle,
+  decorationStyles,
   isActive,
   itemKey,
   itemsOverridesStyle,
@@ -39,7 +39,7 @@ export default function TeleportedItemCell({
   return (
     <ItemCell
       cellStyle={[baseCellStyle, teleportedItemStyles]}
-      decorationStyle={decorationStyle}
+      decorationStyles={decorationStyles}
       itemsOverridesStyle={itemsOverridesStyle}
       onMeasure={(width, height) => {
         onMeasure(width, height);
