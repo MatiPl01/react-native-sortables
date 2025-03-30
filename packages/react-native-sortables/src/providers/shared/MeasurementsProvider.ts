@@ -71,7 +71,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         // and the layout cannot be changed to absolute (e.g. because sorting
         // hasn't been enabled yet)
         const canUpdateDimensions =
-          absoluteLayoutState.value !== AbsoluteLayoutState.Pending;
+          absoluteLayoutState.value !== AbsoluteLayoutState.PENDING;
         // If this is the first time all items have been measured, update
         // dimensions immediately to avoid unnecessary delays
         if (!initialItemMeasurementsCompleted.value) {
@@ -129,7 +129,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       measuredContainerHeight.value = dimensions.height;
       measuredContainerWidth.value = dimensions.width;
 
-      if (absoluteLayoutState.value === AbsoluteLayoutState.Complete) {
+      if (absoluteLayoutState.value === AbsoluteLayoutState.COMPLETE) {
         if (!controlledContainerDimensions.value.height) {
           containerHeight.value = dimensions.height;
         }
@@ -180,7 +180,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     }) => {
       if (
         // Update only if absolute layout is during the transition state
-        absoluteLayoutState.value !== AbsoluteLayoutState.Transition ||
+        absoluteLayoutState.value !== AbsoluteLayoutState.TRANSITION ||
         !itemMeasurementsCompleted ||
         measuredHeight === null ||
         measuredWidth === null ||
@@ -193,7 +193,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         return;
       }
 
-      absoluteLayoutState.value = AbsoluteLayoutState.Complete;
+      absoluteLayoutState.value = AbsoluteLayoutState.COMPLETE;
     }
   );
 

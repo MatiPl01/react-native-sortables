@@ -5,9 +5,9 @@ import type { Vector } from './layout/shared';
 import type { AnyRecord, Maybe } from './utils';
 
 export enum DebugComponentType {
-  Cross = 'cross',
-  Line = 'line',
-  Rect = 'rect'
+  CROSS = 'cross',
+  LINE = 'line',
+  RECT = 'rect'
 }
 
 export type DebugCrossProps = (
@@ -110,17 +110,17 @@ type CreateDebugComponentUpdater<
 };
 
 export type DebugComponentUpdater<T extends DebugComponentType> =
-  T extends DebugComponentType.Line
+  T extends DebugComponentType.LINE
     ? CreateDebugComponentUpdater<T, DebugLineProps>
-    : T extends DebugComponentType.Rect
+    : T extends DebugComponentType.RECT
       ? CreateDebugComponentUpdater<T, DebugRectProps>
-      : T extends DebugComponentType.Cross
+      : T extends DebugComponentType.CROSS
         ? CreateDebugComponentUpdater<T, DebugCrossProps>
         : never;
 
-export type DebugLineUpdater = DebugComponentUpdater<DebugComponentType.Line>;
-export type DebugCrossUpdater = DebugComponentUpdater<DebugComponentType.Cross>;
-export type DebugRectUpdater = DebugComponentUpdater<DebugComponentType.Rect>;
+export type DebugLineUpdater = DebugComponentUpdater<DebugComponentType.LINE>;
+export type DebugCrossUpdater = DebugComponentUpdater<DebugComponentType.CROSS>;
+export type DebugRectUpdater = DebugComponentUpdater<DebugComponentType.RECT>;
 
 export type DebugViews = Record<
   number,

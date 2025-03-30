@@ -59,7 +59,7 @@ export default function SortableContainer({
     useMeasurementsContext();
 
   const outerContainerStyle = useAnimatedStyle(() => {
-    if (absoluteLayoutState.value !== AbsoluteLayoutState.Complete) {
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
       return EMPTY_OBJECT;
     }
 
@@ -87,7 +87,7 @@ export default function SortableContainer({
   }, [animateHeight, animateWidth]);
 
   const innerContainerStyle = useAnimatedStyle(() => {
-    if (absoluteLayoutState.value !== AbsoluteLayoutState.Complete) {
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
       return EMPTY_OBJECT;
     }
 
@@ -105,7 +105,7 @@ export default function SortableContainer({
   });
 
   const animatedMeasurementsContainerStyle = useAnimatedStyle(() => {
-    if (absoluteLayoutState.value === AbsoluteLayoutState.Pending) {
+    if (absoluteLayoutState.value === AbsoluteLayoutState.PENDING) {
       return EMPTY_OBJECT;
     }
 

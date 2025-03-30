@@ -147,7 +147,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
                 paddings: paddings.value
               },
         (props, previousProps) => {
-          if (absoluteLayoutState.value === AbsoluteLayoutState.Pending) {
+          if (absoluteLayoutState.value === AbsoluteLayoutState.PENDING) {
             return;
           }
 

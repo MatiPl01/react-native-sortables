@@ -1,13 +1,13 @@
 export enum DragActivationState {
-  ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
-  TOUCHED = 'TOUCHED'
+  TOUCHED = 'TOUCHED',
+  ACTIVE = 'ACTIVE'
 }
 
 export enum LayerState {
-  Focused = 2,
-  Idle = 0,
-  Intermediate = 1
+  IDLE = 0,
+  INTERMEDIATE = 1,
+  FOCUSED = 2
 }
 
 /**
@@ -19,17 +19,17 @@ export enum AbsoluteLayoutState {
    * Initial state when the layout is relative. This occurs before sorting
    * is enabled for the first time and any measurements have been made.
    */
-  Pending = 1,
+  PENDING = 1,
 
   /**
    * Intermediate state when the layout can be changed to absolute, but
    * measurements haven't been completed yet.
    */
-  Transition = 2,
+  TRANSITION = 2,
 
   /**
    * Final state when the absolute layout can be applied, after all measurements
    * have been completed.
    */
-  Complete = 3
+  COMPLETE = 3
 }

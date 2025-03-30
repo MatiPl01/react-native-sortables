@@ -49,7 +49,7 @@ export default function useItemDecorationStyles(
   });
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (absoluteLayoutState.value !== AbsoluteLayoutState.Complete) {
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
       return DISABLED_STYLE;
     }
 

@@ -99,7 +99,7 @@ export default function useItemLayoutStyles(
   );
 
   return useAnimatedStyle(() => {
-    if (absoluteLayoutState.value !== AbsoluteLayoutState.Complete) {
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
       return RELATIVE_STYLE;
     }
 

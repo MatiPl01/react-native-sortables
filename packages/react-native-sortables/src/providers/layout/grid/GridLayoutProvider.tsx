@@ -128,7 +128,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           numGroups
         }),
         (props, previousProps) => {
-          if (absoluteLayoutState.value === AbsoluteLayoutState.Pending) {
+          if (absoluteLayoutState.value === AbsoluteLayoutState.PENDING) {
             return;
           }
 

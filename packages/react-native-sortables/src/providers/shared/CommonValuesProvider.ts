@@ -130,7 +130,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // OTHER
     const containerRef = useAnimatedRef<View>();
     const sortEnabled = useAnimatableValue(_sortEnabled);
-    const absoluteLayoutState = useSharedValue(AbsoluteLayoutState.Pending);
+    const absoluteLayoutState = useSharedValue(AbsoluteLayoutState.PENDING);
     const shouldAnimateLayout = useSharedValue(true);
     const animateLayoutOnReorderOnly = useDerivedValue(
       () => itemsLayoutTransitionMode === 'reorder',
@@ -149,11 +149,11 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       enabled => {
         if (
           enabled &&
-          absoluteLayoutState.value === AbsoluteLayoutState.Pending
+          absoluteLayoutState.value === AbsoluteLayoutState.PENDING
         ) {
           // Transition from the relative (Pending) to the Absolute (Complete)
           // layout when sorting is enabled for the first time
-          absoluteLayoutState.value = AbsoluteLayoutState.Transition;
+          absoluteLayoutState.value = AbsoluteLayoutState.TRANSITION;
         }
       }
     );

@@ -57,7 +57,7 @@ export default function useItemLayoutStyles(
   useAnimatedReaction(
     () => ({
       activationProgress: activationAnimationProgress.value,
-      canApply: absoluteLayoutState.value === AbsoluteLayoutState.Complete,
+      canApply: absoluteLayoutState.value === AbsoluteLayoutState.COMPLETE,
       isActive: activeItemKey.value === key,
       position: itemPositions.value[key]
     }),
@@ -146,7 +146,7 @@ export default function useItemLayoutStyles(
 
   const animatedTranslationStyle = useAnimatedStyle(() => {
     if (
-      absoluteLayoutState.value !== AbsoluteLayoutState.Complete &&
+      absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE &&
       (layoutX.value === null || layoutY.value === null)
     ) {
       return RELATIVE_STYLE;
@@ -168,7 +168,7 @@ export default function useItemLayoutStyles(
   });
 
   const animatedLayoutStyle = useAnimatedStyle(() => {
-    if (absoluteLayoutState.value !== AbsoluteLayoutState.Complete) {
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
       return EMPTY_OBJECT;
     }
 

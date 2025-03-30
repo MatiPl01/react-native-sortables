@@ -25,21 +25,21 @@ const DebugOutlet = memo(function DebugOutlet() {
     <>
       {Object.entries(debugViews).map(([key, { props, type }]) => {
         switch (type) {
-          case DebugComponentType.Cross:
+          case DebugComponentType.CROSS:
             return (
               <DebugCross
                 key={key}
                 props={props as SharedValue<DebugCrossProps>}
               />
             );
-          case DebugComponentType.Line:
+          case DebugComponentType.LINE:
             return (
               <DebugLine
                 key={key}
                 props={props as SharedValue<DebugLineProps>}
               />
             );
-          case DebugComponentType.Rect:
+          case DebugComponentType.RECT:
             return (
               <DebugRect
                 key={key}
