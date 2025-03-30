@@ -2,6 +2,7 @@ import { type PropsWithChildren, useEffect, useMemo, useRef } from 'react';
 import type { View, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
+  useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
@@ -21,7 +22,7 @@ import type {
   Maybe,
   Vector
 } from '../../types';
-import { DragActivationState } from '../../types';
+import { AbsoluteLayoutState, DragActivationState } from '../../types';
 import { areArraysDifferent } from '../../utils';
 import { createProvider } from '../utils';
 
@@ -129,7 +130,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // OTHER
     const containerRef = useAnimatedRef<View>();
     const sortEnabled = useAnimatableValue(_sortEnabled);
-    const canSwitchToAbsoluteLayout = useSharedValue(false);
+    const absoluteLayoutState = useSharedValue(AbsoluteLayoutState.Pending);
     const shouldAnimateLayout = useSharedValue(true);
     const animateLayoutOnReorderOnly = useDerivedValue(
       () => itemsLayoutTransitionMode === 'reorder',
@@ -143,12 +144,27 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       }
     }, [itemKeys, indexToKey]);
 
+    useAnimatedReaction(
+      () => sortEnabled.value,
+      enabled => {
+        if (
+          enabled &&
+          absoluteLayoutState.value === AbsoluteLayoutState.Pending
+        ) {
+          // Transition from the relative (Pending) to the Absolute (Complete)
+          // layout when sorting is enabled for the first time
+          absoluteLayoutState.value = AbsoluteLayoutState.Transition;
+        }
+      }
+    );
+
     const itemsOverridesStyle = useAnimatedStyle(() => ({
       ...itemsStyleOverride.value
     }));
 
     return {
       value: {
+        absoluteLayoutState,
         activationAnimationDuration,
         activationState,
         activeAnimationProgress,
@@ -160,7 +176,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activeItemScale,
         activeItemShadowOpacity,
         animateLayoutOnReorderOnly,
-        canSwitchToAbsoluteLayout,
         componentId,
         containerHeight,
         containerRef,

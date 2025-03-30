@@ -8,11 +8,12 @@ import {
 
 import { type DEFAULT_SORTABLE_FLEX_PROPS, IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
-import type {
-  FlexLayout,
-  FlexLayoutContextType,
-  RequiredBy,
-  SortableFlexStyle
+import {
+  AbsoluteLayoutState,
+  type FlexLayout,
+  type FlexLayoutContextType,
+  type RequiredBy,
+  type SortableFlexStyle
 } from '../../../types';
 import { haveEqualPropValues } from '../../../utils';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
@@ -55,6 +56,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   width
 }) => {
   const {
+    absoluteLayoutState,
     controlledContainerDimensions,
     indexToKey,
     itemDimensions,
@@ -145,6 +147,10 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
                 paddings: paddings.value
               },
         (props, previousProps) => {
+          if (absoluteLayoutState.value === AbsoluteLayoutState.Pending) {
+            return;
+          }
+
           onChange(
             props && calculateLayout(props),
             // Animate layout only if parent container is not resized
@@ -165,7 +171,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       rowGap,
       itemDimensions,
       dimensionsLimits,
-      paddings
+      paddings,
+      absoluteLayoutState
     ]
   );
 

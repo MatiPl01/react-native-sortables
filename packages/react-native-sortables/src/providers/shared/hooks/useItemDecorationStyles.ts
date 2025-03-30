@@ -11,8 +11,13 @@ import {
 } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
-import type { AnimatedStyleProp } from '../../../types';
+import { AbsoluteLayoutState, type AnimatedStyleProp } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
+
+const DISABLED_STYLE: ViewStyle = {
+  elevation: 0,
+  shadowOpacity: 0
+};
 
 export default function useItemDecorationStyles(
   itemKey: string,
@@ -20,6 +25,7 @@ export default function useItemDecorationStyles(
   activationAnimationProgress: SharedValue<number>
 ): AnimatedStyleProp {
   const {
+    absoluteLayoutState,
     activationAnimationDuration,
     activeItemOpacity,
     activeItemScale,
@@ -43,6 +49,10 @@ export default function useItemDecorationStyles(
   });
 
   const animatedStyle = useAnimatedStyle(() => {
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.Complete) {
+      return DISABLED_STYLE;
+    }
+
     const progress = activationAnimationProgress.value;
     const zeroProgressOpacity = interpolate(
       adjustedInactiveProgress.value,
