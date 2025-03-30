@@ -17,7 +17,7 @@ const { PortalOutletProvider, usePortalOutletContext } = createProvider(
 
   return {
     children: (
-      <View ref={portalOutletRef} style={styles.container}>
+      <View collapsable={false} ref={portalOutletRef} style={styles.container}>
         {children}
       </View>
     ),

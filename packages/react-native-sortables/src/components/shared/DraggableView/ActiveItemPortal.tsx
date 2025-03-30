@@ -9,7 +9,6 @@ import {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { IS_WEB } from '../../../constants';
 import { usePortalContext, useTeleportedItemId } from '../../../providers';
 import type { AnimatedStyleProp, MeasureCallback } from '../../../types';
 
@@ -19,7 +18,7 @@ const TELEPORTED_ITEM_STYLE: ViewStyle = {
 };
 
 const NOT_TELEPORTED_ITEM_STYLE: ViewStyle = {
-  maxHeight: IS_WEB ? 9999 : 'auto', // 'auto' doesn't trigger onLayout on web
+  maxHeight: 9999, // 'auto' doesn't trigger onLayout on web/android
   overflow: 'visible'
 };
 
