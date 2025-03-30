@@ -2,16 +2,16 @@ import { Portal } from '@gorhom/portal';
 import type { JSX, PropsWithChildren, ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
-  Pressable
+  Pressable,
+  TouchableOpacity
 } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
   FadeIn,
-  FadeOut,
   interpolate,
   useAnimatedRef,
   useAnimatedStyle,
@@ -267,10 +267,7 @@ function DropdownContent({
 
   return (
     <Animated.View style={[dropdownStyle, animatedDropdownStyle]}>
-      <Animated.View
-        entering={FadeIn}
-        exiting={FadeOut}
-        style={styles.boxNoneEvents}>
+      <Animated.View entering={FadeIn}>
         <View style={[{ maxHeight: dropdownMaxHeight }, rest]}>
           <Animated.ScrollView
             contentContainerStyle={paddingAndMargin}
@@ -358,17 +355,14 @@ function ScrollBar({
 }
 
 type BackdropProps = {
-  handleClose?: () => void;
+  handleClose: () => void;
 };
 
 function Backdrop({ handleClose }: BackdropProps): JSX.Element {
   return (
-    <Animated.View
-      entering={FadeIn}
-      exiting={FadeOut}
-      style={[styles.backdrop, styles.boxNoneEvents]}>
-      <Pressable style={styles.backdrop} onPress={handleClose} />
-    </Animated.View>
+    <Pressable style={StyleSheet.absoluteFill} onPress={handleClose}>
+      <Animated.View entering={FadeIn} style={styles.backdrop} />
+    </Pressable>
   );
 }
 
@@ -376,9 +370,6 @@ const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.2)'
-  },
-  boxNoneEvents: {
-    pointerEvents: 'box-none'
   },
   scrollBarThumb: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
