@@ -17,7 +17,16 @@ import { useCommonValuesContext } from '../CommonValuesProvider';
 
 const TELEPORTED_ITEM_STYLE: ViewStyle = {
   maxHeight: 0,
-  opacity: 0
+  opacity: 0,
+  ...Platform.select({
+    android: {
+      elevation: 0
+    },
+    default: {},
+    native: {
+      shadowOpacity: 0
+    }
+  })
 };
 
 const NOT_TELEPORTED_ITEM_STYLE: ViewStyle = {
