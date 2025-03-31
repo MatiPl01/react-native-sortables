@@ -11,9 +11,11 @@ export type GroupProps = PropsWithChildren<{
   withMargin?: boolean;
   center?: boolean;
   style?: StyleProp<ViewStyle>;
+  animateLayout?: boolean;
 }>;
 
 export default function Group({
+  animateLayout,
   bordered,
   center,
   children,
@@ -31,7 +33,7 @@ export default function Group({
 
   return (
     <Animated.View
-      layout={LinearTransition}
+      layout={animateLayout ? LinearTransition : undefined}
       style={[
         styles.group,
         bordered && styles.bordered,

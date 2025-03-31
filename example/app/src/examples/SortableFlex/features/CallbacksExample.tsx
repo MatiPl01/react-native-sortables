@@ -135,7 +135,7 @@ export default function CallbacksExample() {
   return (
     <Screen includeNavBarHeight>
       <Stagger wrapperStye={index => (index === 0 ? flex.fill : {})}>
-        <Section title='Callback output' fill>
+        <Section title='Callback output' animateLayout fill>
           <AnimatedText style={flex.fill} text={text} multiline />
         </Section>
         <Section
@@ -147,6 +147,7 @@ export default function CallbacksExample() {
               onPress={() => setShowSettings(prev => !prev)}
             />
           }
+          animateLayout
           noOverflow>
           {showSettings && settingsComponent}
         </Section>
