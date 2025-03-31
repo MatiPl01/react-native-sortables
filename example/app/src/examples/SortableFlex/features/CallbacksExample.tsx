@@ -6,6 +6,7 @@ import Sortable, {
   type DragEndCallback,
   type DragMoveCallback,
   type DragStartCallback,
+  type SortableFlexDragEndCallback,
   type OrderChangeCallback
 } from 'react-native-sortables';
 
@@ -45,7 +46,7 @@ export default function CallbacksExample() {
     [text]
   );
 
-  const onDragEndJS = useCallback<DragEndCallback>(
+  const onDragEndJS = useCallback<SortableFlexDragEndCallback>(
     params => {
       text.value = formatCallbackResult('onDragEnd', params);
     },

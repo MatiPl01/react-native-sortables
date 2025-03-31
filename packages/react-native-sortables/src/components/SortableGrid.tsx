@@ -79,12 +79,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
 
-  const onDragEnd = useDragEndHandler(_onDragEnd, params => {
-    'worklet';
-    return {
-      ...params,
-      data: orderItems(data, itemKeys, params, true)
-    };
+  const onDragEnd = useDragEndHandler(_onDragEnd, {
+    data: params => orderItems(data, itemKeys, params, true)
   });
 
   return (

@@ -22,6 +22,7 @@ import {
 } from '@/components';
 import { flex, spacing } from '@/theme';
 import { formatCallbackResult, getItems } from '@/utils';
+import { SortableGridDragEndCallback } from 'react-native-sortables';
 
 const DATA = getItems(8);
 const COLUMNS = 4;
@@ -46,7 +47,7 @@ export default function CallbacksExample() {
     [text]
   );
 
-  const onDragEndJS = useCallback<DragEndCallback>(
+  const onDragEndJS = useCallback<SortableGridDragEndCallback<string>>(
     params => {
       text.value = formatCallbackResult('onDragEnd', params);
     },

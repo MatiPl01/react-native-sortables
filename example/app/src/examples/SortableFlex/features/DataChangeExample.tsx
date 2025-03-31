@@ -145,7 +145,6 @@ export default function DataChangeExample() {
               scrollableRef={scrollableRef}
               animateHeight
               hapticsEnabled
-              // itemsLayoutTransitionMode='reorder'
               onDragEnd={({ order }) => setData(order(data))}>
               {data.map(item => (
                 <FlexItem item={item} key={item} onRemoveItem={onRemoveItem} />
