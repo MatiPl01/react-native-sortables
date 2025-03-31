@@ -9,11 +9,8 @@ import {
 } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../../constants';
-import {
-  AbsoluteLayoutState,
-  type AnimatedStyleProp,
-  type Vector
-} from '../../../types';
+import type { AnimatedStyleProp, Vector } from '../../../types';
+import { AbsoluteLayoutState } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
