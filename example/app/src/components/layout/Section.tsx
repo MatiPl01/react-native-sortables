@@ -20,6 +20,7 @@ type SectionProps = PropsWithChildren<{
 }>;
 
 export default function Section({
+  animateLayout,
   children,
   description,
   fill,
@@ -27,8 +28,7 @@ export default function Section({
   noOverflow,
   padding,
   title,
-  titleRight,
-  animateLayout
+  titleRight
 }: SectionProps) {
   return (
     <Animated.View

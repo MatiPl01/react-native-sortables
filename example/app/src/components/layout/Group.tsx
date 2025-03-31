@@ -15,13 +15,13 @@ export type GroupProps = PropsWithChildren<{
 }>;
 
 export default function Group({
+  animateLayout,
   bordered,
   center,
   children,
   padding = 'all',
   style,
-  withMargin = true,
-  animateLayout
+  withMargin = true
 }: GroupProps) {
   const paddingStyle = useMemo(() => {
     if (padding === 'all') return { padding: spacing.sm };
