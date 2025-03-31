@@ -11,6 +11,7 @@ export type GroupProps = PropsWithChildren<{
   withMargin?: boolean;
   center?: boolean;
   style?: StyleProp<ViewStyle>;
+  animateLayout?: boolean;
 }>;
 
 export default function Group({
@@ -19,7 +20,8 @@ export default function Group({
   children,
   padding = 'all',
   style,
-  withMargin = true
+  withMargin = true,
+  animateLayout
 }: GroupProps) {
   const paddingStyle = useMemo(() => {
     if (padding === 'all') return { padding: spacing.sm };
@@ -31,7 +33,7 @@ export default function Group({
 
   return (
     <Animated.View
-      layout={LinearTransition}
+      layout={animateLayout ? LinearTransition : undefined}
       style={[
         styles.group,
         bordered && styles.bordered,

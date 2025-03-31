@@ -16,6 +16,7 @@ type SectionProps = PropsWithChildren<{
   group?: boolean;
   titleRight?: ReactNode;
   noOverflow?: boolean;
+  animateLayout?: boolean;
 }>;
 
 export default function Section({
@@ -26,11 +27,12 @@ export default function Section({
   noOverflow,
   padding,
   title,
-  titleRight
+  titleRight,
+  animateLayout
 }: SectionProps) {
   return (
     <Animated.View
-      layout={LinearTransition}
+      layout={animateLayout ? LinearTransition : undefined}
       style={[
         styles.container,
         fill && flex.fill,
@@ -49,7 +51,10 @@ export default function Section({
       </View>
       {children &&
         (group ? (
-          <Group padding={padding} style={[fill && flex.fill]}>
+          <Group
+            animateLayout={animateLayout}
+            padding={padding}
+            style={[fill && flex.fill]}>
             {children}
           </Group>
         ) : (
