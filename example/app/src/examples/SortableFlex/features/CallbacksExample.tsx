@@ -6,8 +6,8 @@ import Sortable, {
   type DragEndCallback,
   type DragMoveCallback,
   type DragStartCallback,
-  type SortableFlexDragEndCallback,
-  type OrderChangeCallback
+  type OrderChangeCallback,
+  type SortableFlexDragEndCallback
 } from 'react-native-sortables';
 
 import type { SwitchOptions } from '@/components';

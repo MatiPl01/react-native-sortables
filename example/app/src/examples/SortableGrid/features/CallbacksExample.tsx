@@ -7,6 +7,7 @@ import Sortable, {
   type DragMoveCallback,
   type DragStartCallback,
   type OrderChangeCallback,
+  type SortableGridDragEndCallback,
   type SortableGridRenderItem
 } from 'react-native-sortables';
 
@@ -22,7 +23,6 @@ import {
 } from '@/components';
 import { flex, spacing } from '@/theme';
 import { formatCallbackResult, getItems } from '@/utils';
-import { SortableGridDragEndCallback } from 'react-native-sortables';
 
 const DATA = getItems(8);
 const COLUMNS = 4;
