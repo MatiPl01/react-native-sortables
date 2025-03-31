@@ -22,7 +22,7 @@ const wrap = <C extends AnyFunction>(callback: C): WrappedCallback<C> => {
   return {
     call: ((...args: Parameters<C>) => {
       'worklet';
-      runOnJS(callback)(args);
+      runOnJS(callback)(...args);
     }) as C
   };
 };

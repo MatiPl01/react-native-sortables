@@ -6,7 +6,6 @@ export const orderItems = <I>(
   { fromIndex, keyToIndex, toIndex }: DragEndParams,
   skipIfNoChange?: boolean
 ): Array<I> => {
-  'worklet';
   if (skipIfNoChange && fromIndex === toIndex) {
     return data;
   }

@@ -21,6 +21,7 @@ export type {
   OrderChangeParams,
   OverDrag,
   ReorderTriggerOrigin,
+  SortableFlexDragEndCallback,
   SortableFlexDragEndParams,
   SortableFlexProps,
   SortableFlexStrategyFactory,

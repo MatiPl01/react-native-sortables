@@ -7,6 +7,7 @@ import Sortable, {
   type DragMoveCallback,
   type DragStartCallback,
   type OrderChangeCallback,
+  type SortableGridDragEndCallback,
   type SortableGridRenderItem
 } from 'react-native-sortables';
 
@@ -46,7 +47,7 @@ export default function CallbacksExample() {
     [text]
   );
 
-  const onDragEndJS = useCallback<DragEndCallback>(
+  const onDragEndJS = useCallback<SortableGridDragEndCallback<string>>(
     params => {
       text.value = formatCallbackResult('onDragEnd', params);
     },
