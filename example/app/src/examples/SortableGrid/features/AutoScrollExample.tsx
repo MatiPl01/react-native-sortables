@@ -177,7 +177,7 @@ function FewCards({ scrollableRef }: CardsSectionProps) {
 function SeparatorSection() {
   return (
     <Group style={styles.section} center>
-      <Text style={styles.title}>Between SortableGrid components</Text>
+      <Text style={styles.title}>Between Sortable.Grid components</Text>
     </Group>
   );
 }

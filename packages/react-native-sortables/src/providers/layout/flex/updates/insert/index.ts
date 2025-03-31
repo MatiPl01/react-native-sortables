@@ -42,9 +42,14 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
   rowGap,
   useFlexLayoutReaction
 }) => {
-  if (fixedItemKeys) {
-    throw error('Fixed items are not yet supported in flex layout');
-  }
+  useAnimatedReaction(
+    () => fixedItemKeys?.value,
+    fixedKeys => {
+      if (Object.keys(fixedKeys ?? {}).length > 0) {
+        throw error('Fixed items are not yet supported in flex layout');
+      }
+    }
+  );
 
   const isColumn = flexDirection.startsWith('column');
   const isReverse = flexDirection.endsWith('reverse');

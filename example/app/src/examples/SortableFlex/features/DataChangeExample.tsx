@@ -136,7 +136,7 @@ export default function DataChangeExample() {
             // @ts-expect-error - overflowY is needed for proper behavior on web
             style={[flex.fill, IS_WEB && { overflowY: 'scroll' }]}>
             <Group withMargin={false} bordered center>
-              <Text style={styles.title}>Above SortableFlex</Text>
+              <Text style={styles.title}>Above Sortable.Flex</Text>
             </Group>
 
             <Sortable.Flex
@@ -145,7 +145,6 @@ export default function DataChangeExample() {
               scrollableRef={scrollableRef}
               animateHeight
               hapticsEnabled
-              // itemsLayoutTransitionMode='reorder'
               onDragEnd={({ order }) => setData(order(data))}>
               {data.map(item => (
                 <FlexItem item={item} key={item} onRemoveItem={onRemoveItem} />
@@ -153,7 +152,7 @@ export default function DataChangeExample() {
             </Sortable.Flex>
 
             <Group withMargin={false} bordered center>
-              <Text style={styles.title}>Below SortableFlex</Text>
+              <Text style={styles.title}>Below Sortable.Flex</Text>
             </Group>
           </Animated.ScrollView>
         </Group>

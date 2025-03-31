@@ -74,20 +74,16 @@ function createStackNavigator(routes: Routes): React.ComponentType {
       []
     );
 
-    const content = (
-      <BottomNavBarHeightProvider>
-        <View style={styles.container}>
-          {navigatorComponent}
-          <BottomNavBar homeRouteName='Examples' routes={routes} />
-        </View>
-      </BottomNavBarHeightProvider>
+    return (
+      <Sortable.PortalProvider enabled={settings.activeItemPortalEnabled}>
+        <BottomNavBarHeightProvider>
+          <View style={styles.container}>
+            {navigatorComponent}
+            <BottomNavBar homeRouteName='Examples' routes={routes} />
+          </View>
+        </BottomNavBarHeightProvider>
+      </Sortable.PortalProvider>
     );
-
-    if (settings.activeItemPortalEnabled) {
-      return <Sortable.PortalProvider>{content}</Sortable.PortalProvider>;
-    }
-
-    return content;
   }
 
   return function WrappedNavigator() {

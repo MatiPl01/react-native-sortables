@@ -13,6 +13,14 @@ module.exports = {
         allowObjectStart: true,
         allowArrayStart: true
       }
+    ],
+    'perfectionist/sort-enums': 'off',
+    '@typescript-eslint/naming-convention': [
+      'error',
+      {
+        selector: 'enumMember',
+        format: ['UPPER_CASE']
+      }
     ]
   }
 };

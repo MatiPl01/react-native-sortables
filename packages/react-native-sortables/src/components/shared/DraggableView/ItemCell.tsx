@@ -13,23 +13,21 @@ import type {
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
 export type ItemCellProps = PropsWithChildren<{
-  decorationStyle: AnimatedStyleProp;
+  decorationStyles: AnimatedStyleProp;
   itemsOverridesStyle: AnimatedStyle<ViewStyle>;
   cellStyle: AnimatedStyleProp;
   onMeasure: MeasureCallback;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
   layout?: LayoutTransition;
-  itemStyle?: AnimatedStyleProp;
 }>;
 
 export default function ItemCell({
   cellStyle,
   children,
-  decorationStyle,
+  decorationStyles,
   entering,
   exiting,
-  itemStyle,
   itemsOverridesStyle,
   layout,
   onMeasure
@@ -39,7 +37,7 @@ export default function ItemCell({
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={[itemsOverridesStyle, decorationStyle, itemStyle]}
+        style={[itemsOverridesStyle, decorationStyles]}
         onLayout={({
           nativeEvent: {
             layout: { height, width }

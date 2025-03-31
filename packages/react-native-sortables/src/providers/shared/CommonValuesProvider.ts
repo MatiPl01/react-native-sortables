@@ -21,7 +21,7 @@ import type {
   Maybe,
   Vector
 } from '../../types';
-import { DragActivationState } from '../../types';
+import { AbsoluteLayoutState, DragActivationState } from '../../types';
 import { areArraysDifferent } from '../../utils';
 import { createProvider } from '../utils';
 
@@ -129,7 +129,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // OTHER
     const containerRef = useAnimatedRef<View>();
     const sortEnabled = useAnimatableValue(_sortEnabled);
-    const canSwitchToAbsoluteLayout = useSharedValue(false);
+    const absoluteLayoutState = useSharedValue(AbsoluteLayoutState.PENDING);
     const shouldAnimateLayout = useSharedValue(true);
     const animateLayoutOnReorderOnly = useDerivedValue(
       () => itemsLayoutTransitionMode === 'reorder',
@@ -149,6 +149,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
 
     return {
       value: {
+        absoluteLayoutState,
         activationAnimationDuration,
         activationState,
         activeAnimationProgress,
@@ -160,7 +161,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activeItemScale,
         activeItemShadowOpacity,
         animateLayoutOnReorderOnly,
-        canSwitchToAbsoluteLayout,
         componentId,
         containerHeight,
         containerRef,

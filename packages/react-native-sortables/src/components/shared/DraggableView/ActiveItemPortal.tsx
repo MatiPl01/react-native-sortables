@@ -1,73 +1,50 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { useEffect } from 'react';
-import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import {
-  runOnJS,
-  useAnimatedReaction,
-  useAnimatedStyle,
-  useSharedValue
-} from 'react-native-reanimated';
+import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
-import { IS_WEB } from '../../../constants';
-import { usePortalContext, useTeleportedItemId } from '../../../providers';
-import type { AnimatedStyleProp, MeasureCallback } from '../../../types';
-
-const TELEPORTED_ITEM_STYLE: ViewStyle = {
-  maxHeight: 0,
-  overflow: 'hidden'
-};
-
-const NOT_TELEPORTED_ITEM_STYLE: ViewStyle = {
-  maxHeight: IS_WEB ? 9999 : 'auto', // 'auto' doesn't trigger onLayout on web
-  overflow: 'visible'
-};
+import { usePortalContext } from '../../../providers';
+import { ItemPortalState } from '../../../types';
 
 type ActiveItemPortalProps = PropsWithChildren<{
-  itemKey: string;
+  teleportedItemId: string;
   activationAnimationProgress: SharedValue<number>;
-  onMeasureItem: MeasureCallback;
-  renderItemCell: (
-    onMeasure: MeasureCallback,
-    itemStyle?: AnimatedStyleProp
-  ) => ReactNode;
+  portalState: SharedValue<ItemPortalState>;
   renderTeleportedItemCell: () => ReactNode;
 }>;
 
 export default function ActiveItemPortal({
   activationAnimationProgress,
   children,
-  itemKey: key,
-  onMeasureItem,
-  renderItemCell,
-  renderTeleportedItemCell
+  portalState,
+  renderTeleportedItemCell,
+  teleportedItemId
 }: ActiveItemPortalProps) {
-  const teleportedItemId = useTeleportedItemId(key);
   const { subscribe, teleport } = usePortalContext()!;
-  const canEnableTeleport = useSharedValue(true);
-  const isTeleported = useSharedValue(false);
 
   useEffect(() => {
     const unsubscribe = subscribe(teleportedItemId, teleported => {
-      isTeleported.value = teleported;
+      if (teleported) {
+        portalState.value = ItemPortalState.TELEPORTED;
+      }
     });
 
     return () => {
       unsubscribe();
       teleport(teleportedItemId, null);
     };
-  }, [isTeleported, subscribe, teleport, teleportedItemId]);
+  }, [portalState, subscribe, teleport, teleportedItemId]);
 
   useEffect(() => {
-    if (isTeleported.value) {
+    if (portalState.value === ItemPortalState.TELEPORTED) {
       // Renders a component in the portal outlet
       teleport(teleportedItemId, renderTeleportedItemCell());
     }
   }, [
+    portalState,
     teleportedItemId,
     renderTeleportedItemCell,
     teleport,
-    isTeleported,
     children
   ]);
 
@@ -75,36 +52,20 @@ export default function ActiveItemPortal({
     teleport(teleportedItemId, renderTeleportedItemCell());
   };
 
-  const onMeasure = (width: number, height: number) => {
-    if (canEnableTeleport.value) {
-      onMeasureItem(width, height);
-    } else if (!isTeleported.value && height > 0 && width > 0) {
-      // canEnableTeleport is false when the item is already teleported
-      // We want to use this instead of isTeleported as isTeleported is set
-      // to false before to make the not teleported item back visible
-      teleport(teleportedItemId, null);
-      canEnableTeleport.value = true;
-    }
-  };
-
-  const animatedItemStyle = useAnimatedStyle(() =>
-    isTeleported.value ? TELEPORTED_ITEM_STYLE : NOT_TELEPORTED_ITEM_STYLE
-  );
-
   useAnimatedReaction(
     () => activationAnimationProgress.value,
     progress => {
-      if (progress > 0 && canEnableTeleport.value) {
-        canEnableTeleport.value = false;
+      if (progress > 0 && portalState.value === ItemPortalState.IDLE) {
+        portalState.value = ItemPortalState.TELEPORTING;
         runOnJS(enableTeleport)();
-      } else if (progress === 0) {
-        isTeleported.value = false;
+      } else if (
+        progress === 0 &&
+        portalState.value === ItemPortalState.TELEPORTED
+      ) {
+        portalState.value = ItemPortalState.EXITING;
       }
     }
   );
 
-  // Renders a component within the sortable container
-  // (it cannot be unmounted as it is responsible for gesture handling,
-  // we can just remove its children when they are already teleported)
-  return renderItemCell(onMeasure, animatedItemStyle);
+  return null;
 }

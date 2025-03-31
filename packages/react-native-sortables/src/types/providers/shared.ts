@@ -20,7 +20,11 @@ import type {
   ItemDragSettings,
   ReorderTriggerOrigin
 } from '../props/shared';
-import type { DragActivationState } from '../state';
+import type {
+  AbsoluteLayoutState,
+  DragActivationState,
+  LayerState
+} from '../state';
 import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
 
 // COMMON VALUES
@@ -65,7 +69,7 @@ export type CommonValuesContextType = {
   // OTHER
   containerRef: AnimatedRef<View>;
   sortEnabled: SharedValue<boolean>;
-  canSwitchToAbsoluteLayout: SharedValue<boolean>;
+  absoluteLayoutState: SharedValue<AbsoluteLayoutState>;
   shouldAnimateLayout: SharedValue<boolean>; // used only on web
   animateLayoutOnReorderOnly: SharedValue<boolean>;
   customHandle: boolean;
@@ -78,6 +82,7 @@ export type CommonValuesContextType = {
 // MEASUREMENTS
 
 export type MeasurementsContextType = {
+  measurementsContainerRef: AnimatedRef<View>;
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   removeItemMeasurements: (key: string) => void;
@@ -126,12 +131,6 @@ export type ItemContextType = {
 };
 
 // LAYER
-
-export enum LayerState {
-  Focused = 2,
-  Idle = 0,
-  Intermediate = 1
-}
 
 export type LayerContextType = {
   updateLayer: (state: LayerState) => void;

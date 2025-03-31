@@ -2,11 +2,14 @@
 
 import { useRef } from 'react';
 import type { TextInputProps, TextProps as RNTextProps } from 'react-native';
-import { ScrollView, StyleSheet, TextInput } from 'react-native';
+import { StyleSheet, TextInput } from 'react-native';
 import type { AnimatedProps, SharedValue } from 'react-native-reanimated';
 import Animated, {
+  LinearTransition,
+  scrollTo,
   useAnimatedProps,
   useAnimatedReaction,
+  useAnimatedRef,
   useSharedValue
 } from 'react-native-reanimated';
 
@@ -22,6 +25,7 @@ interface TextProps extends Omit<TextInputProps, 'style' | 'value'> {
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const AnimatedText = (props: TextProps) => {
+  const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
   const { style, text, ...rest } = props;
 
   const textInternal = useSharedValue('');
@@ -30,6 +34,7 @@ const AnimatedText = (props: TextProps) => {
   useAnimatedReaction(
     () => text.value,
     newText => {
+      scrollTo(scrollViewRef, 0, 0, false);
       textInternal.value = newText;
     }
   );
@@ -44,16 +49,20 @@ const AnimatedText = (props: TextProps) => {
   );
 
   return (
-    <ScrollView contentContainerStyle={flex.fill} style={flex.fill}>
+    <Animated.ScrollView
+      contentContainerStyle={flex.fill}
+      ref={scrollViewRef}
+      style={flex.fill}>
       <AnimatedTextInput
         editable={false}
+        layout={LinearTransition}
         ref={textInputRef}
         style={[styles.baseStyle, style]}
         underlineColorAndroid='transparent'
         {...rest}
         {...{ animatedProps }}
       />
-    </ScrollView>
+    </Animated.ScrollView>
   );
 };
 

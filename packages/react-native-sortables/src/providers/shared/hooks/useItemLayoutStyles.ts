@@ -10,6 +10,7 @@ import {
 
 import { EMPTY_OBJECT } from '../../../constants';
 import type { AnimatedStyleProp, Vector } from '../../../types';
+import { AbsoluteLayoutState } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
@@ -34,10 +35,10 @@ export default function useItemLayoutStyles(
   activationAnimationProgress: SharedValue<number>
 ): AnimatedStyleProp {
   const {
+    absoluteLayoutState,
     activeItemKey,
     activeItemPosition,
     animateLayoutOnReorderOnly,
-    canSwitchToAbsoluteLayout,
     itemPositions
   } = useCommonValuesContext();
 
@@ -53,12 +54,12 @@ export default function useItemLayoutStyles(
   useAnimatedReaction(
     () => ({
       activationProgress: activationAnimationProgress.value,
-      canSwitchToAbsolute: canSwitchToAbsoluteLayout.value,
+      canApply: absoluteLayoutState.value === AbsoluteLayoutState.COMPLETE,
       isActive: activeItemKey.value === key,
       position: itemPositions.value[key]
     }),
-    ({ activationProgress, canSwitchToAbsolute, isActive, position }) => {
-      if (!canSwitchToAbsolute) {
+    ({ activationProgress, canApply, isActive, position }) => {
+      if (!canApply) {
         // This affects all items rendered during the initial render when
         // the absolute layout is not yet enabled. All of these items have
         // no translation at the beginning and layoutX and layoutY are
@@ -142,7 +143,7 @@ export default function useItemLayoutStyles(
 
   const animatedTranslationStyle = useAnimatedStyle(() => {
     if (
-      !canSwitchToAbsoluteLayout.value &&
+      absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE &&
       (layoutX.value === null || layoutY.value === null)
     ) {
       return RELATIVE_STYLE;
@@ -164,7 +165,7 @@ export default function useItemLayoutStyles(
   });
 
   const animatedLayoutStyle = useAnimatedStyle(() => {
-    if (!canSwitchToAbsoluteLayout.value) {
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
       return EMPTY_OBJECT;
     }
 

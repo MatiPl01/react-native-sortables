@@ -54,12 +54,12 @@ function SortableFlex(props: SortableFlexProps) {
       : { height: false, width: width === undefined };
   }, [flexWrap, flexDirection, height, width]);
 
-  const onDragEnd = useDragEndHandler(_onDragEnd, params => ({
-    ...params,
-    order<I>(data: Array<I>) {
-      return orderItems(data, itemKeys, params, true);
-    }
-  }));
+  const onDragEnd = useDragEndHandler(_onDragEnd, {
+    order: params =>
+      function <I>(data: Array<I>) {
+        return orderItems(data, itemKeys, params, true);
+      }
+  });
 
   return (
     <SharedProvider

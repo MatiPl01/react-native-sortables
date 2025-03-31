@@ -6,4 +6,5 @@ export {
 } from './SelectListDropdown';
 export { default as SimpleDropdown } from './SimpleDropdown';
 export { default as Slider } from './Slider';
+export { default as Switch, type SwitchOptions } from './Switch';
 export { default as TabSelector } from './TabSelector';

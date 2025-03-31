@@ -1,5 +1,6 @@
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import type { TextStyle } from 'react-native';
 import { Pressable, StyleSheet, Text } from 'react-native';
 import Animated, {
   Easing,
@@ -15,10 +16,16 @@ import { colors, iconSizes, radius, sizes, spacing, text } from '@/theme';
 type CheckboxProps = {
   selected: boolean;
   label?: string;
+  labelStyle?: TextStyle;
   onChange: (selected: boolean) => void;
 };
 
-export default function CheckBox({ label, onChange, selected }: CheckboxProps) {
+export default function CheckBox({
+  label,
+  labelStyle = text.label3,
+  onChange,
+  selected
+}: CheckboxProps) {
   const backgroundAnimationProgress = useDerivedValue(() =>
     withTiming(+selected, { duration: 150 })
   );
@@ -54,7 +61,7 @@ export default function CheckBox({ label, onChange, selected }: CheckboxProps) {
             />
           </Animated.View>
         </Animated.View>
-        {label && <Text style={text.label3}>{label}</Text>}
+        {label && <Text style={labelStyle}>{label}</Text>}
       </Pressable>
     </Animated.View>
   );

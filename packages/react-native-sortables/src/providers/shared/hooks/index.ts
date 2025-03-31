@@ -5,5 +5,4 @@ export { default as useItemPanGesture } from './useItemPanGesture';
 export { default as useItemZIndex } from './useItemZIndex';
 export { default as useLayoutDebugRects } from './useLayoutDebugRects';
 export { default as useOrderUpdater } from './useOrderUpdater';
-export { default as useTeleportedItemId } from './useTeleportedItemId';
 export { default as useTeleportedItemStyles } from './useTeleportedItemStyles';

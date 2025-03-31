@@ -65,7 +65,7 @@ export default function DebugExample() {
             ref={scrollableRef}
             style={flex.fill}>
             <Group style={styles.boundGroup} withMargin={false} bordered center>
-              <Text style={styles.title}>Above SortableFlex</Text>
+              <Text style={styles.title}>Above Sortable.Flex</Text>
             </Group>
 
             <Sortable.Flex
@@ -81,7 +81,7 @@ export default function DebugExample() {
             </Sortable.Flex>
 
             <Group style={styles.boundGroup} withMargin={false} bordered center>
-              <Text style={styles.title}>Below SortableFlex</Text>
+              <Text style={styles.title}>Below Sortable.Flex</Text>
             </Group>
           </Animated.ScrollView>
         </Group>
