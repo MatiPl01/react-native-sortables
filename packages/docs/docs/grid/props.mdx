@@ -638,6 +638,31 @@ type OrderChangeParams = {
 
 ---
 
+### onDragMove
+
+Called when the drag gesture moves.
+
+| type               | default | required |
+| ------------------ | ------- | -------- |
+| `DragMoveCallback` | NO      | NO       |
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type DragMoveCallback = (params: DragMoveParams) => void;
+
+type DragMoveParams = {
+  key: string;
+  fromIndex: number;
+  touchData: TouchData;
+};
+```
+
+</details>
+
+---
+
 ## Other Settings
 
 ### strategy
