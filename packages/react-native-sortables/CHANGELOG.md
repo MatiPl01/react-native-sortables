@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.5.0...v1.5.1) (2025-04-01)
+
+
+### Bug Fixes
+
+* Remove react-native-builder-bob patch ([#339](https://github.com/MatiPl01/react-native-sortables/issues/339)) ([32ae8c6](https://github.com/MatiPl01/react-native-sortables/commit/32ae8c63753dc1dfc0404439d929afb84703bf0a))
+
 # [1.5.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.4.0...v1.5.0) (2025-03-31)
 
 
