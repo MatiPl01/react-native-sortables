@@ -3,9 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import Animated, { FadeOut } from 'react-native-reanimated';
 
 import { spacing, text } from '@/theme';
-
-import type { SwitchOptions } from '../inputs';
-import { CheckBox, Switch } from '../inputs';
+import CheckBox from '../inputs/CheckBox';
+import Switch, { SwitchOptions } from '../inputs/Switch';
 
 type AnySettings = Record<string, SwitchOptions>;
 
