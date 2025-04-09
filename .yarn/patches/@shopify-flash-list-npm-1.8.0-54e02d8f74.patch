@@ -1,5 +1,5 @@
 diff --git a/package.json b/package.json
-index 0ca6e73a4ff68b4a36431ff81c92f3a2556b622b..7969dd1d42881e7e91a20b6248cdb7a6ae9455e8 100644
+index 8b58f544c6b3af49d3d21e7eb961f05e54a5d473..de27d901486465b3b9a877f63f507193dffe7e49 100644
 --- a/package.json
 +++ b/package.json
 @@ -26,6 +26,7 @@
@@ -11,7 +11,7 @@ index 0ca6e73a4ff68b4a36431ff81c92f3a2556b622b..7969dd1d42881e7e91a20b6248cdb7a6
    "scripts": {
      "up": "bundle install && yarn fixture:rn:up && yarn e2e:up && yarn build",
 diff --git a/src/FlashList.tsx b/src/FlashList.tsx
-index 0e9f071a53d113e85f3099ccf239d1f3d06361b6..0d8da0f444a5cc291621732369e71e0b693b4ff3 100644
+index 05cf1af2809c289807efe4386f4a28b9b04c517c..6a5904793207f8ae5df659c2c59b2f5b60d95cfc 100644
 --- a/src/FlashList.tsx
 +++ b/src/FlashList.tsx
 @@ -4,6 +4,7 @@ import {
