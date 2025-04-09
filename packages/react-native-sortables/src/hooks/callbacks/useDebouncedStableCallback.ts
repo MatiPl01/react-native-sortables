@@ -7,7 +7,7 @@ export default function useDebouncedStableCallback<C extends AnyFunction>(
   callback: C,
   delay: number = 100
 ) {
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   return useStableCallback((...args: Parameters<C>) => {
     if (timeoutRef.current) {
