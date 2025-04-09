@@ -84,7 +84,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.24.7":
+"@babel/core@npm:^7.24.7, @babel/core@npm:^7.26.10":
   version: 7.26.10
   resolution: "@babel/core@npm:7.26.10"
   dependencies:
@@ -8298,7 +8298,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "example-app@workspace:example/app"
   dependencies:
-    "@babel/core": "npm:^7.25.2"
+    "@babel/core": "npm:^7.26.10"
     "@babel/preset-env": "npm:^7.25.3"
     "@babel/runtime": "npm:^7.25.0"
     "@fortawesome/fontawesome-svg-core": "npm:^6.5.2"
@@ -8341,7 +8341,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "example-expo@workspace:example/expo"
   dependencies:
-    "@babel/core": "npm:^7.25.2"
+    "@babel/core": "npm:^7.26.10"
     "@types/react": "npm:~18.3.12"
     expo: "npm:~52.0.42"
     expo-status-bar: "npm:~2.0.1"
@@ -15387,7 +15387,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-native-sortables@workspace:packages/react-native-sortables"
   dependencies:
-    "@babel/core": "npm:^7.25.2"
+    "@babel/core": "npm:^7.26.10"
     "@babel/preset-env": "npm:^7.25.3"
     "@babel/runtime": "npm:^7.25.0"
     "@semantic-release/changelog": "npm:^6.0.3"
