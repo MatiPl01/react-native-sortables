@@ -376,8 +376,6 @@ export const calculateLayout = ({
     return null;
   }
 
-  console.log(groupingResult);
-
   const { crossAxisGroupSizes, groups } = groupingResult;
   if (flexWrap === 'wrap-reverse') {
     reverseArray(groups);
