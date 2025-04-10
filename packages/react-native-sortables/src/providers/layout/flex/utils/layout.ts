@@ -42,10 +42,10 @@ const createGroups = (
     const mainItemDimension = dimensions[axisDimensions.main];
     const crossItemDimension = dimensions[axisDimensions.cross];
 
-    if (
-      totalGroupItemsMainSize + currentGroup.length * gap + mainItemDimension >
-      groupMainSizeLimit
-    ) {
+    const currentTotalSize =
+      totalGroupItemsMainSize + currentGroup.length * gap + mainItemDimension;
+
+    if (currentTotalSize > groupMainSizeLimit + 0.1) {
       groups.push(currentGroup);
       crossAxisGroupSizes.push(groupCrossSize);
       currentGroup = [];
@@ -375,6 +375,8 @@ export const calculateLayout = ({
   if (!groupingResult) {
     return null;
   }
+
+  console.log(groupingResult);
 
   const { crossAxisGroupSizes, groups } = groupingResult;
   if (flexWrap === 'wrap-reverse') {
