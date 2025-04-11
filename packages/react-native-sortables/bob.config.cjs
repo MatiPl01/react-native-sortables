@@ -6,7 +6,6 @@ module.exports = {
     '**/*.test.{js,jsx,ts,tsx}'
   ],
   targets: [
-    ['commonjs', { configFile: true }],
     ['module', { configFile: true }],
     ['typescript', { project: 'tsconfig.build.json' }]
   ]
