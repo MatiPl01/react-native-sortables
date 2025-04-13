@@ -41,7 +41,7 @@ body:
       label: Code snippet, Snack or GitHub repository link
       description: |
         Provide a minimal reproduction example code snippet that shows the issue, a link to a Snack or a link to a GitHub repository that reproduces the issue. This is very important to be able to help you.
-        Don't include a part of your project code that depend on other files, packages and data requested from the server because I won't be able to run it.
+        Don't include a part of your project code that depends on other files, packages and data requested from the server because I won't be able to run it.
         Issues that don't include a minimal reproduction will be likely marked as invalid and closed.
       placeholder: Link to a Snack or a GitHub repository
     validations:
