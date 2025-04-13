@@ -15414,6 +15414,7 @@ __metadata:
     react-test-renderer: "npm:19.0.0"
     semantic-release: "npm:^24.0.0"
     semantic-release-yarn: "npm:^3.0.2"
+    syncpack: "npm:^12.3.3"
     typescript: "npm:^5.8.2"
   peerDependencies:
     react: "*"
