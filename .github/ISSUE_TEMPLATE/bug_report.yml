@@ -1,0 +1,139 @@
+name: Bug Report
+description: File a bug report.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+        Before you continue, please make sure to check whether there are similar issues in the repository
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Required information
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a clear, concise and descriptive explanation of what the bug is. Include screenshots or a video if needed. Explain what is the expected behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide a detailed list of steps that reproduce the issue. Describe what to do from starting the example to the point where the bug occurs.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: input
+    id: repro
+    attributes:
+      label: Code snippet, Snack or GitHub repository link
+      description: |
+        Provide a minimal reproduction example code snippet that shows the issue, a link to a Snack or a link to a GitHub repository that reproduces the issue. This is very important to be able to help you.
+        Don't include a part of your project code that depend on other files, packages and data requested from the server because I won't be able to run it.
+        Issues that don't include a minimal reproduction will be likely marked as invalid and closed.
+      placeholder: Link to a Snack or a GitHub repository
+    validations:
+      required: true
+
+  - type: input
+    id: sortables-version
+    attributes:
+      label: React Native Sortables version
+      description: What version of react-native-sortables are you using?
+    validations:
+      required: true
+
+  - type: input
+    id: reanimated-version
+    attributes:
+      label: Reanimated version
+      description: What version of react-native-reanimated are you using?
+    validations:
+      required: true
+
+  - type: input
+    id: gesture-handler-version
+    attributes:
+      label: React Native Gesture Handler version
+      description: What version of react-native-gesture-handler are you using?
+    validations:
+      required: true
+
+  - type: input
+    id: react-native-version
+    attributes:
+      label: React Native version
+      description: What version of react-native are you using?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Platforms
+      description: On which platform you noticed the bug?
+      multiple: true
+      options:
+        - Android
+        - iOS
+        - Web
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Additional information
+
+        It is not required but it might be helpful to reproduce the issue.
+
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: Architecture
+      description: What React Native architecture your application is running on? Currently, the default architecture on React Native is Fabric so if you haven't changed it in your application and use at least React Native 0.76, you are using Fabric.
+      options:
+        - Paper (Old Architecture)
+        - Fabric (New Architecture)
+
+  - type: dropdown
+    id: workflow
+    attributes:
+      label: Workflow
+      description: How is your application managed?
+      options:
+        - React Native Bare Workflow
+        - Expo Go
+        - Expo Dev Client
+
+  - type: dropdown
+    id: emulator
+    attributes:
+      label: Device
+      description: How are you running your application?
+      options:
+        - iOS simulator
+        - Android emulator
+        - Real device
+
+  - type: dropdown
+    id: acknowledgements
+    attributes:
+      label: Acknowledgements
+      description: I searched for similar issues in the repository.
+      options:
+        - "Yes"
+    validations:
+      required: true
