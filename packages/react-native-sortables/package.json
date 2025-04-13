@@ -31,6 +31,7 @@
     "react-test-renderer": "19.0.0",
     "semantic-release": "^24.0.0",
     "semantic-release-yarn": "^3.0.2",
+    "syncpack": "^12.3.3",
     "typescript": "^5.8.2"
   },
   "files": [
