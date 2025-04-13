@@ -64,7 +64,7 @@
       "bash -c tsc --noEmit"
     ]
   },
-  "main": "dist/commonjs/index",
+  "main": "dist/module/index",
   "module": "dist/module/index",
   "optionalDependencies": {
     "react-native-haptic-feedback": ">=2.0.0"
