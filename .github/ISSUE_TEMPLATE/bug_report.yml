@@ -1,7 +1,7 @@
 name: Bug Report
 description: File a bug report.
-title: "[Bug]: "
-labels: ["bug"]
+title: '[Bug]: '
+labels: ['bug']
 body:
   - type: markdown
     attributes:
@@ -134,6 +134,6 @@ body:
       label: Acknowledgements
       description: I searched for similar issues in the repository.
       options:
-        - "Yes"
+        - 'Yes'
     validations:
       required: true
