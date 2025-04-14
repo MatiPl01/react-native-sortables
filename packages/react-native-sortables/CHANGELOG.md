@@ -1,3 +1,11 @@
+## [1.5.2](https://github.com/MatiPl01/react-native-sortables/compare/v1.5.1...v1.5.2) (2025-04-14)
+
+
+### Bug Fixes
+
+* Numeric precision error in flex grouping ([#347](https://github.com/MatiPl01/react-native-sortables/issues/347)) ([b9cfd65](https://github.com/MatiPl01/react-native-sortables/commit/b9cfd65e13852ba6cf574aef7c37ffa10643afd8)), closes [#f3f4f6](https://github.com/MatiPl01/react-native-sortables/issues/f3f4f6) [#1f2021](https://github.com/MatiPl01/react-native-sortables/issues/1f2021) [#007](https://github.com/MatiPl01/react-native-sortables/issues/007)
+* Sortables not working on web when commonjs format is used ([#348](https://github.com/MatiPl01/react-native-sortables/issues/348)) ([50710a1](https://github.com/MatiPl01/react-native-sortables/commit/50710a19c7b249880e459737fc649c36b6023da5))
+
 ## [1.5.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.5.0...v1.5.1) (2025-04-01)
 
 
