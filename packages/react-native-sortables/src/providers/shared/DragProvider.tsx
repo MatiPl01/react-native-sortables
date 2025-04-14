@@ -214,6 +214,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const containerMeasurements = measure(containerRef);
       const itemPosition = itemPositions.value[key];
 
+      console.log('containerMeasurements', containerMeasurements);
+
       if (!containerMeasurements || !itemPosition) {
         fail();
         return;

@@ -33,7 +33,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "reactNativeSortableFabricTests.xctest"
+               BuildableName = "reactNativeSortableFabricTests"
                BlueprintName = "reactNativeSortableFabricTests"
                ReferencedContainer = "container:reactNativeSortableFabric.xcodeproj">
             </BuildableReference>
