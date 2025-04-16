@@ -8328,7 +8328,7 @@ __metadata:
     react-native: "npm:0.79.0"
     react-native-gesture-handler: "npm:2.25.0"
     react-native-haptic-feedback: "npm:^2.3.3"
-    react-native-reanimated: "patch:react-native-reanimated@npm%3A3.17.3#~/.yarn/patches/react-native-reanimated-npm-3.17.3-81013de197.patch"
+    react-native-reanimated: "patch:react-native-reanimated@npm%3A3.17.4#~/.yarn/patches/react-native-reanimated-npm-3.17.4-d7caed9b50.patch"
     react-native-safe-area-context: "npm:5.3.0"
     react-native-screens: "npm:4.10.0"
     react-native-sortables: "workspace:*"
@@ -8348,7 +8348,7 @@ __metadata:
     react: "npm:18.3.1"
     react-native: "npm:0.76.9"
     react-native-gesture-handler: "npm:~2.20.2"
-    react-native-reanimated: "npm:~3.16.1"
+    react-native-reanimated: "patch:react-native-reanimated@npm%3A3.17.4#~/.yarn/patches/react-native-reanimated-npm-3.17.4-d7caed9b50.patch"
     typescript: "npm:^5.8.2"
   languageName: unknown
   linkType: soft
@@ -15270,9 +15270,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.17.3":
-  version: 3.17.3
-  resolution: "react-native-reanimated@npm:3.17.3"
+"react-native-reanimated@npm:3.17.4":
+  version: 3.17.4
+  resolution: "react-native-reanimated@npm:3.17.4"
   dependencies:
     "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
     "@babel/plugin-transform-class-properties": "npm:^7.0.0-0"
@@ -15290,36 +15290,13 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10c0/63dcd555fdb117d44bd42bb7a959b6e7db3f632af8aa0f1417b8557946f59db58062a8b481c0db32064739bad8c3e36ff10dc2858e9b26884abe9578b7c08ee7
+  checksum: 10c0/a86e0886acec76367b14cb3026de09a5c83b2845349b4c643b2a95eb56b9e477a3c6b5956707457c794dde3dc06e47d451c55d94188533abec04451c2c378160
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:~3.16.1":
-  version: 3.16.7
-  resolution: "react-native-reanimated@npm:3.16.7"
-  dependencies:
-    "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
-    "@babel/plugin-transform-class-properties": "npm:^7.0.0-0"
-    "@babel/plugin-transform-classes": "npm:^7.0.0-0"
-    "@babel/plugin-transform-nullish-coalescing-operator": "npm:^7.0.0-0"
-    "@babel/plugin-transform-optional-chaining": "npm:^7.0.0-0"
-    "@babel/plugin-transform-shorthand-properties": "npm:^7.0.0-0"
-    "@babel/plugin-transform-template-literals": "npm:^7.0.0-0"
-    "@babel/plugin-transform-unicode-regex": "npm:^7.0.0-0"
-    "@babel/preset-typescript": "npm:^7.16.7"
-    convert-source-map: "npm:^2.0.0"
-    invariant: "npm:^2.2.4"
-  peerDependencies:
-    "@babel/core": ^7.0.0-0
-    react: "*"
-    react-native: "*"
-  checksum: 10c0/007cbec677d036e8d2c0744dfff52282ddfb9a89bb3eee82e7eaebcf731b07505e241af04ac87a38da038a18e380b32ec8a55263d1bb8559274d1c077b0b1d25
-  languageName: node
-  linkType: hard
-
-"react-native-reanimated@patch:react-native-reanimated@npm%3A3.17.3#~/.yarn/patches/react-native-reanimated-npm-3.17.3-81013de197.patch":
-  version: 3.17.3
-  resolution: "react-native-reanimated@patch:react-native-reanimated@npm%3A3.17.3#~/.yarn/patches/react-native-reanimated-npm-3.17.3-81013de197.patch::version=3.17.3&hash=4be7b0"
+"react-native-reanimated@patch:react-native-reanimated@npm%3A3.17.4#~/.yarn/patches/react-native-reanimated-npm-3.17.4-d7caed9b50.patch":
+  version: 3.17.4
+  resolution: "react-native-reanimated@patch:react-native-reanimated@npm%3A3.17.4#~/.yarn/patches/react-native-reanimated-npm-3.17.4-d7caed9b50.patch::version=3.17.4&hash=4be7b0"
   dependencies:
     "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
     "@babel/plugin-transform-class-properties": "npm:^7.0.0-0"
@@ -15337,7 +15314,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10c0/cebb37afdf218cabe1659cb320f0f1f37b0b835bddbc1e999cfbc9a667ee04d27fbdd50bb8bf63c1f9b0a8b80aa59cf9b4801188057e4a8c474faaf803974bca
+  checksum: 10c0/6c1b3f1302398d74f3fab791f437b2f438234708fc1f11a22795a3a5878a84d0754f346b423bb6e51ad6ac6ab12fc06ee533c67d1e04df5ccf4cc8d8f96af8b0
   languageName: node
   linkType: hard
 
@@ -15410,7 +15387,7 @@ __metadata:
     react-native-builder-bob: "npm:0.39.0"
     react-native-gesture-handler: "npm:2.25.0"
     react-native-haptic-feedback: "npm:>=2.0.0"
-    react-native-reanimated: "patch:react-native-reanimated@npm%3A3.17.3#~/.yarn/patches/react-native-reanimated-npm-3.17.3-81013de197.patch"
+    react-native-reanimated: "patch:react-native-reanimated@npm%3A3.17.4#~/.yarn/patches/react-native-reanimated-npm-3.17.4-d7caed9b50.patch"
     react-test-renderer: "npm:19.0.0"
     semantic-release: "npm:^24.0.0"
     semantic-release-yarn: "npm:^3.0.2"
