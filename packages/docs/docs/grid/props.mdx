@@ -456,11 +456,17 @@ Component to use as the drop indicator. It gives a **full control** over the dro
 
 ```tsx
 type DropIndicatorComponentProps = {
-  activationProgress: SharedValue<number>;
-  touchedItemKey: SharedValue<null | string>;
+  /** Progress of the active item animation (from 0 to 1) */
+  activeAnimationProgress: SharedValue<number>;
+  /** Key of the currently dragged item, or null if no item is being dragged */
+  activeItemKey: SharedValue<null | string>;
+  /** Current index where the dragged item would be dropped */
   dropIndex: SharedValue<number>;
+  /** Current position where the item would be dropped */
   dropPosition: SharedValue<Vector>;
+  /** Array of item keys in their current order */
   orderedItemKeys: SharedValue<Array<string>>;
+  /** Style to be applied to the drop indicator */
   style: ViewStyle;
 };
 ```
@@ -704,6 +710,12 @@ type OrderChangeParams = {
 
 </details>
 
+:::warning
+
+**Don't use** this callback to update items order in state because it's called **frequently** during dragging. Use `onDragEnd` for **state updates** instead.
+
+:::
+
 ---
 
 ### onDragMove
@@ -766,6 +778,16 @@ To use built-in haptics, you have to install `react-native-haptic-feedback` pack
 You can also use any other haptics library but you will have to trigger haptics manually when callbacks are called. See the [Callbacks](#callbacks) section for more details.
 
 :::
+
+---
+
+### overflow
+
+Controls if the overflowing content should be clipped or visible. Applies only when no item is active.
+
+| type                    | default    | required |
+| ----------------------- | ---------- | -------- |
+| `'hidden' \| 'visible'` | `'hidden'` | NO       |
 
 ---
 
