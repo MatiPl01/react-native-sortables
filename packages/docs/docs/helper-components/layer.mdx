@@ -1,6 +1,6 @@
 ---
-sidebar_position: 1
-description: ''
+sidebar_position: 3
+description: 'Component managing zIndex when an item is being dragged'
 ---
 
 # Layer
@@ -31,19 +31,15 @@ The **Sortable Layer** component should be used only when necessary, i.e. if you
 ```tsx
 import Sortable from 'react-native-sortables';
 
-function MyComponent() {
-  return (
-    // ... other components
-    <Sortable.Layer>
-      {/* ... other components */}
-      <Sortable.Grid // or Sortable.Flex
-      // ... sortable grid props
-      />
-      {/* ... other components */}
-    </Sortable.Layer>
-    // ... other components
-  );
-}
+// ... other components
+<Sortable.Layer>
+  {/* ... other components */}
+  <Sortable.Grid // or Sortable.Flex
+  // ... sortable grid props
+  />
+  {/* ... other components */}
+</Sortable.Layer>;
+// ... other components
 ```
 
 ## Props
