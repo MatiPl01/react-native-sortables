@@ -64,6 +64,12 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   if (!isVertical && !rowHeight) {
     throw error('rowHeight is required for horizontal Sortable.Grid');
   }
+  if (columns !== undefined && columns < 1) {
+    throw error('columns must be greater than 0');
+  }
+  if (rows !== undefined && rows < 1) {
+    throw error('rows must be greater than 0');
+  }
 
   const columnGapValue = useAnimatableValue(columnGap);
   const rowGapValue = useAnimatableValue(rowGap);
