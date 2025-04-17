@@ -25,10 +25,10 @@ export default function OrderingStrategyExample() {
             columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
+            dimensionsAnimationType='worklet'
             renderItem={renderItem}
             rowGap={spacing.xs}
             strategy='insert'
-            dimensionsAnimationType='worklet'
           />
         </Section>
 
@@ -39,10 +39,10 @@ export default function OrderingStrategyExample() {
             columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
+            dimensionsAnimationType='worklet'
             renderItem={renderItem}
             rowGap={spacing.xs}
             strategy='swap'
-            dimensionsAnimationType='worklet'
           />
         </Section>
       </Stagger>

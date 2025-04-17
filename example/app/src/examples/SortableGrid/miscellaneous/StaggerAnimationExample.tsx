@@ -67,10 +67,10 @@ export default function StaggerAnimationExample() {
         columnGap={10}
         columns={3}
         data={data}
+        dimensionsAnimationType='worklet'
         overflow='visible'
         renderItem={renderItem}
         rowGap={10}
-        dimensionsAnimationType='worklet'
         onDragEnd={handleDragEnd}
       />
 

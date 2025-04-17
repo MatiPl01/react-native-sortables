@@ -141,9 +141,9 @@ export default function DataChangeExample() {
 
             <Sortable.Flex
               columnGap={spacing.sm}
+              dimensionsAnimationType='worklet'
               rowGap={spacing.xs}
               scrollableRef={scrollableRef}
-              dimensionsAnimationType='worklet'
               hapticsEnabled
               onDragEnd={({ order }) => setData(order(data))}>
               {data.map(item => (

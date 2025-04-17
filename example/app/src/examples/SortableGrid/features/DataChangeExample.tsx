@@ -149,10 +149,10 @@ export default function DataChangeExample() {
               columnGap={spacing.sm}
               columns={COLUMNS}
               data={data}
+              dimensionsAnimationType='worklet'
               renderItem={renderItem}
               rowGap={spacing.xs}
               scrollableRef={scrollableRef}
-              dimensionsAnimationType='worklet'
               hapticsEnabled
               onDragEnd={({ data: newData }) => setData(newData)}
             />
