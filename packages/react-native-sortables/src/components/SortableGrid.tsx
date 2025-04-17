@@ -45,8 +45,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     },
     sharedProps: {
       DropIndicatorComponent,
-      animateHeight,
-      animateWidth,
+      dimensionsAnimationType,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
@@ -109,10 +108,9 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           useAdditionalValues={useGridLayoutContext}
         />
         <SortableGridInner
-          animateHeight={animateHeight}
-          animateWidth={animateWidth}
           columnGap={columnGapValue}
           data={data}
+          dimensionsAnimationType={dimensionsAnimationType}
           DropIndicatorComponent={DropIndicatorComponent}
           dropIndicatorStyle={dropIndicatorStyle}
           groups={groups}
@@ -142,9 +140,8 @@ type SortableGridInnerProps<I> = {
   Required<
     Pick<
       SortableGridProps<I>,
-      | 'animateHeight'
-      | 'animateWidth'
       | 'data'
+      | 'dimensionsAnimationType'
       | 'itemEntering'
       | 'itemExiting'
       | 'itemsLayout'

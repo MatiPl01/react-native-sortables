@@ -28,7 +28,7 @@ export default function OrderingStrategyExample() {
             renderItem={renderItem}
             rowGap={spacing.xs}
             strategy='insert'
-            animateHeight
+            dimensionsAnimationType='worklet'
           />
         </Section>
 
@@ -42,7 +42,7 @@ export default function OrderingStrategyExample() {
             renderItem={renderItem}
             rowGap={spacing.xs}
             strategy='swap'
-            animateHeight
+            dimensionsAnimationType='worklet'
           />
         </Section>
       </Stagger>

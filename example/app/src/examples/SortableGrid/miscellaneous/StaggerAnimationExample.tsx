@@ -70,7 +70,7 @@ export default function StaggerAnimationExample() {
         overflow='visible'
         renderItem={renderItem}
         rowGap={10}
-        animateHeight
+        dimensionsAnimationType='worklet'
         onDragEnd={handleDragEnd}
       />
 

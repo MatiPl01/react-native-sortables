@@ -6,6 +6,7 @@ import {
   type ViewStyle
 } from 'react-native';
 import Animated, {
+  LinearTransition,
   useAnimatedStyle,
   withTiming
 } from 'react-native-reanimated';
@@ -16,11 +17,12 @@ import {
   useCommonValuesContext,
   useMeasurementsContext
 } from '../../providers';
-import {
-  AbsoluteLayoutState,
-  type DropIndicatorSettings,
-  type Overflow
+import type {
+  DimensionsAnimation,
+  DropIndicatorSettings,
+  Overflow
 } from '../../types';
+import { AbsoluteLayoutState } from '../../types';
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 import DropIndicator from './DropIndicator';
 
@@ -28,8 +30,7 @@ const SCREEN_DIMENSIONS = Dimensions.get('screen');
 
 type AnimatedHeightContainerProps = PropsWithChildren<
   {
-    animateHeight: boolean;
-    animateWidth: boolean;
+    dimensionsAnimationType: DimensionsAnimation;
     overflow: Overflow;
     style?: StyleProp<ViewStyle>;
   } & DropIndicatorSettings
@@ -37,9 +38,8 @@ type AnimatedHeightContainerProps = PropsWithChildren<
 
 export default function SortableContainer({
   DropIndicatorComponent,
-  animateHeight,
-  animateWidth,
   children,
+  dimensionsAnimationType,
   dropIndicatorStyle,
   overflow,
   showDropIndicator,
@@ -58,6 +58,9 @@ export default function SortableContainer({
   const { handleHelperContainerMeasurement, measurementsContainerRef } =
     useMeasurementsContext();
 
+  const animateWorklet = dimensionsAnimationType === 'worklet';
+  const animateLayout = dimensionsAnimationType === 'layout';
+
   const outerContainerStyle = useAnimatedStyle(() => {
     if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
       return EMPTY_OBJECT;
@@ -73,7 +76,7 @@ export default function SortableContainer({
     return {
       height: maybeAnimate(
         ctrl.height ? containerHeight.value : null,
-        animateHeight
+        animateWorklet
       ),
       overflow:
         activeItemKey.value !== null || !activeItemDropped.value
@@ -81,10 +84,10 @@ export default function SortableContainer({
           : overflow,
       width: maybeAnimate(
         ctrl.width ? containerWidth.value : null,
-        animateWidth
+        animateWorklet
       )
     };
-  }, [animateHeight, animateWidth]);
+  }, [dimensionsAnimationType]);
 
   const innerContainerStyle = useAnimatedStyle(() => {
     if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
@@ -119,6 +122,7 @@ export default function SortableContainer({
 
   return (
     <Animated.View
+      layout={animateLayout ? LinearTransition : undefined}
       // @ts-expect-error - contain is a correct CSS prop on web
       style={[outerContainerStyle, IS_WEB && { contain: 'layout' }]}>
       {showDropIndicator && (
