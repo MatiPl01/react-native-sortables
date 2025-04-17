@@ -1,1 +1,81 @@
-# TODO
+---
+sidebar_position: 6
+description: ''
+---
+
+# Custom Handle
+
+## Description
+
+The **Custom Handle** example demonstrates how to use a custom item drag handle.
+
+## Usage
+
+### Source Code
+
+```tsx
+import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useCallback } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import type { SortableGridRenderItem } from 'react-native-sortables';
+import Sortable from 'react-native-sortables';
+
+import { ScrollScreen } from '@/components';
+
+const DATA = Array.from({ length: 8 }, (_, index) => `Item ${index + 1}`);
+
+export default function PlaygroundExample() {
+  const renderItem = useCallback<SortableGridRenderItem<string>>(
+    ({ item }) => (
+      <View style={styles.card}>
+        <Text style={styles.text}>{item}</Text>
+        {/* Wraps the handle component (an icon in this case) */}
+        <Sortable.Handle>
+          <FontAwesomeIcon color='white' icon={faGripVertical} />
+        </Sortable.Handle>
+      </View>
+    ),
+    []
+  );
+
+  return (
+    <ScrollScreen contentContainerStyle={styles.container} includeNavBarHeight>
+      <Sortable.Grid
+        activeItemScale={1.05}
+        columns={1}
+        data={DATA}
+        overDrag='vertical'
+        renderItem={renderItem}
+        rowGap={10}
+        customHandle // must be set to use a custom handle
+      />
+    </ScrollScreen>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    alignItems: 'center',
+    backgroundColor: '#36877F',
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 24
+  },
+  container: {
+    padding: 16
+  },
+  text: {
+    color: 'white',
+    flex: 1,
+    fontWeight: 'bold'
+  }
+});
+```
+
+## Result
+
+import handleVideo from '@site/static/video/grid-custom-handle.mp4';
+
+<video autoPlay loop muted width='300px' src={handleVideo} />
