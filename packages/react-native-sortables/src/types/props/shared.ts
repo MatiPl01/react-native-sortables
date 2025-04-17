@@ -12,7 +12,7 @@ import type { Animatable, AnimatableProps, Simplify } from '../utils';
  * Almost all values are provided as Reanimated shared values for fast updates.
  */
 export type DropIndicatorComponentProps = {
-  /** Progress of the active drag animation (0 to 1) */
+  /** Progress of the active item animation (from 0 to 1) */
   activeAnimationProgress: SharedValue<number>;
   /** Key of the currently dragged item, or null if no item is being dragged */
   activeItemKey: SharedValue<null | string>;
@@ -22,7 +22,7 @@ export type DropIndicatorComponentProps = {
   dropPosition: SharedValue<Vector>;
   /** Array of item keys in their current order */
   orderedItemKeys: SharedValue<Array<string>>;
-  /** Style to be applied to the drop indicator (will be merged with the default style) */
+  /** Style to be applied to the drop indicator */
   style: ViewStyle;
 };
 

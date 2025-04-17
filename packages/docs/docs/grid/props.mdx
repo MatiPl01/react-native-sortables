@@ -11,7 +11,7 @@ Whenever `Animatable<T>` is used, it refers to the following type definition:
 type Animatable<T> = SharedValue<T> | T;
 ```
 
-This means that properties of type `Animatable<T>` can accept either:
+This means that properties of type `Animatable<T>` can accept either of the following:
 
 - a Reanimated **Shared Value** (`SharedValue<T>`)
 - a **static value** of type `T`
@@ -135,7 +135,7 @@ This may sometimes cause **performance issues** as it requires layout recalculat
 
 ---
 
-## Item Drag Settings
+## Item Drag
 
 ### overDrag
 
@@ -189,6 +189,43 @@ The maximum distance (in pixels) the finger can move from the touch start positi
 | type                 | default | required |
 | -------------------- | ------- | -------- |
 | `Animatable<number>` | 5       | NO       |
+
+---
+
+## Reordering
+
+### strategy
+
+Controls how items **are reordered** while the **active item** is being **dragged around**.
+
+| type                   | default  | required |
+| ---------------------- | -------- | -------- |
+| `SortableGridStrategy` | 'insert' | NO       |
+
+- `'insert'` - items are reordered by inserting the active item at the target position and moving all items between the active item and the target position
+- `'swap'` - items are reordered by swapping the active item with the target item without moving other items
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type SortableGridStrategy = 'insert' | 'swap' | SortableGridStrategyFactory;
+```
+
+{/* TODO: Add link to docs page explaining how to use SortableGridStrategyFactory */}
+
+</details>
+
+### reorderTriggerOrigin
+
+Determines position of the reordering trigger point. If that point enters the area of a different item than the current one, the reordering will be triggered.
+
+| type                  | default    | required |
+| --------------------- | ---------- | -------- |
+| `'center' \| 'touch'` | `'center'` | NO       |
+
+- `'center'` - reordering will be triggered when the center of the active item enters the area of a different item
+- `'touch'` - reordering will be triggered when the touch point enters the area of a different item
 
 ---
 
@@ -419,11 +456,17 @@ Component to use as the drop indicator. It gives a **full control** over the dro
 
 ```tsx
 type DropIndicatorComponentProps = {
-  activationProgress: SharedValue<number>;
-  touchedItemKey: SharedValue<null | string>;
+  /** Progress of the active item animation (from 0 to 1) */
+  activeAnimationProgress: SharedValue<number>;
+  /** Key of the currently dragged item, or null if no item is being dragged */
+  activeItemKey: SharedValue<null | string>;
+  /** Current index where the dragged item would be dropped */
   dropIndex: SharedValue<number>;
+  /** Current position where the item would be dropped */
   dropPosition: SharedValue<Vector>;
+  /** Array of item keys in their current order */
   orderedItemKeys: SharedValue<Array<string>>;
+  /** Style to be applied to the drop indicator */
   style: ViewStyle;
 };
 ```
@@ -436,12 +479,8 @@ type DropIndicatorComponentProps = {
 
 Layout animations control how items animate when their positions change and when they are added or removed from the grid.
 
-:::note
-
 - Item **entering** animations are **not** triggered during the **initial render** of the grid
 - Item **exiting** animations are **not** triggered when the **entire grid is unmounted**
-
-:::
 
 :::warning Warning (Web)
 There are some **differences** in the **layout animations** implementation on **Web**:
@@ -557,6 +596,41 @@ import reorderVideo from '@site/static/video/grid-layout-transition-mode-reorder
 
 ## Callbacks
 
+:::tip Performance Recommendation
+Use **worklet functions** for callbacks to run directly on the UI thread and avoid thread jumping overhead.
+:::
+
+All callbacks accept two types of functions:
+
+1. **Worklet Functions** (Recommended)
+
+   - To mark a function as worklet, you have to add `'worklet'` directive at the start of the function body
+   - Run directly on the UI thread
+   - More performant
+   - Example:
+
+   ```ts
+   const onDragStart = useCallback((params: DragStartParams) => {
+     'worklet';
+     // Your code here
+   }, []);
+   ```
+
+2. **Plain JS Functions**
+   - No special directive needed
+   - Runs on the JS thread by using `runOnJS`
+   - Less performant due to jumping between threads
+   - Example:
+   ```ts
+   const onDragStart = useCallback((params: DragStartParams) => {
+     // Your code here
+   }, []);
+   ```
+
+:::info
+For more information about worklets refer to the [Reanimated documentation](https://docs.swmansion.com/react-native-reanimated/docs/guides/worklets/).
+:::
+
 ### onDragStart
 
 Called when the drag gesture starts.
@@ -583,7 +657,7 @@ type DragStartParams = {
 
 ### onDragEnd
 
-Called when the drag gesture ends. Data passed to the callback is the new order of the items.
+Called when the drag gesture ends. Data passed to the callback is sorted according to the new order of the items. If the order of items is not changed, the same data array as the one passed to the `data` prop of the grid is passed in the callback params.
 
 | type                             | default | required |
 | -------------------------------- | ------- | -------- |
@@ -636,6 +710,12 @@ type OrderChangeParams = {
 
 </details>
 
+:::warning
+
+**Don't use** this callback to update items order in state because it's called **frequently** during dragging. Use `onDragEnd` for **state updates** instead.
+
+:::
+
 ---
 
 ### onDragMove
@@ -664,27 +744,6 @@ type DragMoveParams = {
 ---
 
 ## Other Settings
-
-### strategy
-
-Controls how items **are reordered** while the **active item** is being **dragged around**.
-
-| type                   | default  | required |
-| ---------------------- | -------- | -------- |
-| `SortableGridStrategy` | 'insert' | NO       |
-
-<details>
-  <summary>Type definitions</summary>
-
-```tsx
-type SortableGridStrategy = 'insert' | 'swap' | SortableGridStrategyFactory;
-```
-
-{/* TODO: Add link to docs page explaining how to use SortableGridStrategyFactory */}
-
-</details>
-
----
 
 ### customHandle
 
@@ -722,9 +781,21 @@ You can also use any other haptics library but you will have to trigger haptics 
 
 ---
 
+### overflow
+
+Controls if the overflowing content should be clipped or visible. Applies only when no item is active.
+
+| type                    | default    | required |
+| ----------------------- | ---------- | -------- |
+| `'hidden' \| 'visible'` | `'hidden'` | NO       |
+
+---
+
 ### debug
 
 Enables debug mode, which shows additional views helpful for debugging. This property is intended for the library **developers** and is not recommended for the library **users**.
+
+Debug mode has no effect in production builds and can be used to debug the library only in the development environment.
 
 | type      | default | required |
 | --------- | ------- | -------- |
