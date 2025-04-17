@@ -65,11 +65,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     throw error('rowHeight is required for horizontal Sortable.Grid');
   }
 
-  // this allows changing the number of columns/rows while developing
-  // code with no necessity to reload the app
-  // (state of the grid must be reset when this param changes)
-  const key = (groups << 1) | (isVertical ? 1 : 0);
-
   const columnGapValue = useAnimatableValue(columnGap);
   const rowGapValue = useAnimatableValue(rowGap);
   const controlledContainerDimensions = useDerivedValue(() => ({
@@ -88,7 +83,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
       itemKeys={itemKeys}
-      key={key}
       initialItemsStyleOverride={
         isVertical ? undefined : styles.horizontalStyleOverride
       }

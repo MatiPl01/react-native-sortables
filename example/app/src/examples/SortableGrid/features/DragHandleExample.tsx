@@ -2,7 +2,10 @@ import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, { useAnimatedRef } from 'react-native-reanimated';
+import Animated, {
+  LinearTransition,
+  useAnimatedRef
+} from 'react-native-reanimated';
 import type { OverDrag, SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
@@ -25,12 +28,14 @@ export default function DragHandleExample() {
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
-      <View style={styles.card}>
+      <Animated.View style={styles.card} layout={LinearTransition}>
         <Text style={styles.text}>{item}</Text>
-        <Sortable.Handle>
-          <FontAwesomeIcon color={colors.white} icon={faGripVertical} />
-        </Sortable.Handle>
-      </View>
+        <Animated.View layout={LinearTransition}>
+          <Sortable.Handle>
+            <FontAwesomeIcon color={colors.white} icon={faGripVertical} />
+          </Sortable.Handle>
+        </Animated.View>
+      </Animated.View>
     ),
     []
   );
