@@ -28,7 +28,7 @@ export default function DragHandleExample() {
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
-      <Animated.View style={styles.card} layout={LinearTransition}>
+      <Animated.View layout={LinearTransition} style={styles.card}>
         <Text style={styles.text}>{item}</Text>
         <Animated.View layout={LinearTransition}>
           <Sortable.Handle>
