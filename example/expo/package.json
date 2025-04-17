@@ -2,17 +2,17 @@
   "name": "example-expo",
   "version": "1.0.0",
   "dependencies": {
-    "expo": "~52.0.42",
-    "expo-status-bar": "~2.0.1",
-    "react": "18.3.1",
-    "react-native": "0.76.9",
-    "react-native-gesture-handler": "~2.20.2",
-    "react-native-reanimated": "patch:react-native-reanimated@npm%3A3.17.4#~/.yarn/patches/react-native-reanimated-npm-3.17.4-d7caed9b50.patch"
+    "expo": "^53.0.0-preview.7",
+    "expo-status-bar": "~2.2.0",
+    "react": "19.0.0",
+    "react-native": "0.79.0",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-reanimated": "~3.17.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~18.3.12",
-    "typescript": "^5.8.2"
+    "@types/react": "~19.0.10",
+    "typescript": "~5.8.3"
   },
   "installConfig": {
     "hoistingLimits": "workspaces",
