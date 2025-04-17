@@ -67,6 +67,7 @@ export default function DragHandleExample() {
           columnGap={10}
           columns={columns}
           data={DATA}
+          dimensionsAnimationType='layout'
           dragActivationDelay={0}
           overDrag={overDrag}
           renderItem={renderItem}

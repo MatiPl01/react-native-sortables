@@ -28,8 +28,7 @@ function SortableFlex(props: SortableFlexProps) {
     },
     sharedProps: {
       DropIndicatorComponent,
-      animateHeight,
-      animateWidth,
+      dimensionsAnimationType,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
@@ -77,9 +76,8 @@ function SortableFlex(props: SortableFlexProps) {
           useAdditionalValues={useFlexLayoutContext}
         />
         <SortableFlexInner
-          animateHeight={animateHeight}
-          animateWidth={animateWidth}
           childrenArray={childrenArray}
+          dimensionsAnimationType={dimensionsAnimationType}
           DropIndicatorComponent={DropIndicatorComponent}
           dropIndicatorStyle={dropIndicatorStyle}
           itemEntering={itemEntering}
@@ -107,8 +105,7 @@ type SortableFlexInnerProps = {
   Required<
     Pick<
       SortableFlexProps,
-      | 'animateHeight'
-      | 'animateWidth'
+      | 'dimensionsAnimationType'
       | 'itemEntering'
       | 'itemExiting'
       | 'itemsLayout'

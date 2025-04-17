@@ -222,14 +222,14 @@ export type SortableCallbacks = {
 
 export type Overflow = 'hidden' | 'visible';
 
+export type DimensionsAnimation = 'layout' | 'none' | 'worklet';
+
 export type SharedProps = Simplify<
   Omit<SortableCallbacks, 'onDragEnd'> &
     Partial<
       {
-        /** Whether to animate container height changes when items are moved */
-        animateHeight: boolean;
-        /** Whether to animate container width changes when items are moved */
-        animateWidth: boolean;
+        /** Whether and how to animate container dimensions changes */
+        dimensionsAnimationType: DimensionsAnimation;
         /** Enable haptic feedback when sorting items */
         hapticsEnabled: boolean;
         /** Controls whether sorting functionality is enabled */
