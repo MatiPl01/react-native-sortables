@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-description: ''
+description: 'Components that work well with sortable component gesture detectors'
 ---
 
 # Touchables
@@ -24,45 +24,25 @@ Use these components when you need to add **interactive elements** (buttons, lin
 
 ## Usage
 
+:::info
+
+For the complete usage example, refer to the [Touchables](/grid/examples/touchables) example.
+
+:::
+
 Use these components withing a sortable component's child (item) component.
 
 ```tsx
 import Sortable from 'react-native-sortables';
 
-function Item({ item }: { item: string }) {
-  return (
-    // ... other components
-    <Sortable.Pressable
-      onPress={() => {
-        console.log('pressed');
-      }}>
-      {/* ... other components */}
-    </Sortable.Pressable>
-    // ... other components
-  );
-}
-```
-
-And, for example, if you use the **Sortable Grid** component:
-
-```tsx
-import { useCallback } from 'react';
-import Sortable from 'react-native-sortables';
-import type { SortableGridRenderItem } from 'react-native-sortables';
-
-export default function Grid() {
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => <Item item={item} />,
-    []
-  );
-
-  return (
-    <Sortable.Grid
-      renderItem={renderItem}
-      // ... other props
-    />
-  );
-}
+// ... other components
+<Sortable.Pressable
+  onPress={() => {
+    console.log('pressed');
+  }}>
+  {/* ... other components */}
+</Sortable.Pressable>;
+// ... other components
 ```
 
 ## Props

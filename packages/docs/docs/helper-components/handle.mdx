@@ -1,0 +1,60 @@
+---
+sidebar_position: 1
+description: 'Component that allows to drag an item by a specific area'
+---
+
+# Handle
+
+## Overview
+
+The **Handle** component allows you to drag an item by a specific area (part of the item) instead of the whole item.
+
+## Usage
+
+:::info
+
+For the complete usage example, refer to the [Handle](/grid/examples/handle) example.
+
+:::
+
+Use this component within a sortable component's child (item) component.
+
+```tsx
+import Sortable from 'react-native-sortables';
+
+// ... other components
+<Sortable.Handle>
+  {/* ... other components */}
+  <HandleComponent />
+  {/* ... other components */}
+</Sortable.Handle>;
+// ... other components
+```
+
+:::important
+
+To use a custom handle component, you **must** set the `customHandle` prop on the sortable component.
+
+:::
+
+## Props
+
+### mode
+
+Determines the reordering behavior of the item.
+
+| type                                        | default       | required |
+| ------------------------------------------- | ------------- | -------- |
+| `'draggable' \| 'fixed' \| 'non-draggable'` | `'draggable'` | NO       |
+
+- `'draggable'` - the item **can be dragged** and **moves** when other items are reordered.
+- `'non-draggable'` - the item **cannot be dragged** but **moves** when other items are reordered.
+- `'fixed'` - the item **cannot be dragged** and **does not move** when other items are reordered.
+
+### children
+
+The handle component (can be anything, e.g. an icon, image, etc.).
+
+| type        | default | required |
+| ----------- | ------- | -------- |
+| `ReactNode` | NO      | NO       |
