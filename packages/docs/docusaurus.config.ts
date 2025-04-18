@@ -58,6 +58,11 @@ const config: Config = {
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   themeConfig: {
+    algolia: {
+      apiKey: '8a07143e93904e0bcdc9e2286393b107',
+      appId: 'I4ZZR4R13B',
+      indexName: 'react-native-sortables-vercel'
+    },
     footer: {
       copyright: `Copyright © ${new Date().getFullYear()} | React Native Sortables by MatiPl01`,
       links: [],
