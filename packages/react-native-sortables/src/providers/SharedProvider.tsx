@@ -19,6 +19,7 @@ import type {
   SortableCallbacks
 } from '../types';
 import {
+  ActiveItemValuesProvider,
   AutoScrollProvider,
   CommonValuesProvider,
   CustomHandleProvider,
@@ -75,6 +76,8 @@ export default function SharedProvider({
     <LayerProvider />,
     // Provider used for layout debugging (can be used only in dev mode)
     __DEV__ && debug && <DebugProvider />,
+    // Provider used for active item values
+    <ActiveItemValuesProvider />,
     // Provider used for shared values between all providers below
     <CommonValuesProvider
       customHandle={customHandle}

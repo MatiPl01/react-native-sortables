@@ -31,6 +31,27 @@ import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
 
 export type ControlledContainerDimensions = { width: boolean; height: boolean };
 
+// ACTIVE ITEM VALUES
+
+export type ActiveItemValuesContextType = {
+  // POSITIONS
+  touchPosition: SharedValue<Vector | null>;
+  activeItemPosition: SharedValue<Vector | null>;
+
+  // DIMENSIONS
+  activeItemDimensions: SharedValue<Dimensions | null>;
+
+  // DRAG STATE
+  prevActiveItemKey: SharedValue<null | string>;
+  activeItemKey: SharedValue<null | string>;
+  activationState: SharedValue<DragActivationState>;
+  activeAnimationProgress: SharedValue<number>;
+  inactiveAnimationProgress: SharedValue<number>;
+  activeItemDropped: SharedValue<boolean>;
+};
+
+// COMMON VALUES
+
 /**
  * Context values shared between all providers.
  * (they are stored in a single context to make the access to them easier
@@ -45,8 +66,6 @@ export type CommonValuesContextType = {
 
   // POSITIONS
   itemPositions: SharedValue<Record<string, Vector>>;
-  touchPosition: SharedValue<Vector | null>;
-  activeItemPosition: SharedValue<Vector | null>;
 
   // DIMENSIONS
   controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
@@ -54,17 +73,8 @@ export type CommonValuesContextType = {
   measuredContainerHeight: SharedValue<null | number>;
   containerWidth: SharedValue<null | number>;
   containerHeight: SharedValue<null | number>;
-  activeItemDimensions: SharedValue<Dimensions | null>;
   itemDimensions: SharedValue<Record<string, Dimensions>>;
   itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
-
-  // DRAG STATE
-  prevActiveItemKey: SharedValue<null | string>;
-  activeItemKey: SharedValue<null | string>;
-  activationState: SharedValue<DragActivationState>;
-  activeAnimationProgress: SharedValue<number>;
-  inactiveAnimationProgress: SharedValue<number>;
-  activeItemDropped: SharedValue<boolean>;
 
   // OTHER
   containerRef: AnimatedRef<View>;
@@ -75,7 +85,8 @@ export type CommonValuesContextType = {
   customHandle: boolean;
 
   itemsOverridesStyle: AnimatedStyle<ViewStyle>;
-} & AnimatedValues<ActiveItemDecorationSettings> &
+} & ActiveItemValuesContextType &
+  AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &
   AnimatedValues<Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>>;
 

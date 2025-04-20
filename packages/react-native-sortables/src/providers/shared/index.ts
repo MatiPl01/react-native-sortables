@@ -1,3 +1,4 @@
+export { ActiveItemValuesProvider } from './ActiveItemValuesProvider';
 export { AutoScrollProvider, useAutoScrollContext } from './AutoScrollProvider';
 export {
   CommonValuesContext,
