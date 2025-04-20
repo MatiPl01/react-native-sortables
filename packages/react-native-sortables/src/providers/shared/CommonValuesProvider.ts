@@ -21,9 +21,10 @@ import type {
   Maybe,
   Vector
 } from '../../types';
-import { AbsoluteLayoutState, DragActivationState } from '../../types';
+import { AbsoluteLayoutState } from '../../types';
 import { areArraysDifferent } from '../../utils';
 import { createProvider } from '../utils';
+import { useActiveItemValuesContext } from './ActiveItemValuesProvider';
 
 let nextId = 0;
 
@@ -75,8 +76,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
 
     // POSITIONS
     const itemPositions = useSharedValue<Record<string, Vector>>({});
-    const touchPosition = useSharedValue<Vector | null>(null);
-    const activeItemPosition = useSharedValue<Vector | null>(null);
 
     // DIMENSIONS
     // measured dimensions via onLayout used to calculate containerWidth and containerHeight
@@ -88,19 +87,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // (containerWidth and containerHeight should be used in most cases)
     const containerWidth = useSharedValue<null | number>(null);
     const containerHeight = useSharedValue<null | number>(null);
-    const activeItemDimensions = useSharedValue<Dimensions | null>(null);
     const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
     const itemsStyleOverride = useSharedValue<Maybe<ViewStyle>>(
       initialItemsStyleOverride
     );
-
-    // DRAG STATE
-    const activeItemKey = useSharedValue<null | string>(null);
-    const prevActiveItemKey = useSharedValue<null | string>(null);
-    const activationState = useSharedValue(DragActivationState.INACTIVE);
-    const activeAnimationProgress = useSharedValue(0);
-    const inactiveAnimationProgress = useSharedValue(0);
-    const activeItemDropped = useSharedValue(true);
 
     // ITEM ACTIVATION SETTINGS
     const dragActivationDelay = useAnimatableValue(_dragActivationDelay);
@@ -149,15 +139,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
 
     return {
       value: {
+        ...useActiveItemValuesContext(),
         absoluteLayoutState,
         activationAnimationDuration,
-        activationState,
-        activeAnimationProgress,
-        activeItemDimensions,
-        activeItemDropped,
-        activeItemKey,
         activeItemOpacity,
-        activeItemPosition,
         activeItemScale,
         activeItemShadowOpacity,
         animateLayoutOnReorderOnly,
@@ -171,7 +156,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         dragActivationFailOffset,
         dropAnimationDuration,
         enableActiveItemSnap,
-        inactiveAnimationProgress,
         inactiveItemOpacity,
         inactiveItemScale,
         indexToKey,
@@ -183,12 +167,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         keyToIndex,
         measuredContainerHeight,
         measuredContainerWidth,
-        prevActiveItemKey,
         shouldAnimateLayout,
         snapOffsetX,
         snapOffsetY,
-        sortEnabled,
-        touchPosition
+        sortEnabled
       }
     };
   });

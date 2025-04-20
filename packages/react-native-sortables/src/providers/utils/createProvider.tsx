@@ -3,6 +3,7 @@
 import {
   createContext,
   type PropsWithChildren,
+  type ReactNode,
   useContext,
   useMemo
 } from 'react';
@@ -20,7 +21,7 @@ export default function createProvider<
     factory: (props: ProviderProps) => {
       value?: ContextValue;
       enabled?: boolean;
-      children?: React.ReactNode;
+      children?: ReactNode;
     }
   ) {
     const { guarded = true } = options ?? {};
