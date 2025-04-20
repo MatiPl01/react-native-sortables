@@ -21,6 +21,13 @@ export default function InterDragExample() {
     []
   );
 
+  const gridProps = {
+    columnGap: 10,
+    columns: 3,
+    renderItem,
+    rowGap: 10
+  };
+
   return (
     <Animated.ScrollView
       contentContainerStyle={IS_WEB && style.webContent}
@@ -30,11 +37,8 @@ export default function InterDragExample() {
         <Sortable.Layer>
           <Group>
             <Sortable.Grid
-              columnGap={10}
-              columns={3}
+              {...gridProps}
               data={data1}
-              renderItem={renderItem}
-              rowGap={10}
               onDragEnd={params => setData1(params.data)}
             />
           </Group>
@@ -42,11 +46,8 @@ export default function InterDragExample() {
         <Sortable.Layer>
           <Group>
             <Sortable.Grid
-              columnGap={10}
-              columns={3}
+              {...gridProps}
               data={data2}
-              renderItem={renderItem}
-              rowGap={10}
               onDragEnd={params => setData2(params.data)}
             />
           </Group>

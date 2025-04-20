@@ -7,10 +7,9 @@ type InterDragProviderProps = PropsWithChildren<{
   // TODO
 }>;
 
-const { InterDragProvider, useInterDragContext } = createProvider('InterDrag')<
-  InterDragProviderProps,
-  InterDragContextType
->(() => {
+const { InterDragProvider, useInterDragContext } = createProvider('InterDrag', {
+  guarded: false
+})<InterDragProviderProps, InterDragContextType>(() => {
   return { value: {} };
 });
 

@@ -11,6 +11,7 @@ import {
   OrderUpdaterComponent,
   SharedProvider,
   useGridLayoutContext,
+  useSortableData,
   useStrategyKey
 } from '../providers';
 import type {
@@ -34,7 +35,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     rest: {
       columnGap,
       columns,
-      data,
+      data: _data,
       keyExtractor = defaultKeyExtractor,
       onDragEnd: _onDragEnd,
       renderItem,
@@ -77,6 +78,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     width: !isVertical // width is controlled for horizontal grids
   }));
 
+  const data = useSortableData(_data);
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
 
   const onDragEnd = useDragEndHandler(_onDragEnd, {

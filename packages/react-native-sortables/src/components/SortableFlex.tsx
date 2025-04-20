@@ -10,6 +10,7 @@ import {
   OrderUpdaterComponent,
   SharedProvider,
   useFlexLayoutContext,
+  useSortableData,
   useStrategyKey
 } from '../providers';
 import type { DropIndicatorSettings, SortableFlexProps } from '../types';
@@ -40,7 +41,7 @@ function SortableFlex(props: SortableFlexProps) {
     }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
 
-  const childrenArray = validateChildren(children);
+  const childrenArray = useSortableData(validateChildren(children));
   const itemKeys = childrenArray.map(([key]) => key);
 
   const { flexDirection, flexWrap } = styleProps;
