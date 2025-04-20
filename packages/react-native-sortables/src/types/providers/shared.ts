@@ -132,6 +132,12 @@ export type DragContextType = {
   ) => void;
 };
 
+// INTER DRAG
+
+export type InterDragContextType = {
+  // TODO
+};
+
 // ITEM
 
 export type ItemContextType = {

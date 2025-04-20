@@ -8,7 +8,7 @@ import {
   SortableHandle,
   SortableLayer
 } from './components';
-import { PortalProvider } from './providers';
+import { InterDragProvider, PortalProvider } from './providers';
 
 export type { SortableHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
@@ -132,6 +132,9 @@ const Sortable = {
    * ```
    */
   Handle: SortableHandle,
+
+  // TODO - add docstring
+  InterDragProvider,
 
   /** Component that manages zIndex for proper rendering of sortable components.
    * Automatically adjusts zIndex values to maintain proper visual hierarchy when items are dragged.

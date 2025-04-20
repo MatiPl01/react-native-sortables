@@ -51,6 +51,10 @@ const routes: Routes = {
             Component: SortableGrid.features.FixedItemsExample,
             name: 'Fixed Items'
           },
+          InterDrag: {
+            Component: SortableGrid.features.InterDragExample,
+            name: 'Inter Drag'
+          },
           CallbacksExample: {
             Component: SortableGrid.features.CallbacksExample,
             name: 'Callbacks'
