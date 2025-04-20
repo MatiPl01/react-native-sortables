@@ -7,5 +7,5 @@ export { default as DragHandleExample } from './DragHandleExample';
 export { default as DropIndicatorExample } from './DropIndicatorExample';
 export { default as FixedItemsExample } from './FixedItemsExample';
 export { default as HorizontalAutoScrollExample } from './HorizontalAutoScrollExample';
-export { default as OrderingStrategyExample } from './OrderingStrategyExample';
 export { default as InterDragExample } from './InterDragExample';
+export { default as OrderingStrategyExample } from './OrderingStrategyExample';

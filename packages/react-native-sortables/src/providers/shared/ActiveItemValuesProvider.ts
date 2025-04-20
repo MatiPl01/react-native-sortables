@@ -1,23 +1,20 @@
-import type { ReactNode } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 
 import type {
   ActiveItemValuesContextType,
+  ChildrenProps,
   Dimensions,
   Vector
 } from '../../types';
 import { DragActivationState } from '../../types';
 import { createProvider } from '../utils';
 
-type ActiveItemValuesProviderProps = {
-  children?: ReactNode;
-};
-
 const { ActiveItemValuesProvider, useActiveItemValuesContext } = createProvider(
   'ActiveItemValues'
-)<ActiveItemValuesProviderProps, ActiveItemValuesContextType>(() => {
+)<ChildrenProps, ActiveItemValuesContextType>(() => {
   // POSITIONS
-  const touchPosition = useSharedValue<Vector | null>(null);
+  const activeItemAbsolutePosition = useSharedValue<Vector | null>(null);
+  const activeItemTriggerOriginPosition = useSharedValue<Vector | null>(null);
   const activeItemPosition = useSharedValue<Vector | null>(null);
 
   // DIMENSIONS
@@ -35,13 +32,14 @@ const { ActiveItemValuesProvider, useActiveItemValuesContext } = createProvider(
     value: {
       activationState,
       activeAnimationProgress,
+      activeItemAbsolutePosition,
       activeItemDimensions,
       activeItemDropped,
       activeItemKey,
       activeItemPosition,
+      activeItemTriggerOriginPosition,
       inactiveAnimationProgress,
-      prevActiveItemKey,
-      touchPosition
+      prevActiveItemKey
     }
   };
 });

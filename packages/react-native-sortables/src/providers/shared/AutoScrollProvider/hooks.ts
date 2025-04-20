@@ -23,8 +23,12 @@ export function useTargetScrollOffset(
   autoScrollActivationOffset: Animatable<[number, number] | number>,
   dragStartScrollOffset: SharedValue<null | number>
 ): SharedValue<null | number> {
-  const { activeItemKey, containerRef, itemDimensions, touchPosition } =
-    useCommonValuesContext();
+  const {
+    activeItemKey,
+    activeItemTriggerOriginPosition,
+    containerRef,
+    itemDimensions
+  } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
   const debugRects = debugContext?.useDebugRects(['start', 'end']);
@@ -54,7 +58,7 @@ export function useTargetScrollOffset(
       if (
         !enabled.value ||
         activeItemHeight.value === null ||
-        !touchPosition.value
+        !activeItemTriggerOriginPosition.value
       ) {
         startContainerPagePosition.value = null;
         targetScrollOffset.value = null;
@@ -64,7 +68,8 @@ export function useTargetScrollOffset(
       return {
         itemHeight: activeItemHeight.value,
         threshold: offsetThreshold.value,
-        touchOffset: touchPosition.value?.[horizontal ? 'x' : 'y']
+        touchOffset:
+          activeItemTriggerOriginPosition.value?.[horizontal ? 'x' : 'y']
       };
     },
     props => {

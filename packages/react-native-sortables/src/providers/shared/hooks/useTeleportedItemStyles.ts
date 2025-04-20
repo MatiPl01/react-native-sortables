@@ -12,7 +12,6 @@ import {
 import type { Vector } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { usePortalOutletContext } from '../PortalOutletProvider';
-import { usePortalContext } from '../PortalProvider';
 import useItemZIndex from './useItemZIndex';
 
 export default function useTeleportedItemStyles(
@@ -20,10 +19,13 @@ export default function useTeleportedItemStyles(
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
-  const { activeItemAbsolutePosition } = usePortalContext()!;
   const { portalOutletRef } = usePortalOutletContext()!;
-  const { activeItemKey, containerRef, itemPositions } =
-    useCommonValuesContext();
+  const {
+    activeItemAbsolutePosition,
+    activeItemKey,
+    containerRef,
+    itemPositions
+  } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
   const dropStartTranslation = useSharedValue<Vector | null>(null);

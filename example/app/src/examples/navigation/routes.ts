@@ -53,7 +53,7 @@ const routes: Routes = {
           },
           InterDrag: {
             Component: SortableGrid.features.InterDragExample,
-            name: 'Inter Drag'
+            name: 'Drag Between Sortable Grids'
           },
           CallbacksExample: {
             Component: SortableGrid.features.CallbacksExample,

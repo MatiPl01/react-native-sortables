@@ -24,7 +24,6 @@ export function useStrategyKey(strategy: AnyStrategyFactory | string) {
 function OrderUpdaterComponent<P extends PredefinedStrategies>({
   predefinedStrategies,
   strategy,
-  triggerOrigin,
   useAdditionalValues
 }: OrderUpdaterProps<P>) {
   const factory =
@@ -41,7 +40,7 @@ function OrderUpdaterComponent<P extends PredefinedStrategies>({
     ...useAdditionalValues()
   });
 
-  useOrderUpdater(updater, triggerOrigin);
+  useOrderUpdater(updater);
 
   return null;
 }

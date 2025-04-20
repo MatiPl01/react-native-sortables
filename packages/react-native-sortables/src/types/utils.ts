@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { ReactNode } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 
 export type AnyFunction = (...args: Array<any>) => any;
@@ -7,6 +8,8 @@ export type AnyFunction = (...args: Array<any>) => any;
 export type EmptyFunction = () => void;
 
 export type AnyRecord = Record<string, any>;
+
+export type EmptyRecord = Record<string, never>;
 
 export type Simplify<T> = {
   [K in keyof T]: T[K];
@@ -41,3 +44,7 @@ export type DefaultProps<
 > = Omit<RequiredExcept<P, O>, E>;
 
 export type NoUndef<T> = T extends undefined ? never : T;
+
+export type ChildrenProps = {
+  children?: ReactNode;
+};

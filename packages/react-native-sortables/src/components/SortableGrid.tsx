@@ -52,7 +52,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       itemExiting,
       itemsLayout,
       overflow,
-      reorderTriggerOrigin,
       showDropIndicator,
       ...sharedProps
     }
@@ -106,7 +105,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           key={useStrategyKey(strategy)}
           predefinedStrategies={GRID_STRATEGIES}
           strategy={strategy}
-          triggerOrigin={reorderTriggerOrigin}
           useAdditionalValues={useGridLayoutContext}
         />
         <SortableGridInner

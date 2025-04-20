@@ -17,8 +17,7 @@ import type { Dimensions, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
-  ItemDragSettings,
-  ReorderTriggerOrigin
+  ItemDragSettings
 } from '../props/shared';
 import type {
   AbsoluteLayoutState,
@@ -35,8 +34,9 @@ export type ControlledContainerDimensions = { width: boolean; height: boolean };
 
 export type ActiveItemValuesContextType = {
   // POSITIONS
-  touchPosition: SharedValue<Vector | null>;
+  activeItemTriggerOriginPosition: SharedValue<Vector | null>;
   activeItemPosition: SharedValue<Vector | null>;
+  activeItemAbsolutePosition: SharedValue<Vector | null>;
 
   // DIMENSIONS
   activeItemDimensions: SharedValue<Dimensions | null>;
@@ -134,7 +134,7 @@ export type DragContextType = {
 
 // INTER DRAG
 
-export type InterDragContextType = {
+export type InterDragInnerContextType = {
   // TODO
 };
 
@@ -168,7 +168,6 @@ export type CustomHandleContextType = {
 export type PortalSubscription = (isTeleported: boolean) => void;
 
 export type PortalContextType = {
-  activeItemAbsolutePosition: SharedValue<Vector | null>;
   teleport: (id: string, node: ReactNode) => void;
   subscribe: (id: string, callback: PortalSubscription) => () => void;
   notifyRendered: (id: string) => void;
@@ -220,6 +219,5 @@ export type OrderUpdaterProps<
 > = {
   predefinedStrategies: P;
   strategy: AnyStrategyFactory | keyof P;
-  triggerOrigin: ReorderTriggerOrigin;
   useAdditionalValues: () => AnyRecord;
 };
