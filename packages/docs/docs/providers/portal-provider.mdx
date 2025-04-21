@@ -13,6 +13,82 @@ It is useful if your sortable component is **deeply nested within other componen
 
 ## Usage
 
-```tsx
+Just wrap your sortable component (and any other components you want the active item to render above) with the `Sortable.PortalProvider` component.
 
+```tsx
+import Sortable from 'react-native-sortables';
+
+// ... other components
+<Sortable.PortalProvider>
+  {/* other components and the nested sortable component */}
+</Sortable.PortalProvider>;
+// ... other components
 ```
+
+## Example
+
+import video from '@site/static/video/portal-provider.mp4';
+
+<video autoPlay loop muted width='300px' src={video} />
+
+## Props
+
+### enabled
+
+Determines whether the portal functionality is enabled.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | `true`  | NO       |
+
+When enabled, the active item will be rendered in a portal outlet, which is rendered on top of other components rendered within the `PortalProvider` component.
+
+### children
+
+The components above which the active item should be rendered.
+
+| type        | default | required |
+| ----------- | ------- | -------- |
+| `ReactNode` | NO      | YES      |
+
+## How It Works?
+
+The Portal Provider creates a separate portal outlet component higher in the view hierarchy. When an item becomes active, it is teleported to this outlet, allowing it to be rendered on top of other components. The provider synchronizes the position of the teleported item with the original item and manages the visibility of the original item while it is being dragged.
+
+This approach ensures a smooth transition between the item rendered within the sortable component and the one rendered in the portal.
+
+## Remarks
+
+### Active Item Copy
+
+The portal renders the active item on a different layer, within a different parent component than the item is normally rendered in. As a result, the copy of the active item is mounted (not re-rendered) while the old component within the sortable container is still rendered but invisible.
+
+This means there are 2 instances of the active item component rendered at the same time until it is dropped.
+
+### Component State
+
+Since the teleported component is a separate instance from the original one, any local state (like `useState` or fetched data) will not be shared between the two instances.
+
+For components that need to maintain state during dragging, consider using:
+
+- Context providers to share state
+- External store or state management library
+- Lifting state up to a parent component (but it may lead to performance issues if not implemented correctly)
+
+### Layout Animations
+
+Since the view is mounted and unmounted within the portal outlet, all entering and exiting animations used in this view triggered on render will be triggered here as well.
+
+:::warning
+
+The Portal Provider uses complex synchronization logic to synchronize Reanimated style updates with React renders. While this approach works well in most cases, it may have some limitations.
+
+If you encounter unexpected behavior or any kind of issues, please report them on [GitHub](https://github.com/matipl01/react-native-sortables/issues) with a detailed description of the problem.
+
+:::
+
+:::info Complete Usage Example
+
+For the complete usage example of the Portal Provider, check out the [Active Item Portal](/grid/examples/active-item-portal) example.
+
+:::
