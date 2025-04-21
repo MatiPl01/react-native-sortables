@@ -22,7 +22,7 @@ type OptionalSharedProps =
   | 'scrollableRef'
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
-type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
+export type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
 
 export const DEFAULT_SHARED_PROPS = {
   DropIndicatorComponent: DefaultDropIndicator,

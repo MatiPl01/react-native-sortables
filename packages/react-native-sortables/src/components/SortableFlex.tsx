@@ -1,9 +1,9 @@
-import { type ReactElement } from 'react';
-import { type StyleProp, StyleSheet, type ViewStyle } from 'react-native';
+import { useMemo } from 'react';
+import { StyleSheet } from 'react-native';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
-import { useDragEndHandler } from '../hooks';
+import { useChildrenArray, useDragEndHandler } from '../hooks';
 import {
   FLEX_STRATEGIES,
   FlexLayoutProvider,
@@ -12,20 +12,38 @@ import {
   useFlexLayoutContext,
   useStrategyKey
 } from '../providers';
-import type { DropIndicatorSettings, SortableFlexProps } from '../types';
-import { getPropsWithDefaults, orderItems, validateChildren } from '../utils';
-import { DraggableView, SortableContainer } from './shared';
+import type { DragEndCallback, SortableFlexProps } from '../types';
+import { getPropsWithDefaults, orderItems, typedMemo } from '../utils';
+import { SortableContainer } from './shared';
 
-function SortableFlex(props: SortableFlexProps) {
+function SortableFlex({
+  children,
+  onDragEnd: _onDragEnd,
+  ...rest
+}: SortableFlexProps) {
+  const childrenArray = useChildrenArray(children);
+  const itemKeys = useMemo(
+    () => childrenArray.map(([key]) => key),
+    [childrenArray]
+  );
+
+  const onDragEnd = useDragEndHandler(_onDragEnd, {
+    order: params =>
+      function <I>(data: Array<I>) {
+        return orderItems(data, itemKeys, params, true);
+      }
+  });
+
+  return <SortableFlexInner {...rest} onDragEnd={onDragEnd} />;
+}
+
+const SortableFlexInner = typedMemo(function SortableFlexInner(
+  props: {
+    onDragEnd: DragEndCallback;
+  } & Omit<SortableFlexProps, 'children' | 'onDragEnd'>
+) {
   const {
-    rest: {
-      children,
-      height,
-      onDragEnd: _onDragEnd,
-      strategy,
-      width,
-      ...styleProps
-    },
+    rest: { height, onDragEnd, strategy, width, ...styleProps },
     sharedProps: {
       DropIndicatorComponent,
       dimensionsAnimationType,
@@ -40,9 +58,6 @@ function SortableFlex(props: SortableFlexProps) {
     }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
 
-  const childrenArray = validateChildren(children);
-  const itemKeys = childrenArray.map(([key]) => key);
-
   const { flexDirection, flexWrap } = styleProps;
   const controlledContainerDimensions = useDerivedValue(() => {
     if (flexWrap === 'nowrap') {
@@ -53,21 +68,13 @@ function SortableFlex(props: SortableFlexProps) {
       : { height: false, width: width === undefined };
   }, [flexWrap, flexDirection, height, width]);
 
-  const onDragEnd = useDragEndHandler(_onDragEnd, {
-    order: params =>
-      function <I>(data: Array<I>) {
-        return orderItems(data, itemKeys, params, true);
-      }
-  });
-
   return (
     <SharedProvider
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
       initialItemsStyleOverride={styles.styleOverride}
-      itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
-      <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
+      <FlexLayoutProvider {...styleProps}>
         <OrderUpdaterComponent
           key={useStrategyKey(strategy)}
           predefinedStrategies={FLEX_STRATEGIES}
@@ -75,8 +82,7 @@ function SortableFlex(props: SortableFlexProps) {
           triggerOrigin={reorderTriggerOrigin}
           useAdditionalValues={useFlexLayoutContext}
         />
-        <SortableFlexInner
-          childrenArray={childrenArray}
+        <SortableContainer
           dimensionsAnimationType={dimensionsAnimationType}
           DropIndicatorComponent={DropIndicatorComponent}
           dropIndicatorStyle={dropIndicatorStyle}
@@ -96,46 +102,7 @@ function SortableFlex(props: SortableFlexProps) {
       </FlexLayoutProvider>
     </SharedProvider>
   );
-}
-
-type SortableFlexInnerProps = {
-  childrenArray: Array<[string, ReactElement]>;
-  style: StyleProp<ViewStyle>;
-} & DropIndicatorSettings &
-  Required<
-    Pick<
-      SortableFlexProps,
-      | 'dimensionsAnimationType'
-      | 'itemEntering'
-      | 'itemExiting'
-      | 'itemsLayout'
-      | 'overflow'
-    >
-  >;
-
-function SortableFlexInner({
-  childrenArray,
-  itemEntering,
-  itemExiting,
-  itemsLayout,
-  style,
-  ...containerProps
-}: SortableFlexInnerProps) {
-  return (
-    <SortableContainer {...containerProps} style={style}>
-      {childrenArray.map(([key, child]) => (
-        <DraggableView
-          entering={itemEntering ?? undefined}
-          exiting={itemExiting ?? undefined}
-          itemKey={key}
-          key={key}
-          layout={itemsLayout ?? undefined}>
-          {child}
-        </DraggableView>
-      ))}
-    </SortableContainer>
-  );
-}
+});
 
 const styles = StyleSheet.create({
   styleOverride: {

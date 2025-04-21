@@ -27,9 +27,11 @@ import type {
 } from '../state';
 import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
 
-// COMMON VALUES
+// CHILDREN
 
-export type ControlledContainerDimensions = { width: boolean; height: boolean };
+export type ChildrenContextType = {
+  children: Array<ReactNode>;
+};
 
 // ACTIVE ITEM VALUES
 
@@ -51,6 +53,8 @@ export type ActiveItemValuesContextType = {
 };
 
 // COMMON VALUES
+
+export type ControlledContainerDimensions = { width: boolean; height: boolean };
 
 /**
  * Context values shared between all providers.

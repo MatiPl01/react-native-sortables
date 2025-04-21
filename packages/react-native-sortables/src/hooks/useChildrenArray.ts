@@ -1,11 +1,9 @@
 import type { ReactElement, ReactNode } from 'react';
-import { Children, Fragment, isValidElement } from 'react';
+import { Children, Fragment, isValidElement, useMemo } from 'react';
 
-import { logger } from './logs';
+import { logger } from '../utils';
 
-export const validateChildren = (
-  children: ReactNode
-): Array<[string, ReactElement]> =>
+const childrenToArray = (children: ReactNode): Array<[string, ReactElement]> =>
   Children.toArray(children).reduce(
     (acc: Array<[string, ReactElement]>, child, index) => {
       if (!isValidElement(child)) {
@@ -14,7 +12,7 @@ export const validateChildren = (
 
       // Handle React Fragments by recursively processing their children
       if (child.type === Fragment) {
-        const fragmentChildren = validateChildren(
+        const fragmentChildren = childrenToArray(
           (child.props as { children: ReactNode }).children
         );
         return [...acc, ...fragmentChildren];
@@ -34,3 +32,9 @@ export const validateChildren = (
     },
     []
   );
+
+export default function useChildrenArray(
+  children: ReactNode
+): Array<[string, ReactElement]> {
+  return useMemo(() => childrenToArray(children), [children]);
+}
