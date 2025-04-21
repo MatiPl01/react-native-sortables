@@ -123,6 +123,7 @@ body:
     attributes:
       label: Device
       description: How are you running your application?
+      multiple: true
       options:
         - iOS simulator
         - Android emulator
