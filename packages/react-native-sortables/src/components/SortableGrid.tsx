@@ -33,13 +33,13 @@ import { type DraggableViewProps } from './shared';
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
     rest: {
-      columnGap,
+      columnGap: _columnGap,
       columns,
       data: _data,
       keyExtractor = defaultKeyExtractor,
       onDragEnd: _onDragEnd,
       renderItem,
-      rowGap,
+      rowGap: _rowGap,
       rowHeight,
       rows,
       strategy
@@ -70,8 +70,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     throw error('rows must be greater than 0');
   }
 
-  const columnGapValue = useAnimatableValue(columnGap);
-  const rowGapValue = useAnimatableValue(rowGap);
+  const columnGap = useAnimatableValue(_columnGap);
+  const rowGap = useAnimatableValue(_rowGap);
   const controlledContainerDimensions = useDerivedValue(() => ({
     height: isVertical, // height is controlled for vertical grids
     width: !isVertical // width is controlled for horizontal grids
@@ -88,17 +88,18 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     <SharedProvider
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
+      data={data}
       itemKeys={itemKeys}
       initialItemsStyleOverride={
         isVertical ? undefined : styles.horizontalStyleOverride
       }
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
-        columnGap={columnGapValue}
+        columnGap={columnGap}
         isVertical={isVertical}
         numGroups={groups}
         numItems={data.length}
-        rowGap={rowGapValue}
+        rowGap={rowGap}
         rowHeight={rowHeight} // horizontal grid only
       >
         <OrderUpdaterComponent
@@ -108,7 +109,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           useAdditionalValues={useGridLayoutContext}
         />
         <SortableGridInner
-          columnGap={columnGapValue}
+          columnGap={columnGap}
           data={data}
           dimensionsAnimationType={dimensionsAnimationType}
           DropIndicatorComponent={DropIndicatorComponent}
@@ -121,7 +122,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           itemsLayout={itemsLayout}
           overflow={overflow}
           renderItem={renderItem}
-          rowGap={rowGapValue}
+          rowGap={rowGap}
           rowHeight={rowHeight!} // must be specified for horizontal grids
           showDropIndicator={showDropIndicator}
         />

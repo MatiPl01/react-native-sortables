@@ -1,13 +1,17 @@
+import type { PropsWithChildren } from 'react';
 import { measure, useAnimatedReaction } from 'react-native-reanimated';
 
-import type { ChildrenProps } from '../../types';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useInterDragContext } from './InterDragProvider';
 
+type InterDragInnerProviderProps = PropsWithChildren<{
+  data: Array<unknown>;
+}>;
+
 const { InterDragInnerProvider } = createProvider('InterDragInner', {
   withContext: false
-})<ChildrenProps>(() => {
+})<InterDragInnerProviderProps>(() => {
   const { activeItemDimensions, containerId, containerRef } =
     useCommonValuesContext();
   const { activeItemTriggerOriginAbsolutePosition, currentContainerId } =

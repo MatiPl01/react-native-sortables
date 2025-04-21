@@ -185,15 +185,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           (offsetDiff?.y ?? 0)
       };
 
-      if (isCenterOrigin) {
-        activeItemTriggerOriginPosition.value = {
-          x: touchPosition.x + snapDimensions.width / 2,
-          y: touchPosition.y + snapDimensions.height / 2
-        };
-      } else {
-        activeItemTriggerOriginPosition.value = touchPosition;
-      }
-
       let tX = itemTouchOffset.x;
       let tY = itemTouchOffset.y;
 
@@ -222,14 +213,21 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         ? unclampedActiveY
         : clamp(unclampedActiveY, 0, containerH - activeDimensions.height);
 
+      const absoluteX = touch.absoluteX + activeX - unclampedActiveX - snapX;
+      const absoluteY = touch.absoluteY + activeY - unclampedActiveY - snapY;
+
       activeItemPosition.value = {
         x: activeX,
         y: activeY
       };
-
-      const absoluteX = touch.absoluteX + activeX - unclampedActiveX - snapX;
-      const absoluteY = touch.absoluteY + activeY - unclampedActiveY - snapY;
-
+      if (isCenterOrigin) {
+        activeItemTriggerOriginPosition.value = {
+          x: activeX + snapDimensions.width / 2,
+          y: activeY + snapDimensions.height / 2
+        };
+      } else {
+        activeItemTriggerOriginPosition.value = touchPosition;
+      }
       if (activeItemAbsolutePosition) {
         activeItemAbsolutePosition.value = {
           x: absoluteX,
@@ -237,9 +235,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         };
       }
       if (activeItemTriggerOriginAbsolutePosition) {
+        const { x: oX, y: oY } = activeItemTriggerOriginPosition.value;
         activeItemTriggerOriginAbsolutePosition.value = {
-          x: absoluteX + (isCenterOrigin ? activeDimensions.width / 2 : 0),
-          y: absoluteY + (isCenterOrigin ? activeDimensions.height / 2 : 0)
+          x: absoluteX + (oX - activeX),
+          y: absoluteY + (oY - activeY)
         };
       }
     }

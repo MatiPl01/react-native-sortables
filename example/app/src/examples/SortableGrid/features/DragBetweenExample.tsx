@@ -38,6 +38,7 @@ export default function DragBetweenExample() {
         <Sortable.Layer>
           <Group>
             <Sortable.Grid
+              debug
               {...gridProps}
               data={data1}
               onDragEnd={params => setData1(params.data)}
@@ -48,6 +49,7 @@ export default function DragBetweenExample() {
           <Group>
             <Sortable.Grid
               {...gridProps}
+              debug
               data={data2}
               onDragEnd={params => setData2(params.data)}
             />

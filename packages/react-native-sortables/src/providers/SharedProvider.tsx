@@ -37,6 +37,7 @@ type SharedProviderProps = PropsWithChildren<
     sortEnabled: Animatable<boolean>;
     hapticsEnabled: boolean;
     customHandle: boolean;
+    data: Array<unknown>;
     debug: boolean;
     controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
     itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
@@ -56,6 +57,7 @@ export default function SharedProvider({
   autoScrollSpeed,
   children,
   customHandle,
+  data,
   debug,
   hapticsEnabled,
   itemKeys,
@@ -118,7 +120,7 @@ export default function SharedProvider({
     />,
     // Provider used for inter drag logic (like changing the active item
     // residence container)
-    hasInterDragProvider && <InterDragInnerProvider />
+    hasInterDragProvider && <InterDragInnerProvider data={data} />
   ];
 
   return (
