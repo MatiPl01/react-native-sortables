@@ -136,6 +136,8 @@ export type DragContextType = {
 
 export type ItemContextType = {
   itemKey: string;
+  activeItemKey: Readonly<SharedValue<null | string>>;
+  prevActiveItemKey: Readonly<SharedValue<null | string>>;
   isActive: Readonly<SharedValue<boolean>>;
   dragActivationState: Readonly<SharedValue<DragActivationState>>;
   activationAnimationProgress: Readonly<SharedValue<number>>;

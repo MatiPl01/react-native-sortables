@@ -10,7 +10,6 @@ import {
 } from './components';
 export { useItemContext } from './providers';
 import { PortalProvider } from './providers';
-
 export type { SortableHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
@@ -33,6 +32,7 @@ export type {
   SortableGridRenderItem,
   SortableGridStrategyFactory
 } from './types';
+export { DragActivationState } from './types';
 
 /** Collection of sortable components and utilities for React Native */
 const Sortable = {
