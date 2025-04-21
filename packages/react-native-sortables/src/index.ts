@@ -8,6 +8,7 @@ import {
   SortableHandle,
   SortableLayer
 } from './components';
+export { useItemContext } from './providers';
 import { PortalProvider } from './providers';
 
 export type { SortableHandleProps, SortableLayerProps } from './components';
