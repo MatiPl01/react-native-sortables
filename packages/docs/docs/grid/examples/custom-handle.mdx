@@ -9,9 +9,7 @@ description: ''
 
 The **Custom Handle** example demonstrates how to use a custom item drag handle.
 
-## Usage
-
-### Source Code
+## Source Code
 
 ```tsx
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
@@ -23,7 +21,7 @@ import Sortable from 'react-native-sortables';
 
 const DATA = Array.from({ length: 8 }, (_, index) => `Item ${index + 1}`);
 
-export default function PlaygroundExample() {
+export default function Example() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
       <View style={styles.card}>

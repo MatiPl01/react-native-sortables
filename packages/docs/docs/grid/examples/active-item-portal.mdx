@@ -1,0 +1,109 @@
+---
+sidebar_position: 8
+description: ''
+---
+
+# Active Item Portal
+
+## Description
+
+This example demonstrates how to use the active item portal to render the active item on top of other components.
+
+In this case, the `PortalProvider` is used to render the active item outside of the `ScrollView` content bounds. This is the only way to render only the active item without cropping it whilst keeping the rest of the grid within the `ScrollView` content bounds.
+
+## Source Code
+
+```tsx
+import { useCallback, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedRef } from 'react-native-reanimated';
+import type { SortableGridRenderItem } from 'react-native-sortables';
+import Sortable from 'react-native-sortables';
+
+const DATA = Array.from({ length: 18 }, (_, index) => `Item ${index + 1}`);
+
+export default function Example() {
+  const [portalEnabled, setPortalEnabled] = useState(false);
+  const scrollableRef = useAnimatedRef<Animated.ScrollView>();
+
+  const renderItem = useCallback<SortableGridRenderItem<string>>(
+    ({ item }) => (
+      <View style={styles.card}>
+        <Text style={styles.text}>{item}</Text>
+      </View>
+    ),
+    []
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* highlight-start */}
+      <Sortable.PortalProvider enabled={portalEnabled}>
+        {/* highlight-end */}
+        <View style={styles.gridContainer}>
+          <Animated.ScrollView
+            contentContainerStyle={styles.contentContainer}
+            ref={scrollableRef}>
+            <Sortable.Grid
+              columnGap={10}
+              columns={3}
+              data={DATA}
+              renderItem={renderItem}
+              rowGap={10}
+              scrollableRef={scrollableRef}
+            />
+          </Animated.ScrollView>
+        </View>
+        <Pressable onPress={() => setPortalEnabled(prev => !prev)}>
+          <Text
+            style={
+              styles.buttonText
+            }>{`${portalEnabled ? 'Disable' : 'Enable'} Portal`}</Text>
+        </Pressable>
+        {/* highlight-start */}
+      </Sortable.PortalProvider>
+      {/* highlight-end */}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#DDE2E3'
+  },
+  gridContainer: {
+    margin: 15,
+    borderRadius: 10,
+    height: 400,
+    backgroundColor: '#FFFFFF'
+  },
+  card: {
+    alignItems: 'center',
+    backgroundColor: '#36877F',
+    borderRadius: 10,
+    height: 100,
+    justifyContent: 'center'
+  },
+  contentContainer: {
+    padding: 10
+  },
+  text: {
+    color: 'white',
+    fontWeight: 'bold'
+  },
+  buttonText: {
+    color: '#36877F',
+    fontSize: 18,
+    fontWeight: 'bold'
+  }
+});
+```
+
+## Result
+
+import video from '@site/static/video/grid-active-item-portal.mp4';
+
+<video autoPlay loop muted width='300px' src={video} />
