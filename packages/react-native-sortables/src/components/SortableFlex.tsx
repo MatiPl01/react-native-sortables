@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
-import { useChildrenArray, useDragEndHandler } from '../hooks';
+import { useDragEndHandler, useStoreItemsUpdater } from '../hooks';
 import {
   FLEX_STRATEGIES,
   FlexLayoutProvider,
@@ -13,7 +13,12 @@ import {
   useStrategyKey
 } from '../providers';
 import type { DragEndCallback, SortableFlexProps } from '../types';
-import { getPropsWithDefaults, orderItems, typedMemo } from '../utils';
+import {
+  childrenToArray,
+  getPropsWithDefaults,
+  orderItems,
+  typedMemo
+} from '../utils';
 import { SortableContainer } from './shared';
 
 function SortableFlex({
@@ -21,7 +26,7 @@ function SortableFlex({
   onDragEnd: _onDragEnd,
   ...rest
 }: SortableFlexProps) {
-  const childrenArray = useChildrenArray(children);
+  const childrenArray = useMemo(() => childrenToArray(children), [children]);
   const itemKeys = useMemo(
     () => childrenArray.map(([key]) => key),
     [childrenArray]
@@ -33,6 +38,8 @@ function SortableFlex({
         return orderItems(data, itemKeys, params, true);
       }
   });
+
+  useStoreItemsUpdater(itemKeys, childrenArray);
 
   return <SortableFlexInner {...rest} onDragEnd={onDragEnd} />;
 }

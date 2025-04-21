@@ -31,7 +31,6 @@ import { ContextProviderComposer } from './utils';
 
 type SharedProviderProps = PropsWithChildren<
   {
-    itemKeys: Array<string>;
     sortEnabled: Animatable<boolean>;
     hapticsEnabled: boolean;
     customHandle: boolean;
@@ -79,13 +78,9 @@ export default function SharedProvider({
     // Provider used for active item values
     <ActiveItemValuesProvider />,
     // Provider used for shared values between all providers below
-    <CommonValuesProvider
-      customHandle={customHandle}
-      itemKeys={itemKeys}
-      {...rest}
-    />,
+    <CommonValuesProvider customHandle={customHandle} {...rest} />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider itemsCount={itemKeys.length} />,
+    <MeasurementsProvider />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (

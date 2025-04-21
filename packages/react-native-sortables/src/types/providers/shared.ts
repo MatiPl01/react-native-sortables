@@ -189,10 +189,10 @@ export type DebugContextType = {
   useDebugRects<K extends string>(keys: Array<K>): Record<K, DebugRectUpdater>;
   useDebugRects(count: number): Array<DebugRectUpdater>;
 
-  useDebugLine: () => DebugLineUpdater;
-  useDebugRect: () => DebugRectUpdater;
-  useDebugCross: () => DebugCrossUpdater;
-  useObserver: (observer: (views: DebugViews) => void) => void;
+  useDebugLine(): DebugLineUpdater;
+  useDebugRect(): DebugRectUpdater;
+  useDebugCross(): DebugCrossUpdater;
+  useObserver(observer: (views: DebugViews) => void): void;
 };
 
 // ORDER UPDATER
