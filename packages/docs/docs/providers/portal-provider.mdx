@@ -79,6 +79,10 @@ For components that need to maintain state during dragging, consider using:
 
 Since the view is mounted and unmounted within the portal outlet, all entering and exiting animations used in this view triggered on render will be triggered here as well.
 
+### Paper (Old Architecture) Only
+
+When using the Portal Provider with in the React Native Old Architecture, you may encounter a shadow-related warning saying that the shadow calculation is inefficient. To resolve this, either set `activeItemShadowOpacity={0}` to remove the shadow or ignore the warning as the shadow only affects a single (active) view.
+
 :::warning
 
 The Portal Provider uses complex synchronization logic to synchronize Reanimated style updates with React renders. While this approach works well in most cases, it may have some limitations.
@@ -87,7 +91,7 @@ If you encounter unexpected behavior or any kind of issues, please report them o
 
 :::
 
-:::info Complete Usage Example
+:::info
 
 For the complete usage example of the Portal Provider, check out the [Active Item Portal](/grid/examples/active-item-portal) example.
 
