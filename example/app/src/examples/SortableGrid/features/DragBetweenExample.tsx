@@ -11,7 +11,7 @@ import { getItems } from '@/utils';
 const DATA = getItems(18);
 const LENGTH = DATA.length;
 
-export default function InterDragExample() {
+export default function DragBetweenExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
   const [data1, setData1] = useState(() => DATA.slice(0, LENGTH / 2));
   const [data2, setData2] = useState(() => DATA.slice(LENGTH / 2));
@@ -24,6 +24,7 @@ export default function InterDragExample() {
   const gridProps = {
     columnGap: 10,
     columns: 3,
+    scrollableRef,
     renderItem,
     rowGap: 10
   };

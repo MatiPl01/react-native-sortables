@@ -52,7 +52,7 @@ const routes: Routes = {
             name: 'Fixed Items'
           },
           InterDrag: {
-            Component: SortableGrid.features.InterDragExample,
+            Component: SortableGrid.features.DragBetweenExample,
             name: 'Drag Between Sortable Grids'
           },
           CallbacksExample: {

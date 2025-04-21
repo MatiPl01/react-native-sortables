@@ -48,7 +48,7 @@ function DraggableView({
   const commonValuesContext = useCommonValuesContext();
   const { handleItemMeasurement, removeItemMeasurements } =
     useMeasurementsContext();
-  const { activeItemKey, componentId, customHandle, itemsOverridesStyle } =
+  const { activeItemKey, containerId, customHandle, itemsOverridesStyle } =
     commonValuesContext;
 
   const activationAnimationProgress = useSharedValue(0);
@@ -103,7 +103,7 @@ function DraggableView({
 
   // PORTAL CASE
 
-  const teleportedItemId = `${componentId}-${key}`;
+  const teleportedItemId = `${containerId}-${key}`;
 
   const onMeasureItem = (width: number, height: number) => {
     const state = portalState.value;

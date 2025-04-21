@@ -1,7 +1,12 @@
 import type { ReactNode } from 'react';
 import { Fragment, useCallback, useRef, useState } from 'react';
+import { useSharedValue } from 'react-native-reanimated';
 
-import type { PortalContextType, PortalSubscription } from '../../types';
+import type {
+  PortalContextType,
+  PortalSubscription,
+  Vector
+} from '../../types';
 import { createProvider } from '../utils';
 import { PortalOutletProvider } from './PortalOutletProvider';
 
@@ -17,6 +22,8 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
   const [teleportedNodes, setTeleportedNodes] = useState<
     Record<string, React.ReactNode>
   >({});
+
+  const activeItemAbsolutePosition = useSharedValue<Vector | null>(null);
 
   const teleport = useCallback((id: string, node: React.ReactNode) => {
     if (node) {
@@ -70,6 +77,7 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     ),
     enabled,
     value: {
+      activeItemAbsolutePosition,
       notifyRendered,
       subscribe,
       teleport

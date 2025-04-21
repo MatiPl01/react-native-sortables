@@ -36,7 +36,6 @@ export type ActiveItemValuesContextType = {
   // POSITIONS
   activeItemTriggerOriginPosition: SharedValue<Vector | null>;
   activeItemPosition: SharedValue<Vector | null>;
-  activeItemAbsolutePosition: SharedValue<Vector | null>;
 
   // DIMENSIONS
   activeItemDimensions: SharedValue<Dimensions | null>;
@@ -58,7 +57,7 @@ export type ActiveItemValuesContextType = {
  * between different providers)
  */
 export type CommonValuesContextType = {
-  componentId: number;
+  containerId: number;
 
   // ORDER
   indexToKey: SharedValue<Array<string>>;
@@ -134,8 +133,9 @@ export type DragContextType = {
 
 // INTER DRAG
 
-export type InterDragInnerContextType = {
-  // TODO
+export type InterDragContextType = {
+  currentContainerId: SharedValue<null | number>;
+  activeItemTriggerOriginAbsolutePosition: SharedValue<Vector | null>;
 };
 
 // ITEM
@@ -168,6 +168,7 @@ export type CustomHandleContextType = {
 export type PortalSubscription = (isTeleported: boolean) => void;
 
 export type PortalContextType = {
+  activeItemAbsolutePosition: SharedValue<Vector | null>;
   teleport: (id: string, node: ReactNode) => void;
   subscribe: (id: string, callback: PortalSubscription) => () => void;
   notifyRendered: (id: string) => void;

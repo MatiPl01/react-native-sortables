@@ -12,10 +12,7 @@ export {
 } from './CustomHandleProvider';
 export { DragProvider, useDragContext } from './DragProvider';
 export * from './hooks';
-export {
-  InterDragInnerProvider,
-  useInterDragInnerContext
-} from './InterDragInnerProvider';
+export { InterDragInnerProvider } from './InterDragInnerProvider';
 export { InterDragProvider, useInterDragContext } from './InterDragProvider';
 export { ItemContextProvider, useItemContext } from './ItemContextProvider';
 export { LayerProvider } from './LayerProvider';

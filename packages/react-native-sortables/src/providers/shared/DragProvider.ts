@@ -36,8 +36,10 @@ import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useCustomHandleContext } from './CustomHandleProvider';
+import { useInterDragContext } from './InterDragProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
+import { usePortalContext } from './PortalProvider';
 
 type DragProviderProps = PropsWithChildren<
   {
@@ -64,7 +66,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationAnimationDuration,
     activationState,
     activeAnimationProgress,
-    activeItemAbsolutePosition,
     activeItemDimensions,
     activeItemDropped,
     activeItemKey,
@@ -95,6 +96,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     useAutoScrollContext() ?? {};
   const { activeHandleDimensions, activeHandleOffset } =
     useCustomHandleContext() ?? {};
+  const { activeItemAbsolutePosition } = usePortalContext() ?? {};
+  const { activeItemTriggerOriginAbsolutePosition } =
+    useInterDragContext() ?? {};
 
   const haptics = useHaptics(hapticsEnabled);
 
@@ -222,10 +226,22 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: activeX,
         y: activeY
       };
-      activeItemAbsolutePosition.value = {
-        x: touch.absoluteX + activeX - unclampedActiveX - snapX,
-        y: touch.absoluteY + activeY - unclampedActiveY - snapY
-      };
+
+      const absoluteX = touch.absoluteX + activeX - unclampedActiveX - snapX;
+      const absoluteY = touch.absoluteY + activeY - unclampedActiveY - snapY;
+
+      if (activeItemAbsolutePosition) {
+        activeItemAbsolutePosition.value = {
+          x: absoluteX,
+          y: absoluteY
+        };
+      }
+      if (activeItemTriggerOriginAbsolutePosition) {
+        activeItemTriggerOriginAbsolutePosition.value = {
+          x: absoluteX + (isCenterOrigin ? activeDimensions.width / 2 : 0),
+          y: absoluteY + (isCenterOrigin ? activeDimensions.height / 2 : 0)
+        };
+      }
     }
   );
 

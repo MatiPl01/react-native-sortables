@@ -13,7 +13,6 @@ const { ActiveItemValuesProvider, useActiveItemValuesContext } = createProvider(
   'ActiveItemValues'
 )<ChildrenProps, ActiveItemValuesContextType>(() => {
   // POSITIONS
-  const activeItemAbsolutePosition = useSharedValue<Vector | null>(null);
   const activeItemTriggerOriginPosition = useSharedValue<Vector | null>(null);
   const activeItemPosition = useSharedValue<Vector | null>(null);
 
@@ -32,7 +31,6 @@ const { ActiveItemValuesProvider, useActiveItemValuesContext } = createProvider(
     value: {
       activationState,
       activeAnimationProgress,
-      activeItemAbsolutePosition,
       activeItemDimensions,
       activeItemDropped,
       activeItemKey,
