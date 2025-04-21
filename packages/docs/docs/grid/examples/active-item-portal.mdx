@@ -1,3 +1,19 @@
+---
+sidebar_position: 8
+description: ''
+---
+
+# Active Item Portal
+
+## Description
+
+This example demonstrates how to use the active item portal to render the active item on top of other components.
+
+In this case, the `PortalProvider` is used to render the active item outside of the `ScrollView` content bounds. This is the only way to render only the active item without cropping it whilst keeping the rest of the grid within the `ScrollView` content bounds.
+
+## Source Code
+
+```tsx
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
@@ -21,7 +37,9 @@ export default function Example() {
 
   return (
     <View style={styles.container}>
+      {/* highlight-start */}
       <Sortable.PortalProvider enabled={portalEnabled}>
+        {/* highlight-end */}
         <View style={styles.gridContainer}>
           <Animated.ScrollView
             contentContainerStyle={styles.contentContainer}
@@ -42,7 +60,9 @@ export default function Example() {
               styles.buttonText
             }>{`${portalEnabled ? 'Disable' : 'Enable'} Portal`}</Text>
         </Pressable>
+        {/* highlight-start */}
       </Sortable.PortalProvider>
+      {/* highlight-end */}
     </View>
   );
 }
@@ -80,3 +100,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   }
 });
+```
+
+## Result
+
+import video from '@site/static/video/grid-active-item-portal.mp4';
+
+<video autoPlay loop muted width='300px' src={video} />
