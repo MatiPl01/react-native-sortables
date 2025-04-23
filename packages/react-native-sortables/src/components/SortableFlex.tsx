@@ -10,6 +10,7 @@ import {
   OrderUpdaterComponent,
   SharedProvider,
   useFlexLayoutContext,
+  useSortableData,
   useStrategyKey
 } from '../providers';
 import type { DropIndicatorSettings, SortableFlexProps } from '../types';
@@ -34,13 +35,12 @@ function SortableFlex(props: SortableFlexProps) {
       itemExiting,
       itemsLayout,
       overflow,
-      reorderTriggerOrigin,
       showDropIndicator,
       ...sharedProps
     }
   } = getPropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
 
-  const childrenArray = validateChildren(children);
+  const childrenArray = useSortableData(validateChildren(children));
   const itemKeys = childrenArray.map(([key]) => key);
 
   const { flexDirection, flexWrap } = styleProps;
@@ -64,6 +64,7 @@ function SortableFlex(props: SortableFlexProps) {
     <SharedProvider
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
+      data={childrenArray}
       initialItemsStyleOverride={styles.styleOverride}
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
@@ -72,7 +73,6 @@ function SortableFlex(props: SortableFlexProps) {
           key={useStrategyKey(strategy)}
           predefinedStrategies={FLEX_STRATEGIES}
           strategy={strategy}
-          triggerOrigin={reorderTriggerOrigin}
           useAdditionalValues={useFlexLayoutContext}
         />
         <SortableFlexInner

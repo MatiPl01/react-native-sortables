@@ -1,31 +1,22 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
-import type {
-  OrderUpdater,
-  ReorderTriggerOrigin,
-  Vector
-} from '../../../types';
+import type { OrderUpdater } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
-export default function useOrderUpdater(
-  updater: OrderUpdater,
-  triggerOrigin: ReorderTriggerOrigin
-) {
+export default function useOrderUpdater(updater: OrderUpdater) {
   const {
     activeItemDimensions,
     activeItemKey,
     activeItemPosition,
-    keyToIndex,
-    touchPosition
+    activeItemTriggerOriginPosition,
+    keyToIndex
   } = useCommonValuesContext();
   const { handleOrderChange } = useDragContext();
   const debugContext = useDebugContext();
 
   const debugCross = debugContext?.useDebugCross();
-
-  const isCenter = triggerOrigin === 'center';
 
   useAnimatedReaction(
     () => ({
@@ -33,14 +24,14 @@ export default function useOrderUpdater(
       dimensions: activeItemDimensions.value,
       positions: {
         activeItem: activeItemPosition.value,
-        touch: touchPosition.value
+        triggerOrigin: activeItemTriggerOriginPosition.value
       }
     }),
     ({ activeKey, dimensions, positions }) => {
       if (
         !activeKey ||
         !dimensions ||
-        !positions.touch ||
+        !positions.triggerOrigin ||
         !positions.activeItem
       ) {
         if (debugCross) debugCross.set({ position: null });
@@ -52,20 +43,7 @@ export default function useOrderUpdater(
         return;
       }
 
-      let position: Vector;
-      if (isCenter) {
-        position = {
-          x: positions.activeItem.x + dimensions.width / 2,
-          y: positions.activeItem.y + dimensions.height / 2
-        };
-      } else {
-        position = positions.touch;
-      }
-
-      if (debugCross) {
-        debugCross.set({ color: '#00007e', position });
-      }
-
+      const position = positions.triggerOrigin;
       const newOrder = updater({
         activeIndex,
         activeKey,
@@ -80,6 +58,10 @@ export default function useOrderUpdater(
           newOrder.indexOf(activeKey),
           newOrder
         );
+      }
+
+      if (debugCross) {
+        debugCross.set({ color: '#00007e', position });
       }
     }
   );

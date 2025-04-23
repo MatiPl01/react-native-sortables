@@ -18,6 +18,7 @@ import { useHaptics, useStableCallbackValue } from '../../hooks';
 import type {
   DragContextType,
   OverDrag,
+  ReorderTriggerOrigin,
   SortableCallbacks,
   Vector
 } from '../../types';
@@ -35,6 +36,7 @@ import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useCustomHandleContext } from './CustomHandleProvider';
+import { useInterDragContext } from './InterDragProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
 import { usePortalContext } from './PortalProvider';
@@ -43,6 +45,7 @@ type DragProviderProps = PropsWithChildren<
   {
     hapticsEnabled: boolean;
     overDrag: OverDrag;
+    triggerOrigin: ReorderTriggerOrigin;
   } & Required<SortableCallbacks>
 >;
 
@@ -55,7 +58,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   onDragMove,
   onDragStart,
   onOrderChange,
-  overDrag
+  overDrag,
+  triggerOrigin
 }) => {
   const {
     absoluteLayoutState,
@@ -66,6 +70,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activeItemDropped,
     activeItemKey,
     activeItemPosition,
+    activeItemTriggerOriginPosition,
     containerHeight,
     containerRef,
     containerWidth,
@@ -83,8 +88,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     prevActiveItemKey,
     snapOffsetX,
     snapOffsetY,
-    sortEnabled,
-    touchPosition
+    sortEnabled
   } = useCommonValuesContext();
   const { measureContainer } = useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
@@ -93,12 +97,15 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { activeHandleDimensions, activeHandleOffset } =
     useCustomHandleContext() ?? {};
   const { activeItemAbsolutePosition } = usePortalContext() ?? {};
+  const { activeItemTriggerOriginAbsolutePosition } =
+    useInterDragContext() ?? {};
 
   const haptics = useHaptics(hapticsEnabled);
 
   const hasHorizontalOverDrag =
     overDrag === 'horizontal' || overDrag === 'both';
   const hasVerticalOverDrag = overDrag === 'vertical' || overDrag === 'both';
+  const isCenterOrigin = triggerOrigin === 'center';
 
   const touchStartTouch = useSharedValue<TouchData | null>(null);
   const currentTouch = useSharedValue<TouchData | null>(null);
@@ -163,11 +170,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         !touch ||
         !startTouch
       ) {
-        touchPosition.value = null;
+        activeItemTriggerOriginPosition.value = null;
         return;
       }
 
-      touchPosition.value = {
+      const touchPosition = {
         x:
           startTouchPosition.x +
           (touch.absoluteX - startTouch.absoluteX) +
@@ -196,8 +203,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const snapX = translate(itemTouchOffset.x, tX);
       const snapY = translate(itemTouchOffset.y, tY);
 
-      const unclampedActiveX = touchPosition.value.x - snapX;
-      const unclampedActiveY = touchPosition.value.y - snapY;
+      const unclampedActiveX = touchPosition.x - snapX;
+      const unclampedActiveY = touchPosition.y - snapY;
 
       const activeX = hasHorizontalOverDrag
         ? unclampedActiveX
@@ -206,14 +213,32 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         ? unclampedActiveY
         : clamp(unclampedActiveY, 0, containerH - activeDimensions.height);
 
+      const absoluteX = touch.absoluteX + activeX - unclampedActiveX - snapX;
+      const absoluteY = touch.absoluteY + activeY - unclampedActiveY - snapY;
+
       activeItemPosition.value = {
         x: activeX,
         y: activeY
       };
+      if (isCenterOrigin) {
+        activeItemTriggerOriginPosition.value = {
+          x: activeX + snapDimensions.width / 2,
+          y: activeY + snapDimensions.height / 2
+        };
+      } else {
+        activeItemTriggerOriginPosition.value = touchPosition;
+      }
       if (activeItemAbsolutePosition) {
         activeItemAbsolutePosition.value = {
-          x: touch.absoluteX + activeX - unclampedActiveX - snapX,
-          y: touch.absoluteY + activeY - unclampedActiveY - snapY
+          x: absoluteX,
+          y: absoluteY
+        };
+      }
+      if (activeItemTriggerOriginAbsolutePosition) {
+        const { x: oX, y: oY } = activeItemTriggerOriginPosition.value;
+        activeItemTriggerOriginAbsolutePosition.value = {
+          x: absoluteX + (oX - activeX),
+          y: absoluteY + (oY - activeY)
         };
       }
     }
@@ -259,8 +284,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const touchX = handlePosition.x + touch.x;
       const touchY = handlePosition.y + touch.y;
 
-      touchPosition.value = { x: touchX, y: touchY };
-      dragStartTouchPosition.value = touchPosition.value;
+      dragStartTouchPosition.value = { x: touchX, y: touchY };
       dragStartItemTouchOffset.value = {
         x: touchX - itemPosition.x,
         y: touchY - itemPosition.y
@@ -315,7 +339,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       keyToIndex,
       prevActiveItemKey,
       stableOnDragStart,
-      touchPosition,
       updateLayer,
       updateStartScrollOffset
     ]
@@ -446,7 +469,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dragStartTouchPosition.value = null;
       activeItemPosition.value = null;
       activeItemDimensions.value = null;
-      touchPosition.value = null;
       activationState.value = DragActivationState.INACTIVE;
       updateStartScrollOffset?.(null);
 
@@ -499,7 +521,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       indexToKey,
       keyToIndex,
       stableOnDragEnd,
-      touchPosition,
       touchStartTouch,
       updateLayer,
       updateStartScrollOffset

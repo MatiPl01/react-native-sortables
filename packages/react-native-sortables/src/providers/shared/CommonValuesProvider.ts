@@ -65,7 +65,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     snapOffsetY: _snapOffsetY,
     sortEnabled: _sortEnabled
   }) => {
-    const componentId = useMemo(() => nextId++, []);
+    const containerId = useMemo(() => nextId++, []);
     const prevKeysRef = useRef<Array<string>>([]);
 
     // ORDER
@@ -146,7 +146,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activeItemScale,
         activeItemShadowOpacity,
         animateLayoutOnReorderOnly,
-        componentId,
+        containerId,
         containerHeight,
         containerRef,
         containerWidth,

@@ -17,8 +17,7 @@ import type { Dimensions, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
-  ItemDragSettings,
-  ReorderTriggerOrigin
+  ItemDragSettings
 } from '../props/shared';
 import type {
   AbsoluteLayoutState,
@@ -35,7 +34,7 @@ export type ControlledContainerDimensions = { width: boolean; height: boolean };
 
 export type ActiveItemValuesContextType = {
   // POSITIONS
-  touchPosition: SharedValue<Vector | null>;
+  activeItemTriggerOriginPosition: SharedValue<Vector | null>;
   activeItemPosition: SharedValue<Vector | null>;
 
   // DIMENSIONS
@@ -58,7 +57,7 @@ export type ActiveItemValuesContextType = {
  * between different providers)
  */
 export type CommonValuesContextType = {
-  componentId: number;
+  containerId: number;
 
   // ORDER
   indexToKey: SharedValue<Array<string>>;
@@ -130,6 +129,13 @@ export type DragContextType = {
     toIndex: number,
     newOrder: Array<string>
   ) => void;
+};
+
+// INTER DRAG
+
+export type InterDragContextType = {
+  currentContainerId: SharedValue<null | number>;
+  activeItemTriggerOriginAbsolutePosition: SharedValue<Vector | null>;
 };
 
 // ITEM
@@ -214,6 +220,5 @@ export type OrderUpdaterProps<
 > = {
   predefinedStrategies: P;
   strategy: AnyStrategyFactory | keyof P;
-  triggerOrigin: ReorderTriggerOrigin;
   useAdditionalValues: () => AnyRecord;
 };
