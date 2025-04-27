@@ -7,7 +7,7 @@ import { useCommonValuesContext } from './CommonValuesProvider';
 type ItemContextProviderProps = PropsWithChildren<
   {
     itemKey: string;
-  } & Omit<ItemContextType, 'dragActivationState'>
+  } & Pick<ItemContextType, 'activationAnimationProgress' | 'isActive'>
 >;
 
 const { ItemContextProvider, useItemContextContext: useItemContext } =
@@ -15,9 +15,17 @@ const { ItemContextProvider, useItemContextContext: useItemContext } =
     ItemContextProviderProps,
     ItemContextType
   >(props => {
-    const { activationState } = useCommonValuesContext();
+    const { activationState, activeItemKey, prevActiveItemKey } =
+      useCommonValuesContext();
 
-    return { value: { ...props, dragActivationState: activationState } };
+    return {
+      value: {
+        ...props,
+        activeItemKey,
+        dragActivationState: activationState,
+        prevActiveItemKey
+      }
+    };
   });
 
 export { ItemContextProvider, useItemContext };
