@@ -1,3 +1,16 @@
+# [1.6.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.5.2...v1.6.0) (2025-04-27)
+
+
+### Bug Fixes
+
+* Column and row count issues ([#354](https://github.com/MatiPl01/react-native-sortables/issues/354)) ([dd3143e](https://github.com/MatiPl01/react-native-sortables/commit/dd3143e37cabbfa6be8112824f3d5c87eea32a44))
+
+
+### Features
+
+* Customizable dimensions animation type - layout and worklet ([#355](https://github.com/MatiPl01/react-native-sortables/issues/355)) ([1d06c6f](https://github.com/MatiPl01/react-native-sortables/commit/1d06c6f5394d5aaa1b8659043a611888bc46236e))
+* Item context and docs ([#363](https://github.com/MatiPl01/react-native-sortables/issues/363)) ([ae212ba](https://github.com/MatiPl01/react-native-sortables/commit/ae212ba9004dc32cbcde36a7bbb5883f7646fd83))
+
 ## [1.5.2](https://github.com/MatiPl01/react-native-sortables/compare/v1.5.1...v1.5.2) (2025-04-14)
 
 
