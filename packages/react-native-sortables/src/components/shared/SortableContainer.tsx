@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import {
   Dimensions,
   type StyleProp,
@@ -20,9 +20,11 @@ import {
 import type {
   DimensionsAnimation,
   DropIndicatorSettings,
+  ItemLayoutAnimationSettings,
   Overflow
 } from '../../types';
 import { AbsoluteLayoutState } from '../../types';
+import { typedMemo } from '../../utils';
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 import DropIndicator from './DropIndicator';
 
@@ -33,10 +35,11 @@ type AnimatedHeightContainerProps = PropsWithChildren<
     dimensionsAnimationType: DimensionsAnimation;
     overflow: Overflow;
     style?: StyleProp<ViewStyle>;
-  } & DropIndicatorSettings
+  } & DropIndicatorSettings &
+    Omit<ItemLayoutAnimationSettings, 'itemsLayoutTransitionMode'>
 >;
 
-export default function SortableContainer({
+function SortableContainer({
   DropIndicatorComponent,
   children,
   dimensionsAnimationType,
@@ -144,3 +147,5 @@ export default function SortableContainer({
     </Animated.View>
   );
 }
+
+export default typedMemo(SortableContainer);

@@ -15,6 +15,10 @@ module.exports = {
       }
     ],
     'perfectionist/sort-enums': 'off',
+    '@typescript-eslint/member-ordering': [
+      'error',
+      { default: ['field', 'constructor', 'method', 'signature'] }
+    ],
     '@typescript-eslint/naming-convention': [
       'error',
       {

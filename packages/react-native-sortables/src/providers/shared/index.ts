@@ -13,6 +13,7 @@ export {
 export { DragProvider, useDragContext } from './DragProvider';
 export * from './hooks';
 export { ItemContextProvider, useItemContext } from './ItemContextProvider';
+export * from './items';
 export { LayerProvider } from './LayerProvider';
 export {
   MeasurementsProvider,

@@ -1,5 +1,4 @@
 import type { ComponentType } from 'react';
-import { memo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
@@ -18,6 +17,7 @@ import type {
   DropIndicatorComponentProps,
   Vector
 } from '../../types';
+import { typedMemo } from '../../utils';
 
 const DEFAULT_STYLE: ViewStyle = {
   opacity: 0
@@ -118,4 +118,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default memo(DropIndicator);
+export default typedMemo(DropIndicator);

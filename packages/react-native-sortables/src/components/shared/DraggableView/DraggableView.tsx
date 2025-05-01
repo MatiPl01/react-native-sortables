@@ -1,5 +1,5 @@
-import type { PropsWithChildren, ReactNode } from 'react';
-import { Fragment, memo, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 import {
   LayoutAnimationConfig,
   useDerivedValue,
@@ -9,6 +9,7 @@ import {
 import {
   CommonValuesContext,
   ItemContextProvider,
+  ItemOutlet,
   useCommonValuesContext,
   useItemDecorationStyles,
   useItemLayoutStyles,
@@ -22,7 +23,7 @@ import {
   type LayoutTransition,
   type MeasureCallback
 } from '../../../types';
-import { getContextProvider } from '../../../utils';
+import { getContextProvider, typedMemo } from '../../../utils';
 import { SortableHandleInternal } from '../SortableHandle';
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
@@ -30,16 +31,15 @@ import TeleportedItemCell from './TeleportedItemCell';
 
 const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
-export type DraggableViewProps = PropsWithChildren<{
+export type DraggableViewProps = {
   itemKey: string;
   entering: LayoutAnimation | undefined;
   exiting: LayoutAnimation | undefined;
   layout: LayoutTransition | undefined;
   style?: AnimatedStyleProp;
-}>;
+};
 
 function DraggableView({
-  children,
   itemKey: key,
   style,
   ...layoutAnimations
@@ -88,7 +88,7 @@ function DraggableView({
         itemsOverridesStyle={itemsOverridesStyle}
         onMeasure={onMeasure}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
-          {children}
+          <ItemOutlet itemKey={key} />
         </LayoutAnimationConfig>
       </ItemCell>
     );
@@ -130,23 +130,23 @@ function DraggableView({
         itemsOverridesStyle={itemsOverridesStyle}
         teleportedItemId={teleportedItemId}
         onMeasure={onMeasureItem}>
-        {children}
+        <ItemOutlet itemKey={key} />
       </TeleportedItemCell>
     </CommonValuesContextProvider>
   );
 
   return (
-    <Fragment>
+    <>
       {renderItemCell(onMeasureItem)}
       <ActiveItemPortal
         activationAnimationProgress={activationAnimationProgress}
         portalState={portalState}
         renderTeleportedItemCell={renderTeleportedItemCell}
         teleportedItemId={teleportedItemId}>
-        {children}
+        <ItemOutlet itemKey={key} />
       </ActiveItemPortal>
-    </Fragment>
+    </>
   );
 }
 
-export default memo(DraggableView);
+export default typedMemo(DraggableView);

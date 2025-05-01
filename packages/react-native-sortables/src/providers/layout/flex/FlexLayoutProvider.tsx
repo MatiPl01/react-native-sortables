@@ -21,9 +21,7 @@ import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';
 
 type FlexLayoutProviderProps = PropsWithChildren<
-  {
-    itemsCount: number;
-  } & RequiredBy<
+  RequiredBy<
     SortableFlexStyle,
     keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
   >
@@ -39,7 +37,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   flexWrap,
   gap,
   height,
-  itemsCount,
   justifyContent,
   maxHeight,
   maxWidth,

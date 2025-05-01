@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useEffect, useMemo, useRef } from 'react';
+import { type PropsWithChildren, useEffect, useMemo } from 'react';
 import type { View, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
@@ -32,7 +32,6 @@ type CommonValuesProviderProps = PropsWithChildren<
   {
     sortEnabled: Animatable<boolean>;
     customHandle: boolean;
-    itemKeys: Array<string>;
     controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
     itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
     initialItemsStyleOverride?: ViewStyle;
@@ -59,14 +58,12 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     inactiveItemOpacity: _inactiveItemOpacity,
     inactiveItemScale: _inactiveItemScale,
     initialItemsStyleOverride,
-    itemKeys,
     itemsLayoutTransitionMode,
     snapOffsetX: _snapOffsetX,
     snapOffsetY: _snapOffsetY,
     sortEnabled: _sortEnabled
   }) => {
     const componentId = useMemo(() => nextId++, []);
-    const prevKeysRef = useRef<Array<string>>([]);
 
     // ORDER
     const indexToKey = useSharedValue<Array<string>>(itemKeys);
@@ -125,13 +122,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       () => itemsLayoutTransitionMode === 'reorder',
       [itemsLayoutTransitionMode]
     );
-
-    useEffect(() => {
-      if (areArraysDifferent(itemKeys, prevKeysRef.current)) {
-        indexToKey.value = itemKeys;
-        prevKeysRef.current = itemKeys;
-      }
-    }, [itemKeys, indexToKey]);
 
     const itemsOverridesStyle = useAnimatedStyle(() => ({
       ...itemsStyleOverride.value
