@@ -1,1 +1,4 @@
-export { default as ComplexLayoutExample } from './ComplexLayoutExample';
+import BottomTabsNavigatorExample from './BottomTabsNavigatorExample';
+import ComplexLayoutExample from './ComplexLayoutExample';
+
+export { BottomTabsNavigatorExample, ComplexLayoutExample };
