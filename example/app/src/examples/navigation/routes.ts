@@ -71,7 +71,16 @@ const routes: Routes = {
             }
           }
         }
-      })
+      }),
+      Tests: {
+        name: 'Test examples',
+        routes: {
+          BottomTabsNavigator: {
+            Component: SortableGrid.tests.BottomTabsNavigatorExample,
+            name: 'Bottom Tabs Navigator'
+          }
+        }
+      }
     }
   },
   SortableFlex: {

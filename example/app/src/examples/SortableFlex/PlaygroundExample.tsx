@@ -8,7 +8,7 @@ import { getCategories } from '@/utils';
 
 const DATA = getCategories(IS_WEB ? 30 : 10);
 
-export default function Flex() {
+export default function PlaygroundExample() {
   return (
     <ScrollScreen includeNavBarHeight>
       <Sortable.Flex gap={10} padding={10}>
