@@ -2,48 +2,39 @@ import { faCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useCallback } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { GridCard, Screen, ScrollScreen } from '@/components';
+import { FlexCell, Screen, ScrollScreen } from '@/components';
 import { colors, spacing, text } from '@/theme';
+import { getCategories } from '@/utils';
 
 const Tab = createBottomTabNavigator();
 
-const DATA_LENGTH = 36;
-const DATA = Array.from(
-  { length: DATA_LENGTH },
-  (_, index) => `Item ${index + 1}`
-);
+const DATA_LENGTH = 30;
+const DATA = getCategories(DATA_LENGTH);
 
-type GridProps = {
+type FlexProps = {
   data: Array<string>;
 };
 
-function Grid({ data }: GridProps) {
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => <GridCard>{item}</GridCard>,
-    []
-  );
-
+function Flex({ data }: FlexProps) {
   return (
-    <Sortable.Grid
-      columnGap={10}
-      columns={3}
-      data={data}
-      renderItem={renderItem}
-      rowGap={10}
-    />
+    <Sortable.Flex columnGap={spacing.sm} rowGap={spacing.xs}>
+      {data.map(item => (
+        <FlexCell key={item} size='large'>
+          {item}
+        </FlexCell>
+      ))}
+    </Sortable.Flex>
   );
 }
 
 function Screen1() {
   return (
     <ScrollScreen contentContainerStyle={styles.scrollContainer}>
-      <Text style={styles.screenTitle}>Screen 1 grid:</Text>
-      <Grid data={DATA.slice(0, DATA_LENGTH / 2)} />
+      <Text style={styles.screenTitle}>Screen 1 flex:</Text>
+      <Flex data={DATA.slice(0, DATA_LENGTH / 2)} />
     </ScrollScreen>
   );
 }
@@ -51,8 +42,8 @@ function Screen1() {
 function Screen2() {
   return (
     <ScrollScreen contentContainerStyle={styles.scrollContainer}>
-      <Text style={styles.screenTitle}>Screen 2 grid:</Text>
-      <Grid data={DATA.slice(DATA_LENGTH / 2)} />
+      <Text style={styles.screenTitle}>Screen 2 flex:</Text>
+      <Flex data={DATA.slice(DATA_LENGTH / 2)} />
     </ScrollScreen>
   );
 }
@@ -68,6 +59,7 @@ const tabBarOptions: BottomTabNavigationOptions = {
     <Text style={focused ? styles.focusedLabel : styles.label}>Screen 1</Text>
   )
 };
+
 function Tabs() {
   return (
     <Tab.Navigator

@@ -135,6 +135,10 @@ const routes: Routes = {
           ComplexLayout: {
             Component: SortableFlex.tests.ComplexLayoutExample,
             name: 'Complex Layout'
+          },
+          BottomTabsNavigator: {
+            Component: SortableFlex.tests.BottomTabsNavigatorExample,
+            name: 'Bottom Tabs Navigator'
           }
         }
       }
