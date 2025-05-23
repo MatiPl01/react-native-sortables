@@ -19,18 +19,18 @@ const DATA = [
 
 export default function Flex() {
   return (
-    <Sortable.Flex gap={10} padding={10} customHandle dragActivationDelay={0}>
+    <Sortable.Flex dragActivationDelay={0} gap={10} padding={10} customHandle>
       {/* You can render anything within the Sortable.Flex component */}
       {DATA.map(item => (
         <Sortable.Handle key={item}>
-          <Sortable.NewPressable
+          <Sortable.Pressable
             onPress={() => {
               Alert.alert('test');
             }}>
             <View key={item} style={styles.cell}>
               <Text style={styles.text}>{item}</Text>
             </View>
-          </Sortable.NewPressable>
+          </Sortable.Pressable>
         </Sortable.Handle>
       ))}
     </Sortable.Flex>
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     padding: 10
   },
   text: {
-    fontSize: 16,
-    color: 'white'
+    color: 'white',
+    fontSize: 16
   }
 });

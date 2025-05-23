@@ -1,8 +1,5 @@
 /* eslint-disable import/no-unused-modules */
-import { Pressable, TouchableHighlight, TouchableOpacity } from 'react-native';
-
 import {
-  createSortableTouchable,
   SortableFlex,
   SortableGrid,
   SortableHandle,
@@ -165,8 +162,6 @@ const Sortable = {
    */
   Layer: SortableLayer,
 
-  NewPressable: SortablePressable,
-
   /** Optional provider that renders dragged items above all other components that are
    * wrapped within the PortalProvider.
    *
@@ -212,44 +207,7 @@ const Sortable = {
    * );
    * ```
    */
-  Pressable: createSortableTouchable(Pressable),
-  /** TouchableHighlight component for use within sortable items.
-   * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
-   *
-   * @example
-   * ```tsx
-   * const renderItem = useCallback<SortableGridRenderItem<string>>(
-   *   ({ item }) => (
-   *     <Sortable.TouchableHighlight
-   *       onPress={() => console.log('pressed', item)}
-   *     >
-   *       <Text>{item}</Text>
-   *     </Sortable.TouchableHighlight>
-   *   ),
-   *   []
-   * );
-   * ```
-   */
-  TouchableHighlight: createSortableTouchable(TouchableHighlight),
-
-  /** TouchableOpacity component for use within sortable items.
-   * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
-   *
-   * @example
-   * ```tsx
-   * const renderItem = useCallback<SortableGridRenderItem<string>>(
-   *   ({ item }) => (
-   *     <Sortable.TouchableOpacity
-   *       onPress={() => console.log('pressed', item)}
-   *     >
-   *       <Text>{item}</Text>
-   *     </Sortable.TouchableOpacity>
-   *   ),
-   *   []
-   * );
-   * ```
-   */
-  TouchableOpacity: createSortableTouchable(TouchableOpacity)
+  Pressable: SortablePressable
 };
 
 export default Sortable;

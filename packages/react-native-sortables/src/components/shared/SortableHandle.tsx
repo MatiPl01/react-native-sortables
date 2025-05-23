@@ -1,11 +1,7 @@
 import { type PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
 import { View } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
-import {
-  measure,
-  useAnimatedReaction,
-  useAnimatedRef
-} from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { measure, useAnimatedRef } from 'react-native-reanimated';
 
 import {
   useCommonValuesContext,
@@ -57,7 +53,7 @@ function SortableHandleComponent({
   }
 
   const {
-    activeHandleDimensions,
+    activeHandleMeasurements,
     activeHandleOffset,
     makeItemFixed,
     removeFixedItem
@@ -91,32 +87,33 @@ function SortableHandleComponent({
       return;
     }
 
-    const { height, pageX, pageY, width } = handleMeasurements;
+    const { pageX: handlePageX, pageY: handlePageY } = handleMeasurements;
     const { pageX: containerPageX, pageY: containerPageY } =
       containerMeasurements;
     const { x: activeX, y: activeY } = activeItemPosition.value;
 
-    activeHandleDimensions.value = { height, width };
+    activeHandleMeasurements.value = handleMeasurements;
     activeHandleOffset.value = {
-      x: pageX - containerPageX - activeX,
-      y: pageY - containerPageY - activeY
+      x: handlePageX - containerPageX - activeX,
+      y: handlePageY - containerPageY - activeY
     };
   }, [
     activeItemKey,
     activeItemPosition,
     containerRef,
     itemKey,
-    activeHandleDimensions,
+    activeHandleMeasurements,
     activeHandleOffset,
     viewRef
   ]);
 
-  // Measure the handle when the active item key changes
-  useAnimatedReaction(() => activeItemKey.value, measureHandle);
-
   const adjustedGesture = useMemo(
-    () => gesture.enabled(dragEnabled),
-    [dragEnabled, gesture]
+    () =>
+      Gesture.Simultaneous(
+        gesture.enabled(dragEnabled),
+        Gesture.Manual().onTouchesDown(measureHandle)
+      ),
+    [dragEnabled, gesture, measureHandle]
   );
 
   return (

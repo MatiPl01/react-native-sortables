@@ -7,6 +7,7 @@ import type {
 import type {
   AnimatedRef,
   AnimatedStyle,
+  MeasuredDimensions,
   SharedValue
 } from 'react-native-reanimated';
 
@@ -119,8 +120,7 @@ export type DragContextType = {
     key: string,
     activationAnimationProgress: SharedValue<number>,
     activate: () => void,
-    fail: () => void,
-    handleRef: AnimatedRef<View> | undefined
+    fail: () => void
   ) => void;
   handleTouchesMove: (e: GestureTouchEvent, fail: () => void) => void;
   handleDragEnd: (
@@ -157,7 +157,7 @@ export type LayerContextType = {
 
 export type CustomHandleContextType = {
   activeHandleOffset: SharedValue<Vector | null>;
-  activeHandleDimensions: SharedValue<Dimensions | null>;
+  activeHandleMeasurements: SharedValue<MeasuredDimensions | null>;
   fixedItemKeys: SharedValue<Record<string, boolean>>;
   makeItemFixed: (key: string) => void;
   removeFixedItem: (key: string) => void;
