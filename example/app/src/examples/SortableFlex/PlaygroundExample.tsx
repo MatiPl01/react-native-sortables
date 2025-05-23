@@ -23,14 +23,14 @@ export default function Flex() {
       {/* You can render anything within the Sortable.Flex component */}
       {DATA.map(item => (
         <Sortable.Handle key={item}>
-          <Sortable.Pressable
-            onPress={() => {
+          <Sortable.Touchable
+            onTap={() => {
               Alert.alert('test');
             }}>
             <View key={item} style={styles.cell}>
               <Text style={styles.text}>{item}</Text>
             </View>
-          </Sortable.Pressable>
+          </Sortable.Touchable>
         </Sortable.Handle>
       ))}
     </Sortable.Flex>

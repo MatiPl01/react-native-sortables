@@ -69,24 +69,18 @@ function DraggableView({
     return () => removeItemMeasurements(key);
   }, [key, removeItemMeasurements]);
 
-  const wrapComponent = (innerComponent: ReactNode) => (
+  const withItemContext = (component: ReactNode) => (
     <ItemContextProvider
       activationAnimationProgress={activationAnimationProgress}
       gesture={gesture}
       isActive={isActive}
       itemKey={key}>
-      {customHandle ? (
-        innerComponent
-      ) : (
-        <GestureDetector gesture={gesture} userSelect='none'>
-          {innerComponent}
-        </GestureDetector>
-      )}
+      {component}
     </ItemContextProvider>
   );
 
-  const renderItemCell = (onMeasure: MeasureCallback) =>
-    wrapComponent(
+  const renderItemCell = (onMeasure: MeasureCallback) => {
+    const innerComponent = (
       <ItemCell
         {...layoutAnimations}
         cellStyle={[style, layoutStyles]}
@@ -98,6 +92,17 @@ function DraggableView({
         </LayoutAnimationConfig>
       </ItemCell>
     );
+
+    return withItemContext(
+      customHandle ? (
+        innerComponent
+      ) : (
+        <GestureDetector gesture={gesture} userSelect='none'>
+          {innerComponent}
+        </GestureDetector>
+      )
+    );
+  };
 
   // NORMAL CASE (no portal)
 
@@ -124,20 +129,21 @@ function DraggableView({
   };
 
   const renderTeleportedItemCell = () => (
-    // We have to wrap the TeleportedItemCell in a CommonValuesContext provider
-    // as it won't be accessible otherwise, when the item is rendered in the
-    // portal outlet
+    // We have to wrap the TeleportedItemCell in context providers as they won't
+    // be accessible otherwise, when the item is rendered in the portal outlet
     <CommonValuesContextProvider value={commonValuesContext}>
-      <TeleportedItemCell
-        activationAnimationProgress={activationAnimationProgress}
-        baseCellStyle={style}
-        isActive={isActive}
-        itemKey={key}
-        itemsOverridesStyle={itemsOverridesStyle}
-        teleportedItemId={teleportedItemId}
-        onMeasure={onMeasureItem}>
-        {children}
-      </TeleportedItemCell>
+      {withItemContext(
+        <TeleportedItemCell
+          activationAnimationProgress={activationAnimationProgress}
+          baseCellStyle={style}
+          isActive={isActive}
+          itemKey={key}
+          itemsOverridesStyle={itemsOverridesStyle}
+          teleportedItemId={teleportedItemId}
+          onMeasure={onMeasureItem}>
+          {children}
+        </TeleportedItemCell>
+      )}
     </CommonValuesContextProvider>
   );
 

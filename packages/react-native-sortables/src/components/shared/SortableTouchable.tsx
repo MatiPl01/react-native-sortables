@@ -3,14 +3,14 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useItemContext } from '../../providers';
 
-type SortablePressableProps = PropsWithChildren<{
-  onPress?: () => void;
+type SortableTouchableProps = PropsWithChildren<{
+  onTap?: () => void;
 }>;
 
-export default function SortablePressable({
+export default function SortableTouchable({
   children,
-  onPress
-}: SortablePressableProps) {
+  onTap
+}: SortableTouchableProps) {
   // TODO - improve
   const { gesture } = useItemContext();
 
@@ -19,7 +19,7 @@ export default function SortablePressable({
       userSelect='none'
       gesture={Gesture.Tap()
         .onEnd(() => {
-          onPress?.();
+          onTap?.();
         })
         .simultaneousWithExternalGesture(gesture)
         .runOnJS(true)}>

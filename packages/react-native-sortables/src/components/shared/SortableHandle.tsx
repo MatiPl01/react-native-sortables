@@ -22,7 +22,7 @@ export type SortableHandleProps = PropsWithChildren<{
   mode?: 'draggable' | 'fixed' | 'non-draggable';
 }>;
 
-export function SortableHandle(props: SortableHandleProps) {
+export default function SortableHandle(props: SortableHandleProps) {
   // The item is teleported when it is rendered within the PortalOutlet
   // component. Because PortalOutlet creates a context, we can use it to
   // check if the item is teleported

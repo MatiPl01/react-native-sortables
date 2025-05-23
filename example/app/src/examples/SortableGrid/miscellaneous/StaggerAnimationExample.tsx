@@ -100,11 +100,11 @@ type GridItemProps = {
 
 const GridItem = memo(function GridItem({ item, onRemove }: GridItemProps) {
   return (
-    <Sortable.Pressable onPress={() => onRemove(item)}>
+    <Sortable.Touchable onTap={() => onRemove(item)}>
       <View style={styles.card}>
         <Text style={styles.text}>{item}</Text>
       </View>
-    </Sortable.Pressable>
+    </Sortable.Touchable>
   );
 });
 

@@ -4,7 +4,7 @@ import {
   SortableGrid,
   SortableHandle,
   SortableLayer,
-  SortablePressable
+  SortableTouchable
 } from './components';
 export { useItemContext } from './providers';
 
@@ -197,17 +197,17 @@ const Sortable = {
    * ```tsx
    * const renderItem = useCallback<SortableGridRenderItem<string>>(
    *   ({ item }) => (
-   *     <Sortable.Pressable
-   *       onPress={() => console.log('pressed', item)}
+   *     <Sortable.Touchable
+   *       onTap={() => console.log('tapped', item)}
    *     >
    *       <Text>{item}</Text>
-   *     </Sortable.Pressable>
+   *     </Sortable.Touchable>
    *   ),
    *   []
    * );
    * ```
    */
-  Pressable: SortablePressable
+  Touchable: SortableTouchable
 };
 
 export default Sortable;
