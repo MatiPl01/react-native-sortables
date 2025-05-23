@@ -1,5 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Fragment, memo, useEffect } from 'react';
+import { GestureDetector } from 'react-native-gesture-handler';
 import {
   LayoutAnimationConfig,
   useDerivedValue,
@@ -12,6 +13,7 @@ import {
   useCommonValuesContext,
   useItemDecorationStyles,
   useItemLayoutStyles,
+  useItemPanGesture,
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
@@ -23,7 +25,6 @@ import {
   type MeasureCallback
 } from '../../../types';
 import { getContextProvider } from '../../../utils';
-import { SortableHandleInternal } from '../SortableHandle';
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
 import TeleportedItemCell from './TeleportedItemCell';
@@ -62,6 +63,8 @@ function DraggableView({
     portalState
   );
 
+  const gesture = useItemPanGesture(key, activationAnimationProgress);
+
   useEffect(() => {
     return () => removeItemMeasurements(key);
   }, [key, removeItemMeasurements]);
@@ -69,12 +72,15 @@ function DraggableView({
   const wrapComponent = (innerComponent: ReactNode) => (
     <ItemContextProvider
       activationAnimationProgress={activationAnimationProgress}
+      gesture={gesture}
       isActive={isActive}
       itemKey={key}>
       {customHandle ? (
         innerComponent
       ) : (
-        <SortableHandleInternal>{innerComponent}</SortableHandleInternal>
+        <GestureDetector gesture={gesture} userSelect='none'>
+          {innerComponent}
+        </GestureDetector>
       )}
     </ItemContextProvider>
   );

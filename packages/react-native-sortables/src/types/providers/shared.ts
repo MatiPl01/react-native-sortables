@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react';
 import type { LayoutChangeEvent, View, ViewStyle } from 'react-native';
-import type { GestureTouchEvent } from 'react-native-gesture-handler';
+import type {
+  GestureTouchEvent,
+  GestureType
+} from 'react-native-gesture-handler';
 import type {
   AnimatedRef,
   AnimatedStyle,
@@ -135,6 +138,7 @@ export type DragContextType = {
 // ITEM
 
 export type ItemContextType = {
+  gesture: GestureType;
   itemKey: string;
   activeItemKey: Readonly<SharedValue<null | string>>;
   prevActiveItemKey: Readonly<SharedValue<null | string>>;

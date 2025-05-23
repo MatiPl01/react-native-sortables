@@ -6,9 +6,11 @@ import {
   SortableFlex,
   SortableGrid,
   SortableHandle,
-  SortableLayer
+  SortableLayer,
+  SortablePressable
 } from './components';
 export { useItemContext } from './providers';
+
 import { PortalProvider } from './providers';
 export type { SortableHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
@@ -163,6 +165,8 @@ const Sortable = {
    */
   Layer: SortableLayer,
 
+  NewPressable: SortablePressable,
+
   /** Optional provider that renders dragged items above all other components that are
    * wrapped within the PortalProvider.
    *
@@ -209,7 +213,6 @@ const Sortable = {
    * ```
    */
   Pressable: createSortableTouchable(Pressable),
-
   /** TouchableHighlight component for use within sortable items.
    * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
    *
@@ -228,6 +231,7 @@ const Sortable = {
    * ```
    */
   TouchableHighlight: createSortableTouchable(TouchableHighlight),
+
   /** TouchableOpacity component for use within sortable items.
    * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
    *

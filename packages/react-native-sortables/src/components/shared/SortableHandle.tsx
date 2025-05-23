@@ -11,7 +11,6 @@ import {
   useCommonValuesContext,
   useCustomHandleContext,
   useItemContext,
-  useItemPanGesture,
   usePortalOutletContext
 } from '../../providers';
 import { error } from '../../utils';
@@ -48,7 +47,7 @@ function SortableHandleComponent({
 }: SortableHandleProps) {
   const { activeItemKey, activeItemPosition, containerRef } =
     useCommonValuesContext();
-  const { activationAnimationProgress, itemKey } = useItemContext();
+  const { gesture, itemKey } = useItemContext();
   const customHandleContext = useCustomHandleContext();
 
   if (!customHandleContext) {
@@ -66,11 +65,6 @@ function SortableHandleComponent({
   const dragEnabled = mode === 'draggable';
 
   const viewRef = useAnimatedRef<View>();
-  const gesture = useItemPanGesture(
-    itemKey,
-    activationAnimationProgress,
-    viewRef
-  );
 
   useEffect(() => {
     if (mode === 'fixed') {
@@ -130,22 +124,6 @@ function SortableHandleComponent({
       <View ref={viewRef} onLayout={dragEnabled ? measureHandle : undefined}>
         {children}
       </View>
-    </GestureDetector>
-  );
-}
-
-export function SortableHandleInternal({
-  children
-}: {
-  children: React.ReactNode;
-}) {
-  const { activationAnimationProgress, itemKey } = useItemContext();
-
-  const gesture = useItemPanGesture(itemKey, activationAnimationProgress);
-
-  return (
-    <GestureDetector gesture={gesture} userSelect='none'>
-      {children}
     </GestureDetector>
   );
 }

@@ -1,7 +1,9 @@
-import { type ComponentType, useCallback } from 'react';
+import type { ComponentType, PropsWithChildren } from 'react';
+import { useCallback } from 'react';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { IS_WEB } from '../../constants';
-import { useCommonValuesContext } from '../../providers';
+import { useCommonValuesContext, useItemContext } from '../../providers';
 import type { AnyFunction, Maybe } from '../../types';
 import { DragActivationState } from '../../types';
 
@@ -67,4 +69,29 @@ export default function createSortableTouchable<P extends AnyPressHandlers>(
   }
 
   return Wrapper;
+}
+
+type SortablePressableProps = PropsWithChildren<{
+  onPress?: () => void;
+}>;
+
+export function SortablePressable({
+  children,
+  onPress
+}: SortablePressableProps) {
+  // TODO - improve
+  const { gesture } = useItemContext();
+
+  return (
+    <GestureDetector
+      userSelect='none'
+      gesture={Gesture.Tap()
+        .onEnd(() => {
+          onPress?.();
+        })
+        .simultaneousWithExternalGesture(gesture)
+        .runOnJS(true)}>
+      {children}
+    </GestureDetector>
+  );
 }
