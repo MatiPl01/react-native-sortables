@@ -1,10 +1,7 @@
 import { type PropsWithChildren, useMemo } from 'react';
 import { View } from 'react-native';
-import {
-  Gesture,
-  GestureDetector,
-  GestureType
-} from 'react-native-gesture-handler';
+import type { GestureType } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useItemContext } from '../../providers';
 
@@ -21,24 +18,26 @@ type SortableTouchableProps = PropsWithChildren<{
 export default function SortableTouchable({
   children,
   failDistance = 10,
-  onTap,
+  gestureMode = 'exclusive',
   onDoubleTap,
   onLongPress,
+  onTap,
   onTouchesDown,
-  onTouchesUp,
-  gestureMode = 'exclusive'
+  onTouchesUp
 }: SortableTouchableProps) {
   const { gesture: externalGesture } = useItemContext();
 
   const gesture = useMemo(() => {
-    const decorate = <T extends GestureType>(gesture: T): T => {
-      gesture.simultaneousWithExternalGesture(externalGesture).runOnJS(true);
-      if ('maxDistance' in gesture) {
+    const decorate = <T extends GestureType>(decoratedGesture: T): T => {
+      decoratedGesture
+        .simultaneousWithExternalGesture(externalGesture)
+        .runOnJS(true);
+      if ('maxDistance' in decoratedGesture) {
         (
-          gesture as { maxDistance: (distance: number) => GestureType }
+          decoratedGesture as { maxDistance: (distance: number) => GestureType }
         ).maxDistance(failDistance);
       }
-      return gesture;
+      return decoratedGesture;
     };
 
     const gestures = [];
