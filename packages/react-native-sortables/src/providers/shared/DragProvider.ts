@@ -226,37 +226,49 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
    */
 
   // If custom handle is used, it must be called after handle is measured
-  const setDragStartValues = useCallback((key: string) => {
-    'worklet';
-    const itemPosition = itemPositions.value[key];
+  const setDragStartValues = useCallback(
+    (key: string) => {
+      'worklet';
+      const itemPosition = itemPositions.value[key];
 
-    if (!itemPosition || !currentTouch.value) {
-      return;
-    }
-
-    let touchItemPosition = itemPosition;
-    if (customHandle) {
-      const containerMeasurements = measure(containerRef);
-      if (!activeHandleMeasurements?.value || !containerMeasurements) {
+      if (!itemPosition || !currentTouch.value) {
         return;
       }
 
-      touchItemPosition = {
-        x: activeHandleMeasurements.value.pageX - containerMeasurements.pageX,
-        y: activeHandleMeasurements.value.pageY - containerMeasurements.pageY
+      let touchItemPosition = itemPosition;
+      if (customHandle) {
+        const containerMeasurements = measure(containerRef);
+        if (!activeHandleMeasurements?.value || !containerMeasurements) {
+          return;
+        }
+
+        touchItemPosition = {
+          x: activeHandleMeasurements.value.pageX - containerMeasurements.pageX,
+          y: activeHandleMeasurements.value.pageY - containerMeasurements.pageY
+        };
+      }
+
+      const touchX = touchItemPosition.x + currentTouch.value.x;
+      const touchY = touchItemPosition.y + currentTouch.value.y;
+
+      touchPosition.value = { x: touchX, y: touchY };
+      dragStartTouchPosition.value = touchPosition.value;
+      dragStartItemTouchOffset.value = {
+        x: touchX - itemPosition.x,
+        y: touchY - itemPosition.y
       };
-    }
-
-    const touchX = touchItemPosition.x + currentTouch.value.x;
-    const touchY = touchItemPosition.y + currentTouch.value.y;
-
-    touchPosition.value = { x: touchX, y: touchY };
-    dragStartTouchPosition.value = touchPosition.value;
-    dragStartItemTouchOffset.value = {
-      x: touchX - itemPosition.x,
-      y: touchY - itemPosition.y
-    };
-  }, []);
+    },
+    [
+      activeHandleMeasurements,
+      containerRef,
+      currentTouch,
+      customHandle,
+      dragStartItemTouchOffset,
+      dragStartTouchPosition,
+      itemPositions,
+      touchPosition
+    ]
+  );
 
   const handleDragStart = useCallback(
     (
@@ -315,10 +327,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationState,
       activeItemKey,
       activeItemPosition,
-      containerRef,
       customHandle,
       dragStartIndex,
-      dragStartTouchPosition,
       haptics,
       inactiveAnimationProgress,
       inactiveItemOpacity,
@@ -327,11 +337,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       itemPositions,
       keyToIndex,
       prevActiveItemKey,
+      setDragStartValues,
       stableOnDragStart,
-      touchPosition,
       updateLayer,
-      updateStartScrollOffset,
-      activeHandleMeasurements
+      updateStartScrollOffset
     ]
   );
 

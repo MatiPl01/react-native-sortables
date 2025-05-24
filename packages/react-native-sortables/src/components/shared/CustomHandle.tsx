@@ -100,12 +100,13 @@ function CustomHandleComponent({
       setDragStartValues(itemKey);
     },
     [
-      activeItemKey,
-      itemPositions,
-      containerRef,
-      itemKey,
-      activeHandleMeasurements,
       activeHandleOffset,
+      activeHandleMeasurements,
+      activeItemKey,
+      containerRef,
+      itemPositions,
+      itemKey,
+      setDragStartValues,
       viewRef
     ]
   );
