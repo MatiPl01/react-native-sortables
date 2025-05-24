@@ -1,39 +1,25 @@
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Sortable from 'react-native-sortables';
 
-const DATA = [
-  'Happy 😀',
-  'Sad 😢',
-  'Angry 😡',
-  'Surprised 😮',
-  'Confused 😕',
-  'Disappointed 😞',
-  'Disgusted 😒',
-  'Excited 😄',
-  'Frustrated 😤',
-  'Grateful 😊',
-  'Hopeful 😊',
-  'Joyful 😊',
-  'Love 😊'
-];
+import { ScrollScreen } from '@/components';
+import { IS_WEB } from '@/constants';
+import { colors, text } from '@/theme';
+import { getCategories } from '@/utils';
+
+const DATA = getCategories(IS_WEB ? 30 : 10);
 
 export default function Flex() {
   return (
-    <Sortable.Flex dragActivationDelay={0} gap={10} padding={10} customHandle>
-      {/* You can render anything within the Sortable.Flex component */}
-      {DATA.map(item => (
-        <Sortable.Handle key={item}>
-          <Sortable.Touchable
-            onTap={() => {
-              Alert.alert('test');
-            }}>
-            <View key={item} style={styles.cell}>
-              <Text style={styles.text}>{item}</Text>
-            </View>
-          </Sortable.Touchable>
-        </Sortable.Handle>
-      ))}
-    </Sortable.Flex>
+    <ScrollScreen includeNavBarHeight>
+      <Sortable.Flex gap={10} padding={10}>
+        {/* You can render anything within the Sortable.Flex component */}
+        {DATA.map(item => (
+          <View key={item} style={styles.cell}>
+            <Text style={styles.text}>{item}</Text>
+          </View>
+        ))}
+      </Sortable.Flex>
+    </ScrollScreen>
   );
 }
 
@@ -46,7 +32,7 @@ const styles = StyleSheet.create({
     padding: 10
   },
   text: {
-    color: 'white',
-    fontSize: 16
+    ...text.label2,
+    color: colors.white
   }
 });
