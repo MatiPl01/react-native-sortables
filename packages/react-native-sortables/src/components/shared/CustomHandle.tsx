@@ -6,6 +6,7 @@ import { measure, useAnimatedRef } from 'react-native-reanimated';
 import {
   useCommonValuesContext,
   useCustomHandleContext,
+  useDragContext,
   useItemContext,
   usePortalOutletContext
 } from '../../providers';
@@ -48,12 +49,18 @@ function CustomHandleComponent({
     );
   }
 
-  const { activeItemKey } = useCommonValuesContext();
+  const { activeItemKey, containerRef, itemPositions } =
+    useCommonValuesContext();
+  const { setDragStartValues } = useDragContext();
   const { gesture, itemKey } = useItemContext();
   const viewRef = useAnimatedRef<View>();
 
-  const { activeHandleMeasurements, makeItemFixed, removeFixedItem } =
-    customHandleContext;
+  const {
+    activeHandleMeasurements,
+    activeHandleOffset,
+    makeItemFixed,
+    removeFixedItem
+  } = customHandleContext;
   const dragEnabled = mode === 'draggable';
 
   useEffect(() => {
@@ -64,24 +71,62 @@ function CustomHandleComponent({
     return () => removeFixedItem(itemKey);
   }, [mode, itemKey, makeItemFixed, removeFixedItem]);
 
-  const measureHandle = useCallback(() => {
-    'worklet';
-    if (activeItemKey.value === itemKey) {
-      activeHandleMeasurements.value = measure(viewRef);
-    }
-  }, [activeItemKey, itemKey, activeHandleMeasurements, viewRef]);
+  const measureHandle = useCallback(
+    (mustBeActive: boolean) => {
+      'worklet';
+      if (mustBeActive && activeItemKey.value !== itemKey) {
+        return;
+      }
 
-  const adjustedGesture = useMemo(
-    () => gesture.onBegin(measureHandle).enabled(dragEnabled),
-    [dragEnabled, gesture, measureHandle]
+      const handleMeasurements = measure(viewRef);
+      const containerMeasurements = measure(containerRef);
+      const itemPosition = itemPositions.value[itemKey];
+
+      if (!handleMeasurements || !containerMeasurements || !itemPosition) {
+        return;
+      }
+
+      const { pageX, pageY } = handleMeasurements;
+      const { pageX: containerPageX, pageY: containerPageY } =
+        containerMeasurements;
+      const { x: activeX, y: activeY } = itemPosition;
+
+      activeHandleMeasurements.value = handleMeasurements;
+      activeHandleOffset.value = {
+        x: pageX - containerPageX - activeX,
+        y: pageY - containerPageY - activeY
+      };
+
+      setDragStartValues(itemKey);
+    },
+    [
+      activeItemKey,
+      itemPositions,
+      containerRef,
+      itemKey,
+      activeHandleMeasurements,
+      activeHandleOffset,
+      viewRef
+    ]
+  );
+
+  const gestureWithMeasure = useMemo(
+    () =>
+      gesture.onBegin(() => {
+        'worklet';
+        measureHandle(false);
+      }),
+    [gesture, measureHandle]
   );
 
   return (
-    <GestureDetector gesture={adjustedGesture} userSelect='none'>
+    <GestureDetector
+      gesture={gestureWithMeasure.enabled(dragEnabled)}
+      userSelect='none'>
       <View
+        collapsable={false}
         ref={viewRef}
-        onLayout={dragEnabled ? measureHandle : undefined}
-        collapsable={false}>
+        onLayout={dragEnabled ? () => measureHandle(true) : undefined}>
         {children}
       </View>
     </GestureDetector>

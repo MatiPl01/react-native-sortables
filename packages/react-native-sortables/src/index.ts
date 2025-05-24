@@ -1,8 +1,8 @@
 /* eslint-disable import/no-unused-modules */
 import {
+  CustomHandle,
   SortableFlex,
   SortableGrid,
-  CustomHandle,
   SortableLayer,
   SortableTouchable
 } from './components';

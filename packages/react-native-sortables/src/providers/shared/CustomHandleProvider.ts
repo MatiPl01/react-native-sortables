@@ -3,7 +3,7 @@ import type { MeasuredDimensions } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
 
 import { useUIStableCallback } from '../../hooks';
-import type { CustomHandleContextType } from '../../types';
+import type { CustomHandleContextType, Vector } from '../../types';
 import { useAnimatedDebounce } from '../../utils';
 import { createProvider } from '../utils';
 
@@ -15,6 +15,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
   'CustomHandle',
   { guarded: false }
 )<CustomHandleProviderProps, CustomHandleContextType>(() => {
+  const activeHandleOffset = useSharedValue<Vector | null>(null);
   const activeHandleMeasurements = useSharedValue<MeasuredDimensions | null>(
     null
   );
@@ -36,6 +37,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
   return {
     value: {
       activeHandleMeasurements,
+      activeHandleOffset,
       fixedItemKeys,
       makeItemFixed,
       removeFixedItem

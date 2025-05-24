@@ -1,8 +1,8 @@
-import { useMemo, type PropsWithChildren } from 'react';
+import { type PropsWithChildren, useMemo } from 'react';
+import { View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useItemContext } from '../../providers';
-import { View } from 'react-native';
 
 type SortableTouchableProps = PropsWithChildren<{
   onTap: () => void;
@@ -11,8 +11,8 @@ type SortableTouchableProps = PropsWithChildren<{
 
 export default function SortableTouchable({
   children,
-  onTap,
-  failDistance = 10
+  failDistance = 10,
+  onTap
 }: SortableTouchableProps) {
   const { gesture } = useItemContext();
 
@@ -28,7 +28,7 @@ export default function SortableTouchable({
   );
 
   return (
-    <GestureDetector userSelect='none' gesture={tapGesture}>
+    <GestureDetector gesture={tapGesture} userSelect='none'>
       <View collapsable={false}>{children}</View>
     </GestureDetector>
   );
