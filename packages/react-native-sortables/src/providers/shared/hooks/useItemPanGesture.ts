@@ -14,7 +14,6 @@ export default function useItemPanGesture(
   return useMemo(
     () =>
       Gesture.Manual()
-        .manualActivation(true)
         .onTouchesDown((e, manager) => {
           handleTouchStart(
             e,

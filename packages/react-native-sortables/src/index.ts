@@ -2,14 +2,14 @@
 import {
   SortableFlex,
   SortableGrid,
-  SortableHandle,
+  CustomHandle,
   SortableLayer,
   SortableTouchable
 } from './components';
 export { useItemContext } from './providers';
 
 import { PortalProvider } from './providers';
-export type { SortableHandleProps, SortableLayerProps } from './components';
+export type { CustomHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
   DragEndCallback,
@@ -131,7 +131,7 @@ const Sortable = {
    * />
    * ```
    */
-  Handle: SortableHandle,
+  Handle: CustomHandle,
 
   /** Component that manages zIndex for proper rendering of sortable components.
    * Automatically adjusts zIndex values to maintain proper visual hierarchy when items are dragged.

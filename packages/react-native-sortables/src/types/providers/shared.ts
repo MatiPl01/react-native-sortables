@@ -156,7 +156,6 @@ export type LayerContextType = {
 // CUSTOM HANDLE
 
 export type CustomHandleContextType = {
-  activeHandleOffset: SharedValue<Vector | null>;
   activeHandleMeasurements: SharedValue<MeasuredDimensions | null>;
   fixedItemKeys: SharedValue<Record<string, boolean>>;
   makeItemFixed: (key: string) => void;
