@@ -1,10 +1,9 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import type { View } from 'react-native';
 import type {
   GestureTouchEvent,
   TouchData
 } from 'react-native-gesture-handler';
-import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import {
   clamp,
   interpolate,
@@ -69,6 +68,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     containerHeight,
     containerRef,
     containerWidth,
+    customHandle,
     dragActivationDelay,
     dragActivationFailOffset,
     dropAnimationDuration,
@@ -90,7 +90,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { updateLayer } = useLayerContext() ?? {};
   const { scrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
-  const { activeHandleDimensions, activeHandleOffset } =
+  const { activeHandleMeasurements, activeHandleOffset } =
     useCustomHandleContext() ?? {};
   const { activeItemAbsolutePosition } = usePortalContext() ?? {};
 
@@ -128,8 +128,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX: snapOffsetX.value,
       offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
-      snapDimensions:
-        activeHandleDimensions?.value ?? activeItemDimensions.value,
+      snapDimensions: customHandle
+        ? activeHandleMeasurements?.value
+        : activeItemDimensions.value,
       snapOffset: activeHandleOffset?.value,
       startTouch: touchStartTouch.value,
       startTouchPosition: dragStartTouchPosition.value,
@@ -210,6 +211,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: activeX,
         y: activeY
       };
+
       if (activeItemAbsolutePosition) {
         activeItemAbsolutePosition.value = {
           x: touch.absoluteX + activeX - unclampedActiveX - snapX,
@@ -223,13 +225,56 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
    * DRAG HANDLERS
    */
 
+  // If custom handle is used, it must be called after handle is measured
+  const setDragStartValues = useCallback(
+    (key: string) => {
+      'worklet';
+      const itemPosition = itemPositions.value[key];
+
+      if (!itemPosition || !currentTouch.value) {
+        return;
+      }
+
+      let touchItemPosition = itemPosition;
+      if (customHandle) {
+        const containerMeasurements = measure(containerRef);
+        if (!activeHandleMeasurements?.value || !containerMeasurements) {
+          return;
+        }
+
+        touchItemPosition = {
+          x: activeHandleMeasurements.value.pageX - containerMeasurements.pageX,
+          y: activeHandleMeasurements.value.pageY - containerMeasurements.pageY
+        };
+      }
+
+      const touchX = touchItemPosition.x + currentTouch.value.x;
+      const touchY = touchItemPosition.y + currentTouch.value.y;
+
+      touchPosition.value = { x: touchX, y: touchY };
+      dragStartTouchPosition.value = touchPosition.value;
+      dragStartItemTouchOffset.value = {
+        x: touchX - itemPosition.x,
+        y: touchY - itemPosition.y
+      };
+    },
+    [
+      activeHandleMeasurements,
+      containerRef,
+      currentTouch,
+      customHandle,
+      dragStartItemTouchOffset,
+      dragStartTouchPosition,
+      itemPositions,
+      touchPosition
+    ]
+  );
+
   const handleDragStart = useCallback(
     (
-      touch: TouchData,
       key: string,
       activationAnimationProgress: SharedValue<number>,
-      fail: () => void,
-      handleRef?: AnimatedRef<View>
+      fail: () => void
     ) => {
       'worklet';
       const itemPosition = itemPositions.value[key];
@@ -239,32 +284,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         fail();
         return;
       }
-
-      let handlePosition = itemPosition;
-
-      if (handleRef) {
-        const handleMeasurements = measure(handleRef);
-        const containerMeasurements = measure(containerRef);
-        if (!handleMeasurements || !containerMeasurements) {
-          fail();
-          return;
-        }
-
-        handlePosition = {
-          x: handleMeasurements.pageX - containerMeasurements.pageX,
-          y: handleMeasurements.pageY - containerMeasurements.pageY
-        };
-      }
-
-      const touchX = handlePosition.x + touch.x;
-      const touchY = handlePosition.y + touch.y;
-
-      touchPosition.value = { x: touchX, y: touchY };
-      dragStartTouchPosition.value = touchPosition.value;
-      dragStartItemTouchOffset.value = {
-        x: touchX - itemPosition.x,
-        y: touchY - itemPosition.y
-      };
 
       activeAnimationProgress.value = 0;
       activeItemDropped.value = false;
@@ -277,6 +296,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       updateLayer?.(LayerState.FOCUSED);
       updateStartScrollOffset?.();
+
+      // If a custom handle is used, these values will be set in the
+      // handle component after the handle is measured
+      if (!customHandle) {
+        setDragStartValues(key);
+      }
 
       const hasInactiveAnimation =
         inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
@@ -302,10 +327,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationState,
       activeItemKey,
       activeItemPosition,
-      containerRef,
+      customHandle,
       dragStartIndex,
-      dragStartItemTouchOffset,
-      dragStartTouchPosition,
       haptics,
       inactiveAnimationProgress,
       inactiveItemOpacity,
@@ -314,8 +337,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       itemPositions,
       keyToIndex,
       prevActiveItemKey,
+      setDragStartValues,
       stableOnDragStart,
-      touchPosition,
       updateLayer,
       updateStartScrollOffset
     ]
@@ -327,8 +350,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       key: string,
       activationAnimationProgress: SharedValue<number>,
       activate: () => void,
-      fail: () => void,
-      handleRef: AnimatedRef<View> | undefined
+      fail: () => void
     ) => {
       'worklet';
       const touch = e.allTouches[0];
@@ -361,14 +383,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
           return;
         }
+        handleDragStart(key, activationAnimationProgress, fail);
         activate();
-        handleDragStart(
-          touch,
-          key,
-          activationAnimationProgress,
-          fail,
-          handleRef
-        );
       }, dragActivationDelay.value);
     },
     [
@@ -450,6 +466,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationState.value = DragActivationState.INACTIVE;
       updateStartScrollOffset?.(null);
 
+      if (activeHandleMeasurements) {
+        activeHandleMeasurements.value = null;
+      }
+
       if (activeItemKey.value !== null) {
         prevActiveItemKey.value = activeItemKey.value;
         activeItemKey.value = null;
@@ -502,7 +522,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       touchPosition,
       touchStartTouch,
       updateLayer,
-      updateStartScrollOffset
+      updateStartScrollOffset,
+      activeHandleMeasurements
     ]
   );
 
@@ -532,10 +553,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     value: {
       dropAnimationDuration,
       handleDragEnd,
-      handleDragStart,
       handleOrderChange,
       handleTouchStart,
-      handleTouchesMove
+      handleTouchesMove,
+      setDragStartValues
     }
   };
 });

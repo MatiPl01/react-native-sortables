@@ -170,9 +170,9 @@ type FlexItemProps = {
 // when the parent component re-renders
 const FlexItem = memo(function FlexItem({ item, onRemoveItem }: FlexItemProps) {
   return (
-    <Sortable.Pressable key={item} onPress={onRemoveItem.bind(null, item)}>
+    <Sortable.Touchable key={item} onTap={onRemoveItem.bind(null, item)}>
       <FlexCell size='large'>{item}</FlexCell>
-    </Sortable.Pressable>
+    </Sortable.Touchable>
   );
 });
 

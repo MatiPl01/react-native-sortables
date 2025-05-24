@@ -1,16 +1,15 @@
 /* eslint-disable import/no-unused-modules */
-import { Pressable, TouchableHighlight, TouchableOpacity } from 'react-native';
-
 import {
-  createSortableTouchable,
+  CustomHandle,
   SortableFlex,
   SortableGrid,
-  SortableHandle,
-  SortableLayer
+  SortableLayer,
+  SortableTouchable
 } from './components';
 export { useItemContext } from './providers';
+
 import { PortalProvider } from './providers';
-export type { SortableHandleProps, SortableLayerProps } from './components';
+export type { CustomHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
   DragEndCallback,
@@ -132,7 +131,7 @@ const Sortable = {
    * />
    * ```
    */
-  Handle: SortableHandle,
+  Handle: CustomHandle,
 
   /** Component that manages zIndex for proper rendering of sortable components.
    * Automatically adjusts zIndex values to maintain proper visual hierarchy when items are dragged.
@@ -198,54 +197,17 @@ const Sortable = {
    * ```tsx
    * const renderItem = useCallback<SortableGridRenderItem<string>>(
    *   ({ item }) => (
-   *     <Sortable.Pressable
-   *       onPress={() => console.log('pressed', item)}
+   *     <Sortable.Touchable
+   *       onTap={() => console.log('tapped', item)}
    *     >
    *       <Text>{item}</Text>
-   *     </Sortable.Pressable>
+   *     </Sortable.Touchable>
    *   ),
    *   []
    * );
    * ```
    */
-  Pressable: createSortableTouchable(Pressable),
-
-  /** TouchableHighlight component for use within sortable items.
-   * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
-   *
-   * @example
-   * ```tsx
-   * const renderItem = useCallback<SortableGridRenderItem<string>>(
-   *   ({ item }) => (
-   *     <Sortable.TouchableHighlight
-   *       onPress={() => console.log('pressed', item)}
-   *     >
-   *       <Text>{item}</Text>
-   *     </Sortable.TouchableHighlight>
-   *   ),
-   *   []
-   * );
-   * ```
-   */
-  TouchableHighlight: createSortableTouchable(TouchableHighlight),
-  /** TouchableOpacity component for use within sortable items.
-   * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
-   *
-   * @example
-   * ```tsx
-   * const renderItem = useCallback<SortableGridRenderItem<string>>(
-   *   ({ item }) => (
-   *     <Sortable.TouchableOpacity
-   *       onPress={() => console.log('pressed', item)}
-   *     >
-   *       <Text>{item}</Text>
-   *     </Sortable.TouchableOpacity>
-   *   ),
-   *   []
-   * );
-   * ```
-   */
-  TouchableOpacity: createSortableTouchable(TouchableOpacity)
+  Touchable: SortableTouchable
 };
 
 export default Sortable;

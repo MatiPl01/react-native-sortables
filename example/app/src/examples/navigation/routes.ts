@@ -126,6 +126,10 @@ const routes: Routes = {
           ComplexLayout: {
             Component: SortableFlex.tests.ComplexLayoutExample,
             name: 'Complex Layout'
+          },
+          ZeroDelayActivationTouchableExample: {
+            Component: SortableFlex.tests.ZeroDelayActivationTouchableExample,
+            name: 'Zero Delay Activation Touchable'
           }
         }
       }

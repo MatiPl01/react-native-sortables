@@ -31,11 +31,11 @@ export default function FixedItemsExample() {
       const fixed = fixedItems.has(item);
 
       return (
-        <Sortable.Pressable onPress={() => handleItemPress(item)}>
+        <Sortable.Touchable onTap={() => handleItemPress(item)}>
           <Sortable.Handle mode={fixed ? 'fixed' : 'draggable'}>
             <GridItem fixed={fixed} item={item} />
           </Sortable.Handle>
-        </Sortable.Pressable>
+        </Sortable.Touchable>
       );
     },
     [fixedItems, handleItemPress]

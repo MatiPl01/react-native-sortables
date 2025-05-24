@@ -177,9 +177,9 @@ type GridItemProps = {
 // after every order change)
 const GridItem = memo(function GridItem({ item, onRemoveItem }: GridItemProps) {
   return (
-    <Sortable.Pressable onPress={onRemoveItem.bind(null, item)}>
+    <Sortable.Touchable onTap={onRemoveItem.bind(null, item)}>
       <GridCard>{item}</GridCard>
-    </Sortable.Pressable>
+    </Sortable.Touchable>
   );
 });
 

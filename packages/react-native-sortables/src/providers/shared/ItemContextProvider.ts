@@ -7,7 +7,10 @@ import { useCommonValuesContext } from './CommonValuesProvider';
 type ItemContextProviderProps = PropsWithChildren<
   {
     itemKey: string;
-  } & Pick<ItemContextType, 'activationAnimationProgress' | 'isActive'>
+  } & Pick<
+    ItemContextType,
+    'activationAnimationProgress' | 'gesture' | 'isActive'
+  >
 >;
 
 const { ItemContextProvider, useItemContextContext: useItemContext } =

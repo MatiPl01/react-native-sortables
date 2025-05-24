@@ -1,14 +1,12 @@
 import { useMemo } from 'react';
-import type { View } from 'react-native';
 import { Gesture } from 'react-native-gesture-handler';
-import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 
 import { useDragContext } from '../DragProvider';
 
 export default function useItemPanGesture(
   key: string,
-  activationAnimationProgress: SharedValue<number>,
-  handleRef?: AnimatedRef<View>
+  activationAnimationProgress: SharedValue<number>
 ) {
   const { handleDragEnd, handleTouchStart, handleTouchesMove } =
     useDragContext();
@@ -16,15 +14,13 @@ export default function useItemPanGesture(
   return useMemo(
     () =>
       Gesture.Manual()
-        .manualActivation(true)
         .onTouchesDown((e, manager) => {
           handleTouchStart(
             e,
             key,
             activationAnimationProgress,
             manager.activate,
-            manager.fail,
-            handleRef
+            manager.fail
           );
         })
         .onTouchesMove((e, manager) => {
@@ -44,8 +40,7 @@ export default function useItemPanGesture(
       activationAnimationProgress,
       handleDragEnd,
       handleTouchStart,
-      handleTouchesMove,
-      handleRef
+      handleTouchesMove
     ]
   );
 }

@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
+import type { MeasuredDimensions } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
 
 import { useUIStableCallback } from '../../hooks';
-import type { CustomHandleContextType, Dimensions, Vector } from '../../types';
+import type { CustomHandleContextType, Vector } from '../../types';
 import { useAnimatedDebounce } from '../../utils';
 import { createProvider } from '../utils';
 
@@ -15,7 +16,9 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
   { guarded: false }
 )<CustomHandleProviderProps, CustomHandleContextType>(() => {
   const activeHandleOffset = useSharedValue<Vector | null>(null);
-  const activeHandleDimensions = useSharedValue<Dimensions | null>(null);
+  const activeHandleMeasurements = useSharedValue<MeasuredDimensions | null>(
+    null
+  );
   const fixedItemKeys = useSharedValue<Record<string, boolean>>({});
   const debounce = useAnimatedDebounce();
 
@@ -33,7 +36,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
 
   return {
     value: {
-      activeHandleDimensions,
+      activeHandleMeasurements,
       activeHandleOffset,
       fixedItemKeys,
       makeItemFixed,

@@ -1,9 +1,13 @@
 import type { ReactNode } from 'react';
 import type { LayoutChangeEvent, View, ViewStyle } from 'react-native';
-import type { GestureTouchEvent } from 'react-native-gesture-handler';
+import type {
+  GestureTouchEvent,
+  GestureType
+} from 'react-native-gesture-handler';
 import type {
   AnimatedRef,
   AnimatedStyle,
+  MeasuredDimensions,
   SharedValue
 } from 'react-native-reanimated';
 
@@ -116,8 +120,7 @@ export type DragContextType = {
     key: string,
     activationAnimationProgress: SharedValue<number>,
     activate: () => void,
-    fail: () => void,
-    handleRef: AnimatedRef<View> | undefined
+    fail: () => void
   ) => void;
   handleTouchesMove: (e: GestureTouchEvent, fail: () => void) => void;
   handleDragEnd: (
@@ -130,11 +133,13 @@ export type DragContextType = {
     toIndex: number,
     newOrder: Array<string>
   ) => void;
+  setDragStartValues: (key: string) => void;
 };
 
 // ITEM
 
 export type ItemContextType = {
+  gesture: GestureType;
   itemKey: string;
   activeItemKey: Readonly<SharedValue<null | string>>;
   prevActiveItemKey: Readonly<SharedValue<null | string>>;
@@ -153,7 +158,7 @@ export type LayerContextType = {
 
 export type CustomHandleContextType = {
   activeHandleOffset: SharedValue<Vector | null>;
-  activeHandleDimensions: SharedValue<Dimensions | null>;
+  activeHandleMeasurements: SharedValue<MeasuredDimensions | null>;
   fixedItemKeys: SharedValue<Record<string, boolean>>;
   makeItemFixed: (key: string) => void;
   removeFixedItem: (key: string) => void;
