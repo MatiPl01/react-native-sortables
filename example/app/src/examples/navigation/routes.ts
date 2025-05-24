@@ -51,11 +51,15 @@ const routes: Routes = {
             Component: SortableGrid.features.FixedItemsExample,
             name: 'Fixed Items'
           },
-          CallbacksExample: {
+          Callbacks: {
             Component: SortableGrid.features.CallbacksExample,
             name: 'Callbacks'
           },
-          DebugExample: {
+          Touchable: {
+            Component: SortableGrid.features.TouchableExample,
+            name: 'Touchable'
+          },
+          Debug: {
             Component: SortableGrid.features.DebugExample,
             name: 'Debug'
           }
@@ -110,11 +114,15 @@ const routes: Routes = {
             Component: SortableFlex.features.HorizontalAutoScrollExample,
             name: 'Horizontal Auto Scroll'
           },
-          CallbacksExample: {
+          Callbacks: {
             Component: SortableFlex.features.CallbacksExample,
             name: 'Callbacks'
           },
-          DebugExample: {
+          Touchable: {
+            Component: SortableFlex.features.TouchableExample,
+            name: 'Touchable'
+          },
+          Debug: {
             Component: SortableFlex.features.DebugExample,
             name: 'Debug'
           }
@@ -126,10 +134,6 @@ const routes: Routes = {
           ComplexLayout: {
             Component: SortableFlex.tests.ComplexLayoutExample,
             name: 'Complex Layout'
-          },
-          ZeroDelayActivationTouchableExample: {
-            Component: SortableFlex.tests.ZeroDelayActivationTouchableExample,
-            name: 'Zero Delay Activation Touchable'
           }
         }
       }

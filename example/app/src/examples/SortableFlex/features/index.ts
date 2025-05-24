@@ -6,3 +6,4 @@ export { default as DragHandleExample } from './DragHandleExample';
 export { default as DropIndicatorExample } from './DropIndicatorExample';
 export { default as FlexLayoutExample } from './FlexLayoutExample';
 export { default as HorizontalAutoScrollExample } from './HorizontalAutoScrollExample';
+export { default as TouchableExample } from './TouchableExample';

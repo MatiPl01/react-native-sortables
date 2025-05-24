@@ -190,8 +190,17 @@ const Sortable = {
    */
   PortalProvider,
 
-  /** Pressable component for use within sortable items.
+  /** Touchable component for use within sortable items.
    * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
+   *
+   * @props
+   * - onTap: Callback function triggered when the item is tapped
+   * - onDoubleTap: Callback function triggered when the item is double tapped
+   * - onLongPress: Callback function triggered when the item is long pressed
+   * - onTouchesDown: Callback function triggered when touches begin
+   * - onTouchesUp: Callback function triggered when touches end
+   * - failDistance: Maximum distance in pixels that the touch can move before failing (default: 10)
+   * - gestureMode: How multiple gesture callbacks should interact with each other ('exclusive' | 'simultaneous', default: 'exclusive')
    *
    * @example
    * ```tsx
