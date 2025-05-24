@@ -1,27 +1,22 @@
 import { useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import Sortable from 'react-native-sortables';
 
-import { AnimatedText, Button, Screen, Section, Stagger } from '@/components';
-import { flex } from '@/theme';
+import {
+  AnimatedText,
+  Button,
+  GridCard,
+  Screen,
+  Section,
+  Stagger
+} from '@/components';
+import { flex, spacing } from '@/theme';
+import { getItems } from '@/utils';
 
-const DATA = [
-  'Happy 😀',
-  'Sad 😢',
-  'Angry 😡',
-  'Surprised 😮',
-  'Confused 😕',
-  'Disappointed 😞',
-  'Disgusted 😒',
-  'Excited 😄',
-  'Frustrated 😤',
-  'Grateful 😊',
-  'Hopeful 😊',
-  'Joyful 😊',
-  'Love 😊'
-];
+const DATA = getItems(12);
 
+const COLUMNS = 4;
 const TEXT_LINE_HEIGHT = 16;
 
 function limit<T extends Array<string>>(lines: T, maxLines: number): T {
@@ -29,7 +24,7 @@ function limit<T extends Array<string>>(lines: T, maxLines: number): T {
   return lines.slice(-maxLines) as T;
 }
 
-export default function ZeroDelayActivationTouchableExample() {
+export default function TouchableExample() {
   const textLines = useSharedValue<Array<string>>([]);
   const maxLines = useSharedValue(10);
   const text = useDerivedValue(() => {
@@ -68,6 +63,19 @@ export default function ZeroDelayActivationTouchableExample() {
     });
   }, [textLines, maxLines]);
 
+  const renderItem = useCallback(
+    ({ item }: { item: string }) => (
+      <Sortable.Touchable
+        onLongPress={onLongPress}
+        onTap={onTap}
+        onTouchesDown={onTouchesDown}
+        onTouchesUp={onTouchesUp}>
+        <GridCard>{item}</GridCard>
+      </Sortable.Touchable>
+    ),
+    [onLongPress, onTap, onTouchesDown, onTouchesUp]
+  );
+
   return (
     <Screen includeNavBarHeight>
       <Stagger wrapperStye={index => (index === 0 ? flex.fill : {})}>
@@ -97,25 +105,15 @@ export default function ZeroDelayActivationTouchableExample() {
           />
         </Section>
 
-        <Section title='Callback output' animateLayout>
-          <Sortable.Flex
+        <Section title='Touchable Grid' animateLayout>
+          <Sortable.Grid
+            columnGap={spacing.xs}
+            columns={COLUMNS}
+            data={DATA}
             dragActivationDelay={0} // drag gesture will be immediately activated
-            gap={10}
-            customHandle>
-            {DATA.map(item => (
-              <Sortable.Handle key={item}>
-                <Sortable.Touchable
-                  onLongPress={onLongPress}
-                  onTap={onTap}
-                  onTouchesDown={onTouchesDown}
-                  onTouchesUp={onTouchesUp}>
-                  <View key={item} style={styles.cell}>
-                    <Text style={styles.text}>{item}</Text>
-                  </View>
-                </Sortable.Touchable>
-              </Sortable.Handle>
-            ))}
-          </Sortable.Flex>
+            renderItem={renderItem}
+            rowGap={spacing.xs}
+          />
         </Section>
       </Stagger>
     </Screen>
@@ -123,17 +121,6 @@ export default function ZeroDelayActivationTouchableExample() {
 }
 
 const styles = StyleSheet.create({
-  cell: {
-    alignItems: 'center',
-    backgroundColor: '#36877F',
-    borderRadius: 9999,
-    justifyContent: 'center',
-    padding: 10
-  },
-  text: {
-    color: 'white',
-    fontSize: 16
-  },
   textInput: {
     flex: 1,
     lineHeight: TEXT_LINE_HEIGHT
