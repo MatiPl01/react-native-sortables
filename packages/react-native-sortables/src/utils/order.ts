@@ -16,3 +16,16 @@ export const orderItems = <I>(
   }
   return result;
 };
+
+export const getKeyToIndex = (
+  itemKeys: Array<string>
+): Record<string, number> => {
+  'worklet';
+  return itemKeys.reduce(
+    (acc, key, index) => {
+      acc[key] = index;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+};

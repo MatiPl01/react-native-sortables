@@ -27,6 +27,7 @@ import {
 } from '../../types';
 import {
   clearAnimatedTimeout,
+  getKeyToIndex,
   getOffsetDistance,
   setAnimatedTimeout
 } from '../../utils';
@@ -542,7 +543,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         fromIndex,
         indexToKey: indexToKey.value,
         key,
-        keyToIndex: keyToIndex.value,
+        keyToIndex: getKeyToIndex(newOrder),
         toIndex
       });
     },
