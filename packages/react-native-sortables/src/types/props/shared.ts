@@ -176,14 +176,7 @@ export type OrderChangeParams = {
 };
 
 /** Parameters provided when the active item is dropped */
-export type ActiveItemDroppedParams = {
-  /** Unique identifier of the dropped item */
-  key: string;
-  /** Original index of the dropped item */
-  fromIndex: number;
-  /** Final index where the item was dropped */
-  toIndex: number;
-};
+export type ActiveItemDroppedParams = DragEndParams;
 
 /**
  * Callback function called when the item drag starts

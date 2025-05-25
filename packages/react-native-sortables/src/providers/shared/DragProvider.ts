@@ -507,7 +507,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         prevActiveItemKey.value = null;
         activeItemDropped.value = true;
         updateLayer?.(LayerState.IDLE);
-        stableOnActiveItemDropped({ fromIndex, key, toIndex });
+        stableOnActiveItemDropped({
+          fromIndex,
+          indexToKey: indexToKey.value,
+          key,
+          keyToIndex: keyToIndex.value,
+          toIndex
+        });
       }, dropAnimationDuration.value);
     },
     [
