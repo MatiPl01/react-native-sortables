@@ -29,7 +29,7 @@ import type {
   DragActivationState,
   LayerState
 } from '../state';
-import type { AnimatedValues, AnyRecord, Maybe } from '../utils';
+import type { AnimatedValues, AnyRecord, DeepReadonly, Maybe } from '../utils';
 
 // COMMON VALUES
 
@@ -140,13 +140,17 @@ export type DragContextType = {
 
 export type ItemContextType = {
   gesture: GestureType;
-  itemKey: string;
-  activeItemKey: Readonly<SharedValue<null | string>>;
-  prevActiveItemKey: Readonly<SharedValue<null | string>>;
-  isActive: Readonly<SharedValue<boolean>>;
-  dragActivationState: Readonly<SharedValue<DragActivationState>>;
-  activationAnimationProgress: Readonly<SharedValue<number>>;
-};
+} & DeepReadonly<
+  {
+    itemKey: string;
+    isActive: SharedValue<boolean>;
+    activationAnimationProgress: SharedValue<number>;
+  } & Pick<
+    ActiveItemValuesContextType,
+    'activationState' | 'activeItemKey' | 'prevActiveItemKey'
+  > &
+    Pick<CommonValuesContextType, 'indexToKey' | 'keyToIndex'>
+>;
 
 // LAYER
 
