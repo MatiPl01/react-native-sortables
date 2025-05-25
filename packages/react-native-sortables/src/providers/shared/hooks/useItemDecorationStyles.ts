@@ -84,9 +84,9 @@ export default function useItemDecorationStyles(
     );
 
     const shadowColor = interpolateColor(
-      progress,
+      interpolate(progress, [0, 1], [0, activeItemShadowOpacity.value]),
       [0, 1],
-      ['transparent', `rgba(0, 0, 0, ${activeItemShadowOpacity.value})`]
+      ['transparent', 'black']
     );
 
     const shadow = IS_WEB
