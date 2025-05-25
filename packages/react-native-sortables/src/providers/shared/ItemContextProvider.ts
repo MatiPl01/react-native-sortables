@@ -18,14 +18,21 @@ const { ItemContextProvider, useItemContextContext: useItemContext } =
     ItemContextProviderProps,
     ItemContextType
   >(props => {
-    const { activationState, activeItemKey, prevActiveItemKey } =
-      useCommonValuesContext();
+    const {
+      activationState,
+      activeItemKey,
+      indexToKey,
+      keyToIndex,
+      prevActiveItemKey
+    } = useCommonValuesContext();
 
     return {
       value: {
         ...props,
+        activationState,
         activeItemKey,
-        dragActivationState: activationState,
+        indexToKey,
+        keyToIndex,
         prevActiveItemKey
       }
     };

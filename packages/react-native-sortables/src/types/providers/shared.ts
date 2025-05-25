@@ -141,12 +141,13 @@ export type DragContextType = {
 export type ItemContextType = {
   gesture: GestureType;
   itemKey: string;
-  activeItemKey: Readonly<SharedValue<null | string>>;
-  prevActiveItemKey: Readonly<SharedValue<null | string>>;
-  isActive: Readonly<SharedValue<boolean>>;
-  dragActivationState: Readonly<SharedValue<DragActivationState>>;
-  activationAnimationProgress: Readonly<SharedValue<number>>;
-};
+  isActive: SharedValue<boolean>;
+  activationAnimationProgress: SharedValue<number>;
+} & Pick<
+  ActiveItemValuesContextType,
+  'activationState' | 'activeItemKey' | 'prevActiveItemKey'
+> &
+  Pick<CommonValuesContextType, 'indexToKey' | 'keyToIndex'>;
 
 // LAYER
 

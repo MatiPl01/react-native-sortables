@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { SharedValue } from 'react-native-reanimated';
+import type { DerivedValue, SharedValue } from 'react-native-reanimated';
 
 export type AnyFunction = (...args: Array<any>) => any;
 
@@ -41,3 +41,11 @@ export type DefaultProps<
 > = Omit<RequiredExcept<P, O>, E>;
 
 export type NoUndef<T> = T extends undefined ? never : T;
+
+export type DeepReadonly<T> = {
+  readonly [K in keyof T]: T[K] extends SharedValue<infer U>
+    ? DerivedValue<U>
+    : T[K] extends Record<string, any>
+      ? DeepReadonly<T[K]>
+      : Readonly<T[K]>;
+};
