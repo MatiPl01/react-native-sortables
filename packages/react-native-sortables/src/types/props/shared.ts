@@ -131,6 +131,10 @@ export type DragStartParams = {
   key: string;
   /** Original index of the dragged item */
   fromIndex: number;
+  /** Array mapping indices to item keys */
+  indexToKey: Array<string>;
+  /** Object mapping item keys to their indices */
+  keyToIndex: Record<string, number>;
 };
 
 /** Parameters provided when an item is being dragged. */

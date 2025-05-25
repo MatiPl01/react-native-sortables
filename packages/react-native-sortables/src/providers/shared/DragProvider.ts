@@ -317,7 +317,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       haptics.medium();
       stableOnDragStart({
         fromIndex: dragStartIndex.value,
-        key
+        indexToKey: indexToKey.value,
+        key,
+        keyToIndex: keyToIndex.value
       });
     },
     [
@@ -334,6 +336,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveAnimationProgress,
       inactiveItemOpacity,
       inactiveItemScale,
+      indexToKey,
       itemDimensions,
       itemPositions,
       keyToIndex,
