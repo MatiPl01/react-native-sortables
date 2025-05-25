@@ -131,6 +131,10 @@ export type DragStartParams = {
   key: string;
   /** Original index of the dragged item */
   fromIndex: number;
+  /** Array mapping indices to item keys */
+  indexToKey: Array<string>;
+  /** Object mapping item keys to their indices */
+  keyToIndex: Record<string, number>;
 };
 
 /** Parameters provided when an item is being dragged. */
@@ -159,16 +163,26 @@ export type DragEndParams = {
 
 /** Parameters provided when items change their positions during dragging. */
 export type OrderChangeParams = {
-  /** Original index of the moved item */
+  /** Unique identifier of the moved item */
+  key: string;
+  /** Previous index of the moved item */
   fromIndex: number;
   /** New index of the moved item */
   toIndex: number;
-  /** Unique identifier of the moved item */
-  key: string;
   /** Array mapping indices to item keys */
   indexToKey: Array<string>;
   /** Object mapping item keys to their indices */
   keyToIndex: Record<string, number>;
+};
+
+/** Parameters provided when the active item is dropped */
+export type ActiveItemDroppedParams = {
+  /** Unique identifier of the dropped item */
+  key: string;
+  /** Original index of the dropped item */
+  fromIndex: number;
+  /** Final index where the item was dropped */
+  toIndex: number;
 };
 
 /**
@@ -195,6 +209,14 @@ export type DragEndCallback = (params: DragEndParams) => void;
  */
 export type OrderChangeCallback = (params: OrderChangeParams) => void;
 
+/**
+ * Callback function called when the active item is dropped
+ * @param params - Parameters for the active item dropped event
+ */
+export type ActiveItemDroppedCallback = (
+  params: ActiveItemDroppedParams
+) => void;
+
 export type SortableCallbacks = {
   /** Called when an item starts being dragged
    * @param params Parameters for the drag start event
@@ -218,6 +240,11 @@ export type SortableCallbacks = {
    * it's called frequently during dragging. Use `onDragEnd` instead.
    */
   onOrderChange?: OrderChangeCallback;
+
+  /** Called once when the active item is dropped.
+   * @param params Parameters for the active item dropped event
+   */
+  onActiveItemDropped?: ActiveItemDroppedCallback;
 };
 
 export type Overflow = 'hidden' | 'visible';

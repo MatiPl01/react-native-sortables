@@ -2,14 +2,16 @@
 /* eslint-disable no-console */
 import { useCallback, useMemo, useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
-import Sortable, {
-  type DragEndCallback,
-  type DragMoveCallback,
-  type DragStartCallback,
-  type OrderChangeCallback,
-  type SortableGridDragEndCallback,
-  type SortableGridRenderItem
+import type {
+  ActiveItemDroppedCallback,
+  DragEndCallback,
+  DragMoveCallback,
+  DragStartCallback,
+  OrderChangeCallback,
+  SortableGridDragEndCallback,
+  SortableGridRenderItem
 } from 'react-native-sortables';
+import Sortable from 'react-native-sortables';
 
 import type { SwitchOptions } from '@/components';
 import {
@@ -68,6 +70,13 @@ export default function CallbacksExample() {
     [text]
   );
 
+  const onActiveItemDroppedJS = useCallback<ActiveItemDroppedCallback>(
+    params => {
+      text.value = formatCallbackResult('onActiveItemDropped', params);
+    },
+    [text]
+  );
+
   /* Callbacks executed on the UI thread */
 
   const onDragStartUI = useCallback<DragStartCallback>(
@@ -102,6 +111,14 @@ export default function CallbacksExample() {
     [text]
   );
 
+  const onActiveItemDroppedUI = useCallback<ActiveItemDroppedCallback>(
+    params => {
+      'worklet';
+      text.value = formatCallbackResult('onActiveItemDropped', params);
+    },
+    [text]
+  );
+
   const renderItem = useCallback<SortableGridRenderItem<(typeof DATA)[number]>>(
     ({ item }) => <GridCard>{item}</GridCard>,
     []
@@ -112,7 +129,8 @@ export default function CallbacksExample() {
       onDragStart: sw(onDragStartJS, onDragStartUI),
       onDragEnd: sw(onDragEndJS, onDragEndUI),
       onOrderChange: sw(onOrderChangeJS, onOrderChangeUI),
-      onDragMove: sw(onDragMoveJS, onDragMoveUI)
+      onDragMove: sw(onDragMoveJS, onDragMoveUI),
+      onActiveItemDropped: sw(onActiveItemDroppedJS, onActiveItemDroppedUI)
     }),
     [
       onDragEndJS,
@@ -122,7 +140,9 @@ export default function CallbacksExample() {
       onDragStartJS,
       onDragStartUI,
       onOrderChangeJS,
-      onOrderChangeUI
+      onOrderChangeUI,
+      onActiveItemDroppedJS,
+      onActiveItemDroppedUI
     ]
   );
 

@@ -12,6 +12,7 @@ import { PortalProvider } from './providers';
 export type { CustomHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
+  ActiveItemDroppedCallback,
   DragEndCallback,
   DragMoveCallback,
   DragStartCallback,
