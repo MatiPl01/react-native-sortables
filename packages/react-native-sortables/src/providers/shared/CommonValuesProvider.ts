@@ -22,7 +22,7 @@ import type {
   Vector
 } from '../../types';
 import { AbsoluteLayoutState } from '../../types';
-import { areArraysDifferent } from '../../utils';
+import { areArraysDifferent, getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
 import { useActiveItemValuesContext } from './ActiveItemValuesProvider';
 
@@ -70,9 +70,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
 
     // ORDER
     const indexToKey = useSharedValue<Array<string>>(itemKeys);
-    const keyToIndex = useDerivedValue(() =>
-      Object.fromEntries(indexToKey.value.map((key, index) => [key, index]))
-    );
+    const keyToIndex = useDerivedValue(() => getKeyToIndex(indexToKey.value));
 
     // POSITIONS
     const itemPositions = useSharedValue<Record<string, Vector>>({});
