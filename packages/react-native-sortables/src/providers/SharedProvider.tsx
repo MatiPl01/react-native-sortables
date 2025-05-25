@@ -57,6 +57,7 @@ export default function SharedProvider({
   debug,
   hapticsEnabled,
   itemKeys,
+  onActiveItemDropped,
   onDragEnd,
   onDragMove,
   onDragStart,
@@ -103,6 +104,7 @@ export default function SharedProvider({
     <DragProvider
       hapticsEnabled={hapticsEnabled}
       overDrag={overDrag}
+      onActiveItemDropped={onActiveItemDropped}
       onDragEnd={onDragEnd}
       onDragMove={onDragMove}
       onDragStart={onDragStart}

@@ -51,6 +51,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   DragContextType
 >(({
   hapticsEnabled,
+  onActiveItemDropped,
   onDragEnd: stableOnDragEnd,
   onDragMove,
   onDragStart,
@@ -115,6 +116,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const stableOnDragStart = useStableCallbackValue(onDragStart);
   const stableOnDragMove = useStableCallbackValue(onDragMove);
   const stableOnOrderChange = useStableCallbackValue(onOrderChange);
+  const stableOnActiveItemDropped = useStableCallbackValue(onActiveItemDropped);
 
   // ACTIVE ITEM POSITION UPDATER
   useAnimatedReaction(
@@ -474,6 +476,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         activeHandleMeasurements.value = null;
       }
 
+      const fromIndex = dragStartIndex.value;
+      const toIndex = keyToIndex.value[key]!;
+
       if (activeItemKey.value !== null) {
         prevActiveItemKey.value = activeItemKey.value;
         activeItemKey.value = null;
@@ -481,11 +486,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         haptics.medium();
 
         stableOnDragEnd({
-          fromIndex: dragStartIndex.value,
+          fromIndex,
           indexToKey: indexToKey.value,
           key,
           keyToIndex: keyToIndex.value,
-          toIndex: keyToIndex.value[key]!
+          toIndex
         });
       }
 
@@ -502,6 +507,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         prevActiveItemKey.value = null;
         activeItemDropped.value = true;
         updateLayer?.(LayerState.IDLE);
+        stableOnActiveItemDropped({ fromIndex, key, toIndex });
       }, dropAnimationDuration.value);
     },
     [
@@ -522,6 +528,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveAnimationProgress,
       indexToKey,
       keyToIndex,
+      stableOnActiveItemDropped,
       stableOnDragEnd,
       touchPosition,
       touchStartTouch,
