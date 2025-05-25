@@ -547,7 +547,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         toIndex
       });
     },
-    [indexToKey, keyToIndex, stableOnOrderChange, haptics]
+    [indexToKey, stableOnOrderChange, haptics]
   );
 
   return {
