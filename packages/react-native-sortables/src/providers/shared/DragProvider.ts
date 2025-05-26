@@ -1,10 +1,9 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import type { View } from 'react-native';
 import type {
   GestureTouchEvent,
   TouchData
 } from 'react-native-gesture-handler';
-import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import {
   clamp,
   interpolate,
@@ -259,10 +258,18 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateLayer?.(LayerState.FOCUSED);
       updateStartScrollOffset?.();
 
-      // Use custom handle position if the custom handle is used
-      // (touch position is relative to the handle in this case)
-      const touchedItemPosition =
-        activeHandleMeasurements?.value ?? itemPosition;
+      let touchedItemPosition = itemPosition;
+
+      // We need to update the custom handle measurements if the custom handle
+      // is used (touch position is relative to the handle in this case)
+      updateActiveHandleMeasurements?.(key);
+      if (activeHandleMeasurements?.value) {
+        const { pageX, pageY } = activeHandleMeasurements.value;
+        touchedItemPosition = {
+          x: pageX - containerMeasurements.pageX,
+          y: pageY - containerMeasurements.pageY
+        };
+      }
 
       // Touch position relative to the top-left corner of the sortable
       // container
@@ -319,6 +326,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       stableOnDragStart,
       touchPosition,
       updateLayer,
+      updateActiveHandleMeasurements,
       updateStartScrollOffset
     ]
   );
@@ -328,7 +336,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       e: GestureTouchEvent,
       key: string,
       activationAnimationProgress: SharedValue<number>,
-      handleRef: AnimatedRef<View> | undefined,
       activate: () => void,
       fail: () => void
     ) => {
@@ -363,10 +370,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
           return;
         }
-        // We need to measure the active item handle if the custom handle is used
-        if (handleRef && updateActiveHandleMeasurements) {
-          updateActiveHandleMeasurements(key, handleRef);
-        }
         handleDragStart(touch, key, activationAnimationProgress, fail);
         activate();
       }, dragActivationDelay.value);
@@ -381,8 +384,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       handleDragStart,
       measureContainer,
       sortEnabled,
-      touchStartTouch,
-      updateActiveHandleMeasurements
+      touchStartTouch
     ]
   );
 

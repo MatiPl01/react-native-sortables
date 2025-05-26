@@ -9,7 +9,7 @@ type ItemContextProviderProps = PropsWithChildren<
     itemKey: string;
   } & Pick<
     ItemContextType,
-    'activationAnimationProgress' | 'createItemPanGesture' | 'isActive'
+    'activationAnimationProgress' | 'gesture' | 'isActive'
   >
 >;
 
@@ -17,12 +17,7 @@ const { ItemContextProvider, useItemContextContext: useItemContext } =
   createProvider('ItemContext', { guarded: true })<
     ItemContextProviderProps,
     ItemContextType
-  >(({
-    activationAnimationProgress,
-    createItemPanGesture,
-    isActive,
-    itemKey
-  }) => {
+  >(({ activationAnimationProgress, gesture, isActive, itemKey }) => {
     const {
       activationState,
       activeItemKey,
@@ -36,7 +31,7 @@ const { ItemContextProvider, useItemContextContext: useItemContext } =
         activationAnimationProgress,
         activationState,
         activeItemKey,
-        createItemPanGesture,
+        gesture,
         indexToKey,
         isActive,
         itemKey,

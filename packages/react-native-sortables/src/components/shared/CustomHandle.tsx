@@ -1,6 +1,5 @@
-import { type PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
+import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import { View } from 'react-native';
-import type { GestureType } from 'react-native-gesture-handler';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { useAnimatedRef } from 'react-native-reanimated';
 
@@ -22,7 +21,7 @@ export type CustomHandleProps = PropsWithChildren<{
   mode?: 'draggable' | 'fixed' | 'non-draggable';
 }>;
 
-export function CustomHandle(props: CustomHandleProps) {
+export default function CustomHandle(props: CustomHandleProps) {
   // The item is teleported when it is rendered within the PortalOutlet
   // component. Because PortalOutlet creates a context, we can use it to
   // check if the item is teleported
@@ -48,29 +47,23 @@ function CustomHandleComponent({
     );
   }
 
-  const { createItemPanGesture, itemKey } = useItemContext();
+  const { gesture, isActive, itemKey } = useItemContext();
   const handleRef = useAnimatedRef<View>();
-  const gesture = useMemo(
-    () => createItemPanGesture(handleRef),
-    [createItemPanGesture, handleRef]
-  );
 
-  const { makeItemFixed, removeFixedItem, updateActiveHandleMeasurements } =
+  const { registerHandle, updateActiveHandleMeasurements } =
     customHandleContext;
   const dragEnabled = mode === 'draggable';
 
   useEffect(() => {
-    if (mode === 'fixed') {
-      makeItemFixed(itemKey);
+    return registerHandle(itemKey, handleRef, mode === 'fixed');
+  }, [handleRef, itemKey, registerHandle, mode]);
+
+  const onLayout = useCallback(() => {
+    'worklet';
+    if (isActive.value) {
+      updateActiveHandleMeasurements(itemKey);
     }
-
-    return () => removeFixedItem(itemKey);
-  }, [mode, itemKey, makeItemFixed, removeFixedItem]);
-
-  const onLayout = useCallback(
-    () => updateActiveHandleMeasurements(itemKey, handleRef),
-    [itemKey, handleRef, updateActiveHandleMeasurements]
-  );
+  }, [itemKey, isActive, updateActiveHandleMeasurements]);
 
   return (
     <GestureDetector gesture={gesture.enabled(dragEnabled)} userSelect='none'>
@@ -79,17 +72,4 @@ function CustomHandleComponent({
       </View>
     </GestureDetector>
   );
-}
-
-type InternalHandleProps = PropsWithChildren<{
-  createItemPanGesture: () => GestureType;
-}>;
-
-export function InternalHandle({
-  children,
-  createItemPanGesture
-}: InternalHandleProps) {
-  const gesture = useMemo(() => createItemPanGesture(), [createItemPanGesture]);
-
-  return <GestureDetector gesture={gesture}>{children}</GestureDetector>;
 }

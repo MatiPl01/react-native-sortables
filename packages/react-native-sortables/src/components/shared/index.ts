@@ -1,11 +1,10 @@
 export { default as AnimatedOnLayoutView } from './AnimatedOnLayoutView';
+export {
+  default as CustomHandle,
+  type CustomHandleProps
+} from './CustomHandle';
 export * from './DraggableView';
 export { default as SortableContainer } from './SortableContainer';
-export {
-  CustomHandle,
-  type CustomHandleProps,
-  InternalHandle
-} from './SortableHandle';
 export {
   default as SortableLayer,
   type SortableLayerProps

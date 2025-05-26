@@ -1,13 +1,11 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useCallback } from 'react';
 import type { View } from 'react-native';
 import type { AnimatedRef, MeasuredDimensions } from 'react-native-reanimated';
-import { measure, useSharedValue } from 'react-native-reanimated';
+import { measure, runOnUI, useSharedValue } from 'react-native-reanimated';
 
-import { useUICallback } from '../../hooks';
 import type { CustomHandleContextType, Vector } from '../../types';
 import { useAnimatedDebounce } from '../../utils';
 import { createProvider } from '../utils';
-import { useActiveItemValuesContext } from './ActiveItemValuesProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
 type CustomHandleProviderProps = {
@@ -18,52 +16,71 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
   'CustomHandle',
   { guarded: false }
 )<CustomHandleProviderProps, CustomHandleContextType>(() => {
-  const { containerRef } = useCommonValuesContext();
-  const { activeItemKey, activeItemPosition } = useActiveItemValuesContext();
+  const { containerRef, itemPositions } = useCommonValuesContext();
   const debounce = useAnimatedDebounce();
 
   const fixedItemKeys = useSharedValue<Record<string, boolean>>({});
+  const handleRefs = useSharedValue<Record<string, AnimatedRef<View>>>({});
   const activeHandleMeasurements = useSharedValue<MeasuredDimensions | null>(
     null
   );
   const activeHandleOffset = useSharedValue<Vector | null>(null);
 
-  const makeItemFixed = useUICallback((key: string) => {
-    'worklet';
-    fixedItemKeys.value[key] = true;
-    debounce(fixedItemKeys.modify, 100);
-  }, []);
+  const registerHandle = useCallback(
+    (key: string, handleRef: AnimatedRef<View>, fixed: boolean) => {
+      runOnUI(() => {
+        'worklet';
+        handleRefs.value[key] = handleRef;
+        if (fixed) {
+          fixedItemKeys.value[key] = true;
+          debounce(fixedItemKeys.modify, 100);
+        }
+      })();
 
-  const removeFixedItem = useUICallback((key: string) => {
-    'worklet';
-    delete fixedItemKeys.value[key];
-    debounce(fixedItemKeys.modify, 100);
-  }, []);
+      const unregister = () => {
+        'worklet';
+        delete handleRefs.value[key];
+        if (fixed) {
+          fixedItemKeys.value[key] = false;
+          debounce(fixedItemKeys.modify, 100);
+        }
+      };
 
-  const updateActiveHandleMeasurements = useUICallback(
-    (key: string, handleRef: AnimatedRef<View>) => {
-      if (key !== activeItemKey.value) {
+      return runOnUI(unregister);
+    },
+    [debounce, fixedItemKeys, handleRefs]
+  );
+
+  const updateActiveHandleMeasurements = useCallback(
+    (key: string) => {
+      'worklet';
+      const handleRef = handleRefs.value[key];
+      if (!handleRef) {
         return;
       }
 
       const handleMeasurements = measure(handleRef);
       const containerMeasurements = measure(containerRef);
-      if (
-        !handleMeasurements ||
-        !containerMeasurements ||
-        !activeItemPosition.value
-      ) {
+      const itemPosition = itemPositions.value[key];
+
+      if (!handleMeasurements || !containerMeasurements || !itemPosition) {
         return;
       }
 
       activeHandleMeasurements.value = handleMeasurements;
-      const { x: activeX, y: activeY } = activeItemPosition.value;
+      const { x: itemX, y: itemY } = itemPosition;
       activeHandleOffset.value = {
-        x: handleMeasurements.pageX - containerMeasurements.pageX - activeX,
-        y: handleMeasurements.pageY - containerMeasurements.pageY - activeY
+        x: handleMeasurements.pageX - containerMeasurements.pageX - itemX,
+        y: handleMeasurements.pageY - containerMeasurements.pageY - itemY
       };
     },
-    []
+    [
+      activeHandleMeasurements,
+      activeHandleOffset,
+      containerRef,
+      handleRefs,
+      itemPositions
+    ]
   );
 
   return {
@@ -71,8 +88,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
       activeHandleMeasurements,
       activeHandleOffset,
       fixedItemKeys,
-      makeItemFixed,
-      removeFixedItem,
+      registerHandle,
       updateActiveHandleMeasurements
     }
   };
