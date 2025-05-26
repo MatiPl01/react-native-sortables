@@ -17,7 +17,7 @@ const { ItemContextProvider, useItemContextContext: useItemContext } =
   createProvider('ItemContext', { guarded: true })<
     ItemContextProviderProps,
     ItemContextType
-  >(({ itemKey, activationAnimationProgress, gesture, isActive }) => {
+  >(({ activationAnimationProgress, gesture, isActive, itemKey }) => {
     const {
       activationState,
       activeItemKey,
@@ -28,13 +28,13 @@ const { ItemContextProvider, useItemContextContext: useItemContext } =
 
     return {
       value: {
-        itemKey,
         activationAnimationProgress,
-        gesture,
-        isActive,
         activationState,
         activeItemKey,
+        gesture,
         indexToKey,
+        isActive,
+        itemKey,
         keyToIndex,
         prevActiveItemKey
       }
