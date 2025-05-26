@@ -7,53 +7,118 @@ description: 'Components that work well with sortable component gesture detector
 
 ## Overview
 
-React Native Sortables exports a few touchable components, i.e. `Pressable`, `TouchableOpacity` and `TouchableHighlight`.
-
-The role of these components is to properly handle **press gesture** on components nested within children of **sortable components**.
+React Native Sortables exports a `Touchable` component that properly handles touch gestures within sortable components without interfering with the drag gesture.
 
 ### Purpose
 
-These touchable components are designed to:
+The `Touchable` component is designed to:
 
-- Handle **press gestures** properly within **sortable component items**
-- **Prevent conflicts** between press handling and **drag-and-drop** functionality
+- Handle various touch gestures (tap, double tap, long press) properly within sortable component items
+- Prevent conflicts between touch handling and drag-and-drop functionality
 
 ### When to Use?
 
-Use these components when you need to add **interactive elements** (buttons, links, etc.) inside **sortable items**. The **press gesture** on a touchable component may interfere with the **gesture detector** used for item activation and dragging. These components will automatically **ignore press events** when sortable component item starts being dragged.
+Use this component when you need to add interactive elements (buttons, links, etc.) inside sortable items. Touch gestures on this component are properly coordinated with the gesture detector used for item activation and dragging.
 
 ## Usage
 
 :::info
 
-For the complete usage example, refer to the [Touchables](/grid/examples/touchables) example.
+For the complete usage example, refer to the [Touchable](/grid/examples/touchable) example.
 
 :::
 
-Use these components withing a sortable component's child (item) component.
+Use the Touchable component within a sortable component's child (item) component.
 
 ```tsx
 import Sortable from 'react-native-sortables';
 
 // ... other components
-<Sortable.Pressable
-  onPress={() => {
-    console.log('pressed');
+<Sortable.Touchable
+  onTap={() => {
+    console.log('tapped');
+  }}
+  onLongPress={() => {
+    console.log('long pressed');
+  }}
+  onTouchesDown={() => {
+    console.log('touch started');
   }}>
   {/* ... other components */}
-</Sortable.Pressable>;
+</Sortable.Touchable>;
 // ... other components
 ```
 
 ## Props
 
-### onPress
+### onTap
 
-Function that will be called when the user **presses** the component **nested within a sortable component child**.
+Called when the user taps the component.
 
-| type                                                            | default | required |
-| --------------------------------------------------------------- | ------- | -------- |
-| `((event: GestureResponderEvent) => void) \| null \| undefined` | NO      | NO       |
+| type         | default | required |
+| ------------ | ------- | -------- |
+| `() => void` | NO      | NO       |
+
+---
+
+### onLongPress
+
+Called when the user long presses the component.
+
+| type         | default | required |
+| ------------ | ------- | -------- |
+| `() => void` | NO      | NO       |
+
+---
+
+### onTouchesDown
+
+Called when touches begin on the component.
+
+| type         | default | required |
+| ------------ | ------- | -------- |
+| `() => void` | NO      | NO       |
+
+---
+
+### onTouchesUp
+
+Called when touches end on the component.
+
+| type         | default | required |
+| ------------ | ------- | -------- |
+| `() => void` | NO      | NO       |
+
+---
+
+### failDistance
+
+Maximum distance in pixels that a touch can move before the gesture is considered failed.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 10      | NO       |
+
+---
+
+### gestureMode
+
+Determines how gestures interact with each other if more than a single callback is provided.
+
+It doesn't impact the drag and drop gesture, which is always handled simultaneously with the touch gesture.
+
+| type                            | default       | required |
+| ------------------------------- | ------------- | -------- |
+| `'exclusive' \| 'simultaneous'` | `'exclusive'` | NO       |
+
+- `'exclusive'` - only one gesture can be active at a time
+- `'simultaneous'` - allows multiple gestures to be active simultaneously
+
+---
+
+### Additional Props
+
+The component also accepts all standard React Native `ViewProps` which are passed through to the underlying View component.
 
 :::info
 
