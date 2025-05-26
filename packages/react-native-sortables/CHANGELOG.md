@@ -1,3 +1,22 @@
+# [1.7.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.6.0...v1.7.0) (2025-05-26)
+
+
+### Bug Fixes
+
+* Invalid call to gesture manager when item is no longer available ([#385](https://github.com/MatiPl01/react-native-sortables/issues/385)) ([5e5e1ca](https://github.com/MatiPl01/react-native-sortables/commit/5e5e1ca9cb7e93d3b4707e185c9bb30d0afd6de7))
+* Invalid custom handle measurement ([#384](https://github.com/MatiPl01/react-native-sortables/issues/384)) ([ad03d2b](https://github.com/MatiPl01/react-native-sortables/commit/ad03d2b7e970f57583e15e6cce9b3424b1ec220b)), closes [#377](https://github.com/MatiPl01/react-native-sortables/issues/377)
+* onPress not fired when activation delay is low ([#377](https://github.com/MatiPl01/react-native-sortables/issues/377)) ([07065b5](https://github.com/MatiPl01/react-native-sortables/commit/07065b527f23637dfd3dd96401490dc0b89e4f96)), closes [#375](https://github.com/MatiPl01/react-native-sortables/issues/375)
+* Order change callback invalid keyToIndex and shadow color interpolation ([#380](https://github.com/MatiPl01/react-native-sortables/issues/380)) ([c0b3c03](https://github.com/MatiPl01/react-native-sortables/commit/c0b3c0351f6837f9b9688dfc387247be10b145bc))
+* Stop passing excessive data to the item context ([#383](https://github.com/MatiPl01/react-native-sortables/issues/383)) ([0b466ac](https://github.com/MatiPl01/react-native-sortables/commit/0b466aca7434327e4acd81f941b4f5dd80e1c02d))
+
+
+### Features
+
+* Active item dropped callback, more props in drag start callback ([#381](https://github.com/MatiPl01/react-native-sortables/issues/381)) ([ef6e6cd](https://github.com/MatiPl01/react-native-sortables/commit/ef6e6cd84e1df65b7690c57d6fa8af13160b77aa))
+* Add keyToIndex and indexToKey to the item context ([#379](https://github.com/MatiPl01/react-native-sortables/issues/379)) ([9166043](https://github.com/MatiPl01/react-native-sortables/commit/91660436ace23d988c2ab83fb51d8b932cd3bffe))
+* Add more params to the item drop callback ([#382](https://github.com/MatiPl01/react-native-sortables/issues/382)) ([36fe591](https://github.com/MatiPl01/react-native-sortables/commit/36fe59171e9fb58d3a1e6d63f7fd0000ffd4cf38))
+* Add more touch events to the touchable ([#378](https://github.com/MatiPl01/react-native-sortables/issues/378)) ([c60500f](https://github.com/MatiPl01/react-native-sortables/commit/c60500fb0c3be27325c8b91a6f42c9237cf72d6f))
+
 # [1.6.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.5.2...v1.6.0) (2025-04-27)
 
 ### Bug Fixes
