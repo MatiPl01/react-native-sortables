@@ -1,19 +1,22 @@
 import { type PropsWithChildren, useMemo } from 'react';
+import type { ViewProps } from 'react-native';
 import { View } from 'react-native';
 import type { GestureType } from 'react-native-gesture-handler';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useItemContext } from '../../providers';
 
-type SortableTouchableProps = PropsWithChildren<{
-  onTap?: () => void;
-  onDoubleTap?: () => void;
-  onLongPress?: () => void;
-  onTouchesDown?: () => void;
-  onTouchesUp?: () => void;
-  failDistance?: number;
-  gestureMode?: 'exclusive' | 'simultaneous';
-}>;
+type SortableTouchableProps = PropsWithChildren<
+  {
+    onTap?: () => void;
+    onDoubleTap?: () => void;
+    onLongPress?: () => void;
+    onTouchesDown?: () => void;
+    onTouchesUp?: () => void;
+    failDistance?: number;
+    gestureMode?: 'exclusive' | 'simultaneous';
+  } & ViewProps
+>;
 
 export default function SortableTouchable({
   children,
@@ -23,7 +26,8 @@ export default function SortableTouchable({
   onLongPress,
   onTap,
   onTouchesDown,
-  onTouchesUp
+  onTouchesUp,
+  ...viewProps
 }: SortableTouchableProps) {
   const { gesture: externalGesture } = useItemContext();
 
@@ -89,7 +93,9 @@ export default function SortableTouchable({
 
   return (
     <GestureDetector gesture={gesture} userSelect='none'>
-      <View collapsable={false}>{children}</View>
+      <View {...viewProps} collapsable={false}>
+        {children}
+      </View>
     </GestureDetector>
   );
 }
