@@ -70,7 +70,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     containerHeight,
     containerRef,
     containerWidth,
-    customHandle,
     dragActivationDelay,
     dragActivationFailOffset,
     dropAnimationDuration,
@@ -92,8 +91,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const { updateLayer } = useLayerContext() ?? {};
   const { scrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
-  const { activeHandleMeasurements, activeHandleOffset } =
-    useCustomHandleContext() ?? {};
+  const {
+    activeHandleMeasurements,
+    activeHandleOffset,
+    updateActiveHandleMeasurements
+  } = useCustomHandleContext() ?? {};
   const { activeItemAbsolutePosition } = usePortalContext() ?? {};
 
   const haptics = useHaptics(hapticsEnabled);
@@ -131,9 +133,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX: snapOffsetX.value,
       offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
-      snapDimensions: customHandle
-        ? activeHandleMeasurements?.value
-        : activeItemDimensions.value,
+      snapDimensions:
+        activeHandleMeasurements?.value ?? activeItemDimensions.value,
       snapOffset: activeHandleOffset?.value,
       startTouch: touchStartTouch.value,
       startTouchPosition: dragStartTouchPosition.value,
@@ -228,53 +229,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
    * DRAG HANDLERS
    */
 
-  // If custom handle is used, it must be called after handle is measured
-  const setDragStartValues = useCallback(
-    (key: string) => {
-      'worklet';
-      const itemPosition = itemPositions.value[key];
-
-      if (!itemPosition || !currentTouch.value) {
-        return;
-      }
-
-      let touchItemPosition = itemPosition;
-      if (customHandle) {
-        const containerMeasurements = measure(containerRef);
-        if (!activeHandleMeasurements?.value || !containerMeasurements) {
-          return;
-        }
-
-        touchItemPosition = {
-          x: activeHandleMeasurements.value.pageX - containerMeasurements.pageX,
-          y: activeHandleMeasurements.value.pageY - containerMeasurements.pageY
-        };
-      }
-
-      const touchX = touchItemPosition.x + currentTouch.value.x;
-      const touchY = touchItemPosition.y + currentTouch.value.y;
-
-      touchPosition.value = { x: touchX, y: touchY };
-      dragStartTouchPosition.value = touchPosition.value;
-      dragStartItemTouchOffset.value = {
-        x: touchX - itemPosition.x,
-        y: touchY - itemPosition.y
-      };
-    },
-    [
-      activeHandleMeasurements,
-      containerRef,
-      currentTouch,
-      customHandle,
-      dragStartItemTouchOffset,
-      dragStartTouchPosition,
-      itemPositions,
-      touchPosition
-    ]
-  );
-
   const handleDragStart = useCallback(
     (
+      touch: TouchData,
       key: string,
       activationAnimationProgress: SharedValue<number>,
       fail: () => void
@@ -282,8 +239,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       'worklet';
       const itemPosition = itemPositions.value[key];
       const dimensions = itemDimensions.value[key];
+      const containerMeasurements = measure(containerRef);
 
-      if (!itemPosition || !dimensions) {
+      if (!itemPosition || !dimensions || !containerMeasurements) {
         fail();
         return;
       }
@@ -300,11 +258,30 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateLayer?.(LayerState.FOCUSED);
       updateStartScrollOffset?.();
 
-      // If a custom handle is used, these values will be set in the
-      // handle component after the handle is measured
-      if (!customHandle) {
-        setDragStartValues(key);
+      let touchedItemPosition = itemPosition;
+
+      // We need to update the custom handle measurements if the custom handle
+      // is used (touch position is relative to the handle in this case)
+      updateActiveHandleMeasurements?.(key);
+      if (activeHandleMeasurements?.value) {
+        const { pageX, pageY } = activeHandleMeasurements.value;
+        touchedItemPosition = {
+          x: pageX - containerMeasurements.pageX,
+          y: pageY - containerMeasurements.pageY
+        };
       }
+
+      // Touch position relative to the top-left corner of the sortable
+      // container
+      const touchX = touchedItemPosition.x + touch.x;
+      const touchY = touchedItemPosition.y + touch.y;
+
+      touchPosition.value = { x: touchX, y: touchY };
+      dragStartTouchPosition.value = touchPosition.value;
+      dragStartItemTouchOffset.value = {
+        x: touchX - itemPosition.x,
+        y: touchY - itemPosition.y
+      };
 
       const hasInactiveAnimation =
         inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
@@ -327,13 +304,16 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     [
       activationAnimationDuration,
       activeAnimationProgress,
+      activeHandleMeasurements,
       activeItemDimensions,
       activeItemDropped,
       activationState,
       activeItemKey,
       activeItemPosition,
-      customHandle,
+      containerRef,
       dragStartIndex,
+      dragStartItemTouchOffset,
+      dragStartTouchPosition,
       haptics,
       inactiveAnimationProgress,
       inactiveItemOpacity,
@@ -343,9 +323,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       itemPositions,
       keyToIndex,
       prevActiveItemKey,
-      setDragStartValues,
       stableOnDragStart,
+      touchPosition,
       updateLayer,
+      updateActiveHandleMeasurements,
       updateStartScrollOffset
     ]
   );
@@ -389,7 +370,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
           return;
         }
-        handleDragStart(key, activationAnimationProgress, fail);
+        handleDragStart(touch, key, activationAnimationProgress, fail);
         activate();
       }, dragActivationDelay.value);
     },
@@ -401,8 +382,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       currentTouch,
       dragActivationDelay,
       handleDragStart,
-      sortEnabled,
       measureContainer,
+      sortEnabled,
       touchStartTouch
     ]
   );
@@ -572,8 +553,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       handleDragEnd,
       handleOrderChange,
       handleTouchStart,
-      handleTouchesMove,
-      setDragStartValues
+      handleTouchesMove
     }
   };
 });

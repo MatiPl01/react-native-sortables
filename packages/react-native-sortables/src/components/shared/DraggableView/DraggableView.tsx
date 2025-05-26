@@ -62,7 +62,6 @@ function DraggableView({
     activationAnimationProgress,
     portalState
   );
-
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
   useEffect(() => {

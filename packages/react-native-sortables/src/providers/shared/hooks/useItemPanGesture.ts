@@ -36,11 +36,11 @@ export default function useItemPanGesture(
           handleDragEnd(key, activationAnimationProgress);
         }),
     [
-      key,
-      activationAnimationProgress,
       handleDragEnd,
       handleTouchStart,
-      handleTouchesMove
+      handleTouchesMove,
+      key,
+      activationAnimationProgress
     ]
   );
 }

@@ -133,7 +133,6 @@ export type DragContextType = {
     toIndex: number,
     newOrder: Array<string>
   ) => void;
-  setDragStartValues: (key: string) => void;
 };
 
 // ITEM
@@ -161,11 +160,15 @@ export type LayerContextType = {
 // CUSTOM HANDLE
 
 export type CustomHandleContextType = {
-  activeHandleOffset: SharedValue<Vector | null>;
-  activeHandleMeasurements: SharedValue<MeasuredDimensions | null>;
   fixedItemKeys: SharedValue<Record<string, boolean>>;
-  makeItemFixed: (key: string) => void;
-  removeFixedItem: (key: string) => void;
+  activeHandleMeasurements: SharedValue<MeasuredDimensions | null>;
+  activeHandleOffset: SharedValue<Vector | null>;
+  registerHandle: (
+    key: string,
+    handleRef: AnimatedRef<View>,
+    fixed: boolean
+  ) => () => void;
+  updateActiveHandleMeasurements: (key: string) => void;
 };
 
 // PORTAL
