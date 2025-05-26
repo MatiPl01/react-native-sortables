@@ -31,7 +31,7 @@ export default function TeleportedItemCell({
   onMeasure,
   teleportedItemId
 }: TeleportedItemCellProps) {
-  const { notifyRendered } = usePortalContext()!;
+  const { notifyRendered } = usePortalContext() ?? {};
 
   const teleportedItemStyles = useTeleportedItemStyles(
     itemKey,
@@ -43,6 +43,10 @@ export default function TeleportedItemCell({
     isActive,
     activationAnimationProgress
   );
+
+  if (!notifyRendered) {
+    return null;
+  }
 
   return (
     <ItemCell

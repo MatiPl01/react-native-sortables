@@ -15,6 +15,7 @@ import {
 
 import { useHaptics, useStableCallbackValue } from '../../hooks';
 import type {
+  Dimensions,
   DragContextType,
   OverDrag,
   SortableCallbacks,
@@ -233,16 +234,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     (
       touch: TouchData,
       key: string,
-      activationAnimationProgress: SharedValue<number>,
-      fail: () => void
+      position: Vector,
+      dimensions: Dimensions,
+      activationAnimationProgress: SharedValue<number>
     ) => {
       'worklet';
-      const itemPosition = itemPositions.value[key];
-      const dimensions = itemDimensions.value[key];
       const containerMeasurements = measure(containerRef);
 
-      if (!itemPosition || !dimensions || !containerMeasurements) {
-        fail();
+      if (!position || !dimensions || !containerMeasurements) {
         return;
       }
 
@@ -250,15 +249,15 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemDropped.value = false;
       prevActiveItemKey.value = activeItemKey.value;
       activeItemKey.value = key;
-      activeItemPosition.value = itemPosition;
-      activeItemDimensions.value = itemDimensions.value[key] ?? null;
+      activeItemPosition.value = position;
+      activeItemDimensions.value = dimensions;
       dragStartIndex.value = keyToIndex.value[key] ?? -1;
       activationState.value = DragActivationState.ACTIVE;
 
       updateLayer?.(LayerState.FOCUSED);
       updateStartScrollOffset?.();
 
-      let touchedItemPosition = itemPosition;
+      let touchedItemPosition = position;
 
       // We need to update the custom handle measurements if the custom handle
       // is used (touch position is relative to the handle in this case)
@@ -279,8 +278,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       touchPosition.value = { x: touchX, y: touchY };
       dragStartTouchPosition.value = touchPosition.value;
       dragStartItemTouchOffset.value = {
-        x: touchX - itemPosition.x,
-        y: touchY - itemPosition.y
+        x: touchX - position.x,
+        y: touchY - position.y
       };
 
       const hasInactiveAnimation =
@@ -319,8 +318,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveItemOpacity,
       inactiveItemScale,
       indexToKey,
-      itemDimensions,
-      itemPositions,
       keyToIndex,
       prevActiveItemKey,
       stableOnDragStart,
@@ -370,7 +367,21 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
           return;
         }
-        handleDragStart(touch, key, activationAnimationProgress, fail);
+
+        const position = itemPositions.value[key];
+        const dimensions = itemDimensions.value[key];
+
+        if (!position || !dimensions) {
+          return;
+        }
+
+        handleDragStart(
+          touch,
+          key,
+          position,
+          dimensions,
+          activationAnimationProgress
+        );
         activate();
       }, dragActivationDelay.value);
     },
@@ -382,6 +393,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       currentTouch,
       dragActivationDelay,
       handleDragStart,
+      itemDimensions,
+      itemPositions,
       measureContainer,
       sortEnabled,
       touchStartTouch
