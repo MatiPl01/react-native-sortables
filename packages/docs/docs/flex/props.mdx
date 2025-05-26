@@ -766,6 +766,8 @@ type DragStartCallback = (params: DragStartParams) => void;
 type DragStartParams = {
   key: string;
   fromIndex: number;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
 };
 ```
 
@@ -773,27 +775,24 @@ type DragStartParams = {
 
 ---
 
-### onDragEnd
+### onDragMove
 
-Called when the drag gesture ends. Data passed to the callback is the new order of the items.
+Called when the drag gesture moves.
 
-| type                          | default | required |
-| ----------------------------- | ------- | -------- |
-| `SortableFlexDragEndCallback` | NO      | NO       |
+| type               | default | required |
+| ------------------ | ------- | -------- |
+| `DragMoveCallback` | NO      | NO       |
 
 <details>
   <summary>Type definitions</summary>
 
 ```tsx
-type SortableFlexDragEndCallback = (params: SortableFlexDragEndParams) => void;
+type DragMoveCallback = (params: DragMoveParams) => void;
 
-type SortableFlexDragEndParams = {
+type DragMoveParams = {
   key: string;
   fromIndex: number;
-  toIndex: number;
-  indexToKey: Array<string>;
-  keyToIndex: Record<string, number>;
-  order: <I>(data: Array<I>) => Array<I>; // returns new array with items in the new order
+  touchData: TouchData;
 };
 ```
 
@@ -834,24 +833,54 @@ type OrderChangeParams = {
 
 ---
 
-### onDragMove
+### onDragEnd
 
-Called when the drag gesture moves.
+Called when the drag gesture ends. Data passed to the callback is the new order of the items.
 
-| type               | default | required |
-| ------------------ | ------- | -------- |
-| `DragMoveCallback` | NO      | NO       |
+| type                          | default | required |
+| ----------------------------- | ------- | -------- |
+| `SortableFlexDragEndCallback` | NO      | NO       |
 
 <details>
   <summary>Type definitions</summary>
 
 ```tsx
-type DragMoveCallback = (params: DragMoveParams) => void;
+type SortableFlexDragEndCallback = (params: SortableFlexDragEndParams) => void;
 
-type DragMoveParams = {
+type SortableFlexDragEndParams = {
   key: string;
   fromIndex: number;
-  touchData: TouchData;
+  toIndex: number;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
+  order: <I>(data: Array<I>) => Array<I>; // returns new array with items in the new order
+};
+```
+
+</details>
+
+---
+
+### onActiveItemDropped
+
+Called when the active item is dropped (the animation to the target item position is completed).
+
+| type                        | default | required |
+| --------------------------- | ------- | -------- |
+| `ActiveItemDroppedCallback` | NO      | NO       |
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type ActiveItemDroppedCallback = (params: ActiveItemDroppedParams) => void;
+
+type ActiveItemDroppedParams = {
+  key: string;
+  fromIndex: number;
+  toIndex: number;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
 };
 ```
 

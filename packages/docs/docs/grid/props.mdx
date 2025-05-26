@@ -648,6 +648,8 @@ type DragStartCallback = (params: DragStartParams) => void;
 type DragStartParams = {
   key: string;
   fromIndex: number;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
 };
 ```
 
@@ -655,29 +657,24 @@ type DragStartParams = {
 
 ---
 
-### onDragEnd
+### onDragMove
 
-Called when the drag gesture ends. Data passed to the callback is sorted according to the new order of the items. If the order of items is not changed, the same data array as the one passed to the `data` prop of the grid is passed in the callback params.
+Called when the drag gesture moves.
 
-| type                             | default | required |
-| -------------------------------- | ------- | -------- |
-| `SortableGridDragEndCallback<T>` | NO      | NO       |
+| type               | default | required |
+| ------------------ | ------- | -------- |
+| `DragMoveCallback` | NO      | NO       |
 
 <details>
   <summary>Type definitions</summary>
 
 ```tsx
-type SortableGridDragEndCallback<T> = (
-  params: SortableGridDragEndParams<T>
-) => void;
+type DragMoveCallback = (params: DragMoveParams) => void;
 
-type SortableGridDragEndParams<T> = {
+type DragMoveParams = {
   key: string;
   fromIndex: number;
-  toIndex: number;
-  indexToKey: Array<string>;
-  keyToIndex: Record<string, number>;
-  data: Array<T>;
+  touchData: TouchData;
 };
 ```
 
@@ -718,24 +715,56 @@ type OrderChangeParams = {
 
 ---
 
-### onDragMove
+### onDragEnd
 
-Called when the drag gesture moves.
+Called when the drag gesture ends. Data passed to the callback is sorted according to the new order of the items. If the order of items is not changed, the same data array as the one passed to the `data` prop of the grid is passed in the callback params.
 
-| type               | default | required |
-| ------------------ | ------- | -------- |
-| `DragMoveCallback` | NO      | NO       |
+| type                             | default | required |
+| -------------------------------- | ------- | -------- |
+| `SortableGridDragEndCallback<T>` | NO      | NO       |
 
 <details>
   <summary>Type definitions</summary>
 
 ```tsx
-type DragMoveCallback = (params: DragMoveParams) => void;
+type SortableGridDragEndCallback<T> = (
+  params: SortableGridDragEndParams<T>
+) => void;
 
-type DragMoveParams = {
+type SortableGridDragEndParams<T> = {
   key: string;
   fromIndex: number;
-  touchData: TouchData;
+  toIndex: number;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
+  data: Array<T>;
+};
+```
+
+</details>
+
+---
+
+### onActiveItemDropped
+
+Called when the active item is dropped (the animation to the target item position is completed).
+
+| type                        | default | required |
+| --------------------------- | ------- | -------- |
+| `ActiveItemDroppedCallback` | NO      | NO       |
+
+<details>
+  <summary>Type definitions</summary>
+
+```tsx
+type ActiveItemDroppedCallback = (params: ActiveItemDroppedParams) => void;
+
+type ActiveItemDroppedParams = {
+  key: string;
+  fromIndex: number;
+  toIndex: number;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
 };
 ```
 
