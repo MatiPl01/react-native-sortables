@@ -119,6 +119,7 @@ export type DragContextType = {
     e: GestureTouchEvent,
     key: string,
     activationAnimationProgress: SharedValue<number>,
+    handleRef: AnimatedRef<View> | undefined,
     activate: () => void,
     fail: () => void
   ) => void;
@@ -133,13 +134,12 @@ export type DragContextType = {
     toIndex: number,
     newOrder: Array<string>
   ) => void;
-  setDragStartValues: (key: string) => void;
 };
 
 // ITEM
 
 export type ItemContextType = {
-  gesture: GestureType;
+  createItemPanGesture: (handleRef?: AnimatedRef<View>) => GestureType;
 } & DeepReadonly<
   {
     itemKey: string;
@@ -161,11 +161,15 @@ export type LayerContextType = {
 // CUSTOM HANDLE
 
 export type CustomHandleContextType = {
-  activeHandleOffset: SharedValue<Vector | null>;
-  activeHandleMeasurements: SharedValue<MeasuredDimensions | null>;
   fixedItemKeys: SharedValue<Record<string, boolean>>;
+  activeHandleMeasurements: SharedValue<MeasuredDimensions | null>;
+  activeHandleOffset: SharedValue<Vector | null>;
   makeItemFixed: (key: string) => void;
   removeFixedItem: (key: string) => void;
+  updateActiveHandleMeasurements: (
+    key: string,
+    handleRef: AnimatedRef<View>
+  ) => void;
 };
 
 // PORTAL
