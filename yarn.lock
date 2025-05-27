@@ -3781,6 +3781,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-navigation/bottom-tabs@npm:^7.3.10":
+  version: 7.3.10
+  resolution: "@react-navigation/bottom-tabs@npm:7.3.10"
+  dependencies:
+    "@react-navigation/elements": "npm:^2.3.8"
+    color: "npm:^4.2.3"
+  peerDependencies:
+    "@react-navigation/native": ^7.1.6
+    react: ">= 18.2.0"
+    react-native: "*"
+    react-native-safe-area-context: ">= 4.0.0"
+    react-native-screens: ">= 4.0.0"
+  checksum: 10c0/17adb7ebc38fd6d99866cf365f93099e5e83efdc0203051f3bbd7f731791f04c4323901d81ea2af9bb82a7ad22ff547d8a31f395a19de6160b7a3596990b1191
+  languageName: node
+  linkType: hard
+
 "@react-navigation/core@npm:^7.3.1":
   version: 7.8.5
   resolution: "@react-navigation/core@npm:7.8.5"
@@ -3798,7 +3814,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/elements@npm:^2.2.5":
+"@react-navigation/elements@npm:^2.2.5, @react-navigation/elements@npm:^2.3.8":
   version: 2.3.8
   resolution: "@react-navigation/elements@npm:2.3.8"
   dependencies:
@@ -7987,6 +8003,7 @@ __metadata:
     "@react-native-community/cli-platform-ios": "npm:18.0.0"
     "@react-native/babel-preset": "npm:0.79.0"
     "@react-native/metro-config": "npm:0.79.0"
+    "@react-navigation/bottom-tabs": "npm:^7.3.10"
     "@react-navigation/native": "npm:7.0.14"
     "@react-navigation/native-stack": "npm:7.2.0"
     "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A1.8.0#~/.yarn/patches/@shopify-flash-list-npm-1.8.0-54e02d8f74.patch"

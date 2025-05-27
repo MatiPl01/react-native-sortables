@@ -75,7 +75,16 @@ const routes: Routes = {
             }
           }
         }
-      })
+      }),
+      Tests: {
+        name: 'Test examples',
+        routes: {
+          BottomTabsNavigator: {
+            Component: SortableGrid.tests.BottomTabsNavigatorExample,
+            name: 'Bottom Tabs Navigator'
+          }
+        }
+      }
     }
   },
   SortableFlex: {
@@ -134,6 +143,10 @@ const routes: Routes = {
           ComplexLayout: {
             Component: SortableFlex.tests.ComplexLayoutExample,
             name: 'Complex Layout'
+          },
+          BottomTabsNavigator: {
+            Component: SortableFlex.tests.BottomTabsNavigatorExample,
+            name: 'Bottom Tabs Navigator'
           }
         }
       }
