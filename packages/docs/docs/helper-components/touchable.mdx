@@ -1,0 +1,127 @@
+---
+sidebar_position: 2
+description: 'Components that work well with sortable component gesture detectors'
+---
+
+# Touchable
+
+## Overview
+
+React Native Sortables exports a `Touchable` component that properly handles touch gestures within sortable components without interfering with the drag gesture.
+
+### Purpose
+
+The `Touchable` component is designed to:
+
+- Handle various touch gestures (tap, double tap, long press) properly within sortable component items
+- Prevent conflicts between touch handling and drag-and-drop functionality
+
+### When to Use?
+
+Use this component when you need to add interactive elements (buttons, links, etc.) inside sortable items. Touch gestures on this component are properly coordinated with the gesture detector used for item activation and dragging.
+
+## Usage
+
+:::info
+
+For the complete usage example, refer to the [Touchable](/grid/examples/touchable) example.
+
+:::
+
+Use the Touchable component within a sortable component's child (item) component.
+
+```tsx
+import Sortable from 'react-native-sortables';
+
+// ... other components
+<Sortable.Touchable
+  onTap={() => {
+    console.log('tapped');
+  }}
+  onLongPress={() => {
+    console.log('long pressed');
+  }}
+  onTouchesDown={() => {
+    console.log('touch started');
+  }}>
+  {/* ... other components */}
+</Sortable.Touchable>;
+// ... other components
+```
+
+## Props
+
+### onTap
+
+Called when the user taps the component.
+
+| type         | default | required |
+| ------------ | ------- | -------- |
+| `() => void` | NO      | NO       |
+
+---
+
+### onLongPress
+
+Called when the user long presses the component.
+
+| type         | default | required |
+| ------------ | ------- | -------- |
+| `() => void` | NO      | NO       |
+
+---
+
+### onTouchesDown
+
+Called when touches begin on the component.
+
+| type         | default | required |
+| ------------ | ------- | -------- |
+| `() => void` | NO      | NO       |
+
+---
+
+### onTouchesUp
+
+Called when touches end on the component.
+
+| type         | default | required |
+| ------------ | ------- | -------- |
+| `() => void` | NO      | NO       |
+
+---
+
+### failDistance
+
+Maximum distance in pixels that a touch can move before the gesture is considered failed.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 10      | NO       |
+
+---
+
+### gestureMode
+
+Determines how gestures interact with each other if more than a single callback is provided.
+
+It doesn't impact the drag and drop gesture, which is always handled simultaneously with the touch gesture.
+
+| type                            | default       | required |
+| ------------------------------- | ------------- | -------- |
+| `'exclusive' \| 'simultaneous'` | `'exclusive'` | NO       |
+
+- `'exclusive'` - only one gesture can be active at a time
+- `'simultaneous'` - allows multiple gestures to be active simultaneously
+
+---
+
+### Additional Props
+
+The component also accepts all standard React Native `ViewProps` which are passed through to the underlying View component.
+
+:::info
+
+If you need more different props, you can open a [Pull Request](https://github.com/MatiPl01/react-native-sortables/) to add them or request them in the [GitHub Discussions](https://github.com/MatiPl01/react-native-sortables/discussions).
+
+:::

@@ -3,23 +3,17 @@ sidebar_position: 5
 description: ''
 ---
 
-# Touchables
+# Touchable
 
 ## Description
 
-This example shows why touchable components exported from this library are useful whe you need to **properly detect press events** on **components nested inside** the sortable component item.
-
-:::info
-
-The **usage is the same** for **all touchable components exported from this library**. To see more information about other touchable components, please **refer to the [Touchables](/helper-components/touchables) page**.
-
-:::
+This example shows why the [Sortable.Touchable](/helper-components/touchable) component is useful when you need to **properly detect press events** on **components nested inside** the sortable component item (more precisely, nested within the part of the item that detects the drag gesture - this might be the entire item or just a part of it if the custom handle, like [Sortable.Handle](/helper-components/handle), is used).
 
 ## Source Code
 
 ```tsx
 import { useCallback, useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
@@ -32,11 +26,11 @@ export default function Example() {
     ({ item }) => (
       <View style={styles.card}>
         <Text style={styles.text}>{item}</Text>
-        <Sortable.Pressable
+        <Sortable.Touchable
           style={styles.deleteButton}
-          onPress={() => setData(prev => prev.filter(i => i !== item))}>
+          onTap={() => setData(prev => prev.filter(i => i !== item))}>
           <Text style={styles.text}>Delete</Text>
-        </Sortable.Pressable>
+        </Sortable.Touchable>
       </View>
     ),
     []
@@ -45,36 +39,36 @@ export default function Example() {
   return (
     <View style={styles.container}>
       <Sortable.Grid
+        columnGap={10}
         columns={2}
         data={data}
         renderItem={renderItem}
         rowGap={10}
-        columnGap={10}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  card: {
+    alignItems: 'center',
+    backgroundColor: '#36877F',
+    borderRadius: 10,
+    gap: 10,
+    height: 100,
+    justifyContent: 'center'
+  },
   container: {
     padding: 10
   },
-  card: {
-    backgroundColor: '#36877F',
-    height: 100,
+  deleteButton: {
+    backgroundColor: '#6AA67C',
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10
+    padding: 10
   },
   text: {
     color: 'white',
     fontWeight: 'bold'
-  },
-  deleteButton: {
-    backgroundColor: '#6AA67C',
-    padding: 10,
-    borderRadius: 10
   }
 });
 ```
@@ -83,11 +77,11 @@ const styles = StyleSheet.create({
 
 You can see that the `Pressable` component from React Native **still detects the press event even when the item started being dragged**, which is not the desired behavior.
 
-On the contrary, the `Sortable.Pressable` component from this library **properly handles the press event** and grid items are removed only when the **Delete** button is **pressed, not when the item is dragged**.
+On the contrary, the `Sortable.Touchable` component from this library **properly handles the press event** and grid items are removed only when the **Delete** button is **pressed, not when the item is dragged**.
 
 import correctVideo from '@site/static/video/grid-touchables-correct.mp4';
 import incorrectVideo from '@site/static/video/grid-touchables-incorrect.mp4';
 
-| React Native's `Pressable`                                                                    | `Sortable.Pressable`                                                                        |
+| React Native's `Pressable`                                                                    | `Sortable.Touchable`                                                                        |
 | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | <video autoPlay loop muted width="100%" style={{ maxWidth: '300px' }} src={incorrectVideo} /> | <video autoPlay loop muted width="100%" style={{ maxWidth: '300px' }} src={correctVideo} /> |
