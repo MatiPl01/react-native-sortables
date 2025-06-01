@@ -75,7 +75,16 @@ const routes: Routes = {
             }
           }
         }
-      })
+      }),
+      Real: {
+        name: 'Real World Examples',
+        routes: {
+          AppleIconsSort: {
+            Component: SortableGrid.real.AppleIconsSort,
+            name: 'Apple Icons Sort'
+          }
+        }
+      }
     }
   },
   SortableFlex: {
