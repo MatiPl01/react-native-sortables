@@ -76,12 +76,12 @@ const routes: Routes = {
           }
         }
       }),
-      Tests: {
-        name: 'Test examples',
+      Real: {
+        name: 'Real World Examples',
         routes: {
-          BottomTabsNavigator: {
-            Component: SortableGrid.tests.BottomTabsNavigatorExample,
-            name: 'Bottom Tabs Navigator'
+          AppleIconsSort: {
+            Component: SortableGrid.real.AppleIconsSort,
+            name: 'Apple Icons Sort'
           }
         }
       }

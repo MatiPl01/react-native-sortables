@@ -29,7 +29,7 @@ export default function ItemCell({
   onMeasure
 }: ItemCellProps) {
   return (
-    <Animated.View style={cellStyle}>
+    <Animated.View style={[cellStyle, { backgroundColor: 'red' }]}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}

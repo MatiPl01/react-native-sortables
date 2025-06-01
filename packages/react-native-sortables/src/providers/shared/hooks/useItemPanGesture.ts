@@ -15,6 +15,7 @@ export default function useItemPanGesture(
     () =>
       Gesture.Manual()
         .onTouchesDown((e, manager) => {
+          console.log('onTouchesDown', key, e);
           handleTouchStart(
             e,
             key,
