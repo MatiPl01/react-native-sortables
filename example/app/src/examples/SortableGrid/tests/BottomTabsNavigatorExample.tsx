@@ -30,6 +30,7 @@ function Grid({ data }: GridProps) {
 
   return (
     <Sortable.Grid
+      dragActivationDelay={0}
       columnGap={10}
       columns={3}
       data={data}
@@ -57,6 +58,14 @@ function Screen2() {
   );
 }
 
+function Screen3() {
+  return (
+    <ScrollScreen contentContainerStyle={styles.scrollContainer}>
+      <Text style={styles.screenTitle}>Screen without sortable grid</Text>
+    </ScrollScreen>
+  );
+}
+
 const tabBarOptions: BottomTabNavigationOptions = {
   tabBarIcon: ({ focused }) => (
     <FontAwesomeIcon
@@ -64,20 +73,37 @@ const tabBarOptions: BottomTabNavigationOptions = {
       icon={faCircle}
     />
   ),
-  tabBarLabel: ({ focused }) => (
-    <Text style={focused ? styles.focusedLabel : styles.label}>Screen 1</Text>
+  tabBarLabel: ({ focused, children }) => (
+    <Text style={focused ? styles.focusedLabel : styles.label}>{children}</Text>
   )
 };
+
 function Tabs() {
   return (
     <Tab.Navigator
+      // This option breaks sortable state when navigating between screens
+      // https://github.com/MatiPl01/react-native-sortables/issues/308
+      detachInactiveScreens={false}
       screenOptions={{
         tabBarStyle: {
           shadowColor: 'transparent'
         }
       }}>
-      <Tab.Screen component={Screen1} name='Screen1' options={tabBarOptions} />
-      <Tab.Screen component={Screen2} name='Screen2' options={tabBarOptions} />
+      <Tab.Screen
+        component={Screen1}
+        name='Sortable 1'
+        options={tabBarOptions}
+      />
+      <Tab.Screen
+        component={Screen2}
+        name='Sortable 2'
+        options={tabBarOptions}
+      />
+      <Tab.Screen
+        component={Screen3}
+        name='No sortable'
+        options={tabBarOptions}
+      />
     </Tab.Navigator>
   );
 }

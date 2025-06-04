@@ -48,6 +48,14 @@ function Screen2() {
   );
 }
 
+function Screen3() {
+  return (
+    <ScrollScreen contentContainerStyle={styles.scrollContainer}>
+      <Text style={styles.screenTitle}>Screen without sortable flex</Text>
+    </ScrollScreen>
+  );
+}
+
 const tabBarOptions: BottomTabNavigationOptions = {
   tabBarIcon: ({ focused }) => (
     <FontAwesomeIcon
@@ -63,6 +71,9 @@ const tabBarOptions: BottomTabNavigationOptions = {
 function Tabs() {
   return (
     <Tab.Navigator
+      // This option breaks sortable state when navigating between screens
+      // https://github.com/MatiPl01/react-native-sortables/issues/308
+      detachInactiveScreens={false}
       screenOptions={{
         tabBarStyle: {
           shadowColor: 'transparent'
@@ -70,6 +81,11 @@ function Tabs() {
       }}>
       <Tab.Screen component={Screen1} name='Screen1' options={tabBarOptions} />
       <Tab.Screen component={Screen2} name='Screen2' options={tabBarOptions} />
+      <Tab.Screen
+        component={Screen3}
+        name='No sortable'
+        options={tabBarOptions}
+      />
     </Tab.Navigator>
   );
 }
