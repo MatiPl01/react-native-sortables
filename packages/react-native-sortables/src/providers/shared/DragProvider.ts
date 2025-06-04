@@ -456,47 +456,54 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const handleDragEnd = useCallback(
     (key: string, activationAnimationProgress: SharedValue<number>) => {
       'worklet';
+      if (activeItemKey.value && activeItemKey.value !== key) {
+        return;
+      }
+
+      clearAnimatedTimeout(activationTimeoutId.value);
       touchStartTouch.value = null;
       currentTouch.value = null;
-      dragStartItemTouchOffset.value = null;
-      dragStartTouchPosition.value = null;
-      activeItemPosition.value = null;
-      activeItemDimensions.value = null;
-      touchPosition.value = null;
       activationState.value = DragActivationState.INACTIVE;
-      updateStartScrollOffset?.(null);
+
+      if (activeItemKey.value === null) {
+        return;
+      }
 
       if (activeHandleMeasurements) {
         activeHandleMeasurements.value = null;
       }
 
-      const fromIndex = dragStartIndex.value;
-      const toIndex = keyToIndex.value[key]!;
-
-      if (activeItemKey.value !== null) {
-        prevActiveItemKey.value = activeItemKey.value;
-        activeItemKey.value = null;
-        updateLayer?.(LayerState.INTERMEDIATE);
-        haptics.medium();
-
-        stableOnDragEnd({
-          fromIndex,
-          indexToKey: indexToKey.value,
-          key,
-          keyToIndex: keyToIndex.value,
-          toIndex
-        });
-      }
+      prevActiveItemKey.value = activeItemKey.value;
+      dragStartItemTouchOffset.value = null;
+      dragStartTouchPosition.value = null;
+      activeItemPosition.value = null;
+      activeItemDimensions.value = null;
+      touchPosition.value = null;
+      activeItemKey.value = null;
+      dragStartIndex.value = -1;
 
       const animate = (callback?: (finished: boolean | undefined) => void) =>
         withTiming(0, { duration: dropAnimationDuration.value }, callback);
 
-      dragStartIndex.value = -1;
       activationAnimationProgress.value = animate();
       inactiveAnimationProgress.value = animate();
       activeAnimationProgress.value = animate();
 
-      clearAnimatedTimeout(activationTimeoutId.value);
+      updateStartScrollOffset?.(null);
+      updateLayer?.(LayerState.INTERMEDIATE);
+      haptics.medium();
+
+      const fromIndex = dragStartIndex.value;
+      const toIndex = keyToIndex.value[key]!;
+
+      stableOnDragEnd({
+        fromIndex,
+        indexToKey: indexToKey.value,
+        key,
+        keyToIndex: keyToIndex.value,
+        toIndex
+      });
+
       activationTimeoutId.value = setAnimatedTimeout(() => {
         prevActiveItemKey.value = null;
         activeItemDropped.value = true;
