@@ -33,7 +33,6 @@ function Grid({ data }: GridProps) {
       columnGap={10}
       columns={3}
       data={data}
-      dragActivationDelay={0}
       renderItem={renderItem}
       rowGap={10}
     />
