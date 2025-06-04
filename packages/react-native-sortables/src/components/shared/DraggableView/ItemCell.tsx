@@ -33,7 +33,9 @@ export default function ItemCell({
   onMeasure
 }: ItemCellProps) {
   return (
-    <Animated.View layout={!IS_WEB ? layout : undefined} style={cellStyle}>
+    <Animated.View
+      layout={!IS_WEB ? layout : undefined}
+      style={[cellStyle, { backgroundColor: 'red' }]}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
