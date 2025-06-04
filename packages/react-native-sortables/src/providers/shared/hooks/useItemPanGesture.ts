@@ -14,7 +14,6 @@ export default function useItemPanGesture(
   return useMemo(
     () =>
       Gesture.Manual()
-        // .shouldCancelWhenOutside(false)
         .onTouchesDown((e, manager) => {
           handleTouchStart(
             e,
@@ -27,12 +26,10 @@ export default function useItemPanGesture(
         .onTouchesMove((e, manager) => {
           handleTouchesMove(e, manager.fail);
         })
-        .onTouchesCancelled((e, manager) => {
-          console.log('onTouchesCancelled', key, e.allTouches);
+        .onTouchesCancelled((_, manager) => {
           manager.fail();
         })
-        .onTouchesUp((e, manager) => {
-          console.log('onTouchesUp', key, e.allTouches);
+        .onTouchesUp((_, manager) => {
           manager.end();
         })
         .onFinalize(() => {
