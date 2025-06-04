@@ -30,10 +30,10 @@ function Grid({ data }: GridProps) {
 
   return (
     <Sortable.Grid
-      dragActivationDelay={0}
       columnGap={10}
       columns={3}
       data={data}
+      dragActivationDelay={0}
       renderItem={renderItem}
       rowGap={10}
     />
@@ -73,7 +73,7 @@ const tabBarOptions: BottomTabNavigationOptions = {
       icon={faCircle}
     />
   ),
-  tabBarLabel: ({ focused, children }) => (
+  tabBarLabel: ({ children, focused }) => (
     <Text style={focused ? styles.focusedLabel : styles.label}>{children}</Text>
   )
 };
