@@ -58,6 +58,7 @@ export const getPropsWithDefaults = <
       // Only override defaultStyle with defined values from propsStyle
       Object.entries(propsStyle).forEach(([key, value]) => {
         if (value !== undefined) {
+          // @ts-expect-error This is fine
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           style[key] = value;
         }

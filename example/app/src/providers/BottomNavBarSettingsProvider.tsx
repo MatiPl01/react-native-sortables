@@ -6,10 +6,10 @@ type BottomNavBarSettings = {
   activeItemPortalEnabled: boolean;
 };
 
-const BottomNavBarSettingsContext = createContext<{
+const BottomNavBarSettingsContext = createContext<null | {
   settings: BottomNavBarSettings;
   onSettingsChange: (settings: BottomNavBarSettings) => void;
-} | null>(null);
+}>(null);
 
 export function useBottomNavBarSettings() {
   const value = useContext(BottomNavBarSettingsContext);

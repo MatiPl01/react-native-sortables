@@ -3,7 +3,7 @@ import { type SharedValue, useSharedValue } from 'react-native-reanimated';
 
 import { IS_REACT_19 } from '@/constants';
 
-const BottomNavBarHeightContext = createContext<SharedValue<number> | null>(
+const BottomNavBarHeightContext = createContext<null | SharedValue<number>>(
   null
 );
 

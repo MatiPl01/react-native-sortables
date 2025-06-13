@@ -5,14 +5,14 @@ type SharedRouteProps = {
   CardComponent?: RouteCardComponent;
 };
 
-export type RouteWithRoutes = {
+export type RouteWithRoutes = SharedRouteProps & {
   flatten?: true;
   routes: Routes;
-} & SharedRouteProps;
+};
 
-type RouteWithComponent = {
+type RouteWithComponent = SharedRouteProps & {
   Component: React.ComponentType;
-} & SharedRouteProps;
+};
 
 export type Route = RouteWithComponent | RouteWithRoutes;
 

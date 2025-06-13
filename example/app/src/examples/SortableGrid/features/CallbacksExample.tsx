@@ -1,5 +1,5 @@
 /* eslint-disable perfectionist/sort-objects */
-/* eslint-disable no-console */
+
 import { useCallback, useMemo, useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import type {

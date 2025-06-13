@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules */
 import { useIsFocused } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 

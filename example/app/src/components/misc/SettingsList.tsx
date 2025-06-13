@@ -72,9 +72,9 @@ export function useSettingsList<O extends AnySettings>(
 type SettingsOptionProps<K, V> = {
   label: K;
   settings: SwitchOptions<V>;
-  value: V | undefined;
-  prevValue: V | undefined;
-  onChange: (key: K, value: V | undefined) => void;
+  value: undefined | V;
+  prevValue: undefined | V;
+  onChange: (key: K, value: undefined | V) => void;
 };
 
 const SettingsOption = memo(function SettingsOption<K extends string, V>({

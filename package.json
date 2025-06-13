@@ -1,6 +1,9 @@
 {
   "name": "react-native-sortables-monorepo",
   "version": "1.0.0",
+  "dependencies": {
+    "eslint-config-react-native-matipl01": "/Users/mateu/Desktop/eslint-config-react-native-matipl01-1.tgz"
+  },
   "devDependencies": {
     "@types/eslint": "^8.56.10",
     "@types/jest": "^29.5.12",
@@ -12,7 +15,7 @@
     "syncpack": "^12.3.3",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -62,8 +65,5 @@
       "example/web",
       "packages/react-native-sortables"
     ]
-  },
-  "dependencies": {
-    "eslint-config-react-native-matipl01": "/Users/mateu/Desktop/eslint-config-react-native-matipl01-1.tgz"
   }
 }

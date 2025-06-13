@@ -8410,6 +8410,7 @@ __metadata:
     react-native-sortables: "workspace:*"
     react-native-svg: "npm:15.11.2"
     react-test-renderer: "npm:19.0.0"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -8425,7 +8426,7 @@ __metadata:
     react-native: "npm:0.79.0"
     react-native-gesture-handler: "npm:~2.24.0"
     react-native-reanimated: "npm:~3.17.3"
-    typescript: "npm:~5.8.3"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -15202,7 +15203,7 @@ __metadata:
     syncpack: "npm:^12.3.3"
     ts-jest: "npm:^29.1.5"
     ts-node: "npm:^10.9.2"
-    typescript: "npm:^5.8.2"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -15238,7 +15239,7 @@ __metadata:
     semantic-release: "npm:^24.0.0"
     semantic-release-yarn: "npm:^3.0.2"
     syncpack: "npm:^12.3.3"
-    typescript: "npm:^5.8.2"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     react: "*"
     react-native: "*"

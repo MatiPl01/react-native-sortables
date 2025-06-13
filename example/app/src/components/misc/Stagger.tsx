@@ -17,10 +17,10 @@ type StaggerProps = PropsWithChildren<{
 }>;
 
 export default function Stagger({
-  ParentComponent,
   children,
   delay = 0,
   interval = 100,
+  ParentComponent,
   wrapperStye
 }: StaggerProps) {
   const childrenArray = Children.toArray(children);
