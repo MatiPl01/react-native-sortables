@@ -1,9 +1,10 @@
+name: 🚀 Release
+
 on:
   workflow_dispatch:
 
 jobs:
   release:
-    name: 🚀 Release
     runs-on: ubuntu-latest
 
     permissions:

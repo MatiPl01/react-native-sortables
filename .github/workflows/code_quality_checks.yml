@@ -1,3 +1,5 @@
+name: 🔍 Code Quality Checks
+
 on:
   push:
     branches:
@@ -8,7 +10,6 @@ on:
 
 jobs:
   checks:
-    name: 🔍 Code Quality Checks
     runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout code

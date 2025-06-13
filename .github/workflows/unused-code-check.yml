@@ -1,3 +1,5 @@
+name: 🗑️ Unused Code Check
+
 on:
   push:
     branches:
@@ -8,7 +10,6 @@ on:
 
 jobs:
   unused_code:
-    name: 🗑️ Unused Code Check
     runs-on: ubuntu-latest
 
     steps:
