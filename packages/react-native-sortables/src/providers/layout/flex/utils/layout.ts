@@ -22,10 +22,10 @@ const createGroups = (
   axisDimensions: AxisDimensions,
   gap: number,
   groupMainSizeLimit: number
-): {
+): null | {
   groups: Array<Array<string>>;
   crossAxisGroupSizes: Array<number>;
-} | null => {
+} => {
   'worklet';
   const groups: Array<Array<string>> = [];
   const crossAxisGroupSizes: Array<number> = [];
@@ -93,19 +93,11 @@ const calculateAlignment = (
   );
 
   switch (align) {
-    case 'flex-end':
-      startOffset = clampedTotalSize - totalSize;
-      break;
     case 'center':
       startOffset = (clampedTotalSize - totalSize) / 2;
       break;
-    case 'space-between':
-      if (sizes.length > 1 || shouldWrap) {
-        adjustedGap = Math.max(
-          (clampedTotalSize - sum(sizes)) / (sizes.length - 1),
-          providedGap
-        );
-      }
+    case 'flex-end':
+      startOffset = clampedTotalSize - totalSize;
       break;
     case 'space-around':
       if (sizes.length > 1 || shouldWrap) {
@@ -116,6 +108,14 @@ const calculateAlignment = (
         if (adjustedGap > providedGap) {
           startOffset = (clampedTotalSize - getTotalSize(adjustedGap)) / 2;
         }
+      }
+      break;
+    case 'space-between':
+      if (sizes.length > 1 || shouldWrap) {
+        adjustedGap = Math.max(
+          (clampedTotalSize - sum(sizes)) / (sizes.length - 1),
+          providedGap
+        );
       }
       break;
     case 'space-evenly':

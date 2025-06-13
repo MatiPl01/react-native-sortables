@@ -19,7 +19,7 @@ function Tab({ children }: TabProps): ReactElement {
 }
 
 type TabViewComponent = {
-  (props: TabViewProps): ReactElement | null;
+  (props: TabViewProps): null | ReactElement;
   Tab: typeof Tab;
 };
 

@@ -44,5 +44,4 @@ const styles = StyleSheet.create({
   }
 });
 
-// eslint-disable-next-line import/no-unused-modules
 export default AnimatedText;

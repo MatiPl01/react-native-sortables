@@ -26,7 +26,7 @@ export default function useTeleportedItemStyles(
     useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
-  const dropStartTranslation = useSharedValue<Vector | null>(null);
+  const dropStartTranslation = useSharedValue<null | Vector>(null);
 
   const absoluteX = useSharedValue<null | number>(null);
   const absoluteY = useSharedValue<null | number>(null);
@@ -56,12 +56,10 @@ export default function useTeleportedItemStyles(
       }
 
       // Drop animation
-      if (!dropStartTranslation.value) {
-        dropStartTranslation.value = {
-          x: absoluteX.value,
-          y: absoluteY.value
-        };
-      }
+      dropStartTranslation.value ??= {
+        x: absoluteX.value,
+        y: absoluteY.value
+      };
 
       const animate = (from: number, to: number) =>
         interpolate(activationProgress, [1, 0], [from, to]);

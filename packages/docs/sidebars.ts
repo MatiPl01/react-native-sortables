@@ -30,5 +30,4 @@ const sidebars: SidebarsConfig = {
    */
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default sidebars;

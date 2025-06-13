@@ -1,6 +1,7 @@
 import { clsx } from 'clsx';
 import type { ReactElement } from 'react';
-import React, { Children, useMemo, useState } from 'react';
+import type React from 'react';
+import { Children, useMemo, useState } from 'react';
 
 import styles from './styles.module.css';
 
@@ -53,6 +54,6 @@ function TabItem({ children }: TabItemProps) {
 
 TabView.Item = TabItem;
 
-export default TabView as {
+export default TabView as typeof TabView & {
   Item: typeof TabItem;
-} & typeof TabView;
+};

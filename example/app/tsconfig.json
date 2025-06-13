@@ -12,7 +12,7 @@
     "index.ts",
     "jest.config.ts",
     "jest.setup.js",
-    ".eslintrc.cjs",
+    "eslint.config.mjs",
     "__tests__"
   ]
 }

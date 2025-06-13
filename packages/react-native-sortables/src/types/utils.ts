@@ -10,7 +10,6 @@ export type AnyRecord = Record<string, any>;
 
 export type Simplify<T> = {
   [K in keyof T]: T[K];
-  // eslint-disable-next-line @typescript-eslint/ban-types
 } & {};
 
 export type Animatable<V> = SharedValue<V> | V;
@@ -32,7 +31,7 @@ export type RequiredBy<T, K extends keyof T> = Omit<T, K> &
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-export type Maybe<T> = T | null | undefined;
+export type Maybe<T> = null | T | undefined;
 
 export type DefaultProps<
   P extends Record<string, any>,

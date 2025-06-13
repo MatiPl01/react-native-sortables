@@ -45,8 +45,8 @@ export type ControlledContainerDimensions = { width: boolean; height: boolean };
 
 export type ActiveItemValuesContextType = {
   // POSITIONS
-  touchPosition: SharedValue<Vector | null>;
-  activeItemPosition: SharedValue<Vector | null>;
+  touchPosition: SharedValue<null | Vector>;
+  activeItemPosition: SharedValue<null | Vector>;
 
   // DIMENSIONS
   activeItemDimensions: SharedValue<Dimensions | null>;
@@ -67,38 +67,40 @@ export type ActiveItemValuesContextType = {
  * (they are stored in a single context to make the access to them easier
  * between different providers)
  */
-export type CommonValuesContextType = {
-  componentId: number;
-
-  // ORDER
-  indexToKey: SharedValue<Array<string>>;
-  keyToIndex: SharedValue<Record<string, number>>;
-
-  // POSITIONS
-  itemPositions: SharedValue<Record<string, Vector>>;
-
-  // DIMENSIONS
-  controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
-  measuredContainerWidth: SharedValue<null | number>;
-  measuredContainerHeight: SharedValue<null | number>;
-  containerWidth: SharedValue<null | number>;
-  containerHeight: SharedValue<null | number>;
-  itemDimensions: SharedValue<Record<string, Dimensions>>;
-  itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
-
-  // OTHER
-  containerRef: AnimatedRef<View>;
-  sortEnabled: SharedValue<boolean>;
-  absoluteLayoutState: SharedValue<AbsoluteLayoutState>;
-  shouldAnimateLayout: SharedValue<boolean>; // used only on web
-  animateLayoutOnReorderOnly: SharedValue<boolean>;
-  customHandle: boolean;
-
-  itemsOverridesStyle: AnimatedStyle<ViewStyle>;
-} & ActiveItemValuesContextType &
+export type CommonValuesContextType = ActiveItemValuesContextType &
   AnimatedValues<ActiveItemDecorationSettings> &
   AnimatedValues<ActiveItemSnapSettings> &
-  AnimatedValues<Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>>;
+  AnimatedValues<
+    Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>
+  > & {
+    componentId: number;
+
+    // ORDER
+    indexToKey: SharedValue<Array<string>>;
+    keyToIndex: SharedValue<Record<string, number>>;
+
+    // POSITIONS
+    itemPositions: SharedValue<Record<string, Vector>>;
+
+    // DIMENSIONS
+    controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+    measuredContainerWidth: SharedValue<null | number>;
+    measuredContainerHeight: SharedValue<null | number>;
+    containerWidth: SharedValue<null | number>;
+    containerHeight: SharedValue<null | number>;
+    itemDimensions: SharedValue<Record<string, Dimensions>>;
+    itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
+
+    // OTHER
+    containerRef: AnimatedRef<View>;
+    sortEnabled: SharedValue<boolean>;
+    absoluteLayoutState: SharedValue<AbsoluteLayoutState>;
+    shouldAnimateLayout: SharedValue<boolean>; // used only on web
+    animateLayoutOnReorderOnly: SharedValue<boolean>;
+    customHandle: boolean;
+
+    itemsOverridesStyle: AnimatedStyle<ViewStyle>;
+  };
 
 // MEASUREMENTS
 
@@ -114,7 +116,7 @@ export type MeasurementsContextType = {
 // AUTO SCROLL
 
 export type AutoScrollContextType = {
-  scrollOffsetDiff: SharedValue<Vector | null>;
+  scrollOffsetDiff: SharedValue<null | Vector>;
   updateStartScrollOffset: (providedOffset?: null | number) => void;
 };
 
@@ -144,19 +146,19 @@ export type DragContextType = {
 // ITEM
 
 export type ItemContextType = Simplify<
-  {
-    gesture: GestureType;
-  } & DeepReadonly<
-    {
-      itemKey: string;
-      isActive: SharedValue<boolean>;
-      activationAnimationProgress: SharedValue<number>;
-    } & Pick<
+  DeepReadonly<
+    Pick<
       ActiveItemValuesContextType,
       'activationState' | 'activeItemKey' | 'prevActiveItemKey'
     > &
-      Pick<CommonValuesContextType, 'indexToKey' | 'keyToIndex'>
-  >
+      Pick<CommonValuesContextType, 'indexToKey' | 'keyToIndex'> & {
+        itemKey: string;
+        isActive: SharedValue<boolean>;
+        activationAnimationProgress: SharedValue<number>;
+      }
+  > & {
+    gesture: GestureType;
+  }
 >;
 
 // LAYER
@@ -170,7 +172,7 @@ export type LayerContextType = {
 export type CustomHandleContextType = {
   fixedItemKeys: SharedValue<Record<string, boolean>>;
   activeHandleMeasurements: SharedValue<MeasuredDimensions | null>;
-  activeHandleOffset: SharedValue<Vector | null>;
+  activeHandleOffset: SharedValue<null | Vector>;
   registerHandle: (
     key: string,
     handleRef: AnimatedRef<View>,
@@ -184,7 +186,7 @@ export type CustomHandleContextType = {
 export type PortalSubscription = (isTeleported: boolean) => void;
 
 export type PortalContextType = {
-  activeItemAbsolutePosition: SharedValue<Vector | null>;
+  activeItemAbsolutePosition: SharedValue<null | Vector>;
   teleport: (id: string, node: ReactNode) => void;
   subscribe: (id: string, callback: PortalSubscription) => () => void;
   notifyRendered: (id: string) => void;

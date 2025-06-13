@@ -21,12 +21,12 @@ import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';
 
 type FlexLayoutProviderProps = PropsWithChildren<
-  {
-    itemsCount: number;
-  } & RequiredBy<
+  RequiredBy<
     SortableFlexStyle,
     keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
-  >
+  > & {
+    itemsCount: number;
+  }
 >;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
@@ -122,7 +122,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   const useFlexLayoutReaction = useCallback(
     (
-      idxToKey: SharedValue<Array<string> | null> | SharedValue<Array<string>>,
+      idxToKey: SharedValue<Array<string>> | SharedValue<Array<string> | null>,
       onChange: (layout: FlexLayout | null, shouldAnimate: boolean) => void
     ) =>
       useAnimatedReaction(

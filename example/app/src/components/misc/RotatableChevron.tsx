@@ -11,7 +11,7 @@ import Animated, {
 import { iconSizes } from '@/theme';
 
 type RotatableChevronProps = {
-  open: SharedValue<boolean> | boolean;
+  open: boolean | SharedValue<boolean>;
   color: string;
   openRotation?: number;
 };

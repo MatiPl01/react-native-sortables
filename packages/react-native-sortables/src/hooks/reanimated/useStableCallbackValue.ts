@@ -39,7 +39,7 @@ const wrap = <C extends AnyFunction>(callback: C): WrappedCallback<C> => {
 export default function useStableCallbackValue<C extends AnyFunction>(
   callback?: C
 ) {
-  const stableCallback = useSharedValue<WrappedCallback<C> | null>(null);
+  const stableCallback = useSharedValue<null | WrappedCallback<C>>(null);
 
   useEffect(() => {
     if (callback) {

@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 
@@ -10,7 +8,7 @@ import type { RequiredBy, SharedProps } from '../types';
 const hasStyleProp = <K extends string, P extends Record<string, any>>(
   styleKey: K,
   props: P
-): props is { [key in K]: ViewStyle } & P => {
+): props is P & { [key in K]: ViewStyle } => {
   return styleKey in props;
 };
 
@@ -61,6 +59,7 @@ export const getPropsWithDefaults = <
       Object.entries(propsStyle).forEach(([key, value]) => {
         if (value !== undefined) {
           // @ts-expect-error This is fine
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           style[key] = value;
         }
       });

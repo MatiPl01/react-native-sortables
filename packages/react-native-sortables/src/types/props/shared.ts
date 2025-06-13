@@ -52,12 +52,7 @@ export type OverDrag = 'both' | 'horizontal' | 'none' | 'vertical';
 /** Position of the reordering trigger point */
 export type ReorderTriggerOrigin = 'center' | 'touch';
 
-export type ItemDragSettings = {
-  /** Controls in which directions items can be dragged beyond container bounds */
-  overDrag: OverDrag;
-  /** Determines whether reordering is triggered from item center or touch point */
-  reorderTriggerOrigin: ReorderTriggerOrigin;
-} & AnimatableProps<{
+export type ItemDragSettings = AnimatableProps<{
   /** Delay in ms before drag gesture is activated */
   dragActivationDelay: number;
   /** Duration of the animation when item becomes active */
@@ -68,7 +63,12 @@ export type ItemDragSettings = {
    * point before the drag is cancelled (only before drag starts)
    */
   dragActivationFailOffset: number;
-}>;
+}> & {
+  /** Controls in which directions items can be dragged beyond container bounds */
+  overDrag: OverDrag;
+  /** Determines whether reordering is triggered from item center or touch point */
+  reorderTriggerOrigin: ReorderTriggerOrigin;
+};
 
 export type ActiveItemSnapSettings = AnimatableProps<{
   /** Whether the active item should snap to the finger */
@@ -79,7 +79,14 @@ export type ActiveItemSnapSettings = AnimatableProps<{
   snapOffsetY: Offset;
 }>;
 
-export type AutoScrollSettings = {
+export type AutoScrollSettings = AnimatableProps<{
+  /** Distance from the edge of the container that triggers auto-scrolling. Can be a single number or [top/left, bottom/right] tuple */
+  autoScrollActivationOffset: [number, number] | number;
+  /** Speed at which auto-scrolling occurs */
+  autoScrollSpeed: number;
+  /** Whether auto-scrolling is enabled */
+  autoScrollEnabled: boolean;
+}> & {
   /** Reference to the animated scrollable container which will be scrolled
    * automatically when the active item is dragged near the edges of the container
    */
@@ -87,14 +94,7 @@ export type AutoScrollSettings = {
   scrollableRef: AnimatedRef<any>; // TODO - type this properly
   /** Direction in which auto-scrolling should occur */
   autoScrollDirection: 'horizontal' | 'vertical';
-} & AnimatableProps<{
-  /** Distance from the edge of the container that triggers auto-scrolling. Can be a single number or [top/left, bottom/right] tuple */
-  autoScrollActivationOffset: [number, number] | number;
-  /** Speed at which auto-scrolling occurs */
-  autoScrollSpeed: number;
-  /** Whether auto-scrolling is enabled */
-  autoScrollEnabled: boolean;
-}>;
+};
 
 export type DropIndicatorSettings = {
   /** Component to render as the drop indicator */
@@ -247,26 +247,26 @@ export type DimensionsAnimation = 'layout' | 'none' | 'worklet';
 export type SharedProps = Simplify<
   Omit<SortableCallbacks, 'onDragEnd'> &
     Partial<
-      {
-        /** Whether and how to animate container dimensions changes */
-        dimensionsAnimationType: DimensionsAnimation;
-        /** Enable haptic feedback when sorting items */
-        hapticsEnabled: boolean;
-        /** Controls whether sorting functionality is enabled */
-        sortEnabled: Animatable<boolean>;
-        /** Whether to use a custom handle component for dragging */
-        customHandle: boolean;
-        /** Specifies how content overflowing the container should be handled */
-        overflow: Overflow;
-        /** Enables debug mode to show additional visual helpers and console logs.
-         * @note This only works in development builds and has no effect in production.
-         */
-        debug: boolean;
-      } & ActiveItemDecorationSettings &
+      ActiveItemDecorationSettings &
         ActiveItemSnapSettings &
         AutoScrollSettings &
         DropIndicatorSettings &
         ItemDragSettings &
-        ItemLayoutAnimationSettings
+        ItemLayoutAnimationSettings & {
+          /** Whether and how to animate container dimensions changes */
+          dimensionsAnimationType: DimensionsAnimation;
+          /** Enable haptic feedback when sorting items */
+          hapticsEnabled: boolean;
+          /** Controls whether sorting functionality is enabled */
+          sortEnabled: Animatable<boolean>;
+          /** Whether to use a custom handle component for dragging */
+          customHandle: boolean;
+          /** Specifies how content overflowing the container should be handled */
+          overflow: Overflow;
+          /** Enables debug mode to show additional visual helpers and console logs.
+           * @note This only works in development builds and has no effect in production.
+           */
+          debug: boolean;
+        }
     >
 >;

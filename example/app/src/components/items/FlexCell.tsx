@@ -22,8 +22,8 @@ export default function FlexCell({
     case 'large':
       cellSizeStyles = largeCellStyles;
       break;
-    default:
     case 'small':
+    default:
       cellSizeStyles = smallCellStyles;
       break;
   }

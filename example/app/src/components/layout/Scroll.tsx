@@ -8,13 +8,13 @@ import { flex, spacing, style } from '@/theme';
 
 import Spacer from './Spacer';
 
-export type ScrollProps = {
+export type ScrollProps = Omit<ScrollViewProps, 'gap' | 'rowGap'> & {
   fill?: boolean;
   noPadding?: boolean;
   gap?: number;
   rowGap?: number;
   includeNavBarHeight?: boolean;
-} & Omit<ScrollViewProps, 'gap' | 'rowGap'>;
+};
 
 export default function Scroll({
   children,

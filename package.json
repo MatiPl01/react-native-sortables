@@ -5,15 +5,15 @@
     "@types/eslint": "^8.56.10",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.9",
-    "eslint": "^8.56.0",
-    "eslint-config-react-native-matipl01": "2.1.0",
+    "eslint": "^9.28.0",
+    "eslint-config-react-native-matipl01": "^3.2.0",
     "husky": "^9.1.4",
     "lint-staged": "^15.5.0",
     "prettier": "^3.3.2",
     "syncpack": "^12.3.3",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

@@ -73,10 +73,10 @@ type ActionSheetDropdownStyleOptions = {
 
 type ActionSheetDropdownProps = PropsWithChildren<{
   options: Array<ActionSheetOption>;
-  styleOptions?: {
+  styleOptions?: ActionSheetDropdownStyleOptions & {
     backdropOpacity?: number;
     dropdownStyle?: StyleProp<ViewStyle>;
-  } & ActionSheetDropdownStyleOptions;
+  };
   hitSlop?: number;
   onOpen?: () => void;
   onClose?: () => void;

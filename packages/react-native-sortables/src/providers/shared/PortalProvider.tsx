@@ -23,7 +23,7 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     Record<string, React.ReactNode>
   >({});
 
-  const activeItemAbsolutePosition = useSharedValue<Vector | null>(null);
+  const activeItemAbsolutePosition = useSharedValue<null | Vector>(null);
 
   const teleport = useCallback((id: string, node: React.ReactNode) => {
     if (node) {
@@ -42,9 +42,7 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
   }, []);
 
   const subscribe = useCallback((id: string, callback: PortalSubscription) => {
-    if (!subscribersRef.current[id]) {
-      subscribersRef.current[id] = new Set();
-    }
+    subscribersRef.current[id] ??= new Set();
     subscribersRef.current[id]?.add(callback);
     return () => {
       subscribersRef.current[id]?.delete(callback);

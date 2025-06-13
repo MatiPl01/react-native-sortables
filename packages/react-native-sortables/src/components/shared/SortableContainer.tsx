@@ -29,17 +29,17 @@ import DropIndicator from './DropIndicator';
 const SCREEN_DIMENSIONS = Dimensions.get('screen');
 
 type AnimatedHeightContainerProps = PropsWithChildren<
-  {
+  DropIndicatorSettings & {
     dimensionsAnimationType: DimensionsAnimation;
     overflow: Overflow;
     style?: StyleProp<ViewStyle>;
-  } & DropIndicatorSettings
+  }
 >;
 
 export default function SortableContainer({
-  DropIndicatorComponent,
   children,
   dimensionsAnimationType,
+  DropIndicatorComponent,
   dropIndicatorStyle,
   overflow,
   showDropIndicator,

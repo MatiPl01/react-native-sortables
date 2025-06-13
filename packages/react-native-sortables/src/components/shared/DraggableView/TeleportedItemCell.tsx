@@ -10,16 +10,16 @@ import type { AnimatedStyleProp } from '../../../types';
 import type { ItemCellProps } from './ItemCell';
 import ItemCell from './ItemCell';
 
-type TeleportedItemCellProps = {
+type TeleportedItemCellProps = Omit<
+  ItemCellProps,
+  'cellStyle' | 'decorationStyles' | 'entering' | 'exiting' | 'layout'
+> & {
   activationAnimationProgress: SharedValue<number>;
   baseCellStyle: AnimatedStyleProp;
   isActive: SharedValue<boolean>;
   teleportedItemId: string;
   itemKey: string;
-} & Omit<
-  ItemCellProps,
-  'cellStyle' | 'decorationStyles' | 'entering' | 'exiting' | 'layout'
->;
+};
 
 export default function TeleportedItemCell({
   activationAnimationProgress,

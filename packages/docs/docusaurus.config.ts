@@ -104,5 +104,4 @@ const config: Config = {
   url: 'https://your-docusaurus-site.example.com'
 };
 
-// eslint-disable-next-line import/no-unused-modules
 export default config;

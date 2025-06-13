@@ -16,7 +16,7 @@ export const getAdditionalSwapOffset = (gap: number, size: number) => {
 export const getTouchPositionInContainer = (
   touch: TouchData,
   relativeRef: AnimatedRef<View>
-): Vector | null => {
+): null | Vector => {
   'worklet';
 
   const measurements = measure(relativeRef);

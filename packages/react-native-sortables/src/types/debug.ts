@@ -10,19 +10,22 @@ export enum DebugComponentType {
   RECT = 'rect'
 }
 
-export type DebugCrossProps = (
-  | {
-      x: Maybe<number>;
-      y: Maybe<number>;
-      position?: never;
-    }
-  | {
-      x?: never;
-      y?: never;
-      position: Maybe<Vector>;
-    }
-) &
-  Pick<DebugLineProps, 'color' | 'opacity' | 'style' | 'thickness' | 'visible'>;
+export type DebugCrossProps = Pick<
+  DebugLineProps,
+  'color' | 'opacity' | 'style' | 'thickness' | 'visible'
+> &
+  (
+    | {
+        x: Maybe<number>;
+        y: Maybe<number>;
+        position?: never;
+      }
+    | {
+        x?: never;
+        y?: never;
+        position: Maybe<Vector>;
+      }
+  );
 
 export type DebugLineProps = {
   visible?: boolean;
@@ -51,51 +54,50 @@ export type DebugLineProps = {
     }
 );
 
-export type DebugRectProps = {
+export type DebugRectProps = Pick<
+  ViewStyle,
+  'backgroundColor' | 'borderColor' | 'borderStyle' | 'borderWidth'
+> & {
   backgroundOpacity?: number;
   visible?: boolean;
 } & (
-  | {
-      from: Maybe<Vector>;
-      to: Maybe<Vector>;
-      x?: never;
-      y?: never;
-      width?: never;
-      height?: never;
-      positionOrigin?: never;
-    }
-  | {
-      x: Maybe<number>;
-      y: Maybe<number>;
-      from?: never;
-      to?: never;
-      width: Maybe<number>;
-      height: Maybe<number>;
-      positionOrigin?: `${'left' | 'right'} ${'bottom' | 'top'}`;
-    }
-  | {
-      x: Maybe<number>;
-      y?: never;
-      from?: never;
-      to?: never;
-      width: Maybe<number>;
-      height?: never;
-      positionOrigin?: `${'left' | 'right'}`;
-    }
-  | {
-      x?: never;
-      y: Maybe<number>;
-      from?: never;
-      to?: never;
-      width?: never;
-      height: Maybe<number>;
-      positionOrigin?: `${'bottom' | 'top'}`;
-    }
-) &
-  Pick<
-    ViewStyle,
-    'backgroundColor' | 'borderColor' | 'borderStyle' | 'borderWidth'
-  >;
+    | {
+        from: Maybe<Vector>;
+        to: Maybe<Vector>;
+        x?: never;
+        y?: never;
+        width?: never;
+        height?: never;
+        positionOrigin?: never;
+      }
+    | {
+        x: Maybe<number>;
+        y: Maybe<number>;
+        from?: never;
+        to?: never;
+        width: Maybe<number>;
+        height: Maybe<number>;
+        positionOrigin?: `${'left' | 'right'} ${'bottom' | 'top'}`;
+      }
+    | {
+        x: Maybe<number>;
+        y?: never;
+        from?: never;
+        to?: never;
+        width: Maybe<number>;
+        height?: never;
+        positionOrigin?: `${'left' | 'right'}`;
+      }
+    | {
+        x?: never;
+        y: Maybe<number>;
+        from?: never;
+        to?: never;
+        width?: never;
+        height: Maybe<number>;
+        positionOrigin?: `${'bottom' | 'top'}`;
+      }
+  );
 
 export type WrappedProps<P> = { props: SharedValue<P> };
 

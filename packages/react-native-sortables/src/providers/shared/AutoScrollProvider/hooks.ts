@@ -106,9 +106,7 @@ export function useTargetScrollOffset(
         debugLine
       );
 
-      if (startContainerPagePosition.value === null) {
-        startContainerPagePosition.value = containerPosition;
-      }
+      startContainerPagePosition.value ??= containerPosition;
 
       const offsetDelta = startContainerPagePosition.value - containerPosition;
       const currentOffset = dragStartScrollOffset.value + offsetDelta;
