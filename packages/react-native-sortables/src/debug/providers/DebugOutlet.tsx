@@ -1,12 +1,6 @@
 import { memo, useCallback, useState } from 'react';
-import type { SharedValue } from 'react-native-reanimated';
 
-import type {
-  DebugCrossProps,
-  DebugLineProps,
-  DebugRectProps,
-  DebugViews
-} from '../../types/debug';
+import type { DebugViews } from '../../types/debug';
 import { DebugComponentType } from '../../types/debug';
 import { DebugCross, DebugLine, DebugRect } from '../components';
 import { useDebugContext } from './DebugProvider';
@@ -26,26 +20,11 @@ const DebugOutlet = memo(function DebugOutlet() {
       {Object.entries(debugViews).map(([key, { props, type }]) => {
         switch (type) {
           case DebugComponentType.CROSS:
-            return (
-              <DebugCross
-                key={key}
-                props={props as SharedValue<DebugCrossProps>}
-              />
-            );
+            return <DebugCross key={key} props={props} />;
           case DebugComponentType.LINE:
-            return (
-              <DebugLine
-                key={key}
-                props={props as SharedValue<DebugLineProps>}
-              />
-            );
+            return <DebugLine key={key} props={props} />;
           case DebugComponentType.RECT:
-            return (
-              <DebugRect
-                key={key}
-                props={props as SharedValue<DebugRectProps>}
-              />
-            );
+            return <DebugRect key={key} props={props} />;
         }
       })}
     </>

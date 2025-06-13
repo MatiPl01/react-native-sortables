@@ -1,5 +1,3 @@
-name: Unused Code Check
-
 on:
   push:
     branches:
