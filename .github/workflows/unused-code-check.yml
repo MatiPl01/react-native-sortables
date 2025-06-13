@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  unused_code:
+  check:
     runs-on: ubuntu-latest
 
     steps:
