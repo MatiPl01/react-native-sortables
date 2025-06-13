@@ -24,7 +24,7 @@ const AnimatedViewWeb = componentWithRef<
       onLayout={e => {
         const el = (e.nativeEvent as unknown as { target: HTMLElement }).target;
         // We want to call onLayout only for displayed views to prevent
-        // layout animation on navigation between screens
+        // layout updates on navigation between screens
         if (el?.offsetParent) {
           onLayout(e);
         }

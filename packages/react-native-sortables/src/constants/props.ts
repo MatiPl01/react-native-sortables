@@ -1,5 +1,4 @@
 import type { ViewStyle } from 'react-native';
-import { LinearTransition } from 'react-native-reanimated';
 
 import { DefaultDropIndicator } from '../components/defaults';
 import type {
@@ -57,7 +56,6 @@ export const DEFAULT_SHARED_PROPS = {
   // fixed in `react-native-reanimated` in the future.
   itemEntering: IS_WEB ? null : SortableItemEntering,
   itemExiting: IS_WEB ? null : SortableItemExiting,
-  itemsLayout: IS_WEB ? null : LinearTransition,
   itemsLayoutTransitionMode: 'all',
   onActiveItemDropped: undefined,
   onDragMove: undefined,

@@ -27,12 +27,12 @@ function SortableFlex(props: SortableFlexProps) {
       ...styleProps
     },
     sharedProps: {
+      debug,
       dimensionsAnimationType,
       DropIndicatorComponent,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
-      itemsLayout,
       overflow,
       reorderTriggerOrigin,
       showDropIndicator,
@@ -64,6 +64,7 @@ function SortableFlex(props: SortableFlexProps) {
     <SharedProvider
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
+      debug={debug}
       initialItemsStyleOverride={styles.styleOverride}
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
@@ -77,12 +78,12 @@ function SortableFlex(props: SortableFlexProps) {
         />
         <SortableFlexInner
           childrenArray={childrenArray}
+          debug={debug}
           dimensionsAnimationType={dimensionsAnimationType}
           DropIndicatorComponent={DropIndicatorComponent}
           dropIndicatorStyle={dropIndicatorStyle}
           itemEntering={itemEntering}
           itemExiting={itemExiting}
-          itemsLayout={itemsLayout}
           overflow={overflow}
           showDropIndicator={showDropIndicator}
           style={[
@@ -102,10 +103,10 @@ type SortableFlexInnerProps = DropIndicatorSettings &
   Required<
     Pick<
       SortableFlexProps,
+      | 'debug'
       | 'dimensionsAnimationType'
       | 'itemEntering'
       | 'itemExiting'
-      | 'itemsLayout'
       | 'overflow'
     >
   > & {
@@ -117,7 +118,6 @@ function SortableFlexInner({
   childrenArray,
   itemEntering,
   itemExiting,
-  itemsLayout,
   style,
   ...containerProps
 }: SortableFlexInnerProps) {
@@ -128,8 +128,7 @@ function SortableFlexInner({
           entering={itemEntering ?? undefined}
           exiting={itemExiting ?? undefined}
           itemKey={key}
-          key={key}
-          layout={itemsLayout ?? undefined}>
+          key={key}>
           {child}
         </DraggableView>
       ))}

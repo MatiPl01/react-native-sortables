@@ -44,12 +44,12 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       strategy
     },
     sharedProps: {
+      debug,
       dimensionsAnimationType,
       DropIndicatorComponent,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
-      itemsLayout,
       overflow,
       reorderTriggerOrigin,
       showDropIndicator,
@@ -87,6 +87,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     <SharedProvider
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
+      debug={debug}
       itemKeys={itemKeys}
       initialItemsStyleOverride={
         isVertical ? undefined : styles.horizontalStyleOverride
@@ -110,6 +111,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
         <SortableGridInner
           columnGap={columnGapValue}
           data={data}
+          debug={debug}
           dimensionsAnimationType={dimensionsAnimationType}
           DropIndicatorComponent={DropIndicatorComponent}
           dropIndicatorStyle={dropIndicatorStyle}
@@ -118,7 +120,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           itemEntering={itemEntering}
           itemExiting={itemExiting}
           itemKeys={itemKeys}
-          itemsLayout={itemsLayout}
           overflow={overflow}
           renderItem={renderItem}
           rowGap={rowGapValue}
@@ -135,10 +136,10 @@ type SortableGridInnerProps<I> = DropIndicatorSettings &
     Pick<
       SortableGridProps<I>,
       | 'data'
+      | 'debug'
       | 'dimensionsAnimationType'
       | 'itemEntering'
       | 'itemExiting'
-      | 'itemsLayout'
       | 'overflow'
       | 'renderItem'
       | 'rowHeight'
@@ -159,7 +160,6 @@ function SortableGridInner<I>({
   itemEntering,
   itemExiting,
   itemKeys,
-  itemsLayout,
   renderItem,
   rowGap,
   rowHeight,
@@ -190,7 +190,6 @@ function SortableGridInner<I>({
           item={item}
           itemKey={key}
           key={key}
-          layout={itemsLayout ?? undefined}
           renderItem={renderItem}
           style={animatedItemStyle}
         />
