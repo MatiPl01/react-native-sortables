@@ -114,7 +114,7 @@ export type DropIndicatorSettings = {
  */
 export type ItemsLayoutTransitionMode = 'all' | 'reorder';
 
-export type ItemLayoutAnimationSettings = {
+type ItemLayoutAnimationSettings = {
   /** Animation to play when an item enters the list */
   itemEntering: LayoutAnimation | null;
   /** Animation to play when an item exits the list */

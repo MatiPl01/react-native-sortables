@@ -1,4 +1,3 @@
-export { default as AnimatedOnLayoutView } from './AnimatedOnLayoutView';
 export {
   default as CustomHandle,
   type CustomHandleProps

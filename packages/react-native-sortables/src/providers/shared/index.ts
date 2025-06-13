@@ -1,5 +1,5 @@
 export { ActiveItemValuesProvider } from './ActiveItemValuesProvider';
-export { AutoScrollProvider, useAutoScrollContext } from './AutoScrollProvider';
+export { AutoScrollProvider } from './AutoScrollProvider';
 export {
   CommonValuesContext,
   CommonValuesProvider,
@@ -10,13 +10,12 @@ export {
   CustomHandleProvider,
   useCustomHandleContext
 } from './CustomHandleProvider';
-export { DragProvider, useDragContext } from './DragProvider';
+export { DragProvider } from './DragProvider';
 export * from './hooks';
 export { ItemContextProvider, useItemContext } from './ItemContextProvider';
 export { LayerProvider } from './LayerProvider';
 export {
   MeasurementsProvider,
-  type MeasurementsProviderProps,
   useMeasurementsContext
 } from './MeasurementsProvider';
 export { usePortalOutletContext } from './PortalOutletProvider';

@@ -1,4 +1,4 @@
-export const LIBRARY_NAME = 'react-native-sortables';
+const LIBRARY_NAME = 'react-native-sortables';
 
 export const logger = {
   error(message: string) {
