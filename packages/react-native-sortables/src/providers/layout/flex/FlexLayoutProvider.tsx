@@ -153,7 +153,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
           onChange(
             props && calculateLayout(props),
-            // On web animate layout only if parent container is not resized
+            // On web, animate layout only if parent container is not resized
             // (e.g. skip animation when the browser window is resized)
             !IS_WEB ||
               !previousProps?.limits ||
