@@ -7967,9 +7967,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-react-native-matipl01@file:/Users/mateu/Desktop/eslint-config-react-native-matipl01-1.tgz::locator=react-native-sortables-monorepo%40workspace%3A.":
-  version: 3.1.0
-  resolution: "eslint-config-react-native-matipl01@file:/Users/mateu/Desktop/eslint-config-react-native-matipl01-1.tgz#/Users/mateu/Desktop/eslint-config-react-native-matipl01-1.tgz::hash=b49ce1&locator=react-native-sortables-monorepo%40workspace%3A."
+"eslint-config-react-native-matipl01@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "eslint-config-react-native-matipl01@npm:3.2.0"
   dependencies:
     "@eslint/compat": "npm:^1.3.0"
     "@eslint/js": "npm:^9.7.0"
@@ -7991,7 +7991,7 @@ __metadata:
     typescript-eslint: "npm:^8.34.0"
   peerDependencies:
     eslint: ">=9.0.0"
-  checksum: 10c0/067d0d2bf4fbff6f3b28b6a1cffcf652be474678d20dd090b6a8addab7ffc2accb958185e49d931a308626bbf2f47c20f1101c685a0986599fa6b607263eab36
+  checksum: 10c0/8ab05fad185ce88aae1e1da7794ace81c41061a7b2e68805eb50921ff27aa288a4eecaf37e912c0b47dbe801583592fe8635388eb2d220fb67d496bc3b232a6b
   languageName: node
   linkType: hard
 
@@ -15196,7 +15196,7 @@ __metadata:
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:^20.14.9"
     eslint: "npm:^9.28.0"
-    eslint-config-react-native-matipl01: /Users/mateu/Desktop/eslint-config-react-native-matipl01-1.tgz
+    eslint-config-react-native-matipl01: "npm:^3.2.0"
     husky: "npm:^9.1.4"
     lint-staged: "npm:^15.5.0"
     prettier: "npm:^3.3.2"
