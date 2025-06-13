@@ -3,11 +3,9 @@ import { type ViewStyle } from 'react-native';
 import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
 
-import { IS_WEB } from '../../../constants';
 import type {
   AnimatedStyleProp,
   LayoutAnimation,
-  LayoutTransition,
   MeasureCallback
 } from '../../../types';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
@@ -19,7 +17,6 @@ export type ItemCellProps = PropsWithChildren<{
   onMeasure: MeasureCallback;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
-  layout?: LayoutTransition;
 }>;
 
 export default function ItemCell({
@@ -29,11 +26,10 @@ export default function ItemCell({
   entering,
   exiting,
   itemsOverridesStyle,
-  layout,
   onMeasure
 }: ItemCellProps) {
   return (
-    <Animated.View layout={!IS_WEB ? layout : undefined} style={cellStyle}>
+    <Animated.View style={cellStyle}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}

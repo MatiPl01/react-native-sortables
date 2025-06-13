@@ -4,7 +4,7 @@ import type { TouchData } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
 import type { Vector } from '../layout/shared';
-import type { LayoutAnimation, LayoutTransition } from '../reanimated';
+import type { LayoutAnimation } from '../reanimated';
 import type { Animatable, AnimatableProps, Simplify } from '../utils';
 
 /** Props passed to a custom drop indicator component.
@@ -119,8 +119,6 @@ type ItemLayoutAnimationSettings = {
   itemEntering: LayoutAnimation | null;
   /** Animation to play when an item exits the list */
   itemExiting: LayoutAnimation | null;
-  /** Animation to play when items are reordered */
-  itemsLayout: LayoutTransition | null;
   /** Controls when layout transitions are applied */
   itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
 };

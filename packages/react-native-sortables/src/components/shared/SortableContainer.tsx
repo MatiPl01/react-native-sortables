@@ -32,12 +32,14 @@ type AnimatedHeightContainerProps = PropsWithChildren<
   DropIndicatorSettings & {
     dimensionsAnimationType: DimensionsAnimation;
     overflow: Overflow;
+    debug?: boolean;
     style?: StyleProp<ViewStyle>;
   }
 >;
 
 export default function SortableContainer({
   children,
+  debug,
   dimensionsAnimationType,
   DropIndicatorComponent,
   dropIndicatorStyle,
@@ -67,7 +69,7 @@ export default function SortableContainer({
     }
 
     const maybeAnimate = (value: null | number, animate: boolean) =>
-      animate && (!IS_WEB || shouldAnimateLayout.value) && value !== null
+      animate && shouldAnimateLayout.value && value !== null
         ? withTiming(value)
         : value;
 
@@ -140,7 +142,7 @@ export default function SortableContainer({
         {children}
       </Animated.View>
       {/* Renders an overlay view helpful for debugging */}
-      <DebugOutlet />
+      {debug && <DebugOutlet />}
     </Animated.View>
   );
 }
