@@ -1,4 +1,4 @@
-import type { AnyRecord, Dimensions, Maybe, Vector } from '../types';
+import type { AnyRecord, Dimensions, Maybe } from '../types';
 
 export function lt(a: number, b: number): boolean {
   'worklet';
@@ -20,18 +20,6 @@ export const areArraysDifferent = <T>(
     arr1.length !== arr2.length ||
     arr1.some((item, index) => !areEqual(item, arr2[index] as T))
   );
-};
-
-export const areVectorsDifferent = (
-  pos1: Vector,
-  pos2: Vector,
-  epx?: number
-): boolean => {
-  'worklet';
-  if (epx) {
-    return Math.abs(pos1.x - pos2.x) > epx || Math.abs(pos1.y - pos2.y) > epx;
-  }
-  return pos1.x !== pos2.x || pos1.y !== pos2.y;
 };
 
 export const areDimensionsDifferent = (

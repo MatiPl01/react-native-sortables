@@ -4,8 +4,6 @@ import type { SharedValue } from 'react-native-reanimated';
 
 export type AnyFunction = (...args: Array<any>) => any;
 
-export type EmptyFunction = () => void;
-
 export type AnyRecord = Record<string, any>;
 
 export type Simplify<T> = {
@@ -14,7 +12,7 @@ export type Simplify<T> = {
 
 export type Animatable<V> = SharedValue<V> | V;
 
-export type UnAnimatable<V> = V extends SharedValue<infer U> ? U : V;
+type UnAnimatable<V> = V extends SharedValue<infer U> ? U : V;
 
 export type AnimatableProps<T extends Record<string, any>> = {
   [K in keyof T]: Animatable<UnAnimatable<T[K]>>;
@@ -41,7 +39,7 @@ export type DefaultProps<
 
 export type NoUndef<T> = T extends undefined ? never : T;
 
-export type ReadonlySharedValue<V> = Readonly<Omit<SharedValue<V>, 'set'>>;
+type ReadonlySharedValue<V> = Readonly<Omit<SharedValue<V>, 'set'>>;
 
 export type DeepReadonly<T> = {
   readonly [K in keyof T]: T[K] extends SharedValue<infer U>

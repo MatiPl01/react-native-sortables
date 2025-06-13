@@ -23,7 +23,7 @@ export type SortableGridDragEndCallback<I> = (
   params: SortableGridDragEndParams<I>
 ) => void;
 
-export type SortableGridLayoutSettings = Partial<
+type SortableGridLayoutSettings = Partial<
   AnimatableProps<{
     /** Vertical spacing between grid items */
     rowGap: number;

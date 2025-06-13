@@ -63,7 +63,7 @@ export const reorderSwap = (
   return result;
 };
 
-export const isValidCoordinate = (coordinate: number): boolean => {
+const isValidCoordinate = (coordinate: number): boolean => {
   'worklet';
   return !isNaN(coordinate) && coordinate > -Infinity && coordinate < Infinity;
 };

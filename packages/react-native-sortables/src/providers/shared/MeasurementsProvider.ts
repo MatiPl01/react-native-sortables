@@ -19,7 +19,7 @@ import { areDimensionsDifferent, useAnimatedDebounce } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
-export type MeasurementsProviderProps = {
+type MeasurementsProviderProps = {
   itemsCount: number;
 };
 

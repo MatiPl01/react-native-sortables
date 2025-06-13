@@ -1,4 +1,4 @@
-name: Code Quality Checks
+name: 🗑️ Unused Code Check
 
 on:
   push:
@@ -9,9 +9,9 @@ on:
       - main
 
 jobs:
-  checks:
-    name: 🔍 Code Quality Checks
+  check:
     runs-on: ubuntu-latest
+
     steps:
       - name: 🛒 Checkout code
         uses: actions/checkout@v3
@@ -25,18 +25,6 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install --immutable
 
-      - name: 🔄 Find circular dependencies
+      - name: 🧹 Find unused JS/TS code
         working-directory: packages/react-native-sortables
-        run: yarn circular-dependency-check
-
-      - name: 🔎 Run typecheck
-        run: yarn typecheck
-
-      - name: 🧹 Run lint
-        run: yarn lint
-
-      - name: 🎨 Run Prettier check
-        run: yarn format:check
-
-      - name: 🧪 Run tests
-        run: yarn test
+        run: yarn knip

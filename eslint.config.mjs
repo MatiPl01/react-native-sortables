@@ -12,7 +12,8 @@ export default [
       '**/jest.setup.js',
       '**/dist',
       '**/README.md',
-      '**/CONTRIBUTING.md'
+      '**/CONTRIBUTING.md',
+      '**/CHANGELOG.md'
     ]
   },
   ...baseConfig

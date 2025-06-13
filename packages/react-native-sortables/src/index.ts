@@ -12,9 +12,12 @@ export type { CustomHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
   ActiveItemDroppedCallback,
+  ActiveItemDroppedParams,
   DragEndCallback,
   DragMoveCallback,
+  DragMoveParams,
   DragStartCallback,
+  DragStartParams,
   DropIndicatorComponentProps,
   OrderChangeCallback,
   OrderChangeParams,
@@ -23,12 +26,15 @@ export type {
   SortableFlexDragEndCallback,
   SortableFlexDragEndParams,
   SortableFlexProps,
+  SortableFlexStrategy,
   SortableFlexStrategyFactory,
   SortableFlexStyle,
   SortableGridDragEndCallback,
   SortableGridDragEndParams,
   SortableGridProps,
   SortableGridRenderItem,
+  SortableGridRenderItemInfo,
+  SortableGridStrategy,
   SortableGridStrategyFactory
 } from './types';
 export { DragActivationState } from './types';

@@ -71,7 +71,7 @@ export const createGridStrategy =
       const getItemCrossSize = (index: number) =>
         crossAxisOffsets[index] !== undefined
           ? crossAxisOffsets[index + 1]! -
-            crossAxisOffsets[index]! -
+            crossAxisOffsets[index] -
             crossGap.value
           : 0;
 
