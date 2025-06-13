@@ -43,7 +43,7 @@ export default function useItemLayoutStyles(
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
-  const dropStartTranslation = useSharedValue<Vector | null>(null);
+  const dropStartTranslation = useSharedValue<null | Vector>(null);
 
   const translateX = useSharedValue<null | number>(null);
   const translateY = useSharedValue<null | number>(null);
@@ -83,12 +83,10 @@ export default function useItemLayoutStyles(
         translateY.value !== null
       ) {
         // Drop animation
-        if (!dropStartTranslation.value) {
-          dropStartTranslation.value = {
-            x: translateX.value,
-            y: translateY.value
-          };
-        }
+        dropStartTranslation.value ??= {
+          x: translateX.value,
+          y: translateY.value
+        };
 
         const animate = (from: number, to: number) =>
           interpolate(activationProgress, [1, 0], [from, to]);

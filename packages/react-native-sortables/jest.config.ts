@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unused-modules */
 import { type JestConfigWithTsJest } from 'ts-jest';
 
 const config: JestConfigWithTsJest = {

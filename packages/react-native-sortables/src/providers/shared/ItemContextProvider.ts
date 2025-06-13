@@ -5,12 +5,12 @@ import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
 type ItemContextProviderProps = PropsWithChildren<
-  {
-    itemKey: string;
-  } & Pick<
+  Pick<
     ItemContextType,
     'activationAnimationProgress' | 'gesture' | 'isActive'
-  >
+  > & {
+    itemKey: string;
+  }
 >;
 
 const { ItemContextProvider, useItemContextContext: useItemContext } =

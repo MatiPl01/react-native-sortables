@@ -13,9 +13,9 @@ import { componentWithRef } from '../../utils/react';
  */
 const AnimatedViewWeb = componentWithRef<
   View,
-  {
+  Omit<AnimatedProps<ViewProps>, 'onLayout'> & {
     onLayout: NonNullable<ViewProps['onLayout']>;
-  } & Omit<AnimatedProps<ViewProps>, 'onLayout'>
+  }
 >(function AnimatedViewWeb({ onLayout, ...rest }, ref) {
   return (
     <Animated.View
@@ -25,7 +25,6 @@ const AnimatedViewWeb = componentWithRef<
         const el = (e.nativeEvent as unknown as { target: HTMLElement }).target;
         // We want to call onLayout only for displayed views to prevent
         // layout animation on navigation between screens
-        // @ts-expect-error This is a correct HTML element prop on web
         if (el?.offsetParent) {
           onLayout(e);
         }

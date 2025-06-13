@@ -17,8 +17,8 @@ const { ActiveItemValuesProvider, useActiveItemValuesContext } = createProvider(
   'ActiveItemValues'
 )<ActiveItemValuesProviderProps, ActiveItemValuesContextType>(() => {
   // POSITIONS
-  const touchPosition = useSharedValue<Vector | null>(null);
-  const activeItemPosition = useSharedValue<Vector | null>(null);
+  const touchPosition = useSharedValue<null | Vector>(null);
+  const activeItemPosition = useSharedValue<null | Vector>(null);
 
   // DIMENSIONS
   const activeItemDimensions = useSharedValue<Dimensions | null>(null);

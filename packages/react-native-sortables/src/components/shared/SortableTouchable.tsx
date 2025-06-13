@@ -7,7 +7,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useItemContext } from '../../providers';
 
 type SortableTouchableProps = PropsWithChildren<
-  {
+  ViewProps & {
     onTap?: () => void;
     onDoubleTap?: () => void;
     onLongPress?: () => void;
@@ -15,7 +15,7 @@ type SortableTouchableProps = PropsWithChildren<
     onTouchesUp?: () => void;
     failDistance?: number;
     gestureMode?: 'exclusive' | 'simultaneous';
-  } & ViewProps
+  }
 >;
 
 export default function SortableTouchable({

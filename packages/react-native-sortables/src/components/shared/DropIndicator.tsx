@@ -53,11 +53,11 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   useAnimatedReaction(
     () => ({
       dropped: activeItemDropped.value,
-      kToI: keyToIndex.value,
       key: activeItemKey.value,
+      kToI: keyToIndex.value,
       positions: itemPositions.value
     }),
-    ({ dropped, kToI, key, positions }) => {
+    ({ dropped, key, kToI, positions }) => {
       if (key !== null) {
         dropIndex.value = kToI[key] ?? 0;
         dropPosition.value = positions[key] ?? { x: 0, y: 0 };

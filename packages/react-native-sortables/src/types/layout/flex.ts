@@ -28,12 +28,12 @@ export type FlexLayoutProps = {
   flexDirection: FlexDirection;
   flexWrap: FlexWrap;
   flexAlignments: FlexAlignments;
-  limits: {
+  limits: null | {
     minHeight: number;
     maxHeight: number;
     minWidth: number;
     maxWidth: number;
-  } | null;
+  };
   paddings: {
     bottom: number;
     left: number;

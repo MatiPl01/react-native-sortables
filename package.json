@@ -5,8 +5,7 @@
     "@types/eslint": "^8.56.10",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.9",
-    "eslint": "^8.56.0",
-    "eslint-config-react-native-matipl01": "2.1.0",
+    "eslint": "^9.28.0",
     "husky": "^9.1.4",
     "lint-staged": "^15.5.0",
     "prettier": "^3.3.2",
@@ -63,5 +62,8 @@
       "example/web",
       "packages/react-native-sortables"
     ]
+  },
+  "dependencies": {
+    "eslint-config-react-native-matipl01": "/Users/mateu/Desktop/eslint-config-react-native-matipl01-1.tgz"
   }
 }

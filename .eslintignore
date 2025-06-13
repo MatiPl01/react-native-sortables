@@ -1,9 +1,0 @@
-example/*
-!example/app
-**/bob.config.cjs
-**/babel.config.cjs
-**/jest.setup.js
-**/dist
-**/README.md
-**/CONTRIBUTING.md
-.eslintrc.cjs

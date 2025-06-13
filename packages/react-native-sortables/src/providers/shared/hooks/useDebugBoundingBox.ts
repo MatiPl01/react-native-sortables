@@ -14,15 +14,15 @@ const DEBUG_COLORS = {
 
 const DEBUG_RECT_KEYS = ['bottom', 'left', 'right', 'top'] as const;
 
-type DebugBox = {
-  hide: () => void;
-} & Record<
+type DebugBox = Record<
   (typeof DEBUG_RECT_KEYS)[number],
   {
     hide: () => void;
     update: (from: Vector, to: Vector) => void;
   }
->;
+> & {
+  hide: () => void;
+};
 
 export default function useDebugBoundingBox(): DebugBox | undefined {
   if (!__DEV__) {

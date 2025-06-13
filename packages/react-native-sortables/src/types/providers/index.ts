@@ -1,2 +1,2 @@
-export * from './layout';
-export * from './shared';
+export type * from './layout';
+export type * from './shared';

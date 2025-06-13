@@ -1,3 +1,3 @@
-export * from './flex';
-export * from './grid';
-export * from './shared';
+export type * from './flex';
+export type * from './grid';
+export type * from './shared';

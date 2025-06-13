@@ -30,21 +30,21 @@ import {
 import { ContextProviderComposer } from './utils';
 
 type SharedProviderProps = PropsWithChildren<
-  {
-    itemKeys: Array<string>;
-    sortEnabled: Animatable<boolean>;
-    hapticsEnabled: boolean;
-    customHandle: boolean;
-    debug: boolean;
-    controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
-    itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
-    initialItemsStyleOverride?: ViewStyle;
-    dropIndicatorStyle?: ViewStyle;
-  } & ActiveItemDecorationSettings &
+  ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
     Required<Omit<ItemDragSettings, 'reorderTriggerOrigin'>> &
-    Required<SortableCallbacks>
+    Required<SortableCallbacks> & {
+      itemKeys: Array<string>;
+      sortEnabled: Animatable<boolean>;
+      hapticsEnabled: boolean;
+      customHandle: boolean;
+      debug: boolean;
+      controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+      itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
+      initialItemsStyleOverride?: ViewStyle;
+      dropIndicatorStyle?: ViewStyle;
+    }
 >;
 
 export default function SharedProvider({

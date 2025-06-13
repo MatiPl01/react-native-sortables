@@ -24,7 +24,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
   const activeHandleMeasurements = useSharedValue<MeasuredDimensions | null>(
     null
   );
-  const activeHandleOffset = useSharedValue<Vector | null>(null);
+  const activeHandleOffset = useSharedValue<null | Vector>(null);
 
   const registerHandle = useCallback(
     (key: string, handleRef: AnimatedRef<View>, fixed: boolean) => {

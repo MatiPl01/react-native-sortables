@@ -27,8 +27,8 @@ function SortableFlex(props: SortableFlexProps) {
       ...styleProps
     },
     sharedProps: {
-      DropIndicatorComponent,
       dimensionsAnimationType,
+      DropIndicatorComponent,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
@@ -98,10 +98,7 @@ function SortableFlex(props: SortableFlexProps) {
   );
 }
 
-type SortableFlexInnerProps = {
-  childrenArray: Array<[string, ReactElement]>;
-  style: StyleProp<ViewStyle>;
-} & DropIndicatorSettings &
+type SortableFlexInnerProps = DropIndicatorSettings &
   Required<
     Pick<
       SortableFlexProps,
@@ -111,7 +108,10 @@ type SortableFlexInnerProps = {
       | 'itemsLayout'
       | 'overflow'
     >
-  >;
+  > & {
+    childrenArray: Array<[string, ReactElement]>;
+    style: StyleProp<ViewStyle>;
+  };
 
 function SortableFlexInner({
   childrenArray,

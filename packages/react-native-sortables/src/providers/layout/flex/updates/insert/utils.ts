@@ -66,7 +66,7 @@ const getIndexesWhenSwappedToGroupBefore = ({
   keyToIndex,
   mainDimension,
   mainGap
-}: ItemGroupSwapProps): Omit<ItemGroupSwapResult, 'indexToKey'> | null => {
+}: ItemGroupSwapProps): null | Omit<ItemGroupSwapResult, 'indexToKey'> => {
   'worklet';
   if (groupSizeLimit === Infinity || currentGroupIndex < 1) {
     return null;
@@ -142,7 +142,7 @@ const getIndexesWhenSwappedToGroupAfter = ({
   keyToIndex,
   mainDimension,
   mainGap
-}: ItemGroupSwapProps): Omit<ItemGroupSwapResult, 'indexToKey'> | null => {
+}: ItemGroupSwapProps): null | Omit<ItemGroupSwapResult, 'indexToKey'> => {
   'worklet';
   if (
     groupSizeLimit === Infinity ||

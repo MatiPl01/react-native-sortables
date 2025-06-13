@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { makeMutable } from 'react-native-reanimated';
 
 import type { AnyFunction } from '../../types';
@@ -32,9 +31,7 @@ export function setAnimatedTimeout<F extends AnyFunction>(
     if (!PENDING_TIMEOUTS.value[currentId]) {
       return;
     }
-    if (startTimestamp === undefined) {
-      startTimestamp = newTimestamp;
-    }
+    startTimestamp ??= newTimestamp;
     if (newTimestamp >= startTimestamp + delay) {
       removeFromPendingTimeouts(currentId);
       callback();

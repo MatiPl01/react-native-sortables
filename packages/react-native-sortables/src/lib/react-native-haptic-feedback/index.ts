@@ -4,13 +4,13 @@
  * optional dependency
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import { NativeModules, TurboModuleRegistry } from 'react-native';
 // Types can be imported even if the module is not available
@@ -39,7 +39,7 @@ const load = () => {
       return null;
     }
     // Lazy load the HapticFeedbackTypes
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { HapticFeedbackTypes } = require('react-native-haptic-feedback');
 
     const defaultOptions = {
@@ -72,13 +72,13 @@ const load = () => {
           // TODO - try to change this to run on UI if possible
           runOnJS(nativeTrigger)(type, triggerOptions);
         }
-      } catch (err) {
+      } catch (_) {
         logger.warn(WARNINGS.notAvailable);
       }
     };
 
     return trigger;
-  } catch (err) {
+  } catch (_) {
     return null;
   }
 };

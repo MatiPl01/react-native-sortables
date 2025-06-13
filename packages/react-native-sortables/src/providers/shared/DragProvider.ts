@@ -41,10 +41,10 @@ import { useMeasurementsContext } from './MeasurementsProvider';
 import { usePortalContext } from './PortalProvider';
 
 type DragProviderProps = PropsWithChildren<
-  {
+  Required<SortableCallbacks> & {
     hapticsEnabled: boolean;
     overDrag: OverDrag;
-  } & Required<SortableCallbacks>
+  }
 >;
 
 const { DragProvider, useDragContext } = createProvider('Drag')<
@@ -105,10 +105,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     overDrag === 'horizontal' || overDrag === 'both';
   const hasVerticalOverDrag = overDrag === 'vertical' || overDrag === 'both';
 
-  const touchStartTouch = useSharedValue<TouchData | null>(null);
-  const currentTouch = useSharedValue<TouchData | null>(null);
-  const dragStartItemTouchOffset = useSharedValue<Vector | null>(null);
-  const dragStartTouchPosition = useSharedValue<Vector | null>(null);
+  const touchStartTouch = useSharedValue<null | TouchData>(null);
+  const currentTouch = useSharedValue<null | TouchData>(null);
+  const dragStartItemTouchOffset = useSharedValue<null | Vector>(null);
+  const dragStartTouchPosition = useSharedValue<null | Vector>(null);
   const dragStartIndex = useSharedValue(-1);
 
   // used for activation and deactivation (drop)
@@ -572,8 +572,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dropAnimationDuration,
       handleDragEnd,
       handleOrderChange,
-      handleTouchStart,
-      handleTouchesMove
+      handleTouchesMove,
+      handleTouchStart
     }
   };
 });

@@ -10,7 +10,7 @@ import { forwardRef } from 'react';
 
 import { IS_REACT_19 } from '../constants';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export const componentWithRef = <T, P = {}>(
   render: ForwardRefRenderFunction<T, P>
 ): ForwardRefExoticComponent<P & RefAttributes<T>> => {

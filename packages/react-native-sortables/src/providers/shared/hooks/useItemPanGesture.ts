@@ -8,7 +8,7 @@ export default function useItemPanGesture(
   key: string,
   activationAnimationProgress: SharedValue<number>
 ) {
-  const { handleDragEnd, handleTouchStart, handleTouchesMove } =
+  const { handleDragEnd, handleTouchesMove, handleTouchStart } =
     useDragContext();
 
   return useMemo(

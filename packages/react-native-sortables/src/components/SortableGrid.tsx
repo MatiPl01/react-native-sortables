@@ -44,8 +44,8 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       strategy
     },
     sharedProps: {
-      DropIndicatorComponent,
       dimensionsAnimationType,
+      DropIndicatorComponent,
       dropIndicatorStyle,
       itemEntering,
       itemExiting,
@@ -130,13 +130,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   );
 }
 
-type SortableGridInnerProps<I> = {
-  itemKeys: Array<string>;
-  rowGap: SharedValue<number>;
-  columnGap: SharedValue<number>;
-  groups: number;
-  isVertical: boolean;
-} & DropIndicatorSettings &
+type SortableGridInnerProps<I> = DropIndicatorSettings &
   Required<
     Pick<
       SortableGridProps<I>,
@@ -149,7 +143,13 @@ type SortableGridInnerProps<I> = {
       | 'renderItem'
       | 'rowHeight'
     >
-  >;
+  > & {
+    itemKeys: Array<string>;
+    rowGap: SharedValue<number>;
+    columnGap: SharedValue<number>;
+    groups: number;
+    isVertical: boolean;
+  };
 
 function SortableGridInner<I>({
   columnGap,
@@ -199,11 +199,11 @@ function SortableGridInner<I>({
   );
 }
 
-type SortableGridItemProps<I> = {
+type SortableGridItemProps<I> = DraggableViewProps & {
   index: number;
   item: I;
   renderItem: SortableGridRenderItem<I>;
-} & DraggableViewProps;
+};
 
 function SortableGridItem<I>({
   index,

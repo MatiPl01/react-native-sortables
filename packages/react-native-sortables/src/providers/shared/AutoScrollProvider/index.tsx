@@ -29,7 +29,6 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   const isHorizontal = autoScrollDirection === 'horizontal';
   const { activeItemKey } = useCommonValuesContext();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const scrollOffset = useScrollViewOffset(scrollableRef);
   const dragStartScrollOffset = useAnimatableValue<null | number>(null);
   const prevScrollToOffset = useSharedValue<null | number>(null);

@@ -29,16 +29,16 @@ import { useActiveItemValuesContext } from './ActiveItemValuesProvider';
 let nextId = 0;
 
 type CommonValuesProviderProps = PropsWithChildren<
-  {
-    sortEnabled: Animatable<boolean>;
-    customHandle: boolean;
-    itemKeys: Array<string>;
-    controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
-    itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
-    initialItemsStyleOverride?: ViewStyle;
-  } & ActiveItemDecorationSettings &
+  ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
-    Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>
+    Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'> & {
+      sortEnabled: Animatable<boolean>;
+      customHandle: boolean;
+      itemKeys: Array<string>;
+      controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+      itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
+      initialItemsStyleOverride?: ViewStyle;
+    }
 >;
 
 const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =

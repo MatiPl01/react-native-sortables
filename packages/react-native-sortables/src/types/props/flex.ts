@@ -18,13 +18,13 @@ import type { Simplify } from '../utils';
 import type { DragEndParams, SharedProps } from './shared';
 
 /** Parameters passed to the onDragEnd callback of a sortable flex container */
-export type SortableFlexDragEndParams = {
+export type SortableFlexDragEndParams = DragEndParams & {
   /** Function that takes an array of items and returns a new array with updated order.
    * @note If the order hasn't changed, returns the original array reference,
    * making it safe to use with setState without triggering unnecessary re-renders.
    */
   order: <I>(data: Array<I>) => Array<I>;
-} & DragEndParams;
+};
 
 /** Callback function called when drag gesture ends in a sortable flex container.
  * @note This callback is always called when drag ends, even if the order hasn't changed.
@@ -43,9 +43,9 @@ export type SortableFlexDragEndCallback = (
  */
 export type SortableFlexStrategyFactory = (
   props: Simplify<
-    { debugContext?: DebugContextType } & CommonValuesContextType &
+    CommonValuesContextType &
       FlexLayoutContextType &
-      Partial<CustomHandleContextType>
+      Partial<CustomHandleContextType> & { debugContext?: DebugContextType }
   >
 ) => OrderUpdater;
 
@@ -105,18 +105,18 @@ export type SortableFlexStyle = {
 /** Props for the SortableFlex component */
 export type SortableFlexProps = Simplify<
   PropsWithChildren<
-    {
-      /** Strategy to use for reordering items.
-       * @default 'insert'
-       */
-      strategy?: SortableFlexStrategy;
-      /** Callback fired when drag gesture ends.
-       * @note This callback is always called when drag ends, even if the order hasn't changed.
-       * The order function provided in the callback parameters will maintain referential
-       * equality with the original data when order hasn't changed.
-       */
-      onDragEnd?: SortableFlexDragEndCallback;
-    } & Omit<SharedProps, 'onDragEnd'> &
-      SortableFlexStyle
+    Omit<SharedProps, 'onDragEnd'> &
+      SortableFlexStyle & {
+        /** Strategy to use for reordering items.
+         * @default 'insert'
+         */
+        strategy?: SortableFlexStrategy;
+        /** Callback fired when drag gesture ends.
+         * @note This callback is always called when drag ends, even if the order hasn't changed.
+         * The order function provided in the callback parameters will maintain referential
+         * equality with the original data when order hasn't changed.
+         */
+        onDragEnd?: SortableFlexDragEndCallback;
+      }
   >
 >;
