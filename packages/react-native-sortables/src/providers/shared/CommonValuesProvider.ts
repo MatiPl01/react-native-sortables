@@ -21,7 +21,6 @@ import type {
   Maybe,
   Vector
 } from '../../types';
-import { AbsoluteLayoutState } from '../../types';
 import { areArraysDifferent, getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
 import { useActiveItemValuesContext } from './ActiveItemValuesProvider';
@@ -117,7 +116,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // OTHER
     const containerRef = useAnimatedRef<View>();
     const sortEnabled = useAnimatableValue(_sortEnabled);
-    const absoluteLayoutState = useSharedValue(AbsoluteLayoutState.PENDING);
+    const usesAbsoluteLayout = useSharedValue(false);
     const shouldAnimateLayout = useSharedValue(true);
     const animateLayoutOnReorderOnly = useDerivedValue(
       () => itemsLayoutTransitionMode === 'reorder',
@@ -138,7 +137,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     return {
       value: {
         ...useActiveItemValuesContext(),
-        absoluteLayoutState,
         activationAnimationDuration,
         activeItemOpacity,
         activeItemScale,
@@ -168,7 +166,8 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         shouldAnimateLayout,
         snapOffsetX,
         snapOffsetY,
-        sortEnabled
+        sortEnabled,
+        usesAbsoluteLayout
       }
     };
   });

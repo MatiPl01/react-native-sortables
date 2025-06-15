@@ -10,7 +10,6 @@ import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
 import {
-  AbsoluteLayoutState,
   type Animatable,
   type GridLayout,
   type GridLayoutContextType
@@ -44,7 +43,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowHeight
 }) => {
   const {
-    absoluteLayoutState,
     indexToKey,
     itemDimensions,
     itemPositions,
@@ -128,10 +126,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           numGroups
         }),
         (props, previousProps) => {
-          if (absoluteLayoutState.value === AbsoluteLayoutState.PENDING) {
-            return;
-          }
-
           onChange(
             calculateLayout(props),
             // On web, animate layout only if parent container is not resized
@@ -142,15 +136,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           );
         }
       ),
-    [
-      mainGroupSize,
-      mainGap,
-      crossGap,
-      numGroups,
-      isVertical,
-      itemDimensions,
-      absoluteLayoutState
-    ]
+    [mainGroupSize, mainGap, crossGap, numGroups, isVertical, itemDimensions]
   );
 
   const useGridLayout = useCallback(

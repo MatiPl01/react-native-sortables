@@ -10,26 +10,6 @@ export enum LayerState {
   FOCUSED = 2
 }
 
-export enum AbsoluteLayoutState {
-  /**
-   * Initial state when the layout is relative. This occurs before sorting
-   * is enabled for the first time and any measurements have been made.
-   */
-  PENDING,
-
-  /**
-   * Intermediate state when the layout can be changed to absolute, but
-   * measurements haven't been completed yet.
-   */
-  TRANSITION,
-
-  /**
-   * Final state when the absolute layout can be applied, after all measurements
-   * have been completed.
-   */
-  COMPLETE
-}
-
 export enum ItemPortalState {
   /**
    * Initial state when there is no portal or the item is rendered
