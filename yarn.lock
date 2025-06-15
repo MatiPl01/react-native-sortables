@@ -4221,7 +4221,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/flash-list@npm:^2.0.0-rc.8":
+"@shopify/flash-list@npm:2.0.0-rc.8":
   version: 2.0.0-rc.8
   resolution: "@shopify/flash-list@npm:2.0.0-rc.8"
   dependencies:
@@ -4232,6 +4232,20 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/8e0428d17e8ac940903684947f7f18b82121dae6b2fad377c947b3056595e5e58871a7369201b829b886d3cb28d66b4bd978c4d80432394f153327fb0190f458
+  languageName: node
+  linkType: hard
+
+"@shopify/flash-list@patch:@shopify/flash-list@npm%3A2.0.0-rc.8#~/.yarn/patches/@shopify-flash-list-npm-2.0.0-rc.8-96ca0285c9.patch":
+  version: 2.0.0-rc.8
+  resolution: "@shopify/flash-list@patch:@shopify/flash-list@npm%3A2.0.0-rc.8#~/.yarn/patches/@shopify-flash-list-npm-2.0.0-rc.8-96ca0285c9.patch::version=2.0.0-rc.8&hash=b92bef"
+  dependencies:
+    recyclerlistview: "npm:4.2.3"
+    tslib: "npm:2.8.1"
+  peerDependencies:
+    "@babel/runtime": "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/892b712006a4d2f23e591d46b80fa5edf66519fdf9c65f96dbffc5357cc5b1e45192c4a9763f875b25ea23d03e1f5af92526e79c5dc0ee27091776724494c113
   languageName: node
   linkType: hard
 
@@ -8447,7 +8461,7 @@ __metadata:
     "@react-navigation/bottom-tabs": "npm:7.3.10"
     "@react-navigation/native": "npm:7.0.14"
     "@react-navigation/native-stack": "npm:7.2.0"
-    "@shopify/flash-list": "npm:^2.0.0-rc.8"
+    "@shopify/flash-list": "patch:@shopify/flash-list@npm%3A2.0.0-rc.8#~/.yarn/patches/@shopify-flash-list-npm-2.0.0-rc.8-96ca0285c9.patch"
     "@testing-library/react-hooks": "npm:^8.0.1"
     "@testing-library/react-native": "npm:^12.5.1"
     "@types/react": "npm:^19.1.0"
