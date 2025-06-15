@@ -3,15 +3,9 @@ import type { ImageSourcePropType } from 'react-native';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
-  Easing,
   FadeIn,
   FadeOut,
-  useAnimatedStyle,
-  useDerivedValue,
-  withDelay,
-  withRepeat,
-  withSequence,
-  withTiming
+  useDerivedValue
 } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
@@ -73,33 +67,33 @@ type IconProps = {
 };
 
 const Icon = memo(function Icon({ isEditing, item }: IconProps) {
-  const shakeProgress = useDerivedValue(() =>
-    isEditing.value
-      ? withDelay(
-          Math.random() * 300,
-          withRepeat(
-            withSequence(
-              withTiming(-2, {
-                duration: 150,
-                easing: Easing.inOut(Easing.ease)
-              }),
-              withTiming(2, {
-                duration: 150,
-                easing: Easing.inOut(Easing.ease)
-              })
-            ),
-            -1
-          )
-        )
-      : withTiming(0)
-  );
+  // const shakeProgress = useDerivedValue(() =>
+  //   isEditing.value
+  //     ? withDelay(
+  //         Math.random() * 300,
+  //         withRepeat(
+  //           withSequence(
+  //             withTiming(-2, {
+  //               duration: 150,
+  //               easing: Easing.inOut(Easing.ease)
+  //             }),
+  //             withTiming(2, {
+  //               duration: 150,
+  //               easing: Easing.inOut(Easing.ease)
+  //             })
+  //           ),
+  //           -1
+  //         )
+  //       )
+  //     : withTiming(0)
+  // );
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${shakeProgress.value}deg` }]
-  }));
+  // const animatedStyle = useAnimatedStyle(() => ({
+  //   transform: [{ rotate: `${shakeProgress.value}deg` }]
+  // }));
 
   return (
-    <Animated.View style={[styles.icon, animatedStyle]}>
+    <Animated.View style={[styles.icon]}>
       <View style={styles.imageContainer}>
         <Image source={item.image} style={styles.image} />
       </View>
@@ -164,8 +158,9 @@ const styles = StyleSheet.create({
   },
   container: {
     // eslint-disable-next-line camelcase
-    experimental_backgroundImage:
-      'linear-gradient(125deg, #0a3d62 0%, #1e8449 50%, #0a3d62 100%), linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%), radial-gradient(circle at 50% 50%, rgba(46, 204, 113, 0.08) 0%, rgba(46, 204, 113, 0) 70%)',
+    experimental_backgroundImage: `linear-gradient(125deg, #0a3d62 0%, #1e8449 50%, #0a3d62 100%), 
+      linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%), 
+      radial-gradient(circle at 50% 50%, rgba(46, 204, 113, 0.08) 0%, rgba(46, 204, 113, 0) 70%)`,
     flex: 1,
     padding: 30
   },

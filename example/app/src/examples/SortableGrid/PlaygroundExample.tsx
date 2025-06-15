@@ -6,7 +6,7 @@ import Sortable from 'react-native-sortables';
 import { ScrollScreen } from '@/components';
 import { colors, radius, sizes, spacing, text } from '@/theme';
 
-const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
+const DATA = Array.from({ length: 20 }, (_, index) => `Item ${index + 1}`);
 
 export default function PlaygroundExample() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
@@ -22,7 +22,7 @@ export default function PlaygroundExample() {
     <ScrollScreen contentContainerStyle={styles.container} includeNavBarHeight>
       <Sortable.Grid
         columnGap={10}
-        columns={3}
+        columns={4}
         data={DATA}
         renderItem={renderItem}
         rowGap={10}
