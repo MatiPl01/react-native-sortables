@@ -21,7 +21,6 @@ import {
   type AnimatedStyleProp,
   ItemPortalState,
   type LayoutAnimation,
-  type LayoutTransition,
   type MeasureCallback
 } from '../../../types';
 import { getContextProvider } from '../../../utils';
@@ -35,7 +34,6 @@ export type DraggableViewProps = PropsWithChildren<{
   itemKey: string;
   entering: LayoutAnimation | undefined;
   exiting: LayoutAnimation | undefined;
-  layout: LayoutTransition | undefined;
   style?: AnimatedStyleProp;
 }>;
 

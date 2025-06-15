@@ -95,7 +95,7 @@ export type CommonValuesContextType = ActiveItemValuesContextType &
     containerRef: AnimatedRef<View>;
     sortEnabled: SharedValue<boolean>;
     absoluteLayoutState: SharedValue<AbsoluteLayoutState>;
-    shouldAnimateLayout: SharedValue<boolean>; // used only on web
+    shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
     animateLayoutOnReorderOnly: SharedValue<boolean>;
     customHandle: boolean;
 

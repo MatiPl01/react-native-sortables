@@ -1,24 +1,19 @@
-import { useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
-  interpolate,
   useAnimatedReaction,
   useAnimatedStyle,
-  useSharedValue
+  useSharedValue,
+  withTiming
 } from 'react-native-reanimated';
 
-import { EMPTY_OBJECT } from '../../../constants';
-import type { AnimatedStyleProp, Vector } from '../../../types';
-import { AbsoluteLayoutState } from '../../../types';
+import { AbsoluteLayoutState, type AnimatedStyleProp } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
 const RELATIVE_STYLE: ViewStyle = {
-  left: undefined,
   opacity: 1,
   position: 'relative',
-  top: undefined,
   transform: [],
   zIndex: 0
 };
@@ -36,88 +31,48 @@ export default function useItemLayoutStyles(
 ): AnimatedStyleProp {
   const {
     absoluteLayoutState,
+    activeItemDropped,
     activeItemKey,
     activeItemPosition,
     animateLayoutOnReorderOnly,
-    itemPositions
+    dropAnimationDuration,
+    itemPositions,
+    shouldAnimateLayout
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
-  const dropStartTranslation = useSharedValue<null | Vector>(null);
 
   const translateX = useSharedValue<null | number>(null);
   const translateY = useSharedValue<null | number>(null);
-  const layoutX = useSharedValue<null | number>(null);
-  const layoutY = useSharedValue<null | number>(null);
 
   // Inactive item updater
   useAnimatedReaction(
     () => ({
-      activationProgress: activationAnimationProgress.value,
-      canApply: absoluteLayoutState.value === AbsoluteLayoutState.COMPLETE,
       isActive: activeItemKey.value === key,
       position: itemPositions.value[key]
     }),
-    ({ activationProgress, canApply, isActive, position }) => {
-      if (!canApply) {
-        // This affects all items rendered during the initial render when
-        // the absolute layout is not yet enabled. All of these items have
-        // no translation at the beginning and layoutX and layoutY are
-        // corresponding to their render position.
-        translateX.value = 0;
-        translateY.value = 0;
-        return;
-      }
-
+    ({ isActive, position }) => {
       if (isActive || !position) {
-        // This reaction doesn't update position of the active item.
-        dropStartTranslation.value = null;
         return;
       }
 
       if (
-        activationProgress &&
-        layoutX.value !== null &&
-        layoutY.value !== null &&
-        translateX.value !== null &&
-        translateY.value !== null
+        translateX.value === null ||
+        translateY.value === null ||
+        !shouldAnimateLayout.value ||
+        (activeItemKey.value === null &&
+          animateLayoutOnReorderOnly.value &&
+          activeItemDropped.value)
       ) {
-        // Drop animation
-        dropStartTranslation.value ??= {
-          x: translateX.value,
-          y: translateY.value
-        };
-
-        const animate = (from: number, to: number) =>
-          interpolate(activationProgress, [1, 0], [from, to]);
-
-        const { x, y } = dropStartTranslation.value;
-        translateX.value = animate(x, position.x - (layoutX.value ?? 0));
-        translateY.value = animate(y, position.y - (layoutY.value ?? 0));
+        translateX.value = position.x;
+        translateY.value = position.y;
       } else {
-        if (translateX.value === null || translateY.value === null) {
-          // This is the case that happens for new items added to the sortable
-          // component after the absolute layout is enabled. In this case,
-          // we have to set translation instead of top/left to the item's
-          // position, as the initial render position of the item is the
-          // top left corner of the container and we don't want to animate
-          // it from this position to its correct position when rendered.
-          translateX.value = position.x;
-          translateY.value = position.y;
-        }
-
-        if (
-          !animateLayoutOnReorderOnly.value ||
-          activeItemKey.value !== null ||
-          layoutX.value === null ||
-          layoutY.value === null
-        ) {
-          layoutX.value = position.x - (translateX.value ?? 0);
-          layoutY.value = position.y - (translateY.value ?? 0);
-        } else {
-          translateX.value = position.x - (layoutX.value ?? 0);
-          translateY.value = position.y - (layoutY.value ?? 0);
-        }
+        translateX.value = withTiming(position.x, {
+          duration: dropAnimationDuration.value
+        });
+        translateY.value = withTiming(position.y, {
+          duration: dropAnimationDuration.value
+        });
       }
     }
   );
@@ -133,17 +88,13 @@ export default function useItemLayoutStyles(
         return;
       }
 
-      // This updates the translation of the active item.
-      translateX.value = position.x - (layoutX.value ?? 0);
-      translateY.value = position.y - (layoutY.value ?? 0);
+      translateX.value = position.x;
+      translateY.value = position.y;
     }
   );
 
-  const animatedTranslationStyle = useAnimatedStyle(() => {
-    if (
-      absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE &&
-      (layoutX.value === null || layoutY.value === null)
-    ) {
+  return useAnimatedStyle(() => {
+    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
       return RELATIVE_STYLE;
     }
 
@@ -161,20 +112,4 @@ export default function useItemLayoutStyles(
       zIndex: zIndex.value
     };
   });
-
-  const animatedLayoutStyle = useAnimatedStyle(() => {
-    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
-      return EMPTY_OBJECT;
-    }
-
-    return {
-      left: layoutX.value,
-      top: layoutY.value
-    };
-  });
-
-  return useMemo(
-    () => [animatedTranslationStyle, animatedLayoutStyle],
-    [animatedLayoutStyle, animatedTranslationStyle]
-  );
 }
