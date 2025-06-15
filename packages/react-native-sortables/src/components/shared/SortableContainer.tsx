@@ -109,16 +109,15 @@ export default function SortableContainer({
   });
 
   const animatedMeasurementsContainerStyle = useAnimatedStyle(() => {
-    if (!usesAbsoluteLayout.value) {
+    const ctrl = controlledContainerDimensions.value;
+    const height = ctrl.height ? containerHeight.value : undefined;
+    const width = ctrl.width ? containerWidth.value : undefined;
+
+    if (!height && !width) {
       return EMPTY_OBJECT;
     }
 
-    const ctrl = controlledContainerDimensions.value;
-
-    return {
-      height: ctrl.height ? containerHeight.value : undefined,
-      width: ctrl.width ? containerWidth.value : undefined
-    };
+    return { height, width };
   });
 
   return (
