@@ -2,7 +2,11 @@ import { type ReactElement } from 'react';
 import { type StyleProp, StyleSheet, type ViewStyle } from 'react-native';
 import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
 
-import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
+import {
+  DEFAULT_SORTABLE_FLEX_PROPS,
+  EMPTY_OBJECT,
+  IS_WEB
+} from '../constants';
 import { useDragEndHandler } from '../hooks';
 import {
   FLEX_STRATEGIES,
@@ -124,6 +128,28 @@ function SortableFlexInner({
 }: SortableFlexInnerProps) {
   const { usesAbsoluteLayout } = useCommonValuesContext();
 
+  let relativeLayoutStyle: ViewStyle = EMPTY_OBJECT;
+  let baseContainerStyle = style;
+  // On web reanimated animated style might not override the plan js style
+  // so we have to filter out flex properties
+  if (IS_WEB) {
+    const {
+      alignItems,
+      flexDirection,
+      flexWrap,
+      justifyContent,
+      ...restStyle
+    } = StyleSheet.flatten(style);
+
+    baseContainerStyle = restStyle;
+    relativeLayoutStyle = {
+      alignItems,
+      flexDirection,
+      flexWrap,
+      justifyContent
+    };
+  }
+
   const animatedContainerStyle = useAnimatedStyle(() =>
     usesAbsoluteLayout.value
       ? {
@@ -138,13 +164,13 @@ function SortableFlexInner({
           paddingRight: 0,
           paddingTop: 0
         }
-      : {}
+      : relativeLayoutStyle
   );
 
   return (
     <SortableContainer
       {...containerProps}
-      style={[style, animatedContainerStyle]}>
+      style={[baseContainerStyle, animatedContainerStyle]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering ?? undefined}
