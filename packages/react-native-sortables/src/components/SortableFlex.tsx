@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react';
 import { type StyleProp, StyleSheet, type ViewStyle } from 'react-native';
-import { useDerivedValue } from 'react-native-reanimated';
+import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import { useDragEndHandler } from '../hooks';
@@ -9,6 +9,7 @@ import {
   FlexLayoutProvider,
   OrderUpdaterComponent,
   SharedProvider,
+  useCommonValuesContext,
   useFlexLayoutContext,
   useStrategyKey
 } from '../providers';
@@ -121,8 +122,29 @@ function SortableFlexInner({
   style,
   ...containerProps
 }: SortableFlexInnerProps) {
+  const { usesAbsoluteLayout } = useCommonValuesContext();
+
+  const animatedContainerStyle = useAnimatedStyle(() =>
+    usesAbsoluteLayout.value
+      ? {
+          // We need to override them to prevent react-native flex layout
+          // positioning from interfering with our absolute layout
+          alignContent: 'flex-start',
+          alignItems: 'flex-start',
+          flexDirection: 'row',
+          justifyContent: 'flex-start',
+          paddingBottom: 0,
+          paddingLeft: 0,
+          paddingRight: 0,
+          paddingTop: 0
+        }
+      : {}
+  );
+
   return (
-    <SortableContainer {...containerProps} style={style}>
+    <SortableContainer
+      {...containerProps}
+      style={[style, animatedContainerStyle]}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering ?? undefined}
