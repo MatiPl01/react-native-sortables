@@ -24,11 +24,7 @@ import type {
   ItemDragSettings,
   ReorderTriggerOrigin
 } from '../props/shared';
-import type {
-  AbsoluteLayoutState,
-  DragActivationState,
-  LayerState
-} from '../state';
+import type { DragActivationState, LayerState } from '../state';
 import type {
   AnimatedValues,
   AnyRecord,
@@ -94,7 +90,7 @@ export type CommonValuesContextType = ActiveItemValuesContextType &
     // OTHER
     containerRef: AnimatedRef<View>;
     sortEnabled: SharedValue<boolean>;
-    absoluteLayoutState: SharedValue<AbsoluteLayoutState>;
+    usesAbsoluteLayout: SharedValue<boolean>;
     shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
     animateLayoutOnReorderOnly: SharedValue<boolean>;
     customHandle: boolean;

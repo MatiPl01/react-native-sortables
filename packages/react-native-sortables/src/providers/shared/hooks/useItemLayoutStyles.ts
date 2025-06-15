@@ -7,7 +7,7 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import { AbsoluteLayoutState, type AnimatedStyleProp } from '../../../types';
+import { type AnimatedStyleProp } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
@@ -30,14 +30,14 @@ export default function useItemLayoutStyles(
   activationAnimationProgress: SharedValue<number>
 ): AnimatedStyleProp {
   const {
-    absoluteLayoutState,
     activeItemDropped,
     activeItemKey,
     activeItemPosition,
     animateLayoutOnReorderOnly,
     dropAnimationDuration,
     itemPositions,
-    shouldAnimateLayout
+    shouldAnimateLayout,
+    usesAbsoluteLayout
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
@@ -94,7 +94,7 @@ export default function useItemLayoutStyles(
   );
 
   return useAnimatedStyle(() => {
-    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
+    if (!usesAbsoluteLayout.value) {
       return RELATIVE_STYLE;
     }
 

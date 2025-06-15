@@ -21,11 +21,7 @@ import type {
   SortableCallbacks,
   Vector
 } from '../../types';
-import {
-  AbsoluteLayoutState,
-  DragActivationState,
-  LayerState
-} from '../../types';
+import { DragActivationState, LayerState } from '../../types';
 import {
   clearAnimatedTimeout,
   getKeyToIndex,
@@ -60,7 +56,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   overDrag
 }) => {
   const {
-    absoluteLayoutState,
     activationAnimationDuration,
     activationState,
     activeAnimationProgress,
@@ -86,7 +81,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     snapOffsetX,
     snapOffsetY,
     sortEnabled,
-    touchPosition
+    touchPosition,
+    usesAbsoluteLayout
   } = useCommonValuesContext();
   const { measureContainer } = useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
@@ -351,7 +347,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
-      if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
+      if (!usesAbsoluteLayout.value) {
         measureContainer();
       }
 
@@ -364,7 +360,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // Start handling touch after a delay to prevent accidental activation
       // e.g. while scrolling the ScrollView
       activationTimeoutId.value = setAnimatedTimeout(() => {
-        if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
+        if (!usesAbsoluteLayout.value) {
           return;
         }
 
@@ -386,7 +382,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }, dragActivationDelay.value);
     },
     [
-      absoluteLayoutState,
+      usesAbsoluteLayout,
       activeItemKey,
       activationState,
       activationTimeoutId,

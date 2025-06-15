@@ -22,7 +22,6 @@ import type {
   DropIndicatorSettings,
   Overflow
 } from '../../types';
-import { AbsoluteLayoutState } from '../../types';
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 import DropIndicator from './DropIndicator';
 
@@ -48,14 +47,14 @@ export default function SortableContainer({
   style
 }: AnimatedHeightContainerProps) {
   const {
-    absoluteLayoutState,
     activeItemDropped,
     activeItemKey,
     containerHeight,
     containerRef,
     containerWidth,
     controlledContainerDimensions,
-    shouldAnimateLayout
+    shouldAnimateLayout,
+    usesAbsoluteLayout
   } = useCommonValuesContext();
   const { handleHelperContainerMeasurement, measurementsContainerRef } =
     useMeasurementsContext();
@@ -64,7 +63,7 @@ export default function SortableContainer({
   const animateLayout = dimensionsAnimationType === 'layout';
 
   const outerContainerStyle = useAnimatedStyle(() => {
-    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
+    if (!usesAbsoluteLayout.value) {
       return EMPTY_OBJECT;
     }
 
@@ -92,7 +91,7 @@ export default function SortableContainer({
   }, [dimensionsAnimationType]);
 
   const innerContainerStyle = useAnimatedStyle(() => {
-    if (absoluteLayoutState.value !== AbsoluteLayoutState.COMPLETE) {
+    if (!usesAbsoluteLayout.value) {
       return EMPTY_OBJECT;
     }
 
@@ -110,7 +109,7 @@ export default function SortableContainer({
   });
 
   const animatedMeasurementsContainerStyle = useAnimatedStyle(() => {
-    if (absoluteLayoutState.value === AbsoluteLayoutState.PENDING) {
+    if (!usesAbsoluteLayout.value) {
       return EMPTY_OBJECT;
     }
 
