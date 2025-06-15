@@ -131,7 +131,12 @@ function SortableFlexInner({
           // positioning from interfering with our absolute layout
           alignContent: 'flex-start',
           alignItems: 'flex-start',
-          justifyContent: 'flex-start'
+          flexDirection: 'row',
+          justifyContent: 'flex-start',
+          paddingBottom: 0,
+          paddingLeft: 0,
+          paddingRight: 0,
+          paddingTop: 0
         }
       : {}
   );
