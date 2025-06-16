@@ -1,7 +1,7 @@
 {
   "name": "react-native-sortables",
   "description": "Powerful Sortable Components for Flexible Content Reordering in React Native",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "author": "Mateusz Łopaciński (https://github.com/MatiPl01)",
   "bugs": "https://github.com/MatiPl01/react-native-sortables/issues",
   "devDependencies": {

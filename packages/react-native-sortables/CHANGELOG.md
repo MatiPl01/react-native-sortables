@@ -1,3 +1,14 @@
+## [1.7.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.7.0...v1.7.1) (2025-06-16)
+
+
+### Bug Fixes
+
+* Flex layout issues ([#400](https://github.com/MatiPl01/react-native-sortables/issues/400)) ([891c0b3](https://github.com/MatiPl01/react-native-sortables/commit/891c0b385ed779b7548cdd8da029e09ea8cde61a))
+* Flex layout with custom alignmnets on web ([#401](https://github.com/MatiPl01/react-native-sortables/issues/401)) ([a74cb4b](https://github.com/MatiPl01/react-native-sortables/commit/a74cb4b313bc60125b27d62e39567940dccaf52d))
+* Invalid items animation on screen change ([#396](https://github.com/MatiPl01/react-native-sortables/issues/396)) ([3262064](https://github.com/MatiPl01/react-native-sortables/commit/3262064207d63ca3a251b15df685f6ffe358a4d2))
+* Items not animated before `sortEnabled` is set to `true` ([#398](https://github.com/MatiPl01/react-native-sortables/issues/398)) ([5ff360c](https://github.com/MatiPl01/react-native-sortables/commit/5ff360c765fcbf72feef260eb779e1e1456c0216))
+* Multi touch flickering issue ([#392](https://github.com/MatiPl01/react-native-sortables/issues/392)) ([6427c8d](https://github.com/MatiPl01/react-native-sortables/commit/6427c8dc370f20362facf945fa34af2e5a5c4585))
+
 # [1.7.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.6.0...v1.7.0) (2025-05-26)
 
 
