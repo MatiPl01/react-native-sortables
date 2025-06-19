@@ -3,7 +3,6 @@ import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import {
   useItemDecorationStyles,
-  usePortalContext,
   useTeleportedItemStyles
 } from '../../../providers';
 import type { AnimatedStyleProp } from '../../../types';
@@ -22,7 +21,6 @@ type TeleportedItemCellProps = Omit<
   activationAnimationProgress: SharedValue<number>;
   baseCellStyle: AnimatedStyleProp;
   isActive: SharedValue<boolean>;
-  teleportedItemId: string;
   itemKey: string;
 };
 
@@ -32,11 +30,8 @@ export default function TeleportedItemCell({
   children,
   isActive,
   itemKey,
-  itemsOverridesStyle,
-  teleportedItemId
+  itemsOverridesStyle
 }: TeleportedItemCellProps) {
-  const { notifyRendered } = usePortalContext() ?? {};
-
   const teleportedItemStyles = useTeleportedItemStyles(
     itemKey,
     isActive,
@@ -47,10 +42,6 @@ export default function TeleportedItemCell({
     isActive,
     activationAnimationProgress
   );
-
-  if (!notifyRendered) {
-    return null;
-  }
 
   return (
     <ItemCell

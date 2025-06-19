@@ -12,14 +12,12 @@ import {
 
 import { IS_WEB } from '../../../constants';
 import type { AnimatedStyleProp } from '../../../types';
-import { ItemPortalState } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
 export default function useItemDecorationStyles(
   itemKey: string,
   isActive: SharedValue<boolean>,
-  activationAnimationProgress: SharedValue<number>,
-  portalState?: SharedValue<ItemPortalState>
+  activationAnimationProgress: SharedValue<number>
 ): AnimatedStyleProp {
   const {
     activationAnimationDuration,
@@ -33,10 +31,6 @@ export default function useItemDecorationStyles(
   } = useCommonValuesContext();
 
   const adjustedInactiveProgress = useDerivedValue(() => {
-    if (portalState?.value === ItemPortalState.TELEPORTED) {
-      return 0;
-    }
-
     if (isActive.value || prevActiveItemKey.value === itemKey) {
       return withTiming(0, { duration: activationAnimationDuration.value });
     }

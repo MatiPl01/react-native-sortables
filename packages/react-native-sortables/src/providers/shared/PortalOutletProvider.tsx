@@ -1,28 +1,42 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useAnimatedRef } from 'react-native-reanimated';
+import type { MeasuredDimensions } from 'react-native-reanimated';
+import {
+  measure,
+  useAnimatedRef,
+  useSharedValue
+} from 'react-native-reanimated';
 
+import { useUIStableCallback } from '../../hooks';
 import type { PortalOutletContextType } from '../../types';
 import { createProvider } from '../utils';
-
-type PortalOutletProps = {
-  children: ReactNode;
-};
 
 const { PortalOutletProvider, usePortalOutletContext } = createProvider(
   'PortalOutlet',
   { guarded: false }
-)<PortalOutletProps, PortalOutletContextType>(({ children }) => {
+)<{ children: ReactNode }, PortalOutletContextType>(({ children }) => {
   const portalOutletRef = useAnimatedRef<View>();
+  const portalOutletMeasurements = useSharedValue<MeasuredDimensions | null>(
+    null
+  );
+
+  const measureOutlet = useUIStableCallback(() => {
+    'worklet';
+    portalOutletMeasurements.value = measure(portalOutletRef);
+  });
 
   return {
     children: (
-      <View collapsable={false} ref={portalOutletRef} style={styles.container}>
+      <View
+        collapsable={false}
+        ref={portalOutletRef}
+        style={styles.container}
+        onLayout={measureOutlet}>
         {children}
       </View>
     ),
     value: {
-      portalOutletRef
+      portalOutletMeasurements
     }
   };
 });
@@ -34,4 +48,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export { PortalOutletProvider, usePortalOutletContext };
+export { PortalOutletProvider as PortalOutlet, usePortalOutletContext };

@@ -8,11 +8,11 @@ import type {
   Vector
 } from '../../types';
 import { createProvider } from '../utils';
-import { PortalOutletProvider } from './PortalOutletProvider';
+import { PortalOutlet } from './PortalOutletProvider';
 
 type PortalProviderProps = {
   children: ReactNode;
-  enabled?: boolean;
+  enabled?: boolean; // TODO - fix
 };
 
 const { PortalProvider, usePortalContext } = createProvider('Portal', {
@@ -25,20 +25,10 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
 
   const activeItemAbsolutePosition = useSharedValue<null | Vector>(null);
 
-  const teleport = useCallback((id: string, node: React.ReactNode) => {
-    if (node) {
-      setTeleportedNodes(prev => {
-        const newState = { ...prev, [id]: node };
-        return newState;
-      });
-    } else {
-      setTeleportedNodes(prev => {
-        if (!prev[id]) return prev;
-        const newState = { ...prev };
-        delete newState[id];
-        return newState;
-      });
-    }
+  const notifySubscribers = useCallback((id: string, isTeleported: boolean) => {
+    subscribersRef.current[id]?.forEach(callback => {
+      callback(isTeleported);
+    });
   }, []);
 
   const subscribe = useCallback((id: string, callback: PortalSubscription) => {
@@ -49,34 +39,38 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     };
   }, []);
 
-  const notifySubscribers = useCallback((id: string, isTeleported: boolean) => {
-    subscribersRef.current[id]?.forEach(callback => {
-      callback(isTeleported);
-    });
-  }, []);
-
-  const notifyRendered = useCallback(
-    (id: string) => {
-      notifySubscribers(id, true);
+  const teleport = useCallback(
+    (id: string, node: React.ReactNode) => {
+      if (node) {
+        setTeleportedNodes(prev => ({ ...prev, [id]: node }));
+        notifySubscribers(id, true);
+      } else {
+        setTeleportedNodes(prev => {
+          const { [id]: _, ...rest } = prev;
+          return rest;
+        });
+        notifySubscribers(id, false);
+      }
     },
     [notifySubscribers]
   );
+
+  console.log('outlet', Object.values(teleportedNodes).length);
 
   return {
     children: (
       <Fragment>
         {children}
-        <PortalOutletProvider>
-          {Object.entries(teleportedNodes).map(([key, node]) => (
-            <Fragment key={key}>{node}</Fragment>
+        <PortalOutlet>
+          {Object.values(teleportedNodes).map((node, index) => (
+            <Fragment key={index}>{node}</Fragment>
           ))}
-        </PortalOutletProvider>
+        </PortalOutlet>
       </Fragment>
     ),
     enabled,
     value: {
       activeItemAbsolutePosition,
-      notifyRendered,
       subscribe,
       teleport
     }

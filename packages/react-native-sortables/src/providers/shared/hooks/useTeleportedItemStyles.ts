@@ -21,7 +21,7 @@ export default function useTeleportedItemStyles(
   activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
   const { activeItemAbsolutePosition } = usePortalContext()!;
-  const { portalOutletRef } = usePortalOutletContext()!;
+  const { portalOutletMeasurements } = usePortalOutletContext()!;
   const { activeItemKey, containerRef, itemPositions } =
     useCommonValuesContext();
 
@@ -78,6 +78,7 @@ export default function useTeleportedItemStyles(
     }),
     ({ active, position }) => {
       if (!active || !position) {
+        console.log('no position');
         return;
       }
 
@@ -87,25 +88,18 @@ export default function useTeleportedItemStyles(
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    const portalOutletMeasurements = measure(portalOutletRef);
-
-    if (
-      absoluteX.value === null ||
-      absoluteY.value === null ||
-      !portalOutletMeasurements
-    ) {
+    if (!portalOutletMeasurements.value) {
+      // This should never happen
       return { opacity: 0 };
     }
 
-    const dX = portalOutletMeasurements.pageX;
-    const dY = portalOutletMeasurements.pageY;
+    const { pageX, pageY } = portalOutletMeasurements.value;
+    const absX = absoluteX.value ?? activeItemAbsolutePosition.value?.x ?? 0;
+    const absY = absoluteY.value ?? activeItemAbsolutePosition.value?.y ?? 0;
 
     return {
       opacity: 1,
-      transform: [
-        { translateX: absoluteX.value - dX },
-        { translateY: absoluteY.value - dY }
-      ],
+      transform: [{ translateX: absX - pageX }, { translateY: absY - pageY }],
       zIndex: zIndex.value
     };
   });
