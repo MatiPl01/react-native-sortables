@@ -11,12 +11,12 @@ import { componentWithRef } from '../../utils/react';
  * (onLayout is called with 0 dimensions for views which have display: none,
  * so it gets called on navigation between screens)
  */
-const AnimatedViewWeb = componentWithRef<
+const AnimatedOnLayoutView = componentWithRef<
   View,
   Omit<AnimatedProps<ViewProps>, 'onLayout'> & {
-    onLayout?: ViewProps['onLayout'];
+    onLayout: ViewProps['onLayout'];
   }
->(function AnimatedViewWeb({ onLayout, ...rest }, ref) {
+>(function AnimatedOnLayoutView({ onLayout, ...rest }, ref) {
   return (
     <Animated.View
       {...rest}
@@ -33,4 +33,4 @@ const AnimatedViewWeb = componentWithRef<
   );
 });
 
-export default IS_WEB ? AnimatedViewWeb : Animated.View;
+export default IS_WEB ? AnimatedOnLayoutView : Animated.View;

@@ -1,4 +1,6 @@
-import type { SharedValue } from 'react-native-reanimated';
+import type { PropsWithChildren } from 'react';
+import type { ViewStyle } from 'react-native';
+import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import {
@@ -6,23 +8,15 @@ import {
   useTeleportedItemStyles
 } from '../../../providers';
 import type { AnimatedStyleProp } from '../../../types';
-import type { ItemCellProps } from './ItemCell';
 import ItemCell from './ItemCell';
 
-type TeleportedItemCellProps = Omit<
-  ItemCellProps,
-  | 'cellStyle'
-  | 'decorationStyles'
-  | 'entering'
-  | 'exiting'
-  | 'layout'
-  | 'onMeasure'
-> & {
+type TeleportedItemCellProps = PropsWithChildren<{
+  itemsOverridesStyle: AnimatedStyle<ViewStyle>;
   activationAnimationProgress: SharedValue<number>;
   baseCellStyle: AnimatedStyleProp;
   isActive: SharedValue<boolean>;
   itemKey: string;
-};
+}>;
 
 export default function TeleportedItemCell({
   activationAnimationProgress,

@@ -3,11 +3,11 @@ import { StyleSheet, View } from 'react-native';
 import type { MeasuredDimensions } from 'react-native-reanimated';
 import {
   measure,
+  runOnUI,
   useAnimatedRef,
   useSharedValue
 } from 'react-native-reanimated';
 
-import { useUIStableCallback } from '../../hooks';
 import type { PortalOutletContextType } from '../../types';
 import { createProvider } from '../utils';
 
@@ -20,18 +20,15 @@ const { PortalOutletProvider, usePortalOutletContext } = createProvider(
     null
   );
 
-  const measureOutlet = useUIStableCallback(() => {
-    'worklet';
-    portalOutletMeasurements.value = measure(portalOutletRef);
-  });
-
   return {
     children: (
       <View
         collapsable={false}
         ref={portalOutletRef}
         style={styles.container}
-        onLayout={measureOutlet}>
+        onLayout={runOnUI(() => {
+          portalOutletMeasurements.value = measure(portalOutletRef);
+        })}>
         {children}
       </View>
     ),
@@ -48,4 +45,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export { PortalOutletProvider as PortalOutlet, usePortalOutletContext };
+export { PortalOutletProvider, usePortalOutletContext };

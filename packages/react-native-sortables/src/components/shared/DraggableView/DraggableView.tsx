@@ -40,9 +40,9 @@ function DraggableView({
   ...layoutAnimations
 }: DraggableViewProps) {
   const portalContext = usePortalContext();
+  const commonValuesContext = useCommonValuesContext();
   const { handleItemMeasurement, removeItemMeasurements } =
     useMeasurementsContext();
-  const commonValuesContext = useCommonValuesContext();
   const { activeItemKey, componentId, customHandle, itemsOverridesStyle } =
     commonValuesContext;
 
@@ -60,9 +60,7 @@ function DraggableView({
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
   useEffect(() => {
-    return () => {
-      removeItemMeasurements(key);
-    };
+    return () => removeItemMeasurements(key);
   }, [key, removeItemMeasurements, teleportedItemId]);
 
   const withItemContext = (component: ReactNode) => (

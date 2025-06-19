@@ -1,5 +1,5 @@
-import { type PropsWithChildren } from 'react';
-import { type ViewStyle } from 'react-native';
+import type { PropsWithChildren } from 'react';
+import type { LayoutChangeEvent, ViewStyle } from 'react-native';
 import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
 
@@ -28,23 +28,23 @@ export default function ItemCell({
   itemsOverridesStyle,
   onMeasure
 }: ItemCellProps) {
+  const maybeOnLayout = onMeasure
+    ? ({
+        nativeEvent: {
+          layout: { height, width }
+        }
+      }: LayoutChangeEvent) => {
+        onMeasure(width, height);
+      }
+    : undefined;
+
   return (
     <Animated.View style={cellStyle}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
         style={[itemsOverridesStyle, decorationStyles]}
-        onLayout={
-          onMeasure
-            ? ({
-                nativeEvent: {
-                  layout: { height, width }
-                }
-              }) => {
-                onMeasure(width, height);
-              }
-            : undefined
-        }>
+        onLayout={maybeOnLayout}>
         {children}
       </AnimatedOnLayoutView>
     </Animated.View>
