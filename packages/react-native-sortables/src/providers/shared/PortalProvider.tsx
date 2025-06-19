@@ -36,8 +36,8 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
       <Fragment>
         {children}
         <PortalOutletProvider>
-          {Object.values(teleportedNodes).map((node, index) => (
-            <Fragment key={index}>{node}</Fragment>
+          {Object.entries(teleportedNodes).map(([id, node]) => (
+            <Fragment key={id}>{node}</Fragment>
           ))}
         </PortalOutletProvider>
       </Fragment>
