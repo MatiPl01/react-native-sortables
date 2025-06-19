@@ -184,14 +184,12 @@ export type PortalSubscription = (isTeleported: boolean) => void;
 export type PortalContextType = {
   activeItemAbsolutePosition: SharedValue<null | Vector>;
   teleport: (id: string, node: ReactNode) => void;
-  subscribe: (id: string, callback: PortalSubscription) => () => void;
-  notifyRendered: (id: string) => void;
 };
 
 // PORTAL OUTLET
 
 export type PortalOutletContextType = {
-  portalOutletRef: AnimatedRef<View>;
+  portalOutletMeasurements: SharedValue<MeasuredDimensions | null>;
 };
 
 // DEBUG

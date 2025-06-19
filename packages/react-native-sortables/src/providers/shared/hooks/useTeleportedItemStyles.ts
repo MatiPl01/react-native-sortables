@@ -6,6 +6,7 @@ import {
   measure,
   useAnimatedReaction,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue
 } from 'react-native-reanimated';
 
@@ -21,90 +22,65 @@ export default function useTeleportedItemStyles(
   activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
   const { activeItemAbsolutePosition } = usePortalContext()!;
-  const { portalOutletRef } = usePortalOutletContext()!;
-  const { activeItemKey, containerRef, itemPositions } =
-    useCommonValuesContext();
+  const { portalOutletMeasurements } = usePortalOutletContext()!;
+  const { containerRef, itemPositions } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
   const dropStartTranslation = useSharedValue<null | Vector>(null);
 
-  const absoluteX = useSharedValue<null | number>(null);
-  const absoluteY = useSharedValue<null | number>(null);
-
   // Inactive item updater (for drop animation)
   useAnimatedReaction(
     () => ({
-      activationProgress: activationAnimationProgress.value,
-      active: isActive.value,
-      position: itemPositions.value[key]
+      active: isActive.value
     }),
-    ({ activationProgress, active, position }) => {
-      if (
-        active ||
-        !position ||
-        !activationProgress ||
-        absoluteX.value === null ||
-        absoluteY.value === null
-      ) {
-        dropStartTranslation.value = null;
-        return;
+    ({ active }) => {
+      if (!active) {
+        dropStartTranslation.value = activeItemAbsolutePosition.value;
       }
+    }
+  );
+
+  const absoluteItemPosition = useDerivedValue(() => {
+    let absolutePosition: null | Vector = null;
+
+    if (isActive.value) {
+      absolutePosition = activeItemAbsolutePosition.value;
+    } else if (dropStartTranslation.value) {
+      const animate = (from: number, to: number) =>
+        interpolate(activationAnimationProgress.value, [1, 0], [from, to]);
+      const { x: startX, y: startY } = dropStartTranslation.value;
 
       const containerMeasurements = measure(containerRef);
-      if (!containerMeasurements) {
-        return;
+      const itemPosition = itemPositions.value[key];
+
+      if (!containerMeasurements || !itemPosition) {
+        // This should never happen
+        return null;
       }
 
-      // Drop animation
-      dropStartTranslation.value ??= {
-        x: absoluteX.value,
-        y: absoluteY.value
+      absolutePosition = {
+        x: animate(startX, containerMeasurements.pageX + itemPosition.x),
+        y: animate(startY, containerMeasurements.pageY + itemPosition.y)
       };
-
-      const animate = (from: number, to: number) =>
-        interpolate(activationProgress, [1, 0], [from, to]);
-
-      const { x, y } = dropStartTranslation.value;
-      absoluteX.value = animate(x, containerMeasurements.pageX + position.x);
-      absoluteY.value = animate(y, containerMeasurements.pageY + position.y);
     }
-  );
 
-  // Active item updater
-  useAnimatedReaction(
-    () => ({
-      active: activeItemKey.value === key,
-      position: activeItemAbsolutePosition.value
-    }),
-    ({ active, position }) => {
-      if (!active || !position) {
-        return;
-      }
-
-      absoluteX.value = position.x;
-      absoluteY.value = position.y;
-    }
-  );
+    return absolutePosition;
+  });
 
   const animatedStyle = useAnimatedStyle(() => {
-    const portalOutletMeasurements = measure(portalOutletRef);
-
-    if (
-      absoluteX.value === null ||
-      absoluteY.value === null ||
-      !portalOutletMeasurements
-    ) {
+    if (!portalOutletMeasurements.value || !absoluteItemPosition.value) {
+      // This should never happen
       return { opacity: 0 };
     }
 
-    const dX = portalOutletMeasurements.pageX;
-    const dY = portalOutletMeasurements.pageY;
+    const { pageX: outletX, pageY: outletY } = portalOutletMeasurements.value;
+    const { x: itemX, y: itemY } = absoluteItemPosition.value;
 
     return {
       opacity: 1,
       transform: [
-        { translateX: absoluteX.value - dX },
-        { translateY: absoluteY.value - dY }
+        { translateX: itemX - outletX },
+        { translateY: itemY - outletY }
       ],
       zIndex: zIndex.value
     };

@@ -12,16 +12,14 @@ import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
 const RELATIVE_STYLE: ViewStyle = {
-  opacity: 1,
   position: 'relative',
   transform: [],
   zIndex: 0
 };
 
-const NO_TRANSLATION_STYLE: ViewStyle = {
-  ...RELATIVE_STYLE,
-  opacity: 0,
+const HIDDEN_STYLE: ViewStyle = {
   position: 'absolute',
+  transform: [{ scale: 0 }],
   zIndex: -1
 };
 
@@ -99,11 +97,10 @@ export default function useItemLayoutStyles(
     }
 
     if (translateX.value === null || translateY.value === null) {
-      return NO_TRANSLATION_STYLE;
+      return HIDDEN_STYLE;
     }
 
     return {
-      opacity: 1,
       position: 'absolute',
       transform: [
         { translateX: translateX.value },

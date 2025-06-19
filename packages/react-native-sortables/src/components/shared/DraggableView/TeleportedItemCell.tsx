@@ -1,25 +1,22 @@
-import type { SharedValue } from 'react-native-reanimated';
+import type { PropsWithChildren } from 'react';
+import type { ViewStyle } from 'react-native';
+import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import {
   useItemDecorationStyles,
-  usePortalContext,
   useTeleportedItemStyles
 } from '../../../providers';
 import type { AnimatedStyleProp } from '../../../types';
-import type { ItemCellProps } from './ItemCell';
 import ItemCell from './ItemCell';
 
-type TeleportedItemCellProps = Omit<
-  ItemCellProps,
-  'cellStyle' | 'decorationStyles' | 'entering' | 'exiting' | 'layout'
-> & {
+type TeleportedItemCellProps = PropsWithChildren<{
+  itemsOverridesStyle: AnimatedStyle<ViewStyle>;
   activationAnimationProgress: SharedValue<number>;
   baseCellStyle: AnimatedStyleProp;
   isActive: SharedValue<boolean>;
-  teleportedItemId: string;
   itemKey: string;
-};
+}>;
 
 export default function TeleportedItemCell({
   activationAnimationProgress,
@@ -27,12 +24,8 @@ export default function TeleportedItemCell({
   children,
   isActive,
   itemKey,
-  itemsOverridesStyle,
-  onMeasure,
-  teleportedItemId
+  itemsOverridesStyle
 }: TeleportedItemCellProps) {
-  const { notifyRendered } = usePortalContext() ?? {};
-
   const teleportedItemStyles = useTeleportedItemStyles(
     itemKey,
     isActive,
@@ -44,23 +37,11 @@ export default function TeleportedItemCell({
     activationAnimationProgress
   );
 
-  if (!notifyRendered) {
-    return null;
-  }
-
   return (
     <ItemCell
       cellStyle={[baseCellStyle, teleportedItemStyles]}
       decorationStyles={decorationStyles}
-      itemsOverridesStyle={itemsOverridesStyle}
-      onMeasure={(width, height) => {
-        onMeasure(width, height);
-        // Mark the teleported item as rendered only after it appeared
-        // on the screen and its layout calculation is completed
-        // (see useTeleportedItemStyles in which we set display property
-        // to 'none' when the animated style is not ready)
-        notifyRendered(teleportedItemId);
-      }}>
+      itemsOverridesStyle={itemsOverridesStyle}>
       <LayoutAnimationConfig skipEntering>{children}</LayoutAnimationConfig>
     </ItemCell>
   );

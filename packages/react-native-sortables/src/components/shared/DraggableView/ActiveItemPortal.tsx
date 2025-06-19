@@ -1,68 +1,58 @@
-import type { PropsWithChildren, ReactNode } from 'react';
-import { useEffect } from 'react';
-import type { SharedValue } from 'react-native-reanimated';
-import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
+import { type PropsWithChildren, type ReactNode, useEffect } from 'react';
+import {
+  runOnJS,
+  type SharedValue,
+  useAnimatedReaction,
+  useSharedValue
+} from 'react-native-reanimated';
 
 import { usePortalContext } from '../../../providers';
-import { ItemPortalState } from '../../../types';
 
 type ActiveItemPortalProps = PropsWithChildren<{
   teleportedItemId: string;
   activationAnimationProgress: SharedValue<number>;
-  portalState: SharedValue<ItemPortalState>;
   renderTeleportedItemCell: () => ReactNode;
+  setIsTeleported: (isTeleported: boolean) => void;
 }>;
 
 export default function ActiveItemPortal({
   activationAnimationProgress,
   children,
-  portalState,
   renderTeleportedItemCell,
+  setIsTeleported,
   teleportedItemId
 }: ActiveItemPortalProps) {
-  const { subscribe, teleport } = usePortalContext()!;
+  const { teleport } = usePortalContext()!;
+  const teleportEnabled = useSharedValue(false);
 
   useEffect(() => {
-    const unsubscribe = subscribe(teleportedItemId, teleported => {
-      if (teleported) {
-        portalState.value = ItemPortalState.TELEPORTED;
-      }
-    });
-
-    return () => {
-      unsubscribe();
-      teleport(teleportedItemId, null);
-    };
-  }, [portalState, subscribe, teleport, teleportedItemId]);
-
-  useEffect(() => {
-    if (portalState.value === ItemPortalState.TELEPORTED) {
-      // Renders a component in the portal outlet
+    if (teleportEnabled.value) {
       teleport(teleportedItemId, renderTeleportedItemCell());
     }
-  }, [
-    portalState,
-    teleportedItemId,
-    renderTeleportedItemCell,
-    teleport,
-    children
-  ]);
+    // This is fine, we want to update the teleported item cell only when
+    // the children change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [children]);
 
   const enableTeleport = () => {
     teleport(teleportedItemId, renderTeleportedItemCell());
+    setIsTeleported(true);
+  };
+
+  const disableTeleport = () => {
+    runOnJS(teleport)(teleportedItemId, null);
+    setIsTeleported(false);
   };
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,
     progress => {
-      if (progress > 0 && portalState.value === ItemPortalState.IDLE) {
-        portalState.value = ItemPortalState.TELEPORTING;
+      if (progress > 0 && !teleportEnabled.value) {
+        teleportEnabled.value = true;
         runOnJS(enableTeleport)();
-      } else if (
-        progress === 0 &&
-        portalState.value === ItemPortalState.TELEPORTED
-      ) {
-        portalState.value = ItemPortalState.EXITING;
+      } else if (progress === 0 && teleportEnabled.value) {
+        teleportEnabled.value = false;
+        runOnJS(disableTeleport)();
       }
     }
   );
