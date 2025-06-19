@@ -12,7 +12,7 @@ import { PortalOutlet } from './PortalOutletProvider';
 
 type PortalProviderProps = {
   children: ReactNode;
-  enabled?: boolean; // TODO - fix
+  enabled?: boolean;
 };
 
 const { PortalProvider, usePortalContext } = createProvider('Portal', {
@@ -54,8 +54,6 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     },
     [notifySubscribers]
   );
-
-  console.log('outlet', Object.values(teleportedNodes).length);
 
   return {
     children: (
