@@ -14,7 +14,7 @@ import { componentWithRef } from '../../utils/react';
 const AnimatedViewWeb = componentWithRef<
   View,
   Omit<AnimatedProps<ViewProps>, 'onLayout'> & {
-    onLayout: NonNullable<ViewProps['onLayout']>;
+    onLayout?: ViewProps['onLayout'];
   }
 >(function AnimatedViewWeb({ onLayout, ...rest }, ref) {
   return (
@@ -26,7 +26,7 @@ const AnimatedViewWeb = componentWithRef<
         // We want to call onLayout only for displayed views to prevent
         // layout updates on navigation between screens
         if (el?.offsetParent) {
-          onLayout(e);
+          onLayout?.(e);
         }
       }}
     />

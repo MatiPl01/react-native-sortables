@@ -20,8 +20,7 @@ import {
 import {
   type AnimatedStyleProp,
   ItemPortalState,
-  type LayoutAnimation,
-  type MeasureCallback
+  type LayoutAnimation
 } from '../../../types';
 import { getContextProvider } from '../../../utils';
 import ActiveItemPortal from './ActiveItemPortal';
@@ -44,9 +43,9 @@ function DraggableView({
   ...layoutAnimations
 }: DraggableViewProps) {
   const portalContext = usePortalContext();
-  const commonValuesContext = useCommonValuesContext();
   const { handleItemMeasurement, removeItemMeasurements } =
     useMeasurementsContext();
+  const commonValuesContext = useCommonValuesContext();
   const { activeItemKey, componentId, customHandle, itemsOverridesStyle } =
     commonValuesContext;
 
@@ -76,14 +75,16 @@ function DraggableView({
     </ItemContextProvider>
   );
 
-  const renderItemCell = (onMeasure: MeasureCallback) => {
+  const renderItemCell = () => {
     const innerComponent = (
       <ItemCell
         {...layoutAnimations}
         cellStyle={[style, layoutStyles]}
         decorationStyles={decorationStyles}
         itemsOverridesStyle={itemsOverridesStyle}
-        onMeasure={onMeasure}>
+        onMeasure={(width, height) =>
+          handleItemMeasurement(key, { height, width })
+        }>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}
         </LayoutAnimationConfig>
@@ -104,26 +105,12 @@ function DraggableView({
   // NORMAL CASE (no portal)
 
   if (!portalContext) {
-    return renderItemCell((width, height) =>
-      handleItemMeasurement(key, { height, width })
-    );
+    return renderItemCell();
   }
 
   // PORTAL CASE
 
   const teleportedItemId = `${componentId}-${key}`;
-
-  const onMeasureItem = (width: number, height: number) => {
-    const state = portalState.value;
-    if (state === ItemPortalState.EXITING) {
-      if (height > 0 && width > 0) {
-        portalContext.teleport(teleportedItemId, null);
-        portalState.value = ItemPortalState.IDLE;
-      }
-    } else if (state !== ItemPortalState.TELEPORTED) {
-      handleItemMeasurement(key, { height, width });
-    }
-  };
 
   const renderTeleportedItemCell = () => (
     // We have to wrap the TeleportedItemCell in context providers as they won't
@@ -136,8 +123,7 @@ function DraggableView({
           isActive={isActive}
           itemKey={key}
           itemsOverridesStyle={itemsOverridesStyle}
-          teleportedItemId={teleportedItemId}
-          onMeasure={onMeasureItem}>
+          teleportedItemId={teleportedItemId}>
           {children}
         </TeleportedItemCell>
       )}
@@ -146,7 +132,7 @@ function DraggableView({
 
   return (
     <Fragment>
-      {renderItemCell(onMeasureItem)}
+      {renderItemCell()}
       <ActiveItemPortal
         activationAnimationProgress={activationAnimationProgress}
         portalState={portalState}

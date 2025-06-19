@@ -1,10 +1,23 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import { useEffect } from 'react';
+import { Platform, type ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
 import { usePortalContext } from '../../../providers';
-import { ItemPortalState } from '../../../types';
+import type { ItemPortalState } from '../../../types';
+
+const TELEPORTED_ITEM_STYLE: ViewStyle = {
+  maxHeight: 0,
+  opacity: 0,
+  ...Platform.select({
+    android: {
+      elevation: 0
+    },
+    default: {},
+    native: {
+      shadowOpacity: 0
+    }
+  })
+};
 
 type ActiveItemPortalProps = PropsWithChildren<{
   teleportedItemId: string;
@@ -17,55 +30,55 @@ export default function ActiveItemPortal({
   activationAnimationProgress,
   children,
   portalState,
-  renderTeleportedItemCell,
+  renderItemCell,
   teleportedItemId
 }: ActiveItemPortalProps) {
   const { subscribe, teleport } = usePortalContext()!;
 
-  useEffect(() => {
-    const unsubscribe = subscribe(teleportedItemId, teleported => {
-      if (teleported) {
-        portalState.value = ItemPortalState.TELEPORTED;
-      }
-    });
+  // useEffect(() => {
+  //   const unsubscribe = subscribe(teleportedItemId, teleported => {
+  //     if (teleported) {
+  //       portalState.value = ItemPortalState.TELEPORTED;
+  //     }
+  //   });
 
-    return () => {
-      unsubscribe();
-      teleport(teleportedItemId, null);
-    };
-  }, [portalState, subscribe, teleport, teleportedItemId]);
+  //   return () => {
+  //     unsubscribe();
+  //     teleport(teleportedItemId, null);
+  //   };
+  // }, [portalState, subscribe, teleport, teleportedItemId]);
 
-  useEffect(() => {
-    if (portalState.value === ItemPortalState.TELEPORTED) {
-      // Renders a component in the portal outlet
-      teleport(teleportedItemId, renderTeleportedItemCell());
-    }
-  }, [
-    portalState,
-    teleportedItemId,
-    renderTeleportedItemCell,
-    teleport,
-    children
-  ]);
+  // useEffect(() => {
+  //   if (portalState.value === ItemPortalState.TELEPORTED) {
+  //     // Renders a component in the portal outlet
+  //     teleport(teleportedItemId, renderTeleportedItemCell());
+  //   }
+  // }, [
+  //   portalState,
+  //   teleportedItemId,
+  //   renderTeleportedItemCell,
+  //   teleport,
+  //   children
+  // ]);
 
-  const enableTeleport = () => {
-    teleport(teleportedItemId, renderTeleportedItemCell());
-  };
+  // const enableTeleport = () => {
+  //   teleport(teleportedItemId, renderTeleportedItemCell());
+  // };
 
-  useAnimatedReaction(
-    () => activationAnimationProgress.value,
-    progress => {
-      if (progress > 0 && portalState.value === ItemPortalState.IDLE) {
-        portalState.value = ItemPortalState.TELEPORTING;
-        runOnJS(enableTeleport)();
-      } else if (
-        progress === 0 &&
-        portalState.value === ItemPortalState.TELEPORTED
-      ) {
-        portalState.value = ItemPortalState.EXITING;
-      }
-    }
-  );
+  // useAnimatedReaction(
+  //   () => activationAnimationProgress.value,
+  //   progress => {
+  //     if (progress > 0 && portalState.value === ItemPortalState.IDLE) {
+  //       portalState.value = ItemPortalState.TELEPORTING;
+  //       runOnJS(enableTeleport)();
+  //     } else if (
+  //       progress === 0 &&
+  //       portalState.value === ItemPortalState.TELEPORTED
+  //     ) {
+  //       portalState.value = ItemPortalState.EXITING;
+  //     }
+  //   }
+  // );
 
   return null;
 }

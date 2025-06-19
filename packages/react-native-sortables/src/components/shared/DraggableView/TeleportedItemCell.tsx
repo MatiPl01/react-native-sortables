@@ -12,7 +12,12 @@ import ItemCell from './ItemCell';
 
 type TeleportedItemCellProps = Omit<
   ItemCellProps,
-  'cellStyle' | 'decorationStyles' | 'entering' | 'exiting' | 'layout'
+  | 'cellStyle'
+  | 'decorationStyles'
+  | 'entering'
+  | 'exiting'
+  | 'layout'
+  | 'onMeasure'
 > & {
   activationAnimationProgress: SharedValue<number>;
   baseCellStyle: AnimatedStyleProp;
@@ -28,7 +33,6 @@ export default function TeleportedItemCell({
   isActive,
   itemKey,
   itemsOverridesStyle,
-  onMeasure,
   teleportedItemId
 }: TeleportedItemCellProps) {
   const { notifyRendered } = usePortalContext() ?? {};
@@ -52,15 +56,7 @@ export default function TeleportedItemCell({
     <ItemCell
       cellStyle={[baseCellStyle, teleportedItemStyles]}
       decorationStyles={decorationStyles}
-      itemsOverridesStyle={itemsOverridesStyle}
-      onMeasure={(width, height) => {
-        onMeasure(width, height);
-        // Mark the teleported item as rendered only after it appeared
-        // on the screen and its layout calculation is completed
-        // (see useTeleportedItemStyles in which we set display property
-        // to 'none' when the animated style is not ready)
-        notifyRendered(teleportedItemId);
-      }}>
+      itemsOverridesStyle={itemsOverridesStyle}>
       <LayoutAnimationConfig skipEntering>{children}</LayoutAnimationConfig>
     </ItemCell>
   );

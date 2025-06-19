@@ -14,7 +14,7 @@ export type ItemCellProps = PropsWithChildren<{
   decorationStyles: AnimatedStyleProp;
   itemsOverridesStyle: AnimatedStyle<ViewStyle>;
   cellStyle: AnimatedStyleProp;
-  onMeasure: MeasureCallback;
+  onMeasure?: MeasureCallback;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
 }>;
@@ -34,13 +34,17 @@ export default function ItemCell({
         entering={entering}
         exiting={exiting}
         style={[itemsOverridesStyle, decorationStyles]}
-        onLayout={({
-          nativeEvent: {
-            layout: { height, width }
-          }
-        }) => {
-          onMeasure(width, height);
-        }}>
+        onLayout={
+          onMeasure
+            ? ({
+                nativeEvent: {
+                  layout: { height, width }
+                }
+              }) => {
+                onMeasure(width, height);
+              }
+            : undefined
+        }>
         {children}
       </AnimatedOnLayoutView>
     </Animated.View>
