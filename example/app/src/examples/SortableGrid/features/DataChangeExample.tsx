@@ -150,7 +150,7 @@ export default function DataChangeExample() {
               columns={COLUMNS}
               data={data}
               dimensionsAnimationType='worklet'
-              dropAnimationDuration={3000}
+              dropAnimationDuration={6000}
               renderItem={renderItem}
               rowGap={spacing.xs}
               scrollableRef={scrollableRef}

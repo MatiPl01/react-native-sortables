@@ -53,10 +53,10 @@ export default function useItemLayoutStyles(
     () => ({
       activationProgress: activationAnimationProgress.value,
       isActive: activeItemKey.value === key,
-      position: itemPositions.value[key]
+      itemPosition: itemPositions.value[key]
     }),
-    ({ activationProgress, isActive, position }, prev) => {
-      if (isActive || !position) {
+    ({ activationProgress, isActive, itemPosition }, prev) => {
+      if (isActive || !itemPosition) {
         dropStartValues.value = null;
         return;
       }
@@ -70,13 +70,14 @@ export default function useItemLayoutStyles(
           activeItemDropped.value)
       ) {
         // No animation case
-        translateX.value = position.x;
-        translateY.value = position.y;
+        translateX.value = itemPosition.x;
+        translateY.value = itemPosition.y;
       } else if (activationProgress > 0) {
         // Drop animation case
         if (
           !dropStartValues.value ||
-          (prev?.position && areVectorsDifferent(prev.position, position))
+          (prev?.itemPosition &&
+            areVectorsDifferent(prev.itemPosition, itemPosition))
         ) {
           dropStartValues.value = {
             position: {
@@ -94,12 +95,12 @@ export default function useItemLayoutStyles(
         const animate = (from: number, to: number) =>
           interpolate(activationProgress, [progress, 0], [from, to]);
 
-        translateX.value = animate(x, position.x);
-        translateY.value = animate(y, position.y);
+        translateX.value = animate(x, itemPosition.x);
+        translateY.value = animate(y, itemPosition.y);
       } else {
         // Order change animation case
-        translateX.value = withTiming(position.x);
-        translateY.value = withTiming(position.y);
+        translateX.value = withTiming(itemPosition.x);
+        translateY.value = withTiming(itemPosition.y);
       }
     }
   );
