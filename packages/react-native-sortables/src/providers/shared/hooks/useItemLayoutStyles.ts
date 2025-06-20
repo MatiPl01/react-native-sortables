@@ -1,13 +1,15 @@
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
+  interpolate,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
 
-import { type AnimatedStyleProp } from '../../../types';
+import type { AnimatedStyleProp, Vector } from '../../../types';
+import { areVectorsDifferent } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
@@ -32,13 +34,16 @@ export default function useItemLayoutStyles(
     activeItemKey,
     activeItemPosition,
     animateLayoutOnReorderOnly,
-    dropAnimationDuration,
     itemPositions,
     shouldAnimateLayout,
     usesAbsoluteLayout
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
+  const dropStartValues = useSharedValue<null | {
+    position: Vector;
+    progress: number;
+  }>(null);
 
   const translateX = useSharedValue<null | number>(null);
   const translateY = useSharedValue<null | number>(null);
@@ -46,11 +51,13 @@ export default function useItemLayoutStyles(
   // Inactive item updater
   useAnimatedReaction(
     () => ({
+      activationProgress: activationAnimationProgress.value,
       isActive: activeItemKey.value === key,
       position: itemPositions.value[key]
     }),
-    ({ isActive, position }) => {
+    ({ activationProgress, isActive, position }, prev) => {
       if (isActive || !position) {
+        dropStartValues.value = null;
         return;
       }
 
@@ -58,19 +65,41 @@ export default function useItemLayoutStyles(
         translateX.value === null ||
         translateY.value === null ||
         !shouldAnimateLayout.value ||
-        (activeItemKey.value === null &&
-          animateLayoutOnReorderOnly.value &&
+        (animateLayoutOnReorderOnly.value &&
+          activationProgress === 0 &&
           activeItemDropped.value)
       ) {
+        // No animation case
         translateX.value = position.x;
         translateY.value = position.y;
+      } else if (activationProgress > 0) {
+        // Drop animation case
+        if (
+          !dropStartValues.value ||
+          (prev?.position && areVectorsDifferent(prev.position, position))
+        ) {
+          dropStartValues.value = {
+            position: {
+              x: translateX.value,
+              y: translateY.value
+            },
+            progress: activationProgress
+          };
+        }
+
+        const {
+          position: { x, y },
+          progress
+        } = dropStartValues.value;
+        const animate = (from: number, to: number) =>
+          interpolate(activationProgress, [progress, 0], [from, to]);
+
+        translateX.value = animate(x, position.x);
+        translateY.value = animate(y, position.y);
       } else {
-        translateX.value = withTiming(position.x, {
-          duration: dropAnimationDuration.value
-        });
-        translateY.value = withTiming(position.y, {
-          duration: dropAnimationDuration.value
-        });
+        // Order change animation case
+        translateX.value = withTiming(position.x);
+        translateY.value = withTiming(position.y);
       }
     }
   );

@@ -340,7 +340,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         // if the current item is still animated to the drag end position
         // or sorting is disabled at all
         !sortEnabled.value ||
-        activationAnimationProgress.value > 0 ||
         activeItemKey.value !== null
       ) {
         fail();

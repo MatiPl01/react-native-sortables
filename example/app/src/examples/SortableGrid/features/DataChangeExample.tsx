@@ -20,7 +20,7 @@ const COLUMNS = 4;
 
 export default function DataChangeExample() {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
-  const [data, setData] = useState(AVAILABLE_DATA.slice(0, 12));
+  const [data, setData] = useState(AVAILABLE_DATA.slice(0, 2));
 
   const getNewItemName = useCallback((currentData: Array<string>) => {
     if (currentData.length >= AVAILABLE_DATA.length) {
@@ -150,13 +150,13 @@ export default function DataChangeExample() {
               columns={COLUMNS}
               data={data}
               dimensionsAnimationType='worklet'
+              dropAnimationDuration={3000}
               renderItem={renderItem}
               rowGap={spacing.xs}
               scrollableRef={scrollableRef}
               hapticsEnabled
               onDragEnd={({ data: newData }) => setData(newData)}
             />
-
             <Group withMargin={false} bordered center>
               <Text style={styles.title}>Below Sortable.Grid</Text>
             </Group>
