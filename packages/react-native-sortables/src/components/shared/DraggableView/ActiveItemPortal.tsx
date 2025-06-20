@@ -12,14 +12,12 @@ type ActiveItemPortalProps = PropsWithChildren<{
   teleportedItemId: string;
   activationAnimationProgress: SharedValue<number>;
   renderTeleportedItemCell: () => ReactNode;
-  setIsTeleported: (isTeleported: boolean) => void;
 }>;
 
 export default function ActiveItemPortal({
   activationAnimationProgress,
   children,
   renderTeleportedItemCell,
-  setIsTeleported,
   teleportedItemId
 }: ActiveItemPortalProps) {
   const { teleport } = usePortalContext()!;
@@ -36,18 +34,16 @@ export default function ActiveItemPortal({
 
   const enableTeleport = () => {
     teleport(teleportedItemId, renderTeleportedItemCell());
-    setIsTeleported(true);
   };
 
   const disableTeleport = () => {
     runOnJS(teleport)(teleportedItemId, null);
-    setIsTeleported(false);
   };
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,
-    progress => {
-      if (progress > 0 && !teleportEnabled.value) {
+    (progress, prevProgress) => {
+      if (prevProgress && progress > prevProgress && !teleportEnabled.value) {
         teleportEnabled.value = true;
         runOnJS(enableTeleport)();
       } else if (progress === 0 && teleportEnabled.value) {

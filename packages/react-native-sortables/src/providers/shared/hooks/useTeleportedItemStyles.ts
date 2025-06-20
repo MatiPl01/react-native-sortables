@@ -55,11 +55,11 @@ export default function useTeleportedItemStyles(
   );
 
   const absoluteItemPosition = useDerivedValue(() => {
-    let absolutePosition: null | Vector = null;
-
     if (isActive.value) {
-      absolutePosition = activeItemAbsolutePosition?.value ?? null;
-    } else if (dropStartValues.value) {
+      return activeItemAbsolutePosition?.value ?? null;
+    }
+
+    if (dropStartValues.value) {
       const measurements = measure(containerRef);
       if (!measurements) {
         return null;
@@ -74,13 +74,13 @@ export default function useTeleportedItemStyles(
           [source, target]
         );
 
-      absolutePosition = {
+      return {
         x: animate(fromAbsolute.x, measurements.pageX + toRelative.x),
         y: animate(fromAbsolute.y, measurements.pageY + toRelative.y)
       };
     }
 
-    return absolutePosition;
+    return null;
   });
 
   // Drop start values updater on target position change

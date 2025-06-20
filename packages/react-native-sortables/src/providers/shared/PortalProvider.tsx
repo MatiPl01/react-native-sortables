@@ -1,8 +1,12 @@
 import type { ReactNode } from 'react';
-import { Fragment, useCallback, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 
-import type { PortalContextType, Vector } from '../../types';
+import type {
+  PortalContextType,
+  PortalSubscription,
+  Vector
+} from '../../types';
 import { createProvider } from '../utils';
 import { PortalOutletProvider } from './PortalOutletProvider';
 
@@ -17,19 +21,46 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
   const [teleportedNodes, setTeleportedNodes] = useState<
     Record<string, React.ReactNode>
   >({});
+  const subscribersRef = useRef<Record<string, Set<PortalSubscription>>>({});
 
   const activeItemAbsolutePosition = useSharedValue<null | Vector>(null);
 
-  const teleport = useCallback((id: string, node: React.ReactNode) => {
-    if (node) {
-      setTeleportedNodes(prev => ({ ...prev, [id]: node }));
-    } else {
-      setTeleportedNodes(prev => {
-        const { [id]: _, ...rest } = prev;
-        return rest;
-      });
+  useEffect(() => {
+    if (!enabled) {
+      setTeleportedNodes({});
     }
+  }, [enabled]);
+
+  const notifySubscribers = useCallback((id: string, isTeleported: boolean) => {
+    subscribersRef.current[id]?.forEach(subscriber => subscriber(isTeleported));
   }, []);
+
+  const teleport = useCallback(
+    (id: string, node: React.ReactNode) => {
+      if (node) {
+        setTeleportedNodes(prev => ({ ...prev, [id]: node }));
+        notifySubscribers(id, true);
+      } else {
+        setTeleportedNodes(prev => {
+          const { [id]: _, ...rest } = prev;
+          return rest;
+        });
+        notifySubscribers(id, false);
+      }
+    },
+    [notifySubscribers]
+  );
+
+  const subscribe = useCallback(
+    (id: string, subscriber: PortalSubscription) => {
+      subscribersRef.current[id] = subscribersRef.current[id] ?? new Set();
+      subscribersRef.current[id].add(subscriber);
+      return () => {
+        subscribersRef.current[id]?.delete(subscriber);
+      };
+    },
+    []
+  );
 
   return {
     children: (
@@ -45,6 +76,7 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     enabled,
     value: {
       activeItemAbsolutePosition,
+      subscribe,
       teleport
     }
   };

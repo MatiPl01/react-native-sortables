@@ -63,6 +63,22 @@ function DraggableView({
     return () => removeItemMeasurements(key);
   }, [key, removeItemMeasurements, teleportedItemId]);
 
+  useEffect(() => {
+    if (!portalContext) {
+      setIsTeleported(false);
+    }
+
+    const unsubscribe = portalContext?.subscribe?.(
+      teleportedItemId,
+      setIsTeleported
+    );
+
+    return () => {
+      portalContext?.teleport?.(teleportedItemId, null);
+      unsubscribe?.();
+    };
+  }, [portalContext, teleportedItemId]);
+
   const withItemContext = (component: ReactNode) => (
     <ItemContextProvider
       activationAnimationProgress={activationAnimationProgress}
@@ -133,7 +149,6 @@ function DraggableView({
       <ActiveItemPortal
         activationAnimationProgress={activationAnimationProgress}
         renderTeleportedItemCell={renderTeleportedItemCell}
-        setIsTeleported={setIsTeleported}
         teleportedItemId={teleportedItemId}>
         {children}
       </ActiveItemPortal>
