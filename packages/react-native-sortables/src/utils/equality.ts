@@ -1,4 +1,4 @@
-import type { AnyRecord, Dimensions, Maybe } from '../types';
+import type { AnyRecord, Dimensions, Maybe, Vector } from '../types';
 
 export function lt(a: number, b: number): boolean {
   'worklet';
@@ -35,6 +35,11 @@ export const areDimensionsDifferent = (
     );
   }
   return dim1.width !== dim2.width || dim1.height !== dim2.height;
+};
+
+export const areVectorsDifferent = (vec1: Vector, vec2: Vector): boolean => {
+  'worklet';
+  return vec1.x !== vec2.x || vec1.y !== vec2.y;
 };
 
 export const haveEqualPropValues = <T extends AnyRecord>(

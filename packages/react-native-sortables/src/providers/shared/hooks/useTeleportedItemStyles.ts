@@ -21,63 +21,100 @@ export default function useTeleportedItemStyles(
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
-  const { activeItemAbsolutePosition } = usePortalContext()!;
-  const { portalOutletMeasurements } = usePortalOutletContext()!;
+  const { activeItemAbsolutePosition } = usePortalContext() ?? {};
+  const { portalOutletMeasurements } = usePortalOutletContext() ?? {};
   const { containerRef, itemPositions } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
-  const dropStartTranslation = useSharedValue<null | Vector>(null);
 
-  // Inactive item updater (for drop animation)
+  const dropStartValues = useSharedValue<null | {
+    fromAbsolute: Vector;
+    progress: number;
+    toRelative: Vector;
+  }>(null);
+
+  // Drop start values calculation reaction
   useAnimatedReaction(
     () => ({
       active: isActive.value
     }),
     ({ active }) => {
-      if (!active) {
-        dropStartTranslation.value = activeItemAbsolutePosition.value;
+      if (active) {
+        dropStartValues.value = null;
+      } else if (
+        activeItemAbsolutePosition?.value &&
+        itemPositions.value[key]
+      ) {
+        dropStartValues.value = {
+          fromAbsolute: activeItemAbsolutePosition.value,
+          progress: activationAnimationProgress.value,
+          toRelative: itemPositions.value[key]
+        };
       }
     }
   );
 
   const absoluteItemPosition = useDerivedValue(() => {
-    let absolutePosition: null | Vector = null;
-
     if (isActive.value) {
-      absolutePosition = activeItemAbsolutePosition.value;
-    } else if (dropStartTranslation.value) {
-      const animate = (from: number, to: number) =>
-        interpolate(activationAnimationProgress.value, [1, 0], [from, to]);
-      const { x: startX, y: startY } = dropStartTranslation.value;
+      return activeItemAbsolutePosition?.value ?? null;
+    }
 
-      const containerMeasurements = measure(containerRef);
-      const itemPosition = itemPositions.value[key];
-
-      if (!containerMeasurements || !itemPosition) {
-        // This should never happen
+    if (dropStartValues.value) {
+      const measurements = measure(containerRef);
+      if (!measurements) {
         return null;
       }
 
-      absolutePosition = {
-        x: animate(startX, containerMeasurements.pageX + itemPosition.x),
-        y: animate(startY, containerMeasurements.pageY + itemPosition.y)
+      const { fromAbsolute, progress, toRelative } = dropStartValues.value;
+
+      const animate = (source: number, target: number) =>
+        interpolate(
+          activationAnimationProgress.value,
+          [progress, 0],
+          [source, target]
+        );
+
+      return {
+        x: animate(fromAbsolute.x, measurements.pageX + toRelative.x),
+        y: animate(fromAbsolute.y, measurements.pageY + toRelative.y)
       };
     }
 
-    return absolutePosition;
+    return null;
   });
 
+  // Drop start values updater on target position change
+  useAnimatedReaction(
+    () => itemPositions.value[key],
+    position => {
+      if (
+        isActive.value ||
+        activationAnimationProgress.value === 0 ||
+        !position ||
+        !absoluteItemPosition.value
+      ) {
+        return;
+      }
+
+      dropStartValues.value = {
+        fromAbsolute: absoluteItemPosition.value,
+        progress: activationAnimationProgress.value,
+        toRelative: position
+      };
+    }
+  );
+
   const animatedStyle = useAnimatedStyle(() => {
-    if (!portalOutletMeasurements.value || !absoluteItemPosition.value) {
+    if (!portalOutletMeasurements?.value || !absoluteItemPosition.value) {
       // This should never happen
-      return { opacity: 0 };
+      return { display: 'none' };
     }
 
     const { pageX: outletX, pageY: outletY } = portalOutletMeasurements.value;
     const { x: itemX, y: itemY } = absoluteItemPosition.value;
 
     return {
-      opacity: 1,
+      display: 'flex',
       transform: [
         { translateX: itemX - outletX },
         { translateY: itemY - outletY }

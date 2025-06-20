@@ -184,6 +184,7 @@ export type PortalSubscription = (isTeleported: boolean) => void;
 export type PortalContextType = {
   activeItemAbsolutePosition: SharedValue<null | Vector>;
   teleport: (id: string, node: ReactNode) => void;
+  subscribe: (id: string, subscriber: PortalSubscription) => () => void;
 };
 
 // PORTAL OUTLET
