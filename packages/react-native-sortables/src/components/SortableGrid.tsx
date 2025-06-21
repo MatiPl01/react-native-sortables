@@ -89,9 +89,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       controlledContainerDimensions={controlledContainerDimensions}
       debug={debug}
       itemKeys={itemKeys}
-      initialItemsStyleOverride={
-        isVertical ? undefined : styles.horizontalStyleOverride
-      }
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
         columnGap={columnGapValue}
@@ -165,18 +162,40 @@ function SortableGridInner<I>({
   rowHeight,
   ...containerProps
 }: SortableGridInnerProps<I>) {
+  const { mainGroupSize } = useGridLayoutContext();
+
   const animatedInnerStyle = useAnimatedStyle(() => ({
     flexDirection: isVertical ? 'row' : 'column',
     height: isVertical ? undefined : groups * (rowHeight + rowGap.value),
-    marginHorizontal: -columnGap.value / 2,
-    marginVertical: -rowGap.value / 2
+    ...(mainGroupSize.value
+      ? {
+          columnGap: columnGap.value,
+          marginHorizontal: 0,
+          marginVertical: 0,
+          rowGap: rowGap.value
+        }
+      : {
+          marginHorizontal: -columnGap.value / 2,
+          marginVertical: -rowGap.value / 2
+        })
   }));
 
-  const animatedItemStyle = useAnimatedStyle(() => ({
-    flexBasis: `${100 / groups}%`,
-    paddingHorizontal: columnGap.value / 2,
-    paddingVertical: rowGap.value / 2
-  }));
+  const animatedItemStyle = useAnimatedStyle(() => {
+    if (!mainGroupSize.value) {
+      return {
+        flexBasis: `${100 / groups}%`,
+        paddingHorizontal: columnGap.value / 2,
+        paddingVertical: rowGap.value / 2
+      };
+    }
+
+    return {
+      flexBasis: 'auto',
+      paddingHorizontal: 0,
+      paddingVertical: 0,
+      width: mainGroupSize.value
+    };
+  });
 
   return (
     <SortableContainer
@@ -191,7 +210,10 @@ function SortableGridInner<I>({
           itemKey={key}
           key={key}
           renderItem={renderItem}
-          style={animatedItemStyle}
+          style={[
+            animatedItemStyle,
+            !isVertical && styles.horizontalStyleOverride
+          ]}
         />
       ))}
     </SortableContainer>

@@ -64,7 +64,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activeItemKey,
     activeItemPosition,
     containerHeight,
-    containerRef,
     containerWidth,
     dragActivationDelay,
     dragActivationFailOffset,
@@ -77,6 +76,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     itemDimensions,
     itemPositions,
     keyToIndex,
+    outerContainerRef,
     prevActiveItemKey,
     snapOffsetX,
     snapOffsetY,
@@ -235,7 +235,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationAnimationProgress: SharedValue<number>
     ) => {
       'worklet';
-      const containerMeasurements = measure(containerRef);
+      const containerMeasurements = measure(outerContainerRef);
 
       if (!position || !dimensions || !containerMeasurements) {
         return;
@@ -305,7 +305,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationState,
       activeItemKey,
       activeItemPosition,
-      containerRef,
+      outerContainerRef,
       dragStartIndex,
       dragStartItemTouchOffset,
       dragStartTouchPosition,

@@ -59,7 +59,6 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
   let mainDimension: Dimension;
   let crossDimension: Dimension;
   let mainGap: SharedValue<number>;
-  let crossGap: SharedValue<number>;
 
   if (isColumn) {
     mainCoordinate = 'y';
@@ -67,14 +66,12 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     mainDimension = 'height';
     crossDimension = 'width';
     mainGap = rowGap;
-    crossGap = columnGap;
   } else {
     mainCoordinate = 'x';
     crossCoordinate = 'y';
     mainDimension = 'width';
     crossDimension = 'height';
     mainGap = columnGap;
-    crossGap = rowGap;
   }
 
   const swappedBeforeIndexes = useMutableValue<ItemGroupSwapResult | null>(
@@ -203,7 +200,6 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
             (currentLayout.crossAxisGroupSizes[groupIndex] ?? 0)) /
           2;
         const additionalSwapOffset = getAdditionalSwapOffset(
-          crossGap.value,
           beforeLayout?.crossAxisGroupSizes?.[beforeIndexes.groupIndex] ?? 0
         );
         swapGroupBeforeBound = swapOffset - additionalSwapOffset;
@@ -262,7 +258,6 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
           2
         : swapGroupAfterOffset;
       const additionalSwapOffset = getAdditionalSwapOffset(
-        crossGap.value,
         afterLayout?.crossAxisGroupSizes?.[afterIndexes.groupIndex] ?? 0
       );
       swapGroupAfterBound = swapOffset + additionalSwapOffset;
@@ -342,10 +337,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       const averageOffset =
         (currentItemMainAxisPosition + nextItemMainAxisPosition + sizeToAdd) /
         2;
-      const additionalSwapOffset = getAdditionalSwapOffset(
-        mainGap.value,
-        sizeToAdd
-      );
+      const additionalSwapOffset = getAdditionalSwapOffset(sizeToAdd);
       swapItemAfterBound =
         averageOffset + (isCurrentBeforeNext ? 1 : -1) * additionalSwapOffset;
     } while (
@@ -407,10 +399,7 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
       const averageOffset =
         (prevItemMainAxisPosition + currentItemMainAxisPosition + sizeToAdd) /
         2;
-      const additionalSwapOffset = getAdditionalSwapOffset(
-        mainGap.value,
-        sizeToAdd
-      );
+      const additionalSwapOffset = getAdditionalSwapOffset(sizeToAdd);
       swapItemBeforeBound =
         averageOffset - (isPrevBeforeCurrent ? 1 : -1) * additionalSwapOffset;
     } while (

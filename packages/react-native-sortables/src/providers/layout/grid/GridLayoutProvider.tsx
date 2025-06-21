@@ -46,11 +46,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     indexToKey,
     itemDimensions,
     itemPositions,
-    itemsStyleOverride,
     measuredContainerWidth,
     shouldAnimateLayout
   } = useCommonValuesContext();
-  const { applyControlledContainerDimensions } = useMeasurementsContext();
+  const { applyControlledContainerDimensions, canMeasureItems } =
+    useMeasurementsContext();
   const debugContext = useDebugContext();
 
   const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
@@ -75,6 +75,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   useAnimatedReaction(
     () => {
       if (!isVertical) {
+        // TODO - check if this is correct for horizontal grids and maybe don't
+        // require specifying rowHeight ( and instead occupy the entire height
+        // of the container)
         return rowHeight ?? null;
       }
 
@@ -91,13 +94,14 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       }
 
       mainGroupSize.value = value;
+      canMeasureItems.value = true;
 
       // DEBUG ONLY
       if (debugMainGapRects) {
         const gap = mainGap.value;
 
         for (let i = 0; i < numGroups - 1; i++) {
-          const pos = value * (i + 1) + gap * (i + 0.5);
+          const pos = value * (i + 1) + gap * i;
 
           debugMainGapRects[i]?.set({
             ...DEBUG_COLORS,
@@ -169,20 +173,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     itemPositions.value = layout.itemPositions;
     // Update controlled container dimensions
     applyControlledContainerDimensions(layout.calculatedDimensions);
-    // Update style overrides
-    const currentStyleOverride = itemsStyleOverride.value;
-    const mainDimension = isVertical ? 'width' : 'height';
-    if (currentStyleOverride?.[mainDimension] !== mainGroupSize.value) {
-      itemsStyleOverride.value = {
-        [mainDimension]: mainGroupSize.value + mainGap.value
-      };
-    }
 
     // DEBUG ONLY
     if (debugCrossGapRects) {
       for (let i = 0; i < layout.crossAxisOffsets.length - 1; i++) {
         const size = crossGap.value;
-        const pos = layout.crossAxisOffsets[i + 1]! - crossGap.value / 2;
+        const pos = layout.crossAxisOffsets[i + 1]! - crossGap.value;
 
         debugCrossGapRects[i]?.set({
           ...DEBUG_COLORS,

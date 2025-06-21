@@ -52,9 +52,10 @@ export default function SortableContainer({
     activeItemDropped,
     activeItemKey,
     containerHeight,
-    containerRef,
     containerWidth,
     controlledContainerDimensions,
+    innerContainerRef,
+    outerContainerRef,
     shouldAnimateLayout,
     usesAbsoluteLayout
   } = useCommonValuesContext();
@@ -134,15 +135,17 @@ export default function SortableContainer({
         />
       )}
       <AnimatedOnLayoutView
-        ref={containerRef}
+        ref={outerContainerRef}
         style={[StyleSheet.absoluteFill, animatedMeasurementsContainerStyle]}
         onLayout={handleHelperContainerMeasurement}
       />
-      <Animated.View style={[style, innerContainerStyle]}>
+      <Animated.View
+        ref={innerContainerRef}
+        style={[style, innerContainerStyle]}>
         {children}
         {multiZoneContext && <MultiZoneOutlet />}
-        {debug && <DebugOutletProvider />}
       </Animated.View>
+      {debug && <DebugOutletProvider />}
       {/* Renders an overlay view helpful for debugging */}
     </Animated.View>
   );

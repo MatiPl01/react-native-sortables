@@ -6,7 +6,7 @@ import { GridCard, ScrollScreen, Section } from '@/components';
 import { spacing } from '@/theme';
 import { getItems } from '@/utils';
 
-const DATA = getItems(8);
+const DATA = getItems(12);
 const COLUMNS = 4;
 
 export default function MultiZoneExample() {

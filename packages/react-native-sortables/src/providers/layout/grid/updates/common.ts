@@ -86,19 +86,15 @@ export const createGridStrategy =
           crossIndex--;
         }
         crossBeforeOffset = crossAxisOffsets[crossIndex] ?? 0;
-        const swapOffset =
-          crossIndex > 0
-            ? ((crossAxisOffsets[crossIndex - 1] ?? 0) +
-                crossBeforeOffset +
-                crossCurrentSize) /
-              2
-            : 0;
         const crossBeforeSize = getItemCrossSize(crossIndex - 1);
         if (crossBeforeSize) {
-          const additionalBeforeOffset = getAdditionalSwapOffset(
-            crossGap.value,
-            crossBeforeSize
-          );
+          const swapOffset =
+            ((crossAxisOffsets[crossIndex - 1] ?? 0) +
+              crossBeforeOffset +
+              crossCurrentSize) /
+            2;
+          const additionalBeforeOffset =
+            getAdditionalSwapOffset(crossBeforeSize);
           crossBeforeBound = swapOffset - additionalBeforeOffset;
           crossCurrentSize = crossBeforeSize;
         } else {
@@ -123,32 +119,27 @@ export const createGridStrategy =
           break;
         }
         crossAfterOffset = nextCrossAxisOffset - crossGap.value;
-        const swapOffset =
-          ((crossAxisOffsets[crossIndex] ?? 0) +
-            nextCrossAxisOffset +
-            crossCurrentSize) /
-          2;
         const crossAfterSize = getItemCrossSize(crossIndex + 1);
         if (crossAfterSize) {
-          const additionalAfterOffset = getAdditionalSwapOffset(
-            crossGap.value,
-            crossAfterSize
-          );
+          const swapOffset =
+            ((crossAxisOffsets[crossIndex] ?? 0) +
+              nextCrossAxisOffset +
+              crossCurrentSize) /
+            2;
+          const additionalAfterOffset = getAdditionalSwapOffset(crossAfterSize);
           crossAfterBound = swapOffset + additionalAfterOffset;
           crossCurrentSize = crossAfterSize;
         } else {
-          crossAfterBound = swapOffset;
+          crossAfterBound =
+            (crossAxisOffsets[crossIndex] ?? 0) + crossCurrentSize;
         }
       } while (
         crossAfterBound < crossContainerSize.value &&
         position[crossCoordinate] > crossAfterBound
       );
 
-      // HORIZONTAL BOUNDS
-      const additionalOffsetX = getAdditionalSwapOffset(
-        mainGap.value,
-        mainContainerSize.value
-      );
+      // MAIN AXIS BOUNDS
+      const additionalOffset = getAdditionalSwapOffset(mainContainerSize.value);
 
       // Before bound
       let mainBeforeOffset = -Infinity;
@@ -159,13 +150,13 @@ export const createGridStrategy =
           mainIndex--;
         }
         mainBeforeOffset = mainIndex * (mainGroupSize.value + mainGap.value);
-        mainBeforeBound = mainBeforeOffset - additionalOffsetX;
+        mainBeforeBound = mainBeforeOffset - additionalOffset;
       } while (
         mainBeforeBound > 0 &&
         position[mainCoordinate] < mainBeforeBound
       );
 
-      // Right bound
+      // After bound
       let mainAfterOffset = Infinity;
       let mainAfterBound = -Infinity;
 
@@ -176,7 +167,7 @@ export const createGridStrategy =
         mainAfterOffset =
           mainIndex * (mainGroupSize.value + mainGap.value) +
           mainGroupSize.value;
-        mainAfterBound = mainAfterOffset + additionalOffsetX;
+        mainAfterBound = mainAfterOffset + additionalOffset;
       } while (
         mainAfterBound < mainContainerSize.value &&
         position[mainCoordinate] > mainAfterBound
@@ -184,56 +175,51 @@ export const createGridStrategy =
 
       // DEBUG ONLY
       if (debugBox) {
-        const offset = (coords: { x: number; y: number }) => ({
-          x: coords.x + (isVertical ? mainGap.value : crossGap.value) / 2,
-          y: coords.y + (isVertical ? crossGap.value : mainGap.value) / 2
-        });
-
         if (isVertical) {
           debugBox.top.update(
-            offset({ x: mainBeforeBound, y: crossBeforeBound }),
-            offset({
+            { x: mainBeforeBound, y: crossBeforeBound },
+            {
               x: mainAfterBound,
               y: Math.max(crossBeforeOffset, crossBeforeBound)
-            })
+            }
           );
           debugBox.bottom.update(
-            offset({
+            {
               x: mainBeforeBound,
               y: Math.min(crossAfterOffset, crossAfterBound)
-            }),
-            offset({ x: mainAfterBound, y: crossAfterBound })
+            },
+            { x: mainAfterBound, y: crossAfterBound }
           );
           debugBox.left.update(
-            offset({ x: mainBeforeBound, y: crossBeforeBound }),
-            offset({ x: mainBeforeOffset, y: crossAfterBound })
+            { x: mainBeforeBound, y: crossBeforeBound },
+            { x: mainBeforeOffset, y: crossAfterBound }
           );
           debugBox.right.update(
-            offset({ x: mainAfterOffset, y: crossBeforeBound }),
-            offset({ x: mainAfterBound, y: crossAfterBound })
+            { x: mainAfterOffset, y: crossBeforeBound },
+            { x: mainAfterBound, y: crossAfterBound }
           );
         } else {
           debugBox.top.update(
-            offset({ x: crossBeforeBound, y: mainBeforeBound }),
-            offset({ x: crossAfterBound, y: mainBeforeOffset })
+            { x: crossBeforeBound, y: mainBeforeBound },
+            { x: crossAfterBound, y: mainBeforeOffset }
           );
           debugBox.bottom.update(
-            offset({ x: crossBeforeBound, y: mainAfterBound }),
-            offset({ x: crossAfterBound, y: mainAfterOffset })
+            { x: crossBeforeBound, y: mainAfterBound },
+            { x: crossAfterBound, y: mainAfterOffset }
           );
           debugBox.left.update(
-            offset({ x: crossBeforeBound, y: mainBeforeBound }),
-            offset({
+            { x: crossBeforeBound, y: mainBeforeBound },
+            {
               x: Math.max(crossBeforeOffset, crossBeforeBound),
               y: mainAfterBound
-            })
+            }
           );
           debugBox.right.update(
-            offset({
+            {
               x: Math.min(crossAfterOffset, crossAfterBound),
               y: mainAfterBound
-            }),
-            offset({ x: crossAfterBound, y: mainBeforeBound })
+            },
+            { x: crossAfterBound, y: mainBeforeBound }
           );
         }
       }

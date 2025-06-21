@@ -40,8 +40,7 @@ function DraggableView({
   const commonValuesContext = useCommonValuesContext();
   const { handleItemMeasurement, removeItemMeasurements } =
     useMeasurementsContext();
-  const { activeItemKey, containerId, customHandle, itemsOverridesStyle } =
-    commonValuesContext;
+  const { activeItemKey, containerId, customHandle } = commonValuesContext;
 
   const teleportedItemId = `${containerId}-${key}`;
 
@@ -90,7 +89,6 @@ function DraggableView({
         {...layoutAnimations}
         cellStyle={[style, itemStyles]}
         hidden={hidden}
-        itemsOverridesStyle={itemsOverridesStyle}
         onMeasure={onMeasure}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}
@@ -127,7 +125,6 @@ function DraggableView({
           baseCellStyle={style}
           isActive={isActive}
           itemKey={key}
-          itemsOverridesStyle={itemsOverridesStyle}
           onMeasure={onMeasure}>
           {children}
         </TeleportedItemCell>

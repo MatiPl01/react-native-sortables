@@ -15,31 +15,40 @@ import { useCommonValuesContext } from './CommonValuesProvider';
 
 type MeasurementsProviderProps = {
   itemsCount: number;
+  initialCanMeasureItems: boolean;
 };
 
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<MeasurementsProviderProps, MeasurementsContextType>(({ itemsCount }) => {
+)<MeasurementsProviderProps, MeasurementsContextType>(({
+  initialCanMeasureItems,
+  itemsCount
+}) => {
   const {
     activeItemDimensions,
     activeItemKey,
     containerHeight,
-    containerRef,
     containerWidth,
     controlledContainerDimensions,
     itemDimensions,
     measuredContainerHeight,
     measuredContainerWidth,
+    outerContainerRef,
     usesAbsoluteLayout
   } = useCommonValuesContext();
 
   const measuredItemsCount = useMutableValue(0);
   const initialItemMeasurementsCompleted = useMutableValue(false);
+  const canMeasureItems = useMutableValue(initialCanMeasureItems);
   const debounce = useAnimatedDebounce();
 
   const handleItemMeasurement = useUIStableCallback(
     (key: string, dimensions: Dimensions) => {
       'worklet';
+      if (!canMeasureItems.value) {
+        return;
+      }
+
       const storedDimensions = itemDimensions.value[key];
 
       if (
@@ -146,11 +155,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const measureContainer = useCallback(() => {
     'worklet';
-    const measurements = measure(containerRef);
+    const measurements = measure(outerContainerRef);
     if (measurements) {
       applyMeasuredContainerDimensions(measurements);
     }
-  }, [applyMeasuredContainerDimensions, containerRef]);
+  }, [applyMeasuredContainerDimensions, outerContainerRef]);
 
   useAnimatedReaction(
     () => ({
@@ -188,6 +197,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   return {
     value: {
       applyControlledContainerDimensions,
+      canMeasureItems,
       handleHelperContainerMeasurement,
       handleItemMeasurement,
       measureContainer,

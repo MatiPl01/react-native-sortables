@@ -23,7 +23,7 @@ export function useTargetScrollOffset(
   autoScrollActivationOffset: Animatable<[number, number] | number>,
   dragStartScrollOffset: SharedValue<null | number>
 ): SharedValue<null | number> {
-  const { activeItemKey, containerRef, itemDimensions, touchPosition } =
+  const { activeItemKey, itemDimensions, outerContainerRef, touchPosition } =
     useCommonValuesContext();
   const debugContext = useDebugContext();
 
@@ -80,7 +80,7 @@ export function useTargetScrollOffset(
       }
 
       const scrollableMeasurements = measure(scrollableRef);
-      const containerMeasurements = measure(containerRef);
+      const containerMeasurements = measure(outerContainerRef);
 
       if (
         !scrollableMeasurements ||

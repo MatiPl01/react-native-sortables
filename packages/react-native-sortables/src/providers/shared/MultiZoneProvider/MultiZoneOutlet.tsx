@@ -16,7 +16,7 @@ const ACTIVE_COLORS = {
 };
 
 export default function MultiZoneOutlet() {
-  const { activeItemDimensions, containerId, containerRef } =
+  const { activeItemDimensions, containerId, outerContainerRef } =
     useCommonValuesContext();
   // Multi-zone provider uses portal context, so we can use it here
   const { activeItemAbsolutePosition } = usePortalContext()!;
@@ -38,7 +38,7 @@ export default function MultiZoneOutlet() {
         return;
       }
 
-      const container = measure(containerRef);
+      const container = measure(outerContainerRef);
       if (!container) {
         return;
       }

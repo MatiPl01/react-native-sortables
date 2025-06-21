@@ -53,8 +53,7 @@ const { DebugOutletProvider, useDebugOutletContext } = createProvider(
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    pointerEvents: 'none',
-    zIndex: 1000
+    pointerEvents: 'none'
   }
 });
 

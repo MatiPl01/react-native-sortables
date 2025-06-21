@@ -1,12 +1,11 @@
 import type { ReactNode } from 'react';
-import type { LayoutChangeEvent, View, ViewStyle } from 'react-native';
+import type { LayoutChangeEvent, View } from 'react-native';
 import type {
   GestureTouchEvent,
   GestureType
 } from 'react-native-gesture-handler';
 import type {
   AnimatedRef,
-  AnimatedStyle,
   MeasuredDimensions,
   SharedValue
 } from 'react-native-reanimated';
@@ -85,22 +84,21 @@ export type CommonValuesContextType = ActiveItemValuesContextType &
     containerWidth: SharedValue<null | number>;
     containerHeight: SharedValue<null | number>;
     itemDimensions: SharedValue<Record<string, Dimensions>>;
-    itemsStyleOverride: SharedValue<Maybe<ViewStyle>>;
 
     // OTHER
-    containerRef: AnimatedRef<View>;
+    innerContainerRef: AnimatedRef<View>;
+    outerContainerRef: AnimatedRef<View>;
     sortEnabled: SharedValue<boolean>;
     usesAbsoluteLayout: SharedValue<boolean>;
     shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
     animateLayoutOnReorderOnly: SharedValue<boolean>;
     customHandle: boolean;
-
-    itemsOverridesStyle: AnimatedStyle<ViewStyle>;
   };
 
 // MEASUREMENTS
 
 export type MeasurementsContextType = {
+  canMeasureItems: SharedValue<boolean>;
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   removeItemMeasurements: (key: string) => void;
