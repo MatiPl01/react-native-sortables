@@ -25,6 +25,7 @@ export default function MultiZoneExample() {
             data={DATA}
             renderItem={renderItem}
             rowGap={spacing.xs}
+            debug
           />
         </Section>
 
@@ -35,6 +36,7 @@ export default function MultiZoneExample() {
             data={DATA}
             renderItem={renderItem}
             rowGap={spacing.xs}
+            debug
           />
         </Section>
       </Sortable.MultiZoneProvider>

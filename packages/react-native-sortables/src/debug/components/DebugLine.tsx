@@ -4,10 +4,10 @@ import Animated, { measure, useAnimatedStyle } from 'react-native-reanimated';
 import type { DebugLineProps, WrappedProps } from '../../types/debug';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
-import { useDebugOutletContext } from '../providers/DebugOutletProvider';
+import { useDebugContext } from '../providers/DebugProvider';
 
 export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
-  const { debugOutletRef } = useDebugOutletContext() ?? {};
+  const { debugOutletRef } = useDebugContext() ?? {};
   const screenDiagonal = useScreenDiagonal();
 
   const animatedStyle = useAnimatedStyle(() => {

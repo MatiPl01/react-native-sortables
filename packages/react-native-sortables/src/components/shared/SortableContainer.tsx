@@ -12,7 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT, IS_WEB } from '../../constants';
-import { DebugOutletProvider } from '../../debug';
+import { DebugOutlet } from '../../debug';
 import {
   MultiZoneOutlet,
   useCommonValuesContext,
@@ -145,7 +145,7 @@ export default function SortableContainer({
         {children}
         {multiZoneContext && <MultiZoneOutlet />}
       </Animated.View>
-      {debug && <DebugOutletProvider />}
+      {debug && <DebugOutlet />}
       {/* Renders an overlay view helpful for debugging */}
     </Animated.View>
   );

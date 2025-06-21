@@ -212,11 +212,7 @@ export type DebugContextType = {
   useDebugRect: () => DebugRectUpdater;
   useDebugCross: () => DebugCrossUpdater;
   useObserver: (observer: (views: DebugViews) => void) => void;
-};
 
-// DEBUG OUTLET
-
-export type DebugOutletContextType = {
   debugOutletRef: AnimatedRef<View>;
 };
 

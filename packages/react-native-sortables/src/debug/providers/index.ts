@@ -1,5 +1,2 @@
-export {
-  DebugOutletProvider,
-  useDebugOutletContext
-} from './DebugOutletProvider';
+export { default as DebugOutlet } from './DebugOutlet';
 export * from './DebugProvider';
