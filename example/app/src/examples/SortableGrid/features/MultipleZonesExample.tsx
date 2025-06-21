@@ -9,7 +9,7 @@ import { getItems } from '@/utils';
 const DATA = getItems(8);
 const COLUMNS = 4;
 
-export default function MultiZoneExample() {
+export default function MultipleZonesExample() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => <GridCard>{item}</GridCard>,
     []

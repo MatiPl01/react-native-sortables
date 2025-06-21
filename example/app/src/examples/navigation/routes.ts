@@ -52,8 +52,8 @@ const routes: Routes = {
             name: 'Fixed Items'
           },
           MultiZone: {
-            Component: SortableGrid.features.MultiZoneExample,
-            name: 'Multi Zone'
+            Component: SortableGrid.features.MultipleZonesExample,
+            name: 'Multiple Zones'
           },
           Callbacks: {
             Component: SortableGrid.features.CallbacksExample,
