@@ -1,13 +1,14 @@
 import { memo, useCallback, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import type { DebugViews } from '../../types/debug';
 import { DebugComponentType } from '../../types/debug';
 import { DebugCross, DebugLine, DebugRect } from '../components';
 import { useDebugContext } from './DebugProvider';
 
-const DebugOutlet = memo(function DebugOutlet() {
+function DebugOutlet() {
   const [debugViews, setDebugViews] = useState<DebugViews>({});
-  const { useObserver } = useDebugContext() ?? {};
+  const { debugOutletRef, useObserver } = useDebugContext() ?? {};
 
   const observer = useCallback((views: DebugViews) => {
     setDebugViews(views);
@@ -16,7 +17,7 @@ const DebugOutlet = memo(function DebugOutlet() {
   useObserver?.(observer);
 
   return (
-    <>
+    <View ref={debugOutletRef} style={styles.container}>
       {Object.entries(debugViews).map(([key, { props, type }]) => {
         switch (type) {
           case DebugComponentType.CROSS:
@@ -27,8 +28,15 @@ const DebugOutlet = memo(function DebugOutlet() {
             return <DebugRect key={key} props={props} />;
         }
       })}
-    </>
+    </View>
   );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    pointerEvents: 'none'
+  }
 });
 
-export default DebugOutlet;
+export default memo(DebugOutlet);

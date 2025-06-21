@@ -40,10 +40,9 @@ function DraggableView({
   const commonValuesContext = useCommonValuesContext();
   const { handleItemMeasurement, removeItemMeasurements } =
     useMeasurementsContext();
-  const { activeItemKey, componentId, customHandle, itemsOverridesStyle } =
-    commonValuesContext;
+  const { activeItemKey, containerId, customHandle } = commonValuesContext;
 
-  const teleportedItemId = `${componentId}-${key}`;
+  const teleportedItemId = `${containerId}-${key}`;
 
   const [isTeleported, setIsTeleported] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
@@ -53,7 +52,7 @@ function DraggableView({
 
   useEffect(() => {
     return () => removeItemMeasurements(key);
-  }, [key, removeItemMeasurements, teleportedItemId]);
+  }, [key, removeItemMeasurements]);
 
   useEffect(() => {
     if (!portalContext) {
@@ -90,7 +89,6 @@ function DraggableView({
         {...layoutAnimations}
         cellStyle={[style, itemStyles]}
         hidden={hidden}
-        itemsOverridesStyle={itemsOverridesStyle}
         onMeasure={onMeasure}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}
@@ -127,7 +125,6 @@ function DraggableView({
           baseCellStyle={style}
           isActive={isActive}
           itemKey={key}
-          itemsOverridesStyle={itemsOverridesStyle}
           onMeasure={onMeasure}>
           {children}
         </TeleportedItemCell>

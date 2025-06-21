@@ -1,11 +1,6 @@
 import { useCallback } from 'react';
-import type { LayoutChangeEvent, View } from 'react-native';
-import {
-  measure,
-  runOnUI,
-  useAnimatedReaction,
-  useAnimatedRef
-} from 'react-native-reanimated';
+import type { LayoutChangeEvent } from 'react-native';
+import { measure, runOnUI, useAnimatedReaction } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
@@ -20,11 +15,15 @@ import { useCommonValuesContext } from './CommonValuesProvider';
 
 type MeasurementsProviderProps = {
   itemsCount: number;
+  initialCanMeasureItems: boolean;
 };
 
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<MeasurementsProviderProps, MeasurementsContextType>(({ itemsCount }) => {
+)<MeasurementsProviderProps, MeasurementsContextType>(({
+  initialCanMeasureItems,
+  itemsCount
+}) => {
   const {
     activeItemDimensions,
     activeItemKey,
@@ -34,17 +33,22 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     itemDimensions,
     measuredContainerHeight,
     measuredContainerWidth,
+    outerContainerRef,
     usesAbsoluteLayout
   } = useCommonValuesContext();
 
-  const measurementsContainerRef = useAnimatedRef<View>();
   const measuredItemsCount = useMutableValue(0);
   const initialItemMeasurementsCompleted = useMutableValue(false);
+  const canMeasureItems = useMutableValue(initialCanMeasureItems);
   const debounce = useAnimatedDebounce();
 
   const handleItemMeasurement = useUIStableCallback(
     (key: string, dimensions: Dimensions) => {
       'worklet';
+      if (!canMeasureItems.value) {
+        return;
+      }
+
       const storedDimensions = itemDimensions.value[key];
 
       if (
@@ -151,11 +155,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const measureContainer = useCallback(() => {
     'worklet';
-    const measurements = measure(measurementsContainerRef);
+    const measurements = measure(outerContainerRef);
     if (measurements) {
       applyMeasuredContainerDimensions(measurements);
     }
-  }, [applyMeasuredContainerDimensions, measurementsContainerRef]);
+  }, [applyMeasuredContainerDimensions, outerContainerRef]);
 
   useAnimatedReaction(
     () => ({
@@ -193,10 +197,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   return {
     value: {
       applyControlledContainerDimensions,
+      canMeasureItems,
       handleHelperContainerMeasurement,
       handleItemMeasurement,
       measureContainer,
-      measurementsContainerRef,
       removeItemMeasurements
     }
   };

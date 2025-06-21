@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 
 import type {
@@ -10,10 +10,9 @@ import { useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 import { PortalOutletProvider } from './PortalOutletProvider';
 
-type PortalProviderProps = {
-  children: ReactNode;
+type PortalProviderProps = PropsWithChildren<{
   enabled?: boolean;
-};
+}>;
 
 const { PortalProvider, usePortalContext } = createProvider('Portal', {
   guarded: false

@@ -6,8 +6,14 @@ import {
   useRef,
   useState
 } from 'react';
+import type { View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { cancelAnimation, makeMutable, runOnUI } from 'react-native-reanimated';
+import {
+  cancelAnimation,
+  makeMutable,
+  runOnUI,
+  useAnimatedRef
+} from 'react-native-reanimated';
 
 import { useDebouncedStableCallback } from '../../hooks';
 import { createProvider } from '../../providers/utils';
@@ -15,14 +21,17 @@ import type { DebugContextType } from '../../types';
 import type { DebugComponentUpdater, DebugViews } from '../../types/debug';
 import { DebugComponentType } from '../../types/debug';
 
-type DebugProviderProps = PropsWithChildren<unknown>;
+type DebugProviderProps = PropsWithChildren<{
+  enabled?: boolean;
+}>;
 
 const { DebugProvider, useDebugContext } = createProvider('Debug', {
   guarded: false
-})<DebugProviderProps, DebugContextType>(() => {
+})<DebugProviderProps, DebugContextType>(({ enabled }) => {
   const debugIdRef = useRef(0);
   const debugViewsRef = useRef<DebugViews>({});
   const observersRef = useRef(new Set<(views: DebugViews) => void>());
+  const debugOutletRef = useAnimatedRef<View>();
 
   const getNextKey = useCallback(() => debugIdRef.current++, []);
 
@@ -202,7 +211,9 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
   }, []);
 
   return {
+    enabled,
     value: {
+      debugOutletRef,
       useDebugCross,
       useDebugLine,
       useDebugLines: useDebugLines as DebugContextType['useDebugLines'],

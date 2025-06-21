@@ -1,11 +1,7 @@
 import { type PropsWithChildren, useEffect, useMemo, useRef } from 'react';
-import type { View, ViewStyle } from 'react-native';
+import type { View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import {
-  useAnimatedRef,
-  useAnimatedStyle,
-  useDerivedValue
-} from 'react-native-reanimated';
+import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
 
 import { useAnimatableValue } from '../../hooks';
 import type {
@@ -17,7 +13,6 @@ import type {
   Dimensions,
   ItemDragSettings,
   ItemsLayoutTransitionMode,
-  Maybe,
   Vector
 } from '../../types';
 import {
@@ -39,7 +34,6 @@ type CommonValuesProviderProps = PropsWithChildren<
       itemKeys: Array<string>;
       controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
       itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
-      initialItemsStyleOverride?: ViewStyle;
     }
 >;
 
@@ -60,14 +54,13 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     enableActiveItemSnap: _enableActiveItemSnap,
     inactiveItemOpacity: _inactiveItemOpacity,
     inactiveItemScale: _inactiveItemScale,
-    initialItemsStyleOverride,
     itemKeys,
     itemsLayoutTransitionMode,
     snapOffsetX: _snapOffsetX,
     snapOffsetY: _snapOffsetY,
     sortEnabled: _sortEnabled
   }) => {
-    const componentId = useMemo(() => nextId++, []);
+    const containerId = useMemo(() => nextId++, []);
     const prevKeysRef = useRef<Array<string>>([]);
 
     // ORDER
@@ -88,9 +81,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const containerWidth = useMutableValue<null | number>(null);
     const containerHeight = useMutableValue<null | number>(null);
     const itemDimensions = useMutableValue<Record<string, Dimensions>>({});
-    const itemsStyleOverride = useMutableValue<Maybe<ViewStyle>>(
-      initialItemsStyleOverride
-    );
 
     // ITEM ACTIVATION SETTINGS
     const dragActivationDelay = useAnimatableValue(_dragActivationDelay);
@@ -117,7 +107,8 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const snapOffsetY = useAnimatableValue(_snapOffsetY);
 
     // OTHER
-    const containerRef = useAnimatedRef<View>();
+    const outerContainerRef = useAnimatedRef<View>();
+    const innerContainerRef = useAnimatedRef<View>();
     const sortEnabled = useAnimatableValue(_sortEnabled);
     const usesAbsoluteLayout = useMutableValue(false);
     const shouldAnimateLayout = useMutableValue(true);
@@ -133,10 +124,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       }
     }, [itemKeys, indexToKey]);
 
-    const itemsOverridesStyle = useAnimatedStyle(() => ({
-      ...itemsStyleOverride.value
-    }));
-
     return {
       value: {
         ...useActiveItemValuesContext(),
@@ -145,9 +132,8 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activeItemScale,
         activeItemShadowOpacity,
         animateLayoutOnReorderOnly,
-        componentId,
         containerHeight,
-        containerRef,
+        containerId,
         containerWidth,
         controlledContainerDimensions,
         customHandle,
@@ -158,14 +144,14 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         inactiveItemOpacity,
         inactiveItemScale,
         indexToKey,
+        innerContainerRef,
         itemDimensions,
         itemPositions,
         itemsLayoutTransitionMode,
-        itemsOverridesStyle,
-        itemsStyleOverride,
         keyToIndex,
         measuredContainerHeight,
         measuredContainerWidth,
+        outerContainerRef,
         shouldAnimateLayout,
         snapOffsetX,
         snapOffsetY,

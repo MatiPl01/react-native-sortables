@@ -86,19 +86,15 @@ export const createGridStrategy =
           crossIndex--;
         }
         crossBeforeOffset = crossAxisOffsets[crossIndex] ?? 0;
-        const swapOffset =
-          crossIndex > 0
-            ? ((crossAxisOffsets[crossIndex - 1] ?? 0) +
-                crossBeforeOffset +
-                crossCurrentSize) /
-              2
-            : 0;
         const crossBeforeSize = getItemCrossSize(crossIndex - 1);
         if (crossBeforeSize) {
-          const additionalBeforeOffset = getAdditionalSwapOffset(
-            crossGap.value,
-            crossBeforeSize
-          );
+          const swapOffset =
+            ((crossAxisOffsets[crossIndex - 1] ?? 0) +
+              crossBeforeOffset +
+              crossCurrentSize) /
+            2;
+          const additionalBeforeOffset =
+            getAdditionalSwapOffset(crossBeforeSize);
           crossBeforeBound = swapOffset - additionalBeforeOffset;
           crossCurrentSize = crossBeforeSize;
         } else {
@@ -123,32 +119,27 @@ export const createGridStrategy =
           break;
         }
         crossAfterOffset = nextCrossAxisOffset - crossGap.value;
-        const swapOffset =
-          ((crossAxisOffsets[crossIndex] ?? 0) +
-            nextCrossAxisOffset +
-            crossCurrentSize) /
-          2;
         const crossAfterSize = getItemCrossSize(crossIndex + 1);
         if (crossAfterSize) {
-          const additionalAfterOffset = getAdditionalSwapOffset(
-            crossGap.value,
-            crossAfterSize
-          );
+          const swapOffset =
+            ((crossAxisOffsets[crossIndex] ?? 0) +
+              nextCrossAxisOffset +
+              crossCurrentSize) /
+            2;
+          const additionalAfterOffset = getAdditionalSwapOffset(crossAfterSize);
           crossAfterBound = swapOffset + additionalAfterOffset;
           crossCurrentSize = crossAfterSize;
         } else {
-          crossAfterBound = swapOffset;
+          crossAfterBound =
+            (crossAxisOffsets[crossIndex] ?? 0) + crossCurrentSize;
         }
       } while (
         crossAfterBound < crossContainerSize.value &&
         position[crossCoordinate] > crossAfterBound
       );
 
-      // HORIZONTAL BOUNDS
-      const additionalOffsetX = getAdditionalSwapOffset(
-        mainGap.value,
-        mainContainerSize.value
-      );
+      // MAIN AXIS BOUNDS
+      const additionalOffset = getAdditionalSwapOffset(mainContainerSize.value);
 
       // Before bound
       let mainBeforeOffset = -Infinity;
@@ -159,13 +150,13 @@ export const createGridStrategy =
           mainIndex--;
         }
         mainBeforeOffset = mainIndex * (mainGroupSize.value + mainGap.value);
-        mainBeforeBound = mainBeforeOffset - additionalOffsetX;
+        mainBeforeBound = mainBeforeOffset - additionalOffset;
       } while (
         mainBeforeBound > 0 &&
         position[mainCoordinate] < mainBeforeBound
       );
 
-      // Right bound
+      // After bound
       let mainAfterOffset = Infinity;
       let mainAfterBound = -Infinity;
 
@@ -176,7 +167,7 @@ export const createGridStrategy =
         mainAfterOffset =
           mainIndex * (mainGroupSize.value + mainGap.value) +
           mainGroupSize.value;
-        mainAfterBound = mainAfterOffset + additionalOffsetX;
+        mainAfterBound = mainAfterOffset + additionalOffset;
       } while (
         mainAfterBound < mainContainerSize.value &&
         position[mainCoordinate] > mainAfterBound

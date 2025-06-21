@@ -1,15 +1,25 @@
 import { StyleSheet } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated, { measure, useAnimatedStyle } from 'react-native-reanimated';
 
 import type { DebugLineProps, WrappedProps } from '../../types/debug';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
+import { useDebugContext } from '../providers/DebugProvider';
 
 export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
+  const { debugOutletRef } = useDebugContext() ?? {};
   const screenDiagonal = useScreenDiagonal();
 
   const animatedStyle = useAnimatedStyle(() => {
-    const { from, thickness = 3, to, visible = true, x, y } = props.value;
+    const {
+      from,
+      isAbsolute,
+      thickness = 3,
+      to,
+      visible = true,
+      x,
+      y
+    } = props.value;
 
     let angle = 0,
       length,
@@ -34,13 +44,23 @@ export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
       return { display: 'none' };
     }
 
+    const measurements = isAbsolute
+      ? debugOutletRef && measure(debugOutletRef)
+      : undefined;
+
     return {
       display: visible ? 'flex' : 'none',
       height: thickness,
       opacity: props.value.opacity,
       transform: [
-        { translateX: tX + (Math.sin(angle) * thickness) / 2 },
-        { translateY: tY - (Math.cos(angle) * thickness) / 2 },
+        {
+          translateX:
+            tX - (measurements?.pageX ?? 0) + (Math.sin(angle) * thickness) / 2
+        },
+        {
+          translateY:
+            tY - (measurements?.pageY ?? 0) + (Math.cos(angle) * thickness) / 2
+        },
         { rotate: `${angle}rad` }
       ],
       width: length
