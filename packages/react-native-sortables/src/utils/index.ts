@@ -11,3 +11,4 @@ export * from './order';
 export * from './props';
 export * from './react';
 export * from './reanimated';
+export * from './styles';

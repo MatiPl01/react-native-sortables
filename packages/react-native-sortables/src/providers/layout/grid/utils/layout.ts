@@ -54,7 +54,7 @@ export const calculateLayout = ({
     // Update offset of the next group
     crossAxisOffsets[crossIndex + 1] = Math.max(
       crossAxisOffsets[crossIndex + 1] ?? 0,
-      crossAxisOffset + crossItemSize + gaps.cross
+      crossAxisOffset + crossItemSize
     );
 
     // Update item position

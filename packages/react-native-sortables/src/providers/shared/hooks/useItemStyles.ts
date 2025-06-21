@@ -3,7 +3,9 @@ import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle } from 'react-native-reanimated';
 
 import type { AnimatedStyleProp } from '../../../types';
+import { mergeStyles } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
+import useItemDecorationValues from './useItemDecorationValues';
 import useItemPosition from './useItemPosition';
 import useItemZIndex from './useItemZIndex';
 
@@ -19,31 +21,40 @@ const HIDDEN_STYLE: ViewStyle = {
   zIndex: -1
 };
 
-export default function useItemLayoutStyles(
+export default function useItemStyles(
   key: string,
+  isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
 ): AnimatedStyleProp {
   const { usesAbsoluteLayout } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
-  const position = useItemPosition(key, activationAnimationProgress);
+  const position = useItemPosition(key, isActive, activationAnimationProgress);
+  const decoration = useItemDecorationValues(
+    key,
+    isActive,
+    activationAnimationProgress
+  );
 
   return useAnimatedStyle(() => {
     if (!usesAbsoluteLayout.value) {
-      return RELATIVE_STYLE;
+      return mergeStyles(RELATIVE_STYLE, decoration.value);
     }
 
     if (!position.value) {
       return HIDDEN_STYLE;
     }
 
-    return {
-      position: 'absolute',
-      transform: [
-        { translateX: position.value.x },
-        { translateY: position.value.y }
-      ],
-      zIndex: zIndex.value
-    };
+    return mergeStyles(
+      {
+        position: 'absolute',
+        transform: [
+          { translateX: position.value.x },
+          { translateY: position.value.y }
+        ],
+        zIndex: zIndex.value
+      },
+      decoration.value
+    );
   });
 }

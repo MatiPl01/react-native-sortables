@@ -13,6 +13,7 @@ import { useCommonValuesContext } from '../CommonValuesProvider';
 
 export default function useItemPosition(
   key: string,
+  isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
 ): SharedValue<null | Vector> {
   const {
@@ -30,7 +31,7 @@ export default function useItemPosition(
   }>(null);
 
   positionRef.current ??= makeMutable(
-    activeItemKey.value === key
+    isActive.value
       ? activeItemPosition.value
       : (itemPositions.value[key] ?? null)
   );
@@ -41,11 +42,11 @@ export default function useItemPosition(
   useAnimatedReaction(
     () => ({
       activationProgress: activationAnimationProgress.value,
-      isActive: activeItemKey.value === key,
+      active: isActive.value,
       itemPosition: itemPositions.value[key]
     }),
-    ({ activationProgress, isActive, itemPosition }, prev) => {
-      if (!itemPosition || isActive) {
+    ({ activationProgress, active, itemPosition }, prev) => {
+      if (!itemPosition || active) {
         dropStartValues.value = null;
         return;
       }
@@ -64,7 +65,7 @@ export default function useItemPosition(
       }
       // Set dropStartValues only if the item was previously active or if is
       // already during the drop animation and the target position changed
-      else if (dropStartValues.value ? positionChanged : prev?.isActive) {
+      else if (dropStartValues.value ? positionChanged : prev?.active) {
         dropStartValues.value = {
           position: result.value,
           progress: activationProgress
@@ -104,11 +105,11 @@ export default function useItemPosition(
   // Active item updater
   useAnimatedReaction(
     () => ({
-      isActive: activeItemKey.value === key,
+      active: isActive.value,
       position: activeItemPosition.value
     }),
-    ({ isActive, position }) => {
-      if (isActive && position) {
+    ({ active, position }) => {
+      if (active && position) {
         result.value = position;
       }
     }

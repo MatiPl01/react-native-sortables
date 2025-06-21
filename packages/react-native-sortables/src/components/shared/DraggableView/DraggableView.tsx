@@ -1,6 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Fragment, memo, useEffect, useState } from 'react';
-import { StyleSheet, type ViewStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
   LayoutAnimationConfig,
@@ -12,9 +12,8 @@ import {
   CommonValuesContext,
   ItemContextProvider,
   useCommonValuesContext,
-  useItemDecorationStyles,
-  useItemLayoutStyles,
   useItemPanGesture,
+  useItemStyles,
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
@@ -51,12 +50,7 @@ function DraggableView({
   const [isTeleported, setIsTeleported] = useState(false);
   const activationAnimationProgress = useSharedValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
-  const layoutStyles = useItemLayoutStyles(key, activationAnimationProgress);
-  const decorationStyles = useItemDecorationStyles(
-    key,
-    isActive,
-    activationAnimationProgress
-  );
+  const itemStyles = useItemStyles(key, isActive, activationAnimationProgress);
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
   useEffect(() => {
@@ -89,12 +83,12 @@ function DraggableView({
     </ItemContextProvider>
   );
 
-  const renderItemCell = (styleOverride?: ViewStyle) => {
+  const renderItemCell = (hidden?: boolean) => {
     const innerComponent = (
       <ItemCell
         {...layoutAnimations}
-        cellStyle={[style, layoutStyles, styleOverride]}
-        decorationStyles={decorationStyles}
+        // TODO - check if this hiding approach works
+        cellStyle={[style, itemStyles, hidden && styles.hidden]}
         itemsOverridesStyle={itemsOverridesStyle}
         onMeasure={(width, height) =>
           handleItemMeasurement(key, { height, width })
@@ -145,7 +139,7 @@ function DraggableView({
     <Fragment>
       {/* We cannot unmount this item as its gesture detector must be still
       mounted to continue handling the pan gesture */}
-      {renderItemCell(isTeleported ? styles.hidden : undefined)}
+      {renderItemCell(isTeleported)}
       <ActiveItemPortal
         activationAnimationProgress={activationAnimationProgress}
         renderTeleportedItemCell={renderTeleportedItemCell}

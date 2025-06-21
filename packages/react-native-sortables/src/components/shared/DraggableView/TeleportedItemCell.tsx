@@ -3,10 +3,7 @@ import type { ViewStyle } from 'react-native';
 import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
-import {
-  useItemDecorationStyles,
-  useTeleportedItemStyles
-} from '../../../providers';
+import { useTeleportedItemStyles } from '../../../providers';
 import type { AnimatedStyleProp } from '../../../types';
 import ItemCell from './ItemCell';
 
@@ -31,16 +28,10 @@ export default function TeleportedItemCell({
     isActive,
     activationAnimationProgress
   );
-  const decorationStyles = useItemDecorationStyles(
-    itemKey,
-    isActive,
-    activationAnimationProgress
-  );
 
   return (
     <ItemCell
       cellStyle={[baseCellStyle, teleportedItemStyles]}
-      decorationStyles={decorationStyles}
       itemsOverridesStyle={itemsOverridesStyle}>
       <LayoutAnimationConfig skipEntering>{children}</LayoutAnimationConfig>
     </ItemCell>

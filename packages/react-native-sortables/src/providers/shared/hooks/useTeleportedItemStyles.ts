@@ -2,7 +2,9 @@ import { type StyleProp, type ViewStyle } from 'react-native';
 import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle } from 'react-native-reanimated';
 
+import { mergeStyles } from '../../../utils';
 import { usePortalOutletContext } from '../PortalOutletProvider';
+import useItemDecorationValues from './useItemDecorationValues';
 import useItemZIndex from './useItemZIndex';
 import useTeleportedItemPosition from './useTeleportedItemPosition';
 
@@ -19,6 +21,11 @@ export default function useTeleportedItemStyles(
     isActive,
     activationAnimationProgress
   );
+  const decoration = useItemDecorationValues(
+    key,
+    isActive,
+    activationAnimationProgress
+  );
 
   return useAnimatedStyle(() => {
     if (!portalOutletMeasurements?.value || !position.value) {
@@ -29,14 +36,17 @@ export default function useTeleportedItemStyles(
     const { pageX: outletX, pageY: outletY } = portalOutletMeasurements.value;
     const { x: itemX, y: itemY } = position.value;
 
-    return {
-      display: 'flex',
-      position: 'absolute',
-      transform: [
-        { translateX: itemX - outletX },
-        { translateY: itemY - outletY }
-      ],
-      zIndex: zIndex.value
-    };
+    return mergeStyles(
+      {
+        display: 'flex',
+        position: 'absolute',
+        transform: [
+          { translateX: itemX - outletX },
+          { translateY: itemY - outletY }
+        ],
+        zIndex: zIndex.value
+      },
+      decoration.value
+    );
   });
 }
