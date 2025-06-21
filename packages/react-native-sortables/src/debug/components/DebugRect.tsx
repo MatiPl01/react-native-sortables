@@ -4,7 +4,7 @@ import Animated, { measure, useAnimatedStyle } from 'react-native-reanimated';
 import type { DebugRectProps, WrappedProps } from '../../types/debug';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
-import { useDebugOutletContext } from '../providers';
+import { useDebugOutletContext } from '../providers/DebugOutletProvider';
 
 export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
   const { debugOutletRef } = useDebugOutletContext() ?? {};
