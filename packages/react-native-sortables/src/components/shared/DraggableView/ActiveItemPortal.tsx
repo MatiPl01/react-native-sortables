@@ -2,11 +2,11 @@ import { type PropsWithChildren, type ReactNode, useEffect } from 'react';
 import {
   runOnJS,
   type SharedValue,
-  useAnimatedReaction,
-  useSharedValue
+  useAnimatedReaction
 } from 'react-native-reanimated';
 
 import { usePortalContext } from '../../../providers';
+import { useMutableValue } from '../../../utils';
 
 type ActiveItemPortalProps = PropsWithChildren<{
   teleportedItemId: string;
@@ -21,7 +21,7 @@ export default function ActiveItemPortal({
   teleportedItemId
 }: ActiveItemPortalProps) {
   const { teleport } = usePortalContext()!;
-  const teleportEnabled = useSharedValue(false);
+  const teleportEnabled = useMutableValue(false);
 
   useEffect(() => {
     if (teleportEnabled.value) {

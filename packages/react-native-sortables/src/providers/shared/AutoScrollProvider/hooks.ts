@@ -2,13 +2,13 @@ import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 import {
   measure,
   useAnimatedReaction,
-  useDerivedValue,
-  useSharedValue
+  useDerivedValue
 } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
 import { useAnimatableValue } from '../../../hooks';
 import type { Animatable } from '../../../types';
+import { useMutableValue } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import {
   handleMeasurementsHorizontal,
@@ -30,8 +30,8 @@ export function useTargetScrollOffset(
   const debugRects = debugContext?.useDebugRects(['start', 'end']);
   const debugLine = debugContext?.useDebugLine();
 
-  const targetScrollOffset = useSharedValue<null | number>(null);
-  const startContainerPagePosition = useSharedValue<null | number>(null);
+  const targetScrollOffset = useMutableValue<null | number>(null);
+  const startContainerPagePosition = useMutableValue<null | number>(null);
 
   const activeItemHeight = useDerivedValue(() => {
     const key = activeItemKey.value;

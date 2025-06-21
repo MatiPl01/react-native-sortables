@@ -8,7 +8,6 @@ import Animated, {
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
-  useSharedValue,
   withTiming
 } from 'react-native-reanimated';
 
@@ -18,6 +17,7 @@ import type {
   DropIndicatorComponentProps,
   Vector
 } from '../../types';
+import { useMutableValue } from '../../utils';
 
 const DEFAULT_STYLE: ViewStyle = {
   opacity: 0
@@ -42,13 +42,13 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
   // Clone the array in order to prevent user from mutating the internal state
   const orderedItemKeys = useDerivedValue(() => [...indexToKey.value]);
 
-  const dropIndex = useSharedValue(0);
-  const dropPosition = useSharedValue<Vector>({ x: 0, y: 0 });
-  const prevUpdateItemKey = useSharedValue<null | string>(null);
-  const dimensions = useSharedValue<Dimensions | null>(null);
+  const dropIndex = useMutableValue(0);
+  const dropPosition = useMutableValue<Vector>({ x: 0, y: 0 });
+  const prevUpdateItemKey = useMutableValue<null | string>(null);
+  const dimensions = useMutableValue<Dimensions | null>(null);
 
-  const x = useSharedValue<null | number>(null);
-  const y = useSharedValue<null | number>(null);
+  const x = useMutableValue<null | number>(null);
+  const y = useMutableValue<null | number>(null);
 
   useAnimatedReaction(
     () => ({

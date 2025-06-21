@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
 
 import type {
   PortalContextType,
   PortalSubscription,
   Vector
 } from '../../types';
+import { useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 import { PortalOutletProvider } from './PortalOutletProvider';
 
@@ -23,7 +23,7 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
   >({});
   const subscribersRef = useRef<Record<string, Set<PortalSubscription>>>({});
 
-  const activeItemAbsolutePosition = useSharedValue<null | Vector>(null);
+  const activeItemAbsolutePosition = useMutableValue<null | Vector>(null);
 
   useEffect(() => {
     if (!enabled) {

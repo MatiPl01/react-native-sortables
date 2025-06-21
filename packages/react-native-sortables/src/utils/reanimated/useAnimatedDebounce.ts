@@ -1,14 +1,14 @@
 import { useCallback, useEffect } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
 
 import {
   type AnimatedTimeoutID,
   clearAnimatedTimeout,
   setAnimatedTimeout
 } from './animatedTimeout';
+import useMutableValue from './useMutableValue';
 
 export function useAnimatedDebounce() {
-  const updateTimeoutId = useSharedValue<AnimatedTimeoutID>(-1);
+  const updateTimeoutId = useMutableValue<AnimatedTimeoutID>(-1);
 
   useEffect(() => {
     return () => {

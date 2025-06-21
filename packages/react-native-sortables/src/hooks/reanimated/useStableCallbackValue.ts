@@ -1,11 +1,8 @@
 import { useCallback, useEffect } from 'react';
-import {
-  isWorkletFunction,
-  runOnJS,
-  useSharedValue
-} from 'react-native-reanimated';
+import { isWorkletFunction, runOnJS } from 'react-native-reanimated';
 
 import type { AnyFunction } from '../../types';
+import { useMutableValue } from '../../utils';
 
 // We cannot store a function as a SharedValue because reanimated will treat
 // it as an animation and will try to execute the animation when assigned
@@ -39,7 +36,7 @@ const wrap = <C extends AnyFunction>(callback: C): WrappedCallback<C> => {
 export default function useStableCallbackValue<C extends AnyFunction>(
   callback?: C
 ) {
-  const stableCallback = useSharedValue<null | WrappedCallback<C>>(null);
+  const stableCallback = useMutableValue<null | WrappedCallback<C>>(null);
 
   useEffect(() => {
     if (callback) {

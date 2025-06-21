@@ -5,13 +5,13 @@ import {
   useAnimatedReaction,
   useDerivedValue,
   useFrameCallback,
-  useScrollViewOffset,
-  useSharedValue
+  useScrollViewOffset
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
 import { useAnimatableValue } from '../../../hooks';
 import type { AutoScrollContextType, AutoScrollSettings } from '../../../types';
+import { useMutableValue } from '../../../utils';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useTargetScrollOffset } from './hooks';
@@ -31,7 +31,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
 
   const scrollOffset = useScrollViewOffset(scrollableRef);
   const dragStartScrollOffset = useAnimatableValue<null | number>(null);
-  const prevScrollToOffset = useSharedValue<null | number>(null);
+  const prevScrollToOffset = useMutableValue<null | number>(null);
   const scrollOffsetDiff = useDerivedValue(() => {
     if (dragStartScrollOffset.value === null) {
       return null;
@@ -45,7 +45,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   const enabled = useAnimatableValue(autoScrollEnabled);
   const speed = useAnimatableValue(autoScrollSpeed);
 
-  const isFrameCallbackActive = useSharedValue(false);
+  const isFrameCallbackActive = useMutableValue(false);
 
   const targetScrollOffset = useTargetScrollOffset(
     scrollableRef,

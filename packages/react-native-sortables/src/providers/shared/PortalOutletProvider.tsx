@@ -1,14 +1,10 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { MeasuredDimensions } from 'react-native-reanimated';
-import {
-  measure,
-  runOnUI,
-  useAnimatedRef,
-  useSharedValue
-} from 'react-native-reanimated';
+import { measure, runOnUI, useAnimatedRef } from 'react-native-reanimated';
 
 import type { PortalOutletContextType } from '../../types';
+import { useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 
 const { PortalOutletProvider, usePortalOutletContext } = createProvider(
@@ -16,7 +12,7 @@ const { PortalOutletProvider, usePortalOutletContext } = createProvider(
   { guarded: false }
 )<{ children: ReactNode }, PortalOutletContextType>(({ children }) => {
   const portalOutletRef = useAnimatedRef<View>();
-  const portalOutletMeasurements = useSharedValue<MeasuredDimensions | null>(
+  const portalOutletMeasurements = useMutableValue<MeasuredDimensions | null>(
     null
   );
 

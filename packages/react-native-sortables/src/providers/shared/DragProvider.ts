@@ -9,7 +9,6 @@ import {
   interpolate,
   measure,
   useAnimatedReaction,
-  useSharedValue,
   withTiming
 } from 'react-native-reanimated';
 
@@ -26,7 +25,8 @@ import {
   clearAnimatedTimeout,
   getKeyToIndex,
   getOffsetDistance,
-  setAnimatedTimeout
+  setAnimatedTimeout,
+  useMutableValue
 } from '../../utils';
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
@@ -101,14 +101,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     overDrag === 'horizontal' || overDrag === 'both';
   const hasVerticalOverDrag = overDrag === 'vertical' || overDrag === 'both';
 
-  const touchStartTouch = useSharedValue<null | TouchData>(null);
-  const currentTouch = useSharedValue<null | TouchData>(null);
-  const dragStartItemTouchOffset = useSharedValue<null | Vector>(null);
-  const dragStartTouchPosition = useSharedValue<null | Vector>(null);
-  const dragStartIndex = useSharedValue(-1);
+  const touchStartTouch = useMutableValue<null | TouchData>(null);
+  const currentTouch = useMutableValue<null | TouchData>(null);
+  const dragStartItemTouchOffset = useMutableValue<null | Vector>(null);
+  const dragStartTouchPosition = useMutableValue<null | Vector>(null);
+  const dragStartIndex = useMutableValue(-1);
 
   // used for activation and deactivation (drop)
-  const activationTimeoutId = useSharedValue(-1);
+  const activationTimeoutId = useMutableValue(-1);
 
   // Create stable callbacks to avoid re-rendering when the callback
   // function is not memoized

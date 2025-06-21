@@ -1,10 +1,6 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import {
-  useAnimatedReaction,
-  useDerivedValue,
-  useSharedValue
-} from 'react-native-reanimated';
+import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
 import { type DEFAULT_SORTABLE_FLEX_PROPS, IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
@@ -14,7 +10,7 @@ import {
   type RequiredBy,
   type SortableFlexStyle
 } from '../../../types';
-import { haveEqualPropValues } from '../../../utils';
+import { haveEqualPropValues, useMutableValue } from '../../../utils';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';
@@ -66,7 +62,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const { applyControlledContainerDimensions } = useMeasurementsContext();
   const debugContext = useDebugContext();
 
-  const keyToGroup = useSharedValue<Record<string, number>>({});
+  const keyToGroup = useMutableValue<Record<string, number>>({});
 
   const columnGap = useDerivedValue(() => columnGap_ ?? gap);
   const rowGap = useDerivedValue(() => rowGap_ ?? gap);
@@ -109,7 +105,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     };
   });
 
-  const appliedLayout = useSharedValue<FlexLayout | null>(null);
+  const appliedLayout = useMutableValue<FlexLayout | null>(null);
 
   // Because the number of groups can dynamically change after order change
   // and we can't detect that in the React runtime, we are creating debug
