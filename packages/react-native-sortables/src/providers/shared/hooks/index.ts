@@ -1,5 +1,4 @@
 export { default as useDebugBoundingBox } from './useDebugBoundingBox';
-export { default as useItemDecorationStyles } from './useItemDecorationValues';
 export { default as useItemPanGesture } from './useItemPanGesture';
 export { default as useItemStyles } from './useItemStyles';
 export { default as useOrderUpdater } from './useOrderUpdater';

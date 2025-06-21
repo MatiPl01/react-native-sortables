@@ -17,8 +17,7 @@ export default function useTeleportedItemPosition(
   activationAnimationProgress: SharedValue<number>
 ) {
   const { activeItemAbsolutePosition } = usePortalContext() ?? {};
-  const { activeItemKey, containerRef, itemPositions } =
-    useCommonValuesContext();
+  const { containerRef, itemPositions } = useCommonValuesContext();
 
   const dropStartValues = useMutableValue<null | {
     fromAbsolute: Vector;
@@ -29,7 +28,7 @@ export default function useTeleportedItemPosition(
   // Drop start values calculation reaction
   useAnimatedReaction(
     () => ({
-      active: activeItemKey.value === key
+      active: isActive.value
     }),
     ({ active }) => {
       if (active) {

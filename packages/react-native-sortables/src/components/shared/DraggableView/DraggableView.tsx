@@ -1,6 +1,5 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Fragment, memo, useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
   LayoutAnimationConfig,
@@ -73,6 +72,9 @@ function DraggableView({
     };
   }, [portalContext, teleportedItemId]);
 
+  const onMeasure = (width: number, height: number) =>
+    handleItemMeasurement(key, { height, width });
+
   const withItemContext = (component: ReactNode) => (
     <ItemContextProvider
       activationAnimationProgress={activationAnimationProgress}
@@ -83,16 +85,14 @@ function DraggableView({
     </ItemContextProvider>
   );
 
-  const renderItemCell = (hidden?: boolean) => {
+  const renderItemCell = (hidden = false) => {
     const innerComponent = (
       <ItemCell
         {...layoutAnimations}
-        // TODO - check if this hiding approach works
-        cellStyle={[style, itemStyles, hidden && styles.hidden]}
+        cellStyle={[style, itemStyles]}
+        hidden={hidden}
         itemsOverridesStyle={itemsOverridesStyle}
-        onMeasure={(width, height) =>
-          handleItemMeasurement(key, { height, width })
-        }>
+        onMeasure={onMeasure}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}
         </LayoutAnimationConfig>
@@ -128,7 +128,8 @@ function DraggableView({
           baseCellStyle={style}
           isActive={isActive}
           itemKey={key}
-          itemsOverridesStyle={itemsOverridesStyle}>
+          itemsOverridesStyle={itemsOverridesStyle}
+          onMeasure={onMeasure}>
           {children}
         </TeleportedItemCell>
       )}
@@ -149,11 +150,5 @@ function DraggableView({
     </Fragment>
   );
 }
-
-const styles = StyleSheet.create({
-  hidden: {
-    opacity: 0
-  }
-});
 
 export default memo(DraggableView);
