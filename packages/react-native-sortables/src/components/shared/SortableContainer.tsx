@@ -12,10 +12,12 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT, IS_WEB } from '../../constants';
-import { DebugOutlet } from '../../debug';
+import { DebugOutletProvider } from '../../debug';
 import {
+  MultiZoneOutlet,
   useCommonValuesContext,
-  useMeasurementsContext
+  useMeasurementsContext,
+  useMultiZoneContext
 } from '../../providers';
 import type {
   DimensionsAnimation,
@@ -56,8 +58,8 @@ export default function SortableContainer({
     shouldAnimateLayout,
     usesAbsoluteLayout
   } = useCommonValuesContext();
-  const { handleHelperContainerMeasurement, measurementsContainerRef } =
-    useMeasurementsContext();
+  const { handleHelperContainerMeasurement } = useMeasurementsContext();
+  const multiZoneContext = useMultiZoneContext();
 
   const animateWorklet = dimensionsAnimationType === 'worklet';
   const animateLayout = dimensionsAnimationType === 'layout';
@@ -132,15 +134,16 @@ export default function SortableContainer({
         />
       )}
       <AnimatedOnLayoutView
-        ref={measurementsContainerRef}
+        ref={containerRef}
         style={[StyleSheet.absoluteFill, animatedMeasurementsContainerStyle]}
         onLayout={handleHelperContainerMeasurement}
       />
-      <Animated.View ref={containerRef} style={[style, innerContainerStyle]}>
+      <Animated.View style={[style, innerContainerStyle]}>
         {children}
+        {multiZoneContext && <MultiZoneOutlet />}
+        {debug && <DebugOutletProvider />}
       </Animated.View>
       {/* Renders an overlay view helpful for debugging */}
-      {debug && <DebugOutlet />}
     </Animated.View>
   );
 }

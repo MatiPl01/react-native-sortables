@@ -2,7 +2,7 @@ import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 import type { Vector } from './layout/shared';
-import type { AnyRecord, Maybe } from './utils';
+import type { Maybe } from './utils';
 
 export enum DebugComponentType {
   CROSS = 'cross',
@@ -13,8 +13,9 @@ export enum DebugComponentType {
 export type DebugCrossProps = Pick<
   DebugLineProps,
   'color' | 'opacity' | 'style' | 'thickness' | 'visible'
-> &
-  (
+> & {
+  isAbsolute?: boolean;
+} & (
     | {
         x: Maybe<number>;
         y: Maybe<number>;
@@ -28,6 +29,7 @@ export type DebugCrossProps = Pick<
   );
 
 export type DebugLineProps = {
+  isAbsolute?: boolean;
   visible?: boolean;
   color?: ViewStyle['borderColor'];
   thickness?: number;
@@ -58,6 +60,7 @@ export type DebugRectProps = Pick<
   ViewStyle,
   'backgroundColor' | 'borderColor' | 'borderStyle' | 'borderWidth'
 > & {
+  isAbsolute?: boolean;
   backgroundOpacity?: number;
   visible?: boolean;
 } & (
@@ -103,7 +106,7 @@ export type WrappedProps<P> = { props: SharedValue<P> };
 
 type CreateDebugComponentUpdater<
   T extends DebugComponentType,
-  P extends AnyRecord
+  P extends { isAbsolute?: boolean }
 > = {
   props: SharedValue<P>;
   hide: () => void;

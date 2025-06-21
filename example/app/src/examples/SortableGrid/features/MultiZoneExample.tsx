@@ -17,14 +17,15 @@ export default function MultiZoneExample() {
 
   return (
     <ScrollScreen includeNavBarHeight>
-      <Sortable.MultiZoneProvider>
+      <Sortable.MultiZoneProvider minActivationDistance={10}>
         <Section title='Section 1'>
           <Sortable.Grid
             columnGap={spacing.xs}
             columns={COLUMNS}
             data={DATA}
             renderItem={renderItem}
-            rowGap={spacing.xs}
+            rowGap={80}
+            debug
           />
         </Section>
 

@@ -76,7 +76,10 @@ export default function SharedProvider({
     // Provider used for proper zIndex management
     <LayerProvider />,
     // Provider used for layout debugging (can be used only in dev mode)
-    __DEV__ && debug && <DebugProvider />,
+    // (In dev, if debug mode is not enabled on the component, we still have
+    // to use the DebugProvider but make it disabled to prevent capturing
+    // the debug context from the MultiZoneProvider if it is used)
+    __DEV__ && (debug ? <DebugProvider /> : <DebugProvider enabled={false} />),
     // Provider used for active item values
     <ActiveItemValuesProvider />,
     // Provider used for shared values between all providers below

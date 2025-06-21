@@ -69,7 +69,7 @@ export type CommonValuesContextType = ActiveItemValuesContextType &
   AnimatedValues<
     Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>
   > & {
-    componentId: number;
+    containerId: number;
 
     // ORDER
     indexToKey: SharedValue<Array<string>>;
@@ -101,7 +101,6 @@ export type CommonValuesContextType = ActiveItemValuesContextType &
 // MEASUREMENTS
 
 export type MeasurementsContextType = {
-  measurementsContainerRef: AnimatedRef<View>;
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   removeItemMeasurements: (key: string) => void;
@@ -193,6 +192,13 @@ export type PortalOutletContextType = {
   portalOutletMeasurements: SharedValue<MeasuredDimensions | null>;
 };
 
+// MULTI ZONE
+
+export type MultiZoneContextType = {
+  activeContainerId: SharedValue<null | string>;
+  minActivationDistance: SharedValue<number>;
+};
+
 // DEBUG
 
 export type DebugContextType = {
@@ -208,6 +214,12 @@ export type DebugContextType = {
   useDebugRect: () => DebugRectUpdater;
   useDebugCross: () => DebugCrossUpdater;
   useObserver: (observer: (views: DebugViews) => void) => void;
+};
+
+// DEBUG OUTLET
+
+export type DebugOutletContextType = {
+  debugOutletRef: AnimatedRef<View>;
 };
 
 // ORDER UPDATER

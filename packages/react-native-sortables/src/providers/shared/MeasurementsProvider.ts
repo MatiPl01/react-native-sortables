@@ -1,11 +1,6 @@
 import { useCallback } from 'react';
-import type { LayoutChangeEvent, View } from 'react-native';
-import {
-  measure,
-  runOnUI,
-  useAnimatedReaction,
-  useAnimatedRef
-} from 'react-native-reanimated';
+import type { LayoutChangeEvent } from 'react-native';
+import { measure, runOnUI, useAnimatedReaction } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
@@ -29,6 +24,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     activeItemDimensions,
     activeItemKey,
     containerHeight,
+    containerRef,
     containerWidth,
     controlledContainerDimensions,
     itemDimensions,
@@ -37,7 +33,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     usesAbsoluteLayout
   } = useCommonValuesContext();
 
-  const measurementsContainerRef = useAnimatedRef<View>();
   const measuredItemsCount = useMutableValue(0);
   const initialItemMeasurementsCompleted = useMutableValue(false);
   const debounce = useAnimatedDebounce();
@@ -151,11 +146,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const measureContainer = useCallback(() => {
     'worklet';
-    const measurements = measure(measurementsContainerRef);
+    const measurements = measure(containerRef);
     if (measurements) {
       applyMeasuredContainerDimensions(measurements);
     }
-  }, [applyMeasuredContainerDimensions, measurementsContainerRef]);
+  }, [applyMeasuredContainerDimensions, containerRef]);
 
   useAnimatedReaction(
     () => ({
@@ -196,7 +191,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       handleHelperContainerMeasurement,
       handleItemMeasurement,
       measureContainer,
-      measurementsContainerRef,
       removeItemMeasurements
     }
   };

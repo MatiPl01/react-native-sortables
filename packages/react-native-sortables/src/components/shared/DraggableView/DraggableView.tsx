@@ -40,10 +40,10 @@ function DraggableView({
   const commonValuesContext = useCommonValuesContext();
   const { handleItemMeasurement, removeItemMeasurements } =
     useMeasurementsContext();
-  const { activeItemKey, componentId, customHandle, itemsOverridesStyle } =
+  const { activeItemKey, containerId, customHandle, itemsOverridesStyle } =
     commonValuesContext;
 
-  const teleportedItemId = `${componentId}-${key}`;
+  const teleportedItemId = `${containerId}-${key}`;
 
   const [isTeleported, setIsTeleported] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
@@ -53,7 +53,7 @@ function DraggableView({
 
   useEffect(() => {
     return () => removeItemMeasurements(key);
-  }, [key, removeItemMeasurements, teleportedItemId]);
+  }, [key, removeItemMeasurements]);
 
   useEffect(() => {
     if (!portalContext) {

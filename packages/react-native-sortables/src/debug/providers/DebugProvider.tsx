@@ -15,11 +15,13 @@ import type { DebugContextType } from '../../types';
 import type { DebugComponentUpdater, DebugViews } from '../../types/debug';
 import { DebugComponentType } from '../../types/debug';
 
-type DebugProviderProps = PropsWithChildren<unknown>;
+type DebugProviderProps = PropsWithChildren<{
+  enabled?: boolean;
+}>;
 
 const { DebugProvider, useDebugContext } = createProvider('Debug', {
   guarded: false
-})<DebugProviderProps, DebugContextType>(() => {
+})<DebugProviderProps, DebugContextType>(({ enabled }) => {
   const debugIdRef = useRef(0);
   const debugViewsRef = useRef<DebugViews>({});
   const observersRef = useRef(new Set<(views: DebugViews) => void>());
@@ -202,6 +204,7 @@ const { DebugProvider, useDebugContext } = createProvider('Debug', {
   }, []);
 
   return {
+    enabled,
     value: {
       useDebugCross,
       useDebugLine,

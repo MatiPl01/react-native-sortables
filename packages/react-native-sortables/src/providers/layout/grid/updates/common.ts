@@ -184,51 +184,56 @@ export const createGridStrategy =
 
       // DEBUG ONLY
       if (debugBox) {
+        const offset = (coords: { x: number; y: number }) => ({
+          x: coords.x + (isVertical ? mainGap.value : crossGap.value) / 2,
+          y: coords.y + (isVertical ? crossGap.value : mainGap.value) / 2
+        });
+
         if (isVertical) {
           debugBox.top.update(
-            { x: mainBeforeBound, y: crossBeforeBound },
-            {
+            offset({ x: mainBeforeBound, y: crossBeforeBound }),
+            offset({
               x: mainAfterBound,
               y: Math.max(crossBeforeOffset, crossBeforeBound)
-            }
+            })
           );
           debugBox.bottom.update(
-            {
+            offset({
               x: mainBeforeBound,
               y: Math.min(crossAfterOffset, crossAfterBound)
-            },
-            { x: mainAfterBound, y: crossAfterBound }
+            }),
+            offset({ x: mainAfterBound, y: crossAfterBound })
           );
           debugBox.left.update(
-            { x: mainBeforeBound, y: crossBeforeBound },
-            { x: mainBeforeOffset, y: crossAfterBound }
+            offset({ x: mainBeforeBound, y: crossBeforeBound }),
+            offset({ x: mainBeforeOffset, y: crossAfterBound })
           );
           debugBox.right.update(
-            { x: mainAfterOffset, y: crossBeforeBound },
-            { x: mainAfterBound, y: crossAfterBound }
+            offset({ x: mainAfterOffset, y: crossBeforeBound }),
+            offset({ x: mainAfterBound, y: crossAfterBound })
           );
         } else {
           debugBox.top.update(
-            { x: crossBeforeBound, y: mainBeforeBound },
-            { x: crossAfterBound, y: mainBeforeOffset }
+            offset({ x: crossBeforeBound, y: mainBeforeBound }),
+            offset({ x: crossAfterBound, y: mainBeforeOffset })
           );
           debugBox.bottom.update(
-            { x: crossBeforeBound, y: mainAfterBound },
-            { x: crossAfterBound, y: mainAfterOffset }
+            offset({ x: crossBeforeBound, y: mainAfterBound }),
+            offset({ x: crossAfterBound, y: mainAfterOffset })
           );
           debugBox.left.update(
-            { x: crossBeforeBound, y: mainBeforeBound },
-            {
+            offset({ x: crossBeforeBound, y: mainBeforeBound }),
+            offset({
               x: Math.max(crossBeforeOffset, crossBeforeBound),
               y: mainAfterBound
-            }
+            })
           );
           debugBox.right.update(
-            {
+            offset({
               x: Math.min(crossAfterOffset, crossAfterBound),
               y: mainAfterBound
-            },
-            { x: crossAfterBound, y: mainBeforeBound }
+            }),
+            offset({ x: crossAfterBound, y: mainBeforeBound })
           );
         }
       }

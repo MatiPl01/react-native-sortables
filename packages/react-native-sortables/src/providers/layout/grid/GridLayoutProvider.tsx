@@ -97,11 +97,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         const gap = mainGap.value;
 
         for (let i = 0; i < numGroups - 1; i++) {
-          const size = value * (i + 1) + gap * i;
+          const pos = value * (i + 1) + gap * (i + 0.5);
 
           debugMainGapRects[i]?.set({
             ...DEBUG_COLORS,
-            ...(isVertical ? { width: gap, x: size } : { height: gap, y: size })
+            ...(isVertical ? { width: gap, x: pos } : { height: gap, y: pos })
           });
         }
       }
@@ -182,7 +182,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     if (debugCrossGapRects) {
       for (let i = 0; i < layout.crossAxisOffsets.length - 1; i++) {
         const size = crossGap.value;
-        const pos = layout.crossAxisOffsets[i + 1]! - crossGap.value;
+        const pos = layout.crossAxisOffsets[i + 1]! - crossGap.value / 2;
 
         debugCrossGapRects[i]?.set({
           ...DEBUG_COLORS,
