@@ -1,6 +1,5 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Fragment, memo, useEffect, useState } from 'react';
-import { StyleSheet, type ViewStyle } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
   LayoutAnimationConfig,
@@ -12,9 +11,8 @@ import {
   CommonValuesContext,
   ItemContextProvider,
   useCommonValuesContext,
-  useItemDecorationStyles,
-  useItemLayoutStyles,
   useItemPanGesture,
+  useItemStyles,
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
@@ -51,12 +49,7 @@ function DraggableView({
   const [isTeleported, setIsTeleported] = useState(false);
   const activationAnimationProgress = useSharedValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
-  const layoutStyles = useItemLayoutStyles(key, activationAnimationProgress);
-  const decorationStyles = useItemDecorationStyles(
-    key,
-    isActive,
-    activationAnimationProgress
-  );
+  const itemStyles = useItemStyles(key, isActive, activationAnimationProgress);
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
   useEffect(() => {
@@ -79,6 +72,9 @@ function DraggableView({
     };
   }, [portalContext, teleportedItemId]);
 
+  const onMeasure = (width: number, height: number) =>
+    handleItemMeasurement(key, { height, width });
+
   const withItemContext = (component: ReactNode) => (
     <ItemContextProvider
       activationAnimationProgress={activationAnimationProgress}
@@ -89,16 +85,14 @@ function DraggableView({
     </ItemContextProvider>
   );
 
-  const renderItemCell = (styleOverride?: ViewStyle) => {
+  const renderItemCell = (hidden = false) => {
     const innerComponent = (
       <ItemCell
         {...layoutAnimations}
-        cellStyle={[style, layoutStyles, styleOverride]}
-        decorationStyles={decorationStyles}
+        cellStyle={[style, itemStyles]}
+        hidden={hidden}
         itemsOverridesStyle={itemsOverridesStyle}
-        onMeasure={(width, height) =>
-          handleItemMeasurement(key, { height, width })
-        }>
+        onMeasure={onMeasure}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}
         </LayoutAnimationConfig>
@@ -134,7 +128,8 @@ function DraggableView({
           baseCellStyle={style}
           isActive={isActive}
           itemKey={key}
-          itemsOverridesStyle={itemsOverridesStyle}>
+          itemsOverridesStyle={itemsOverridesStyle}
+          onMeasure={onMeasure}>
           {children}
         </TeleportedItemCell>
       )}
@@ -145,7 +140,7 @@ function DraggableView({
     <Fragment>
       {/* We cannot unmount this item as its gesture detector must be still
       mounted to continue handling the pan gesture */}
-      {renderItemCell(isTeleported ? styles.hidden : undefined)}
+      {renderItemCell(isTeleported)}
       <ActiveItemPortal
         activationAnimationProgress={activationAnimationProgress}
         renderTeleportedItemCell={renderTeleportedItemCell}
@@ -155,11 +150,5 @@ function DraggableView({
     </Fragment>
   );
 }
-
-const styles = StyleSheet.create({
-  hidden: {
-    opacity: 0
-  }
-});
 
 export default memo(DraggableView);

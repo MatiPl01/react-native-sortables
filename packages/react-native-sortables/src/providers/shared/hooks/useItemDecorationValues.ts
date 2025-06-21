@@ -1,24 +1,19 @@
-import { useMemo } from 'react';
-import type { ViewStyle } from 'react-native';
-import { Platform, StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   interpolate,
   interpolateColor,
-  useAnimatedStyle,
   useDerivedValue,
   withTiming
 } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
-import type { AnimatedStyleProp } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
-export default function useItemDecorationStyles(
-  itemKey: string,
+export default function useItemDecorationValues(
+  key: string,
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
-): AnimatedStyleProp {
+) {
   const {
     activationAnimationDuration,
     activeItemOpacity,
@@ -31,7 +26,7 @@ export default function useItemDecorationStyles(
   } = useCommonValuesContext();
 
   const adjustedInactiveProgress = useDerivedValue(() => {
-    if (isActive.value || prevActiveItemKey.value === itemKey) {
+    if (isActive.value || prevActiveItemKey.value === key) {
       return withTiming(0, { duration: activationAnimationDuration.value });
     }
 
@@ -42,7 +37,7 @@ export default function useItemDecorationStyles(
     );
   });
 
-  const animatedStyle = useAnimatedStyle(() => {
+  return useDerivedValue(() => {
     const progress = activationAnimationProgress.value;
     const zeroProgressOpacity = interpolate(
       adjustedInactiveProgress.value,
@@ -83,23 +78,4 @@ export default function useItemDecorationStyles(
       ]
     };
   });
-
-  return useMemo(() => [styles.decoration, animatedStyle], [animatedStyle]);
 }
-
-const styles = StyleSheet.create({
-  decoration: Platform.select<ViewStyle>({
-    android: {
-      elevation: 5
-    },
-    default: {},
-    native: {
-      shadowOffset: {
-        height: 0,
-        width: 0
-      },
-      shadowOpacity: 1,
-      shadowRadius: 5
-    }
-  })
-});
