@@ -1,11 +1,9 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import type { LayerContextType, LayerState } from '../../types';
+import { useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 
 type LayerProviderProps = PropsWithChildren<{
@@ -18,7 +16,7 @@ const { LayerProvider, useLayerContext } = createProvider('Layer', {
   const { updateLayer: updateParentLayer } = (useLayerContext() ??
     {}) as Partial<LayerContextType>;
 
-  const zIndex = useSharedValue(0);
+  const zIndex = useMutableValue(0);
 
   const updateLayer = useCallback(
     (state: LayerState) => {

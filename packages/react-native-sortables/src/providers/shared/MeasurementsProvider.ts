@@ -4,14 +4,17 @@ import {
   measure,
   runOnUI,
   useAnimatedReaction,
-  useAnimatedRef,
-  useSharedValue
+  useAnimatedRef
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../constants';
 import { useUIStableCallback } from '../../hooks';
 import { type Dimensions, type MeasurementsContextType } from '../../types';
-import { areDimensionsDifferent, useAnimatedDebounce } from '../../utils';
+import {
+  areDimensionsDifferent,
+  useAnimatedDebounce,
+  useMutableValue
+} from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
@@ -35,8 +38,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   } = useCommonValuesContext();
 
   const measurementsContainerRef = useAnimatedRef<View>();
-  const measuredItemsCount = useSharedValue(0);
-  const initialItemMeasurementsCompleted = useSharedValue(false);
+  const measuredItemsCount = useMutableValue(0);
+  const initialItemMeasurementsCompleted = useMutableValue(false);
   const debounce = useAnimatedDebounce();
 
   const handleItemMeasurement = useUIStableCallback(

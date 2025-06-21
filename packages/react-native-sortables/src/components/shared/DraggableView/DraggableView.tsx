@@ -3,8 +3,7 @@ import { Fragment, memo, useEffect, useState } from 'react';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
   LayoutAnimationConfig,
-  useDerivedValue,
-  useSharedValue
+  useDerivedValue
 } from 'react-native-reanimated';
 
 import {
@@ -17,7 +16,7 @@ import {
   usePortalContext
 } from '../../../providers';
 import type { AnimatedStyleProp, LayoutAnimation } from '../../../types';
-import { getContextProvider } from '../../../utils';
+import { getContextProvider, useMutableValue } from '../../../utils';
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
 import TeleportedItemCell from './TeleportedItemCell';
@@ -47,7 +46,7 @@ function DraggableView({
   const teleportedItemId = `${componentId}-${key}`;
 
   const [isTeleported, setIsTeleported] = useState(false);
-  const activationAnimationProgress = useSharedValue(0);
+  const activationAnimationProgress = useMutableValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
   const itemStyles = useItemStyles(key, isActive, activationAnimationProgress);
   const gesture = useItemPanGesture(key, activationAnimationProgress);

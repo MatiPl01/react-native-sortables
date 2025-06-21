@@ -4,8 +4,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import {
   useAnimatedRef,
   useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue
+  useDerivedValue
 } from 'react-native-reanimated';
 
 import { useAnimatableValue } from '../../hooks';
@@ -21,7 +20,11 @@ import type {
   Maybe,
   Vector
 } from '../../types';
-import { areArraysDifferent, getKeyToIndex } from '../../utils';
+import {
+  areArraysDifferent,
+  getKeyToIndex,
+  useMutableValue
+} from '../../utils';
 import { createProvider } from '../utils';
 import { useActiveItemValuesContext } from './ActiveItemValuesProvider';
 
@@ -68,24 +71,24 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const prevKeysRef = useRef<Array<string>>([]);
 
     // ORDER
-    const indexToKey = useSharedValue<Array<string>>(itemKeys);
+    const indexToKey = useMutableValue<Array<string>>(itemKeys);
     const keyToIndex = useDerivedValue(() => getKeyToIndex(indexToKey.value));
 
     // POSITIONS
-    const itemPositions = useSharedValue<Record<string, Vector>>({});
+    const itemPositions = useMutableValue<Record<string, Vector>>({});
 
     // DIMENSIONS
     // measured dimensions via onLayout used to calculate containerWidth and containerHeight
     // (should be used for layout calculations and to determine if calculated
     // container dimensions have been applied)
-    const measuredContainerWidth = useSharedValue<null | number>(null);
-    const measuredContainerHeight = useSharedValue<null | number>(null);
+    const measuredContainerWidth = useMutableValue<null | number>(null);
+    const measuredContainerHeight = useMutableValue<null | number>(null);
     // calculated based on measuredContainerWidth and measuredContainerHeight and current layout
     // (containerWidth and containerHeight should be used in most cases)
-    const containerWidth = useSharedValue<null | number>(null);
-    const containerHeight = useSharedValue<null | number>(null);
-    const itemDimensions = useSharedValue<Record<string, Dimensions>>({});
-    const itemsStyleOverride = useSharedValue<Maybe<ViewStyle>>(
+    const containerWidth = useMutableValue<null | number>(null);
+    const containerHeight = useMutableValue<null | number>(null);
+    const itemDimensions = useMutableValue<Record<string, Dimensions>>({});
+    const itemsStyleOverride = useMutableValue<Maybe<ViewStyle>>(
       initialItemsStyleOverride
     );
 
@@ -116,8 +119,8 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // OTHER
     const containerRef = useAnimatedRef<View>();
     const sortEnabled = useAnimatableValue(_sortEnabled);
-    const usesAbsoluteLayout = useSharedValue(false);
-    const shouldAnimateLayout = useSharedValue(true);
+    const usesAbsoluteLayout = useMutableValue(false);
+    const shouldAnimateLayout = useMutableValue(true);
     const animateLayoutOnReorderOnly = useDerivedValue(
       () => itemsLayoutTransitionMode === 'reorder',
       [itemsLayoutTransitionMode]

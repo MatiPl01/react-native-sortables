@@ -1,10 +1,10 @@
 import { type ReactNode, useCallback } from 'react';
 import type { View } from 'react-native';
 import type { AnimatedRef, MeasuredDimensions } from 'react-native-reanimated';
-import { measure, runOnUI, useSharedValue } from 'react-native-reanimated';
+import { measure, runOnUI } from 'react-native-reanimated';
 
 import type { CustomHandleContextType, Vector } from '../../types';
-import { useAnimatedDebounce } from '../../utils';
+import { useAnimatedDebounce, useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
@@ -19,12 +19,12 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
   const { containerRef, itemPositions } = useCommonValuesContext();
   const debounce = useAnimatedDebounce();
 
-  const fixedItemKeys = useSharedValue<Record<string, boolean>>({});
-  const handleRefs = useSharedValue<Record<string, AnimatedRef<View>>>({});
-  const activeHandleMeasurements = useSharedValue<MeasuredDimensions | null>(
+  const fixedItemKeys = useMutableValue<Record<string, boolean>>({});
+  const handleRefs = useMutableValue<Record<string, AnimatedRef<View>>>({});
+  const activeHandleMeasurements = useMutableValue<MeasuredDimensions | null>(
     null
   );
-  const activeHandleOffset = useSharedValue<null | Vector>(null);
+  const activeHandleOffset = useMutableValue<null | Vector>(null);
 
   const registerHandle = useCallback(
     (key: string, handleRef: AnimatedRef<View>, fixed: boolean) => {

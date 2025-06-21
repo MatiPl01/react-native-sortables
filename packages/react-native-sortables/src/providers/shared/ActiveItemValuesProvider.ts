@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
 
 import type {
   ActiveItemValuesContextType,
@@ -7,6 +6,7 @@ import type {
   Vector
 } from '../../types';
 import { DragActivationState } from '../../types';
+import { useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 
 type ActiveItemValuesProviderProps = {
@@ -17,19 +17,19 @@ const { ActiveItemValuesProvider, useActiveItemValuesContext } = createProvider(
   'ActiveItemValues'
 )<ActiveItemValuesProviderProps, ActiveItemValuesContextType>(() => {
   // POSITIONS
-  const touchPosition = useSharedValue<null | Vector>(null);
-  const activeItemPosition = useSharedValue<null | Vector>(null);
+  const touchPosition = useMutableValue<null | Vector>(null);
+  const activeItemPosition = useMutableValue<null | Vector>(null);
 
   // DIMENSIONS
-  const activeItemDimensions = useSharedValue<Dimensions | null>(null);
+  const activeItemDimensions = useMutableValue<Dimensions | null>(null);
 
   // DRAG STATE
-  const activeItemKey = useSharedValue<null | string>(null);
-  const prevActiveItemKey = useSharedValue<null | string>(null);
-  const activationState = useSharedValue(DragActivationState.INACTIVE);
-  const activeAnimationProgress = useSharedValue(0);
-  const inactiveAnimationProgress = useSharedValue(0);
-  const activeItemDropped = useSharedValue(true);
+  const activeItemKey = useMutableValue<null | string>(null);
+  const prevActiveItemKey = useMutableValue<null | string>(null);
+  const activationState = useMutableValue(DragActivationState.INACTIVE);
+  const activeAnimationProgress = useMutableValue(0);
+  const inactiveAnimationProgress = useMutableValue(0);
+  const activeItemDropped = useMutableValue(true);
 
   return {
     value: {

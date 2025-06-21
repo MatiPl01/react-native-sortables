@@ -2,8 +2,7 @@ import { type PropsWithChildren, useCallback } from 'react';
 import {
   type SharedValue,
   useAnimatedReaction,
-  useDerivedValue,
-  useSharedValue
+  useDerivedValue
 } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
@@ -14,6 +13,7 @@ import {
   type GridLayout,
   type GridLayoutContextType
 } from '../../../types';
+import { useMutableValue } from '../../../utils';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout } from './utils';
@@ -69,7 +69,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
    * width - in vertical orientation (default) (columns are groups)
    * height - in horizontal orientation (rows are groups)
    */
-  const mainGroupSize = useSharedValue<null | number>(rowHeight ?? null);
+  const mainGroupSize = useMutableValue<null | number>(rowHeight ?? null);
 
   // MAIN GROUP SIZE UPDATER
   useAnimatedReaction(

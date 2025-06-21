@@ -1,7 +1,11 @@
-import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
+import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { EMPTY_ARRAY } from '../../../../constants';
-import { areArraysDifferent, reorderSwap } from '../../../../utils';
+import {
+  areArraysDifferent,
+  reorderSwap,
+  useMutableValue
+} from '../../../../utils';
 import { useCommonValuesContext } from '../../../shared';
 import { useGridLayoutContext } from '../GridLayoutProvider';
 import { getMainIndex } from '../utils';
@@ -26,7 +30,7 @@ import { createGridStrategy } from './common';
 function useInactiveIndexToKey() {
   const { activeItemKey, indexToKey, keyToIndex } = useCommonValuesContext();
   const { numGroups } = useGridLayoutContext();
-  const result = useSharedValue<Array<string>>(EMPTY_ARRAY);
+  const result = useMutableValue<Array<string>>(EMPTY_ARRAY);
 
   useAnimatedReaction(
     () => ({

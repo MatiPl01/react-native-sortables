@@ -1,9 +1,5 @@
 import type { SharedValue } from 'react-native-reanimated';
-import {
-  useAnimatedReaction,
-  useDerivedValue,
-  useSharedValue
-} from 'react-native-reanimated';
+import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
 import type {
   Coordinate,
@@ -15,7 +11,8 @@ import {
   error,
   gt as gt_,
   lt as lt_,
-  reorderInsert
+  reorderInsert,
+  useMutableValue
 } from '../../../../../utils';
 import {
   getAdditionalSwapOffset,
@@ -80,10 +77,12 @@ const useInsertStrategy: SortableFlexStrategyFactory = ({
     crossGap = rowGap;
   }
 
-  const swappedBeforeIndexes = useSharedValue<ItemGroupSwapResult | null>(null);
-  const swappedAfterIndexes = useSharedValue<ItemGroupSwapResult | null>(null);
-  const swappedBeforeLayout = useSharedValue<FlexLayout | null>(null);
-  const swappedAfterLayout = useSharedValue<FlexLayout | null>(null);
+  const swappedBeforeIndexes = useMutableValue<ItemGroupSwapResult | null>(
+    null
+  );
+  const swappedAfterIndexes = useMutableValue<ItemGroupSwapResult | null>(null);
+  const swappedBeforeLayout = useMutableValue<FlexLayout | null>(null);
+  const swappedAfterLayout = useMutableValue<FlexLayout | null>(null);
   const debugBox = useDebugBoundingBox();
 
   const activeGroupIndex = useDerivedValue(() => {
