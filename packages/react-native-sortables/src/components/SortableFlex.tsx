@@ -70,8 +70,8 @@ function SortableFlex(props: SortableFlexProps) {
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
       debug={debug}
-      initialItemsStyleOverride={styles.styleOverride}
       itemKeys={itemKeys}
+      initialCanMeasureItems
       onDragEnd={onDragEnd}>
       <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
         <OrderUpdaterComponent
@@ -176,7 +176,8 @@ function SortableFlexInner({
           entering={itemEntering ?? undefined}
           exiting={itemExiting ?? undefined}
           itemKey={key}
-          key={key}>
+          key={key}
+          style={styles.styleOverride}>
           {child}
         </DraggableView>
       ))}

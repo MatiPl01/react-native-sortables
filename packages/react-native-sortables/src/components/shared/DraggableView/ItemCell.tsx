@@ -5,7 +5,6 @@ import {
   StyleSheet,
   type ViewStyle
 } from 'react-native';
-import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
 
 import type {
@@ -16,7 +15,6 @@ import type {
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
 export type ItemCellProps = PropsWithChildren<{
-  itemsOverridesStyle: AnimatedStyle<ViewStyle>;
   cellStyle: AnimatedStyleProp;
   onMeasure: MeasureCallback;
   hidden?: boolean;
@@ -30,16 +28,8 @@ export default function ItemCell({
   entering,
   exiting,
   hidden,
-  itemsOverridesStyle,
   onMeasure
 }: ItemCellProps) {
-  const style = [
-    styles.decoration,
-    cellStyle,
-    itemsOverridesStyle,
-    hidden && styles.hidden
-  ];
-
   const onLayout = hidden
     ? undefined
     : ({
@@ -51,7 +41,9 @@ export default function ItemCell({
       };
 
   return (
-    <AnimatedOnLayoutView style={style} onLayout={onLayout}>
+    <AnimatedOnLayoutView
+      style={[styles.decoration, cellStyle, hidden && styles.hidden]}
+      onLayout={onLayout}>
       {/* TODO - remove itemEntering and itemExiting layout animation in sortables v2 */}
       {entering || exiting ? (
         <Animated.View entering={entering} exiting={exiting}>

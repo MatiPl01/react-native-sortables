@@ -42,7 +42,7 @@ type SharedProviderProps = PropsWithChildren<
       debug: boolean;
       controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
       itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
-      initialItemsStyleOverride?: ViewStyle;
+      initialCanMeasureItems?: boolean;
       dropIndicatorStyle?: ViewStyle;
     }
 >;
@@ -56,6 +56,7 @@ export default function SharedProvider({
   customHandle,
   debug,
   hapticsEnabled,
+  initialCanMeasureItems,
   itemKeys,
   onActiveItemDropped,
   onDragEnd,
@@ -86,7 +87,10 @@ export default function SharedProvider({
       {...rest}
     />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider itemsCount={itemKeys.length} />,
+    <MeasurementsProvider
+      initialCanMeasureItems={initialCanMeasureItems ?? false}
+      itemsCount={itemKeys.length}
+    />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (

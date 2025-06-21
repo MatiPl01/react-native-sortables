@@ -1,11 +1,13 @@
 import { StyleSheet } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated, { measure, useAnimatedStyle } from 'react-native-reanimated';
 
 import type { DebugRectProps, WrappedProps } from '../../types/debug';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
+import { useDebugOutletContext } from '../providers';
 
 export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
+  const { debugOutletRef } = useDebugOutletContext() ?? {};
   const screenDiagonal = useScreenDiagonal();
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -15,12 +17,14 @@ export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
       borderStyle = 'dashed',
       borderWidth = 2,
       from,
+      isAbsolute,
       positionOrigin: origin,
       to,
       visible = true,
       x,
       y
     } = props.value;
+
     let tX = 0,
       tY = 0;
 
@@ -54,13 +58,20 @@ export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
       }
     }
 
+    const measurements = isAbsolute
+      ? debugOutletRef && measure(debugOutletRef)
+      : undefined;
+
     return {
       borderColor,
       borderStyle,
       borderWidth,
       display: visible ? 'flex' : 'none',
       height,
-      transform: [{ translateX: tX }, { translateY: tY }],
+      transform: [
+        { translateX: tX - (measurements?.pageX ?? 0) },
+        { translateY: tY - (measurements?.pageY ?? 0) }
+      ],
       width
     };
   }, []);

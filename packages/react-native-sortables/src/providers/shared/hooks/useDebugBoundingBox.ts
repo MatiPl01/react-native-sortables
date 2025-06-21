@@ -7,7 +7,12 @@ import type { Vector } from '../../../types';
 import { isValidVector } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
-const DEBUG_COLORS = {
+type DebugRectColors = {
+  backgroundColor: string;
+  borderColor: string;
+};
+
+const DEBUG_COLORS: DebugRectColors = {
   backgroundColor: '#1111ef',
   borderColor: '#00007e'
 };
@@ -18,13 +23,15 @@ type DebugBox = Record<
   (typeof DEBUG_RECT_KEYS)[number],
   {
     hide: () => void;
-    update: (from: Vector, to: Vector) => void;
+    update: (from: Vector, to: Vector, colors?: DebugRectColors) => void;
   }
 > & {
   hide: () => void;
 };
 
-export default function useDebugBoundingBox(): DebugBox | undefined {
+export default function useDebugBoundingBox(
+  isAbsolute = false
+): DebugBox | undefined {
   if (!__DEV__) {
     return undefined;
   }
@@ -37,19 +44,20 @@ export default function useDebugBoundingBox(): DebugBox | undefined {
   );
 
   const updateDebugRect = useCallback(
-    (key: string, from: Vector, to: Vector) => {
+    (key: string, from: Vector, to: Vector, colors?: DebugRectColors) => {
       'worklet';
       if (!isValidVector(from) || !isValidVector(to)) {
         debugRects?.[key]?.hide();
       } else {
         debugRects?.[key]?.set({
-          ...DEBUG_COLORS,
+          ...(colors ?? DEBUG_COLORS),
           from,
+          isAbsolute,
           to
         });
       }
     },
-    [debugRects]
+    [debugRects, isAbsolute]
   );
 
   const debugBox = useMemo(
@@ -63,9 +71,9 @@ export default function useDebugBoundingBox(): DebugBox | undefined {
                 'worklet';
                 debugRects?.[key]?.hide();
               },
-              update: (from: Vector, to: Vector) => {
+              update: (from: Vector, to: Vector, colors?: DebugRectColors) => {
                 'worklet';
-                updateDebugRect(key, from, to);
+                updateDebugRect(key, from, to, colors);
               }
             }
           ])
