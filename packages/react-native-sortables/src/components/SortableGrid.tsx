@@ -191,9 +191,9 @@ function SortableGridInner<I>({
 
     return {
       flexBasis: 'auto',
+      [isVertical ? 'width' : 'height']: mainGroupSize.value,
       paddingHorizontal: 0,
-      paddingVertical: 0,
-      width: mainGroupSize.value
+      paddingVertical: 0
     };
   });
 
