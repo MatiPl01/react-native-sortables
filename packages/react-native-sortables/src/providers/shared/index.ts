@@ -18,6 +18,7 @@ export {
   MeasurementsProvider,
   useMeasurementsContext
 } from './MeasurementsProvider';
+export { MultiZoneProvider, useMultiZoneContext } from './MultiZoneProvider';
 export { usePortalOutletContext } from './PortalOutletProvider';
 export { PortalProvider, usePortalContext } from './PortalProvider';
 export * from './utils';

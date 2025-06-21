@@ -7,7 +7,7 @@ import {
 } from './components';
 export { useItemContext } from './providers';
 
-import { PortalProvider } from './providers';
+import { MultiZoneProvider, PortalProvider } from './providers';
 export type { CustomHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
@@ -168,6 +168,9 @@ const Sortable = {
    */
   Layer: SortableLayer,
 
+  // TODO - add doc string
+  MultiZoneProvider,
+
   /** Optional provider that renders dragged items above all other components that are
    * wrapped within the PortalProvider.
    *
@@ -195,7 +198,6 @@ const Sortable = {
    * ```
    */
   PortalProvider,
-
   /** Touchable component for use within sortable items.
    * Properly handles press gestures while preventing conflicts with drag-and-drop functionality.
    *
