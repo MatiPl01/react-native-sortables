@@ -5,8 +5,8 @@ import { runOnUI, useAnimatedRef } from 'react-native-reanimated';
 
 import {
   useCustomHandleContext,
-  useItemContext,
-  usePortalOutletContext
+  useIsInPortalOutlet,
+  useItemContext
 } from '../../providers';
 import { error } from '../../utils';
 
@@ -23,9 +23,8 @@ export type CustomHandleProps = PropsWithChildren<{
 
 export default function CustomHandle(props: CustomHandleProps) {
   // The item is teleported when it is rendered within the PortalOutlet
-  // component. Because PortalOutlet creates a context, we can use it to
-  // check if the item is teleported
-  const isTeleported = !!usePortalOutletContext();
+  // component
+  const isTeleported = useIsInPortalOutlet();
 
   // In case of teleported handle items, we want to render just the
   // handle component without any functionality

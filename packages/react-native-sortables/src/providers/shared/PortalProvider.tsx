@@ -1,5 +1,8 @@
 import type { PropsWithChildren } from 'react';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import type { View } from 'react-native';
+import type { MeasuredDimensions } from 'react-native-reanimated';
+import { measure, useAnimatedRef } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../integrations/reanimated';
 import type {
@@ -21,8 +24,12 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     Record<string, React.ReactNode>
   >({});
   const subscribersRef = useRef<Record<string, Set<PortalSubscription>>>({});
+  const portalOutletRef = useAnimatedRef<View>();
 
   const activeItemAbsolutePosition = useMutableValue<null | Vector>(null);
+  const portalOutletMeasurements = useMutableValue<MeasuredDimensions | null>(
+    null
+  );
 
   useEffect(() => {
     if (!enabled) {
@@ -61,11 +68,18 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     []
   );
 
+  const measurePortalOutlet = useCallback(() => {
+    'worklet';
+    portalOutletMeasurements.value = measure(portalOutletRef);
+  }, [portalOutletRef, portalOutletMeasurements]);
+
   return {
     children: (
       <Fragment>
         {children}
-        <PortalOutletProvider>
+        <PortalOutletProvider
+          measurePortalOutlet={measurePortalOutlet}
+          portalOutletRef={portalOutletRef}>
           {Object.entries(teleportedNodes).map(([id, node]) => (
             <Fragment key={id}>{node}</Fragment>
           ))}
@@ -75,6 +89,8 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     enabled,
     value: {
       activeItemAbsolutePosition,
+      measurePortalOutlet,
+      portalOutletMeasurements,
       subscribe,
       teleport
     }

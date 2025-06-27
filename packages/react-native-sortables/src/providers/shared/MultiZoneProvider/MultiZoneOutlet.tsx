@@ -20,7 +20,7 @@ export default function MultiZoneOutlet() {
     useCommonValuesContext();
   // Multi-zone provider uses portal context, so we can use it here
   const { activeItemAbsolutePosition } = usePortalContext()!;
-  const { activeContainerId, minActivationDistance } = useMultiZoneContext()!;
+  const { activeContainerId } = useMultiZoneContext()!;
 
   const debugBox = useDebugBoundingBox(true);
 
@@ -28,10 +28,9 @@ export default function MultiZoneOutlet() {
     () => ({
       activeContainer: activeContainerId.value,
       dimensions: activeItemDimensions.value,
-      offset: minActivationDistance.value,
       position: activeItemAbsolutePosition.value
     }),
-    ({ activeContainer, dimensions, offset, position }) => {
+    ({ activeContainer, dimensions, position }) => {
       // We don't want to activate the current container as long as other
       // container is active
       if (!position || !dimensions || activeContainer) {
@@ -49,10 +48,10 @@ export default function MultiZoneOutlet() {
       const { height, pageX, pageY, width } = container;
 
       // Check if the item is within the bounding box of the zone
-      const minX = pageX - offset;
-      const maxX = pageX + width + offset;
-      const minY = pageY - offset;
-      const maxY = pageY + height + offset;
+      const minX = pageX;
+      const maxX = pageX + width;
+      const minY = pageY;
+      const maxY = pageY + height;
 
       const isInZone =
         centerX >= minX &&

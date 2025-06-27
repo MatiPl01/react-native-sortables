@@ -23,6 +23,6 @@ export {
   MultiZoneProvider,
   useMultiZoneContext
 } from './MultiZoneProvider';
-export { usePortalOutletContext } from './PortalOutletProvider';
+export { useIsInPortalOutlet } from './PortalOutletProvider';
 export { PortalProvider, usePortalContext } from './PortalProvider';
 export * from './utils';

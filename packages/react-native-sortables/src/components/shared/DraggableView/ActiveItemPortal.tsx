@@ -20,7 +20,7 @@ export default function ActiveItemPortal({
   renderTeleportedItemCell,
   teleportedItemId
 }: ActiveItemPortalProps) {
-  const { teleport } = usePortalContext()!;
+  const { measurePortalOutlet, teleport } = usePortalContext()!;
   const teleportEnabled = useMutableValue(false);
 
   useEffect(() => {
@@ -44,6 +44,10 @@ export default function ActiveItemPortal({
     () => activationAnimationProgress.value,
     (progress, prevProgress) => {
       if (prevProgress && progress > prevProgress && !teleportEnabled.value) {
+        // We have to ensure that the portal outlet ref is measured before the
+        // teleported item is rendered within it because portal outlet position
+        // must be known to calculate the teleported item position
+        measurePortalOutlet?.();
         teleportEnabled.value = true;
         runOnJS(enableTeleport)();
       } else if (progress === 0 && teleportEnabled.value) {
