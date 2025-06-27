@@ -3,8 +3,8 @@ import type { ViewStyle } from 'react-native';
 import type { TouchData } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
+import type { LayoutAnimation } from '../../integrations/reanimated';
 import type { Vector } from '../layout/shared';
-import type { LayoutAnimation } from '../reanimated';
 import type { Animatable, AnimatableProps, Simplify } from '../utils';
 
 /** Props passed to a custom drop indicator component.

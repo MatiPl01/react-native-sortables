@@ -7,6 +7,10 @@ import {
   useDerivedValue
 } from 'react-native-reanimated';
 
+import type {
+  AnimatedStyleProp,
+  LayoutAnimation
+} from '../../../integrations/reanimated';
 import { useMutableValue } from '../../../integrations/reanimated';
 import {
   CommonValuesContext,
@@ -17,7 +21,6 @@ import {
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
-import type { AnimatedStyleProp, LayoutAnimation } from '../../../types';
 import { getContextProvider } from '../../../utils';
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
