@@ -457,6 +457,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       clearAnimatedTimeout(activationTimeoutId.value);
+
+      const fromIndex = dragStartIndex.value;
+      const toIndex = keyToIndex.value[key]!;
+
       touchStartTouch.value = null;
       currentTouch.value = null;
       activationState.value = DragActivationState.INACTIVE;
@@ -488,9 +492,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateStartScrollOffset?.(null);
       updateLayer?.(LayerState.INTERMEDIATE);
       haptics.medium();
-
-      const fromIndex = dragStartIndex.value;
-      const toIndex = keyToIndex.value[key]!;
 
       stableOnDragEnd({
         fromIndex,
