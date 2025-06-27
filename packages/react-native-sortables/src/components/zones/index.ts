@@ -1,1 +1,1 @@
-export { default as CallbackZone } from './BaseZone';
+export { default as BaseZone } from './BaseZone';

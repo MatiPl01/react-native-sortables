@@ -13,12 +13,8 @@ type PortalOutletProviderProps = PropsWithChildren<{
 const { PortalOutletProvider, usePortalOutletContext } = createProvider(
   'PortalOutlet',
   { guarded: false }
-)<PortalOutletProviderProps, true>(({
-  children,
-  measurePortalOutlet,
-  portalOutletRef
-}) => {
-  return {
+)<PortalOutletProviderProps, true>(
+  ({ children, measurePortalOutlet, portalOutletRef }) => ({
     children: (
       <View
         collapsable={false}
@@ -29,8 +25,8 @@ const { PortalOutletProvider, usePortalOutletContext } = createProvider(
       </View>
     ),
     value: true
-  };
-});
+  })
+);
 
 const styles = StyleSheet.create({
   container: {

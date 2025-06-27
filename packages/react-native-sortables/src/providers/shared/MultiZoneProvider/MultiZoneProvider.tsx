@@ -4,7 +4,7 @@ import type { Animatable } from '../../../integrations/reanimated';
 import { useMutableValue } from '../../../integrations/reanimated';
 import type { MultiZoneContextType } from '../../../types';
 import { createProvider } from '../../utils';
-import { PortalProvider, usePortalContext } from '../PortalProvider';
+import { PortalProvider } from '../PortalProvider';
 
 type MultiZoneProviderProps = PropsWithChildren<{
   minActivationDistance?: Animatable<number>;
@@ -16,10 +16,8 @@ const { MultiZoneProvider, useMultiZoneContext } = createProvider('MultiZone', {
   const activeContainerId = useMutableValue<null | string>(null);
 
   return {
-    children: !usePortalContext() ? (
-      <PortalProvider>{children}</PortalProvider>
-    ) : (
-      children
+    children: (
+      <PortalProvider propagateToOuterPortal>{children}</PortalProvider>
     ),
     value: {
       activeContainerId

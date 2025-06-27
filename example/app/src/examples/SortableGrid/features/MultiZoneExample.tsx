@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
@@ -30,16 +31,15 @@ export default function MultiZoneExample() {
         </Section>
 
         <Section title='Section 2'>
-          <Sortable.Grid
-            columnGap={spacing.xs}
-            columns={COLUMNS}
-            data={DATA}
-            renderItem={renderItem}
-            rowGap={spacing.xs}
-            debug
-          />
+          <Sortable.BaseZone style={styles.zone} />
         </Section>
       </Sortable.MultiZoneProvider>
     </ScrollScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  zone: {
+    height: 100
+  }
+});

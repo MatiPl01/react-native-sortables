@@ -28,10 +28,6 @@ export default function useTeleportedItemStyles(
   );
 
   return useAnimatedStyle(() => {
-    console.log('useTeleportedItemStyles', {
-      portalOutletMeasurements: portalOutletMeasurements?.value,
-      position: position.value
-    });
     if (!portalOutletMeasurements?.value || !position.value) {
       // This should never happen
       return { display: 'none' };
@@ -39,13 +35,6 @@ export default function useTeleportedItemStyles(
 
     const { pageX: outletX, pageY: outletY } = portalOutletMeasurements.value;
     const { x: itemX, y: itemY } = position.value;
-
-    console.log('useTeleportedItemStyles', {
-      itemX,
-      itemY,
-      outletX,
-      outletY
-    });
 
     return mergeStyles(
       {

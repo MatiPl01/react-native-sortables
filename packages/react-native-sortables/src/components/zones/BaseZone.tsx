@@ -1,18 +1,18 @@
 import { View, type ViewProps } from 'react-native';
 
-export type CallbacksZoneProps = ViewProps & {
-  onItemEnter: () => void;
-  onItemLeave: () => void;
-  onItemDrop: () => void;
+export type BaseZoneProps = ViewProps & {
+  onItemEnter?: () => void;
+  onItemLeave?: () => void;
+  onItemDrop?: () => void;
   minActivationDistance?: number;
 };
 
-export default function CallbackZone({
+export default function BaseZone({
   minActivationDistance = 0,
   onItemDrop,
   onItemEnter,
   onItemLeave,
   ...rest
-}: CallbacksZoneProps) {
+}: BaseZoneProps) {
   return <View {...rest} />;
 }
