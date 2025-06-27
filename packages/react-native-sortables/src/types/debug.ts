@@ -1,8 +1,8 @@
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
+import type { Maybe } from '../helperTypes';
 import type { Vector } from './layout/shared';
-import type { Maybe } from './utils';
 
 export enum DebugComponentType {
   CROSS = 'cross',

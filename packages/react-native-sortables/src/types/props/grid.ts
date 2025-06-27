@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import type { Simplify } from '../../helperTypes';
+import type { AnimatableProps } from '../../integrations/reanimated';
 import type {
   CommonValuesContextType,
   CustomHandleContextType,
@@ -7,7 +9,6 @@ import type {
   GridLayoutContextType,
   OrderUpdater
 } from '../providers';
-import type { AnimatableProps, Simplify } from '../utils';
 import type { DragEndParams, SharedProps } from './shared';
 
 /** Parameters passed to the onDragEnd callback of a sortable grid */

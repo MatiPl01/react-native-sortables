@@ -19,7 +19,7 @@ import { runOnJS } from 'react-native-reanimated';
 
 import { logger } from '../../../utils';
 
-export const WARNINGS = {
+const WARNINGS = {
   notAvailable: 'react-native-haptic-feedback is not available'
 };
 

@@ -3,6 +3,7 @@ import type { View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
 
+import type { Animatable } from '../../integrations/reanimated';
 import {
   useAnimatableValue,
   useMutableValue
@@ -10,7 +11,6 @@ import {
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
-  Animatable,
   CommonValuesContextType,
   ControlledContainerDimensions,
   Dimensions,

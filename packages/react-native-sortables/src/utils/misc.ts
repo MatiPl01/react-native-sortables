@@ -1,4 +1,4 @@
-import type { Maybe } from '../types/utils';
+import type { Maybe } from '../helperTypes';
 
 export const isPresent = <V>(value: Maybe<V>): value is V => {
   'worklet';

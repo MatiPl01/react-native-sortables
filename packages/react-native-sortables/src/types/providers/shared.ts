@@ -11,6 +11,13 @@ import type {
 } from 'react-native-reanimated';
 
 import type {
+  AnyRecord,
+  DeepReadonly,
+  Maybe,
+  Simplify
+} from '../../helperTypes';
+import type { AnimatedValues } from '../../integrations/reanimated';
+import type {
   DebugCrossUpdater,
   DebugLineUpdater,
   DebugRectUpdater,
@@ -24,13 +31,6 @@ import type {
   ReorderTriggerOrigin
 } from '../props/shared';
 import type { DragActivationState, LayerState } from '../state';
-import type {
-  AnimatedValues,
-  AnyRecord,
-  DeepReadonly,
-  Maybe,
-  Simplify
-} from '../utils';
 
 // COMMON VALUES
 

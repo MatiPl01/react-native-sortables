@@ -1,7 +1,7 @@
 import type { JSX, PropsWithChildren } from 'react';
 import { cloneElement, memo } from 'react';
 
-import type { Maybe } from '../../types';
+import type { Maybe } from '../../helperTypes';
 
 type ContextProviderComposerProps = PropsWithChildren<{
   providers: Array<false | Maybe<JSX.Element>>;

@@ -6,11 +6,11 @@ import {
 } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
+import type { Animatable } from '../../../integrations/reanimated';
 import {
   useAnimatableValue,
   useMutableValue
 } from '../../../integrations/reanimated';
-import type { Animatable } from '../../../types';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import {
   handleMeasurementsHorizontal,

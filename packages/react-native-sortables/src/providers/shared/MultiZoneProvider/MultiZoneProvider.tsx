@@ -1,10 +1,11 @@
 import type { PropsWithChildren } from 'react';
 
+import type { Animatable } from '../../../integrations/reanimated';
 import {
   useAnimatableValue,
   useMutableValue
 } from '../../../integrations/reanimated';
-import type { Animatable, MultiZoneContextType } from '../../../types';
+import type { MultiZoneContextType } from '../../../types';
 import { createProvider } from '../../utils';
 import { PortalProvider, usePortalContext } from '../PortalProvider';
 
