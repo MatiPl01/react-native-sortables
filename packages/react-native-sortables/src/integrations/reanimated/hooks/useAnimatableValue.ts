@@ -4,7 +4,7 @@
 import type { SharedValue } from 'react-native-reanimated';
 import { isSharedValue, useDerivedValue } from 'react-native-reanimated';
 
-import type { Animatable } from '../../types';
+import type { Animatable } from '../../../types';
 
 export default function useAnimatableValue<V>(
   value: Animatable<V>

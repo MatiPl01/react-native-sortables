@@ -17,10 +17,15 @@ import { NativeModules, TurboModuleRegistry } from 'react-native';
 import type { HapticOptions } from 'react-native-haptic-feedback';
 import { runOnJS } from 'react-native-reanimated';
 
-import { logger } from '../../utils';
+import { logger } from '../../../utils';
 
 export const WARNINGS = {
   notAvailable: 'react-native-haptic-feedback is not available'
+};
+
+const notAvailableCallback = () => {
+  'worklet';
+  logger.warn(WARNINGS.notAvailable);
 };
 
 const loadNative = (isTurboModuleEnabled: boolean) => {
@@ -36,7 +41,7 @@ const load = () => {
     const nativeTrigger = loadNative(isTurboModuleEnabled);
 
     if (!nativeTrigger) {
-      return null;
+      return notAvailableCallback;
     }
     // Lazy load the HapticFeedbackTypes
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -73,13 +78,13 @@ const load = () => {
           runOnJS(nativeTrigger)(type, triggerOptions);
         }
       } catch (_) {
-        logger.warn(WARNINGS.notAvailable);
+        notAvailableCallback();
       }
     };
 
     return trigger;
   } catch (_) {
-    return null;
+    return notAvailableCallback;
   }
 };
 

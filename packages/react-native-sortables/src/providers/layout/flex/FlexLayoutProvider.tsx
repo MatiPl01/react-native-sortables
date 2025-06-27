@@ -4,13 +4,14 @@ import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
 import { type DEFAULT_SORTABLE_FLEX_PROPS, IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
+import { useMutableValue } from '../../../integrations/reanimated';
 import {
   type FlexLayout,
   type FlexLayoutContextType,
   type RequiredBy,
   type SortableFlexStyle
 } from '../../../types';
-import { haveEqualPropValues, useMutableValue } from '../../../utils';
+import { haveEqualPropValues } from '../../../utils';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';

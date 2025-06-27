@@ -11,13 +11,13 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../integrations/reanimated';
 import { useCommonValuesContext } from '../../providers';
 import type {
   Dimensions,
   DropIndicatorComponentProps,
   Vector
 } from '../../types';
-import { useMutableValue } from '../../utils';
 
 const DEFAULT_STYLE: ViewStyle = {
   opacity: 0

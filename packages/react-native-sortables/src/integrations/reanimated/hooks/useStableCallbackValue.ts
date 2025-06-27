@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from 'react';
 import { isWorkletFunction, runOnJS } from 'react-native-reanimated';
 
-import type { AnyFunction } from '../../types';
-import { useMutableValue } from '../../utils';
+import type { AnyFunction } from '../../../types';
+import useMutableValue from './useMutableValue';
 
 // We cannot store a function as a SharedValue because reanimated will treat
 // it as an animation and will try to execute the animation when assigned

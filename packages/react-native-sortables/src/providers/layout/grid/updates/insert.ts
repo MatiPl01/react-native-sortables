@@ -1,11 +1,8 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { EMPTY_ARRAY } from '../../../../constants';
-import {
-  areArraysDifferent,
-  reorderInsert,
-  useMutableValue
-} from '../../../../utils';
+import { useMutableValue } from '../../../../integrations/reanimated';
+import { areArraysDifferent, reorderInsert } from '../../../../utils';
 import {
   useCommonValuesContext,
   useCustomHandleContext

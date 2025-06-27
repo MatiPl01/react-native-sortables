@@ -3,8 +3,11 @@ import type { View } from 'react-native';
 import type { AnimatedRef, MeasuredDimensions } from 'react-native-reanimated';
 import { measure, runOnUI } from 'react-native-reanimated';
 
+import {
+  useAnimatedDebounce,
+  useMutableValue
+} from '../../integrations/reanimated';
 import type { CustomHandleContextType, Vector } from '../../types';
-import { useAnimatedDebounce, useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 

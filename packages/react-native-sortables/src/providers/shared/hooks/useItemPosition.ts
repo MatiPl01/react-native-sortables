@@ -7,8 +7,9 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../../integrations/reanimated';
 import type { Vector } from '../../../types';
-import { areVectorsDifferent, useMutableValue } from '../../../utils';
+import { areVectorsDifferent } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
 export default function useItemPosition(

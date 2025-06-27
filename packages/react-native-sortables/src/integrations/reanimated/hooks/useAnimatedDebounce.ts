@@ -4,10 +4,10 @@ import {
   type AnimatedTimeoutID,
   clearAnimatedTimeout,
   setAnimatedTimeout
-} from './animatedTimeout';
+} from '../utils/animatedTimeout';
 import useMutableValue from './useMutableValue';
 
-export function useAnimatedDebounce() {
+export default function useAnimatedDebounce() {
   const updateTimeoutId = useMutableValue<AnimatedTimeoutID>(-1);
 
   useEffect(() => {
