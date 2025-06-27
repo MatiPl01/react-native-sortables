@@ -3,13 +3,13 @@ import type { LayoutChangeEvent } from 'react-native';
 import { measure, runOnUI, useAnimatedReaction } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../constants';
-import { useUIStableCallback } from '../../hooks';
-import { type Dimensions, type MeasurementsContextType } from '../../types';
+import { useStableCallback } from '../../hooks';
 import {
-  areDimensionsDifferent,
   useAnimatedDebounce,
   useMutableValue
-} from '../../utils';
+} from '../../integrations/reanimated';
+import { type Dimensions, type MeasurementsContextType } from '../../types';
+import { areDimensionsDifferent } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 
@@ -42,8 +42,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   const canMeasureItems = useMutableValue(initialCanMeasureItems);
   const debounce = useAnimatedDebounce();
 
-  const handleItemMeasurement = useUIStableCallback(
-    (key: string, dimensions: Dimensions) => {
+  const handleItemMeasurement = useStableCallback(
+    runOnUI((key: string, dimensions: Dimensions) => {
       'worklet';
       if (!canMeasureItems.value) {
         return;
@@ -81,14 +81,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
           debounce(itemDimensions.modify, 100);
         }
       }
-    }
+    })
   );
 
-  const removeItemMeasurements = useUIStableCallback((key: string) => {
-    'worklet';
-    delete itemDimensions.value[key];
-    measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
-  });
+  const removeItemMeasurements = useCallback(
+    (key: string) => {
+      'worklet';
+      delete itemDimensions.value[key];
+      measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
+    },
+    [itemDimensions, measuredItemsCount]
+  );
 
   const applyControlledContainerDimensions = useCallback(
     (dimensions: Partial<Dimensions>) => {
@@ -147,9 +150,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   );
 
   const handleHelperContainerMeasurement = useCallback(
-    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
-      runOnUI(applyMeasuredContainerDimensions)(layout);
-    },
+    ({ nativeEvent: { layout } }: LayoutChangeEvent) =>
+      runOnUI(applyMeasuredContainerDimensions)(layout),
     [applyMeasuredContainerDimensions]
   );
 

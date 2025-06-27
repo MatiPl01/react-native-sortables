@@ -6,8 +6,8 @@ import {
   useDerivedValue
 } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../../integrations/reanimated';
 import type { Vector } from '../../../types';
-import { useMutableValue } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { usePortalContext } from '../PortalProvider';
 

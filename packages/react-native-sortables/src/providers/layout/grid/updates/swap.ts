@@ -1,11 +1,8 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { EMPTY_ARRAY } from '../../../../constants';
-import {
-  areArraysDifferent,
-  reorderSwap,
-  useMutableValue
-} from '../../../../utils';
+import { useMutableValue } from '../../../../integrations/reanimated';
+import { areArraysDifferent, reorderSwap } from '../../../../utils';
 import { useCommonValuesContext } from '../../../shared';
 import { useGridLayoutContext } from '../GridLayoutProvider';
 import { getMainIndex } from '../utils';

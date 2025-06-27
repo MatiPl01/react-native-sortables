@@ -1,17 +1,16 @@
 import { useCallback, useMemo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 
-import { IS_WEB } from '../constants';
-import { ReactNativeHapticFeedback } from '../lib';
-import { WARNINGS } from '../lib/react-native-haptic-feedback';
-import { ensureExists } from '../utils';
+import { IS_WEB } from '../../../constants';
+import { ReactNativeHapticFeedback } from '../adapters';
 
 type HapticImpact = {
   light(): void;
   medium(): void;
 };
 
-let hapticFeedback: ReturnType<typeof ReactNativeHapticFeedback.load> = null;
+let hapticFeedback: null | ReturnType<typeof ReactNativeHapticFeedback.load> =
+  null;
 
 export default function useHaptics(enabled: boolean): HapticImpact {
   const isEnabled = !IS_WEB && enabled;
@@ -23,21 +22,15 @@ export default function useHaptics(enabled: boolean): HapticImpact {
 
   const light = useCallback(() => {
     'worklet';
-    if (
-      enabledValue.value &&
-      ensureExists(hapticFeedback, WARNINGS.notAvailable)
-    ) {
-      hapticFeedback('impactLight');
+    if (enabledValue.value) {
+      hapticFeedback?.('impactLight');
     }
   }, [enabledValue]);
 
   const medium = useCallback(() => {
     'worklet';
-    if (
-      enabledValue.value &&
-      ensureExists(hapticFeedback, WARNINGS.notAvailable)
-    ) {
-      hapticFeedback('impactMedium');
+    if (enabledValue.value) {
+      hapticFeedback?.('impactMedium');
     }
   }, [enabledValue]);
 

@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from 'react';
 
+import type { Simplify } from '../../helperTypes';
 import type {
   AlignContent,
   AlignItems,
@@ -14,7 +15,6 @@ import type {
   FlexLayoutContextType,
   OrderUpdater
 } from '../providers';
-import type { Simplify } from '../utils';
 import type { DragEndParams, SharedProps } from './shared';
 
 /** Parameters passed to the onDragEnd callback of a sortable flex container */

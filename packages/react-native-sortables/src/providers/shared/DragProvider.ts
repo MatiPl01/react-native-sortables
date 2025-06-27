@@ -12,7 +12,13 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import { useHaptics, useStableCallbackValue } from '../../hooks';
+import { useHaptics } from '../../integrations/haptics';
+import {
+  clearAnimatedTimeout,
+  setAnimatedTimeout,
+  useMutableValue,
+  useStableCallbackValue
+} from '../../integrations/reanimated';
 import type {
   Dimensions,
   DragContextType,
@@ -21,13 +27,7 @@ import type {
   Vector
 } from '../../types';
 import { DragActivationState, LayerState } from '../../types';
-import {
-  clearAnimatedTimeout,
-  getKeyToIndex,
-  getOffsetDistance,
-  setAnimatedTimeout,
-  useMutableValue
-} from '../../utils';
+import { getKeyToIndex, getOffsetDistance } from '../../utils';
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';

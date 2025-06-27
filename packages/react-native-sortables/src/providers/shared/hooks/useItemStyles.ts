@@ -2,7 +2,7 @@ import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle } from 'react-native-reanimated';
 
-import type { AnimatedStyleProp } from '../../../types';
+import type { AnimatedStyleProp } from '../../../integrations/reanimated';
 import { mergeStyles } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemDecorationValues from './useItemDecorationValues';

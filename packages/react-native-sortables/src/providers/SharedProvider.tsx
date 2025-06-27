@@ -6,16 +6,16 @@ import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { DebugProvider } from '../debug';
+import type { PartialBy } from '../helperTypes';
 import { useWarnOnPropChange } from '../hooks';
+import type { Animatable } from '../integrations/reanimated';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
-  Animatable,
   AutoScrollSettings,
   ControlledContainerDimensions,
   ItemDragSettings,
   ItemsLayoutTransitionMode,
-  PartialBy,
   SortableCallbacks
 } from '../types';
 import {

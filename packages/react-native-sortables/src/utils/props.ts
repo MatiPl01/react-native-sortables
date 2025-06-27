@@ -1,21 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 
 import { DEFAULT_SHARED_PROPS, STYLE_PROPS } from '../constants/props';
-import type { RequiredBy, SharedProps } from '../types';
+import type { AnyRecord, RequiredBy } from '../helperTypes';
+import type { SharedProps } from '../types';
 
-const hasStyleProp = <K extends string, P extends Record<string, any>>(
+const hasStyleProp = <K extends string, P extends AnyRecord>(
   styleKey: K,
   props: P
 ): props is P & { [key in K]: ViewStyle } => {
   return styleKey in props;
 };
 
-type PropsWithDefaults<
-  P extends Record<string, any>,
-  D extends Record<string, any>
-> = {
+type PropsWithDefaults<P extends AnyRecord, D extends AnyRecord> = {
   sharedProps: Required<{ [K in keyof SharedProps]: P[K] }>;
   rest: Omit<
     Omit<P, keyof D> & RequiredBy<P, keyof D & keyof P>,
@@ -23,10 +20,7 @@ type PropsWithDefaults<
   >;
 };
 
-export const getPropsWithDefaults = <
-  P extends Record<string, any>,
-  D extends Record<string, any>
->(
+export const getPropsWithDefaults = <P extends AnyRecord, D extends AnyRecord>(
   props: P,
   componentDefaultProps: D
 ): PropsWithDefaults<P, D> => {
@@ -68,8 +62,8 @@ export const getPropsWithDefaults = <
     }
   }
 
-  const sharedProps: Record<string, any> = {};
-  const rest: Record<string, any> = {};
+  const sharedProps: AnyRecord = {};
+  const rest: AnyRecord = {};
 
   for (const key in propsWithDefaults) {
     const k = key as keyof P;

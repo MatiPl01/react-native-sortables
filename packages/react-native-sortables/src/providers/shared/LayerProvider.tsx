@@ -2,8 +2,8 @@ import { type PropsWithChildren, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../integrations/reanimated';
 import type { LayerContextType, LayerState } from '../../types';
-import { useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 
 type LayerProviderProps = PropsWithChildren<{

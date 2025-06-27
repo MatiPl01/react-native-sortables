@@ -5,8 +5,8 @@ import {
   useAnimatedReaction
 } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../../integrations/reanimated';
 import { usePortalContext } from '../../../providers';
-import { useMutableValue } from '../../../utils';
 
 type ActiveItemPortalProps = PropsWithChildren<{
   teleportedItemId: string;

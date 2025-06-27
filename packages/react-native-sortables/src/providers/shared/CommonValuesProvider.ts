@@ -3,11 +3,14 @@ import type { View } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
 
-import { useAnimatableValue } from '../../hooks';
+import type { Animatable } from '../../integrations/reanimated';
+import {
+  useAnimatableValue,
+  useMutableValue
+} from '../../integrations/reanimated';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
-  Animatable,
   CommonValuesContextType,
   ControlledContainerDimensions,
   Dimensions,
@@ -15,11 +18,7 @@ import type {
   ItemsLayoutTransitionMode,
   Vector
 } from '../../types';
-import {
-  areArraysDifferent,
-  getKeyToIndex,
-  useMutableValue
-} from '../../utils';
+import { areArraysDifferent, getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
 import { useActiveItemValuesContext } from './ActiveItemValuesProvider';
 

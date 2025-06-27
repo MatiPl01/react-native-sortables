@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
 
+import { useMutableValue } from '../../integrations/reanimated';
 import type {
   ActiveItemValuesContextType,
   Dimensions,
   Vector
 } from '../../types';
 import { DragActivationState } from '../../types';
-import { useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 
 type ActiveItemValuesProviderProps = {

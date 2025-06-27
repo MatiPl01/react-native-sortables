@@ -4,7 +4,8 @@ import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
-import { useAnimatableValue, useDragEndHandler } from '../hooks';
+import { useDragEndHandler } from '../hooks';
+import { useAnimatableValue } from '../integrations/reanimated';
 import {
   GRID_STRATEGIES,
   GridLayoutProvider,

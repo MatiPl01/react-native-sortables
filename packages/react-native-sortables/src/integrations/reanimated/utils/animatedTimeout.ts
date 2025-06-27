@@ -1,6 +1,6 @@
 import { makeMutable } from 'react-native-reanimated';
 
-import type { AnyFunction } from '../../types';
+import type { AnyFunction } from '../../../helperTypes';
 
 const PENDING_TIMEOUTS = makeMutable<Record<string, boolean>>({});
 const TIMEOUT_ID = makeMutable(0);

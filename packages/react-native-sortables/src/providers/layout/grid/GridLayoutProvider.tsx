@@ -7,13 +7,12 @@ import {
 
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
-import { useAnimatableValue } from '../../../hooks';
+import type { Animatable } from '../../../integrations/reanimated';
 import {
-  type Animatable,
-  type GridLayout,
-  type GridLayoutContextType
-} from '../../../types';
-import { useMutableValue } from '../../../utils';
+  useAnimatableValue,
+  useMutableValue
+} from '../../../integrations/reanimated';
+import type { GridLayout, GridLayoutContextType } from '../../../types';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout } from './utils';

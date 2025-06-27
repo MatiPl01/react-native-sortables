@@ -1,8 +1,9 @@
 import { isWorkletFunction } from 'react-native-reanimated';
 
-import type { AnyRecord, DragEndCallback, DragEndParams } from '../../types';
+import type { AnyRecord } from '../../helperTypes';
+import { useStableCallbackValue } from '../../integrations/reanimated';
+import type { DragEndCallback, DragEndParams } from '../../types';
 import { logger } from '../../utils';
-import { useStableCallbackValue } from '../reanimated';
 
 export default function useDragEndHandler<P extends AnyRecord>(
   onDragEnd: ((params: P) => void) | undefined,

@@ -1,8 +1,8 @@
 import type { ViewStyle } from 'react-native';
 
 import { DefaultDropIndicator } from '../components/defaults';
+import type { DefaultProps } from '../helperTypes';
 import type {
-  DefaultProps,
   SharedProps,
   SortableCallbacks,
   SortableFlexProps,

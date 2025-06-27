@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 
-import type { AnyFunction } from '../../types';
+import type { AnyFunction } from '../../helperTypes';
 import useStableCallback from './useStableCallback';
 
 export default function useDebouncedStableCallback<C extends AnyFunction>(

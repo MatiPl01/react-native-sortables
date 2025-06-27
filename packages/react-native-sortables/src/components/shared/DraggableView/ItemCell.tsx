@@ -9,9 +9,9 @@ import Animated from 'react-native-reanimated';
 
 import type {
   AnimatedStyleProp,
-  LayoutAnimation,
-  MeasureCallback
-} from '../../../types';
+  LayoutAnimation
+} from '../../../integrations/reanimated';
+import type { MeasureCallback } from '../../../types';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
 export type ItemCellProps = PropsWithChildren<{

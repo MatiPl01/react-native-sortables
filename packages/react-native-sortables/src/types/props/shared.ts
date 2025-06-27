@@ -3,9 +3,13 @@ import type { ViewStyle } from 'react-native';
 import type { TouchData } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
+import type { Simplify } from '../../helperTypes';
+import type {
+  Animatable,
+  AnimatableProps,
+  LayoutAnimation
+} from '../../integrations/reanimated';
 import type { Vector } from '../layout/shared';
-import type { LayoutAnimation } from '../reanimated';
-import type { Animatable, AnimatableProps, Simplify } from '../utils';
 
 /** Props passed to a custom drop indicator component.
  * The drop indicator shows where the dragged item will be placed when dropped.

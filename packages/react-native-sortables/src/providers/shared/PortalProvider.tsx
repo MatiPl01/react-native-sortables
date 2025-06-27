@@ -1,12 +1,12 @@
 import type { PropsWithChildren } from 'react';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 
+import { useMutableValue } from '../../integrations/reanimated';
 import type {
   PortalContextType,
   PortalSubscription,
   Vector
 } from '../../types';
-import { useMutableValue } from '../../utils';
 import { createProvider } from '../utils';
 import { PortalOutletProvider } from './PortalOutletProvider';
 

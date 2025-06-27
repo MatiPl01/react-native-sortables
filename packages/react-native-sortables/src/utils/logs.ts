@@ -11,17 +11,6 @@ export const logger = {
   }
 };
 
-export const ensureExists = <T>(
-  value: T,
-  message: string
-): value is NonNullable<T> => {
-  'worklet';
-  if (value === undefined || value === null) {
-    logger.warn(message);
-  }
-  return !!value;
-};
-
 export const error = (message: string) => {
   'worklet';
   return new Error(`[${LIBRARY_NAME}] ${message}`);

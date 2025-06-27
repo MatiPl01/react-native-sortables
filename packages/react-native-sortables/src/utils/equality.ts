@@ -1,4 +1,5 @@
-import type { AnyRecord, Dimensions, Maybe, Vector } from '../types';
+import type { AnyRecord, Maybe } from '../helperTypes';
+import type { Dimensions, Vector } from '../types';
 
 export function lt(a: number, b: number): boolean {
   'worklet';

@@ -3,9 +3,15 @@ import { Fragment, memo, useEffect, useState } from 'react';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
   LayoutAnimationConfig,
+  runOnUI,
   useDerivedValue
 } from 'react-native-reanimated';
 
+import type {
+  AnimatedStyleProp,
+  LayoutAnimation
+} from '../../../integrations/reanimated';
+import { useMutableValue } from '../../../integrations/reanimated';
 import {
   CommonValuesContext,
   ItemContextProvider,
@@ -15,8 +21,7 @@ import {
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
-import type { AnimatedStyleProp, LayoutAnimation } from '../../../types';
-import { getContextProvider, useMutableValue } from '../../../utils';
+import { getContextProvider } from '../../../utils';
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
 import TeleportedItemCell from './TeleportedItemCell';
@@ -50,9 +55,10 @@ function DraggableView({
   const itemStyles = useItemStyles(key, isActive, activationAnimationProgress);
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
-  useEffect(() => {
-    return () => removeItemMeasurements(key);
-  }, [key, removeItemMeasurements]);
+  useEffect(
+    () => runOnUI(removeItemMeasurements)(key),
+    [key, removeItemMeasurements]
+  );
 
   useEffect(() => {
     if (!portalContext) {

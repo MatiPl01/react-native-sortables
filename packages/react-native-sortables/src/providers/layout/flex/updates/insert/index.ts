@@ -1,6 +1,7 @@
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../../../../integrations/reanimated';
 import type {
   Coordinate,
   Dimension,
@@ -11,8 +12,7 @@ import {
   error,
   gt as gt_,
   lt as lt_,
-  reorderInsert,
-  useMutableValue
+  reorderInsert
 } from '../../../../../utils';
 import {
   getAdditionalSwapOffset,

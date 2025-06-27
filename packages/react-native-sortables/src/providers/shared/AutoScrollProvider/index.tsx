@@ -9,9 +9,11 @@ import {
 } from 'react-native-reanimated';
 
 import { OFFSET_EPS } from '../../../constants';
-import { useAnimatableValue } from '../../../hooks';
+import {
+  useAnimatableValue,
+  useMutableValue
+} from '../../../integrations/reanimated';
 import type { AutoScrollContextType, AutoScrollSettings } from '../../../types';
-import { useMutableValue } from '../../../utils';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useTargetScrollOffset } from './hooks';
