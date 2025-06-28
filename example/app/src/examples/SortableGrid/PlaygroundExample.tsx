@@ -32,7 +32,7 @@ export default function PlaygroundExample() {
         data={DATA}
         renderItem={renderItem}
         rowGap={10}
-        strategy='swap'
+        // strategy='swap'
         debug
       />
     </ScrollScreen>
