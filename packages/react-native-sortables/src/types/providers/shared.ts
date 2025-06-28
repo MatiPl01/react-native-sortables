@@ -10,12 +10,7 @@ import type {
   SharedValue
 } from 'react-native-reanimated';
 
-import type {
-  AnyRecord,
-  DeepReadonly,
-  Maybe,
-  Simplify
-} from '../../helperTypes';
+import type { DeepReadonly, Maybe, Simplify } from '../../helperTypes';
 import type { AnimatedValues } from '../../integrations/reanimated';
 import type {
   DebugCrossUpdater,
@@ -217,16 +212,25 @@ export type OrderUpdater = (
   params: OrderUpdaterCallbackProps
 ) => Maybe<Array<string>>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyStrategyFactory = (props: any) => OrderUpdater;
+/**
+ * Factory function that creates custom sort strategies.
+ *
+ * Building a custom sort strategy requires the usage of internal contexts.
+ * These contexts are exported from the library and can be used in a similar
+ * way to how predefined strategies are built within the library.
+ *
+ * **IMPORTANT**: This function must be a hook since it needs to access internal contexts.
+ *
+ * @returns An OrderUpdater function that determines the new order of items
+ */
+export type SortStrategyFactory = () => OrderUpdater;
 
-export type PredefinedStrategies = Record<string, AnyStrategyFactory>;
+export type PredefinedStrategies = Record<string, SortStrategyFactory>;
 
 export type OrderUpdaterProps<
   P extends PredefinedStrategies = PredefinedStrategies
 > = {
   predefinedStrategies: P;
-  strategy: AnyStrategyFactory | keyof P;
+  strategy: keyof P | SortStrategyFactory;
   triggerOrigin: ReorderTriggerOrigin;
-  useAdditionalValues: () => AnyRecord;
 };

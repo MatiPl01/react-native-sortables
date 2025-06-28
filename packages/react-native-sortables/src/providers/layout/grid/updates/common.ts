@@ -4,28 +4,35 @@ import type {
   Coordinate,
   Dimension,
   ReorderFunction,
-  SortableGridStrategyFactory
+  SortStrategyFactory
 } from '../../../../types';
-import { getAdditionalSwapOffset, useDebugBoundingBox } from '../../../shared';
+import {
+  getAdditionalSwapOffset,
+  useCommonValuesContext,
+  useCustomHandleContext,
+  useDebugBoundingBox
+} from '../../../shared';
+import { useGridLayoutContext } from '../GridLayoutProvider';
 import { getCrossIndex, getMainIndex } from '../utils';
 
 export const createGridStrategy =
   (
     useInactiveIndexToKey: () => SharedValue<Array<string>>,
     reorder: ReorderFunction
-  ): SortableGridStrategyFactory =>
-  ({
-    containerHeight,
-    containerWidth,
-    crossGap,
-    fixedItemKeys,
-    indexToKey,
-    isVertical,
-    mainGap,
-    mainGroupSize,
-    numGroups,
-    useGridLayout
-  }) => {
+  ): SortStrategyFactory =>
+  () => {
+    const { containerHeight, containerWidth, indexToKey } =
+      useCommonValuesContext();
+    const {
+      crossGap,
+      isVertical,
+      mainGap,
+      mainGroupSize,
+      numGroups,
+      useGridLayout
+    } = useGridLayoutContext();
+    const { fixedItemKeys } = useCustomHandleContext() ?? {};
+
     const othersIndexToKey = useInactiveIndexToKey();
     const othersLayout = useGridLayout(othersIndexToKey);
     const debugBox = useDebugBoundingBox();

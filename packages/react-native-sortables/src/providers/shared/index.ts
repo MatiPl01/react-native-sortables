@@ -1,4 +1,4 @@
-export { AutoScrollProvider } from './AutoScrollProvider';
+export { AutoScrollProvider, useAutoScrollContext } from './AutoScrollProvider';
 export {
   CommonValuesContext,
   CommonValuesProvider,

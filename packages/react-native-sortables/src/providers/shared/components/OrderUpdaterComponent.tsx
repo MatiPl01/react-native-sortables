@@ -1,17 +1,14 @@
 import { useMemo, useRef } from 'react';
 
-import { useDebugContext } from '../../../debug';
 import type {
-  AnyStrategyFactory,
   OrderUpdaterProps,
-  PredefinedStrategies
+  PredefinedStrategies,
+  SortStrategyFactory
 } from '../../../types';
 import { error, typedMemo } from '../../../utils';
-import { useCommonValuesContext } from '../CommonValuesProvider';
-import { useCustomHandleContext } from '../CustomHandleProvider';
 import { useOrderUpdater } from '../hooks';
 
-export function useStrategyKey(strategy: AnyStrategyFactory | string) {
+export function useStrategyKey(strategy: SortStrategyFactory | string) {
   const counterRef = useRef(0);
 
   return useMemo(
@@ -24,23 +21,16 @@ export function useStrategyKey(strategy: AnyStrategyFactory | string) {
 function OrderUpdaterComponent<P extends PredefinedStrategies>({
   predefinedStrategies,
   strategy,
-  triggerOrigin,
-  useAdditionalValues
+  triggerOrigin
 }: OrderUpdaterProps<P>) {
-  const factory =
+  const useStrategy =
     typeof strategy === 'string' ? predefinedStrategies[strategy] : strategy;
 
-  if (!factory && typeof strategy === 'string') {
-    throw error(`'${strategy}' is not a valid ordering strategy`);
+  if (!useStrategy || typeof useStrategy !== 'function') {
+    throw error(`'${String(useStrategy)}' is not a valid ordering strategy`);
   }
 
-  const updater = (factory as AnyStrategyFactory)({
-    debugContext: useDebugContext(),
-    ...useCommonValuesContext(),
-    ...useCustomHandleContext(),
-    ...useAdditionalValues()
-  });
-
+  const updater = useStrategy();
   useOrderUpdater(updater, triggerOrigin);
 
   return null;

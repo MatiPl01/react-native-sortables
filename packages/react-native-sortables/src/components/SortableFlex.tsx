@@ -14,7 +14,6 @@ import {
   OrderUpdaterComponent,
   SharedProvider,
   useCommonValuesContext,
-  useFlexLayoutContext,
   useStrategyKey
 } from '../providers';
 import type { DropIndicatorSettings, SortableFlexProps } from '../types';
@@ -79,7 +78,6 @@ function SortableFlex(props: SortableFlexProps) {
           predefinedStrategies={FLEX_STRATEGIES}
           strategy={strategy}
           triggerOrigin={reorderTriggerOrigin}
-          useAdditionalValues={useFlexLayoutContext}
         />
         <SortableFlexInner
           childrenArray={childrenArray}

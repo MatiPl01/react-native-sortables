@@ -8,13 +8,7 @@ import type {
   FlexWrap,
   JustifyContent
 } from '../layout/flex';
-import type {
-  CommonValuesContextType,
-  CustomHandleContextType,
-  DebugContextType,
-  FlexLayoutContextType,
-  OrderUpdater
-} from '../providers';
+import type { SortStrategyFactory } from '../providers';
 import type { DragEndParams, SharedProps } from './shared';
 
 /** Parameters passed to the onDragEnd callback of a sortable flex container */
@@ -37,24 +31,12 @@ export type SortableFlexDragEndCallback = (
   params: SortableFlexDragEndParams
 ) => void;
 
-/** Factory function for creating custom reordering strategies
- * @param props Context values and layout information
- * @returns Function to update item order
- */
-export type SortableFlexStrategyFactory = (
-  props: Simplify<
-    CommonValuesContextType &
-      FlexLayoutContextType &
-      Partial<CustomHandleContextType> & { debugContext?: DebugContextType }
-  >
-) => OrderUpdater;
-
 /** Strategy to use for reordering items:
  * - 'insert': Shifts all items between the dragged item and the target
  * position to make space for the dragged item
  * - Or a custom strategy factory function
  */
-export type SortableFlexStrategy = 'insert' | SortableFlexStrategyFactory;
+export type SortableFlexStrategy = 'insert' | SortStrategyFactory;
 
 /** Style properties for the flex container */
 export type SortableFlexStyle = {

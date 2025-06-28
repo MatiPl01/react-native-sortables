@@ -6,7 +6,7 @@ import type {
   Coordinate,
   Dimension,
   FlexLayout,
-  SortableFlexStrategyFactory
+  SortStrategyFactory
 } from '../../../../../types';
 import {
   error,
@@ -16,8 +16,11 @@ import {
 } from '../../../../../utils';
 import {
   getAdditionalSwapOffset,
+  useCommonValuesContext,
+  useCustomHandleContext,
   useDebugBoundingBox
 } from '../../../../shared';
+import { useFlexLayoutContext } from '../../FlexLayoutProvider';
 import type { ItemGroupSwapProps, ItemGroupSwapResult } from './utils';
 import {
   getSwappedToGroupAfterIndices,
@@ -25,20 +28,20 @@ import {
   getTotalGroupSize
 } from './utils';
 
-const useInsertStrategy: SortableFlexStrategyFactory = ({
-  activeItemKey,
-  appliedLayout,
-  calculateFlexLayout,
-  columnGap,
-  fixedItemKeys,
-  flexDirection,
-  indexToKey,
-  itemDimensions,
-  keyToGroup,
-  keyToIndex,
-  rowGap,
-  useFlexLayoutReaction
-}) => {
+const useInsertStrategy: SortStrategyFactory = () => {
+  const { activeItemKey, indexToKey, itemDimensions, keyToIndex } =
+    useCommonValuesContext();
+  const {
+    appliedLayout,
+    calculateFlexLayout,
+    columnGap,
+    flexDirection,
+    keyToGroup,
+    rowGap,
+    useFlexLayoutReaction
+  } = useFlexLayoutContext();
+  const { fixedItemKeys } = useCustomHandleContext() ?? {};
+
   useAnimatedReaction(
     () => fixedItemKeys?.value,
     fixedKeys => {

@@ -2,13 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { Simplify } from '../../helperTypes';
 import type { AnimatableProps } from '../../integrations/reanimated';
-import type {
-  CommonValuesContextType,
-  CustomHandleContextType,
-  DebugContextType,
-  GridLayoutContextType,
-  OrderUpdater
-} from '../providers';
+import type { SortStrategyFactory } from '../providers';
 import type { DragEndParams, SharedProps } from './shared';
 
 /** Parameters passed to the onDragEnd callback of a sortable grid */
@@ -61,28 +55,13 @@ export type SortableGridRenderItem<I> = (
   info: SortableGridRenderItemInfo<I>
 ) => ReactNode;
 
-/** Factory function for creating custom reordering strategies
- * @param props Context values and layout information
- * @returns Function to update item order
- */
-export type SortableGridStrategyFactory = (
-  props: Simplify<
-    CommonValuesContextType &
-      GridLayoutContextType &
-      Partial<CustomHandleContextType> & { debugContext?: DebugContextType }
-  >
-) => OrderUpdater;
-
 /** Strategy to use for reordering items:
  * - 'insert': Shifts all items between the dragged item and the target
  * position to make space for the dragged item
  * - 'swap': Swaps the dragged item with the item at the target position
  * - Or a custom strategy factory function
  */
-export type SortableGridStrategy =
-  | 'insert'
-  | 'swap'
-  | SortableGridStrategyFactory;
+export type SortableGridStrategy = 'insert' | 'swap' | SortStrategyFactory;
 
 /** Props for the SortableGrid component */
 export type SortableGridProps<I> = Simplify<
