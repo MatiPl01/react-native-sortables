@@ -219,6 +219,8 @@ export type OrderUpdater = (
  * These contexts are exported from the library and can be used in a similar
  * way to how predefined strategies are built within the library.
  *
+ * **IMPORTANT**: This function must be a hook since it needs to access internal contexts.
+ *
  * @returns An OrderUpdater function that determines the new order of items
  */
 export type SortStrategyFactory = () => OrderUpdater;
