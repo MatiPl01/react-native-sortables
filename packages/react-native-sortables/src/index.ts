@@ -6,11 +6,23 @@ import {
   SortableLayer,
   SortableTouchable
 } from './components';
-export { useItemContext } from './providers';
+import { MultiZoneProvider, PortalProvider } from './providers';
 
-import { MultiZoneProvider, PortalProvider, useZoneContext } from './providers';
 export type { CustomHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
+export { useItemContext } from './providers';
+export {
+  useAutoScrollContext,
+  useCommonValuesContext,
+  useCustomHandleContext,
+  useDragContext,
+  useFlexLayoutContext,
+  useGridLayoutContext,
+  useIsInPortalOutlet,
+  useMeasurementsContext,
+  usePortalContext,
+  useZoneContext
+} from './providers';
 export type {
   ActiveItemDroppedCallback,
   ActiveItemDroppedParams,
@@ -28,7 +40,6 @@ export type {
   SortableFlexDragEndParams,
   SortableFlexProps,
   SortableFlexStrategy,
-  SortableFlexStrategyFactory,
   SortableFlexStyle,
   SortableGridDragEndCallback,
   SortableGridDragEndParams,
@@ -36,7 +47,7 @@ export type {
   SortableGridRenderItem,
   SortableGridRenderItemInfo,
   SortableGridStrategy,
-  SortableGridStrategyFactory
+  SortStrategyFactory
 } from './types';
 export { DragActivationState } from './types';
 
@@ -231,7 +242,5 @@ const Sortable = {
    */
   Touchable: SortableTouchable
 };
-
-export { useZoneContext };
 
 export default Sortable;

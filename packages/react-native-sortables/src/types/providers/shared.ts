@@ -10,12 +10,7 @@ import type {
   SharedValue
 } from 'react-native-reanimated';
 
-import type {
-  AnyRecord,
-  DeepReadonly,
-  Maybe,
-  Simplify
-} from '../../helperTypes';
+import type { DeepReadonly, Maybe, Simplify } from '../../helperTypes';
 import type { AnimatedValues } from '../../integrations/reanimated';
 import type {
   DebugCrossUpdater,
@@ -217,16 +212,14 @@ export type OrderUpdater = (
   params: OrderUpdaterCallbackProps
 ) => Maybe<Array<string>>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyStrategyFactory = (props: any) => OrderUpdater;
+export type SortStrategyFactory = () => OrderUpdater;
 
-export type PredefinedStrategies = Record<string, AnyStrategyFactory>;
+export type PredefinedStrategies = Record<string, SortStrategyFactory>;
 
 export type OrderUpdaterProps<
   P extends PredefinedStrategies = PredefinedStrategies
 > = {
   predefinedStrategies: P;
-  strategy: AnyStrategyFactory | keyof P;
+  strategy: keyof P | SortStrategyFactory;
   triggerOrigin: ReorderTriggerOrigin;
-  useAdditionalValues: () => AnyRecord;
 };

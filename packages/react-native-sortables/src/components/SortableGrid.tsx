@@ -104,7 +104,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
           predefinedStrategies={GRID_STRATEGIES}
           strategy={strategy}
           triggerOrigin={reorderTriggerOrigin}
-          useAdditionalValues={useGridLayoutContext}
         />
         <SortableGridInner
           columnGap={columnGapValue}
