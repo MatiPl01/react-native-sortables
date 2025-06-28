@@ -1,6 +1,6 @@
 import { error } from '../../../../utils';
 import { usePortalContext } from '../../PortalProvider';
-import { useMultiZoneContext } from '..';
+import { useMultiZoneContext } from '../MultiZoneProvider';
 
 export default function useZoneContext() {
   const multiZoneContext = useMultiZoneContext();

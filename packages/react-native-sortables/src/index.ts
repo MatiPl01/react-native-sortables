@@ -8,7 +8,7 @@ import {
 } from './components';
 export { useItemContext } from './providers';
 
-import { MultiZoneProvider, PortalProvider } from './providers';
+import { MultiZoneProvider, PortalProvider, useZoneContext } from './providers';
 export type { CustomHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
@@ -231,5 +231,7 @@ const Sortable = {
    */
   Touchable: SortableTouchable
 };
+
+export { useZoneContext };
 
 export default Sortable;

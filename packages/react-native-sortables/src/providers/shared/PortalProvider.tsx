@@ -36,12 +36,9 @@ type PortalProviderProps = PropsWithChildren<{
   propagateToOuterPortal?: boolean;
 }>;
 
-const { PortalContext, PortalProvider, usePortalContext } = createProvider(
-  'Portal',
-  {
-    guarded: false
-  }
-)<PortalProviderProps, PortalContextType>(({
+const { PortalProvider, usePortalContext } = createProvider('Portal', {
+  guarded: false
+})<PortalProviderProps, PortalContextType>(({
   children,
   enabled,
   propagateToOuterPortal = false
@@ -143,4 +140,4 @@ const { PortalContext, PortalProvider, usePortalContext } = createProvider(
   };
 });
 
-export { PortalContext, PortalProvider, usePortalContext };
+export { PortalProvider, usePortalContext };
