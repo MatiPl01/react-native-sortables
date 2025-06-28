@@ -70,7 +70,7 @@ type GridItemProps = {
 const GridItem = memo(function GridItem({ fixed, item, onTap }: GridItemProps) {
   return (
     <Sortable.Touchable onTap={() => onTap(item)}>
-      <Sortable.Handle mode={fixed ? 'fixed' : 'draggable'}>
+      <Sortable.Handle mode={fixed ? 'fixed-order' : 'draggable'}>
         <View
           style={[
             styles.card,

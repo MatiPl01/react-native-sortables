@@ -61,7 +61,7 @@ type FlexItemProps = {
 const FlexItem = memo(function FlexItem({ fixed, item, onTap }: FlexItemProps) {
   return (
     <Sortable.Touchable key={item} onTap={() => onTap(item)}>
-      <Sortable.Handle mode={fixed ? 'fixed' : 'draggable'}>
+      <Sortable.Handle mode={fixed ? 'fixed-order' : 'draggable'}>
         <View
           style={[
             styles.card,

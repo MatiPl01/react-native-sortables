@@ -18,7 +18,7 @@ export type CustomHandleProps = PropsWithChildren<{
    * - 'fixed': Item stays in place and cannot be dragged
    * @default 'draggable'
    */
-  mode?: 'draggable' | 'fixed' | 'non-draggable';
+  mode?: 'draggable' | 'fixed-order' | 'non-draggable';
 }>;
 
 export default function CustomHandle(props: CustomHandleProps) {
@@ -54,7 +54,7 @@ function CustomHandleComponent({
   const dragEnabled = mode === 'draggable';
 
   useEffect(() => {
-    return registerHandle(itemKey, handleRef, mode === 'fixed');
+    return registerHandle(itemKey, handleRef, mode === 'fixed-order');
   }, [handleRef, itemKey, registerHandle, mode]);
 
   const onLayout = useCallback(() => {

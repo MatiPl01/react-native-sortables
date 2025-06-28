@@ -86,6 +86,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
             activeItemIndex: keyToIndex.value[activeItemKey.value]!,
             activeItemKey: activeItemKey.value,
             currentGroupIndex: activeGroupIndex.value,
+            fixedKeys: fixedItemKeys?.value,
             groupSizeLimit: appliedLayout.value.groupSizeLimit,
             indexToKey: indexToKey.value,
             itemDimensions: itemDimensions.value,
@@ -133,6 +134,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
       'activeItemIndex' | 'currentGroupIndex'
     > = {
       activeItemKey: activeKey,
+      fixedKeys: fixedItemKeys?.value,
       groupSizeLimit: currentLayout.groupSizeLimit,
       indexToKey: indexToKey.value,
       itemDimensions: itemDimensions.value,
@@ -265,12 +267,11 @@ const useInsertStrategy: SortStrategyFactory = () => {
       if (activeIndex === lastItemIndex) {
         return null;
       }
-      // TODO - add fixed items support in flex
       return reorderInsert(
         indexToKey.value,
         activeIndex,
         lastItemIndex,
-        undefined
+        fixedItemKeys?.value
       );
     }
     const mainAxisPosition = position[mainCoordinate];
@@ -450,17 +451,21 @@ const useInsertStrategy: SortStrategyFactory = () => {
       }
     }
 
-    const newActiveIndex =
+    const newIndex =
       firstGroupItemIndex + (itemIndexInGroup - initialItemIndexInGroup);
 
-    if (newActiveIndex === activeIndex) return;
+    if (
+      newIndex === activeIndex ||
+      fixedItemKeys?.value?.[indexToKey.value[newIndex]!]
+    ) {
+      return;
+    }
 
     return reorderInsert(
       indexToKey.value,
       activeIndex,
-      newActiveIndex,
-      undefined
-      // TODO - add fixed items support in flex
+      newIndex,
+      fixedItemKeys?.value
     );
   };
 };
