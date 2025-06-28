@@ -27,6 +27,7 @@ export const reorderInsert = (
   fixedItemKeys: Record<string, boolean> | undefined
 ) => {
   'worklet';
+  toIndex = Math.min(toIndex, indexToKey.length - 1);
   const direction = toIndex > fromIndex ? -1 : 1;
   const fromKey = indexToKey[fromIndex]!;
   const op = direction < 0 ? lt : gt;
@@ -58,6 +59,9 @@ export const reorderSwap = (
   toIndex: number
 ) => {
   'worklet';
+  if (toIndex > indexToKey.length - 1) {
+    return indexToKey;
+  }
   const result = [...indexToKey];
   [result[fromIndex], result[toIndex]] = [result[toIndex]!, result[fromIndex]!];
   return result;
