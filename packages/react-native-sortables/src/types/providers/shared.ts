@@ -181,7 +181,8 @@ export type PortalContextType = {
 // MULTI ZONE
 
 export type MultiZoneContextType = {
-  activeContainerId: SharedValue<null | string>;
+  activeContainerId: SharedValue<null | number>;
+  activeItemDimensions: SharedValue<Dimensions | null>;
 };
 
 // DEBUG

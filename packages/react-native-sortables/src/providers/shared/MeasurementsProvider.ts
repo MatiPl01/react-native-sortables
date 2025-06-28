@@ -12,6 +12,7 @@ import { type Dimensions, type MeasurementsContextType } from '../../types';
 import { areDimensionsDifferent } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
+import { useMultiZoneContext } from './MultiZoneProvider/MultiZoneProvider';
 
 type MeasurementsProviderProps = {
   itemsCount: number;
@@ -36,6 +37,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     outerContainerRef,
     usesAbsoluteLayout
   } = useCommonValuesContext();
+  const { activeItemDimensions: multiZoneActiveItemDimensions } =
+    useMultiZoneContext() ?? {};
 
   const measuredItemsCount = useMutableValue(0);
   const initialItemMeasurementsCompleted = useMutableValue(false);
@@ -65,6 +68,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       itemDimensions.value[key] = dimensions;
       if (activeItemKey.value === key) {
         activeItemDimensions.value = dimensions;
+        if (multiZoneActiveItemDimensions) {
+          multiZoneActiveItemDimensions.value = dimensions;
+        }
       }
 
       // Update the array of item dimensions only after all items have been

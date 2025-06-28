@@ -7,25 +7,32 @@ import {
 
 import { useMutableValue } from '../../../integrations/reanimated';
 import { usePortalContext } from '../../../providers';
+import type { CommonValuesContextType } from '../../../types';
 
 type ActiveItemPortalProps = PropsWithChildren<{
-  teleportedItemId: string;
+  itemKey: string;
   activationAnimationProgress: SharedValue<number>;
+  commonValuesContext: CommonValuesContextType;
   renderTeleportedItemCell: () => ReactNode;
 }>;
 
 export default function ActiveItemPortal({
   activationAnimationProgress,
   children,
-  renderTeleportedItemCell,
-  teleportedItemId
+  commonValuesContext,
+  itemKey,
+  renderTeleportedItemCell
 }: ActiveItemPortalProps) {
-  const { measurePortalOutlet, teleport } = usePortalContext()!;
+  const { containerId } = commonValuesContext;
+  const { measurePortalOutlet, teleport } = usePortalContext() ?? {};
+
   const teleportEnabled = useMutableValue(false);
+
+  const teleportedItemId = `${containerId}-${itemKey}`;
 
   useEffect(() => {
     if (teleportEnabled.value) {
-      teleport(teleportedItemId, renderTeleportedItemCell());
+      teleport?.(teleportedItemId, renderTeleportedItemCell());
     }
     // This is fine, we want to update the teleported item cell only when
     // the children change
@@ -33,11 +40,13 @@ export default function ActiveItemPortal({
   }, [children]);
 
   const enableTeleport = () => {
-    teleport(teleportedItemId, renderTeleportedItemCell());
+    teleport?.(teleportedItemId, renderTeleportedItemCell());
   };
 
   const disableTeleport = () => {
-    runOnJS(teleport)(teleportedItemId, null);
+    if (teleport) {
+      runOnJS(teleport)(teleportedItemId, null);
+    }
   };
 
   useAnimatedReaction(

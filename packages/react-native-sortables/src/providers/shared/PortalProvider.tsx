@@ -1,5 +1,12 @@
 import type { PropsWithChildren } from 'react';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import type { View } from 'react-native';
 import type { MeasuredDimensions } from 'react-native-reanimated';
 import { measure, useAnimatedRef } from 'react-native-reanimated';
@@ -110,19 +117,25 @@ const { PortalContext, PortalProvider, usePortalContext } = createProvider(
         teleport
       };
 
+  const outlet = useMemo(
+    () =>
+      !shouldPropagate && (
+        <PortalOutletProvider
+          measurePortalOutlet={measurePortalOutlet}
+          portalOutletRef={portalOutletRef}>
+          {Object.entries(teleportedNodes).map(([id, node]) => (
+            <Fragment key={id}>{node}</Fragment>
+          ))}
+        </PortalOutletProvider>
+      ),
+    [measurePortalOutlet, portalOutletRef, shouldPropagate, teleportedNodes]
+  );
+
   return {
     children: (
       <Fragment>
         {children}
-        {!shouldPropagate && (
-          <PortalOutletProvider
-            measurePortalOutlet={measurePortalOutlet}
-            portalOutletRef={portalOutletRef}>
-            {Object.entries(teleportedNodes).map(([id, node]) => (
-              <Fragment key={id}>{node}</Fragment>
-            ))}
-          </PortalOutletProvider>
-        )}
+        {outlet}
       </Fragment>
     ),
     enabled,

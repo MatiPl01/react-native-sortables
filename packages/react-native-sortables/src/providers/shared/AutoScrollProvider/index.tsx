@@ -16,7 +16,7 @@ import {
 import type { AutoScrollContextType, AutoScrollSettings } from '../../../types';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
-import { useTargetScrollOffset } from './hooks';
+import useTargetScrollOffset from './useTargetScrollOffset';
 
 const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   'AutoScroll',
