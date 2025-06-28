@@ -212,6 +212,15 @@ export type OrderUpdater = (
   params: OrderUpdaterCallbackProps
 ) => Maybe<Array<string>>;
 
+/**
+ * Factory function that creates custom sort strategies.
+ *
+ * Building a custom sort strategy requires the usage of internal contexts.
+ * These contexts are exported from the library and can be used in a similar
+ * way to how predefined strategies are built within the library.
+ *
+ * @returns An OrderUpdater function that determines the new order of items
+ */
 export type SortStrategyFactory = () => OrderUpdater;
 
 export type PredefinedStrategies = Record<string, SortStrategyFactory>;
