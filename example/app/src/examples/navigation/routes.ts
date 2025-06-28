@@ -127,6 +127,10 @@ const routes: Routes = {
             Component: SortableFlex.features.HorizontalAutoScrollExample,
             name: 'Horizontal Auto Scroll'
           },
+          FixedItems: {
+            Component: SortableFlex.features.FixedItemsExample,
+            name: 'Fixed Items'
+          },
           Callbacks: {
             Component: SortableFlex.features.CallbacksExample,
             name: 'Callbacks'

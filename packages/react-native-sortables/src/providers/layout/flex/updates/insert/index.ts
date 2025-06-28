@@ -8,12 +8,7 @@ import type {
   FlexLayout,
   SortStrategyFactory
 } from '../../../../../types';
-import {
-  error,
-  gt as gt_,
-  lt as lt_,
-  reorderInsert
-} from '../../../../../utils';
+import { gt as gt_, lt as lt_, reorderInsert } from '../../../../../utils';
 import {
   getAdditionalSwapOffset,
   useCommonValuesContext,
@@ -41,15 +36,6 @@ const useInsertStrategy: SortStrategyFactory = () => {
     useFlexLayoutReaction
   } = useFlexLayoutContext();
   const { fixedItemKeys } = useCustomHandleContext() ?? {};
-
-  useAnimatedReaction(
-    () => fixedItemKeys?.value,
-    fixedKeys => {
-      if (Object.keys(fixedKeys ?? {}).length > 0) {
-        throw error('Fixed items are not yet supported in flex layout');
-      }
-    }
-  );
 
   const isColumn = flexDirection.startsWith('column');
   const isReverse = flexDirection.endsWith('reverse');
