@@ -73,7 +73,7 @@ export const createGridStrategy =
           ? crossAxisOffsets[index + 1]! -
             crossAxisOffsets[index] -
             crossGap.value
-          : 0;
+          : null;
 
       // CROSS AXIS BOUNDS
       // Before bound
@@ -118,20 +118,14 @@ export const createGridStrategy =
         if (!nextCrossAxisOffset) {
           break;
         }
-        crossAfterOffset = nextCrossAxisOffset - crossGap.value;
+        crossAfterOffset =
+          (crossAxisOffsets[crossIndex] ?? 0) + crossCurrentSize;
         const crossAfterSize = getItemCrossSize(crossIndex + 1);
+        const swapOffset = (crossAfterOffset + nextCrossAxisOffset) / 2;
+        const additionalAfterOffset = getAdditionalSwapOffset(crossAfterSize);
+        crossAfterBound = swapOffset + additionalAfterOffset;
         if (crossAfterSize) {
-          const swapOffset =
-            ((crossAxisOffsets[crossIndex] ?? 0) +
-              nextCrossAxisOffset +
-              crossCurrentSize) /
-            2;
-          const additionalAfterOffset = getAdditionalSwapOffset(crossAfterSize);
-          crossAfterBound = swapOffset + additionalAfterOffset;
           crossCurrentSize = crossAfterSize;
-        } else {
-          crossAfterBound =
-            (crossAxisOffsets[crossIndex] ?? 0) + crossCurrentSize;
         }
       } while (
         crossAfterBound < crossContainerSize.value &&

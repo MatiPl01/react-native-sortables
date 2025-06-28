@@ -5,7 +5,6 @@ import { useMutableValue } from '../../../../integrations/reanimated';
 import { areArraysDifferent, reorderSwap } from '../../../../utils';
 import { useCommonValuesContext } from '../../../shared';
 import { useGridLayoutContext } from '../GridLayoutProvider';
-import { getMainIndex } from '../utils';
 import { createGridStrategy } from './common';
 
 /**
@@ -19,7 +18,7 @@ import { createGridStrategy } from './common';
  * |12 |13 |14 |15 |     |12 |14 |15 | <-- in the last row we can have anything
  *
  * It removes the active item and shifts items in the same column
- * to the top. Items in the last row are shifted to the left to fill
+ * to the top. Remaining items are shifted to the left to fill
  * the blank space.
  *
  * The same applies to the horizontal grid but with direction changes.
@@ -43,22 +42,12 @@ function useInactiveIndexToKey() {
       }
 
       const othersArray = [...idxToKey];
+      let i = excludedIndex;
 
-      for (
-        let i = excludedIndex;
-        i + numGroups < othersArray.length;
-        i += numGroups
-      ) {
+      for (; i + numGroups < othersArray.length; i += numGroups) {
         othersArray[i] = othersArray[i + numGroups]!;
       }
-
-      const activeColumnIndex = getMainIndex(excludedIndex, numGroups);
-      const lastRowIndex = Math.floor((othersArray.length - 1) / numGroups);
-      for (
-        let i = lastRowIndex * numGroups + activeColumnIndex;
-        i < othersArray.length;
-        i++
-      ) {
+      for (; i < othersArray.length; i++) {
         othersArray[i] = othersArray[i + 1]!;
       }
       othersArray.pop();
