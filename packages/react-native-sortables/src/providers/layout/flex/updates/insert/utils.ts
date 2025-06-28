@@ -22,24 +22,15 @@ export type ItemGroupSwapResult = {
   groupIndex: number;
 };
 
-const getFirstItemIndex = (
+const getGroupItemIndex = (
+  inGroupIndex: number,
   group: Array<string>,
   keyToIndex: Record<string, number>
 ) => {
   'worklet';
-  const firstKey = group[0];
-  if (firstKey === undefined) return null;
-  return keyToIndex[firstKey] ?? null;
-};
-
-const getLastItemIndex = (
-  group: Array<string>,
-  keyToIndex: Record<string, number>
-) => {
-  'worklet';
-  const lastKey = group[group.length - 1];
-  if (lastKey === undefined) return null;
-  return keyToIndex[lastKey] ?? null;
+  const key = group[inGroupIndex]!;
+  if (key === undefined) return null;
+  return keyToIndex[key] ?? null;
 };
 
 export const getTotalGroupSize = (
@@ -61,6 +52,7 @@ export const getTotalGroupSize = (
 const getIndexesWhenSwappedToGroupBefore = ({
   activeItemKey,
   currentGroupIndex,
+  fixedKeys,
   groupSizeLimit,
   itemDimensions,
   itemGroups,
@@ -69,68 +61,57 @@ const getIndexesWhenSwappedToGroupBefore = ({
   mainGap
 }: ItemGroupSwapProps): null | Omit<ItemGroupSwapResult, 'indexToKey'> => {
   'worklet';
-  if (groupSizeLimit === Infinity || currentGroupIndex < 1) {
-    return null;
-  }
-
-  const firstInGroupBeforeIndex = getFirstItemIndex(
-    itemGroups[currentGroupIndex - 1]!,
-    keyToIndex
-  );
-  const lastInGroupBeforeIndex = getLastItemIndex(
-    itemGroups[currentGroupIndex - 1]!,
-    keyToIndex
-  );
-  if (firstInGroupBeforeIndex === null || lastInGroupBeforeIndex === null) {
+  if (groupSizeLimit === Infinity) {
     return null;
   }
 
   const activeMainSize = itemDimensions[activeItemKey]?.[mainDimension] ?? 0;
 
-  if (currentGroupIndex > 1) {
-    // If there is a group before the group before the active group,
-    // we have to check whether the active item won't wrap to this group
-    const totalGroupBeforeBeforeSize = getTotalGroupSize(
-      itemGroups[currentGroupIndex - 2]!,
-      itemDimensions,
-      mainDimension,
-      mainGap
+  for (let groupIdx = currentGroupIndex; groupIdx > 0; groupIdx--) {
+    const groupBefore = itemGroups[groupIdx - 1]!;
+    const firstInGroupBeforeIndex = getGroupItemIndex(
+      0,
+      groupBefore,
+      keyToIndex
+    );
+    const lastInGroupBeforeIndex = getGroupItemIndex(
+      groupBefore.length - 1,
+      groupBefore,
+      keyToIndex
     );
 
-    if (totalGroupBeforeBeforeSize + activeMainSize <= groupSizeLimit) {
-      if (firstInGroupBeforeIndex < lastInGroupBeforeIndex) {
-        // If the active item fits in the group before the group before
-        // the active group, we want to put it in the second position of
-        // the group before the active group to prevent it from wrapping
-        // to the group before it (we cannot put it as the first one as
-        // it will be wrapped in this case).
-        return {
-          groupIndex: currentGroupIndex - 1,
-          itemIndex: firstInGroupBeforeIndex + 1,
-          itemIndexInGroup: 1
-        };
-      }
+    if (firstInGroupBeforeIndex === null || lastInGroupBeforeIndex === null) {
+      return null;
+    }
 
-      // If the active item fits in the group before the group before,
-      // and it doesn't fit in the group before the active group,
-      // we want to put it in the 2nd group before the active group.
-      return {
-        groupIndex: currentGroupIndex - 2,
-        itemIndex:
-          getFirstItemIndex(
-            itemGroups[currentGroupIndex - 2] ?? [],
-            keyToIndex
-          ) ?? 0,
-        itemIndexInGroup: 0
-      };
+    let itemIndex = firstInGroupBeforeIndex;
+
+    const groupBeforeBefore = itemGroups[groupIdx - 2];
+    if (groupBeforeBefore) {
+      // If there is a group before the group before the active group,
+      // we have to check whether the active item won't wrap to this group
+      const totalGroupBeforeBeforeSize = getTotalGroupSize(
+        groupBeforeBefore,
+        itemDimensions,
+        mainDimension,
+        mainGap
+      );
+      const canBeFirstInGroupBefore =
+        totalGroupBeforeBeforeSize + activeMainSize > groupSizeLimit;
+      if (!canBeFirstInGroupBefore) {
+        itemIndex++;
+      }
+    }
+
+    for (; itemIndex < lastInGroupBeforeIndex; itemIndex++) {
+      const itemIndexInGroup = itemIndex - firstInGroupBeforeIndex;
+      if (!fixedKeys?.[groupBefore[itemIndexInGroup]!]) {
+        return { groupIndex: groupIdx - 1, itemIndex, itemIndexInGroup };
+      }
     }
   }
 
-  return {
-    groupIndex: currentGroupIndex - 1,
-    itemIndex: firstInGroupBeforeIndex,
-    itemIndexInGroup: 0
-  };
+  return null;
 };
 
 const getIndexesWhenSwappedToGroupAfter = ({
@@ -152,12 +133,11 @@ const getIndexesWhenSwappedToGroupAfter = ({
     return null;
   }
 
-  const firstInActiveGroupIndex = getFirstItemIndex(
-    itemGroups[currentGroupIndex]!,
-    keyToIndex
-  );
-  const lastInActiveGroupIndex = getLastItemIndex(
-    itemGroups[currentGroupIndex]!,
+  const activeGroup = itemGroups[currentGroupIndex]!;
+  const firstInActiveGroupIndex = getGroupItemIndex(0, activeGroup, keyToIndex);
+  const lastInActiveGroupIndex = getGroupItemIndex(
+    activeGroup.length - 1,
+    activeGroup,
     keyToIndex
   );
   if (firstInActiveGroupIndex === null || lastInActiveGroupIndex === null) {
@@ -225,6 +205,8 @@ export const getSwappedToGroupBeforeIndices = (
   'worklet';
   const indexes = getIndexesWhenSwappedToGroupBefore(props);
   if (indexes === null) return null;
+
+  console.log('getSwappedToGroupBeforeIndices', indexes);
 
   return {
     ...indexes,

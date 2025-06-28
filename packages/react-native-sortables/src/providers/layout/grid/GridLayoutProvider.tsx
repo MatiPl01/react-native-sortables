@@ -75,7 +75,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     () => {
       if (!isVertical) {
         // TODO - check if this is correct for horizontal grids and maybe don't
-        // require specifying rowHeight ( and instead occupy the entire height
+        // require specifying rowHeight (and instead occupy the entire height
         // of the container)
         return rowHeight ?? null;
       }

@@ -38,7 +38,7 @@ export default function FixedItemsExample() {
           the same ordinal position (index).
         </Text>
       </View>
-      <Sortable.Flex columnGap={10} rowGap={10} customHandle>
+      <Sortable.Flex columnGap={10} rowGap={10} customHandle debug>
         {DATA.map(item => (
           <FlexItem
             fixed={fixedItems.has(item)}
