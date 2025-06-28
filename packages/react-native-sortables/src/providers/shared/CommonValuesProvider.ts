@@ -8,19 +8,19 @@ import {
   useAnimatableValue,
   useMutableValue
 } from '../../integrations/reanimated';
-import type {
-  ActiveItemDecorationSettings,
-  ActiveItemSnapSettings,
-  CommonValuesContextType,
-  ControlledContainerDimensions,
-  Dimensions,
-  ItemDragSettings,
-  ItemsLayoutTransitionMode,
-  Vector
+import {
+  type ActiveItemDecorationSettings,
+  type ActiveItemSnapSettings,
+  type CommonValuesContextType,
+  type ControlledContainerDimensions,
+  type Dimensions,
+  DragActivationState,
+  type ItemDragSettings,
+  type ItemsLayoutTransitionMode,
+  type Vector
 } from '../../types';
 import { areArraysDifferent, getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
-import { useActiveItemValuesContext } from './ActiveItemValuesProvider';
 
 let nextId = 0;
 
@@ -68,6 +68,8 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
 
     // POSITIONS
     const itemPositions = useMutableValue<Record<string, Vector>>({});
+    const touchPosition = useMutableValue<null | Vector>(null);
+    const activeItemPosition = useMutableValue<null | Vector>(null);
 
     // DIMENSIONS
     // measured dimensions via onLayout used to calculate containerWidth and containerHeight
@@ -80,6 +82,15 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const containerWidth = useMutableValue<null | number>(null);
     const containerHeight = useMutableValue<null | number>(null);
     const itemDimensions = useMutableValue<Record<string, Dimensions>>({});
+    const activeItemDimensions = useMutableValue<Dimensions | null>(null);
+
+    // DRAG STATE
+    const activeItemKey = useMutableValue<null | string>(null);
+    const prevActiveItemKey = useMutableValue<null | string>(null);
+    const activationState = useMutableValue(DragActivationState.INACTIVE);
+    const activeAnimationProgress = useMutableValue(0);
+    const inactiveAnimationProgress = useMutableValue(0);
+    const activeItemDropped = useMutableValue(true);
 
     // ITEM ACTIVATION SETTINGS
     const dragActivationDelay = useAnimatableValue(_dragActivationDelay);
@@ -125,9 +136,14 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
 
     return {
       value: {
-        ...useActiveItemValuesContext(),
         activationAnimationDuration,
+        activationState,
+        activeAnimationProgress,
+        activeItemDimensions,
+        activeItemDropped,
+        activeItemKey,
         activeItemOpacity,
+        activeItemPosition,
         activeItemScale,
         activeItemShadowOpacity,
         animateLayoutOnReorderOnly,
@@ -140,6 +156,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         dragActivationFailOffset,
         dropAnimationDuration,
         enableActiveItemSnap,
+        inactiveAnimationProgress,
         inactiveItemOpacity,
         inactiveItemScale,
         indexToKey,
@@ -151,10 +168,12 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         measuredContainerHeight,
         measuredContainerWidth,
         outerContainerRef,
+        prevActiveItemKey,
         shouldAnimateLayout,
         snapOffsetX,
         snapOffsetY,
         sortEnabled,
+        touchPosition,
         usesAbsoluteLayout
       }
     };

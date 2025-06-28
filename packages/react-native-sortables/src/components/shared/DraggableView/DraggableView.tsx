@@ -16,6 +16,7 @@ import {
   CommonValuesContext,
   ItemContextProvider,
   useCommonValuesContext,
+  useDragContext,
   useItemPanGesture,
   useItemStyles,
   useMeasurementsContext,
@@ -45,9 +46,8 @@ function DraggableView({
   const commonValuesContext = useCommonValuesContext();
   const { handleItemMeasurement, removeItemMeasurements } =
     useMeasurementsContext();
+  const { handleDragEnd } = useDragContext();
   const { activeItemKey, containerId, customHandle } = commonValuesContext;
-
-  const teleportedItemId = `${containerId}-${key}`;
 
   const [isTeleported, setIsTeleported] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
@@ -56,15 +56,21 @@ function DraggableView({
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
   useEffect(
-    () => runOnUI(removeItemMeasurements)(key),
-    [key, removeItemMeasurements]
+    () =>
+      runOnUI(() => {
+        handleDragEnd(key, activationAnimationProgress);
+        removeItemMeasurements(key);
+      }),
+    [activationAnimationProgress, handleDragEnd, key, removeItemMeasurements]
   );
 
   useEffect(() => {
     if (!portalContext) {
       setIsTeleported(false);
+      return;
     }
 
+    const teleportedItemId = `${containerId}-${key}`;
     const unsubscribe = portalContext?.subscribe?.(
       teleportedItemId,
       setIsTeleported
@@ -74,7 +80,7 @@ function DraggableView({
       portalContext?.teleport?.(teleportedItemId, null);
       unsubscribe?.();
     };
-  }, [portalContext, teleportedItemId]);
+  }, [portalContext, containerId, key]);
 
   const onMeasure = (width: number, height: number) =>
     handleItemMeasurement(key, { height, width });
@@ -145,8 +151,9 @@ function DraggableView({
       {renderItemCell(isTeleported)}
       <ActiveItemPortal
         activationAnimationProgress={activationAnimationProgress}
-        renderTeleportedItemCell={renderTeleportedItemCell}
-        teleportedItemId={teleportedItemId}>
+        commonValuesContext={commonValuesContext}
+        itemKey={key}
+        renderTeleportedItemCell={renderTeleportedItemCell}>
         {children}
       </ActiveItemPortal>
     </Fragment>

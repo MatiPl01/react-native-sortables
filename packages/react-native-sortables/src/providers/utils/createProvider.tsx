@@ -14,7 +14,7 @@ export default function createProvider<
 >(name: ProviderName, options?: { guarded?: Guarded }) {
   return function <
     ProviderProps extends PropsWithChildren<object>,
-    ContextValue extends object
+    ContextValue
   >(
     factory: (props: ProviderProps) => {
       value?: ContextValue;
@@ -42,8 +42,11 @@ export default function createProvider<
 
       const memoValue = useMemo(
         () => (enabled ? value : null),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, react-hooks/exhaustive-deps
-        [enabled, ...Object.values(value)]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        typeof value === 'object'
+          ? // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            [enabled, ...Object.values(value)]
+          : [enabled, value]
       );
 
       const ContextProvider = getContextProvider(Context);

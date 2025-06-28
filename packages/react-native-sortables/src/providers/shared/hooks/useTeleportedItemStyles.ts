@@ -3,7 +3,7 @@ import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle } from 'react-native-reanimated';
 
 import { mergeStyles } from '../../../utils';
-import { usePortalOutletContext } from '../PortalOutletProvider';
+import { usePortalContext } from '../PortalProvider';
 import useItemDecorationValues from './useItemDecorationValues';
 import useItemZIndex from './useItemZIndex';
 import useTeleportedItemPosition from './useTeleportedItemPosition';
@@ -13,7 +13,7 @@ export default function useTeleportedItemStyles(
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
-  const { portalOutletMeasurements } = usePortalOutletContext() ?? {};
+  const { portalOutletMeasurements } = usePortalContext() ?? {};
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
   const position = useTeleportedItemPosition(

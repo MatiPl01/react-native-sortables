@@ -1,4 +1,5 @@
 import {
+  BaseZone,
   CustomHandle,
   SortableFlex,
   SortableGrid,
@@ -7,7 +8,7 @@ import {
 } from './components';
 export { useItemContext } from './providers';
 
-import { MultiZoneProvider, PortalProvider } from './providers';
+import { MultiZoneProvider, PortalProvider, useZoneContext } from './providers';
 export type { CustomHandleProps, SortableLayerProps } from './components';
 export * from './constants/layoutAnimations';
 export type {
@@ -39,8 +40,13 @@ export type {
 } from './types';
 export { DragActivationState } from './types';
 
+const zones = {
+  BaseZone
+};
+
 /** Collection of sortable components and utilities for React Native */
 const Sortable = {
+  ...zones,
   /** Flexible container component that allows reordering of child elements through drag and drop.
    * Uses flexbox layout for arranging items, making it ideal for dynamic layouts
    * where items need to flow naturally based on available space.
@@ -170,7 +176,6 @@ const Sortable = {
 
   // TODO - add doc string
   MultiZoneProvider,
-
   /** Optional provider that renders dragged items above all other components that are
    * wrapped within the PortalProvider.
    *
@@ -226,5 +231,7 @@ const Sortable = {
    */
   Touchable: SortableTouchable
 };
+
+export { useZoneContext };
 
 export default Sortable;

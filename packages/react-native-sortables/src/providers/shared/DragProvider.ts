@@ -34,6 +34,7 @@ import { useCommonValuesContext } from './CommonValuesProvider';
 import { useCustomHandleContext } from './CustomHandleProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
+import { useMultiZoneContext } from './MultiZoneProvider';
 import { usePortalContext } from './PortalProvider';
 
 type DragProviderProps = PropsWithChildren<
@@ -64,6 +65,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activeItemKey,
     activeItemPosition,
     containerHeight,
+    containerId,
     containerWidth,
     dragActivationDelay,
     dragActivationFailOffset,
@@ -94,6 +96,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     updateActiveHandleMeasurements
   } = useCustomHandleContext() ?? {};
   const { activeItemAbsolutePosition } = usePortalContext() ?? {};
+  const {
+    activeContainerId,
+    activeItemDimensions: multiZoneActiveItemDimensions
+  } = useMultiZoneContext() ?? {};
 
   const haptics = useHaptics(hapticsEnabled);
 
@@ -250,6 +256,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dragStartIndex.value = keyToIndex.value[key] ?? -1;
       activationState.value = DragActivationState.ACTIVE;
 
+      if (activeContainerId) {
+        activeContainerId.value = containerId;
+      }
+      if (multiZoneActiveItemDimensions) {
+        multiZoneActiveItemDimensions.value = dimensions;
+      }
+
       updateLayer?.(LayerState.FOCUSED);
       updateStartScrollOffset?.();
 
@@ -299,13 +312,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     [
       activationAnimationDuration,
       activeAnimationProgress,
+      activeContainerId,
       activeHandleMeasurements,
       activeItemDimensions,
       activeItemDropped,
       activationState,
       activeItemKey,
       activeItemPosition,
-      outerContainerRef,
+      containerId,
       dragStartIndex,
       dragStartItemTouchOffset,
       dragStartTouchPosition,
@@ -315,6 +329,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveItemScale,
       indexToKey,
       keyToIndex,
+      multiZoneActiveItemDimensions,
+      outerContainerRef,
       prevActiveItemKey,
       stableOnDragStart,
       touchPosition,
@@ -468,9 +484,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       if (activeItemKey.value === null) {
         return;
       }
-
       if (activeHandleMeasurements) {
         activeHandleMeasurements.value = null;
+      }
+      if (activeContainerId) {
+        activeContainerId.value = null;
+      }
+      if (multiZoneActiveItemDimensions) {
+        multiZoneActiveItemDimensions.value = null;
       }
 
       prevActiveItemKey.value = activeItemKey.value;
@@ -515,6 +536,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }, dropAnimationDuration.value);
     },
     [
+      activeContainerId,
       activeItemKey,
       activeItemDimensions,
       activeItemDropped,
@@ -532,6 +554,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveAnimationProgress,
       indexToKey,
       keyToIndex,
+      multiZoneActiveItemDimensions,
       stableOnActiveItemDropped,
       stableOnDragEnd,
       touchPosition,

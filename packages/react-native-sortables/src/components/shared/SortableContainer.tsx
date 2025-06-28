@@ -14,10 +14,8 @@ import Animated, {
 import { EMPTY_OBJECT, IS_WEB } from '../../constants';
 import { DebugOutlet } from '../../debug';
 import {
-  MultiZoneOutlet,
   useCommonValuesContext,
-  useMeasurementsContext,
-  useMultiZoneContext
+  useMeasurementsContext
 } from '../../providers';
 import type {
   DimensionsAnimation,
@@ -60,7 +58,6 @@ export default function SortableContainer({
     usesAbsoluteLayout
   } = useCommonValuesContext();
   const { handleHelperContainerMeasurement } = useMeasurementsContext();
-  const multiZoneContext = useMultiZoneContext();
 
   const animateWorklet = dimensionsAnimationType === 'worklet';
   const animateLayout = dimensionsAnimationType === 'layout';
@@ -143,7 +140,6 @@ export default function SortableContainer({
         ref={innerContainerRef}
         style={[style, innerContainerStyle]}>
         {children}
-        {multiZoneContext && <MultiZoneOutlet />}
       </Animated.View>
       {debug && <DebugOutlet />}
       {/* Renders an overlay view helpful for debugging */}

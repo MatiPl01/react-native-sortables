@@ -1,38 +1,32 @@
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { MeasuredDimensions } from 'react-native-reanimated';
-import { measure, runOnUI, useAnimatedRef } from 'react-native-reanimated';
+import type { AnimatedRef } from 'react-native-reanimated';
+import { runOnUI } from 'react-native-reanimated';
 
-import { useMutableValue } from '../../integrations/reanimated';
-import type { PortalOutletContextType } from '../../types';
 import { createProvider } from '../utils';
+
+type PortalOutletProviderProps = PropsWithChildren<{
+  portalOutletRef: AnimatedRef<View>;
+  measurePortalOutlet: () => void;
+}>;
 
 const { PortalOutletProvider, usePortalOutletContext } = createProvider(
   'PortalOutlet',
   { guarded: false }
-)<{ children: ReactNode }, PortalOutletContextType>(({ children }) => {
-  const portalOutletRef = useAnimatedRef<View>();
-  const portalOutletMeasurements = useMutableValue<MeasuredDimensions | null>(
-    null
-  );
-
-  return {
+)<PortalOutletProviderProps, true>(
+  ({ children, measurePortalOutlet, portalOutletRef }) => ({
     children: (
       <View
         collapsable={false}
         ref={portalOutletRef}
         style={styles.container}
-        onLayout={runOnUI(() => {
-          portalOutletMeasurements.value = measure(portalOutletRef);
-        })}>
+        onLayout={runOnUI(measurePortalOutlet)}>
         {children}
       </View>
     ),
-    value: {
-      portalOutletMeasurements
-    }
-  };
-});
+    value: true
+  })
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -41,4 +35,8 @@ const styles = StyleSheet.create({
   }
 });
 
-export { PortalOutletProvider, usePortalOutletContext };
+function useIsInPortalOutlet() {
+  return !!usePortalOutletContext();
+}
+
+export { PortalOutletProvider, useIsInPortalOutlet };

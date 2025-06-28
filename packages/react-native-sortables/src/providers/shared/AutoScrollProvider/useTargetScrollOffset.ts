@@ -1,9 +1,5 @@
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
-import {
-  measure,
-  useAnimatedReaction,
-  useDerivedValue
-} from 'react-native-reanimated';
+import { measure, useAnimatedReaction } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
 import type { Animatable } from '../../../integrations/reanimated';
@@ -17,7 +13,7 @@ import {
   handleMeasurementsVertical
 } from './utils';
 
-export function useTargetScrollOffset(
+export default function useTargetScrollOffset(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scrollableRef: AnimatedRef<any>,
   enabled: SharedValue<boolean>,
@@ -25,8 +21,7 @@ export function useTargetScrollOffset(
   autoScrollActivationOffset: Animatable<[number, number] | number>,
   dragStartScrollOffset: SharedValue<null | number>
 ): SharedValue<null | number> {
-  const { activeItemKey, itemDimensions, outerContainerRef, touchPosition } =
-    useCommonValuesContext();
+  const { outerContainerRef, touchPosition } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
   const debugRects = debugContext?.useDebugRects(['start', 'end']);
@@ -35,10 +30,6 @@ export function useTargetScrollOffset(
   const targetScrollOffset = useMutableValue<null | number>(null);
   const startContainerPagePosition = useMutableValue<null | number>(null);
 
-  const activeItemHeight = useDerivedValue(() => {
-    const key = activeItemKey.value;
-    return (key ? itemDimensions.value[key]?.height : null) ?? null;
-  });
   const offsetThreshold = useAnimatableValue(
     autoScrollActivationOffset,
     (v): [number, number] => {
@@ -53,18 +44,13 @@ export function useTargetScrollOffset(
 
   useAnimatedReaction(
     () => {
-      if (
-        !enabled.value ||
-        activeItemHeight.value === null ||
-        !touchPosition.value
-      ) {
+      if (!enabled.value || !touchPosition.value) {
         startContainerPagePosition.value = null;
         targetScrollOffset.value = null;
         return null;
       }
 
       return {
-        itemHeight: activeItemHeight.value,
         threshold: offsetThreshold.value,
         touchOffset: touchPosition.value?.[horizontal ? 'x' : 'y']
       };
