@@ -19,13 +19,13 @@ import type {
   SortableCallbacks
 } from '../types';
 import {
-  ActiveItemValuesProvider,
   AutoScrollProvider,
   CommonValuesProvider,
   CustomHandleProvider,
   DragProvider,
   LayerProvider,
-  MeasurementsProvider
+  MeasurementsProvider,
+  useMultiZoneContext
 } from './shared';
 import { ContextProviderComposer } from './utils';
 
@@ -67,6 +67,8 @@ export default function SharedProvider({
   scrollableRef,
   ...rest
 }: SharedProviderProps) {
+  const inMultiZone = !!useMultiZoneContext();
+
   if (__DEV__) {
     useWarnOnPropChange('debug', debug);
     useWarnOnPropChange('customHandle', customHandle);
@@ -75,11 +77,9 @@ export default function SharedProvider({
 
   const providers = [
     // Provider used for proper zIndex management
-    <LayerProvider />,
+    !inMultiZone && <LayerProvider />,
     // Provider used for layout debugging (can be used only in dev mode)
     __DEV__ && debug && <DebugProvider />,
-    // Provider used for active item values
-    <ActiveItemValuesProvider />,
     // Provider used for shared values between all providers below
     <CommonValuesProvider
       customHandle={customHandle}

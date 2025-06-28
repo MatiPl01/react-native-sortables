@@ -36,25 +36,6 @@ import type { DragActivationState, LayerState } from '../state';
 
 export type ControlledContainerDimensions = { width: boolean; height: boolean };
 
-// ACTIVE ITEM VALUES
-
-export type ActiveItemValuesContextType = {
-  // POSITIONS
-  touchPosition: SharedValue<null | Vector>;
-  activeItemPosition: SharedValue<null | Vector>;
-
-  // DIMENSIONS
-  activeItemDimensions: SharedValue<Dimensions | null>;
-
-  // DRAG STATE
-  prevActiveItemKey: SharedValue<null | string>;
-  activeItemKey: SharedValue<null | string>;
-  activationState: SharedValue<DragActivationState>;
-  activeAnimationProgress: SharedValue<number>;
-  inactiveAnimationProgress: SharedValue<number>;
-  activeItemDropped: SharedValue<boolean>;
-};
-
 // COMMON VALUES
 
 /**
@@ -62,38 +43,49 @@ export type ActiveItemValuesContextType = {
  * (they are stored in a single context to make the access to them easier
  * between different providers)
  */
-export type CommonValuesContextType = ActiveItemValuesContextType &
+export type CommonValuesContextType =
   AnimatedValues<ActiveItemDecorationSettings> &
-  AnimatedValues<ActiveItemSnapSettings> &
-  AnimatedValues<
-    Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>
-  > & {
-    containerId: number;
+    AnimatedValues<ActiveItemSnapSettings> &
+    AnimatedValues<
+      Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'>
+    > & {
+      containerId: number;
 
-    // ORDER
-    indexToKey: SharedValue<Array<string>>;
-    keyToIndex: SharedValue<Record<string, number>>;
+      // ORDER
+      indexToKey: SharedValue<Array<string>>;
+      keyToIndex: SharedValue<Record<string, number>>;
 
-    // POSITIONS
-    itemPositions: SharedValue<Record<string, Vector>>;
+      // POSITIONS
+      itemPositions: SharedValue<Record<string, Vector>>;
+      touchPosition: SharedValue<null | Vector>;
+      activeItemPosition: SharedValue<null | Vector>;
 
-    // DIMENSIONS
-    controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
-    measuredContainerWidth: SharedValue<null | number>;
-    measuredContainerHeight: SharedValue<null | number>;
-    containerWidth: SharedValue<null | number>;
-    containerHeight: SharedValue<null | number>;
-    itemDimensions: SharedValue<Record<string, Dimensions>>;
+      // DIMENSIONS
+      controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+      measuredContainerWidth: SharedValue<null | number>;
+      measuredContainerHeight: SharedValue<null | number>;
+      containerWidth: SharedValue<null | number>;
+      containerHeight: SharedValue<null | number>;
+      itemDimensions: SharedValue<Record<string, Dimensions>>;
+      activeItemDimensions: SharedValue<Dimensions | null>;
 
-    // OTHER
-    innerContainerRef: AnimatedRef<View>;
-    outerContainerRef: AnimatedRef<View>;
-    sortEnabled: SharedValue<boolean>;
-    usesAbsoluteLayout: SharedValue<boolean>;
-    shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
-    animateLayoutOnReorderOnly: SharedValue<boolean>;
-    customHandle: boolean;
-  };
+      // DRAG STATE
+      prevActiveItemKey: SharedValue<null | string>;
+      activeItemKey: SharedValue<null | string>;
+      activationState: SharedValue<DragActivationState>;
+      activeAnimationProgress: SharedValue<number>;
+      inactiveAnimationProgress: SharedValue<number>;
+      activeItemDropped: SharedValue<boolean>;
+
+      // OTHER
+      innerContainerRef: AnimatedRef<View>;
+      outerContainerRef: AnimatedRef<View>;
+      sortEnabled: SharedValue<boolean>;
+      usesAbsoluteLayout: SharedValue<boolean>;
+      shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
+      animateLayoutOnReorderOnly: SharedValue<boolean>;
+      customHandle: boolean;
+    };
 
 // MEASUREMENTS
 
@@ -141,7 +133,7 @@ export type DragContextType = {
 export type ItemContextType = Simplify<
   DeepReadonly<
     Pick<
-      ActiveItemValuesContextType,
+      CommonValuesContextType,
       'activationState' | 'activeItemKey' | 'prevActiveItemKey'
     > &
       Pick<CommonValuesContextType, 'indexToKey' | 'keyToIndex'> & {

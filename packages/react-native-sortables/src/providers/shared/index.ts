@@ -1,4 +1,3 @@
-export { ActiveItemValuesProvider } from './ActiveItemValuesProvider';
 export { AutoScrollProvider } from './AutoScrollProvider';
 export {
   CommonValuesContext,
@@ -18,11 +17,7 @@ export {
   MeasurementsProvider,
   useMeasurementsContext
 } from './MeasurementsProvider';
-export {
-  MultiZoneOutlet,
-  MultiZoneProvider,
-  useMultiZoneContext
-} from './MultiZoneProvider';
+export { MultiZoneProvider, useMultiZoneContext } from './MultiZoneProvider';
 export { useIsInPortalOutlet } from './PortalOutletProvider';
 export { PortalProvider, usePortalContext } from './PortalProvider';
 export * from './utils';
