@@ -29,7 +29,7 @@ const getGroupItemIndex = (
   keyToIndex: Record<string, number>
 ) => {
   'worklet';
-  const key = group[inGroupIndex]!;
+  const key = group[inGroupIndex];
   if (key === undefined) return null;
   return keyToIndex[key] ?? null;
 };
