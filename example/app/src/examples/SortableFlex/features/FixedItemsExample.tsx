@@ -4,11 +4,29 @@ import Sortable from 'react-native-sortables';
 
 import { ScrollScreen } from '@/components';
 import { colors, radius, spacing, text } from '@/theme';
-import { getCategories } from '@/utils';
 
-const DATA = getCategories(12);
+const DATA = [
+  'politics',
+  'philosophy',
+  'economics',
+  'psychology',
+  'biology',
+  'literature',
+  'music',
+  'art',
+  'science',
+  'history',
+  'geography',
+  'sports'
+];
 
-const INITIAL_FIXED_ITEMS = new Set([DATA[0]!, DATA[4]!, DATA[11]!]);
+const INITIAL_FIXED_ITEMS = new Set([
+  'biology',
+  'economics',
+  'history',
+  'literature',
+  'psychology'
+]);
 
 export default function FixedItemsExample() {
   const [fixedItems, setFixedItems] =
