@@ -1,16 +1,16 @@
 import { memo, useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
 import { ScrollScreen } from '@/components';
-import { colors, radius, sizes, spacing, text } from '@/theme';
+import { colors, radius, spacing, text } from '@/theme';
+import { getCategories } from '@/utils';
 
-const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
+const DATA = getCategories(12);
 
-const INITIAL_FIXED_ITEMS = new Set(['Item 1', 'Item 5', 'Item 12']);
+const INITIAL_FIXED_ITEMS = new Set([DATA[1]!, DATA[5]!, DATA[6]!, DATA[11]!]);
 
-export default function FixedItemsExample() {
+export default function FixedOrderItemsExample() {
   const [fixedItems, setFixedItems] =
     useState<Set<string>>(INITIAL_FIXED_ITEMS);
 
@@ -26,17 +26,6 @@ export default function FixedItemsExample() {
     });
   }, []);
 
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <GridItem
-        fixed={fixedItems.has(item)}
-        item={item}
-        onTap={handleItemPress}
-      />
-    ),
-    [fixedItems, handleItemPress]
-  );
-
   return (
     <ScrollScreen contentContainerStyle={styles.container} includeNavBarHeight>
       <View style={styles.usageSection}>
@@ -46,30 +35,32 @@ export default function FixedItemsExample() {
         </Text>
         <Text style={text.body1}>
           Drag items that aren&apos;t grayed out to see that fixed items stay in
-          place.
+          the same ordinal position (index).
         </Text>
       </View>
-      <Sortable.Grid
-        columnGap={10}
-        columns={3}
-        data={DATA}
-        renderItem={renderItem}
-        rowGap={10}
-        customHandle
-      />
+      <Sortable.Flex columnGap={10} rowGap={10} customHandle>
+        {DATA.map(item => (
+          <FlexItem
+            fixed={fixedItems.has(item)}
+            item={item}
+            key={item}
+            onTap={handleItemPress}
+          />
+        ))}
+      </Sortable.Flex>
     </ScrollScreen>
   );
 }
 
-type GridItemProps = {
+type FlexItemProps = {
   item: string;
   fixed: boolean;
   onTap: (item: string) => void;
 };
 
-const GridItem = memo(function GridItem({ fixed, item, onTap }: GridItemProps) {
+const FlexItem = memo(function FlexItem({ fixed, item, onTap }: FlexItemProps) {
   return (
-    <Sortable.Touchable onTap={() => onTap(item)}>
+    <Sortable.Touchable key={item} onTap={() => onTap(item)}>
       <Sortable.Handle mode={fixed ? 'fixed-order' : 'draggable'}>
         <View
           style={[
@@ -87,9 +78,10 @@ const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
     backgroundColor: '#36877F',
-    borderRadius: radius.md,
-    height: sizes.xl,
-    justifyContent: 'center'
+    borderRadius: radius.full,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm
   },
   container: {
     padding: spacing.md
