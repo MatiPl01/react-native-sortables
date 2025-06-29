@@ -48,8 +48,8 @@ const routes: Routes = {
             name: 'Ordering Strategy'
           },
           FixedItems: {
-            Component: SortableGrid.features.FixedItemsExample,
-            name: 'Fixed Items'
+            Component: SortableGrid.features.FixedOrderItemsExample,
+            name: 'Fixed Order Items'
           },
           MultiZone: {
             Component: SortableGrid.features.MultiZoneExample,
@@ -126,6 +126,10 @@ const routes: Routes = {
           HorizontalAutoScroll: {
             Component: SortableFlex.features.HorizontalAutoScrollExample,
             name: 'Horizontal Auto Scroll'
+          },
+          FixedItems: {
+            Component: SortableFlex.features.FixedOrderItemsExample,
+            name: 'Fixed Order Items'
           },
           Callbacks: {
             Component: SortableFlex.features.CallbacksExample,

@@ -8,12 +8,7 @@ import type {
   FlexLayout,
   SortStrategyFactory
 } from '../../../../../types';
-import {
-  error,
-  gt as gt_,
-  lt as lt_,
-  reorderInsert
-} from '../../../../../utils';
+import { gt as gt_, lt as lt_, reorderInsert } from '../../../../../utils';
 import {
   getAdditionalSwapOffset,
   useCommonValuesContext,
@@ -21,7 +16,7 @@ import {
   useDebugBoundingBox
 } from '../../../../shared';
 import { useFlexLayoutContext } from '../../FlexLayoutProvider';
-import type { ItemGroupSwapProps, ItemGroupSwapResult } from './utils';
+import type { ItemGroupSwapResult } from './utils';
 import {
   getSwappedToGroupAfterIndices,
   getSwappedToGroupBeforeIndices,
@@ -41,15 +36,6 @@ const useInsertStrategy: SortStrategyFactory = () => {
     useFlexLayoutReaction
   } = useFlexLayoutContext();
   const { fixedItemKeys } = useCustomHandleContext() ?? {};
-
-  useAnimatedReaction(
-    () => fixedItemKeys?.value,
-    fixedKeys => {
-      if (Object.keys(fixedKeys ?? {}).length > 0) {
-        throw error('Fixed items are not yet supported in flex layout');
-      }
-    }
-  );
 
   const isColumn = flexDirection.startsWith('column');
   const isReverse = flexDirection.endsWith('reverse');
@@ -100,6 +86,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
             activeItemIndex: keyToIndex.value[activeItemKey.value]!,
             activeItemKey: activeItemKey.value,
             currentGroupIndex: activeGroupIndex.value,
+            fixedKeys: fixedItemKeys?.value,
             groupSizeLimit: appliedLayout.value.groupSizeLimit,
             indexToKey: indexToKey.value,
             itemDimensions: itemDimensions.value,
@@ -142,16 +129,11 @@ const useInsertStrategy: SortStrategyFactory = () => {
 
     let currentLayout = appliedLayout.value;
 
-    const sharedSwapProps: Omit<
-      ItemGroupSwapProps,
-      'activeItemIndex' | 'currentGroupIndex'
-    > = {
+    const sharedSwapProps = {
       activeItemKey: activeKey,
+      fixedKeys: fixedItemKeys?.value,
       groupSizeLimit: currentLayout.groupSizeLimit,
-      indexToKey: indexToKey.value,
       itemDimensions: itemDimensions.value,
-      itemGroups: currentLayout.itemGroups,
-      keyToIndex: keyToIndex.value,
       mainDimension,
       mainGap: mainGap.value
     };
@@ -160,7 +142,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
     let beforeIndexes = swappedBeforeIndexes.value;
     let beforeLayout = swappedBeforeLayout.value;
     let groupIndex = activeGroupIndex.value;
-    let firstGroupItemIndex = activeIndex;
+    let firstAvailableInGroupIndex = activeIndex;
     let itemIndexInGroup = 0;
     const crossAxisPosition = position[crossCoordinate];
 
@@ -175,22 +157,22 @@ const useInsertStrategy: SortStrategyFactory = () => {
 
       if (swapGroupBeforeBound !== Infinity) {
         groupIndex = beforeIndexes.groupIndex;
-        firstGroupItemIndex = beforeIndexes.itemIndex;
+        firstAvailableInGroupIndex = beforeIndexes.itemIndex;
         itemIndexInGroup = beforeIndexes.itemIndexInGroup;
 
         if (beforeLayout) currentLayout = beforeLayout;
         beforeIndexes = getSwappedToGroupBeforeIndices({
           ...sharedSwapProps,
-          activeItemIndex: activeIndex,
-          currentGroupIndex: groupIndex
+          activeItemIndex: firstAvailableInGroupIndex,
+          currentGroupIndex: groupIndex,
+          indexToKey: beforeIndexes.indexToKey,
+          itemGroups: currentLayout.itemGroups,
+          keyToIndex: beforeIndexes.keyToIndex
         });
         if (!beforeIndexes) break;
-        swappedBeforeLayout.value = calculateFlexLayout(
-          beforeIndexes.indexToKey
-        );
+        beforeLayout = calculateFlexLayout(beforeIndexes.indexToKey);
       }
 
-      beforeLayout = swappedBeforeLayout.value;
       swapGroupBeforeOffset =
         currentLayout.crossAxisGroupOffsets[groupIndex] ?? 0;
       if (groupIndex === 0) {
@@ -229,20 +211,22 @@ const useInsertStrategy: SortStrategyFactory = () => {
         swappedAfterGroupsCount =
           swappedAfterLayout.value?.itemGroups.length ?? 0;
         groupIndex = afterIndexes.groupIndex;
-        firstGroupItemIndex = afterIndexes.itemIndex;
+        firstAvailableInGroupIndex = afterIndexes.itemIndex;
         itemIndexInGroup = afterIndexes.itemIndexInGroup;
 
         if (afterLayout) currentLayout = afterLayout;
         afterIndexes = getSwappedToGroupAfterIndices({
           ...sharedSwapProps,
-          activeItemIndex: activeIndex,
-          currentGroupIndex: groupIndex
+          activeItemIndex: firstAvailableInGroupIndex,
+          currentGroupIndex: groupIndex,
+          indexToKey: afterIndexes.indexToKey,
+          itemGroups: currentLayout.itemGroups,
+          keyToIndex: afterIndexes.keyToIndex
         });
         if (!afterIndexes) break;
-        swappedAfterLayout.value = calculateFlexLayout(afterIndexes.indexToKey);
+        afterLayout = calculateFlexLayout(afterIndexes.indexToKey);
       }
 
-      afterLayout = swappedAfterLayout.value;
       const currentGroupBeforeOffset =
         currentLayout.crossAxisGroupOffsets[groupIndex] ?? 0;
       swapGroupAfterOffset =
@@ -279,12 +263,11 @@ const useInsertStrategy: SortStrategyFactory = () => {
       if (activeIndex === lastItemIndex) {
         return null;
       }
-      // TODO - add fixed items support in flex
       return reorderInsert(
         indexToKey.value,
         activeIndex,
         lastItemIndex,
-        undefined
+        fixedItemKeys?.value
       );
     }
     const mainAxisPosition = position[mainCoordinate];
@@ -299,10 +282,12 @@ const useInsertStrategy: SortStrategyFactory = () => {
     }
 
     const initialItemIndexInGroup = itemIndexInGroup;
+    const activeItemMainSize = activeItemDimensions[mainDimension];
 
     // Item after
     let swapItemAfterOffset = -Infinity;
     let swapItemAfterBound = -Infinity;
+    let totalGroupSize = 0;
 
     do {
       if (swapItemAfterBound !== -Infinity) {
@@ -314,9 +299,9 @@ const useInsertStrategy: SortStrategyFactory = () => {
       const currentItemDimensions = itemDimensions.value[currentItemKey];
       if (!currentItemPosition || !currentItemDimensions) return;
 
+      const itemMainSize = currentItemDimensions[mainDimension];
       swapItemAfterOffset =
-        currentItemPosition[mainCoordinate] +
-        (isReverse ? 0 : currentItemDimensions[mainDimension]);
+        currentItemPosition[mainCoordinate] + (isReverse ? 0 : itemMainSize);
 
       const nextItemKey = currentGroup[itemIndexInGroup + 1];
       if (nextItemKey === undefined) {
@@ -343,6 +328,11 @@ const useInsertStrategy: SortStrategyFactory = () => {
       const additionalSwapOffset = getAdditionalSwapOffset(sizeToAdd);
       swapItemAfterBound =
         averageOffset + (isCurrentBeforeNext ? 1 : -1) * additionalSwapOffset;
+
+      totalGroupSize += itemMainSize + mainGap.value;
+      if (totalGroupSize + activeItemMainSize > currentLayout.groupSizeLimit) {
+        break;
+      }
     } while (
       itemIndexInGroup < currentGroup.length - 1 &&
       gt(mainAxisPosition, swapItemAfterBound)
@@ -359,7 +349,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
         mainGap.value
       );
       canBeFirst =
-        groupBeforeSize + activeItemDimensions[mainDimension] + mainGap.value >
+        groupBeforeSize + activeItemMainSize + mainGap.value >
         currentLayout.groupSizeLimit;
     }
 
@@ -464,17 +454,21 @@ const useInsertStrategy: SortStrategyFactory = () => {
       }
     }
 
-    const newActiveIndex =
-      firstGroupItemIndex + (itemIndexInGroup - initialItemIndexInGroup);
+    const newIndex =
+      firstAvailableInGroupIndex + (itemIndexInGroup - initialItemIndexInGroup);
 
-    if (newActiveIndex === activeIndex) return;
+    if (
+      newIndex === activeIndex ||
+      fixedItemKeys?.value?.[indexToKey.value[newIndex]!]
+    ) {
+      return;
+    }
 
     return reorderInsert(
       indexToKey.value,
       activeIndex,
-      newActiveIndex,
-      undefined
-      // TODO - add fixed items support in flex
+      newIndex,
+      fixedItemKeys?.value
     );
   };
 };

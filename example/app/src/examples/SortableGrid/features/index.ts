@@ -5,7 +5,7 @@ export { default as DebugExample } from './DebugExample';
 export { default as DifferentSizeItems } from './DifferentSizeItems';
 export { default as DragHandleExample } from './DragHandleExample';
 export { default as DropIndicatorExample } from './DropIndicatorExample';
-export { default as FixedItemsExample } from './FixedItemsExample';
+export { default as FixedOrderItemsExample } from './FixedOrderItemsExample';
 export { default as HorizontalAutoScrollExample } from './HorizontalAutoScrollExample';
 export { default as MultiZoneExample } from './MultiZoneExample';
 export { default as OrderingStrategyExample } from './OrderingStrategyExample';

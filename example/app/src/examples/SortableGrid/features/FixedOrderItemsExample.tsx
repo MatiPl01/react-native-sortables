@@ -10,34 +10,30 @@ const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
 
 const INITIAL_FIXED_ITEMS = new Set(['Item 1', 'Item 5', 'Item 12']);
 
-export default function FixedItemsExample() {
+export default function FixedOrderItemsExample() {
   const [fixedItems, setFixedItems] =
     useState<Set<string>>(INITIAL_FIXED_ITEMS);
 
-  const handleItemPress = useCallback(
-    (item: string) => {
-      if (fixedItems.has(item)) {
-        fixedItems.delete(item);
+  const handleItemPress = useCallback((item: string) => {
+    setFixedItems(oldItems => {
+      const newItems = new Set(oldItems);
+      if (newItems.has(item)) {
+        newItems.delete(item);
       } else {
-        fixedItems.add(item);
+        newItems.add(item);
       }
-      setFixedItems(new Set(fixedItems));
-    },
-    [fixedItems]
-  );
+      return newItems;
+    });
+  }, []);
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => {
-      const fixed = fixedItems.has(item);
-
-      return (
-        <Sortable.Touchable onTap={() => handleItemPress(item)}>
-          <Sortable.Handle mode={fixed ? 'fixed' : 'draggable'}>
-            <GridItem fixed={fixed} item={item} />
-          </Sortable.Handle>
-        </Sortable.Touchable>
-      );
-    },
+    ({ item }) => (
+      <GridItem
+        fixed={fixedItems.has(item)}
+        item={item}
+        onTap={handleItemPress}
+      />
+    ),
     [fixedItems, handleItemPress]
   );
 
@@ -68,17 +64,22 @@ export default function FixedItemsExample() {
 type GridItemProps = {
   item: string;
   fixed: boolean;
+  onTap: (item: string) => void;
 };
 
-const GridItem = memo(function GridItem({ fixed, item }: GridItemProps) {
+const GridItem = memo(function GridItem({ fixed, item, onTap }: GridItemProps) {
   return (
-    <View
-      style={[
-        styles.card,
-        { backgroundColor: fixed ? '#555' : colors.primary }
-      ]}>
-      <Text style={styles.text}>{item}</Text>
-    </View>
+    <Sortable.Touchable onTap={() => onTap(item)}>
+      <Sortable.Handle mode={fixed ? 'fixed-order' : 'draggable'}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: fixed ? '#555' : colors.primary }
+          ]}>
+          <Text style={styles.text}>{item}</Text>
+        </View>
+      </Sortable.Handle>
+    </Sortable.Touchable>
   );
 });
 
