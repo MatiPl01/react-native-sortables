@@ -1,4 +1,5 @@
 /* eslint-disable perfectionist/sort-objects */
+import { SortableFlexCard, SortableGridCard } from '@/components';
 import { IS_WEB } from '@/constants';
 import * as SortableFlex from '@/examples/SortableFlex';
 import * as SortableGrid from '@/examples/SortableGrid';
@@ -7,7 +8,7 @@ import type { Routes } from './types';
 
 const routes: Routes = {
   SortableGrid: {
-    // CardComponent: SortableGridCard,
+    CardComponent: SortableGridCard,
     name: 'Sortable Grid',
     flatten: true,
     routes: {
@@ -95,7 +96,7 @@ const routes: Routes = {
     }
   },
   SortableFlex: {
-    // CardComponent: SortableFlexCard,
+    CardComponent: SortableFlexCard,
     name: 'Sortable Flex',
     flatten: true,
     routes: {
