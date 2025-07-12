@@ -84,8 +84,13 @@ export type ActiveItemSnapSettings = AnimatableProps<{
 }>;
 
 export type AutoScrollSettings = AnimatableProps<{
-  /** Distance from the edge of the container that triggers auto-scrolling. Can be a single number or [top/left, bottom/right] tuple */
+  /** Distance from the edge of the container that triggers auto-scrolling.
+   * Can be a single number or [top/left, bottom/right] tuple */
   autoScrollActivationOffset: [number, number] | number;
+  /** Maximum overscroll distance beyond the normal scroll bounds when
+   * scrollToOverflowEnabled is enabled on the scrollable container.
+   * If null, uses the autoScrollActivationOffset value, otherwise uses the provided value */
+  maxScrollToOverflowOffset: [number, number] | null | number;
   /** Speed at which auto-scrolling occurs */
   autoScrollSpeed: number;
   /** Whether auto-scrolling is enabled */

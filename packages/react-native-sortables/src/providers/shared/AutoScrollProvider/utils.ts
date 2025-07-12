@@ -9,6 +9,7 @@ const DEBUG_COLORS = {
 
 export const handleMeasurementsVertical = (
   threshold: [number, number],
+  maxOverScrollOffset: [number, number] | null,
   touchOffset: number,
   scrollableMeasurements: MeasuredDimensions,
   containerMeasurements: MeasuredDimensions,
@@ -18,9 +19,10 @@ export const handleMeasurementsVertical = (
   'worklet';
   const { height: sH, pageY: sY } = scrollableMeasurements;
   const { height: cH, pageY: cY } = containerMeasurements;
+  maxOverScrollOffset ??= threshold;
 
-  const startDistance = sY + threshold[0] - cY;
-  const endDistance = cY + cH - (sY + sH - threshold[1]);
+  const startDistance = sY + maxOverScrollOffset[0] - cY;
+  const endDistance = cY + cH - (sY + sH - maxOverScrollOffset[1]);
 
   const startOverflow = sY + threshold[0] - (cY + touchOffset);
   const endOverflow = cY + touchOffset - (sY + sH - threshold[1]);
@@ -56,6 +58,7 @@ export const handleMeasurementsVertical = (
 
 export const handleMeasurementsHorizontal = (
   threshold: [number, number],
+  maxOverScrollOffset: [number, number] | null,
   touchOffset: number,
   scrollableMeasurements: MeasuredDimensions,
   containerMeasurements: MeasuredDimensions,
@@ -65,9 +68,10 @@ export const handleMeasurementsHorizontal = (
   'worklet';
   const { pageX: sX, width: sW } = scrollableMeasurements;
   const { pageX: cX, width: cW } = containerMeasurements;
+  maxOverScrollOffset ??= threshold;
 
-  const startDistance = sX + threshold[0] - cX;
-  const endDistance = cX + cW - (sX + sW - threshold[1]);
+  const startDistance = sX + maxOverScrollOffset[0] - cX;
+  const endDistance = cX + cW - (sX + sW - maxOverScrollOffset[1]);
 
   const startOverflow = sX + threshold[0] - (cX + touchOffset);
   const endOverflow = cX + touchOffset - (sX + sW - threshold[1]);

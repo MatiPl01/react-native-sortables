@@ -58,6 +58,7 @@ export default function SharedProvider({
   hapticsEnabled,
   initialCanMeasureItems,
   itemKeys,
+  maxScrollToOverflowOffset,
   onActiveItemDropped,
   onDragEnd,
   onDragMove,
@@ -99,6 +100,7 @@ export default function SharedProvider({
         autoScrollDirection={autoScrollDirection}
         autoScrollEnabled={autoScrollEnabled}
         autoScrollSpeed={autoScrollSpeed}
+        maxScrollToOverflowOffset={maxScrollToOverflowOffset}
         scrollableRef={scrollableRef}
       />
     ),

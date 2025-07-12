@@ -19,6 +19,7 @@ export default function useTargetScrollOffset(
   enabled: SharedValue<boolean>,
   horizontal: boolean,
   autoScrollActivationOffset: Animatable<[number, number] | number>,
+  maxScrollToOverflowOffset: Animatable<[number, number] | null | number>,
   dragStartScrollOffset: SharedValue<null | number>
 ): SharedValue<null | number> {
   const { outerContainerRef, touchPosition } = useCommonValuesContext();
@@ -33,6 +34,13 @@ export default function useTargetScrollOffset(
   const offsetThreshold = useAnimatableValue(
     autoScrollActivationOffset,
     (v): [number, number] => {
+      'worklet';
+      return typeof v === 'number' ? [v, v] : v;
+    }
+  );
+  const maxOverScrollOffset = useAnimatableValue(
+    maxScrollToOverflowOffset,
+    (v): [number, number] | null => {
       'worklet';
       return typeof v === 'number' ? [v, v] : v;
     }
@@ -87,6 +95,7 @@ export default function useTargetScrollOffset(
         startOverflow
       } = handleMeasurements(
         props.threshold,
+        maxOverScrollOffset.value,
         props.touchOffset,
         scrollableMeasurements,
         containerMeasurements,
