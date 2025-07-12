@@ -57,6 +57,7 @@ export const DEFAULT_SHARED_PROPS = {
   itemEntering: IS_WEB ? null : SortableItemEntering,
   itemExiting: IS_WEB ? null : SortableItemExiting,
   itemsLayoutTransitionMode: 'all',
+  maxScrollToOverflowOffset: null,
   onActiveItemDropped: undefined,
   onDragMove: undefined,
   onDragStart: undefined,

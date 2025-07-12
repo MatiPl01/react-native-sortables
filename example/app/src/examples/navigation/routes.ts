@@ -86,6 +86,10 @@ const routes: Routes = {
           BottomTabsNavigator: {
             Component: SortableGrid.tests.BottomTabsNavigatorExample,
             name: 'Bottom Tabs Navigator'
+          },
+          MaxOverscrollOffset: {
+            Component: SortableGrid.tests.MaxOverscrollOffsetExample,
+            name: 'Max Overscroll Offset'
           }
         }
       }

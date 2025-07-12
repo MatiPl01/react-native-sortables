@@ -26,6 +26,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   autoScrollDirection,
   autoScrollEnabled,
   autoScrollSpeed,
+  maxScrollToOverflowOffset,
   scrollableRef
 }) => {
   const isHorizontal = autoScrollDirection === 'horizontal';
@@ -54,6 +55,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     enabled,
     isHorizontal,
     autoScrollActivationOffset,
+    maxScrollToOverflowOffset,
     dragStartScrollOffset
   );
 

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
@@ -73,6 +73,10 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
   const columnGapValue = useAnimatableValue(columnGap);
   const rowGapValue = useAnimatableValue(rowGap);
+  const initialCanMeasureItemsRef = useRef<boolean | null>(null);
+  initialCanMeasureItemsRef.current ??=
+    columnGapValue.value === 0 && rowGapValue.value === 0;
+
   const controlledContainerDimensions = useDerivedValue(() => ({
     height: isVertical, // height is controlled for vertical grids
     width: !isVertical // width is controlled for horizontal grids
@@ -89,6 +93,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
       debug={debug}
+      initialCanMeasureItems={initialCanMeasureItemsRef.current}
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
