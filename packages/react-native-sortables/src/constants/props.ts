@@ -32,6 +32,7 @@ export const DEFAULT_SHARED_PROPS = {
   autoScrollDirection: 'vertical',
   autoScrollEnabled: true,
   autoScrollSpeed: 1,
+  bringToFrontWhenActive: true,
   customHandle: false,
   debug: false,
   dimensionsAnimationType: 'none',

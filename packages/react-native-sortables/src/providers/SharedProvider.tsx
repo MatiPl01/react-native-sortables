@@ -42,6 +42,7 @@ type SharedProviderProps = PropsWithChildren<
       debug: boolean;
       controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
       itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
+      bringToFrontWhenActive: boolean;
       initialCanMeasureItems?: boolean;
       dropIndicatorStyle?: ViewStyle;
     }
@@ -52,6 +53,7 @@ export default function SharedProvider({
   autoScrollDirection,
   autoScrollEnabled,
   autoScrollSpeed,
+  bringToFrontWhenActive,
   children,
   customHandle,
   debug,
@@ -78,7 +80,7 @@ export default function SharedProvider({
 
   const providers = [
     // Provider used for proper zIndex management
-    !inMultiZone && <LayerProvider />,
+    bringToFrontWhenActive && !inMultiZone && <LayerProvider />,
     // Provider used for layout debugging (can be used only in dev mode)
     __DEV__ && debug && <DebugProvider />,
     // Provider used for shared values between all providers below

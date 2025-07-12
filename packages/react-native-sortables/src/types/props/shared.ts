@@ -274,6 +274,10 @@ export type SharedProps = Simplify<
            * @note This only works in development builds and has no effect in production.
            */
           debug: boolean;
+          /** Whether the zIndex of the sortable container should be changed when
+           * drag starts
+           */
+          bringToFrontWhenActive: boolean;
         }
     >
 >;
