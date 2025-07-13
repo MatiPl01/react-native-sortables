@@ -8,9 +8,10 @@ export type GridLayoutContextType = {
   mainGap: SharedValue<number>;
   crossGap: SharedValue<number>;
   isVertical: boolean;
-  useGridLayout: (
-    idxToKey: SharedValue<Array<string>>
-  ) => SharedValue<GridLayout | null>;
+  useGridLayoutReaction: (
+    idxToKey: SharedValue<Array<string>>,
+    onChange: (layout: GridLayout | null, shouldAnimate: boolean) => void
+  ) => void;
 };
 
 export type FlexLayoutContextType = {

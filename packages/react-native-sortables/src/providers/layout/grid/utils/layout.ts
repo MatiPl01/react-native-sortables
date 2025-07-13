@@ -7,14 +7,18 @@ import type {
 } from '../../../../types';
 import { getCrossIndex, getMainIndex } from './helpers';
 
-export const calculateLayout = ({
-  gaps,
-  indexToKey,
-  isVertical,
-  itemDimensions,
-  mainGroupSize,
-  numGroups
-}: GridLayoutProps): GridLayout | null => {
+export const calculateLayout = (
+  {
+    gaps,
+    indexToKey,
+    isVertical,
+    itemDimensions,
+    mainGroupSize,
+    numGroups
+  }: GridLayoutProps,
+  prevLayout: GridLayout | null,
+  activeItemKey: null | string
+): GridLayout | null => {
   'worklet';
   if (!mainGroupSize) {
     return null;

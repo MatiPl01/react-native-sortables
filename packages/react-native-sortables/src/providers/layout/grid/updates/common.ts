@@ -1,8 +1,9 @@
-import type { SharedValue } from 'react-native-reanimated';
+import { type SharedValue, useSharedValue } from 'react-native-reanimated';
 
 import type {
   Coordinate,
   Dimension,
+  GridLayout,
   ReorderFunction,
   SortStrategyFactory
 } from '../../../../types';
@@ -29,13 +30,18 @@ export const createGridStrategy =
       mainGap,
       mainGroupSize,
       numGroups,
-      useGridLayout
+      useGridLayoutReaction
     } = useGridLayoutContext();
     const { fixedItemKeys } = useCustomHandleContext() ?? {};
 
     const othersIndexToKey = useInactiveIndexToKey();
-    const othersLayout = useGridLayout(othersIndexToKey);
+    const othersLayout = useSharedValue<GridLayout | null>(null);
     const debugBox = useDebugBoundingBox();
+
+    useGridLayoutReaction(othersIndexToKey, layout => {
+      'worklet';
+      othersLayout.value = layout;
+    });
 
     let mainContainerSize: SharedValue<null | number>;
     let crossContainerSize: SharedValue<null | number>;
