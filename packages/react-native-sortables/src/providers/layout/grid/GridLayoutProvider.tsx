@@ -1,9 +1,5 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import {
-  type SharedValue,
-  useAnimatedReaction,
-  useDerivedValue
-} from 'react-native-reanimated';
+import { type SharedValue, useAnimatedReaction } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
@@ -42,6 +38,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowHeight
 }) => {
   const {
+    activeItemKey,
     indexToKey,
     itemDimensions,
     itemPositions,
@@ -115,7 +112,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     (
       idxToKey: SharedValue<Array<string>>,
       onChange: (layout: GridLayout | null, shouldAnimate: boolean) => void
-    ) =>
+    ) => {
+      const prevLayout = useMutableValue<GridLayout | null>(null);
+
       useAnimatedReaction(
         () => ({
           gaps: {
@@ -130,7 +129,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         }),
         (props, previousProps) => {
           onChange(
-            calculateLayout(props),
+            calculateLayout(props, prevLayout.value, activeItemKey.value),
             // On web, animate layout only if parent container is not resized
             // (e.g. skip animation when the browser window is resized)
             !IS_WEB ||
@@ -138,26 +137,17 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
               props.mainGroupSize === previousProps.mainGroupSize
           );
         }
-      ),
-    [mainGroupSize, mainGap, crossGap, numGroups, isVertical, itemDimensions]
-  );
-
-  const useGridLayout = useCallback(
-    (idxToKey: SharedValue<Array<string>>) =>
-      useDerivedValue(() =>
-        calculateLayout({
-          gaps: {
-            cross: crossGap.value,
-            main: mainGap.value
-          },
-          indexToKey: idxToKey.value,
-          isVertical,
-          itemDimensions: itemDimensions.value,
-          mainGroupSize: mainGroupSize.value,
-          numGroups
-        })
-      ),
-    [mainGroupSize, mainGap, crossGap, numGroups, isVertical, itemDimensions]
+      );
+    },
+    [
+      mainGroupSize,
+      mainGap,
+      crossGap,
+      numGroups,
+      isVertical,
+      itemDimensions,
+      activeItemKey
+    ]
   );
 
   // GRID LAYOUT UPDATER
@@ -194,7 +184,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       mainGap,
       mainGroupSize,
       numGroups,
-      useGridLayout
+      useGridLayoutReaction
     }
   };
 });
