@@ -10,15 +10,12 @@ import useItemPosition from './useItemPosition';
 import useItemZIndex from './useItemZIndex';
 
 const RELATIVE_STYLE: ViewStyle = {
-  position: 'relative',
-  transform: [],
-  zIndex: 0
+  position: 'relative'
 };
 
 const HIDDEN_STYLE: ViewStyle = {
-  position: 'absolute',
-  transform: [{ scale: 0 }],
-  zIndex: -1
+  left: -9999,
+  position: 'absolute'
 };
 
 export default function useItemStyles(
@@ -47,6 +44,7 @@ export default function useItemStyles(
 
     return mergeStyles(
       {
+        left: 0,
         position: 'absolute',
         transform: [
           { translateX: position.value.x },

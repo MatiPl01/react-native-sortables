@@ -16,15 +16,11 @@ import { useMultiZoneContext } from './MultiZoneProvider/MultiZoneProvider';
 
 type MeasurementsProviderProps = {
   itemsCount: number;
-  initialCanMeasureItems: boolean;
 };
 
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<MeasurementsProviderProps, MeasurementsContextType>(({
-  initialCanMeasureItems,
-  itemsCount
-}) => {
+)<MeasurementsProviderProps, MeasurementsContextType>(({ itemsCount }) => {
   const {
     activeItemDimensions,
     activeItemKey,
@@ -42,16 +38,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const measuredItemsCount = useMutableValue(0);
   const initialItemMeasurementsCompleted = useMutableValue(false);
-  const canMeasureItems = useMutableValue(initialCanMeasureItems);
   const debounce = useAnimatedDebounce();
 
   const handleItemMeasurement = useStableCallback(
     runOnUI((key: string, dimensions: Dimensions) => {
       'worklet';
-      if (!canMeasureItems.value) {
-        return;
-      }
-
       const storedDimensions = itemDimensions.value[key];
 
       if (
@@ -61,8 +52,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         return;
       }
 
+      let newItemMeasured = false;
       if (!itemDimensions.value[key]) {
         measuredItemsCount.value += 1;
+        newItemMeasured = true;
       }
 
       itemDimensions.value[key] = dimensions;
@@ -76,14 +69,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       // Update the array of item dimensions only after all items have been
       // measured to reduce the number of times animated reactions are triggered
       if (measuredItemsCount.value === itemsCount) {
-        // If this is the first time all items have been measured, update
-        // dimensions immediately to avoid unnecessary delays
-        if (!initialItemMeasurementsCompleted.value) {
-          initialItemMeasurementsCompleted.value = true;
+        initialItemMeasurementsCompleted.value = true;
+
+        if (newItemMeasured) {
+          // If measurements were triggered because of adding new items and all new
+          // items have been measured, update dimensions immediately to avoid
+          // unnecessary delays
           itemDimensions.modify();
-        } else if (usesAbsoluteLayout.value) {
-          // In all other cases, debounce the update in case multiple items
-          // change their size at the same time
+        } else {
+          // Otherwise, debounce the update if the number of items is not changed
+          // to reduce the number of updates if dimensions of items are changed
+          // many times within a short period of time
           debounce(itemDimensions.modify, 100);
         }
       }
@@ -205,7 +201,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   return {
     value: {
       applyControlledContainerDimensions,
-      canMeasureItems,
       handleHelperContainerMeasurement,
       handleItemMeasurement,
       measureContainer,

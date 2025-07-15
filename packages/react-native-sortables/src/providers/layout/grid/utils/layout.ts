@@ -23,27 +23,33 @@ export const calculateLayout = ({
   const crossAxisOffsets = [0];
   const itemPositions: Record<string, Vector> = {};
 
+  let mainDimension: Dimension;
   let crossDimension: Dimension;
   let mainCoordinate: Coordinate;
   let crossCoordinate: Coordinate;
 
   if (isVertical) {
     // grid with specified number of columns (vertical orientation)
+    mainDimension = 'width';
     crossDimension = 'height'; // items can grow vertically
     mainCoordinate = 'x';
     crossCoordinate = 'y';
   } else {
     // grid with specified number of rows (horizontal orientation)
+    mainDimension = 'height';
     crossDimension = 'width'; // items can grow horizontally
     mainCoordinate = 'y';
     crossCoordinate = 'x';
   }
 
   for (const [itemIndex, itemKey] of indexToKey.entries()) {
-    const crossItemSize = itemDimensions[itemKey]?.[crossDimension];
+    const dimensions = itemDimensions[itemKey];
+    const crossItemSize = dimensions?.[crossDimension];
+    const mainItemSize = dimensions?.[mainDimension];
 
-    // Return if the item is not yet measured
-    if (crossItemSize === undefined) {
+    // Return null if the item is not yet measured or the item main size
+    // is different than the main group size (main size must be always the same)
+    if (crossItemSize === undefined || mainItemSize !== mainGroupSize) {
       return null;
     }
 

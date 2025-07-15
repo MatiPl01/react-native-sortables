@@ -48,8 +48,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     measuredContainerWidth,
     shouldAnimateLayout
   } = useCommonValuesContext();
-  const { applyControlledContainerDimensions, canMeasureItems } =
-    useMeasurementsContext();
+  const { applyControlledContainerDimensions } = useMeasurementsContext();
   const debugContext = useDebugContext();
 
   const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
@@ -93,7 +92,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       }
 
       mainGroupSize.value = value;
-      canMeasureItems.value = true;
 
       // DEBUG ONLY
       if (debugMainGapRects) {

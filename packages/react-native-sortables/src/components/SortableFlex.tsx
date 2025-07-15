@@ -70,7 +70,6 @@ function SortableFlex(props: SortableFlexProps) {
       controlledContainerDimensions={controlledContainerDimensions}
       debug={debug}
       itemKeys={itemKeys}
-      initialCanMeasureItems
       onDragEnd={onDragEnd}>
       <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
         <OrderUpdaterComponent
