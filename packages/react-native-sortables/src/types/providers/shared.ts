@@ -85,7 +85,6 @@ export type CommonValuesContextType =
 // MEASUREMENTS
 
 export type MeasurementsContextType = {
-  canMeasureItems: SharedValue<boolean>;
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   removeItemMeasurements: (key: string) => void;
