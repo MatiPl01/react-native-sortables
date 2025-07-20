@@ -7,7 +7,7 @@ import {
   useDerivedValue
 } from 'react-native-reanimated';
 
-import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
+import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
 import {
@@ -173,44 +173,41 @@ function SortableGridInner<I>({
 
   const animatedInnerStyle = useAnimatedStyle(() => ({
     flexDirection: isVertical ? 'row' : 'column',
-    height: isVertical
-      ? undefined
-      : groups * (rowHeight + rowGap.value) - rowGap.value,
-    ...(mainGroupSize.value
+    ...(IS_WEB || mainGroupSize.value
       ? {
           columnGap: columnGap.value,
-          marginBottom: 0,
-          marginLeft: 0,
-          marginRight: 0,
-          marginTop: 0,
+          marginHorizontal: 0,
+          marginVertical: 0,
           rowGap: rowGap.value
         }
       : {
-          marginBottom: -rowGap.value / 2,
-          marginLeft: -columnGap.value / 2,
-          marginRight: -columnGap.value / 2,
-          marginTop: -rowGap.value / 2
+          marginHorizontal: -columnGap.value / 2,
+          marginVertical: -rowGap.value / 2
         })
   }));
 
+  // TODO - fix teleported items size
   const animatedItemStyle = useAnimatedStyle(() => {
+    if (IS_WEB) {
+      return {
+        [isVertical ? 'width' : 'height']:
+          `calc((100% - ${columnGap.value * (groups - 1)}px) / ${groups})`
+      };
+    }
+
     if (!mainGroupSize.value) {
       return {
         flexBasis: `${100 / groups}%`,
-        paddingBottom: rowGap.value / 2,
-        paddingLeft: columnGap.value / 2,
-        paddingRight: columnGap.value / 2,
-        paddingTop: rowGap.value / 2
+        paddingHorizontal: columnGap.value / 2,
+        paddingVertical: rowGap.value / 2
       };
     }
 
     return {
-      flexBasis: 'auto',
+      flexBasis: undefined,
       [isVertical ? 'width' : 'height']: mainGroupSize.value,
-      paddingBottom: 0,
-      paddingLeft: 0,
-      paddingRight: 0,
-      paddingTop: 0
+      paddingHorizontal: 0,
+      paddingVertical: 0
     };
   });
 
@@ -219,7 +216,7 @@ function SortableGridInner<I>({
       {...containerProps}
       style={[styles.gridContainer, animatedInnerStyle]}
       onLayout={runOnUI((width, height) => {
-        if (mainGroupSize.value) {
+        if (IS_WEB || mainGroupSize.value) {
           handleContainerMeasurement(width, height);
         } else {
           handleContainerMeasurement(

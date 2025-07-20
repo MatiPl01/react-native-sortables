@@ -89,6 +89,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       }
 
       mainGroupSize.value = value;
+      console.log(
+        'mainGroupSize',
+        containerWidth.value,
+        mainGap.value,
+        mainGroupSize.value
+      );
 
       // DEBUG ONLY
       if (debugMainGapRects) {
@@ -124,7 +130,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           numGroups
         }),
         (props, previousProps) => {
-          console.log('props', props, calculateLayout(props));
           onChange(
             calculateLayout(props),
             // On web, animate layout only if parent container is not resized
