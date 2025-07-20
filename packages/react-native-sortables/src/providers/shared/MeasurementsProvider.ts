@@ -41,8 +41,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       'worklet';
       const storedDimensions = itemDimensions.value[key];
 
-      console.log('handleItemMeasurement', key, dimensions);
-
       if (
         storedDimensions &&
         !areDimensionsDifferent(storedDimensions, dimensions, 1)
@@ -130,13 +128,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       itemMeasurementsCompleted: initialItemMeasurementsCompleted.value
     }),
     ({ containerH, containerW, itemMeasurementsCompleted }) => {
-      console.log(
-        'usesAbsoluteLayout.value',
-        usesAbsoluteLayout.value,
-        itemMeasurementsCompleted,
-        containerH,
-        containerW
-      );
       if (
         usesAbsoluteLayout.value ||
         !itemMeasurementsCompleted ||

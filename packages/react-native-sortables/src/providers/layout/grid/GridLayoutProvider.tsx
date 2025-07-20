@@ -89,12 +89,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       }
 
       mainGroupSize.value = value;
-      console.log(
-        'mainGroupSize',
-        containerWidth.value,
-        mainGap.value,
-        mainGroupSize.value
-      );
 
       // DEBUG ONLY
       if (debugMainGapRects) {

@@ -173,6 +173,9 @@ function SortableGridInner<I>({
 
   const animatedInnerStyle = useAnimatedStyle(() => ({
     flexDirection: isVertical ? 'row' : 'column',
+    height: isVertical
+      ? undefined
+      : groups * (rowHeight + rowGap.value) - rowGap.value,
     ...(IS_WEB || mainGroupSize.value
       ? {
           columnGap: columnGap.value,

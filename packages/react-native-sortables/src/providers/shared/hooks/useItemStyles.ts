@@ -134,13 +134,6 @@ export default function useItemStyles(
         return;
       }
 
-      console.log(
-        'positionChanged',
-        key,
-        positionChanged,
-        shouldAnimateLayout.value
-      );
-
       if (
         shouldAnimateLayout.value &&
         (!animateLayoutOnReorderOnly.value || activeItemKey.value !== null)
