@@ -124,6 +124,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           numGroups
         }),
         (props, previousProps) => {
+          console.log('props', props, calculateLayout(props));
           onChange(
             calculateLayout(props),
             // On web, animate layout only if parent container is not resized

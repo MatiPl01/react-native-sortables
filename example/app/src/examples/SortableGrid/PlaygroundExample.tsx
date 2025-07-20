@@ -35,6 +35,7 @@ export default function PlaygroundExample() {
         columnGap={10}
         columns={2}
         data={collapsed ? data.slice(0, 4) : data}
+        dimensionsAnimationType='worklet'
         renderItem={renderItem}
         rowGap={10}
         sortEnabled={isEditable}

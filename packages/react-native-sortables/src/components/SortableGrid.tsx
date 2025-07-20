@@ -173,17 +173,23 @@ function SortableGridInner<I>({
 
   const animatedInnerStyle = useAnimatedStyle(() => ({
     flexDirection: isVertical ? 'row' : 'column',
-    height: isVertical ? undefined : groups * (rowHeight + rowGap.value),
+    height: isVertical
+      ? undefined
+      : groups * (rowHeight + rowGap.value) - rowGap.value,
     ...(mainGroupSize.value
       ? {
           columnGap: columnGap.value,
-          marginHorizontal: 0,
-          marginVertical: 0,
+          marginBottom: 0,
+          marginLeft: 0,
+          marginRight: 0,
+          marginTop: 0,
           rowGap: rowGap.value
         }
       : {
-          marginHorizontal: -columnGap.value / 2,
-          marginVertical: -rowGap.value / 2
+          marginBottom: -rowGap.value / 2,
+          marginLeft: -columnGap.value / 2,
+          marginRight: -columnGap.value / 2,
+          marginTop: -rowGap.value / 2
         })
   }));
 
@@ -191,16 +197,20 @@ function SortableGridInner<I>({
     if (!mainGroupSize.value) {
       return {
         flexBasis: `${100 / groups}%`,
-        paddingHorizontal: columnGap.value / 2,
-        paddingVertical: rowGap.value / 2
+        paddingBottom: rowGap.value / 2,
+        paddingLeft: columnGap.value / 2,
+        paddingRight: columnGap.value / 2,
+        paddingTop: rowGap.value / 2
       };
     }
 
     return {
       flexBasis: 'auto',
       [isVertical ? 'width' : 'height']: mainGroupSize.value,
-      paddingHorizontal: 0,
-      paddingVertical: 0
+      paddingBottom: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingTop: 0
     };
   });
 
