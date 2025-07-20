@@ -87,6 +87,10 @@ const routes: Routes = {
             Component: SortableGrid.tests.BottomTabsNavigatorExample,
             name: 'Bottom Tabs Navigator'
           },
+          HidingItems: {
+            Component: SortableGrid.tests.HidingItemsExample,
+            name: 'Hiding Items'
+          },
           ...(IS_IOS && {
             MaxOverscrollOffset: {
               Component: SortableGrid.tests.MaxOverscrollOffsetExample,
