@@ -1,7 +1,11 @@
 import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
+import {
+  runOnUI,
+  useAnimatedStyle,
+  useDerivedValue
+} from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
 import { useDragEndHandler } from '../hooks';
@@ -12,6 +16,7 @@ import {
   OrderUpdaterComponent,
   SharedProvider,
   useGridLayoutContext,
+  useMeasurementsContext,
   useStrategyKey
 } from '../providers';
 import type {
@@ -164,6 +169,7 @@ function SortableGridInner<I>({
   ...containerProps
 }: SortableGridInnerProps<I>) {
   const { mainGroupSize } = useGridLayoutContext();
+  const { handleContainerMeasurement } = useMeasurementsContext();
 
   const animatedInnerStyle = useAnimatedStyle(() => ({
     flexDirection: isVertical ? 'row' : 'column',
@@ -190,8 +196,6 @@ function SortableGridInner<I>({
       };
     }
 
-    console.log('mainGroupSize', mainGroupSize.value);
-
     return {
       flexBasis: 'auto',
       [isVertical ? 'width' : 'height']: mainGroupSize.value,
@@ -203,7 +207,17 @@ function SortableGridInner<I>({
   return (
     <SortableContainer
       {...containerProps}
-      style={[styles.gridContainer, animatedInnerStyle]}>
+      style={[styles.gridContainer, animatedInnerStyle]}
+      onLayout={runOnUI((width, height) => {
+        if (mainGroupSize.value) {
+          handleContainerMeasurement(width, height);
+        } else {
+          handleContainerMeasurement(
+            width - columnGap.value,
+            height - rowGap.value
+          );
+        }
+      })}>
       {zipArrays(data, itemKeys).map(([item, key], index) => (
         <SortableGridItem
           entering={itemEntering ?? undefined}

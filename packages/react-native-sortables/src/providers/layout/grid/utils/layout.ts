@@ -1,3 +1,4 @@
+import { OFFSET_EPS } from '../../../../constants';
 import type {
   Coordinate,
   Dimension,
@@ -49,7 +50,11 @@ export const calculateLayout = ({
 
     // Return null if the item is not yet measured or the item main size
     // is different than the main group size (main size must be always the same)
-    if (crossItemSize === undefined || mainItemSize !== mainGroupSize) {
+    if (
+      crossItemSize === undefined ||
+      mainItemSize === undefined ||
+      Math.abs(mainItemSize - mainGroupSize) > OFFSET_EPS
+    ) {
       return null;
     }
 

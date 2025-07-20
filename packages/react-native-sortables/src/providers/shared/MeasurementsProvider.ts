@@ -1,18 +1,17 @@
 import { useCallback } from 'react';
-import type { LayoutChangeEvent } from 'react-native';
-import { measure, runOnUI, useAnimatedReaction } from 'react-native-reanimated';
+import { runOnUI, useAnimatedReaction } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '../../constants';
 import { useStableCallback } from '../../hooks';
 import {
+  setAnimatedTimeout,
   useAnimatedDebounce,
   useMutableValue
 } from '../../integrations/reanimated';
-import { type Dimensions, type MeasurementsContextType } from '../../types';
+import type { Dimensions, MeasurementsContextType } from '../../types';
 import { areDimensionsDifferent } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
-import { useMultiZoneContext } from './MultiZoneProvider/MultiZoneProvider';
+import { useMultiZoneContext } from './MultiZoneProvider';
 
 type MeasurementsProviderProps = {
   itemsCount: number;
@@ -28,9 +27,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     containerWidth,
     controlledContainerDimensions,
     itemDimensions,
-    measuredContainerHeight,
-    measuredContainerWidth,
-    outerContainerRef,
     usesAbsoluteLayout
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
@@ -95,115 +91,65 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     [itemDimensions, measuredItemsCount]
   );
 
+  const handleContainerMeasurement = useCallback(
+    (width: number, height: number) => {
+      'worklet';
+      const ctrl = controlledContainerDimensions.value;
+
+      if (!ctrl.width) {
+        containerWidth.value = width;
+      }
+      if (!ctrl.height) {
+        containerHeight.value = height;
+      }
+    },
+    [controlledContainerDimensions, containerHeight, containerWidth]
+  );
+
   const applyControlledContainerDimensions = useCallback(
     (dimensions: Partial<Dimensions>) => {
       'worklet';
-      // Reset container dimensions to the measured dimensions
-      containerHeight.value = measuredContainerHeight.value ?? null;
-      containerWidth.value = measuredContainerWidth.value ?? null;
+      const ctrl = controlledContainerDimensions.value;
 
-      // Override controlled dimensions (dimensions that are applied based
-      // on the sortable component layout calculations)
-      if (
-        controlledContainerDimensions.value.height &&
-        dimensions.height !== undefined
-      ) {
+      if (ctrl.height && dimensions.height !== undefined) {
         containerHeight.value = dimensions.height;
       }
-      if (
-        controlledContainerDimensions.value.width &&
-        dimensions.width !== undefined
-      ) {
+      if (ctrl.width && dimensions.width !== undefined) {
         containerWidth.value = dimensions.width;
       }
     },
-    [
-      containerHeight,
-      containerWidth,
-      controlledContainerDimensions,
-      measuredContainerHeight,
-      measuredContainerWidth
-    ]
+    [containerHeight, containerWidth, controlledContainerDimensions]
   );
-
-  const applyMeasuredContainerDimensions = useCallback(
-    (dimensions: Dimensions) => {
-      'worklet';
-      measuredContainerHeight.value = dimensions.height;
-      measuredContainerWidth.value = dimensions.width;
-
-      if (usesAbsoluteLayout.value) {
-        if (!controlledContainerDimensions.value.height) {
-          containerHeight.value = dimensions.height;
-        }
-        if (!controlledContainerDimensions.value.width) {
-          containerWidth.value = dimensions.width;
-        }
-      }
-    },
-    [
-      usesAbsoluteLayout,
-      containerHeight,
-      containerWidth,
-      controlledContainerDimensions,
-      measuredContainerHeight,
-      measuredContainerWidth
-    ]
-  );
-
-  const handleHelperContainerMeasurement = useCallback(
-    ({ nativeEvent: { layout } }: LayoutChangeEvent) =>
-      runOnUI(applyMeasuredContainerDimensions)(layout),
-    [applyMeasuredContainerDimensions]
-  );
-
-  const measureContainer = useCallback(() => {
-    'worklet';
-    const measurements = measure(outerContainerRef);
-    if (measurements) {
-      applyMeasuredContainerDimensions(measurements);
-    }
-  }, [applyMeasuredContainerDimensions, outerContainerRef]);
 
   useAnimatedReaction(
     () => ({
       containerH: containerHeight.value,
       containerW: containerWidth.value,
-      itemMeasurementsCompleted: initialItemMeasurementsCompleted.value,
-      measuredHeight: measuredContainerHeight.value,
-      measuredWidth: measuredContainerWidth.value
+      itemMeasurementsCompleted: initialItemMeasurementsCompleted.value
     }),
-    ({
-      containerH,
-      containerW,
-      itemMeasurementsCompleted,
-      measuredHeight,
-      measuredWidth
-    }) => {
+    ({ containerH, containerW, itemMeasurementsCompleted }) => {
       if (
         usesAbsoluteLayout.value ||
         !itemMeasurementsCompleted ||
-        measuredHeight === null ||
-        measuredWidth === null ||
-        (containerH === null && containerW === null) ||
-        (containerH !== null &&
-          Math.abs(measuredHeight - containerH) > OFFSET_EPS) ||
-        (containerW !== null &&
-          Math.abs(measuredWidth - containerW) > OFFSET_EPS)
+        !containerH ||
+        !containerW
       ) {
         return;
       }
 
-      usesAbsoluteLayout.value = true;
+      // Add timeout for safety, to prevent too many updates in a short period of time
+      // (this may cause perf issues on low end devices, so the update is delayed for safety)
+      setAnimatedTimeout(() => {
+        usesAbsoluteLayout.value = true;
+      }, 100);
     }
   );
 
   return {
     value: {
       applyControlledContainerDimensions,
-      handleHelperContainerMeasurement,
+      handleContainerMeasurement,
       handleItemMeasurement,
-      measureContainer,
       removeItemMeasurements
     }
   };
