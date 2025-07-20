@@ -1,24 +1,33 @@
+import { useRef } from 'react';
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle } from 'react-native-reanimated';
+import {
+  interpolate,
+  makeMutable,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useDerivedValue,
+  withTiming
+} from 'react-native-reanimated';
 
-import type { AnimatedStyleProp } from '../../../integrations/reanimated';
-import { mergeStyles } from '../../../utils';
+import { isPaper } from '../../../constants';
+import {
+  type AnimatedStyleProp,
+  useMutableValue
+} from '../../../integrations/reanimated';
+import type { Vector } from '../../../types';
+import { areVectorsDifferent, mergeStyles } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemDecorationValues from './useItemDecorationValues';
-import useItemPosition from './useItemPosition';
 import useItemZIndex from './useItemZIndex';
 
 const RELATIVE_STYLE: ViewStyle = {
-  position: 'relative',
-  transform: [],
-  zIndex: 0
+  position: 'relative'
 };
 
 const HIDDEN_STYLE: ViewStyle = {
-  position: 'absolute',
-  transform: [{ scale: 0 }],
-  zIndex: -1
+  left: -9999,
+  position: 'absolute'
 };
 
 export default function useItemStyles(
@@ -26,35 +35,173 @@ export default function useItemStyles(
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
 ): AnimatedStyleProp {
-  const { usesAbsoluteLayout } = useCommonValuesContext();
+  const {
+    activeItemKey,
+    activeItemPosition,
+    animateLayoutOnReorderOnly,
+    itemPositions,
+    shouldAnimateLayout,
+    usesAbsoluteLayout
+  } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
-  const position = useItemPosition(key, isActive, activationAnimationProgress);
+  const layoutPosition = useDerivedValue(
+    () => itemPositions.value[key] ?? null
+  );
   const decoration = useItemDecorationValues(
     key,
     isActive,
     activationAnimationProgress
   );
 
-  return useAnimatedStyle(() => {
+  const positionsRef = useRef<{
+    initial: SharedValue<null | Vector>;
+    current: SharedValue<null | Vector>;
+  }>(null);
+  const dropStartValues = useMutableValue<null | {
+    position: Vector;
+    progress: number;
+  }>(null);
+
+  if (!positionsRef.current) {
+    const initialPosition = isActive.value
+      ? activeItemPosition.value
+      : layoutPosition.value;
+    positionsRef.current = {
+      current: makeMutable(initialPosition),
+      initial: makeMutable(initialPosition)
+    };
+  }
+
+  const { current: position, initial: initialPosition } = positionsRef.current;
+
+  // Inactive item updater
+  useAnimatedReaction(
+    () => ({
+      activationProgress: activationAnimationProgress.value,
+      active: isActive.value,
+      itemPosition: layoutPosition.value
+    }),
+    ({ activationProgress, active, itemPosition }, prev) => {
+      initialPosition.value ??= itemPosition;
+
+      if (!itemPosition || active) {
+        dropStartValues.value = null;
+        return;
+      }
+
+      if (!position.value) {
+        position.value = itemPosition;
+        return;
+      }
+
+      const positionChanged =
+        prev?.itemPosition &&
+        areVectorsDifferent(prev.itemPosition, itemPosition);
+
+      if (activationProgress === 0) {
+        if (dropStartValues.value) {
+          dropStartValues.value = null;
+          position.value = itemPosition;
+          return;
+        }
+      }
+      // Set dropStartValues only if the item was previously active or if is
+      // already during the drop animation and the target position changed
+      else if (dropStartValues.value ? positionChanged : prev?.active) {
+        dropStartValues.value = {
+          position: position.value,
+          progress: activationProgress
+        };
+      }
+
+      if (dropStartValues.value) {
+        const {
+          position: { x, y },
+          progress
+        } = dropStartValues.value;
+        const animate = (from: number, to: number) =>
+          interpolate(activationProgress, [progress, 0], [from, to]);
+
+        position.value = {
+          x: animate(x, itemPosition.x),
+          y: animate(y, itemPosition.y)
+        };
+        return;
+      }
+
+      if (!positionChanged) {
+        return;
+      }
+
+      if (
+        shouldAnimateLayout.value &&
+        (!animateLayoutOnReorderOnly.value || activeItemKey.value !== null)
+      ) {
+        position.value = withTiming(itemPosition);
+      } else {
+        position.value = itemPosition;
+      }
+    }
+  );
+
+  // Active item updater
+  useAnimatedReaction(
+    () => ({
+      active: isActive.value,
+      activePosition: activeItemPosition.value
+    }),
+    ({ active, activePosition }) => {
+      if (active && activePosition) {
+        position.value = activePosition;
+      }
+    }
+  );
+
+  const isOldArch = isPaper();
+
+  const layoutStyles = useAnimatedStyle(() => {
     if (!usesAbsoluteLayout.value) {
-      return mergeStyles(RELATIVE_STYLE, decoration.value);
+      return RELATIVE_STYLE;
+    }
+    if (!initialPosition.value) {
+      return HIDDEN_STYLE;
     }
 
-    if (!position.value) {
-      return HIDDEN_STYLE;
+    return {
+      position: 'absolute',
+      zIndex: zIndex.value,
+      ...(isOldArch
+        ? { left: initialPosition.value.x, top: initialPosition.value.y }
+        : { left: 0 })
+    };
+  });
+
+  const nonLayoutStyles = useAnimatedStyle(() => {
+    if (
+      !usesAbsoluteLayout.value ||
+      !initialPosition.value ||
+      !position.value
+    ) {
+      return decoration.value;
     }
 
     return mergeStyles(
       {
-        position: 'absolute',
         transform: [
-          { translateX: position.value.x },
-          { translateY: position.value.y }
-        ],
-        zIndex: zIndex.value
+          {
+            translateX:
+              position.value.x - (isOldArch ? initialPosition.value.x : 0)
+          },
+          {
+            translateY:
+              position.value.y - (isOldArch ? initialPosition.value.y : 0)
+          }
+        ]
       },
       decoration.value
     );
   });
+
+  return [layoutStyles, nonLayoutStyles];
 }

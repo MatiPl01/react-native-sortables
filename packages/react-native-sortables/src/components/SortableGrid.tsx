@@ -1,9 +1,13 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
+import {
+  runOnUI,
+  useAnimatedStyle,
+  useDerivedValue
+} from 'react-native-reanimated';
 
-import { DEFAULT_SORTABLE_GRID_PROPS } from '../constants';
+import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
 import {
@@ -12,6 +16,7 @@ import {
   OrderUpdaterComponent,
   SharedProvider,
   useGridLayoutContext,
+  useMeasurementsContext,
   useStrategyKey
 } from '../providers';
 import type {
@@ -73,9 +78,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
 
   const columnGapValue = useAnimatableValue(columnGap);
   const rowGapValue = useAnimatableValue(rowGap);
-  const initialCanMeasureItemsRef = useRef<boolean | null>(null);
-  initialCanMeasureItemsRef.current ??=
-    columnGapValue.value === 0 && rowGapValue.value === 0;
 
   const controlledContainerDimensions = useDerivedValue(() => ({
     height: isVertical, // height is controlled for vertical grids
@@ -93,7 +95,6 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
       debug={debug}
-      initialCanMeasureItems={initialCanMeasureItemsRef.current}
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
@@ -168,11 +169,14 @@ function SortableGridInner<I>({
   ...containerProps
 }: SortableGridInnerProps<I>) {
   const { mainGroupSize } = useGridLayoutContext();
+  const { handleContainerMeasurement } = useMeasurementsContext();
 
   const animatedInnerStyle = useAnimatedStyle(() => ({
     flexDirection: isVertical ? 'row' : 'column',
-    height: isVertical ? undefined : groups * (rowHeight + rowGap.value),
-    ...(mainGroupSize.value
+    height: isVertical
+      ? undefined
+      : groups * (rowHeight + rowGap.value) - rowGap.value,
+    ...(IS_WEB || mainGroupSize.value
       ? {
           columnGap: columnGap.value,
           marginHorizontal: 0,
@@ -185,7 +189,15 @@ function SortableGridInner<I>({
         })
   }));
 
+  // TODO - fix teleported items size
   const animatedItemStyle = useAnimatedStyle(() => {
+    if (IS_WEB) {
+      return {
+        [isVertical ? 'width' : 'height']:
+          `calc((100% - ${columnGap.value * (groups - 1)}px) / ${groups})`
+      };
+    }
+
     if (!mainGroupSize.value) {
       return {
         flexBasis: `${100 / groups}%`,
@@ -195,7 +207,7 @@ function SortableGridInner<I>({
     }
 
     return {
-      flexBasis: 'auto',
+      flexBasis: undefined,
       [isVertical ? 'width' : 'height']: mainGroupSize.value,
       paddingHorizontal: 0,
       paddingVertical: 0
@@ -205,7 +217,17 @@ function SortableGridInner<I>({
   return (
     <SortableContainer
       {...containerProps}
-      style={[styles.gridContainer, animatedInnerStyle]}>
+      style={[styles.gridContainer, animatedInnerStyle]}
+      onLayout={runOnUI((width, height) => {
+        if (IS_WEB || mainGroupSize.value) {
+          handleContainerMeasurement(width, height);
+        } else {
+          handleContainerMeasurement(
+            width - columnGap.value,
+            height - rowGap.value
+          );
+        }
+      })}>
       {zipArrays(data, itemKeys).map(([item, key], index) => (
         <SortableGridItem
           entering={itemEntering ?? undefined}

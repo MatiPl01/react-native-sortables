@@ -42,14 +42,13 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowHeight
 }) => {
   const {
+    containerWidth,
     indexToKey,
     itemDimensions,
     itemPositions,
-    measuredContainerWidth,
     shouldAnimateLayout
   } = useCommonValuesContext();
-  const { applyControlledContainerDimensions, canMeasureItems } =
-    useMeasurementsContext();
+  const { applyControlledContainerDimensions } = useMeasurementsContext();
   const debugContext = useDebugContext();
 
   const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
@@ -80,12 +79,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         return rowHeight ?? null;
       }
 
-      const mainContainerWidth = measuredContainerWidth.value;
-      if (!mainContainerWidth) {
-        return null;
-      }
-
-      return (mainContainerWidth + mainGap.value) / numGroups - mainGap.value;
+      return containerWidth.value
+        ? (containerWidth.value + mainGap.value) / numGroups - mainGap.value
+        : null;
     },
     value => {
       if (!value) {
@@ -93,7 +89,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       }
 
       mainGroupSize.value = value;
-      canMeasureItems.value = true;
 
       // DEBUG ONLY
       if (debugMainGapRects) {

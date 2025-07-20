@@ -8,17 +8,17 @@ import {
   useAnimatableValue,
   useMutableValue
 } from '../../integrations/reanimated';
-import {
-  type ActiveItemDecorationSettings,
-  type ActiveItemSnapSettings,
-  type CommonValuesContextType,
-  type ControlledContainerDimensions,
-  type Dimensions,
-  DragActivationState,
-  type ItemDragSettings,
-  type ItemsLayoutTransitionMode,
-  type Vector
+import type {
+  ActiveItemDecorationSettings,
+  ActiveItemSnapSettings,
+  CommonValuesContextType,
+  ControlledContainerDimensions,
+  Dimensions,
+  ItemDragSettings,
+  ItemsLayoutTransitionMode,
+  Vector
 } from '../../types';
+import { DragActivationState } from '../../types';
 import { areArraysDifferent, getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
 
@@ -72,13 +72,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const activeItemPosition = useMutableValue<null | Vector>(null);
 
     // DIMENSIONS
-    // measured dimensions via onLayout used to calculate containerWidth and containerHeight
-    // (should be used for layout calculations and to determine if calculated
-    // container dimensions have been applied)
-    const measuredContainerWidth = useMutableValue<null | number>(null);
-    const measuredContainerHeight = useMutableValue<null | number>(null);
-    // calculated based on measuredContainerWidth and measuredContainerHeight and current layout
-    // (containerWidth and containerHeight should be used in most cases)
     const containerWidth = useMutableValue<null | number>(null);
     const containerHeight = useMutableValue<null | number>(null);
     const itemDimensions = useMutableValue<Record<string, Dimensions>>({});
@@ -117,8 +110,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const snapOffsetY = useAnimatableValue(_snapOffsetY);
 
     // OTHER
-    const outerContainerRef = useAnimatedRef<View>();
-    const innerContainerRef = useAnimatedRef<View>();
+    const containerRef = useAnimatedRef<View>();
     const sortEnabled = useAnimatableValue(_sortEnabled);
     const usesAbsoluteLayout = useMutableValue(false);
     const shouldAnimateLayout = useMutableValue(true);
@@ -149,6 +141,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         animateLayoutOnReorderOnly,
         containerHeight,
         containerId,
+        containerRef,
         containerWidth,
         controlledContainerDimensions,
         customHandle,
@@ -160,14 +153,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         inactiveItemOpacity,
         inactiveItemScale,
         indexToKey,
-        innerContainerRef,
         itemDimensions,
         itemPositions,
         itemsLayoutTransitionMode,
         keyToIndex,
-        measuredContainerHeight,
-        measuredContainerWidth,
-        outerContainerRef,
         prevActiveItemKey,
         shouldAnimateLayout,
         snapOffsetX,

@@ -1,10 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import {
-  Dimensions,
-  type StyleProp,
-  StyleSheet,
-  type ViewStyle
-} from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import Animated, {
   LinearTransition,
   useAnimatedStyle,
@@ -13,10 +8,7 @@ import Animated, {
 
 import { EMPTY_OBJECT, IS_WEB } from '../../constants';
 import { DebugOutlet } from '../../debug';
-import {
-  useCommonValuesContext,
-  useMeasurementsContext
-} from '../../providers';
+import { useCommonValuesContext } from '../../providers';
 import type {
   DimensionsAnimation,
   DropIndicatorSettings,
@@ -25,12 +17,11 @@ import type {
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 import DropIndicator from './DropIndicator';
 
-const SCREEN_DIMENSIONS = Dimensions.get('screen');
-
 type AnimatedHeightContainerProps = PropsWithChildren<
   DropIndicatorSettings & {
     dimensionsAnimationType: DimensionsAnimation;
     overflow: Overflow;
+    onLayout: (width: number, height: number) => void;
     debug?: boolean;
     style?: StyleProp<ViewStyle>;
   }
@@ -42,6 +33,7 @@ export default function SortableContainer({
   dimensionsAnimationType,
   DropIndicatorComponent,
   dropIndicatorStyle,
+  onLayout,
   overflow,
   showDropIndicator,
   style
@@ -50,14 +42,12 @@ export default function SortableContainer({
     activeItemDropped,
     activeItemKey,
     containerHeight,
+    containerRef,
     containerWidth,
     controlledContainerDimensions,
-    innerContainerRef,
-    outerContainerRef,
     shouldAnimateLayout,
     usesAbsoluteLayout
   } = useCommonValuesContext();
-  const { handleHelperContainerMeasurement } = useMeasurementsContext();
 
   const animateWorklet = dimensionsAnimationType === 'worklet';
   const animateLayout = dimensionsAnimationType === 'layout';
@@ -91,33 +81,12 @@ export default function SortableContainer({
   }, [dimensionsAnimationType]);
 
   const innerContainerStyle = useAnimatedStyle(() => {
-    if (!usesAbsoluteLayout.value) {
-      return EMPTY_OBJECT;
-    }
-
-    const minHeight =
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      containerHeight.value || SCREEN_DIMENSIONS.height;
-    const minWidth =
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      containerWidth.value || SCREEN_DIMENSIONS.width;
+    const ctrl = controlledContainerDimensions.value;
 
     return {
-      minHeight,
-      minWidth
+      ...(ctrl.height && { minHeight: containerHeight.value }),
+      ...(ctrl.width && { minWidth: containerWidth.value })
     };
-  });
-
-  const animatedMeasurementsContainerStyle = useAnimatedStyle(() => {
-    const ctrl = controlledContainerDimensions.value;
-    const height = ctrl.height ? containerHeight.value : undefined;
-    const width = ctrl.width ? containerWidth.value : undefined;
-
-    if (!height && !width) {
-      return EMPTY_OBJECT;
-    }
-
-    return { height, width };
   });
 
   return (
@@ -132,17 +101,15 @@ export default function SortableContainer({
         />
       )}
       <AnimatedOnLayoutView
-        ref={outerContainerRef}
-        style={[StyleSheet.absoluteFill, animatedMeasurementsContainerStyle]}
-        onLayout={handleHelperContainerMeasurement}
-      />
-      <Animated.View
-        ref={innerContainerRef}
-        style={[style, innerContainerStyle]}>
+        ref={containerRef}
+        style={[style, innerContainerStyle]}
+        onLayout={({ nativeEvent: { layout } }) => {
+          onLayout(layout.width, layout.height);
+        }}>
         {children}
-      </Animated.View>
-      {debug && <DebugOutlet />}
+      </AnimatedOnLayoutView>
       {/* Renders an overlay view helpful for debugging */}
+      {debug && <DebugOutlet />}
     </Animated.View>
   );
 }

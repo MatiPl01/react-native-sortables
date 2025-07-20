@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 import { SortableFlexCard, SortableGridCard } from '@/components';
-import { IS_WEB } from '@/constants';
+import { IS_IOS, IS_WEB } from '@/constants';
 import * as SortableFlex from '@/examples/SortableFlex';
 import * as SortableGrid from '@/examples/SortableGrid';
 
@@ -87,10 +87,16 @@ const routes: Routes = {
             Component: SortableGrid.tests.BottomTabsNavigatorExample,
             name: 'Bottom Tabs Navigator'
           },
-          MaxOverscrollOffset: {
-            Component: SortableGrid.tests.MaxOverscrollOffsetExample,
-            name: 'Max Overscroll Offset'
-          }
+          HidingItems: {
+            Component: SortableGrid.tests.HidingItemsExample,
+            name: 'Hiding Items'
+          },
+          ...(IS_IOS && {
+            MaxOverscrollOffset: {
+              Component: SortableGrid.tests.MaxOverscrollOffsetExample,
+              name: 'Max Overscroll Offset'
+            }
+          })
         }
       }
     }

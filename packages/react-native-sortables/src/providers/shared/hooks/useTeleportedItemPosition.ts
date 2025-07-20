@@ -17,7 +17,7 @@ export default function useTeleportedItemPosition(
   activationAnimationProgress: SharedValue<number>
 ) {
   const { activeItemAbsolutePosition } = usePortalContext() ?? {};
-  const { innerContainerRef, itemPositions } = useCommonValuesContext();
+  const { containerRef, itemPositions } = useCommonValuesContext();
 
   const dropStartValues = useMutableValue<null | {
     fromAbsolute: Vector;
@@ -52,7 +52,7 @@ export default function useTeleportedItemPosition(
     }
 
     if (dropStartValues.value) {
-      const measurements = measure(innerContainerRef);
+      const measurements = measure(containerRef);
       if (!measurements) {
         return null;
       }

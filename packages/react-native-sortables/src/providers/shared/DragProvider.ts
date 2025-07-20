@@ -66,6 +66,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activeItemPosition,
     containerHeight,
     containerId,
+    containerRef,
     containerWidth,
     dragActivationDelay,
     dragActivationFailOffset,
@@ -78,7 +79,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     itemDimensions,
     itemPositions,
     keyToIndex,
-    outerContainerRef,
     prevActiveItemKey,
     snapOffsetX,
     snapOffsetY,
@@ -86,7 +86,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     touchPosition,
     usesAbsoluteLayout
   } = useCommonValuesContext();
-  const { measureContainer } = useMeasurementsContext();
+  const { handleContainerMeasurement } = useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { scrollOffsetDiff, updateStartScrollOffset } =
     useAutoScrollContext() ?? {};
@@ -241,7 +241,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationAnimationProgress: SharedValue<number>
     ) => {
       'worklet';
-      const containerMeasurements = measure(outerContainerRef);
+      const containerMeasurements = measure(containerRef);
 
       if (!position || !dimensions || !containerMeasurements) {
         return;
@@ -330,7 +330,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       indexToKey,
       keyToIndex,
       multiZoneActiveItemDimensions,
-      outerContainerRef,
+      containerRef,
       prevActiveItemKey,
       stableOnDragStart,
       touchPosition,
@@ -364,7 +364,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       if (!usesAbsoluteLayout.value) {
-        measureContainer();
+        const measurements = measure(containerRef);
+        if (measurements) {
+          handleContainerMeasurement(measurements.width, measurements.height);
+        }
       }
 
       touchStartTouch.value = touch;
@@ -398,18 +401,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }, dragActivationDelay.value);
     },
     [
-      usesAbsoluteLayout,
       activeItemKey,
       activationState,
       activationTimeoutId,
+      containerRef,
       currentTouch,
       dragActivationDelay,
+      handleContainerMeasurement,
       handleDragStart,
       itemDimensions,
       itemPositions,
-      measureContainer,
       sortEnabled,
-      touchStartTouch
+      touchStartTouch,
+      usesAbsoluteLayout
     ]
   );
 

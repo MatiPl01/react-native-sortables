@@ -1,6 +1,10 @@
 import { type ReactElement } from 'react';
 import { type StyleProp, StyleSheet, type ViewStyle } from 'react-native';
-import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
+import {
+  runOnUI,
+  useAnimatedStyle,
+  useDerivedValue
+} from 'react-native-reanimated';
 
 import {
   DEFAULT_SORTABLE_FLEX_PROPS,
@@ -14,6 +18,7 @@ import {
   OrderUpdaterComponent,
   SharedProvider,
   useCommonValuesContext,
+  useMeasurementsContext,
   useStrategyKey
 } from '../providers';
 import type { DropIndicatorSettings, SortableFlexProps } from '../types';
@@ -52,9 +57,10 @@ function SortableFlex(props: SortableFlexProps) {
     if (flexWrap === 'nowrap') {
       return { height: height === undefined, width: width === undefined };
     }
-    return flexDirection.startsWith('row')
-      ? { height: height === undefined, width: false }
-      : { height: false, width: width === undefined };
+    return {
+      height: height === undefined,
+      width: flexDirection.startsWith('column') && width === undefined
+    };
   }, [flexWrap, flexDirection, height, width]);
 
   const onDragEnd = useDragEndHandler(_onDragEnd, {
@@ -70,7 +76,6 @@ function SortableFlex(props: SortableFlexProps) {
       controlledContainerDimensions={controlledContainerDimensions}
       debug={debug}
       itemKeys={itemKeys}
-      initialCanMeasureItems
       onDragEnd={onDragEnd}>
       <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
         <OrderUpdaterComponent
@@ -125,6 +130,7 @@ function SortableFlexInner({
   ...containerProps
 }: SortableFlexInnerProps) {
   const { usesAbsoluteLayout } = useCommonValuesContext();
+  const { handleContainerMeasurement } = useMeasurementsContext();
 
   let relativeLayoutStyle: ViewStyle = EMPTY_OBJECT;
   let baseContainerStyle = style;
@@ -168,7 +174,10 @@ function SortableFlexInner({
   return (
     <SortableContainer
       {...containerProps}
-      style={[baseContainerStyle, animatedContainerStyle]}>
+      style={[baseContainerStyle, animatedContainerStyle]}
+      onLayout={runOnUI((width, height) => {
+        handleContainerMeasurement(width, height);
+      })}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
           entering={itemEntering ?? undefined}

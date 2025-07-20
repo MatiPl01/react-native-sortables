@@ -19,7 +19,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
   'CustomHandle',
   { guarded: false }
 )<CustomHandleProviderProps, CustomHandleContextType>(() => {
-  const { itemPositions, outerContainerRef } = useCommonValuesContext();
+  const { containerRef, itemPositions } = useCommonValuesContext();
   const debounce = useAnimatedDebounce();
 
   const fixedItemKeys = useMutableValue<Record<string, boolean>>({});
@@ -63,7 +63,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
       }
 
       const handleMeasurements = measure(handleRef);
-      const containerMeasurements = measure(outerContainerRef);
+      const containerMeasurements = measure(containerRef);
       const itemPosition = itemPositions.value[key];
 
       if (!handleMeasurements || !containerMeasurements || !itemPosition) {
@@ -80,7 +80,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
     [
       activeHandleMeasurements,
       activeHandleOffset,
-      outerContainerRef,
+      containerRef,
       handleRefs,
       itemPositions
     ]

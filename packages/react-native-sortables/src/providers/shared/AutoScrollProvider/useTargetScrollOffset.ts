@@ -22,7 +22,7 @@ export default function useTargetScrollOffset(
   maxScrollToOverflowOffset: Animatable<[number, number] | null | number>,
   dragStartScrollOffset: SharedValue<null | number>
 ): SharedValue<null | number> {
-  const { outerContainerRef, touchPosition } = useCommonValuesContext();
+  const { containerRef, touchPosition } = useCommonValuesContext();
   const debugContext = useDebugContext();
 
   const debugRects = debugContext?.useDebugRects(['start', 'end']);
@@ -76,7 +76,7 @@ export default function useTargetScrollOffset(
       }
 
       const scrollableMeasurements = measure(scrollableRef);
-      const containerMeasurements = measure(outerContainerRef);
+      const containerMeasurements = measure(containerRef);
 
       if (
         !scrollableMeasurements ||

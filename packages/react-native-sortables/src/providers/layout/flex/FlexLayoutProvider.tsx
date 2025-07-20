@@ -52,12 +52,12 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   width
 }) => {
   const {
+    containerHeight,
+    containerWidth,
     controlledContainerDimensions,
     indexToKey,
     itemDimensions,
     itemPositions,
-    measuredContainerHeight,
-    measuredContainerWidth,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
@@ -76,13 +76,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   }));
 
   const dimensionsLimits = useDerivedValue(() => {
-    if (
-      measuredContainerHeight.value === null ||
-      measuredContainerWidth.value === null
-    ) {
-      return null;
-    }
-
     const h = height === 'fill' ? undefined : height;
     const w = width === 'fill' ? undefined : width;
 
@@ -92,10 +85,16 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     let maxW = Math.min(maxWidth ?? Infinity, w ?? Infinity);
 
     if (!controlledContainerDimensions.value.width) {
-      minW = maxW = measuredContainerWidth.value;
+      if (!containerWidth.value) {
+        return null;
+      }
+      minW = maxW = containerWidth.value;
     }
     if (!controlledContainerDimensions.value.height) {
-      minH = maxH = measuredContainerHeight.value;
+      if (!containerHeight.value) {
+        return null;
+      }
+      minH = maxH = containerHeight.value;
     }
 
     return {

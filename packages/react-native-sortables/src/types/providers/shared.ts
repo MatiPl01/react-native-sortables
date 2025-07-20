@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { LayoutChangeEvent, View } from 'react-native';
+import type { View } from 'react-native';
 import type {
   GestureTouchEvent,
   GestureType
@@ -57,8 +57,6 @@ export type CommonValuesContextType =
 
       // DIMENSIONS
       controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
-      measuredContainerWidth: SharedValue<null | number>;
-      measuredContainerHeight: SharedValue<null | number>;
       containerWidth: SharedValue<null | number>;
       containerHeight: SharedValue<null | number>;
       itemDimensions: SharedValue<Record<string, Dimensions>>;
@@ -73,8 +71,7 @@ export type CommonValuesContextType =
       activeItemDropped: SharedValue<boolean>;
 
       // OTHER
-      innerContainerRef: AnimatedRef<View>;
-      outerContainerRef: AnimatedRef<View>;
+      containerRef: AnimatedRef<View>;
       sortEnabled: SharedValue<boolean>;
       usesAbsoluteLayout: SharedValue<boolean>;
       shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
@@ -85,12 +82,10 @@ export type CommonValuesContextType =
 // MEASUREMENTS
 
 export type MeasurementsContextType = {
-  canMeasureItems: SharedValue<boolean>;
-  applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
   handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
   removeItemMeasurements: (key: string) => void;
-  measureContainer: () => void;
-  handleHelperContainerMeasurement: (event: LayoutChangeEvent) => void;
+  handleContainerMeasurement: (width: number, height: number) => void;
+  applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
 };
 
 // AUTO SCROLL
