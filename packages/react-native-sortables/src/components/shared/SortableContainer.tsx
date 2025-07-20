@@ -84,8 +84,8 @@ export default function SortableContainer({
     const ctrl = controlledContainerDimensions.value;
 
     return {
-      minHeight: ctrl.height ? containerHeight.value : '100%',
-      minWidth: ctrl.width ? containerWidth.value : '100%'
+      ...(ctrl.height && { minHeight: containerHeight.value }),
+      ...(ctrl.width && { minWidth: containerWidth.value })
     };
   });
 

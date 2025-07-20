@@ -76,6 +76,8 @@ const styles = StyleSheet.create({
     // (can't use opacity and transform because they are used in animated
     // styles, which take precedence over the js style; can't change dimensions
     // as they trigger layout transition in the child component)
-    left: -9999
+    // (we use top and left on paper for the initial item absolute position
+    // so we have to use something else to hide the item here)
+    marginLeft: -9999
   }
 });

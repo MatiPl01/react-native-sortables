@@ -66,6 +66,7 @@ export default function SharedProvider({
   onOrderChange,
   overDrag,
   scrollableRef,
+  sortEnabled,
   ...rest
 }: SharedProviderProps) {
   const inMultiZone = !!useMultiZoneContext();
@@ -85,6 +86,7 @@ export default function SharedProvider({
     <CommonValuesProvider
       customHandle={customHandle}
       itemKeys={itemKeys}
+      sortEnabled={sortEnabled}
       {...rest}
     />,
     // Provider used for measurements of items and the container

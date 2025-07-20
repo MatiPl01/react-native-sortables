@@ -57,9 +57,10 @@ function SortableFlex(props: SortableFlexProps) {
     if (flexWrap === 'nowrap') {
       return { height: height === undefined, width: width === undefined };
     }
-    return flexDirection.startsWith('row')
-      ? { height: height === undefined, width: false }
-      : { height: false, width: width === undefined };
+    return {
+      height: height === undefined,
+      width: flexDirection.startsWith('column') && width === undefined
+    };
   }, [flexWrap, flexDirection, height, width]);
 
   const onDragEnd = useDragEndHandler(_onDragEnd, {
