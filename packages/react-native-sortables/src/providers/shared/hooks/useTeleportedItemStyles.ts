@@ -1,8 +1,9 @@
-import { type StyleProp, type ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
 
 import { mergeStyles } from '../../../utils';
+import { useCommonValuesContext } from '../CommonValuesProvider';
 import { usePortalContext } from '../PortalProvider';
 import useItemDecorationValues from './useItemDecorationValues';
 import useItemZIndex from './useItemZIndex';
@@ -13,9 +14,11 @@ export default function useTeleportedItemStyles(
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
+  const { itemDimensions } = useCommonValuesContext();
   const { portalOutletMeasurements } = usePortalContext() ?? {};
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
+  const dimensions = useDerivedValue(() => itemDimensions.value[key]);
   const position = useTeleportedItemPosition(
     key,
     isActive,
@@ -38,6 +41,7 @@ export default function useTeleportedItemStyles(
 
     return mergeStyles(
       {
+        ...dimensions.value,
         display: 'flex',
         position: 'absolute',
         transform: [
