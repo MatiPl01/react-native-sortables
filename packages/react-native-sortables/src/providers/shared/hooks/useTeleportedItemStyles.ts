@@ -39,6 +39,8 @@ export default function useTeleportedItemStyles(
     const { pageX: outletX, pageY: outletY } = portalOutletMeasurements.value;
     const { x: itemX, y: itemY } = position.value;
 
+    console.log('dimensions', key, dimensions.value);
+
     return mergeStyles(
       {
         ...dimensions.value,

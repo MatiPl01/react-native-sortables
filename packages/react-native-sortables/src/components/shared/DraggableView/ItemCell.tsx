@@ -5,7 +5,11 @@ import {
   StyleSheet,
   type ViewStyle
 } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, {
+  measure,
+  runOnUI,
+  useAnimatedRef
+} from 'react-native-reanimated';
 
 import type {
   AnimatedStyleProp,
@@ -30,6 +34,8 @@ export default function ItemCell({
   hidden,
   onMeasure
 }: ItemCellProps) {
+  const animatedRef = useAnimatedRef();
+
   const onLayout =
     !onMeasure || hidden
       ? undefined
@@ -39,10 +45,14 @@ export default function ItemCell({
           }
         }: LayoutChangeEvent) => {
           onMeasure(width, height);
+          runOnUI(() => {
+            console.log('measurements', measure(animatedRef));
+          })();
         };
 
   return (
     <AnimatedOnLayoutView
+      ref={animatedRef}
       style={[styles.decoration, cellStyle, hidden && styles.hidden]}
       onLayout={onLayout}>
       {/* TODO - remove itemEntering and itemExiting layout animation in sortables v2 */}

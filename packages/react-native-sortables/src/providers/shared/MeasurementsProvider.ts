@@ -48,6 +48,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         return;
       }
 
+      console.log('handleItemMeasurement', key, dimensions);
+
       let newItemMeasured = false;
       if (!itemDimensions.value[key]) {
         measuredItemsCount.value += 1;

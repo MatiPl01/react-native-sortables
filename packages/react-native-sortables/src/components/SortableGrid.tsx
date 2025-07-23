@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
+import { StyleSheet, type ViewStyle } from 'react-native';
+import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import {
   runOnUI,
   useAnimatedStyle,
@@ -189,30 +189,32 @@ function SortableGridInner<I>({
         })
   }));
 
-  // TODO - fix teleported items size
-  const animatedItemStyle = useAnimatedStyle(() => {
-    if (IS_WEB) {
-      return {
-        [isVertical ? 'width' : 'height']:
-          `calc((100% - ${columnGap.value * (groups - 1)}px) / ${groups})`
-      };
-    }
+  let animatedItemStyle: AnimatedStyle<ViewStyle>;
+  if (IS_WEB) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    animatedItemStyle = useAnimatedStyle(() => ({
+      [isVertical ? 'width' : 'height']:
+        `calc((100% - ${columnGap.value * (groups - 1)}px) / ${groups})`
+    }));
+  } else {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    animatedItemStyle = useAnimatedStyle(() => {
+      if (!mainGroupSize.value) {
+        return {
+          flexBasis: `${100 / groups}%`,
+          paddingHorizontal: columnGap.value / 2,
+          paddingVertical: rowGap.value / 2
+        };
+      }
 
-    if (!mainGroupSize.value) {
       return {
-        flexBasis: `${100 / groups}%`,
-        paddingHorizontal: columnGap.value / 2,
-        paddingVertical: rowGap.value / 2
+        flexBasis: undefined,
+        [isVertical ? 'width' : 'height']: mainGroupSize.value,
+        paddingHorizontal: 0,
+        paddingVertical: 0
       };
-    }
-
-    return {
-      flexBasis: undefined,
-      [isVertical ? 'width' : 'height']: mainGroupSize.value,
-      paddingHorizontal: 0,
-      paddingVertical: 0
-    };
-  });
+    });
+  }
 
   return (
     <SortableContainer
