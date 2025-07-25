@@ -10,7 +10,6 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import { isPaper } from '../../../constants';
 import {
   type AnimatedStyleProp,
   useMutableValue
@@ -54,26 +53,17 @@ export default function useItemStyles(
     activationAnimationProgress
   );
 
-  const positionsRef = useRef<{
-    initial: SharedValue<null | Vector>;
-    current: SharedValue<null | Vector>;
-  }>(null);
+  const positionRef = useRef<SharedValue<null | Vector>>(null);
   const dropStartValues = useMutableValue<null | {
     position: Vector;
     progress: number;
   }>(null);
 
-  if (!positionsRef.current) {
-    const initialPosition = isActive.value
-      ? activeItemPosition.value
-      : layoutPosition.value;
-    positionsRef.current = {
-      current: makeMutable(initialPosition),
-      initial: makeMutable(initialPosition)
-    };
-  }
+  positionRef.current ??= makeMutable(
+    isActive.value ? activeItemPosition.value : layoutPosition.value
+  );
 
-  const { current: position, initial: initialPosition } = positionsRef.current;
+  const position = positionRef.current;
 
   // Inactive item updater
   useAnimatedReaction(
@@ -83,8 +73,6 @@ export default function useItemStyles(
       itemPosition: layoutPosition.value
     }),
     ({ activationProgress, active, itemPosition }, prev) => {
-      initialPosition.value ??= itemPosition;
-
       if (!itemPosition || active) {
         dropStartValues.value = null;
         return;
@@ -158,50 +146,26 @@ export default function useItemStyles(
     }
   );
 
-  const isOldArch = isPaper();
-
-  const layoutStyles = useAnimatedStyle(() => {
+  return useAnimatedStyle(() => {
     if (!usesAbsoluteLayout.value) {
-      return RELATIVE_STYLE;
+      return mergeStyles(RELATIVE_STYLE, decoration.value);
     }
-    if (!initialPosition.value) {
+
+    if (!position.value) {
       return HIDDEN_STYLE;
-    }
-
-    return {
-      position: 'absolute',
-      zIndex: zIndex.value,
-      ...(isOldArch
-        ? { left: initialPosition.value.x, top: initialPosition.value.y }
-        : { left: 0 })
-    };
-  });
-
-  const nonLayoutStyles = useAnimatedStyle(() => {
-    if (
-      !usesAbsoluteLayout.value ||
-      !initialPosition.value ||
-      !position.value
-    ) {
-      return decoration.value;
     }
 
     return mergeStyles(
       {
-        transform: [
-          {
-            translateX:
-              position.value.x - (isOldArch ? initialPosition.value.x : 0)
-          },
-          {
-            translateY:
-              position.value.y - (isOldArch ? initialPosition.value.y : 0)
-          }
-        ]
+        // Must use layout props to position views to ensure that TextInput
+        // components work properly
+        // https://github.com/MatiPl01/react-native-sortables/issues/430
+        left: position.value.x,
+        position: 'absolute',
+        top: position.value.y,
+        zIndex: zIndex.value
       },
       decoration.value
     );
   });
-
-  return [layoutStyles, nonLayoutStyles];
 }

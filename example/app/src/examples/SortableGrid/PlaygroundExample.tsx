@@ -1,49 +1,101 @@
-import { useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import type { SortableGridRenderItem } from 'react-native-sortables';
-import Sortable from 'react-native-sortables';
+import { useEffect, useState } from 'react';
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  PerformanceMonitor,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming
+} from 'react-native-reanimated';
 
-import { ScrollScreen } from '@/components';
-import { colors, radius, sizes, spacing, text } from '@/theme';
+const BOX_SIZE = 30;
+const COUNT = 300;
+const TRAVEL = 200; // px each direction
+const DURATION = 2000; // ms for one leg of the journey
 
-const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
+function MovingBox({ index, mode }: { index: number; mode: string }) {
+  // 0 → 1 shared progress value animated back‑and‑forth forever
+  const progress = useSharedValue(0);
 
-export default function PlaygroundExample() {
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <View style={styles.card}>
-        <Text style={styles.text}>{item}</Text>
-      </View>
-    ),
-    []
-  );
+  useEffect(() => {
+    progress.value = withRepeat(
+      withTiming(1, { duration: DURATION }),
+      -1,
+      true /* yoyo */
+    );
+  }, []);
+
+  const animatedStyleTransform = useAnimatedStyle(() => {
+    const offset = progress.value * TRAVEL;
+    return {
+      transform: [
+        { translateX: index * 2 + offset },
+        { translateY: index * 2 + offset }
+      ]
+    };
+  });
+
+  const animatedStylePosition = useAnimatedStyle(() => {
+    const offset = progress.value * TRAVEL;
+    return {
+      left: index * 2 + offset,
+      top: index * 2 + offset
+    };
+  });
 
   return (
-    <ScrollScreen contentContainerStyle={styles.container} includeNavBarHeight>
-      <Sortable.Grid
-        columnGap={10}
-        columns={3}
-        data={DATA}
-        renderItem={renderItem}
-        rowGap={10}
-      />
-    </ScrollScreen>
+    <Animated.View
+      key={mode}
+      style={[
+        styles.box,
+        mode === 'transform' ? animatedStyleTransform : animatedStylePosition
+      ]}>
+      <Text>{index}</Text>
+    </Animated.View>
+  );
+}
+
+export default function App() {
+  const [mode, setMode] = useState('transform');
+  //--------------------------------------------------------------------
+
+  const boxes = Array.from({ length: COUNT }, (_, i) => (
+    <MovingBox index={i} key={i} mode={mode} />
+  ));
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* --- Header --------------------------------------------------- */}
+
+      <Pressable
+        style={styles.button}
+        onPress={() =>
+          setMode(prev => (prev === 'transform' ? 'position' : 'transform'))
+        }>
+        <Text style={styles.buttonText}>Mode: {mode} (tap to toggle)</Text>
+      </Pressable>
+      <PerformanceMonitor />
+
+      {/* --- Animated playground ------------------------------------- */}
+      <View style={styles.stage}>{boxes}</View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
+  box: {
+    backgroundColor: '#61dafb',
+    borderRadius: 6,
+    height: BOX_SIZE,
+    position: 'absolute',
+    width: BOX_SIZE
+  },
+  button: {
     alignItems: 'center',
-    backgroundColor: '#36877F',
-    borderRadius: radius.md,
-    height: sizes.xl,
-    justifyContent: 'center'
+    backgroundColor: '#282c34',
+    padding: 12
   },
-  container: {
-    padding: spacing.md
-  },
-  text: {
-    ...text.label2,
-    color: colors.white
-  }
+  buttonText: { color: '#fff', fontWeight: 'bold' },
+  container: { backgroundColor: '#0e0e0e', flex: 1 },
+  stage: { flex: 1, position: 'relative' }
 });

@@ -207,7 +207,7 @@ function SortableGridInner<I>({
     }
 
     return {
-      flexBasis: undefined,
+      flexBasis: 'auto',
       [isVertical ? 'width' : 'height']: mainGroupSize.value,
       paddingHorizontal: 0,
       paddingVertical: 0
