@@ -41,6 +41,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const handleItemMeasurement = useStableCallback(
     (key: string, dimensions: Dimensions) => {
+      const prevDimensions = previousItemDimensionsRef.current[key];
       previousItemDimensionsRef.current[key] = dimensions;
 
       const { height: isHeightControlled, width: isWidthControlled } =
@@ -50,7 +51,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       const changedDimensions: Partial<Dimensions> = {};
-      const prevDimensions = previousItemDimensionsRef.current[key];
       const isNewItem = !prevDimensions;
 
       if (
@@ -66,54 +66,58 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         changedDimensions.height = dimensions.height;
       }
 
-      if (Object.keys(changedDimensions).length > 0) {
-        runOnUI(() => {
-          if (isNewItem) {
-            measuredItemsCount.value += 1;
-          }
-          if (!isWidthControlled) {
-            (itemWidths.value as Record<string, number>)[key] =
-              dimensions.width;
-          }
-          if (!isHeightControlled) {
-            (itemHeights.value as Record<string, number>)[key] =
-              dimensions.height;
-          }
-          if (activeItemKey.value === key) {
-            activeItemDimensions.value = dimensions;
-            if (multiZoneActiveItemDimensions) {
-              multiZoneActiveItemDimensions.value = dimensions;
-            }
-          }
-
-          // Update the array of item dimensions only after all items have been
-          // measured to reduce the number of times animated reactions are triggered
-          if (measuredItemsCount.value === itemsCount) {
-            initialItemMeasurementsCompleted.value = true;
-
-            const updateDimensions = () => {
-              if (isWidthControlled) {
-                itemWidths.modify();
-              }
-              if (isHeightControlled) {
-                itemHeights.modify();
-              }
-            };
-
-            if (isNewItem) {
-              // If measurements were triggered because of adding new items and all new
-              // items have been measured, update dimensions immediately to avoid
-              // unnecessary delays
-              updateDimensions();
-            } else {
-              // Otherwise, debounce the update if the number of items is not changed
-              // to reduce the number of updates if dimensions of items are changed
-              // many times within a short period of time
-              debounce(updateDimensions, 100);
-            }
-          }
-        })();
+      if (!Object.keys(changedDimensions).length) {
+        return;
       }
+
+      runOnUI(() => {
+        console.log('update dimensions', key);
+        if (isNewItem) {
+          measuredItemsCount.value += 1;
+        }
+        if (!isWidthControlled) {
+          (itemWidths.value as Record<string, number>)[key] = dimensions.width;
+        }
+        if (!isHeightControlled) {
+          (itemHeights.value as Record<string, number>)[key] =
+            dimensions.height;
+        }
+        if (activeItemKey.value === key) {
+          activeItemDimensions.value = dimensions;
+          if (multiZoneActiveItemDimensions) {
+            multiZoneActiveItemDimensions.value = dimensions;
+          }
+        }
+
+        // Update the array of item dimensions only after all items have been
+        // measured to reduce the number of times animated reactions are triggered
+        if (measuredItemsCount.value === itemsCount) {
+          initialItemMeasurementsCompleted.value = true;
+
+          const updateDimensions = () => {
+            if (isWidthControlled) {
+              itemWidths.modify();
+            }
+            if (isHeightControlled) {
+              itemHeights.modify();
+            }
+          };
+
+          if (isNewItem) {
+            // If measurements were triggered because of adding new items and all new
+            // items have been measured, update dimensions immediately to avoid
+            // unnecessary delays
+            console.log('update dimensions immediately', key);
+            updateDimensions();
+          } else {
+            // Otherwise, debounce the update if the number of items is not changed
+            // to reduce the number of updates if dimensions of items are changed
+            // many times within a short period of time
+            console.log('debounce update dimensions', key);
+            debounce(updateDimensions, 100);
+          }
+        }
+      })();
     }
   );
 
@@ -155,13 +159,13 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     (dimensions: Partial<Dimensions>) => {
       'worklet';
       if (
-        !controlledContainerDimensions.width &&
+        controlledContainerDimensions.width &&
         dimensions.width !== undefined
       ) {
         containerWidth.value = dimensions.width;
       }
       if (
-        !controlledContainerDimensions.height &&
+        controlledContainerDimensions.height &&
         dimensions.height !== undefined
       ) {
         containerHeight.value = dimensions.height;
@@ -177,6 +181,13 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       itemMeasurementsCompleted: initialItemMeasurementsCompleted.value
     }),
     ({ containerH, containerW, itemMeasurementsCompleted }) => {
+      console.log(
+        usesAbsoluteLayout.value,
+        itemMeasurementsCompleted,
+        containerH,
+        containerW
+      );
+
       if (
         usesAbsoluteLayout.value ||
         !itemMeasurementsCompleted ||

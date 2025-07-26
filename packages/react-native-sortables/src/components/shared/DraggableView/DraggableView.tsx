@@ -136,8 +136,7 @@ function DraggableView({
           activationAnimationProgress={activationAnimationProgress}
           baseCellStyle={style}
           isActive={isActive}
-          itemKey={key}
-          onMeasure={onMeasure}>
+          itemKey={key}>
           {children}
         </TeleportedItemCell>
       )}

@@ -4,7 +4,6 @@ import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import type { AnimatedStyleProp } from '../../../integrations/reanimated';
 import { useTeleportedItemStyles } from '../../../providers';
-import type { MeasureCallback } from '../../../types';
 import ItemCell from './ItemCell';
 
 type TeleportedItemCellProps = PropsWithChildren<{
@@ -12,7 +11,6 @@ type TeleportedItemCellProps = PropsWithChildren<{
   baseCellStyle: AnimatedStyleProp;
   isActive: SharedValue<boolean>;
   itemKey: string;
-  onMeasure: MeasureCallback;
 }>;
 
 export default function TeleportedItemCell({
@@ -20,8 +18,7 @@ export default function TeleportedItemCell({
   baseCellStyle,
   children,
   isActive,
-  itemKey,
-  onMeasure
+  itemKey
 }: TeleportedItemCellProps) {
   const teleportedItemStyles = useTeleportedItemStyles(
     itemKey,
@@ -30,9 +27,7 @@ export default function TeleportedItemCell({
   );
 
   return (
-    <ItemCell
-      cellStyle={[baseCellStyle, teleportedItemStyles]}
-      onMeasure={onMeasure}>
+    <ItemCell cellStyle={[baseCellStyle, teleportedItemStyles]}>
       <LayoutAnimationConfig skipEntering>{children}</LayoutAnimationConfig>
     </ItemCell>
   );
