@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { runOnUI, useAnimatedReaction } from 'react-native-reanimated';
 
 import { useStableCallback } from '../../hooks';
@@ -8,7 +8,7 @@ import {
   useMutableValue
 } from '../../integrations/reanimated';
 import type { Dimensions, MeasurementsContextType } from '../../types';
-import { areDimensionsDifferent } from '../../utils';
+import { areValuesDifferent } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
@@ -26,7 +26,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     containerHeight,
     containerWidth,
     controlledContainerDimensions,
-    itemDimensions,
+    controlledItemDimensions,
+    itemHeights,
+    itemWidths,
     usesAbsoluteLayout
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
@@ -34,72 +36,115 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const measuredItemsCount = useMutableValue(0);
   const initialItemMeasurementsCompleted = useMutableValue(false);
+  const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
   const debounce = useAnimatedDebounce();
 
   const handleItemMeasurement = useStableCallback(
-    runOnUI((key: string, dimensions: Dimensions) => {
-      'worklet';
-      const storedDimensions = itemDimensions.value[key];
+    (key: string, dimensions: Dimensions) => {
+      previousItemDimensionsRef.current[key] = dimensions;
 
-      if (
-        storedDimensions &&
-        !areDimensionsDifferent(storedDimensions, dimensions, 1)
-      ) {
+      const { height: isHeightControlled, width: isWidthControlled } =
+        controlledItemDimensions;
+      if (isWidthControlled && isHeightControlled) {
         return;
       }
 
-      let newItemMeasured = false;
-      if (!itemDimensions.value[key]) {
-        measuredItemsCount.value += 1;
-        newItemMeasured = true;
+      const changedDimensions: Partial<Dimensions> = {};
+      const prevDimensions = previousItemDimensionsRef.current[key];
+      const isNewItem = !prevDimensions;
+
+      if (
+        !isWidthControlled &&
+        areValuesDifferent(prevDimensions?.width, dimensions.width, 1)
+      ) {
+        changedDimensions.width = dimensions.width;
+      }
+      if (
+        !isHeightControlled &&
+        areValuesDifferent(prevDimensions?.height, dimensions.height, 1)
+      ) {
+        changedDimensions.height = dimensions.height;
       }
 
-      itemDimensions.value[key] = dimensions;
-      if (activeItemKey.value === key) {
-        activeItemDimensions.value = dimensions;
-        if (multiZoneActiveItemDimensions) {
-          multiZoneActiveItemDimensions.value = dimensions;
-        }
-      }
+      if (Object.keys(changedDimensions).length > 0) {
+        runOnUI(() => {
+          if (isNewItem) {
+            measuredItemsCount.value += 1;
+          }
+          if (!isWidthControlled) {
+            (itemWidths.value as Record<string, number>)[key] =
+              dimensions.width;
+          }
+          if (!isHeightControlled) {
+            (itemHeights.value as Record<string, number>)[key] =
+              dimensions.height;
+          }
+          if (activeItemKey.value === key) {
+            activeItemDimensions.value = dimensions;
+            if (multiZoneActiveItemDimensions) {
+              multiZoneActiveItemDimensions.value = dimensions;
+            }
+          }
 
-      // Update the array of item dimensions only after all items have been
-      // measured to reduce the number of times animated reactions are triggered
-      if (measuredItemsCount.value === itemsCount) {
-        initialItemMeasurementsCompleted.value = true;
+          // Update the array of item dimensions only after all items have been
+          // measured to reduce the number of times animated reactions are triggered
+          if (measuredItemsCount.value === itemsCount) {
+            initialItemMeasurementsCompleted.value = true;
 
-        if (newItemMeasured) {
-          // If measurements were triggered because of adding new items and all new
-          // items have been measured, update dimensions immediately to avoid
-          // unnecessary delays
-          itemDimensions.modify();
-        } else {
-          // Otherwise, debounce the update if the number of items is not changed
-          // to reduce the number of updates if dimensions of items are changed
-          // many times within a short period of time
-          debounce(itemDimensions.modify, 100);
-        }
+            const updateDimensions = () => {
+              if (isWidthControlled) {
+                itemWidths.modify();
+              }
+              if (isHeightControlled) {
+                itemHeights.modify();
+              }
+            };
+
+            if (isNewItem) {
+              // If measurements were triggered because of adding new items and all new
+              // items have been measured, update dimensions immediately to avoid
+              // unnecessary delays
+              updateDimensions();
+            } else {
+              // Otherwise, debounce the update if the number of items is not changed
+              // to reduce the number of updates if dimensions of items are changed
+              // many times within a short period of time
+              debounce(updateDimensions, 100);
+            }
+          }
+        })();
       }
-    })
+    }
   );
 
   const removeItemMeasurements = useCallback(
     (key: string) => {
-      'worklet';
-      delete itemDimensions.value[key];
-      measuredItemsCount.value = Math.max(0, measuredItemsCount.value - 1);
+      delete previousItemDimensionsRef.current[key];
+      const { height: isHeightControlled, width: isWidthControlled } =
+        controlledItemDimensions;
+      if (isWidthControlled && isHeightControlled) {
+        return;
+      }
+
+      runOnUI(() => {
+        if (!isWidthControlled) {
+          delete (itemWidths.value as Record<string, number>)[key];
+        }
+        if (!isHeightControlled) {
+          delete (itemHeights.value as Record<string, number>)[key];
+        }
+      })();
     },
-    [itemDimensions, measuredItemsCount]
+    [controlledItemDimensions, itemHeights, itemWidths]
   );
 
   const handleContainerMeasurement = useCallback(
     (width: number, height: number) => {
       'worklet';
-      const ctrl = controlledContainerDimensions.value;
-
-      if (!ctrl.width) {
+      if (!controlledContainerDimensions.width) {
         containerWidth.value = width;
       }
-      if (!ctrl.height) {
+      if (!controlledContainerDimensions.height) {
         containerHeight.value = height;
       }
     },
@@ -109,13 +154,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   const applyControlledContainerDimensions = useCallback(
     (dimensions: Partial<Dimensions>) => {
       'worklet';
-      const ctrl = controlledContainerDimensions.value;
-
-      if (ctrl.height && dimensions.height !== undefined) {
-        containerHeight.value = dimensions.height;
-      }
-      if (ctrl.width && dimensions.width !== undefined) {
+      if (
+        !controlledContainerDimensions.width &&
+        dimensions.width !== undefined
+      ) {
         containerWidth.value = dimensions.width;
+      }
+      if (
+        !controlledContainerDimensions.height &&
+        dimensions.height !== undefined
+      ) {
+        containerHeight.value = dimensions.height;
       }
     },
     [containerHeight, containerWidth, controlledContainerDimensions]

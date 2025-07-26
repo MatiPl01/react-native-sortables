@@ -2,8 +2,6 @@ import { IS_WEB } from '../../../../constants';
 import type {
   AlignContent,
   AlignItems,
-  Dimension,
-  Dimensions,
   Direction,
   FlexAlignments,
   FlexLayout,
@@ -12,14 +10,14 @@ import type {
   Vector
 } from '../../../../types';
 import { reverseArray, sum } from '../../../../utils';
+import { resolveDimension } from '../../../shared';
 
-type AxisDimensions = { cross: Dimension; main: Dimension };
 type AxisDirections = { cross: Direction; main: Direction };
 
 const createGroups = (
   indexToKey: Array<string>,
-  itemDimensions: Record<string, Dimensions>,
-  axisDimensions: AxisDimensions,
+  mainItemSizes: number | Record<string, number>,
+  crossItemSizes: number | Record<string, number>,
   gap: number,
   groupMainSizeLimit: number
 ): null | {
@@ -35,12 +33,11 @@ const createGroups = (
   let groupCrossSize = 0;
 
   for (const key of indexToKey) {
-    const dimensions = itemDimensions[key];
-    if (!dimensions) {
+    const mainItemDimension = resolveDimension(mainItemSizes, key);
+    const crossItemDimension = resolveDimension(crossItemSizes, key);
+    if (!mainItemDimension || !crossItemDimension) {
       return null;
     }
-    const mainItemDimension = dimensions[axisDimensions.main];
-    const crossItemDimension = dimensions[axisDimensions.cross];
 
     const currentTotalSize =
       totalGroupItemsMainSize + currentGroup.length * gap + mainItemDimension;
@@ -144,9 +141,9 @@ const calculateAlignment = (
 const handleLayoutCalculation = (
   groups: Array<Array<string>>,
   crossAxisGroupSizes: Array<number>,
-  itemDimensions: Record<string, Dimensions>,
+  mainItemSizes: number | Record<string, number>,
+  crossItemSizes: number | Record<string, number>,
   gaps: FlexLayoutProps['gaps'],
-  axisDimensions: AxisDimensions,
   axisDirections: AxisDirections,
   { alignContent, alignItems, justifyContent }: FlexAlignments,
   paddings: FlexLayoutProps['paddings'],
@@ -210,11 +207,11 @@ const handleLayoutCalculation = (
     const mainAxisGroupItemSizes: Array<number> = [];
 
     for (const key of group) {
-      const itemSize = itemDimensions[key]?.[axisDimensions.main];
-      if (itemSize === undefined) {
+      const mainItemSize = resolveDimension(mainItemSizes, key);
+      if (mainItemSize === undefined) {
         return null;
       }
-      mainAxisGroupItemSizes.push(itemSize);
+      mainAxisGroupItemSizes.push(mainItemSize);
     }
 
     const contentJustification = calculateAlignment(
@@ -244,14 +241,14 @@ const handleLayoutCalculation = (
       // ALIGN ITEMS // TODO - override with alignSelf if specified for an item
       // position items in groups on the cross axis
       const key = group[j]!;
-      const crossAxisItemSize = itemDimensions[key]?.[axisDimensions.cross];
-      if (crossAxisItemSize === undefined) {
+      const crossItemSize = resolveDimension(crossItemSizes, key);
+      if (crossItemSize === undefined) {
         return null;
       }
 
       const itemAlignment = calculateAlignment(
         alignItems,
-        [crossAxisItemSize],
+        [crossItemSize],
         groupCrossSize,
         groupCrossSize,
         shouldWrap
@@ -332,7 +329,8 @@ export const calculateLayout = ({
   flexWrap,
   gaps,
   indexToKey,
-  itemDimensions,
+  itemHeights,
+  itemWidths,
   limits,
   paddings
 }: FlexLayoutProps): FlexLayout | null => {
@@ -344,12 +342,18 @@ export const calculateLayout = ({
   // CREATE GROUPS
   // Determine the direction of the main axis and the parallel dimension
   const isRow = flexDirection.startsWith('row');
-  const axisDimensions: AxisDimensions = isRow
-    ? { cross: 'height', main: 'width' }
-    : { cross: 'width', main: 'height' };
   const axisDirections: AxisDirections = isRow
     ? { cross: 'column', main: 'row' }
     : { cross: 'row', main: 'column' };
+
+  let crossItemSizes, mainItemSizes;
+  if (isRow) {
+    mainItemSizes = itemWidths;
+    crossItemSizes = itemHeights;
+  } else {
+    mainItemSizes = itemHeights;
+    crossItemSizes = itemWidths;
+  }
 
   const shouldWrap = flexWrap !== 'nowrap';
   let groupSizeLimit = Infinity;
@@ -367,8 +371,8 @@ export const calculateLayout = ({
 
   const groupingResult = createGroups(
     indexToKey,
-    itemDimensions,
-    axisDimensions,
+    mainItemSizes,
+    crossItemSizes,
     gaps[axisDirections.cross],
     groupSizeLimit
   );
@@ -388,9 +392,9 @@ export const calculateLayout = ({
   const layoutResult = handleLayoutCalculation(
     groups,
     crossAxisGroupSizes,
-    itemDimensions,
+    mainItemSizes,
+    crossItemSizes,
     gaps,
-    axisDimensions,
     axisDirections,
     flexAlignments,
     paddings,

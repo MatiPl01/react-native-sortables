@@ -1,11 +1,7 @@
 import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import {
-  runOnUI,
-  useAnimatedStyle,
-  useDerivedValue
-} from 'react-native-reanimated';
+import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import { useDragEndHandler } from '../hooks';
@@ -79,10 +75,20 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   const columnGapValue = useAnimatableValue(columnGap);
   const rowGapValue = useAnimatableValue(rowGap);
 
-  const controlledContainerDimensions = useDerivedValue(() => ({
-    height: isVertical, // height is controlled for vertical grids
-    width: !isVertical // width is controlled for horizontal grids
-  }));
+  const controlledContainerDimensions = useMemo(
+    () => ({
+      height: isVertical, // height is controlled for vertical grids
+      width: !isVertical // width is controlled for horizontal grids
+    }),
+    [isVertical]
+  );
+  const controlledItemDimensions = useMemo(
+    () => ({
+      height: !isVertical, // height is controlled for horizontal grids
+      width: isVertical // width is controlled for vertical grids
+    }),
+    [isVertical]
+  );
 
   const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
 
@@ -94,6 +100,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     <SharedProvider
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
+      controlledItemDimensions={controlledItemDimensions}
       debug={debug}
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
