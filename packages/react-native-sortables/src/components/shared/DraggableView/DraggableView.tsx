@@ -55,14 +55,14 @@ function DraggableView({
   const itemStyles = useItemStyles(key, isActive, activationAnimationProgress);
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
-  useEffect(
-    () =>
+  useEffect(() => {
+    return () => {
+      removeItemMeasurements(key);
       runOnUI(() => {
         handleDragEnd(key, activationAnimationProgress);
-        removeItemMeasurements(key);
-      }),
-    [activationAnimationProgress, handleDragEnd, key, removeItemMeasurements]
-  );
+      })();
+    };
+  }, [activationAnimationProgress, handleDragEnd, key, removeItemMeasurements]);
 
   useEffect(() => {
     if (!portalContext) {
@@ -136,8 +136,7 @@ function DraggableView({
           activationAnimationProgress={activationAnimationProgress}
           baseCellStyle={style}
           isActive={isActive}
-          itemKey={key}
-          onMeasure={onMeasure}>
+          itemKey={key}>
           {children}
         </TeleportedItemCell>
       )}

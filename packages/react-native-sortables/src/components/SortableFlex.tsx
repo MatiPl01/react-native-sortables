@@ -1,10 +1,6 @@
-import { type ReactElement } from 'react';
+import { type ReactElement, useMemo } from 'react';
 import { type StyleProp, StyleSheet, type ViewStyle } from 'react-native';
-import {
-  runOnUI,
-  useAnimatedStyle,
-  useDerivedValue
-} from 'react-native-reanimated';
+import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 
 import {
   DEFAULT_SORTABLE_FLEX_PROPS,
@@ -24,6 +20,11 @@ import {
 import type { DropIndicatorSettings, SortableFlexProps } from '../types';
 import { getPropsWithDefaults, orderItems, validateChildren } from '../utils';
 import { DraggableView, SortableContainer } from './shared';
+
+const CONTROLLED_ITEM_DIMENSIONS = {
+  height: false,
+  width: false
+};
 
 function SortableFlex(props: SortableFlexProps) {
   const {
@@ -53,15 +54,17 @@ function SortableFlex(props: SortableFlexProps) {
   const itemKeys = childrenArray.map(([key]) => key);
 
   const { flexDirection, flexWrap } = styleProps;
-  const controlledContainerDimensions = useDerivedValue(() => {
+  const isColumn = flexDirection.startsWith('column');
+
+  const controlledContainerDimensions = useMemo(() => {
     if (flexWrap === 'nowrap') {
       return { height: height === undefined, width: width === undefined };
     }
     return {
       height: height === undefined,
-      width: flexDirection.startsWith('column') && width === undefined
+      width: isColumn && width === undefined
     };
-  }, [flexWrap, flexDirection, height, width]);
+  }, [flexWrap, isColumn, height, width]);
 
   const onDragEnd = useDragEndHandler(_onDragEnd, {
     order: params =>
@@ -74,6 +77,7 @@ function SortableFlex(props: SortableFlexProps) {
     <SharedProvider
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
+      controlledItemDimensions={CONTROLLED_ITEM_DIMENSIONS}
       debug={debug}
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>

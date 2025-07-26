@@ -6,14 +6,15 @@ export type GridLayoutProps = {
     main: number;
     cross: number;
   };
-  itemDimensions: Record<string, Dimensions>;
+  itemHeights: number | Record<string, number>;
+  itemWidths: number | Record<string, number>;
   indexToKey: Array<string>;
-  numGroups: number;
   isVertical: boolean;
+  numGroups: number;
 };
 
 export type GridLayout = {
   itemPositions: Record<string, Vector>;
   crossAxisOffsets: Array<number>;
-  calculatedDimensions: Partial<Dimensions>;
+  controlledContainerDimensions: Partial<Dimensions>;
 };

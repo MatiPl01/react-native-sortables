@@ -1,18 +1,19 @@
 import { OFFSET_EPS } from '../../../../constants';
 import type {
   Coordinate,
-  Dimension,
   GridLayout,
   GridLayoutProps,
   Vector
 } from '../../../../types';
+import { resolveDimension } from '../../../shared';
 import { getCrossIndex, getMainIndex } from './helpers';
 
 export const calculateLayout = ({
   gaps,
   indexToKey,
   isVertical,
-  itemDimensions,
+  itemHeights,
+  itemWidths,
   mainGroupSize,
   numGroups
 }: GridLayoutProps): GridLayout | null => {
@@ -24,29 +25,27 @@ export const calculateLayout = ({
   const crossAxisOffsets = [0];
   const itemPositions: Record<string, Vector> = {};
 
-  let mainDimension: Dimension;
-  let crossDimension: Dimension;
   let mainCoordinate: Coordinate;
   let crossCoordinate: Coordinate;
+  let crossItemSizes, mainItemSizes;
 
   if (isVertical) {
     // grid with specified number of columns (vertical orientation)
-    mainDimension = 'width';
-    crossDimension = 'height'; // items can grow vertically
     mainCoordinate = 'x';
     crossCoordinate = 'y';
+    mainItemSizes = itemWidths;
+    crossItemSizes = itemHeights;
   } else {
     // grid with specified number of rows (horizontal orientation)
-    mainDimension = 'height';
-    crossDimension = 'width'; // items can grow horizontally
     mainCoordinate = 'y';
     crossCoordinate = 'x';
+    mainItemSizes = itemHeights;
+    crossItemSizes = itemWidths;
   }
 
   for (const [itemIndex, itemKey] of indexToKey.entries()) {
-    const dimensions = itemDimensions[itemKey];
-    const crossItemSize = dimensions?.[crossDimension];
-    const mainItemSize = dimensions?.[mainDimension];
+    const crossItemSize = resolveDimension(crossItemSizes, itemKey);
+    const mainItemSize = resolveDimension(mainItemSizes, itemKey);
 
     // Return null if the item is not yet measured or the item main size
     // is different than the main group size (main size must be always the same)
@@ -78,8 +77,8 @@ export const calculateLayout = ({
   const lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
 
   return {
-    calculatedDimensions: {
-      [crossDimension]: lastCrossOffset
+    controlledContainerDimensions: {
+      [isVertical ? 'height' : 'width']: lastCrossOffset
         ? Math.max(lastCrossOffset - gaps.cross, 0)
         : 0
     },

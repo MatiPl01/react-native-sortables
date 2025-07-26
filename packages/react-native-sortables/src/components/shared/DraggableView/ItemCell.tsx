@@ -16,7 +16,7 @@ import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
 export type ItemCellProps = PropsWithChildren<{
   cellStyle: AnimatedStyleProp;
-  onMeasure: MeasureCallback;
+  onMeasure?: MeasureCallback;
   hidden?: boolean;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
@@ -30,15 +30,15 @@ export default function ItemCell({
   hidden,
   onMeasure
 }: ItemCellProps) {
-  const onLayout = hidden
-    ? undefined
-    : ({
-        nativeEvent: {
-          layout: { height, width }
-        }
-      }: LayoutChangeEvent) => {
-        onMeasure(width, height);
-      };
+  const onLayout =
+    onMeasure &&
+    (({
+      nativeEvent: {
+        layout: { height, width }
+      }
+    }: LayoutChangeEvent) => {
+      onMeasure(width, height);
+    });
 
   return (
     <AnimatedOnLayoutView

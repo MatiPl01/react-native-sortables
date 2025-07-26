@@ -1,5 +1,5 @@
 import type { AnyRecord, Maybe } from '../helperTypes';
-import type { Dimensions, Vector } from '../types';
+import type { Vector } from '../types';
 
 export function lt(a: number, b: number): boolean {
   'worklet';
@@ -23,19 +23,24 @@ export const areArraysDifferent = <T>(
   );
 };
 
-export const areDimensionsDifferent = (
-  dim1: Dimensions,
-  dim2: Dimensions,
+export const areValuesDifferent = (
+  dim1: number | undefined,
+  dim2: number | undefined,
   eps?: number
 ): boolean => {
   'worklet';
-  if (eps) {
-    return (
-      Math.abs(dim1.width - dim2.width) > eps ||
-      Math.abs(dim1.height - dim2.height) > eps
-    );
+  if (dim1 === undefined) {
+    return dim2 !== undefined;
   }
-  return dim1.width !== dim2.width || dim1.height !== dim2.height;
+  if (dim2 === undefined) {
+    return true;
+  }
+
+  if (eps) {
+    return Math.abs(dim1 - dim2) > eps;
+  }
+
+  return dim1 !== dim2;
 };
 
 export const areVectorsDifferent = (vec1: Vector, vec2: Vector): boolean => {

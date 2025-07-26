@@ -1,9 +1,12 @@
 import { type StyleProp, type ViewStyle } from 'react-native';
 import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
 
+import type { Dimensions } from '../../../types';
 import { mergeStyles } from '../../../utils';
+import { useCommonValuesContext } from '../CommonValuesProvider';
 import { usePortalContext } from '../PortalProvider';
+import { resolveDimension } from '../utils';
 import useItemDecorationValues from './useItemDecorationValues';
 import useItemZIndex from './useItemZIndex';
 import useTeleportedItemPosition from './useTeleportedItemPosition';
@@ -13,6 +16,8 @@ export default function useTeleportedItemStyles(
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
+  const { controlledItemDimensions, itemHeights, itemWidths } =
+    useCommonValuesContext();
   const { portalOutletMeasurements } = usePortalContext() ?? {};
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
@@ -27,6 +32,17 @@ export default function useTeleportedItemStyles(
     activationAnimationProgress
   );
 
+  const controlledDimensions = useDerivedValue(() => {
+    const result: Partial<Dimensions> = {};
+    if (controlledItemDimensions.width) {
+      result.width = resolveDimension(itemWidths.value, key);
+    }
+    if (controlledItemDimensions.height) {
+      result.height = resolveDimension(itemHeights.value, key);
+    }
+    return result;
+  });
+
   return useAnimatedStyle(() => {
     if (!portalOutletMeasurements?.value || !position.value) {
       // This should never happen
@@ -38,6 +54,7 @@ export default function useTeleportedItemStyles(
 
     return mergeStyles(
       {
+        ...controlledDimensions.value,
         display: 'flex',
         position: 'absolute',
         transform: [

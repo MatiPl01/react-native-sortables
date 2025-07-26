@@ -56,8 +56,9 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     containerWidth,
     controlledContainerDimensions,
     indexToKey,
-    itemDimensions,
+    itemHeights,
     itemPositions,
+    itemWidths,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
@@ -84,13 +85,13 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     let minW = Math.max(minWidth ?? 0, w ?? 0);
     let maxW = Math.min(maxWidth ?? Infinity, w ?? Infinity);
 
-    if (!controlledContainerDimensions.value.width) {
+    if (!controlledContainerDimensions.width) {
       if (!containerWidth.value) {
         return null;
       }
       minW = maxW = containerWidth.value;
     }
-    if (!controlledContainerDimensions.value.height) {
+    if (!controlledContainerDimensions.height) {
       if (!containerHeight.value) {
         return null;
       }
@@ -136,7 +137,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
                   row: rowGap.value
                 },
                 indexToKey: idxToKey.value,
-                itemDimensions: itemDimensions.value,
+                itemHeights: itemHeights.value,
+                itemWidths: itemWidths.value,
                 limits: dimensionsLimits.value,
                 paddings: paddings.value
               },
@@ -159,7 +161,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       flexWrap,
       columnGap,
       rowGap,
-      itemDimensions,
+      itemHeights,
+      itemWidths,
       dimensionsLimits,
       paddings
     ]
@@ -181,7 +184,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
           row: rowGap.value
         },
         indexToKey: idxToKey,
-        itemDimensions: itemDimensions.value,
+        itemHeights: itemHeights.value,
+        itemWidths: itemWidths.value,
         limits: dimensionsLimits.value,
         paddings: paddings.value
       });
@@ -194,7 +198,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       flexWrap,
       columnGap,
       rowGap,
-      itemDimensions,
+      itemHeights,
+      itemWidths,
       dimensionsLimits,
       paddings
     ]
@@ -225,7 +230,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         layout,
         debugCrossAxisGapRects,
         debugMainAxisGapRects,
-        itemDimensions
+        itemWidths.value,
+        itemHeights.value
       );
     }
   });

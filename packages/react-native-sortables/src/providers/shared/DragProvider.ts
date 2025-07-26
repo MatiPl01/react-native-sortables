@@ -36,6 +36,7 @@ import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 import { usePortalContext } from './PortalProvider';
+import { getItemDimensions } from './utils';
 
 type DragProviderProps = PropsWithChildren<
   Required<SortableCallbacks> & {
@@ -76,8 +77,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     inactiveItemOpacity,
     inactiveItemScale,
     indexToKey,
-    itemDimensions,
+    itemHeights,
     itemPositions,
+    itemWidths,
     keyToIndex,
     prevActiveItemKey,
     snapOffsetX,
@@ -384,7 +386,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         }
 
         const position = itemPositions.value[key];
-        const dimensions = itemDimensions.value[key];
+        const dimensions = getItemDimensions(
+          key,
+          itemWidths.value,
+          itemHeights.value
+        );
 
         if (!position || !dimensions) {
           return;
@@ -409,7 +415,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dragActivationDelay,
       handleContainerMeasurement,
       handleDragStart,
-      itemDimensions,
+      itemHeights,
+      itemWidths,
       itemPositions,
       sortEnabled,
       touchStartTouch,
