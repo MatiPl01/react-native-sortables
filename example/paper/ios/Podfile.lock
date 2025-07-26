@@ -2213,7 +2213,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated (3.18.0):
+  - RNReanimated (3.19.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2240,11 +2240,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.18.0)
-    - RNReanimated/worklets (= 3.18.0)
+    - RNReanimated/reanimated (= 3.19.0)
+    - RNReanimated/worklets (= 3.19.0)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (3.18.0):
+  - RNReanimated/reanimated (3.19.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2271,10 +2271,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 3.18.0)
+    - RNReanimated/reanimated/apple (= 3.19.0)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (3.18.0):
+  - RNReanimated/reanimated/apple (3.19.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2303,7 +2303,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets (3.18.0):
+  - RNReanimated/worklets (3.19.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2330,10 +2330,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/worklets/apple (= 3.18.0)
+    - RNReanimated/worklets/apple (= 3.19.0)
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets/apple (3.18.0):
+  - RNReanimated/worklets/apple (3.19.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2725,7 +2725,7 @@ SPEC CHECKSUMS:
   RNFlashList: aad5ccddcbcdfe34dcca3524fdef1416abb32a55
   RNGestureHandler: 4babc0b2fdcf63e8ddcd86f3c1c3639972922f6b
   RNReactNativeHapticFeedback: eed9dfa61c409807a2c95860b45aaad085ccbbc9
-  RNReanimated: 8ae25bd377e5e5e8c3b942788f80e8dff4671570
+  RNReanimated: 4d57827f1d1619f662d1d94176fda2c11a2c7aa0
   RNScreens: f75a433d5966ab2b0570fa5e5e487f1c46488972
   RNSVG: 3446469442ca54ddf210d2a1b7c2b6eaecaca2c3
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
@@ -2733,4 +2733,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 6b2e06a38b488f5d2e72122a691bae590b20c50c
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.14.3
