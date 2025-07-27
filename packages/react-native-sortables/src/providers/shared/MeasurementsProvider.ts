@@ -105,12 +105,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         if (isNewItem) {
           measuredItemsCount.value += 1;
         }
-        if (!isWidthControlled) {
-          (itemWidths.value as Record<string, number>)[key] = dimensions.width;
+        if (typeof itemWidths.value === 'object') {
+          itemWidths.value[key] = dimensions.width;
         }
-        if (!isHeightControlled) {
-          (itemHeights.value as Record<string, number>)[key] =
-            dimensions.height;
+        if (typeof itemHeights.value === 'object') {
+          itemHeights.value[key] = dimensions.height;
         }
 
         if (activeItemKey.value === key) {
@@ -154,11 +153,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       runOnUI(() => {
-        if (!isWidthControlled) {
-          delete (itemWidths.value as Record<string, number>)[key];
+        if (typeof itemWidths.value === 'object') {
+          delete itemWidths.value[key];
         }
-        if (!isHeightControlled) {
-          delete (itemHeights.value as Record<string, number>)[key];
+        if (typeof itemHeights.value === 'object') {
+          delete itemHeights.value[key];
         }
         measuredItemsCount.value -= 1;
       })();
