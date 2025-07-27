@@ -59,9 +59,6 @@ function useItemStylesPaper(
     }
 
     return {
-      // Must use layout props to position views to ensure that TextInput
-      // components work properly
-      // https://github.com/MatiPl01/react-native-sortables/issues/430
       left: position.value.x,
       position: 'absolute',
       top: position.value.y,
@@ -144,9 +141,6 @@ function useItemStylesFabric(
             ]
           }
         : {
-            // Must use layout props to position views to ensure that TextInput
-            // components work properly
-            // https://github.com/MatiPl01/react-native-sortables/issues/430
             left: position.value.x,
             top: position.value.y,
             transform: []
