@@ -10,12 +10,14 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
+import { IS_WEB, isFabric } from '../../../constants';
+import type { AnyRecord } from '../../../helperTypes';
 import {
   type AnimatedStyleProp,
   useMutableValue
 } from '../../../integrations/reanimated';
 import type { Vector } from '../../../types';
-import { areVectorsDifferent } from '../../../utils';
+import { areVectorsDifferent, mergeStyles } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemDecorationValues from './useItemDecorationValues';
 import useItemZIndex from './useItemZIndex';
@@ -29,6 +31,131 @@ const HIDDEN_STYLE: ViewStyle = {
   position: 'absolute'
 };
 
+/**
+ * Handles item positioning for Paper (old React Native architecture).
+ *
+ * On Paper, we can safely use layout props (top/left) for positioning because:
+ * - Child onLayout callbacks are typically not triggered when parent position changes
+ * - This allows for efficient animation without performance issues
+ * - TextInput components work properly with layout-based positioning
+ *
+ * We must use layout props instead of transforms to ensure TextInput components
+ * work correctly (see issue https://github.com/MatiPl01/react-native-sortables/issues/430)
+ */
+function useItemStylesPaper(
+  position: SharedValue<null | Vector>,
+  decoration: SharedValue<AnyRecord>,
+  zIndex: SharedValue<number>
+) {
+  const { usesAbsoluteLayout } = useCommonValuesContext();
+
+  const layoutStyles = useAnimatedStyle(() => {
+    if (!usesAbsoluteLayout.value) {
+      return RELATIVE_STYLE;
+    }
+
+    if (!position.value) {
+      return HIDDEN_STYLE;
+    }
+
+    return {
+      // Must use layout props to position views to ensure that TextInput
+      // components work properly
+      // https://github.com/MatiPl01/react-native-sortables/issues/430
+      left: position.value.x,
+      position: 'absolute',
+      top: position.value.y,
+      zIndex: zIndex.value
+    };
+  });
+
+  const nonLayoutStyles = useAnimatedStyle(() => decoration.value);
+
+  return [layoutStyles, nonLayoutStyles];
+}
+
+/**
+ * Handles item positioning for Fabric (new React Native architecture).
+ *
+ * On Fabric, there's a performance issue where any change to parent layout
+ * triggers child onLayout callbacks, causing numerous calls from C++ to JS
+ * and significant performance loss. This is especially problematic when one
+ * of the items is being dragged around.
+ *
+ * To solve this, we use a hybrid approach:
+ * 1. Use layout props (top/left) when items are not being animated
+ * 2. Switch to transforms during active animations to avoid triggering onLayout
+ * 3. Switch back to layout props when animation completes
+ *
+ * Since Fabric updates non-layout and layout props simultaneously, it's safe
+ * to switch between transforms and layout props without visual glitches.
+ *
+ * We still use layout props for TextInput compatibility
+ * (see issue https://github.com/MatiPl01/react-native-sortables/issues/430)
+ * but minimize their use during animations for better performance.
+ */
+function useItemStylesFabric(
+  position: SharedValue<null | Vector>,
+  layoutPosition: SharedValue<null | Vector>,
+  decoration: SharedValue<AnyRecord>,
+  zIndex: SharedValue<number>
+) {
+  const { activeItemDropped, usesAbsoluteLayout } = useCommonValuesContext();
+  const isTransform = useMutableValue(false);
+
+  useAnimatedReaction(
+    () => ({
+      current: position.value,
+      dropped: activeItemDropped.value,
+      layout: layoutPosition.value
+    }),
+    ({ current, dropped, layout }) => {
+      if (layout && current && areVectorsDifferent(layout, current)) {
+        // Switch to positioning via transform for every item which position
+        // is being changed while one of the items is being dragged
+        isTransform.value = true;
+      } else if (dropped) {
+        isTransform.value = false;
+      }
+    }
+  );
+
+  return useAnimatedStyle(() => {
+    if (!usesAbsoluteLayout.value) {
+      return mergeStyles(RELATIVE_STYLE, decoration.value);
+    }
+
+    if (!position.value) {
+      return HIDDEN_STYLE;
+    }
+
+    return mergeStyles(
+      {
+        position: 'absolute',
+        zIndex: zIndex.value
+      },
+      isTransform.value
+        ? {
+            left: 0,
+            top: 0,
+            transform: [
+              { translateX: position.value.x },
+              { translateY: position.value.y }
+            ]
+          }
+        : {
+            // Must use layout props to position views to ensure that TextInput
+            // components work properly
+            // https://github.com/MatiPl01/react-native-sortables/issues/430
+            left: position.value.x,
+            top: position.value.y,
+            transform: []
+          },
+      decoration.value
+    );
+  });
+}
+
 export default function useItemStyles(
   key: string,
   isActive: SharedValue<boolean>,
@@ -39,8 +166,7 @@ export default function useItemStyles(
     activeItemPosition,
     animateLayoutOnReorderOnly,
     itemPositions,
-    shouldAnimateLayout,
-    usesAbsoluteLayout
+    shouldAnimateLayout
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
@@ -146,27 +272,9 @@ export default function useItemStyles(
     }
   );
 
-  const layoutStyles = useAnimatedStyle(() => {
-    if (!usesAbsoluteLayout.value) {
-      return RELATIVE_STYLE;
-    }
-
-    if (!position.value) {
-      return HIDDEN_STYLE;
-    }
-
-    return {
-      // Must use layout props to position views to ensure that TextInput
-      // components work properly
-      // https://github.com/MatiPl01/react-native-sortables/issues/430
-      left: position.value.x,
-      position: 'absolute',
-      top: position.value.y,
-      zIndex: zIndex.value
-    };
-  });
-
-  const nonLayoutStyles = useAnimatedStyle(() => decoration.value);
-
-  return [layoutStyles, nonLayoutStyles];
+  return isFabric() || IS_WEB
+    ? // eslint-disable-next-line react-hooks/rules-of-hooks
+      useItemStylesFabric(position, layoutPosition, decoration, zIndex)
+    : // eslint-disable-next-line react-hooks/rules-of-hooks
+      useItemStylesPaper(position, decoration, zIndex);
 }
