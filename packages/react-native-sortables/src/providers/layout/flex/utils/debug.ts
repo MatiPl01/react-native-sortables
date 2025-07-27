@@ -1,12 +1,6 @@
-import type { SharedValue } from 'react-native-reanimated';
-
 import type { DebugRectUpdater } from '../../../../debug';
-import type {
-  Dimensions,
-  FlexDirection,
-  FlexLayout,
-  Vector
-} from '../../../../types';
+import type { FlexDirection, FlexLayout, Vector } from '../../../../types';
+import { resolveDimension } from '../../../../utils';
 
 const DEBUG_COLORS = {
   backgroundColor: '#ffa500',
@@ -18,7 +12,8 @@ export const updateLayoutDebugRects = (
   layout: FlexLayout,
   debugCrossAxisGapRects: Array<DebugRectUpdater>,
   debugMainAxisGapRects: Array<DebugRectUpdater>,
-  itemDimensions: SharedValue<Record<string, Dimensions>>
+  itemWidths: number | Record<string, number>,
+  itemHeights: number | Record<string, number>
 ) => {
   'worklet';
   const isRow = flexDirection.startsWith('row');
@@ -49,6 +44,14 @@ export const updateLayoutDebugRects = (
     const group = layout.itemGroups[i];
     if (!group) break;
 
+    const set = (index: number, config: { from: Vector; to: Vector }) => {
+      debugMainAxisGapRects[index]?.set({
+        ...DEBUG_COLORS,
+        from: config.from,
+        to: config.to
+      });
+    };
+
     for (let j = 0; j < group.length; j++) {
       const key = group[j]!;
       const nextKey = layout.itemGroups[i]![j + 1];
@@ -59,40 +62,41 @@ export const updateLayoutDebugRects = (
 
       const position = layout.itemPositions[key]!;
       const nextPosition = layout.itemPositions[nextKey]!;
-      const dimensions = itemDimensions.value[key]!;
-      const nextDimensions = itemDimensions.value[nextKey]!;
-
-      // eslint-disable-next-line no-loop-func
-      const set = (config: { from: Vector; to: Vector }) => {
-        debugMainAxisGapRects[itemIndex]?.set({
-          ...DEBUG_COLORS,
-          from: config.from,
-          to: config.to
-        });
-      };
 
       if (isRow && isReverse) {
         // row-reverse
-        set({
-          from: { x: nextPosition.x + nextDimensions.width, y: offset },
+        set(itemIndex, {
+          from: {
+            x: nextPosition.x + resolveDimension(itemWidths, nextKey)!,
+            y: offset
+          },
           to: { x: position.x, y: currentEndOffset }
         });
       } else if (isRow) {
         // row
-        set({
-          from: { x: position.x + dimensions.width, y: offset },
+        set(itemIndex, {
+          from: {
+            x: position.x + resolveDimension(itemWidths, key)!,
+            y: offset
+          },
           to: { x: nextPosition.x, y: currentEndOffset }
         });
       } else if (isReverse) {
         // column-reverse
-        set({
-          from: { x: offset, y: nextPosition.y + nextDimensions.height },
+        set(itemIndex, {
+          from: {
+            x: offset,
+            y: nextPosition.y + resolveDimension(itemHeights, nextKey)!
+          },
           to: { x: currentEndOffset, y: position.y }
         });
       } else {
         // column
-        set({
-          from: { x: offset, y: position.y + dimensions.height },
+        set(itemIndex, {
+          from: {
+            x: offset,
+            y: position.y + resolveDimension(itemHeights, key)!
+          },
           to: { x: currentEndOffset, y: nextPosition.y }
         });
       }

@@ -1,5 +1,6 @@
 export * from './arrays';
 export * from './children';
+export * from './dimensions';
 export * from './equality';
 export * from './keys';
 export * from './layout';

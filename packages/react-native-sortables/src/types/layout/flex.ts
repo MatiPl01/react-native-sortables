@@ -23,7 +23,8 @@ export type FlexLayoutProps = {
     row: number;
     column: number;
   };
-  itemDimensions: Record<string, Dimensions>;
+  itemWidths: number | Record<string, number>;
+  itemHeights: number | Record<string, number>;
   indexToKey: Array<string>;
   flexDirection: FlexDirection;
   flexWrap: FlexWrap;

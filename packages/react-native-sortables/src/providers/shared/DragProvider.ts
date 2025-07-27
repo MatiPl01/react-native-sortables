@@ -27,7 +27,11 @@ import type {
   Vector
 } from '../../types';
 import { DragActivationState, LayerState } from '../../types';
-import { getKeyToIndex, getOffsetDistance } from '../../utils';
+import {
+  getItemDimensions,
+  getKeyToIndex,
+  getOffsetDistance
+} from '../../utils';
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
@@ -76,8 +80,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     inactiveItemOpacity,
     inactiveItemScale,
     indexToKey,
-    itemDimensions,
+    itemHeights,
     itemPositions,
+    itemWidths,
     keyToIndex,
     prevActiveItemKey,
     snapOffsetX,
@@ -384,7 +389,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         }
 
         const position = itemPositions.value[key];
-        const dimensions = itemDimensions.value[key];
+        const dimensions = getItemDimensions(
+          key,
+          itemWidths.value,
+          itemHeights.value
+        );
 
         if (!position || !dimensions) {
           return;
@@ -409,7 +418,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dragActivationDelay,
       handleContainerMeasurement,
       handleDragStart,
-      itemDimensions,
+      itemHeights,
+      itemWidths,
       itemPositions,
       sortEnabled,
       touchStartTouch,

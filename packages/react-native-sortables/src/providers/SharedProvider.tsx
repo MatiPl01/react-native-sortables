@@ -2,7 +2,6 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { DebugProvider } from '../debug';
@@ -13,11 +12,12 @@ import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
   AutoScrollSettings,
-  ControlledContainerDimensions,
+  ControlledDimensions,
   ItemDragSettings,
   ItemsLayoutTransitionMode,
   SortableCallbacks
 } from '../types';
+import type { ItemDimensionsValidator } from './shared';
 import {
   AutoScrollProvider,
   CommonValuesProvider,
@@ -40,10 +40,12 @@ type SharedProviderProps = PropsWithChildren<
       hapticsEnabled: boolean;
       customHandle: boolean;
       debug: boolean;
-      controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+      controlledContainerDimensions: ControlledDimensions;
+      controlledItemDimensions: ControlledDimensions;
       itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
       bringToFrontWhenActive: boolean;
       dropIndicatorStyle?: ViewStyle;
+      validateItemDimensions?: ItemDimensionsValidator;
     }
 >;
 
@@ -67,6 +69,7 @@ export default function SharedProvider({
   overDrag,
   scrollableRef,
   sortEnabled,
+  validateItemDimensions,
   ...rest
 }: SharedProviderProps) {
   const inMultiZone = !!useMultiZoneContext();
@@ -90,7 +93,10 @@ export default function SharedProvider({
       {...rest}
     />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider itemsCount={itemKeys.length} />,
+    <MeasurementsProvider
+      itemsCount={itemKeys.length}
+      validateDimensions={validateItemDimensions}
+    />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (

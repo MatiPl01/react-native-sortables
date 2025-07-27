@@ -1,5 +1,4 @@
-import type { Dimension, Dimensions } from '../../../../../types';
-import { reorderInsert } from '../../../../../utils';
+import { reorderInsert, resolveDimension } from '../../../../../utils';
 
 export type ItemGroupSwapProps = {
   activeItemKey: string;
@@ -8,9 +7,8 @@ export type ItemGroupSwapProps = {
   groupSizeLimit: number;
   indexToKey: Array<string>;
   keyToIndex: Record<string, number>;
-  itemDimensions: Record<string, Dimensions>;
+  mainItemSizes: number | Record<string, number>;
   itemGroups: Array<Array<string>>;
-  mainDimension: Dimension;
   mainGap: number;
   fixedKeys: Record<string, boolean> | undefined;
 };
@@ -36,14 +34,13 @@ const getGroupItemIndex = (
 
 export const getTotalGroupSize = (
   group: Array<string>,
-  itemDimensions: Record<string, Dimensions>,
-  mainDimension: Dimension,
+  mainItemSizes: number | Record<string, number>,
   gap: number
 ) => {
   'worklet';
 
   const sizesSum = group.reduce(
-    (total, key) => total + (itemDimensions[key]?.[mainDimension] ?? 0),
+    (total, key) => total + (resolveDimension(mainItemSizes, key) ?? 0),
     0
   );
 
@@ -61,18 +58,17 @@ const getIndexesWhenSwappedToGroupBefore = ({
   fixedKeys,
   groupSizeLimit,
   indexToKey,
-  itemDimensions,
   itemGroups,
   keyToIndex,
-  mainDimension,
-  mainGap
+  mainGap,
+  mainItemSizes
 }: ItemGroupSwapProps): SwappedGroupIndexesResult => {
   'worklet';
   if (groupSizeLimit === Infinity) {
     return null;
   }
 
-  const activeMainSize = itemDimensions[activeItemKey]?.[mainDimension] ?? 0;
+  const activeMainSize = resolveDimension(mainItemSizes, activeItemKey) ?? 0;
 
   for (let groupIdx = currentGroupIndex; groupIdx > 0; groupIdx--) {
     const groupBefore = itemGroups[groupIdx - 1]!;
@@ -100,8 +96,7 @@ const getIndexesWhenSwappedToGroupBefore = ({
       // we have to check whether the active item won't wrap to this group
       const totalGroupBeforeBeforeSize = getTotalGroupSize(
         groupBeforeBefore,
-        itemDimensions,
-        mainDimension,
+        mainItemSizes,
         mainGap
       );
       const canBeFirstInGroupBefore =
@@ -112,7 +107,7 @@ const getIndexesWhenSwappedToGroupBefore = ({
           return null;
         }
         totalGroupSize +=
-          (itemDimensions[firstItemKey]?.[mainDimension] ?? 0) + mainGap;
+          (resolveDimension(mainItemSizes, firstItemKey) ?? 0) + mainGap;
         itemIndex++;
       }
     }
@@ -134,7 +129,7 @@ const getIndexesWhenSwappedToGroupBefore = ({
         };
       }
 
-      const itemMainSize = itemDimensions[itemKey]?.[mainDimension] ?? 0;
+      const itemMainSize = resolveDimension(mainItemSizes, itemKey) ?? 0;
       totalGroupSize += itemMainSize + mainGap;
     }
   }
@@ -148,11 +143,10 @@ const getIndexesWhenSwappedToGroupAfter = ({
   fixedKeys,
   groupSizeLimit,
   indexToKey,
-  itemDimensions,
   itemGroups,
   keyToIndex,
-  mainDimension,
-  mainGap
+  mainGap,
+  mainItemSizes
 }: ItemGroupSwapProps): SwappedGroupIndexesResult => {
   'worklet';
   const activeGroup = itemGroups[currentGroupIndex];
@@ -167,7 +161,7 @@ const getIndexesWhenSwappedToGroupAfter = ({
   }
 
   const getItemMainSize = (key: string) =>
-    itemDimensions[key]?.[mainDimension] ?? 0;
+    resolveDimension(mainItemSizes, key) ?? 0;
 
   // We need to remove the active item from the its group, fit all items
   // in the remaining space between the active item's group and the target group,
