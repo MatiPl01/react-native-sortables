@@ -236,37 +236,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     }
   });
 
-  // useAnimatedReaction(
-  //   () => ({
-  //     containerH: containerHeight.value,
-  //     containerW: containerWidth.value,
-  //     itemMeasurementsCompleted: initialItemMeasurementsCompleted.value
-  //   }),
-  //   ({ containerH, containerW, itemMeasurementsCompleted }) => {
-  //     console.log(
-  //       usesAbsoluteLayout.value,
-  //       itemMeasurementsCompleted,
-  //       containerH,
-  //       containerW
-  //     );
-
-  //     if (
-  //       usesAbsoluteLayout.value ||
-  //       !itemMeasurementsCompleted ||
-  //       !containerH ||
-  //       !containerW
-  //     ) {
-  //       return;
-  //     }
-
-  //     // Add timeout for safety, to prevent too many updates in a short period of time
-  //     // (this may cause perf issues on low end devices, so the update is delayed for safety)
-  //     setAnimatedTimeout(() => {
-  //       usesAbsoluteLayout.value = true;
-  //     }, 100);
-  //   }
-  // );
-
   return {
     value: {
       appliedLayout,

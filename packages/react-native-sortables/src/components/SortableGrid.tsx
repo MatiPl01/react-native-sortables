@@ -6,6 +6,7 @@ import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
+import type { ItemDimensionsValidator } from '../providers';
 import {
   GRID_STRATEGIES,
   GridLayoutProvider,
@@ -21,6 +22,7 @@ import type {
   SortableGridRenderItem
 } from '../types';
 import {
+  areValuesDifferent,
   defaultKeyExtractor,
   error,
   getPropsWithDefaults,
@@ -103,6 +105,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       controlledItemDimensions={controlledItemDimensions}
       debug={debug}
       itemKeys={itemKeys}
+      validateItemDimensions={IS_WEB ? undefined : validateItemDimensions}
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
         columnGap={columnGapValue}
@@ -140,6 +143,23 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     </SharedProvider>
   );
 }
+
+const validateItemDimensions: ItemDimensionsValidator = (
+  resolvedWidth,
+  resolvedHeight,
+  controlledDimensions,
+  measuredDimensions
+) => {
+  'worklet';
+  const isNewItem = resolvedWidth === undefined || resolvedHeight === undefined;
+  return (
+    !isNewItem ||
+    (controlledDimensions.width &&
+      !areValuesDifferent(resolvedWidth, measuredDimensions.width, 1)) ||
+    (controlledDimensions.height &&
+      !areValuesDifferent(resolvedHeight, measuredDimensions.height, 1))
+  );
+};
 
 type SortableGridInnerProps<I> = DropIndicatorSettings &
   Required<

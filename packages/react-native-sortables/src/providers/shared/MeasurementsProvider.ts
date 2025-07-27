@@ -3,22 +3,39 @@ import { runOnUI } from 'react-native-reanimated';
 
 import { useStableCallback } from '../../hooks';
 import {
+  setAnimatedTimeout,
   useAnimatedDebounce,
   useMutableValue
 } from '../../integrations/reanimated';
-import type { Dimensions, MeasurementsContextType } from '../../types';
+import type {
+  ControlledDimensions,
+  Dimensions,
+  MeasurementsContextType
+} from '../../types';
 import { areValuesDifferent } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
+import { resolveDimension } from './utils';
+
+export type ItemDimensionsValidator = (
+  resolvedWidth: number | undefined,
+  resolvedHeight: number | undefined,
+  controlledDimensions: ControlledDimensions,
+  measuredDimensions: Dimensions
+) => boolean;
 
 type MeasurementsProviderProps = {
   itemsCount: number;
+  validateDimensions: ItemDimensionsValidator | undefined;
 };
 
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<MeasurementsProviderProps, MeasurementsContextType>(({ itemsCount }) => {
+)<MeasurementsProviderProps, MeasurementsContextType>(({
+  itemsCount,
+  validateDimensions
+}) => {
   const {
     activeItemDimensions,
     activeItemKey,
@@ -27,7 +44,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     controlledContainerDimensions,
     controlledItemDimensions,
     itemHeights,
-    itemWidths
+    itemWidths,
+    usesAbsoluteLayout
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
     useMultiZoneContext() ?? {};
@@ -39,7 +57,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   const handleItemMeasurement = useStableCallback(
     (key: string, dimensions: Dimensions) => {
       const prevDimensions = previousItemDimensionsRef.current[key];
-      previousItemDimensionsRef.current[key] = dimensions;
 
       const { height: isHeightControlled, width: isWidthControlled } =
         controlledItemDimensions;
@@ -48,7 +65,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       const changedDimensions: Partial<Dimensions> = {};
-      const isNewItem = !prevDimensions;
 
       if (
         !isWidthControlled &&
@@ -67,11 +83,29 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         return;
       }
 
+      previousItemDimensionsRef.current[key] = dimensions;
+
       runOnUI(() => {
+        const resolvedWidth = resolveDimension(itemWidths.value, key);
+        const resolvedHeight = resolveDimension(itemHeights.value, key);
+
+        if (
+          validateDimensions &&
+          !validateDimensions(
+            resolvedWidth,
+            resolvedHeight,
+            controlledItemDimensions,
+            dimensions
+          )
+        ) {
+          return;
+        }
+
+        const isNewItem =
+          resolvedWidth === undefined || resolvedHeight === undefined;
         if (isNewItem) {
           measuredItemsCount.value += 1;
         }
-
         if (!isWidthControlled) {
           (itemWidths.value as Record<string, number>)[key] = dimensions.width;
         }
@@ -91,8 +125,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         // measured to reduce the number of times animated reactions are triggered
         if (measuredItemsCount.value === itemsCount) {
           const updateDimensions = () => {
-            if (isWidthControlled) itemWidths.modify();
-            if (isHeightControlled) itemHeights.modify();
+            if (!isWidthControlled) itemWidths.modify();
+            if (!isHeightControlled) itemHeights.modify();
           };
 
           if (isNewItem) {
@@ -161,8 +195,21 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       ) {
         containerHeight.value = dimensions.height;
       }
+
+      if (!usesAbsoluteLayout.value) {
+        // Add timeout for safety, to prevent too many layout recalculations
+        // in a short period of time (this may cause issues on low end devices)
+        setAnimatedTimeout(() => {
+          usesAbsoluteLayout.value = true;
+        }, 100);
+      }
     },
-    [containerHeight, containerWidth, controlledContainerDimensions]
+    [
+      containerHeight,
+      containerWidth,
+      controlledContainerDimensions,
+      usesAbsoluteLayout
+    ]
   );
 
   return {
