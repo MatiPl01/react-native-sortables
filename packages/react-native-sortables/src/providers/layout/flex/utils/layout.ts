@@ -34,7 +34,7 @@ const createGroups = (
   for (const key of indexToKey) {
     const mainItemDimension = resolveDimension(mainItemSizes, key);
     const crossItemDimension = resolveDimension(crossItemSizes, key);
-    if (!mainItemDimension || !crossItemDimension) {
+    if (mainItemDimension === undefined || crossItemDimension === undefined) {
       return null;
     }
 
