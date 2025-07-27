@@ -7,34 +7,19 @@ import {
   useAnimatedDebounce,
   useMutableValue
 } from '../../integrations/reanimated';
-import type {
-  ControlledDimensions,
-  Dimensions,
-  MeasurementsContextType
-} from '../../types';
+import type { Dimensions, MeasurementsContextType } from '../../types';
 import { areValuesDifferent, resolveDimension } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 
-export type ItemDimensionsValidator = (
-  resolvedWidth: number | undefined,
-  resolvedHeight: number | undefined,
-  controlledDimensions: ControlledDimensions,
-  measuredDimensions: Dimensions
-) => boolean;
-
 type MeasurementsProviderProps = {
   itemsCount: number;
-  validateDimensions: ItemDimensionsValidator | undefined;
 };
 
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<MeasurementsProviderProps, MeasurementsContextType>(({
-  itemsCount,
-  validateDimensions
-}) => {
+)<MeasurementsProviderProps, MeasurementsContextType>(({ itemsCount }) => {
   const {
     activeItemDimensions,
     activeItemKey,
@@ -87,18 +72,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       runOnUI(() => {
         const resolvedWidth = resolveDimension(itemWidths.value, key);
         const resolvedHeight = resolveDimension(itemHeights.value, key);
-
-        if (
-          validateDimensions &&
-          !validateDimensions(
-            resolvedWidth,
-            resolvedHeight,
-            controlledItemDimensions,
-            dimensions
-          )
-        ) {
-          return;
-        }
 
         const isNewItem =
           resolvedWidth === undefined || resolvedHeight === undefined;

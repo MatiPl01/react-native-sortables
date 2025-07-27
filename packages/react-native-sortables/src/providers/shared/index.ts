@@ -14,7 +14,6 @@ export * from './hooks';
 export { ItemContextProvider, useItemContext } from './ItemContextProvider';
 export { LayerProvider } from './LayerProvider';
 export {
-  type ItemDimensionsValidator,
   MeasurementsProvider,
   useMeasurementsContext
 } from './MeasurementsProvider';
