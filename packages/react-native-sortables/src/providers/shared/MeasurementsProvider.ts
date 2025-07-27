@@ -1,9 +1,8 @@
 import { useCallback, useRef } from 'react';
-import { runOnUI, useAnimatedReaction } from 'react-native-reanimated';
+import { runOnUI } from 'react-native-reanimated';
 
 import { useStableCallback } from '../../hooks';
 import {
-  setAnimatedTimeout,
   useAnimatedDebounce,
   useMutableValue
 } from '../../integrations/reanimated';
@@ -28,14 +27,12 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     controlledContainerDimensions,
     controlledItemDimensions,
     itemHeights,
-    itemWidths,
-    usesAbsoluteLayout
+    itemWidths
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
     useMultiZoneContext() ?? {};
 
   const measuredItemsCount = useMutableValue(0);
-  const initialItemMeasurementsCompleted = useMutableValue(false);
   const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
   const debounce = useAnimatedDebounce();
 
@@ -71,10 +68,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       runOnUI(() => {
-        console.log('update dimensions', key);
         if (isNewItem) {
           measuredItemsCount.value += 1;
         }
+
         if (!isWidthControlled) {
           (itemWidths.value as Record<string, number>)[key] = dimensions.width;
         }
@@ -82,6 +79,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
           (itemHeights.value as Record<string, number>)[key] =
             dimensions.height;
         }
+
         if (activeItemKey.value === key) {
           activeItemDimensions.value = dimensions;
           if (multiZoneActiveItemDimensions) {
@@ -92,28 +90,20 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         // Update the array of item dimensions only after all items have been
         // measured to reduce the number of times animated reactions are triggered
         if (measuredItemsCount.value === itemsCount) {
-          initialItemMeasurementsCompleted.value = true;
-
           const updateDimensions = () => {
-            if (isWidthControlled) {
-              itemWidths.modify();
-            }
-            if (isHeightControlled) {
-              itemHeights.modify();
-            }
+            if (isWidthControlled) itemWidths.modify();
+            if (isHeightControlled) itemHeights.modify();
           };
 
           if (isNewItem) {
             // If measurements were triggered because of adding new items and all new
             // items have been measured, update dimensions immediately to avoid
             // unnecessary delays
-            console.log('update dimensions immediately', key);
             updateDimensions();
           } else {
             // Otherwise, debounce the update if the number of items is not changed
             // to reduce the number of updates if dimensions of items are changed
             // many times within a short period of time
-            console.log('debounce update dimensions', key);
             debounce(updateDimensions, 100);
           }
         }
@@ -137,9 +127,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         if (!isHeightControlled) {
           delete (itemHeights.value as Record<string, number>)[key];
         }
+        measuredItemsCount.value -= 1;
       })();
     },
-    [controlledItemDimensions, itemHeights, itemWidths]
+    [controlledItemDimensions, itemHeights, itemWidths, measuredItemsCount]
   );
 
   const handleContainerMeasurement = useCallback(
@@ -172,37 +163,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
     },
     [containerHeight, containerWidth, controlledContainerDimensions]
-  );
-
-  useAnimatedReaction(
-    () => ({
-      containerH: containerHeight.value,
-      containerW: containerWidth.value,
-      itemMeasurementsCompleted: initialItemMeasurementsCompleted.value
-    }),
-    ({ containerH, containerW, itemMeasurementsCompleted }) => {
-      console.log(
-        usesAbsoluteLayout.value,
-        itemMeasurementsCompleted,
-        containerH,
-        containerW
-      );
-
-      if (
-        usesAbsoluteLayout.value ||
-        !itemMeasurementsCompleted ||
-        !containerH ||
-        !containerW
-      ) {
-        return;
-      }
-
-      // Add timeout for safety, to prevent too many updates in a short period of time
-      // (this may cause perf issues on low end devices, so the update is delayed for safety)
-      setAnimatedTimeout(() => {
-        usesAbsoluteLayout.value = true;
-      }, 100);
-    }
   );
 
   return {
