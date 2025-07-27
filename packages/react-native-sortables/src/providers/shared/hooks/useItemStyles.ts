@@ -15,7 +15,7 @@ import {
   useMutableValue
 } from '../../../integrations/reanimated';
 import type { Vector } from '../../../types';
-import { areVectorsDifferent, mergeStyles } from '../../../utils';
+import { areVectorsDifferent } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemDecorationValues from './useItemDecorationValues';
 import useItemZIndex from './useItemZIndex';
@@ -146,26 +146,27 @@ export default function useItemStyles(
     }
   );
 
-  return useAnimatedStyle(() => {
+  const layoutStyles = useAnimatedStyle(() => {
     if (!usesAbsoluteLayout.value) {
-      return mergeStyles(RELATIVE_STYLE, decoration.value);
+      return RELATIVE_STYLE;
     }
 
     if (!position.value) {
       return HIDDEN_STYLE;
     }
 
-    return mergeStyles(
-      {
-        // Must use layout props to position views to ensure that TextInput
-        // components work properly
-        // https://github.com/MatiPl01/react-native-sortables/issues/430
-        left: position.value.x,
-        position: 'absolute',
-        top: position.value.y,
-        zIndex: zIndex.value
-      },
-      decoration.value
-    );
+    return {
+      // Must use layout props to position views to ensure that TextInput
+      // components work properly
+      // https://github.com/MatiPl01/react-native-sortables/issues/430
+      left: position.value.x,
+      position: 'absolute',
+      top: position.value.y,
+      zIndex: zIndex.value
+    };
   });
+
+  const nonLayoutStyles = useAnimatedStyle(() => decoration.value);
+
+  return [layoutStyles, nonLayoutStyles];
 }

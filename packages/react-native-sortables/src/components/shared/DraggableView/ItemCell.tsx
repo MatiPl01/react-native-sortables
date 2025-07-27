@@ -41,18 +41,19 @@ export default function ItemCell({
     });
 
   return (
-    <AnimatedOnLayoutView
-      style={[styles.decoration, cellStyle, hidden && styles.hidden]}
-      onLayout={onLayout}>
-      {/* TODO - remove itemEntering and itemExiting layout animation in sortables v2 */}
-      {entering || exiting ? (
-        <Animated.View entering={entering} exiting={exiting}>
-          {children}
-        </Animated.View>
-      ) : (
-        children
-      )}
-    </AnimatedOnLayoutView>
+    <Animated.View
+      style={[styles.decoration, cellStyle, hidden && styles.hidden]}>
+      <AnimatedOnLayoutView
+        entering={entering}
+        exiting={exiting}
+        // TODO - improve this onLayout - it gets called on Fabric when the active
+        // item is dragged around because the top/left offset of the parent is changed
+        // (it shouldn't be called for the child as the child dimensions and position
+        // don't change - seems to be a Fabric bug)
+        onLayout={onLayout}>
+        {children}
+      </AnimatedOnLayoutView>
+    </Animated.View>
   );
 }
 
