@@ -8,10 +8,14 @@ import type {
   FlexLayout,
   SortStrategyFactory
 } from '../../../../../types';
-import { gt as gt_, lt as lt_, reorderInsert } from '../../../../../utils';
+import {
+  gt as gt_,
+  lt as lt_,
+  reorderInsert,
+  resolveDimension
+} from '../../../../../utils';
 import {
   getAdditionalSwapOffset,
-  resolveDimension,
   useCommonValuesContext,
   useCustomHandleContext,
   useDebugBoundingBox

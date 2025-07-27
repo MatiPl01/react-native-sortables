@@ -3,10 +3,9 @@ import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
 
 import type { Dimensions } from '../../../types';
-import { mergeStyles } from '../../../utils';
+import { mergeStyles, resolveDimension } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { usePortalContext } from '../PortalProvider';
-import { resolveDimension } from '../utils';
 import useItemDecorationValues from './useItemDecorationValues';
 import useItemZIndex from './useItemZIndex';
 import useTeleportedItemPosition from './useTeleportedItemPosition';

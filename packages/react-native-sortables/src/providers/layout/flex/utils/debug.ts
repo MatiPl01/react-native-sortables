@@ -1,6 +1,6 @@
 import type { DebugRectUpdater } from '../../../../debug';
 import type { FlexDirection, FlexLayout, Vector } from '../../../../types';
-import { resolveDimension } from '../../../shared';
+import { resolveDimension } from '../../../../utils';
 
 const DEBUG_COLORS = {
   backgroundColor: '#ffa500',

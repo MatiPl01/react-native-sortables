@@ -9,8 +9,7 @@ import type {
   JustifyContent,
   Vector
 } from '../../../../types';
-import { reverseArray, sum } from '../../../../utils';
-import { resolveDimension } from '../../../shared';
+import { resolveDimension, reverseArray, sum } from '../../../../utils';
 
 type AxisDirections = { cross: Direction; main: Direction };
 

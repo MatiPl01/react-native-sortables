@@ -4,7 +4,7 @@ import type {
   GridLayoutProps,
   Vector
 } from '../../../../types';
-import { resolveDimension } from '../../../shared';
+import { resolveDimension } from '../../../../utils';
 import { getCrossIndex, getMainIndex } from './helpers';
 
 export const calculateLayout = ({

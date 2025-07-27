@@ -1,5 +1,4 @@
-import { reorderInsert } from '../../../../../utils';
-import { resolveDimension } from '../../../..';
+import { reorderInsert, resolveDimension } from '../../../../../utils';
 
 export type ItemGroupSwapProps = {
   activeItemKey: string;

@@ -3,8 +3,8 @@ import { isSharedValue, useDerivedValue } from 'react-native-reanimated';
 
 import type { Animatable } from '../../../integrations/reanimated';
 import type { Dimensions } from '../../../types';
+import { getItemDimensions } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
-import { getItemDimensions } from '../utils';
 
 export default function useItemDimensions(
   key: Animatable<null | string>

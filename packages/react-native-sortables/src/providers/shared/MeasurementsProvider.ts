@@ -12,11 +12,10 @@ import type {
   Dimensions,
   MeasurementsContextType
 } from '../../types';
-import { areValuesDifferent } from '../../utils';
+import { areValuesDifferent, resolveDimension } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
-import { resolveDimension } from './utils';
 
 export type ItemDimensionsValidator = (
   resolvedWidth: number | undefined,

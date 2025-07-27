@@ -27,7 +27,11 @@ import type {
   Vector
 } from '../../types';
 import { DragActivationState, LayerState } from '../../types';
-import { getKeyToIndex, getOffsetDistance } from '../../utils';
+import {
+  getItemDimensions,
+  getKeyToIndex,
+  getOffsetDistance
+} from '../../utils';
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
@@ -36,7 +40,6 @@ import { useLayerContext } from './LayerProvider';
 import { useMeasurementsContext } from './MeasurementsProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 import { usePortalContext } from './PortalProvider';
-import { getItemDimensions } from './utils';
 
 type DragProviderProps = PropsWithChildren<
   Required<SortableCallbacks> & {
