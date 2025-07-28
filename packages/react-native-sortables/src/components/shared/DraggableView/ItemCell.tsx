@@ -75,6 +75,6 @@ const styles = StyleSheet.create({
     }
   }),
   hidden: {
-    left: -9999
+    display: 'none'
   }
 });
