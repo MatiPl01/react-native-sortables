@@ -11,15 +11,13 @@ import {
 } from 'react-native-reanimated';
 
 import { IS_WEB, isFabric } from '../../../constants';
-import type { AnyRecord } from '../../../helperTypes';
 import {
   type AnimatedStyleProp,
   useMutableValue
 } from '../../../integrations/reanimated';
 import type { Vector } from '../../../types';
-import { areVectorsDifferent, mergeStyles } from '../../../utils';
+import { areVectorsDifferent } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
-import useItemDecorationValues from './useItemDecorationValues';
 import useItemZIndex from './useItemZIndex';
 
 const RELATIVE_STYLE: ViewStyle = {
@@ -42,14 +40,13 @@ const HIDDEN_STYLE: ViewStyle = {
  * We must use layout props instead of transforms to ensure TextInput components
  * work correctly (see issue https://github.com/MatiPl01/react-native-sortables/issues/430)
  */
-function useItemStylesPaper(
+function useItemLayoutStylePaper(
   position: SharedValue<null | Vector>,
-  decoration: SharedValue<AnyRecord>,
   zIndex: SharedValue<number>
 ) {
   const { usesAbsoluteLayout } = useCommonValuesContext();
 
-  const layoutStyles = useAnimatedStyle(() => {
+  return useAnimatedStyle(() => {
     if (!usesAbsoluteLayout.value) {
       return RELATIVE_STYLE;
     }
@@ -65,10 +62,6 @@ function useItemStylesPaper(
       zIndex: zIndex.value
     };
   });
-
-  const nonLayoutStyles = useAnimatedStyle(() => decoration.value);
-
-  return [layoutStyles, nonLayoutStyles];
 }
 
 /**
@@ -91,10 +84,9 @@ function useItemStylesPaper(
  * (see issue https://github.com/MatiPl01/react-native-sortables/issues/430)
  * but minimize their use during animations for better performance.
  */
-function useItemStylesFabric(
+function useItemLayoutStyleFabric(
   position: SharedValue<null | Vector>,
   layoutPosition: SharedValue<null | Vector>,
-  decoration: SharedValue<AnyRecord>,
   zIndex: SharedValue<number>
 ) {
   const { activeItemDropped, usesAbsoluteLayout } = useCommonValuesContext();
@@ -119,19 +111,17 @@ function useItemStylesFabric(
 
   return useAnimatedStyle(() => {
     if (!usesAbsoluteLayout.value) {
-      return mergeStyles(RELATIVE_STYLE, decoration.value);
+      return RELATIVE_STYLE;
     }
 
     if (!position.value) {
       return HIDDEN_STYLE;
     }
 
-    return mergeStyles(
-      {
-        position: 'absolute',
-        zIndex: zIndex.value
-      },
-      isTransform.value
+    return {
+      position: 'absolute',
+      zIndex: zIndex.value,
+      ...(isTransform.value
         ? {
             left: 0,
             top: 0,
@@ -144,13 +134,12 @@ function useItemStylesFabric(
             left: position.value.x,
             top: position.value.y,
             transform: []
-          },
-      decoration.value
-    );
+          })
+    };
   });
 }
 
-export default function useItemStyles(
+export default function useItemLayoutStyle(
   key: string,
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
@@ -166,11 +155,6 @@ export default function useItemStyles(
   const zIndex = useItemZIndex(key, activationAnimationProgress);
   const layoutPosition = useDerivedValue(
     () => itemPositions.value[key] ?? null
-  );
-  const decoration = useItemDecorationValues(
-    key,
-    isActive,
-    activationAnimationProgress
   );
 
   const positionRef = useRef<SharedValue<null | Vector>>(null);
@@ -268,7 +252,7 @@ export default function useItemStyles(
 
   return isFabric() || IS_WEB
     ? // eslint-disable-next-line react-hooks/rules-of-hooks
-      useItemStylesFabric(position, layoutPosition, decoration, zIndex)
+      useItemLayoutStyleFabric(position, layoutPosition, zIndex)
     : // eslint-disable-next-line react-hooks/rules-of-hooks
-      useItemStylesPaper(position, decoration, zIndex);
+      useItemLayoutStylePaper(position, zIndex);
 }

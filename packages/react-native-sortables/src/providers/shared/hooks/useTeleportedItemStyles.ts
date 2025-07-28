@@ -3,10 +3,9 @@ import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
 import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
 
 import type { Dimensions } from '../../../types';
-import { mergeStyles, resolveDimension } from '../../../utils';
+import { resolveDimension } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { usePortalContext } from '../PortalProvider';
-import useItemDecorationValues from './useItemDecorationValues';
 import useItemZIndex from './useItemZIndex';
 import useTeleportedItemPosition from './useTeleportedItemPosition';
 
@@ -21,11 +20,6 @@ export default function useTeleportedItemStyles(
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
   const position = useTeleportedItemPosition(
-    key,
-    isActive,
-    activationAnimationProgress
-  );
-  const decoration = useItemDecorationValues(
     key,
     isActive,
     activationAnimationProgress
@@ -51,18 +45,15 @@ export default function useTeleportedItemStyles(
     const { pageX: outletX, pageY: outletY } = portalOutletMeasurements.value;
     const { x: itemX, y: itemY } = position.value;
 
-    return mergeStyles(
-      {
-        ...controlledDimensions.value,
-        display: 'flex',
-        position: 'absolute',
-        transform: [
-          { translateX: itemX - outletX },
-          { translateY: itemY - outletY }
-        ],
-        zIndex: zIndex.value
-      },
-      decoration.value
-    );
+    return {
+      ...controlledDimensions.value,
+      display: 'flex',
+      position: 'absolute',
+      transform: [
+        { translateX: itemX - outletX },
+        { translateY: itemY - outletY }
+      ],
+      zIndex: zIndex.value
+    };
   });
 }
