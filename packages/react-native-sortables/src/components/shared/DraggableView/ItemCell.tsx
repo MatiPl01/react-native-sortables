@@ -48,12 +48,7 @@ export default function ItemCell({
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={[
-          styles.fill,
-          styles.decoration,
-          decorationStyle,
-          hidden && styles.hidden
-        ]}
+        style={[styles.decoration, decorationStyle, hidden && styles.hidden]}
         onLayout={hidden ? undefined : onLayout}>
         {children}
       </AnimatedOnLayoutView>
@@ -74,11 +69,11 @@ const styles = StyleSheet.create({
       },
       shadowOpacity: 1,
       shadowRadius: 5
+    },
+    web: {
+      flex: 1
     }
   }),
-  fill: {
-    flex: 1
-  },
   hidden: {
     left: -9999
   }
