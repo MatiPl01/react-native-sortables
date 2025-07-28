@@ -1,4 +1,4 @@
-import type { Dimensions, Vector } from './shared';
+import type { ControlledSizes, Dimensions, Vector } from './shared';
 
 export type GridLayoutProps = {
   mainGroupSize: null | number;
@@ -6,8 +6,8 @@ export type GridLayoutProps = {
     main: number;
     cross: number;
   };
-  itemHeights: number | Record<string, number>;
-  itemWidths: number | Record<string, number>;
+  itemHeights: ControlledSizes;
+  itemWidths: ControlledSizes;
   indexToKey: Array<string>;
   isVertical: boolean;
   numGroups: number;

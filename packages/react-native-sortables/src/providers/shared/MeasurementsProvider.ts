@@ -40,7 +40,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const handleItemMeasurement = useStableCallback(
     (key: string, dimensions: Dimensions) => {
-      console.log('handleItemMeasurement', key, dimensions);
       const prevDimensions = previousItemDimensionsRef.current[key];
 
       const { height: isHeightControlled, width: isWidthControlled } =
@@ -74,15 +73,14 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         const resolvedWidth = resolveDimension(itemWidths.value, key);
         const resolvedHeight = resolveDimension(itemHeights.value, key);
 
-        const isNewItem =
-          resolvedWidth === undefined || resolvedHeight === undefined;
+        const isNewItem = resolvedWidth === null || resolvedHeight === null;
         if (isNewItem) {
           measuredItemsCount.value += 1;
         }
-        if (typeof itemWidths.value === 'object') {
+        if (itemWidths.value && typeof itemWidths.value === 'object') {
           itemWidths.value[key] = dimensions.width;
         }
-        if (typeof itemHeights.value === 'object') {
+        if (itemHeights.value && typeof itemHeights.value === 'object') {
           itemHeights.value[key] = dimensions.height;
         }
 
@@ -127,10 +125,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       runOnUI(() => {
-        if (typeof itemWidths.value === 'object') {
+        if (itemWidths.value && typeof itemWidths.value === 'object') {
           delete itemWidths.value[key];
         }
-        if (typeof itemHeights.value === 'object') {
+        if (itemHeights.value && typeof itemHeights.value === 'object') {
           delete itemHeights.value[key];
         }
         measuredItemsCount.value -= 1;

@@ -2,7 +2,6 @@ import type { SharedValue } from 'react-native-reanimated';
 import {
   interpolate,
   interpolateColor,
-  useAnimatedStyle,
   useDerivedValue,
   withTiming
 } from 'react-native-reanimated';
@@ -10,7 +9,7 @@ import {
 import { IS_WEB } from '../../../constants';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
-export default function useItemDecorationStyle(
+export default function useItemDecoration(
   key: string,
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
@@ -38,7 +37,7 @@ export default function useItemDecorationStyle(
     );
   });
 
-  return useAnimatedStyle(() => {
+  return useDerivedValue(() => {
     const progress = activationAnimationProgress.value;
     const zeroProgressOpacity = interpolate(
       adjustedInactiveProgress.value,

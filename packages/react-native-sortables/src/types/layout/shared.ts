@@ -3,6 +3,8 @@ export type Dimensions = {
   height: number;
 };
 
+export type ControlledSizes = null | number | Record<string, number>;
+
 export type MeasureCallback = (width: number, height: number) => void;
 
 export type Vector = {

@@ -1,10 +1,7 @@
 import { type StyleProp, type ViewStyle } from 'react-native';
 import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
+import { useAnimatedStyle } from 'react-native-reanimated';
 
-import type { Dimensions } from '../../../types';
-import { resolveDimension } from '../../../utils';
-import { useCommonValuesContext } from '../CommonValuesProvider';
 import { usePortalContext } from '../PortalProvider';
 import useItemZIndex from './useItemZIndex';
 import useTeleportedItemPosition from './useTeleportedItemPosition';
@@ -14,8 +11,6 @@ export default function useTeleportedItemStyles(
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
 ): StyleProp<AnimatedStyle<ViewStyle>> {
-  const { controlledItemDimensions, itemHeights, itemWidths } =
-    useCommonValuesContext();
   const { portalOutletMeasurements } = usePortalContext() ?? {};
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
@@ -24,17 +19,6 @@ export default function useTeleportedItemStyles(
     isActive,
     activationAnimationProgress
   );
-
-  const controlledDimensions = useDerivedValue(() => {
-    const result: Partial<Dimensions> = {};
-    if (controlledItemDimensions.width) {
-      result.width = resolveDimension(itemWidths.value, key);
-    }
-    if (controlledItemDimensions.height) {
-      result.height = resolveDimension(itemHeights.value, key);
-    }
-    return result;
-  });
 
   return useAnimatedStyle(() => {
     if (!portalOutletMeasurements?.value || !position.value) {
@@ -46,7 +30,6 @@ export default function useTeleportedItemStyles(
     const { x: itemX, y: itemY } = position.value;
 
     return {
-      ...controlledDimensions.value,
       display: 'flex',
       position: 'absolute',
       transform: [

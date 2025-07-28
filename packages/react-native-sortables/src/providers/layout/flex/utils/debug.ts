@@ -1,5 +1,10 @@
 import type { DebugRectUpdater } from '../../../../debug';
-import type { FlexDirection, FlexLayout, Vector } from '../../../../types';
+import type {
+  ControlledSizes,
+  FlexDirection,
+  FlexLayout,
+  Vector
+} from '../../../../types';
 import { resolveDimension } from '../../../../utils';
 
 const DEBUG_COLORS = {
@@ -12,8 +17,8 @@ export const updateLayoutDebugRects = (
   layout: FlexLayout,
   debugCrossAxisGapRects: Array<DebugRectUpdater>,
   debugMainAxisGapRects: Array<DebugRectUpdater>,
-  itemWidths: number | Record<string, number>,
-  itemHeights: number | Record<string, number>
+  itemWidths: ControlledSizes,
+  itemHeights: ControlledSizes
 ) => {
   'worklet';
   const isRow = flexDirection.startsWith('row');

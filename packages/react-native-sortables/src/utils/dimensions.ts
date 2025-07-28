@@ -1,23 +1,23 @@
-import type { Dimensions } from '../types';
+import type { ControlledSizes, Dimensions } from '../types';
 
-export const resolveDimension = (
-  dimension: number | Record<string, number>,
-  key: string
-) => {
+export const resolveDimension = (dimension: ControlledSizes, key: string) => {
   'worklet';
-  return typeof dimension === 'number' ? dimension : dimension[key];
+  return (
+    dimension &&
+    (typeof dimension === 'number' ? dimension : (dimension[key] ?? null))
+  );
 };
 
 export const getItemDimensions = (
   key: string,
-  itemWidths: number | Record<string, number>,
-  itemHeights: number | Record<string, number>
+  itemWidths: ControlledSizes,
+  itemHeights: ControlledSizes
 ): Dimensions | null => {
   'worklet';
   const itemWidth = resolveDimension(itemWidths, key);
   const itemHeight = resolveDimension(itemHeights, key);
 
-  if (itemWidth === undefined || itemHeight === undefined) {
+  if (itemWidth === null || itemHeight === null) {
     return null;
   }
 

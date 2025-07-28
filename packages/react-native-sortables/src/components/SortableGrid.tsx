@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
+import type { DimensionValue } from 'react-native';
 import { StyleSheet } from 'react-native';
-import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
@@ -11,8 +12,6 @@ import {
   GridLayoutProvider,
   OrderUpdaterComponent,
   SharedProvider,
-  useCommonValuesContext,
-  useGridLayoutContext,
   useMeasurementsContext,
   useStrategyKey
 } from '../providers';
@@ -176,66 +175,46 @@ function SortableGridInner<I>({
   rowHeight,
   ...containerProps
 }: SortableGridInnerProps<I>) {
-  const { usesAbsoluteLayout } = useCommonValuesContext();
-  const { mainGroupSize } = useGridLayoutContext();
   const { handleContainerMeasurement } = useMeasurementsContext();
 
-  const animatedInnerStyle = useAnimatedStyle(() => ({
-    flexDirection: isVertical ? 'row' : 'column',
-    height: isVertical
-      ? undefined
-      : groups * (rowHeight + rowGap.value) - rowGap.value,
-    ...(IS_WEB || (mainGroupSize.value && usesAbsoluteLayout.value)
+  const animatedInnerStyle = useAnimatedStyle(() =>
+    isVertical
       ? {
-          marginHorizontal: 0,
-          marginVertical: 0
+          flexDirection: 'row',
+          marginHorizontal: IS_WEB ? 0 : -columnGap.value / 2,
+          rowGap: rowGap.value
         }
       : {
-          marginHorizontal: -columnGap.value / 2,
-          marginVertical: -rowGap.value / 2
-        })
-  }));
+          columnGap: columnGap.value,
+          flexDirection: 'column',
+          height: groups * (rowHeight + rowGap.value) - rowGap.value,
+          rowGap: rowGap.value
+        }
+  );
 
-  let animatedItemStyle: AnimatedStyle;
-  if (IS_WEB) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    animatedItemStyle = useAnimatedStyle(() => ({
-      [isVertical ? 'width' : 'height']:
-        `calc((100% - ${columnGap.value * (groups - 1)}px) / ${groups})`
-    }));
-  } else {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    animatedItemStyle = useAnimatedStyle(() => {
-      if (!mainGroupSize.value || !usesAbsoluteLayout.value) {
-        return {
-          flexBasis: `${100 / groups}%`,
-          paddingHorizontal: columnGap.value / 2,
-          paddingVertical: rowGap.value / 2
-        };
-      }
-
-      return {
-        flexBasis: 'auto',
-        [isVertical ? 'width' : 'height']: mainGroupSize.value,
-        paddingHorizontal: 0,
-        paddingVertical: 0
-      };
-    });
-  }
+  const animatedItemStyle = useAnimatedStyle(() =>
+    isVertical
+      ? IS_WEB
+        ? {
+            width:
+              `calc((100% - ${columnGap.value * (groups - 1)}px) / ${groups})` as DimensionValue
+          }
+        : {
+            flexBasis: `${100 / groups}%`,
+            paddingHorizontal: columnGap.value / 2
+          }
+      : { height: rowHeight }
+  );
 
   return (
     <SortableContainer
       {...containerProps}
       style={[styles.gridContainer, animatedInnerStyle]}
       onLayout={runOnUI((width, height) => {
-        if (IS_WEB || mainGroupSize.value) {
-          handleContainerMeasurement(width, height);
-        } else {
-          handleContainerMeasurement(
-            width - columnGap.value,
-            height - rowGap.value
-          );
-        }
+        handleContainerMeasurement(
+          width - (isVertical && !IS_WEB ? columnGap.value : 0),
+          height
+        );
       })}>
       {zipArrays(data, itemKeys).map(([item, key], index) => (
         <SortableGridItem

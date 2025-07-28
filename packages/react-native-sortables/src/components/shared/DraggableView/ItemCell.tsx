@@ -6,14 +6,19 @@ import {
   type ViewStyle
 } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import Animated from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue
+} from 'react-native-reanimated';
 
 import { HIDDEN_X_OFFSET } from '../../../constants';
 import type {
   AnimatedStyleProp,
   LayoutAnimation
 } from '../../../integrations/reanimated';
-import { useItemDecorationStyle } from '../../../providers';
+import { useCommonValuesContext, useItemDecoration } from '../../../providers';
+import type { Dimensions } from '../../../types';
+import { resolveDimension } from '../../../utils';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
 export type ItemCellProps = PropsWithChildren<{
@@ -38,18 +43,40 @@ export default function ItemCell({
   itemKey,
   onLayout
 }: ItemCellProps) {
-  const decorationStyle = useItemDecorationStyle(
+  const { controlledItemDimensions, itemHeights, itemWidths } =
+    useCommonValuesContext();
+
+  const decoration = useItemDecoration(
     itemKey,
     isActive,
     activationAnimationProgress
   );
+
+  const controlledDimensions = useDerivedValue(() => {
+    const result: Partial<Dimensions> = {};
+    if (controlledItemDimensions.width) {
+      result.width = resolveDimension(itemWidths.value, itemKey) ?? undefined;
+    }
+    if (controlledItemDimensions.height) {
+      result.height = resolveDimension(itemHeights.value, itemKey) ?? undefined;
+    }
+    return result;
+  });
+
+  const decorationStyle = useAnimatedStyle(() => decoration.value);
+  const dimensionsStyle = useAnimatedStyle(() => controlledDimensions.value);
 
   return (
     <Animated.View style={cellStyle}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={[styles.decoration, decorationStyle, hidden && styles.hidden]}
+        style={[
+          styles.decoration,
+          decorationStyle,
+          dimensionsStyle,
+          hidden && styles.hidden
+        ]}
         onLayout={hidden ? undefined : onLayout}>
         {children}
       </AnimatedOnLayoutView>
