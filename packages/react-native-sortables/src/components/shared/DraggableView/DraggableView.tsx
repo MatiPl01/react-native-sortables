@@ -39,10 +39,9 @@ export type DraggableViewProps = PropsWithChildren<{
 
 function DraggableView({
   children,
-  entering: entering_,
-  exiting,
   itemKey: key,
-  style
+  style,
+  ...layoutAnimations
 }: DraggableViewProps) {
   const portalContext = usePortalContext();
   const commonValuesContext = useCommonValuesContext();
@@ -51,10 +50,7 @@ function DraggableView({
   const { handleDragEnd } = useDragContext();
   const { activeItemKey, containerId, customHandle } = commonValuesContext;
 
-  const [{ entering, isTeleported }, setState] = useState<{
-    entering?: LayoutAnimation;
-    isTeleported: boolean;
-  }>({ entering: entering_, isTeleported: false });
+  const [isTeleported, setIsTeleported] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
   const itemStyles = useItemStyles(key, isActive, activationAnimationProgress);
@@ -71,14 +67,14 @@ function DraggableView({
 
   useEffect(() => {
     if (!portalContext) {
-      setState(prev => (prev.isTeleported ? { isTeleported: false } : prev));
+      setIsTeleported(false);
       return;
     }
 
     const teleportedItemId = `${containerId}-${key}`;
     const unsubscribe = portalContext?.subscribe?.(
       teleportedItemId,
-      teleported => setState({ isTeleported: teleported })
+      setIsTeleported
     );
 
     return () => {
@@ -116,10 +112,9 @@ function DraggableView({
   const renderItemCell = (hidden = false) => {
     const innerComponent = (
       <ItemCell
+        {...layoutAnimations}
         {...sharedCellProps}
         cellStyle={[style, itemStyles]}
-        entering={entering}
-        exiting={exiting}
         hidden={hidden}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}

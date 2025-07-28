@@ -75,6 +75,8 @@ const styles = StyleSheet.create({
     }
   }),
   hidden: {
-    display: 'none'
+    maxHeight: 0,
+    maxWidth: 0,
+    overflow: 'hidden'
   }
 });
