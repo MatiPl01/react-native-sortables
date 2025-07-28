@@ -11,4 +11,3 @@ export * from './operations';
 export * from './order';
 export * from './props';
 export * from './react';
-export * from './styles';

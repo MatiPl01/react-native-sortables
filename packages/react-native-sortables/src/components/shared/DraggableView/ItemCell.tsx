@@ -5,52 +5,56 @@ import {
   StyleSheet,
   type ViewStyle
 } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
 
 import type {
   AnimatedStyleProp,
   LayoutAnimation
 } from '../../../integrations/reanimated';
-import type { MeasureCallback } from '../../../types';
+import { useItemDecorationStyle } from '../../../providers';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
 export type ItemCellProps = PropsWithChildren<{
+  itemKey: string;
+  isActive: SharedValue<boolean>;
+  activationAnimationProgress: SharedValue<number>;
   cellStyle: AnimatedStyleProp;
-  onMeasure?: MeasureCallback;
+  onLayout: (event: LayoutChangeEvent) => void;
   hidden?: boolean;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
 }>;
 
 export default function ItemCell({
+  activationAnimationProgress,
   cellStyle,
   children,
   entering,
   exiting,
   hidden,
-  onMeasure
+  isActive,
+  itemKey,
+  onLayout
 }: ItemCellProps) {
-  const onLayout =
-    onMeasure &&
-    (({
-      nativeEvent: {
-        layout: { height, width }
-      }
-    }: LayoutChangeEvent) => {
-      onMeasure(width, height);
-    });
+  const decorationStyle = useItemDecorationStyle(
+    itemKey,
+    isActive,
+    activationAnimationProgress
+  );
 
   return (
-    <Animated.View
-      style={[styles.decoration, cellStyle, hidden && styles.hidden]}>
+    <Animated.View style={cellStyle}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        // TODO - improve this onLayout - it gets called on Fabric when the active
-        // item is dragged around because the top/left offset of the parent is changed
-        // (it shouldn't be called for the child as the child dimensions and position
-        // don't change - seems to be a Fabric bug)
-        onLayout={onLayout}>
+        style={[
+          styles.fill,
+          styles.decoration,
+          decorationStyle,
+          hidden && styles.hidden
+        ]}
+        onLayout={hidden ? undefined : onLayout}>
         {children}
       </AnimatedOnLayoutView>
     </Animated.View>
@@ -72,13 +76,10 @@ const styles = StyleSheet.create({
       shadowRadius: 5
     }
   }),
+  fill: {
+    flex: 1
+  },
   hidden: {
-    // TODO - find a better way to hide the item
-    // (can't use opacity and transform because they are used in animated
-    // styles, which take precedence over the js style; can't change dimensions
-    // as they trigger layout transition in the child component)
-    // (we use top and left on paper for the initial item absolute position
-    // so we have to use something else to hide the item here)
-    marginLeft: -9999
+    left: -9999
   }
 });
