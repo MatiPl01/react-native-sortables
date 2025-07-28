@@ -79,12 +79,14 @@ export default function SortableContainer({
   }, [dimensionsAnimationType]);
 
   const innerContainerStyle = useAnimatedStyle(() => ({
-    ...(controlledContainerDimensions.height && {
-      minHeight: containerHeight.value
-    }),
-    ...(controlledContainerDimensions.width && {
-      minWidth: containerWidth.value
-    })
+    ...(controlledContainerDimensions.height &&
+      containerHeight.value !== null && {
+        height: containerHeight.value
+      }),
+    ...(controlledContainerDimensions.width &&
+      containerWidth.value !== null && {
+        width: containerWidth.value
+      })
   }));
 
   return (
