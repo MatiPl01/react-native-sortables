@@ -527,7 +527,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       updateStartScrollOffset?.(null);
       updateLayer?.(LayerState.INTERMEDIATE);
       haptics.medium();
-      console.log('handleDragEnd');
 
       stableOnDragEnd({
         fromIndex,
@@ -589,7 +588,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     ) => {
       'worklet';
       indexToKey.value = newOrder;
-      console.log('handleOrderChange', newOrder);
       haptics.light();
 
       stableOnOrderChange({
