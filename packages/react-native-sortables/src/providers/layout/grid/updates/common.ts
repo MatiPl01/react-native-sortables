@@ -232,7 +232,10 @@ export const createGridStrategy =
         0,
         Math.min(crossIndex, Math.floor((itemsCount - 1) / numGroups))
       );
-      const newIndex = Math.max(0, limitedCrossIndex * numGroups + mainIndex);
+      const newIndex = Math.min(
+        Math.max(0, limitedCrossIndex * numGroups + mainIndex),
+        itemsCount - 1
+      );
 
       if (
         newIndex === activeIndex ||
