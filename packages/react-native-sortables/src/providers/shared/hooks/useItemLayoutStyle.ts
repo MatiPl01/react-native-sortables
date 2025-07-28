@@ -10,7 +10,7 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import { IS_WEB, isFabric } from '../../../constants';
+import { HIDDEN_X_OFFSET, IS_WEB, isFabric } from '../../../constants';
 import {
   type AnimatedStyleProp,
   useMutableValue
@@ -25,7 +25,7 @@ const RELATIVE_STYLE: ViewStyle = {
 };
 
 const HIDDEN_STYLE: ViewStyle = {
-  left: -9999,
+  left: HIDDEN_X_OFFSET,
   position: 'absolute'
 };
 
@@ -183,13 +183,22 @@ export default function useItemLayoutStyle(
       }
 
       if (!position.value) {
+        console.log(key, 'set item position', itemPosition);
         position.value = itemPosition;
         return;
       }
 
       const positionChanged =
         prev?.itemPosition &&
-        areVectorsDifferent(prev.itemPosition, itemPosition);
+        areVectorsDifferent(prev.itemPosition, itemPosition, 1);
+
+      console.log(
+        key,
+        'positionChanged',
+        positionChanged,
+        prev?.itemPosition,
+        itemPosition
+      );
 
       if (activationProgress === 0) {
         if (dropStartValues.value) {

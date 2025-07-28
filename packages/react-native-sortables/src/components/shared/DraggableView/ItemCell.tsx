@@ -8,6 +8,7 @@ import {
 import type { SharedValue } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
 
+import { HIDDEN_X_OFFSET } from '../../../constants';
 import type {
   AnimatedStyleProp,
   LayoutAnimation
@@ -75,8 +76,11 @@ const styles = StyleSheet.create({
     }
   }),
   hidden: {
-    maxHeight: 0,
-    maxWidth: 0,
-    overflow: 'hidden'
+    // We change the x position to hide items when teleported (we can't use
+    // non-layout props like opacity as they are sometimes not updated via
+    // Reanimated on the Old Architecture; we also can't use any props that
+    // affect item dimensions, etc., so the safest way is to put the item
+    // far away from the viewport to hide it)
+    left: HIDDEN_X_OFFSET
   }
 });

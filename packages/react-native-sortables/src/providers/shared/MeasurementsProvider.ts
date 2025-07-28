@@ -40,6 +40,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const handleItemMeasurement = useStableCallback(
     (key: string, dimensions: Dimensions) => {
+      console.log('handleItemMeasurement', key, dimensions);
       const prevDimensions = previousItemDimensionsRef.current[key];
 
       const { height: isHeightControlled, width: isWidthControlled } =

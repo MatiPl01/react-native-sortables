@@ -11,6 +11,7 @@ import {
   GridLayoutProvider,
   OrderUpdaterComponent,
   SharedProvider,
+  useCommonValuesContext,
   useGridLayoutContext,
   useMeasurementsContext,
   useStrategyKey
@@ -175,6 +176,7 @@ function SortableGridInner<I>({
   rowHeight,
   ...containerProps
 }: SortableGridInnerProps<I>) {
+  const { usesAbsoluteLayout } = useCommonValuesContext();
   const { mainGroupSize } = useGridLayoutContext();
   const { handleContainerMeasurement } = useMeasurementsContext();
 
@@ -183,12 +185,10 @@ function SortableGridInner<I>({
     height: isVertical
       ? undefined
       : groups * (rowHeight + rowGap.value) - rowGap.value,
-    ...(IS_WEB || mainGroupSize.value
+    ...(IS_WEB || (mainGroupSize.value && usesAbsoluteLayout.value)
       ? {
-          columnGap: columnGap.value,
           marginHorizontal: 0,
-          marginVertical: 0,
-          rowGap: rowGap.value
+          marginVertical: 0
         }
       : {
           marginHorizontal: -columnGap.value / 2,
@@ -206,7 +206,7 @@ function SortableGridInner<I>({
   } else {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     animatedItemStyle = useAnimatedStyle(() => {
-      if (!mainGroupSize.value) {
+      if (!mainGroupSize.value || !usesAbsoluteLayout.value) {
         return {
           flexBasis: `${100 / groups}%`,
           paddingHorizontal: columnGap.value / 2,
