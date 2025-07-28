@@ -91,6 +91,10 @@ const routes: Routes = {
             Component: SortableGrid.tests.HidingItemsExample,
             name: 'Hiding Items'
           },
+          InputFocus: {
+            Component: SortableGrid.tests.InputFocusExample,
+            name: 'Input Focus'
+          },
           ...(IS_IOS && {
             MaxOverscrollOffset: {
               Component: SortableGrid.tests.MaxOverscrollOffsetExample,
