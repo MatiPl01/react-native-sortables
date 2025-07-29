@@ -43,9 +43,16 @@ export const areValuesDifferent = (
   return dim1 !== dim2;
 };
 
-export const areVectorsDifferent = (vec1: Vector, vec2: Vector): boolean => {
+export const areVectorsDifferent = (
+  vec1: Vector,
+  vec2: Vector,
+  eps?: number
+): boolean => {
   'worklet';
-  return vec1.x !== vec2.x || vec1.y !== vec2.y;
+  return (
+    areValuesDifferent(vec1.x, vec2.x, eps) ||
+    areValuesDifferent(vec1.y, vec2.y, eps)
+  );
 };
 
 export const haveEqualPropValues = <T extends AnyRecord>(

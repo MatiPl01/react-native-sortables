@@ -45,7 +45,7 @@ export const calculateLayout = ({
 
     // Return null if the item is not yet measured or the item main size
     // is different than the main group size (main size must be always the same)
-    if (crossItemSize === undefined) {
+    if (crossItemSize === null) {
       return null;
     }
 

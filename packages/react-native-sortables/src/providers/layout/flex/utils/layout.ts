@@ -2,6 +2,7 @@ import { IS_WEB } from '../../../../constants';
 import type {
   AlignContent,
   AlignItems,
+  ControlledSizes,
   Direction,
   FlexAlignments,
   FlexLayout,
@@ -15,8 +16,8 @@ type AxisDirections = { cross: Direction; main: Direction };
 
 const createGroups = (
   indexToKey: Array<string>,
-  mainItemSizes: number | Record<string, number>,
-  crossItemSizes: number | Record<string, number>,
+  mainItemSizes: ControlledSizes,
+  crossItemSizes: ControlledSizes,
   gap: number,
   groupMainSizeLimit: number
 ): null | {
@@ -34,7 +35,7 @@ const createGroups = (
   for (const key of indexToKey) {
     const mainItemDimension = resolveDimension(mainItemSizes, key);
     const crossItemDimension = resolveDimension(crossItemSizes, key);
-    if (mainItemDimension === undefined || crossItemDimension === undefined) {
+    if (mainItemDimension === null || crossItemDimension === null) {
       return null;
     }
 
@@ -140,8 +141,8 @@ const calculateAlignment = (
 const handleLayoutCalculation = (
   groups: Array<Array<string>>,
   crossAxisGroupSizes: Array<number>,
-  mainItemSizes: number | Record<string, number>,
-  crossItemSizes: number | Record<string, number>,
+  mainItemSizes: ControlledSizes,
+  crossItemSizes: ControlledSizes,
   gaps: FlexLayoutProps['gaps'],
   axisDirections: AxisDirections,
   { alignContent, alignItems, justifyContent }: FlexAlignments,
@@ -207,7 +208,7 @@ const handleLayoutCalculation = (
 
     for (const key of group) {
       const mainItemSize = resolveDimension(mainItemSizes, key);
-      if (mainItemSize === undefined) {
+      if (mainItemSize === null) {
         return null;
       }
       mainAxisGroupItemSizes.push(mainItemSize);
@@ -241,7 +242,7 @@ const handleLayoutCalculation = (
       // position items in groups on the cross axis
       const key = group[j]!;
       const crossItemSize = resolveDimension(crossItemSizes, key);
-      if (crossItemSize === undefined) {
+      if (crossItemSize === null) {
         return null;
       }
 

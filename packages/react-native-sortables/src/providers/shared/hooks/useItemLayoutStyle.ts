@@ -10,7 +10,7 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import { IS_WEB, isFabric } from '../../../constants';
+import { HIDDEN_X_OFFSET, IS_WEB, isFabric } from '../../../constants';
 import {
   type AnimatedStyleProp,
   useMutableValue
@@ -25,7 +25,7 @@ const RELATIVE_STYLE: ViewStyle = {
 };
 
 const HIDDEN_STYLE: ViewStyle = {
-  left: -9999,
+  left: HIDDEN_X_OFFSET,
   position: 'absolute'
 };
 
@@ -90,7 +90,7 @@ function useItemLayoutStyleFabric(
   zIndex: SharedValue<number>
 ) {
   const { activeItemDropped, usesAbsoluteLayout } = useCommonValuesContext();
-  const isTransform = useMutableValue(false);
+  const transformStartPosition = useMutableValue<null | Vector>(null);
 
   useAnimatedReaction(
     () => ({
@@ -99,12 +99,17 @@ function useItemLayoutStyleFabric(
       layout: layoutPosition.value
     }),
     ({ current, dropped, layout }) => {
-      if (layout && current && areVectorsDifferent(layout, current)) {
+      if (
+        !transformStartPosition.value &&
+        layout &&
+        current &&
+        areVectorsDifferent(layout, current)
+      ) {
         // Switch to positioning via transform for every item which position
         // is being changed while one of the items is being dragged
-        isTransform.value = true;
+        transformStartPosition.value = current;
       } else if (dropped) {
-        isTransform.value = false;
+        transformStartPosition.value = null;
       }
     }
   );
@@ -118,16 +123,18 @@ function useItemLayoutStyleFabric(
       return HIDDEN_STYLE;
     }
 
+    const startPosition = transformStartPosition.value;
+
     return {
       position: 'absolute',
       zIndex: zIndex.value,
-      ...(isTransform.value
+      ...(startPosition
         ? {
-            left: 0,
-            top: 0,
+            left: startPosition.x,
+            top: startPosition.y,
             transform: [
-              { translateX: position.value.x },
-              { translateY: position.value.y }
+              { translateX: position.value.x - startPosition.x },
+              { translateY: position.value.y - startPosition.y }
             ]
           }
         : {
@@ -189,7 +196,7 @@ export default function useItemLayoutStyle(
 
       const positionChanged =
         prev?.itemPosition &&
-        areVectorsDifferent(prev.itemPosition, itemPosition);
+        areVectorsDifferent(prev.itemPosition, itemPosition, 1);
 
       if (activationProgress === 0) {
         if (dropStartValues.value) {

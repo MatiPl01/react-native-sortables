@@ -39,8 +39,8 @@ export default function InputFocusExample() {
 
   return (
     <KeyboardAvoidingView
-      behavior={IS_IOS ? 'height' : undefined}
-      keyboardVerticalOffset={100}
+      behavior={IS_IOS ? 'height' : 'padding'}
+      keyboardVerticalOffset={IS_IOS ? 100 : 80}
       style={styles.flex}>
       <ScrollScreen
         contentContainerStyle={styles.container}

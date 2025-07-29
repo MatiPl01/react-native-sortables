@@ -3,6 +3,7 @@ import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../../../../integrations/reanimated';
 import type {
+  ControlledSizes,
   Coordinate,
   Dimension,
   FlexLayout,
@@ -53,7 +54,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
   let mainDimension: Dimension;
   let crossDimension: Dimension;
   let mainGap: SharedValue<number>;
-  let mainItemSizes: SharedValue<number | Record<string, number>>;
+  let mainItemSizes: SharedValue<ControlledSizes>;
 
   if (isRow) {
     mainCoordinate = 'x';
@@ -306,7 +307,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
         mainItemSizes.value,
         currentItemKey
       );
-      if (!currentItemPosition || itemMainSize === undefined) return;
+      if (!currentItemPosition || itemMainSize === null) return;
 
       swapItemAfterOffset =
         currentItemPosition[mainCoordinate] + (isReverse ? 0 : itemMainSize);
@@ -322,7 +323,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
         mainItemSizes.value,
         nextItemKey
       );
-      if (!nextItemPosition || nextItemMainSize === undefined) break;
+      if (!nextItemPosition || nextItemMainSize === null) break;
 
       const currentItemMainAxisPosition = currentItemPosition[mainCoordinate];
       const nextItemMainAxisPosition = nextItemPosition[mainCoordinate];
@@ -375,7 +376,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
         mainItemSizes.value,
         currentItemKey
       );
-      if (!currentItemPosition || currentItemMainSize === undefined) return;
+      if (!currentItemPosition || currentItemMainSize === null) return;
 
       swapItemBeforeOffset =
         currentItemPosition[mainCoordinate] +
@@ -392,7 +393,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
         mainItemSizes.value,
         prevItemKey
       );
-      if (!prevItemPosition || prevItemMainSize === undefined) return;
+      if (!prevItemPosition || prevItemMainSize === null) return;
 
       const currentItemMainAxisPosition = currentItemPosition[mainCoordinate];
       const prevItemMainAxisPosition = prevItemPosition[mainCoordinate];

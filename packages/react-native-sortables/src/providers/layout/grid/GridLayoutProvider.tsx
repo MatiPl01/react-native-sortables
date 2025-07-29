@@ -74,9 +74,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   useAnimatedReaction(
     () => {
       if (!isVertical) {
-        // TODO - check if this is correct for horizontal grids and maybe don't
-        // require specifying rowHeight (and instead occupy the entire height
-        // of the container)
+        // TODO - maybe don't require specifying rowHeight (and instead
+        // occupy the entire height of the container)
         return rowHeight ?? null;
       }
 
