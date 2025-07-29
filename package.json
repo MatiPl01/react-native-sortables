@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "devDependencies": {
     "@types/eslint": "^9.6.1",
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.14.9",
     "eslint": "^9.28.0",
     "eslint-config-react-native-matipl01": "^3.2.0",
