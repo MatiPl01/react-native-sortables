@@ -1,4 +1,7 @@
 {
   "extends": "../app/tsconfig.json",
-  "include": ["index.js"]
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["index.js", "react-native.config.js"]
 }
