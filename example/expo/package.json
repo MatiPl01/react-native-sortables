@@ -7,7 +7,7 @@
     "react": "19.0.0",
     "react-native": "0.79.5",
     "react-native-gesture-handler": "~2.24.0",
-    "react-native-reanimated": "~3.17.4"
+    "react-native-reanimated": "patch:react-native-reanimated@npm%3A3.19.0#~/.yarn/patches/react-native-reanimated-npm-3.19.0-0ecc169167.patch"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
