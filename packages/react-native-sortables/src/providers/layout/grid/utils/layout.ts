@@ -45,6 +45,7 @@ export const calculateLayout = (
 
   for (const [itemIndex, itemKey] of indexToKey.entries()) {
     const crossItemSize = itemDimensions[itemKey]?.[crossDimension];
+    console.log('crossItemSize', itemKey, crossItemSize);
 
     // Return if the item is not yet measured
     if (crossItemSize === undefined) {
@@ -69,6 +70,12 @@ export const calculateLayout = (
   }
 
   const lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
+
+  // TODO - clean this up
+  if (activeItemKey) {
+    const newActivePosition = itemPositions[activeItemKey]?.[crossCoordinate];
+    console.log('newActivePosition', activeItemKey, newActivePosition);
+  }
 
   return {
     calculatedDimensions: {

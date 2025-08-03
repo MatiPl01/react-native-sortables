@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
 import { SortableFlexCard, SortableGridCard } from '@/components';
-import { IS_WEB } from '@/constants';
+import { IS_IOS, IS_WEB } from '@/constants';
 import * as SortableFlex from '@/examples/SortableFlex';
 import * as SortableGrid from '@/examples/SortableGrid';
 
@@ -76,7 +76,18 @@ const routes: Routes = {
             StaggerAnimation: {
               Component: SortableGrid.miscellaneous.StaggerAnimationExample,
               name: 'Stagger Animation'
-            }
+            },
+            CollapsibleItems: {
+              Component: SortableGrid.miscellaneous.CollapsibleItemsExample,
+              name: 'Collapsible Items'
+            },
+            ...(IS_IOS && {
+              MaxOverscrollOffset: {
+                Component:
+                  SortableGrid.miscellaneous.MaxOverscrollOffsetExample,
+                name: 'Max Overscroll Offset'
+              }
+            })
           }
         }
       }),
@@ -86,10 +97,6 @@ const routes: Routes = {
           BottomTabsNavigator: {
             Component: SortableGrid.tests.BottomTabsNavigatorExample,
             name: 'Bottom Tabs Navigator'
-          },
-          MaxOverscrollOffset: {
-            Component: SortableGrid.tests.MaxOverscrollOffsetExample,
-            name: 'Max Overscroll Offset'
           }
         }
       }
