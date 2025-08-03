@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "react-native": "0.80.0",
+    "react-native-reanimated": "3.19.0",
     "react-native-sortables": "workspace:*"
   },
   "installConfig": {

@@ -4,15 +4,14 @@
  */
 const path = require('path');
 
-const rootDir = path.resolve(__dirname, '../..');
 const appDir = path.resolve(__dirname, '../app');
 
 module.exports = function (api) {
   api.cache(true);
   return {
-    extends: path.join(rootDir, 'babel.config.cjs'),
     presets: ['babel-preset-expo'],
     plugins: [
+      '@babel/plugin-transform-export-namespace-from',
       [
         'module-resolver',
         {
@@ -23,7 +22,8 @@ module.exports = function (api) {
             '@': path.join(appDir, 'src')
           }
         }
-      ]
+      ],
+      'react-native-worklets/plugin'
     ]
   };
 };
