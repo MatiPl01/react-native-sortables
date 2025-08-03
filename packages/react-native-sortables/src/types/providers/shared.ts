@@ -88,6 +88,7 @@ export type MeasurementsContextType = {
   removeItemMeasurements: (key: string) => void;
   handleContainerMeasurement: (width: number, height: number) => void;
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
+  resetMeasurements: () => void;
 };
 
 // AUTO SCROLL

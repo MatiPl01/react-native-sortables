@@ -13,6 +13,7 @@ import {
 import { HIDDEN_X_OFFSET, IS_WEB, isFabric } from '../../../constants';
 import {
   type AnimatedStyleProp,
+  useAnimatedDebounce,
   useMutableValue
 } from '../../../integrations/reanimated';
 import type { Vector } from '../../../types';
@@ -86,30 +87,20 @@ function useItemLayoutStylePaper(
  */
 function useItemLayoutStyleFabric(
   position: SharedValue<null | Vector>,
-  layoutPosition: SharedValue<null | Vector>,
   zIndex: SharedValue<number>
 ) {
   const { activeItemDropped, usesAbsoluteLayout } = useCommonValuesContext();
   const transformStartPosition = useMutableValue<null | Vector>(null);
+  const debounce = useAnimatedDebounce();
 
   useAnimatedReaction(
-    () => ({
-      current: position.value,
-      dropped: activeItemDropped.value,
-      layout: layoutPosition.value
-    }),
-    ({ current, dropped, layout }) => {
-      if (
-        !transformStartPosition.value &&
-        layout &&
-        current &&
-        areVectorsDifferent(layout, current)
-      ) {
-        // Switch to positioning via transform for every item which position
-        // is being changed while one of the items is being dragged
-        transformStartPosition.value = current;
-      } else if (dropped) {
-        transformStartPosition.value = null;
+    () => ({ current: position.value, dropped: activeItemDropped.value }),
+    ({ current, dropped }) => {
+      transformStartPosition.value ??= current;
+      if (dropped) {
+        debounce(() => {
+          transformStartPosition.value = null;
+        }, 50);
       }
     }
   );
@@ -259,7 +250,7 @@ export default function useItemLayoutStyle(
 
   return isFabric() || IS_WEB
     ? // eslint-disable-next-line react-hooks/rules-of-hooks
-      useItemLayoutStyleFabric(position, layoutPosition, zIndex)
+      useItemLayoutStyleFabric(position, zIndex)
     : // eslint-disable-next-line react-hooks/rules-of-hooks
       useItemLayoutStylePaper(position, zIndex);
 }
