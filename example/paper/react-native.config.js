@@ -4,5 +4,5 @@
 const { getDependencies } = require('../app/scripts/dependencies');
 
 module.exports = {
-  dependencies: getDependencies(__dirname)
+  dependencies: getDependencies(__dirname, ['react-native-worklets'])
 };

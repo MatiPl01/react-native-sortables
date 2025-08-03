@@ -1,13 +1,17 @@
 const path = require('path');
 
-function getDependencies(currentAppDir = '.') {
+function getDependencies(currentAppDir = '.', excludeCommon = []) {
   const commonAppDir = path.resolve(__dirname, '..');
   const commonAppPkg = require(path.resolve(commonAppDir, 'package.json'));
   const currentAppPkg = require(path.resolve(currentAppDir, 'package.json'));
 
+  const excludedCommonDeps = new Set(excludeCommon);
+
   const allDeps = new Set([
-    ...Object.keys(commonAppPkg.dependencies ?? {}),
-    ...Object.keys(commonAppPkg.devDependencies ?? {}),
+    ...[
+      ...Object.keys(commonAppPkg.dependencies ?? {}),
+      ...Object.keys(commonAppPkg.devDependencies ?? {})
+    ].filter(dep => !excludedCommonDeps.has(dep)),
     ...Object.keys(currentAppPkg.dependencies ?? {}),
     ...Object.keys(currentAppPkg.devDependencies ?? {})
   ]);
