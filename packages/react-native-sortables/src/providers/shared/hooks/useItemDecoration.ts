@@ -9,7 +9,7 @@ import {
 import { IS_WEB } from '../../../constants';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
-export default function useItemDecorationValues(
+export default function useItemDecoration(
   key: string,
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>

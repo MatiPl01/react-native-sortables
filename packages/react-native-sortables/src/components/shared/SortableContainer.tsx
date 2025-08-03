@@ -62,11 +62,9 @@ export default function SortableContainer({
         ? withTiming(value)
         : value;
 
-    const ctrl = controlledContainerDimensions.value;
-
     return {
       height: maybeAnimate(
-        ctrl.height ? containerHeight.value : null,
+        controlledContainerDimensions.height ? containerHeight.value : null,
         animateWorklet
       ),
       overflow:
@@ -74,20 +72,22 @@ export default function SortableContainer({
           ? 'visible'
           : overflow,
       width: maybeAnimate(
-        ctrl.width ? containerWidth.value : null,
+        controlledContainerDimensions.width ? containerWidth.value : null,
         animateWorklet
       )
     };
   }, [dimensionsAnimationType]);
 
-  const innerContainerStyle = useAnimatedStyle(() => {
-    const ctrl = controlledContainerDimensions.value;
-
-    return {
-      ...(ctrl.height && { minHeight: containerHeight.value }),
-      ...(ctrl.width && { minWidth: containerWidth.value })
-    };
-  });
+  const innerContainerStyle = useAnimatedStyle(() => ({
+    ...(controlledContainerDimensions.height &&
+      containerHeight.value !== null && {
+        height: containerHeight.value
+      }),
+    ...(controlledContainerDimensions.width &&
+      containerWidth.value !== null && {
+        width: containerWidth.value
+      })
+  }));
 
   return (
     <Animated.View

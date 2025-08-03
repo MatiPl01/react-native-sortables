@@ -5,54 +5,82 @@ import {
   StyleSheet,
   type ViewStyle
 } from 'react-native';
-import Animated from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue
+} from 'react-native-reanimated';
 
+import { HIDDEN_X_OFFSET } from '../../../constants';
 import type {
   AnimatedStyleProp,
   LayoutAnimation
 } from '../../../integrations/reanimated';
-import type { MeasureCallback } from '../../../types';
+import { useCommonValuesContext, useItemDecoration } from '../../../providers';
+import type { Dimensions } from '../../../types';
+import { resolveDimension } from '../../../utils';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
 export type ItemCellProps = PropsWithChildren<{
+  itemKey: string;
+  isActive: SharedValue<boolean>;
+  activationAnimationProgress: SharedValue<number>;
   cellStyle: AnimatedStyleProp;
-  onMeasure: MeasureCallback;
+  onLayout: (event: LayoutChangeEvent) => void;
   hidden?: boolean;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
 }>;
 
 export default function ItemCell({
+  activationAnimationProgress,
   cellStyle,
   children,
   entering,
   exiting,
   hidden,
-  onMeasure
+  isActive,
+  itemKey,
+  onLayout
 }: ItemCellProps) {
-  const onLayout = hidden
-    ? undefined
-    : ({
-        nativeEvent: {
-          layout: { height, width }
-        }
-      }: LayoutChangeEvent) => {
-        onMeasure(width, height);
-      };
+  const { controlledItemDimensions, itemHeights, itemWidths } =
+    useCommonValuesContext();
+
+  const decoration = useItemDecoration(
+    itemKey,
+    isActive,
+    activationAnimationProgress
+  );
+
+  const controlledDimensions = useDerivedValue(() => {
+    const result: Partial<Dimensions> = {};
+    if (controlledItemDimensions.width) {
+      result.width = resolveDimension(itemWidths.value, itemKey) ?? undefined;
+    }
+    if (controlledItemDimensions.height) {
+      result.height = resolveDimension(itemHeights.value, itemKey) ?? undefined;
+    }
+    return result;
+  });
+
+  const decorationStyle = useAnimatedStyle(() => decoration.value);
+  const dimensionsStyle = useAnimatedStyle(() => controlledDimensions.value);
 
   return (
-    <AnimatedOnLayoutView
-      style={[styles.decoration, cellStyle, hidden && styles.hidden]}
-      onLayout={onLayout}>
-      {/* TODO - remove itemEntering and itemExiting layout animation in sortables v2 */}
-      {entering || exiting ? (
-        <Animated.View entering={entering} exiting={exiting}>
-          {children}
-        </Animated.View>
-      ) : (
-        children
-      )}
-    </AnimatedOnLayoutView>
+    <Animated.View style={cellStyle}>
+      <AnimatedOnLayoutView
+        entering={entering}
+        exiting={exiting}
+        style={[
+          styles.decoration,
+          decorationStyle,
+          dimensionsStyle,
+          hidden && styles.hidden
+        ]}
+        onLayout={hidden ? undefined : onLayout}>
+        {children}
+      </AnimatedOnLayoutView>
+    </Animated.View>
   );
 }
 
@@ -69,15 +97,17 @@ const styles = StyleSheet.create({
       },
       shadowOpacity: 1,
       shadowRadius: 5
+    },
+    web: {
+      flex: 1
     }
   }),
   hidden: {
-    // TODO - find a better way to hide the item
-    // (can't use opacity and transform because they are used in animated
-    // styles, which take precedence over the js style; can't change dimensions
-    // as they trigger layout transition in the child component)
-    // (we use top and left on paper for the initial item absolute position
-    // so we have to use something else to hide the item here)
-    marginLeft: -9999
+    // We change the x position to hide items when teleported (we can't use
+    // non-layout props like opacity as they are sometimes not updated via
+    // Reanimated on the Old Architecture; we also can't use any props that
+    // affect item dimensions, etc., so the safest way is to put the item
+    // far away from the viewport to hide it)
+    left: HIDDEN_X_OFFSET
   }
 });

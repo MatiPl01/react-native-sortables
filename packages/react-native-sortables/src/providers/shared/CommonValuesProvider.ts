@@ -1,6 +1,5 @@
 import { type PropsWithChildren, useEffect, useMemo, useRef } from 'react';
 import type { View } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
 
 import type { Animatable } from '../../integrations/reanimated';
@@ -12,7 +11,8 @@ import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
   CommonValuesContextType,
-  ControlledContainerDimensions,
+  ControlledDimensions,
+  ControlledSizes,
   Dimensions,
   ItemDragSettings,
   ItemsLayoutTransitionMode,
@@ -31,7 +31,8 @@ type CommonValuesProviderProps = PropsWithChildren<
       sortEnabled: Animatable<boolean>;
       customHandle: boolean;
       itemKeys: Array<string>;
-      controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+      controlledContainerDimensions: ControlledDimensions;
+      controlledItemDimensions: ControlledDimensions;
       itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
     }
 >;
@@ -46,6 +47,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     activeItemScale: _activeItemScale,
     activeItemShadowOpacity: _activeItemShadowOpacity,
     controlledContainerDimensions,
+    controlledItemDimensions,
     customHandle,
     dragActivationDelay: _dragActivationDelay,
     dragActivationFailOffset: _dragActivationFailOffset,
@@ -74,7 +76,12 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // DIMENSIONS
     const containerWidth = useMutableValue<null | number>(null);
     const containerHeight = useMutableValue<null | number>(null);
-    const itemDimensions = useMutableValue<Record<string, Dimensions>>({});
+    const itemWidths = useMutableValue<ControlledSizes>(
+      controlledItemDimensions.width ? null : {}
+    );
+    const itemHeights = useMutableValue<ControlledSizes>(
+      controlledItemDimensions.height ? null : {}
+    );
     const activeItemDimensions = useMutableValue<Dimensions | null>(null);
 
     // DRAG STATE
@@ -144,6 +151,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         containerRef,
         containerWidth,
         controlledContainerDimensions,
+        controlledItemDimensions,
         customHandle,
         dragActivationDelay,
         dragActivationFailOffset,
@@ -153,9 +161,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         inactiveItemOpacity,
         inactiveItemScale,
         indexToKey,
-        itemDimensions,
+        itemHeights,
         itemPositions,
         itemsLayoutTransitionMode,
+        itemWidths,
         keyToIndex,
         prevActiveItemKey,
         shouldAnimateLayout,

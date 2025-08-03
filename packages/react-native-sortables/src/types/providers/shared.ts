@@ -18,7 +18,7 @@ import type {
   DebugRectUpdater,
   DebugViews
 } from '../debug';
-import type { Dimensions, Vector } from '../layout/shared';
+import type { ControlledSizes, Dimensions, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
@@ -29,7 +29,7 @@ import type { DragActivationState, LayerState } from '../state';
 
 // COMMON VALUES
 
-export type ControlledContainerDimensions = { width: boolean; height: boolean };
+export type ControlledDimensions = { width: boolean; height: boolean };
 
 // COMMON VALUES
 
@@ -56,10 +56,12 @@ export type CommonValuesContextType =
       activeItemPosition: SharedValue<null | Vector>;
 
       // DIMENSIONS
-      controlledContainerDimensions: SharedValue<ControlledContainerDimensions>;
+      controlledContainerDimensions: ControlledDimensions;
+      controlledItemDimensions: ControlledDimensions;
       containerWidth: SharedValue<null | number>;
       containerHeight: SharedValue<null | number>;
-      itemDimensions: SharedValue<Record<string, Dimensions>>;
+      itemWidths: SharedValue<ControlledSizes>;
+      itemHeights: SharedValue<ControlledSizes>;
       activeItemDimensions: SharedValue<Dimensions | null>;
 
       // DRAG STATE

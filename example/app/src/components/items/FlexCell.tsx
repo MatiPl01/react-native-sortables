@@ -37,7 +37,9 @@ export default function FlexCell({
         { height }
       ]}>
       {typeof children === 'string' ? (
-        <Text style={[sharedCellStyles.cellText, cellSizeStyles.cellText]}>
+        <Text
+          numberOfLines={1}
+          style={[sharedCellStyles.cellText, cellSizeStyles.cellText]}>
           {children}
         </Text>
       ) : (

@@ -3,6 +3,7 @@ import type { View } from 'react-native';
 import type { AnimatedRef, MeasuredDimensions } from 'react-native-reanimated';
 import { measure, runOnUI } from 'react-native-reanimated';
 
+import { HIDDEN_X_OFFSET } from '../../constants';
 import {
   useAnimatedDebounce,
   useMutableValue
@@ -71,10 +72,16 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
       }
 
       activeHandleMeasurements.value = handleMeasurements;
+
       const { x: itemX, y: itemY } = itemPosition;
+      const { pageX: handleX, pageY: handleY } = handleMeasurements;
+      const { pageX: containerX, pageY: containerY } = containerMeasurements;
+
       activeHandleOffset.value = {
-        x: handleMeasurements.pageX - containerMeasurements.pageX - itemX,
-        y: handleMeasurements.pageY - containerMeasurements.pageY - itemY
+        // The handle might be measured when the item is already hidden (put outside
+        // of the viewport) so we need to adjust the measured x position accordingly
+        x: ((handleX + HIDDEN_X_OFFSET) % HIDDEN_X_OFFSET) - containerX - itemX,
+        y: handleY - containerY - itemY
       };
     },
     [

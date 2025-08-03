@@ -1,5 +1,6 @@
 export * from './arrays';
 export * from './children';
+export * from './dimensions';
 export * from './equality';
 export * from './keys';
 export * from './layout';
@@ -10,4 +11,3 @@ export * from './operations';
 export * from './order';
 export * from './props';
 export * from './react';
-export * from './styles';

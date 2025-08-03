@@ -1,5 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import { Fragment, memo, useEffect, useState } from 'react';
+import { Fragment, memo, useCallback, useEffect, useState } from 'react';
+import type { LayoutChangeEvent } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
   LayoutAnimationConfig,
@@ -55,14 +56,14 @@ function DraggableView({
   const itemStyles = useItemStyles(key, isActive, activationAnimationProgress);
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
-  useEffect(
-    () =>
+  useEffect(() => {
+    return () => {
+      removeItemMeasurements(key);
       runOnUI(() => {
         handleDragEnd(key, activationAnimationProgress);
-        removeItemMeasurements(key);
-      }),
-    [activationAnimationProgress, handleDragEnd, key, removeItemMeasurements]
-  );
+      })();
+    };
+  }, [activationAnimationProgress, handleDragEnd, key, removeItemMeasurements]);
 
   useEffect(() => {
     if (!portalContext) {
@@ -82,8 +83,14 @@ function DraggableView({
     };
   }, [portalContext, containerId, key]);
 
-  const onMeasure = (width: number, height: number) =>
-    handleItemMeasurement(key, { height, width });
+  const onLayout = useCallback(
+    ({
+      nativeEvent: {
+        layout: { height, width }
+      }
+    }: LayoutChangeEvent) => handleItemMeasurement(key, { height, width }),
+    [handleItemMeasurement, key]
+  );
 
   const withItemContext = (component: ReactNode) => (
     <ItemContextProvider
@@ -95,13 +102,20 @@ function DraggableView({
     </ItemContextProvider>
   );
 
+  const sharedCellProps = {
+    activationAnimationProgress,
+    isActive,
+    itemKey: key,
+    onLayout
+  };
+
   const renderItemCell = (hidden = false) => {
     const innerComponent = (
       <ItemCell
         {...layoutAnimations}
+        {...sharedCellProps}
         cellStyle={[style, itemStyles]}
-        hidden={hidden}
-        onMeasure={onMeasure}>
+        hidden={hidden}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}
         </LayoutAnimationConfig>
@@ -132,12 +146,7 @@ function DraggableView({
     // be accessible otherwise, when the item is rendered in the portal outlet
     <CommonValuesContextProvider value={commonValuesContext}>
       {withItemContext(
-        <TeleportedItemCell
-          activationAnimationProgress={activationAnimationProgress}
-          baseCellStyle={style}
-          isActive={isActive}
-          itemKey={key}
-          onMeasure={onMeasure}>
+        <TeleportedItemCell {...sharedCellProps} cellStyle={style}>
           {children}
         </TeleportedItemCell>
       )}

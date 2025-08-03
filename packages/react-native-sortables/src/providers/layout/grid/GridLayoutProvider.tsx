@@ -44,8 +44,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const {
     containerWidth,
     indexToKey,
-    itemDimensions,
+    itemHeights,
     itemPositions,
+    itemWidths,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
@@ -73,9 +74,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   useAnimatedReaction(
     () => {
       if (!isVertical) {
-        // TODO - check if this is correct for horizontal grids and maybe don't
-        // require specifying rowHeight (and instead occupy the entire height
-        // of the container)
+        // TODO - maybe don't require specifying rowHeight (and instead
+        // occupy the entire height of the container)
         return rowHeight ?? null;
       }
 
@@ -89,6 +89,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       }
 
       mainGroupSize.value = value;
+
+      if (isVertical) {
+        itemWidths.value = value;
+      } else {
+        itemHeights.value = value;
+      }
 
       // DEBUG ONLY
       if (debugMainGapRects) {
@@ -119,7 +125,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           },
           indexToKey: idxToKey.value,
           isVertical,
-          itemDimensions: itemDimensions.value,
+          itemHeights: itemHeights.value,
+          itemWidths: itemWidths.value,
           mainGroupSize: mainGroupSize.value,
           numGroups
         }),
@@ -134,7 +141,15 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           );
         }
       ),
-    [mainGroupSize, mainGap, crossGap, numGroups, isVertical, itemDimensions]
+    [
+      mainGroupSize,
+      mainGap,
+      crossGap,
+      numGroups,
+      isVertical,
+      itemHeights,
+      itemWidths
+    ]
   );
 
   const useGridLayout = useCallback(
@@ -147,12 +162,21 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           },
           indexToKey: idxToKey.value,
           isVertical,
-          itemDimensions: itemDimensions.value,
+          itemHeights: itemHeights.value,
+          itemWidths: itemWidths.value,
           mainGroupSize: mainGroupSize.value,
           numGroups
         })
       ),
-    [mainGroupSize, mainGap, crossGap, numGroups, isVertical, itemDimensions]
+    [
+      mainGroupSize,
+      mainGap,
+      crossGap,
+      numGroups,
+      isVertical,
+      itemHeights,
+      itemWidths
+    ]
   );
 
   // GRID LAYOUT UPDATER
@@ -166,7 +190,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     // Update item positions
     itemPositions.value = layout.itemPositions;
     // Update controlled container dimensions
-    applyControlledContainerDimensions(layout.calculatedDimensions);
+    applyControlledContainerDimensions(layout.controlledContainerDimensions);
 
     // DEBUG ONLY
     if (debugCrossGapRects) {
