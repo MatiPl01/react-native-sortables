@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { DimensionValue } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
@@ -175,7 +175,10 @@ function SortableGridInner<I>({
   rowHeight,
   ...containerProps
 }: SortableGridInnerProps<I>) {
-  const { handleContainerMeasurement } = useMeasurementsContext();
+  const { handleContainerMeasurement, resetMeasurements } =
+    useMeasurementsContext();
+
+  useEffect(resetMeasurements, [groups, resetMeasurements]);
 
   const animatedInnerStyle = useAnimatedStyle(() =>
     isVertical

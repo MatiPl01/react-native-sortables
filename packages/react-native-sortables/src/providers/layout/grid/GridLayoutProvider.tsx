@@ -89,7 +89,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       }
 
       mainGroupSize.value = value;
-
       if (isVertical) {
         itemWidths.value = value;
       } else {

@@ -1,7 +1,7 @@
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   LinearTransition,
   useAnimatedRef
@@ -9,7 +9,13 @@ import Animated, {
 import type { OverDrag, SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { OptionGroup, SimpleDropdown, Spacer, TabSelector } from '@/components';
+import {
+  CheckBox,
+  OptionGroup,
+  SimpleDropdown,
+  Spacer,
+  TabSelector
+} from '@/components';
 import { IS_WEB } from '@/constants';
 import { useBottomNavBarHeight } from '@/providers';
 import { colors, flex, radius, sizes, spacing, style, text } from '@/theme';
@@ -24,12 +30,19 @@ export default function DragHandleExample() {
   const bottomNavBarHeight = useBottomNavBarHeight();
   const [columns, setColumns] = useState(1);
   const [overDrag, setOverDrag] = useState<OverDrag>('both');
+  const [changeHeight, setChangeHeight] = useState(false);
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
+
+  const cardHeight = changeHeight ? columns * sizes.md : sizes.lg;
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
-      <Animated.View layout={LinearTransition} style={styles.card}>
-        <Text style={styles.text}>{item}</Text>
+      <Animated.View
+        layout={LinearTransition}
+        style={[styles.card, { height: cardHeight }]}>
+        <Animated.Text layout={LinearTransition} style={styles.text}>
+          {item}
+        </Animated.Text>
         <Animated.View layout={LinearTransition}>
           <Sortable.Handle>
             <FontAwesomeIcon color={colors.white} icon={faGripVertical} />
@@ -37,7 +50,7 @@ export default function DragHandleExample() {
         </Animated.View>
       </Animated.View>
     ),
-    []
+    [cardHeight]
   );
 
   return (
@@ -57,6 +70,9 @@ export default function DragHandleExample() {
             onSelect={setOverDrag}
           />
         </OptionGroup>
+        <OptionGroup label='change height with columns'>
+          <CheckBox selected={changeHeight} onChange={setChangeHeight} />
+        </OptionGroup>
       </View>
       <Animated.ScrollView
         contentContainerStyle={[IS_WEB && style.webContent, styles.container]}
@@ -70,6 +86,7 @@ export default function DragHandleExample() {
           dimensionsAnimationType='layout'
           dragActivationDelay={0}
           overDrag={overDrag}
+          overflow='visible'
           renderItem={renderItem}
           rowGap={10}
           scrollableRef={scrollableRef}
@@ -87,7 +104,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#36877F',
     borderRadius: radius.md,
     flexDirection: 'row',
-    height: sizes.lg,
     justifyContent: 'space-between',
     padding: spacing.md
   },

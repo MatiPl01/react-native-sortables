@@ -2475,7 +2475,7 @@ DEPENDENCIES:
   - "RNFlashList (from `../../../node_modules/@shopify/flash-list`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
-  - RNReanimated (from `../../../node_modules/react-native-reanimated`)
+  - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - SocketRocket (~> 0.7.1)
@@ -2640,7 +2640,7 @@ EXTERNAL SOURCES:
   RNReactNativeHapticFeedback:
     :path: "../../../node_modules/react-native-haptic-feedback"
   RNReanimated:
-    :path: "../../../node_modules/react-native-reanimated"
+    :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../../../node_modules/react-native-screens"
   RNSVG:
@@ -2725,7 +2725,7 @@ SPEC CHECKSUMS:
   RNFlashList: aad5ccddcbcdfe34dcca3524fdef1416abb32a55
   RNGestureHandler: 4babc0b2fdcf63e8ddcd86f3c1c3639972922f6b
   RNReactNativeHapticFeedback: eed9dfa61c409807a2c95860b45aaad085ccbbc9
-  RNReanimated: 4d57827f1d1619f662d1d94176fda2c11a2c7aa0
+  RNReanimated: ecffc26eddb9f122cd03f762f8ad93aefb37dd36
   RNScreens: f75a433d5966ab2b0570fa5e5e487f1c46488972
   RNSVG: 3446469442ca54ddf210d2a1b7c2b6eaecaca2c3
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

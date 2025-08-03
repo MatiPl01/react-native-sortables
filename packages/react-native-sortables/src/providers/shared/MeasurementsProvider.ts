@@ -35,6 +35,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     useMultiZoneContext() ?? {};
 
   const measuredItemsCount = useMutableValue(0);
+  const queuedMeasurements = useMutableValue<null | Set<string>>(null);
   const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
   const debounce = useAnimatedDebounce();
 
@@ -95,6 +96,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         // measured to reduce the number of times animated reactions are triggered
         if (measuredItemsCount.value === itemsCount) {
           const updateDimensions = () => {
+            queuedMeasurements.value = null;
             if (!isWidthControlled) itemWidths.modify();
             if (!isHeightControlled) itemHeights.modify();
           };
@@ -105,10 +107,20 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
             // unnecessary delays
             updateDimensions();
           } else {
-            // Otherwise, debounce the update if the number of items is not changed
-            // to reduce the number of updates if dimensions of items are changed
-            // many times within a short period of time
-            debounce(updateDimensions, 100);
+            // If all sortable container items' dimensions have changed, we can
+            // update dimensions immediately to avoid unnecessary delays (e.g. when
+            // someone creates collapsible items which change their height when the user
+            // starts dragging them)
+            queuedMeasurements.value ??= new Set();
+            queuedMeasurements.value.add(key);
+            if (queuedMeasurements.value.size === itemsCount) {
+              updateDimensions();
+            } else {
+              // In all other cases, debounce the update to reduce the number of
+              // updates if dimensions of items are changed many times within a
+              // short period of time
+              debounce(updateDimensions, 100);
+            }
           }
         }
       })();
@@ -182,12 +194,27 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     ]
   );
 
+  const resetMeasurements = useCallback(() => {
+    previousItemDimensionsRef.current = {};
+    runOnUI(() => {
+      measuredItemsCount.value = 0;
+      queuedMeasurements.value = null;
+      if (typeof itemWidths.value === 'object') {
+        itemWidths.value = {};
+      }
+      if (typeof itemHeights.value === 'object') {
+        itemHeights.value = {};
+      }
+    })();
+  }, [itemHeights, itemWidths, measuredItemsCount, queuedMeasurements]);
+
   return {
     value: {
       applyControlledContainerDimensions,
       handleContainerMeasurement,
       handleItemMeasurement,
-      removeItemMeasurements
+      removeItemMeasurements,
+      resetMeasurements
     }
   };
 });
