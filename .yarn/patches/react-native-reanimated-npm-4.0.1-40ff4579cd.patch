@@ -1,0 +1,24 @@
+diff --git a/lib/module/layoutReanimation/web/componentUtils.js b/lib/module/layoutReanimation/web/componentUtils.js
+index 558d20f1721d3ee84e61ea6abb98b611bbce1520..8f8d9fd7461a35bc9f543b997cf7b33113a44171 100644
+--- a/lib/module/layoutReanimation/web/componentUtils.js
++++ b/lib/module/layoutReanimation/web/componentUtils.js
+@@ -110,6 +110,7 @@ export function setElementAnimation(element, animationConfig, shouldSavePosition
+     element.style.animationDuration = `${duration}s`;
+     element.style.animationDelay = `${delay}s`;
+     element.style.animationTimingFunction = easing;
++    element.style.animationFillMode = "backwards";
+   };
+   if (animationConfig.animationType === LayoutAnimationType.ENTERING) {
+     // On chrome sometimes entering animations flicker. This is most likely caused by animation being interrupted
+diff --git a/src/layoutReanimation/web/componentUtils.ts b/src/layoutReanimation/web/componentUtils.ts
+index 7118949bc0f3ae223d7890cb860e688e75ad8f0d..aec1349be3798e9d1fde4fca08639c5ba97a9ebc 100644
+--- a/src/layoutReanimation/web/componentUtils.ts
++++ b/src/layoutReanimation/web/componentUtils.ts
+@@ -163,6 +163,7 @@ export function setElementAnimation(
+     element.style.animationDuration = `${duration}s`;
+     element.style.animationDelay = `${delay}s`;
+     element.style.animationTimingFunction = easing;
++    element.style.animationFillMode = "backwards";
+   };
+ 
+   if (animationConfig.animationType === LayoutAnimationType.ENTERING) {
