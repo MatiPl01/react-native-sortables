@@ -21,7 +21,7 @@ function createMetroConfig(defaultConfig, currentAppDir, options = {}) {
   config.resolver.disableHierarchicalLookup = true;
 
   if (excludeFromRoot.length > 0) {
-    config.resolver.blacklistRE = excludeFromRoot.map(
+    config.resolver.blockList = excludeFromRoot.map(
       m =>
         new RegExp(
           `^${escape(path.join(monorepoRoot, 'node_modules', m))}\\/.*$`
