@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "react-native": "0.80.0",
-    "react-native-reanimated": "patch:react-native-reanimated@npm%3A3.19.0#~/.yarn/patches/react-native-reanimated-npm-3.19.0-0ecc169167.patch",
-    "react-native-sortables": "workspace:*",
-    "react-native-worklets": "0.4.1"
+    "react-native-sortables": "workspace:*"
   },
   "installConfig": {
     "selfReferences": false

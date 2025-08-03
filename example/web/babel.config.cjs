@@ -22,7 +22,8 @@ module.exports = function (api) {
             '@': path.join(appDir, 'src')
           }
         }
-      ]
+      ],
+      'react-native-worklets/plugin'
     ]
   };
 };
