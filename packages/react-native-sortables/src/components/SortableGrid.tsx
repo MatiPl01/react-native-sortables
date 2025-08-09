@@ -8,13 +8,12 @@ import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
 import {
-  GRID_STRATEGIES,
-  GridLayoutProvider,
   OrderUpdaterComponent,
   SharedProvider,
   useMeasurementsContext,
   useStrategyKey
 } from '../providers';
+import { GRID_STRATEGIES, GridLayoutProvider } from '../providers/grid';
 import type {
   DropIndicatorSettings,
   SortableGridProps,
@@ -34,6 +33,7 @@ import { type DraggableViewProps } from './shared';
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
     rest: {
+      autoAdjustOnResizeDuringDrag,
       columnGap,
       columns,
       data,
@@ -105,6 +105,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
       itemKeys={itemKeys}
       onDragEnd={onDragEnd}>
       <GridLayoutProvider
+        autoAdjustOnResizeDuringDrag={autoAdjustOnResizeDuringDrag}
         columnGap={columnGapValue}
         isVertical={isVertical}
         numGroups={groups}

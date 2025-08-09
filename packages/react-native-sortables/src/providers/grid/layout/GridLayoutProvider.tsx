@@ -22,6 +22,7 @@ type GridLayoutProviderProps = PropsWithChildren<{
   numItems: number;
   numGroups: number;
   isVertical: boolean;
+  autoAdjustOnResizeDuringDrag: boolean;
   rowGap: Animatable<number>;
   columnGap: Animatable<number>;
   rowHeight?: number;
@@ -122,6 +123,13 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       numGroups
     }),
     (props, previousProps) => {
+      console.log(
+        'indexToKey change',
+        props.indexToKey !== previousProps?.indexToKey,
+        'heights change',
+        props.itemHeights,
+        previousProps?.itemHeights
+      );
       const layout = calculateLayout(props);
 
       // On web, animate layout only if parent container is not resized

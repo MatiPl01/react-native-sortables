@@ -9,14 +9,13 @@ import {
 } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import {
-  FLEX_STRATEGIES,
-  FlexLayoutProvider,
   OrderUpdaterComponent,
   SharedProvider,
   useCommonValuesContext,
   useMeasurementsContext,
   useStrategyKey
 } from '../providers';
+import { FLEX_STRATEGIES, FlexLayoutProvider } from '../providers/flex';
 import type { DropIndicatorSettings, SortableFlexProps } from '../types';
 import { getPropsWithDefaults, orderItems, validateChildren } from '../utils';
 import { DraggableView, SortableContainer } from './shared';
