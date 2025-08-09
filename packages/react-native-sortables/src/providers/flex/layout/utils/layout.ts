@@ -2,7 +2,7 @@ import { IS_WEB } from '../../../../constants';
 import type {
   AlignContent,
   AlignItems,
-  ControlledSizes,
+  ItemSizes,
   Direction,
   FlexAlignments,
   FlexLayout,
@@ -16,8 +16,8 @@ type AxisDirections = { cross: Direction; main: Direction };
 
 const createGroups = (
   indexToKey: Array<string>,
-  mainItemSizes: ControlledSizes,
-  crossItemSizes: ControlledSizes,
+  mainItemSizes: ItemSizes,
+  crossItemSizes: ItemSizes,
   gap: number,
   groupMainSizeLimit: number
 ): null | {
@@ -141,8 +141,8 @@ const calculateAlignment = (
 const handleLayoutCalculation = (
   groups: Array<Array<string>>,
   crossAxisGroupSizes: Array<number>,
-  mainItemSizes: ControlledSizes,
-  crossItemSizes: ControlledSizes,
+  mainItemSizes: ItemSizes,
+  crossItemSizes: ItemSizes,
   gaps: FlexLayoutProps['gaps'],
   axisDirections: AxisDirections,
   { alignContent, alignItems, justifyContent }: FlexAlignments,

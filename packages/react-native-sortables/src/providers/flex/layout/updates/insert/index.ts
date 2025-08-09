@@ -3,10 +3,10 @@ import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../../../../integrations/reanimated';
 import type {
-  ControlledSizes,
   Coordinate,
   Dimension,
   FlexLayout,
+  ItemSizes,
   SortStrategyFactory
 } from '../../../../../types';
 import {
@@ -53,7 +53,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
   let mainDimension: Dimension;
   let crossDimension: Dimension;
   let mainGap: SharedValue<number>;
-  let mainItemSizes: SharedValue<ControlledSizes>;
+  let mainItemSizes: SharedValue<ItemSizes>;
 
   if (isRow) {
     mainCoordinate = 'x';

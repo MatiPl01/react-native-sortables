@@ -1,6 +1,6 @@
-import type { ControlledSizes, Dimensions } from '../types';
+import type { ItemSizes, Dimensions } from '../types';
 
-export const resolveDimension = (dimension: ControlledSizes, key: string) => {
+export const resolveDimension = (dimension: ItemSizes, key: string) => {
   'worklet';
   return (
     dimension &&
@@ -10,8 +10,8 @@ export const resolveDimension = (dimension: ControlledSizes, key: string) => {
 
 export const getItemDimensions = (
   key: string,
-  itemWidths: ControlledSizes,
-  itemHeights: ControlledSizes
+  itemWidths: ItemSizes,
+  itemHeights: ItemSizes
 ): Dimensions | null => {
   'worklet';
   const itemWidth = resolveDimension(itemWidths, key);
