@@ -96,6 +96,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         // measured to reduce the number of times animated reactions are triggered
         if (measuredItemsCount.value === itemsCount) {
           const updateDimensions = () => {
+            debounce.cancel();
             queuedMeasurements.value = null;
             if (!isWidthControlled) itemWidths.modify();
             if (!isHeightControlled) itemHeights.modify();
@@ -119,7 +120,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
               // In all other cases, debounce the update to reduce the number of
               // updates if dimensions of items are changed many times within a
               // short period of time
-              debounce(updateDimensions, 100);
+              debounce.call(updateDimensions, 100);
             }
           }
         }
