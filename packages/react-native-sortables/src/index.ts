@@ -16,13 +16,13 @@ export {
   useCommonValuesContext,
   useCustomHandleContext,
   useDragContext,
-  useFlexLayoutContext,
-  useGridLayoutContext,
   useIsInPortalOutlet,
   useMeasurementsContext,
   usePortalContext,
   useZoneContext
 } from './providers';
+export { useFlexLayoutContext } from './providers/flex';
+export { useGridLayoutContext } from './providers/grid';
 export type {
   ActiveItemDroppedCallback,
   ActiveItemDroppedParams,
