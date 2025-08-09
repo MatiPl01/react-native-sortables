@@ -62,7 +62,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   // SMOOTH SCROLL POSITION UPDATER
   // Updates the scroll position smoothly
   // (quickly at first, then slower if the remaining distance is small)
-  const frameCallback = useFrameCallback(() => {
+  const frameCallbackFunction = useCallback(() => {
+    'worklet';
     const targetOffset = targetScrollOffset.value;
     if (!isFrameCallbackActive.value || targetOffset === null) {
       return;
@@ -96,7 +97,17 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       scrollTo(scrollableRef, 0, nextOffset, false);
     }
     prevScrollToOffset.value = nextOffset;
-  }, false);
+  }, [
+    isFrameCallbackActive,
+    isHorizontal,
+    prevScrollToOffset,
+    scrollableRef,
+    scrollOffset,
+    speed,
+    targetScrollOffset
+  ]);
+
+  const frameCallback = useFrameCallback(frameCallbackFunction, false);
 
   const toggleFrameCallback = useCallback(
     (isEnabled: boolean) => frameCallback.setActive(isEnabled),
