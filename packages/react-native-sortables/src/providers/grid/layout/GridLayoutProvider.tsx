@@ -4,10 +4,7 @@ import { useAnimatedReaction } from 'react-native-reanimated';
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type { Animatable } from '../../../integrations/reanimated';
-import {
-  useAnimatableValue,
-  useMutableValue
-} from '../../../integrations/reanimated';
+import { useAnimatableValue } from '../../../integrations/reanimated';
 import type { GridLayoutContextType } from '../../../types';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
@@ -60,13 +57,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const mainGap = isVertical ? columnGap : rowGap;
   const crossGap = isVertical ? rowGap : columnGap;
 
-  /**
-   * Size of the group of items determined by the parent container size.
-   * width - in vertical orientation (default) (columns are groups)
-   * height - in horizontal orientation (rows are groups)
-   */
-  const mainGroupSize = useMutableValue<null | number>(rowHeight ?? null);
-
   // MAIN GROUP SIZE UPDATER
   useAnimatedReaction(
     () => {
@@ -85,7 +75,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         return;
       }
 
-      mainGroupSize.value = value;
       if (isVertical) {
         itemWidths.value = value;
       } else {
@@ -119,27 +108,22 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       isVertical,
       itemHeights: itemHeights.value,
       itemWidths: itemWidths.value,
-      mainGroupSize: mainGroupSize.value,
       numGroups
     }),
     (props, previousProps) => {
-      console.log(
-        'indexToKey change',
-        props.indexToKey !== previousProps?.indexToKey,
-        'heights change',
-        props.itemHeights,
-        previousProps?.itemHeights
-      );
       const layout = calculateLayout(props);
 
       // On web, animate layout only if parent container is not resized
       // (e.g. skip animation when the browser window is resized)
       shouldAnimateLayout.value =
         !IS_WEB ||
-        !previousProps?.mainGroupSize ||
-        props.mainGroupSize === previousProps.mainGroupSize;
+        !previousProps?.itemHeights ||
+        !previousProps?.itemWidths ||
+        isVertical
+          ? props.itemWidths === previousProps?.itemWidths
+          : props.itemHeights === previousProps?.itemHeights;
 
-      if (!layout || mainGroupSize.value === null) {
+      if (!layout || !itemHeights.value || !itemWidths.value) {
         return;
       }
 
@@ -168,7 +152,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       crossGap,
       isVertical,
       mainGap,
-      mainGroupSize,
       numGroups
     }
   };

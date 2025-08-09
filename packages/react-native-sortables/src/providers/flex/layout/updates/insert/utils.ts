@@ -1,4 +1,4 @@
-import type { ControlledSizes } from '../../../../../types';
+import type { ItemSizes } from '../../../../../types';
 import { reorderInsert, resolveDimension } from '../../../../../utils';
 
 export type ItemGroupSwapProps = {
@@ -8,7 +8,7 @@ export type ItemGroupSwapProps = {
   groupSizeLimit: number;
   indexToKey: Array<string>;
   keyToIndex: Record<string, number>;
-  mainItemSizes: ControlledSizes;
+  mainItemSizes: ItemSizes;
   itemGroups: Array<Array<string>>;
   mainGap: number;
   fixedKeys: Record<string, boolean> | undefined;
@@ -35,7 +35,7 @@ const getGroupItemIndex = (
 
 export const getTotalGroupSize = (
   group: Array<string>,
-  mainItemSizes: ControlledSizes,
+  mainItemSizes: ItemSizes,
   gap: number
 ) => {
   'worklet';

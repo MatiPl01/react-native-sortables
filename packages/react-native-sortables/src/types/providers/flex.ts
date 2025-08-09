@@ -2,14 +2,6 @@ import type { SharedValue } from 'react-native-reanimated';
 
 import type { FlexDirection, FlexLayout } from '../layout';
 
-export type GridLayoutContextType = {
-  mainGroupSize: SharedValue<null | number>;
-  numGroups: number;
-  mainGap: SharedValue<number>;
-  crossGap: SharedValue<number>;
-  isVertical: boolean;
-};
-
 export type FlexLayoutContextType = {
   flexDirection: FlexDirection;
   columnGap: SharedValue<number>;
