@@ -21,9 +21,9 @@ type AnimatedHeightContainerProps = PropsWithChildren<
   DropIndicatorSettings & {
     dimensionsAnimationType: DimensionsAnimation;
     overflow: Overflow;
-    onLayout: (width: number, height: number) => void;
     debug?: boolean;
     style?: StyleProp<ViewStyle>;
+    onLayout: (width: number, height: number) => void;
   }
 >;
 
@@ -76,7 +76,7 @@ export default function SortableContainer({
         animateWorklet
       )
     };
-  }, [dimensionsAnimationType]);
+  });
 
   const innerContainerStyle = useAnimatedStyle(() => ({
     ...(controlledContainerDimensions.height &&

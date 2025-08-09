@@ -62,41 +62,52 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   // SMOOTH SCROLL POSITION UPDATER
   // Updates the scroll position smoothly
   // (quickly at first, then slower if the remaining distance is small)
-  const frameCallback = useFrameCallback(() => {
-    const targetOffset = targetScrollOffset.value;
-    if (!isFrameCallbackActive.value || targetOffset === null) {
-      return;
-    }
-    const currentOffset = scrollOffset.value;
-    const diff = targetOffset - currentOffset;
+  const frameCallback = useFrameCallback(
+    useCallback(() => {
+      const targetOffset = targetScrollOffset.value;
+      if (!isFrameCallbackActive.value || targetOffset === null) {
+        return;
+      }
+      const currentOffset = scrollOffset.value;
+      const diff = targetOffset - currentOffset;
 
-    if (Math.abs(diff) < OFFSET_EPS) {
-      targetScrollOffset.value = null;
-      return;
-    }
+      if (Math.abs(diff) < OFFSET_EPS) {
+        targetScrollOffset.value = null;
+        return;
+      }
 
-    const direction = diff > 0 ? 1 : -1;
-    const step = speed.value * direction * Math.sqrt(Math.abs(diff));
-    const nextOffset =
-      targetOffset > currentOffset
-        ? Math.min(currentOffset + step, targetOffset)
-        : Math.max(currentOffset + step, targetOffset);
+      const direction = diff > 0 ? 1 : -1;
+      const step = speed.value * direction * Math.sqrt(Math.abs(diff));
+      const nextOffset =
+        targetOffset > currentOffset
+          ? Math.min(currentOffset + step, targetOffset)
+          : Math.max(currentOffset + step, targetOffset);
 
-    if (
-      Math.abs(nextOffset - currentOffset) < 0.1 * OFFSET_EPS ||
-      prevScrollToOffset.value === nextOffset
-    ) {
-      targetScrollOffset.value = null;
-      return;
-    }
+      if (
+        Math.abs(nextOffset - currentOffset) < 0.1 * OFFSET_EPS ||
+        prevScrollToOffset.value === nextOffset
+      ) {
+        targetScrollOffset.value = null;
+        return;
+      }
 
-    if (isHorizontal) {
-      scrollTo(scrollableRef, nextOffset, 0, false);
-    } else {
-      scrollTo(scrollableRef, 0, nextOffset, false);
-    }
-    prevScrollToOffset.value = nextOffset;
-  }, false);
+      if (isHorizontal) {
+        scrollTo(scrollableRef, nextOffset, 0, false);
+      } else {
+        scrollTo(scrollableRef, 0, nextOffset, false);
+      }
+      prevScrollToOffset.value = nextOffset;
+    }, [
+      isFrameCallbackActive,
+      isHorizontal,
+      prevScrollToOffset,
+      scrollableRef,
+      scrollOffset,
+      speed,
+      targetScrollOffset
+    ]),
+    false
+  );
 
   const toggleFrameCallback = useCallback(
     (isEnabled: boolean) => frameCallback.setActive(isEnabled),
