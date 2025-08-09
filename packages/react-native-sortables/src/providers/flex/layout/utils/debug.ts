@@ -1,6 +1,6 @@
 import type { DebugRectUpdater } from '../../../../debug';
 import type {
-  ControlledSizes,
+  ItemSizes,
   FlexDirection,
   FlexLayout,
   Vector
@@ -17,8 +17,8 @@ export const updateLayoutDebugRects = (
   layout: FlexLayout,
   debugCrossAxisGapRects: Array<DebugRectUpdater>,
   debugMainAxisGapRects: Array<DebugRectUpdater>,
-  itemWidths: ControlledSizes,
-  itemHeights: ControlledSizes
+  itemWidths: ItemSizes,
+  itemHeights: ItemSizes
 ) => {
   'worklet';
   const isRow = flexDirection.startsWith('row');

@@ -1,13 +1,12 @@
-import type { ControlledSizes, Dimensions, Vector } from './shared';
+import type { Dimensions, ItemSizes, Vector } from './shared';
 
 export type GridLayoutProps = {
-  mainGroupSize: null | number;
   gaps: {
     main: number;
     cross: number;
   };
-  itemHeights: ControlledSizes;
-  itemWidths: ControlledSizes;
+  itemHeights: ItemSizes;
+  itemWidths: ItemSizes;
   indexToKey: Array<string>;
   isVertical: boolean;
   numGroups: number;

@@ -12,9 +12,9 @@ import type {
   ActiveItemSnapSettings,
   CommonValuesContextType,
   ControlledDimensions,
-  ControlledSizes,
   Dimensions,
   ItemDragSettings,
+  ItemSizes,
   ItemsLayoutTransitionMode,
   Vector
 } from '../../types';
@@ -76,10 +76,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // DIMENSIONS
     const containerWidth = useMutableValue<null | number>(null);
     const containerHeight = useMutableValue<null | number>(null);
-    const itemWidths = useMutableValue<ControlledSizes>(
+    const itemWidths = useMutableValue<ItemSizes>(
       controlledItemDimensions.width ? null : {}
     );
-    const itemHeights = useMutableValue<ControlledSizes>(
+    const itemHeights = useMutableValue<ItemSizes>(
       controlledItemDimensions.height ? null : {}
     );
     const activeItemDimensions = useMutableValue<Dimensions | null>(null);

@@ -13,10 +13,13 @@ export const calculateLayout = ({
   isVertical,
   itemHeights,
   itemWidths,
-  mainGroupSize,
   numGroups
 }: GridLayoutProps): GridLayout | null => {
   'worklet';
+  const mainGroupSize = (isVertical ? itemWidths : itemHeights) as
+    | null
+    | number;
+
   if (!mainGroupSize) {
     return null;
   }

@@ -1,7 +1,7 @@
 import type { ViewStyle } from 'react-native';
 
 import type { NoUndef } from '../../helperTypes';
-import type { ControlledSizes, Dimensions, Vector } from './shared';
+import type { ItemSizes, Dimensions, Vector } from './shared';
 
 export type AlignContent = Exclude<
   NoUndef<ViewStyle['alignContent']>,
@@ -37,8 +37,8 @@ export type FlexLayoutProps = {
     row: number;
     column: number;
   };
-  itemWidths: ControlledSizes;
-  itemHeights: ControlledSizes;
+  itemWidths: ItemSizes;
+  itemHeights: ItemSizes;
   indexToKey: Array<string>;
   flexDirection: FlexDirection;
   flexWrap: FlexWrap;
