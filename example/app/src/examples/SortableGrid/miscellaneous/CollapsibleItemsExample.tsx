@@ -29,6 +29,7 @@ export default function CollapsibleItemsExample() {
   return (
     <ScrollScreen contentContainerStyle={styles.container} includeNavBarHeight>
       <Sortable.Grid
+        activeItemScale={1.05}
         columnGap={10}
         data={DATA}
         overDrag='vertical'
