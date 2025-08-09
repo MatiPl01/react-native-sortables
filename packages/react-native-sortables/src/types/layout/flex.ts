@@ -18,6 +18,20 @@ export type FlexAlignments = {
   alignItems: AlignItems;
 };
 
+export type DimensionLimits = {
+  minHeight: number;
+  maxHeight: number;
+  minWidth: number;
+  maxWidth: number;
+};
+
+export type Paddings = {
+  bottom: number;
+  left: number;
+  right: number;
+  top: number;
+};
+
 export type FlexLayoutProps = {
   gaps: {
     row: number;
@@ -29,18 +43,8 @@ export type FlexLayoutProps = {
   flexDirection: FlexDirection;
   flexWrap: FlexWrap;
   flexAlignments: FlexAlignments;
-  limits: null | {
-    minHeight: number;
-    maxHeight: number;
-    minWidth: number;
-    maxWidth: number;
-  };
-  paddings: {
-    bottom: number;
-    left: number;
-    right: number;
-    top: number;
-  };
+  limits: DimensionLimits | null;
+  paddings: Paddings;
 };
 
 export type FlexLayout = {

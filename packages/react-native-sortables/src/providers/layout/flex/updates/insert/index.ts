@@ -38,8 +38,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
     columnGap,
     flexDirection,
     keyToGroup,
-    rowGap,
-    useFlexLayoutReaction
+    rowGap
   } = useFlexLayoutContext();
   const { fixedItemKeys } = useCustomHandleContext() ?? {};
 
@@ -108,21 +107,17 @@ const useInsertStrategy: SortStrategyFactory = () => {
       swappedBeforeIndexes.value =
         props && getSwappedToGroupBeforeIndices(props);
       swappedAfterIndexes.value = props && getSwappedToGroupAfterIndices(props);
-    }
-  );
 
-  useFlexLayoutReaction(
-    useDerivedValue(() => swappedBeforeIndexes.value?.indexToKey ?? null),
-    layout => {
-      'worklet';
-      swappedBeforeLayout.value = layout;
-    }
-  );
-  useFlexLayoutReaction(
-    useDerivedValue(() => swappedAfterIndexes.value?.indexToKey ?? null),
-    layout => {
-      'worklet';
-      swappedAfterLayout.value = layout;
+      if (swappedBeforeIndexes.value) {
+        swappedBeforeLayout.value = calculateFlexLayout(
+          swappedBeforeIndexes.value.indexToKey
+        );
+      }
+      if (swappedAfterIndexes.value) {
+        swappedAfterLayout.value = calculateFlexLayout(
+          swappedAfterIndexes.value.indexToKey
+        );
+      }
     }
   );
 
