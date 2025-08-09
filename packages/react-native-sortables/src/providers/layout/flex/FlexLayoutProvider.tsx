@@ -1,5 +1,4 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
 import { type DEFAULT_SORTABLE_FLEX_PROPS, IS_WEB } from '../../../constants';
@@ -7,8 +6,10 @@ import { useDebugContext } from '../../../debug';
 import type { RequiredBy } from '../../../helperTypes';
 import { useMutableValue } from '../../../integrations/reanimated';
 import type {
+  DimensionLimits,
   FlexLayout,
   FlexLayoutContextType,
+  Paddings,
   SortableFlexStyle
 } from '../../../types';
 import { haveEqualPropValues } from '../../../utils';
@@ -69,14 +70,14 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const columnGap = useDerivedValue(() => columnGap_ ?? gap);
   const rowGap = useDerivedValue(() => rowGap_ ?? gap);
 
-  const paddings = useDerivedValue(() => ({
+  const paddings = useDerivedValue<Paddings>(() => ({
     bottom: paddingBottom ?? paddingVertical ?? padding,
     left: paddingLeft ?? paddingHorizontal ?? padding,
     right: paddingRight ?? paddingHorizontal ?? padding,
     top: paddingTop ?? paddingVertical ?? padding
   }));
 
-  const dimensionsLimits = useDerivedValue(() => {
+  const dimensionsLimits = useDerivedValue<DimensionLimits | null>(() => {
     const h = height === 'fill' ? undefined : height;
     const w = width === 'fill' ? undefined : width;
 
@@ -115,57 +116,63 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
   const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
 
-  const useFlexLayoutReaction = useCallback(
-    (
-      idxToKey: SharedValue<Array<string>> | SharedValue<Array<string> | null>,
-      onChange: (layout: FlexLayout | null, shouldAnimate: boolean) => void
-    ) =>
-      useAnimatedReaction(
-        () =>
-          idxToKey.value === null
-            ? null
-            : {
-                flexAlignments: {
-                  alignContent,
-                  alignItems,
-                  justifyContent
-                },
-                flexDirection,
-                flexWrap,
-                gaps: {
-                  column: columnGap.value,
-                  row: rowGap.value
-                },
-                indexToKey: idxToKey.value,
-                itemHeights: itemHeights.value,
-                itemWidths: itemWidths.value,
-                limits: dimensionsLimits.value,
-                paddings: paddings.value
-              },
-        (props, previousProps) => {
-          onChange(
-            props && calculateLayout(props),
-            // On web, animate layout only if parent container is not resized
-            // (e.g. skip animation when the browser window is resized)
-            !IS_WEB ||
-              !previousProps?.limits ||
-              haveEqualPropValues(props?.limits, previousProps?.limits)
-          );
-        }
-      ),
-    [
-      alignContent,
-      alignItems,
-      justifyContent,
+  // FLEX LAYOUT UPDATER
+  useAnimatedReaction(
+    () => ({
+      flexAlignments: {
+        alignContent,
+        alignItems,
+        justifyContent
+      },
       flexDirection,
       flexWrap,
-      columnGap,
-      rowGap,
-      itemHeights,
-      itemWidths,
-      dimensionsLimits,
-      paddings
-    ]
+      gaps: {
+        column: columnGap.value,
+        row: rowGap.value
+      },
+      indexToKey: indexToKey.value,
+      itemHeights: itemHeights.value,
+      itemWidths: itemWidths.value,
+      limits: dimensionsLimits.value,
+      paddings: paddings.value
+    }),
+    (props, previousProps) => {
+      const layout = calculateLayout(props);
+
+      // On web, animate layout only if parent container is not resized
+      // (e.g. skip animation when the browser window is resized)
+      shouldAnimateLayout.value =
+        !IS_WEB ||
+        !previousProps?.limits ||
+        haveEqualPropValues(props?.limits, previousProps?.limits);
+
+      if (!layout) {
+        return;
+      }
+
+      // Update current layout
+      appliedLayout.value = layout;
+      // Update item positions
+      itemPositions.value = layout.itemPositions;
+      // Update controlled container dimensions
+      applyControlledContainerDimensions(layout.totalDimensions);
+      // Update key to group
+      keyToGroup.value = Object.fromEntries(
+        layout.itemGroups.flatMap((group, i) => group.map(key => [key, i]))
+      );
+
+      // DEBUG ONLY
+      if (debugCrossAxisGapRects && debugMainAxisGapRects) {
+        updateLayoutDebugRects(
+          flexDirection,
+          layout,
+          debugCrossAxisGapRects,
+          debugMainAxisGapRects,
+          itemWidths.value,
+          itemHeights.value
+        );
+      }
+    }
   );
 
   const calculateFlexLayout = useCallback(
@@ -205,37 +212,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     ]
   );
 
-  useFlexLayoutReaction(indexToKey, (layout, shouldAnimate) => {
-    'worklet';
-    shouldAnimateLayout.value = shouldAnimate;
-    if (!layout) {
-      return;
-    }
-
-    // Update current layout
-    appliedLayout.value = layout;
-    // Update item positions
-    itemPositions.value = layout.itemPositions;
-    // Update controlled container dimensions
-    applyControlledContainerDimensions(layout.totalDimensions);
-    // Update key to group
-    keyToGroup.value = Object.fromEntries(
-      layout.itemGroups.flatMap((group, i) => group.map(key => [key, i]))
-    );
-
-    // DEBUG ONLY
-    if (debugCrossAxisGapRects && debugMainAxisGapRects) {
-      updateLayoutDebugRects(
-        flexDirection,
-        layout,
-        debugCrossAxisGapRects,
-        debugMainAxisGapRects,
-        itemWidths.value,
-        itemHeights.value
-      );
-    }
-  });
-
   return {
     value: {
       appliedLayout,
@@ -243,8 +219,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       columnGap,
       flexDirection,
       keyToGroup,
-      rowGap,
-      useFlexLayoutReaction
+      rowGap
     }
   };
 });

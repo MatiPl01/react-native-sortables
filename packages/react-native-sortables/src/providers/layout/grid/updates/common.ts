@@ -1,4 +1,4 @@
-import type { SharedValue } from 'react-native-reanimated';
+import { type SharedValue, useDerivedValue } from 'react-native-reanimated';
 
 import type {
   Coordinate,
@@ -13,7 +13,7 @@ import {
   useDebugBoundingBox
 } from '../../../shared';
 import { useGridLayoutContext } from '../GridLayoutProvider';
-import { getCrossIndex, getMainIndex } from '../utils';
+import { calculateLayout, getCrossIndex, getMainIndex } from '../utils';
 
 export const createGridStrategy =
   (
@@ -21,20 +21,32 @@ export const createGridStrategy =
     reorder: ReorderFunction
   ): SortStrategyFactory =>
   () => {
-    const { containerHeight, containerWidth, indexToKey } =
-      useCommonValuesContext();
     const {
-      crossGap,
-      isVertical,
-      mainGap,
-      mainGroupSize,
-      numGroups,
-      useGridLayout
-    } = useGridLayoutContext();
+      containerHeight,
+      containerWidth,
+      indexToKey,
+      itemHeights,
+      itemWidths
+    } = useCommonValuesContext();
+    const { crossGap, isVertical, mainGap, mainGroupSize, numGroups } =
+      useGridLayoutContext();
     const { fixedItemKeys } = useCustomHandleContext() ?? {};
 
     const othersIndexToKey = useInactiveIndexToKey();
-    const othersLayout = useGridLayout(othersIndexToKey);
+    const othersLayout = useDerivedValue(() =>
+      calculateLayout({
+        gaps: {
+          cross: crossGap.value,
+          main: mainGap.value
+        },
+        indexToKey: othersIndexToKey.value,
+        isVertical,
+        itemHeights: itemHeights.value,
+        itemWidths: itemWidths.value,
+        mainGroupSize: mainGroupSize.value,
+        numGroups
+      })
+    );
     const debugBox = useDebugBoundingBox();
 
     let mainContainerSize: SharedValue<null | number>;
