@@ -1,6 +1,6 @@
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { FlexDirection, FlexLayout, GridLayout } from '../layout';
+import type { FlexDirection, FlexLayout } from '../layout';
 
 export type GridLayoutContextType = {
   mainGroupSize: SharedValue<null | number>;
@@ -8,9 +8,6 @@ export type GridLayoutContextType = {
   mainGap: SharedValue<number>;
   crossGap: SharedValue<number>;
   isVertical: boolean;
-  useGridLayout: (
-    idxToKey: SharedValue<Array<string>>
-  ) => SharedValue<GridLayout | null>;
 };
 
 export type FlexLayoutContextType = {
