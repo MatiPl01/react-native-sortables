@@ -17,7 +17,7 @@ import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';
 
-type FlexLayoutProviderProps = PropsWithChildren<
+export type FlexLayoutProviderProps = PropsWithChildren<
   RequiredBy<
     SortableFlexStyle,
     keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS

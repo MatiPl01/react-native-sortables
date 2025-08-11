@@ -3,7 +3,7 @@ import type { ViewStyle } from 'react-native';
 import type { TouchData } from 'react-native-gesture-handler';
 import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
 
-import type { Simplify } from '../../helperTypes';
+import type { DefaultProps, Simplify } from '../../helperTypes';
 import type {
   Animatable,
   AnimatableProps,
@@ -281,3 +281,9 @@ export type SharedProps = Simplify<
         }
     >
 >;
+
+type OptionalSharedProps =
+  | 'scrollableRef'
+  | keyof Omit<SortableCallbacks, 'onDragEnd'>;
+
+export type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;

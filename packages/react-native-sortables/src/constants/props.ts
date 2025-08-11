@@ -1,27 +1,16 @@
 import type { ViewStyle } from 'react-native';
 
 import { DefaultDropIndicator } from '../components/defaults';
-import type { DefaultProps } from '../helperTypes';
 import type {
-  SharedProps,
-  SortableCallbacks,
-  SortableFlexProps,
-  SortableGridProps
+  DefaultSharedProps,
+  DefaultSortableFlexProps,
+  DefaultSortableGridProps
 } from '../types';
 import { defaultKeyExtractor } from '../utils/keys';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
 import { IS_WEB } from './platform';
 
 export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
-
-/**
- * DEFAULT SHARED PROPS
- */
-type OptionalSharedProps =
-  | 'scrollableRef'
-  | keyof Omit<SortableCallbacks, 'onDragEnd'>;
-
-type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
 
 export const DEFAULT_SHARED_PROPS = {
   activationAnimationDuration: 300,
@@ -73,17 +62,6 @@ export const DEFAULT_SHARED_PROPS = {
   sortEnabled: true
 } satisfies DefaultSharedProps;
 
-/**
- * DEFAULT SORTABLE GRID PROPS
- */
-type ExcludedFromDefaultGridProps = 'data' | 'onDragEnd' | 'renderItem';
-
-type DefaultSortableGridProps = DefaultProps<
-  Omit<SortableGridProps<unknown>, keyof DefaultSharedProps>,
-  'rowHeight' | 'rows',
-  ExcludedFromDefaultGridProps
->;
-
 export const DEFAULT_SORTABLE_GRID_PROPS = {
   columnGap: 0,
   columns: 1,
@@ -91,34 +69,6 @@ export const DEFAULT_SORTABLE_GRID_PROPS = {
   rowGap: 0,
   strategy: 'insert'
 } satisfies DefaultSortableGridProps;
-
-/**
- * DEFAULT SORTABLE FLEX PROPS
- */
-type OptionalDefaultFlexProps =
-  | 'children'
-  | 'columnGap'
-  | 'height'
-  | 'maxHeight'
-  | 'maxWidth'
-  | 'minHeight'
-  | 'minWidth'
-  | 'paddingBottom'
-  | 'paddingHorizontal'
-  | 'paddingLeft'
-  | 'paddingRight'
-  | 'paddingTop'
-  | 'paddingVertical'
-  | 'rowGap'
-  | 'width';
-
-type ExcludedFromDefaultFlexProps = 'onDragEnd';
-
-type DefaultSortableFlexProps = DefaultProps<
-  Omit<SortableFlexProps, keyof DefaultSharedProps>,
-  OptionalDefaultFlexProps,
-  ExcludedFromDefaultFlexProps
->;
 
 export const DEFAULT_SORTABLE_FLEX_PROPS = {
   alignContent: 'flex-start',

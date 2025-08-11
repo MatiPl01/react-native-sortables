@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 
-import type { Simplify } from '../../helperTypes';
+import type { DefaultProps, Simplify } from '../../helperTypes';
 import type { AnimatableProps } from '../../integrations/reanimated';
 import type { SortStrategyFactory } from '../providers';
-import type { DragEndParams, SharedProps } from './shared';
+import type { DefaultSharedProps, DragEndParams, SharedProps } from './shared';
 
 /** Parameters passed to the onDragEnd callback of a sortable grid */
 export type SortableGridDragEndParams<I> = DragEndParams & {
@@ -112,4 +112,12 @@ export type SortableGridProps<I> = Simplify<
        */
       rowHeight?: number;
     }
+>;
+
+type ExcludedFromDefaultGridProps = 'data' | 'onDragEnd' | 'renderItem';
+
+export type DefaultSortableGridProps = DefaultProps<
+  Omit<SortableGridProps<unknown>, keyof DefaultSharedProps>,
+  'rowHeight' | 'rows',
+  ExcludedFromDefaultGridProps
 >;

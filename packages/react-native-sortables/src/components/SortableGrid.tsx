@@ -7,14 +7,7 @@ import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
-import {
-  GRID_STRATEGIES,
-  GridLayoutProvider,
-  OrderUpdaterComponent,
-  SharedProvider,
-  useMeasurementsContext,
-  useStrategyKey
-} from '../providers';
+import { GridProvider, useMeasurementsContext } from '../providers';
 import type {
   DropIndicatorSettings,
   SortableGridProps,
@@ -97,47 +90,40 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   });
 
   return (
-    <SharedProvider
+    <GridProvider
       {...sharedProps}
+      columnGap={columnGapValue}
       controlledContainerDimensions={controlledContainerDimensions}
       controlledItemDimensions={controlledItemDimensions}
       debug={debug}
+      isVertical={isVertical}
       itemKeys={itemKeys}
+      numGroups={groups}
+      numItems={data.length}
+      reorderTriggerOrigin={reorderTriggerOrigin}
+      rowGap={rowGapValue}
+      rowHeight={rowHeight} // must be specified for horizontal grids
+      strategy={strategy}
       onDragEnd={onDragEnd}>
-      <GridLayoutProvider
+      <SortableGridInner
         columnGap={columnGapValue}
+        data={data}
+        debug={debug}
+        dimensionsAnimationType={dimensionsAnimationType}
+        DropIndicatorComponent={DropIndicatorComponent}
+        dropIndicatorStyle={dropIndicatorStyle}
+        groups={groups}
         isVertical={isVertical}
-        numGroups={groups}
-        numItems={data.length}
+        itemEntering={itemEntering}
+        itemExiting={itemExiting}
+        itemKeys={itemKeys}
+        overflow={overflow}
+        renderItem={renderItem}
         rowGap={rowGapValue}
-        rowHeight={rowHeight} // horizontal grid only
-      >
-        <OrderUpdaterComponent
-          key={useStrategyKey(strategy)}
-          predefinedStrategies={GRID_STRATEGIES}
-          strategy={strategy}
-          triggerOrigin={reorderTriggerOrigin}
-        />
-        <SortableGridInner
-          columnGap={columnGapValue}
-          data={data}
-          debug={debug}
-          dimensionsAnimationType={dimensionsAnimationType}
-          DropIndicatorComponent={DropIndicatorComponent}
-          dropIndicatorStyle={dropIndicatorStyle}
-          groups={groups}
-          isVertical={isVertical}
-          itemEntering={itemEntering}
-          itemExiting={itemExiting}
-          itemKeys={itemKeys}
-          overflow={overflow}
-          renderItem={renderItem}
-          rowGap={rowGapValue}
-          rowHeight={rowHeight!} // must be specified for horizontal grids
-          showDropIndicator={showDropIndicator}
-        />
-      </GridLayoutProvider>
-    </SharedProvider>
+        rowHeight={rowHeight!} // must be specified for horizontal grids
+        showDropIndicator={showDropIndicator}
+      />
+    </GridProvider>
   );
 }
 
@@ -210,6 +196,19 @@ function SortableGridInner<I>({
       : { height: rowHeight }
   );
 
+  const itemStyle = useMemo(
+    () => [animatedItemStyle, !isVertical && styles.horizontalStyleOverride],
+    [animatedItemStyle, isVertical]
+  );
+
+  const sharedItemProps = {
+    itemEntering,
+    itemExiting,
+    itemKeys,
+    renderItem,
+    style: itemStyle
+  };
+
   return (
     <SortableContainer
       {...containerProps}
@@ -222,17 +221,11 @@ function SortableGridInner<I>({
       })}>
       {zipArrays(data, itemKeys).map(([item, key], index) => (
         <SortableGridItem
-          entering={itemEntering ?? undefined}
-          exiting={itemExiting ?? undefined}
+          {...sharedItemProps}
           index={index}
           item={item}
           itemKey={key}
           key={key}
-          renderItem={renderItem}
-          style={[
-            animatedItemStyle,
-            !isVertical && styles.horizontalStyleOverride
-          ]}
         />
       ))}
     </SortableContainer>

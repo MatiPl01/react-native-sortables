@@ -32,16 +32,17 @@ const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
 export type DraggableViewProps = PropsWithChildren<{
   itemKey: string;
-  entering: LayoutAnimation | undefined;
-  exiting: LayoutAnimation | undefined;
+  itemEntering: LayoutAnimation | null;
+  itemExiting: LayoutAnimation | null;
   style?: AnimatedStyleProp;
 }>;
 
 function DraggableView({
   children,
+  itemEntering,
+  itemExiting,
   itemKey: key,
-  style,
-  ...layoutAnimations
+  style
 }: DraggableViewProps) {
   const portalContext = usePortalContext();
   const commonValuesContext = useCommonValuesContext();
@@ -112,9 +113,10 @@ function DraggableView({
   const renderItemCell = (hidden = false) => {
     const innerComponent = (
       <ItemCell
-        {...layoutAnimations}
         {...sharedCellProps}
         cellStyle={[style, itemStyles]}
+        entering={itemEntering ?? undefined}
+        exiting={itemExiting ?? undefined}
         hidden={hidden}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}

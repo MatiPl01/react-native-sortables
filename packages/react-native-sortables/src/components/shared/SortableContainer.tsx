@@ -17,7 +17,7 @@ import type {
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 import DropIndicator from './DropIndicator';
 
-type AnimatedHeightContainerProps = PropsWithChildren<
+export type SortableContainerProps = PropsWithChildren<
   DropIndicatorSettings & {
     dimensionsAnimationType: DimensionsAnimation;
     overflow: Overflow;
@@ -37,7 +37,7 @@ export default function SortableContainer({
   overflow,
   showDropIndicator,
   style
-}: AnimatedHeightContainerProps) {
+}: SortableContainerProps) {
   const {
     activeItemDropped,
     activeItemKey,

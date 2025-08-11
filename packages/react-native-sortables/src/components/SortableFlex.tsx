@@ -9,13 +9,9 @@ import {
 } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import {
-  FLEX_STRATEGIES,
-  FlexLayoutProvider,
-  OrderUpdaterComponent,
-  SharedProvider,
+  FlexProvider,
   useCommonValuesContext,
-  useMeasurementsContext,
-  useStrategyKey
+  useMeasurementsContext
 } from '../providers';
 import type { DropIndicatorSettings, SortableFlexProps } from '../types';
 import { getPropsWithDefaults, orderItems, validateChildren } from '../utils';
@@ -28,14 +24,7 @@ const CONTROLLED_ITEM_DIMENSIONS = {
 
 function SortableFlex(props: SortableFlexProps) {
   const {
-    rest: {
-      children,
-      height,
-      onDragEnd: _onDragEnd,
-      strategy,
-      width,
-      ...styleProps
-    },
+    rest: { children, onDragEnd: _onDragEnd, strategy, ...styleProps },
     sharedProps: {
       debug,
       dimensionsAnimationType,
@@ -44,7 +33,6 @@ function SortableFlex(props: SortableFlexProps) {
       itemEntering,
       itemExiting,
       overflow,
-      reorderTriggerOrigin,
       showDropIndicator,
       ...sharedProps
     }
@@ -53,7 +41,7 @@ function SortableFlex(props: SortableFlexProps) {
   const childrenArray = validateChildren(children);
   const itemKeys = childrenArray.map(([key]) => key);
 
-  const { flexDirection, flexWrap } = styleProps;
+  const { flexDirection, flexWrap, height, width, ...restStyle } = styleProps;
   const isColumn = flexDirection.startsWith('column');
 
   const controlledContainerDimensions = useMemo(() => {
@@ -73,41 +61,39 @@ function SortableFlex(props: SortableFlexProps) {
       }
   });
 
+  const containerStyle = [
+    restStyle,
+    {
+      flexDirection,
+      flexWrap,
+      height: height === 'fill' ? undefined : height,
+      width: width === 'fill' ? undefined : width
+    }
+  ];
+
   return (
-    <SharedProvider
+    <FlexProvider
       {...sharedProps}
       controlledContainerDimensions={controlledContainerDimensions}
       controlledItemDimensions={CONTROLLED_ITEM_DIMENSIONS}
       debug={debug}
       itemKeys={itemKeys}
+      strategy={strategy}
+      styleProps={styleProps}
       onDragEnd={onDragEnd}>
-      <FlexLayoutProvider {...styleProps} itemsCount={itemKeys.length}>
-        <OrderUpdaterComponent
-          key={useStrategyKey(strategy)}
-          predefinedStrategies={FLEX_STRATEGIES}
-          strategy={strategy}
-          triggerOrigin={reorderTriggerOrigin}
-        />
-        <SortableFlexInner
-          childrenArray={childrenArray}
-          debug={debug}
-          dimensionsAnimationType={dimensionsAnimationType}
-          DropIndicatorComponent={DropIndicatorComponent}
-          dropIndicatorStyle={dropIndicatorStyle}
-          itemEntering={itemEntering}
-          itemExiting={itemExiting}
-          overflow={overflow}
-          showDropIndicator={showDropIndicator}
-          style={[
-            styleProps,
-            {
-              height: height === 'fill' ? undefined : height,
-              width: width === 'fill' ? undefined : width
-            }
-          ]}
-        />
-      </FlexLayoutProvider>
-    </SharedProvider>
+      <SortableFlexInner
+        childrenArray={childrenArray}
+        debug={debug}
+        dimensionsAnimationType={dimensionsAnimationType}
+        DropIndicatorComponent={DropIndicatorComponent}
+        dropIndicatorStyle={dropIndicatorStyle}
+        itemEntering={itemEntering}
+        itemExiting={itemExiting}
+        overflow={overflow}
+        showDropIndicator={showDropIndicator}
+        style={containerStyle}
+      />
+    </FlexProvider>
   );
 }
 
@@ -184,8 +170,8 @@ function SortableFlexInner({
       })}>
       {childrenArray.map(([key, child]) => (
         <DraggableView
-          entering={itemEntering ?? undefined}
-          exiting={itemExiting ?? undefined}
+          itemEntering={itemEntering}
+          itemExiting={itemExiting}
           itemKey={key}
           key={key}
           style={styles.styleOverride}>
