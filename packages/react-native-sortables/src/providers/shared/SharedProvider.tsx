@@ -4,10 +4,10 @@ import type { PropsWithChildren } from 'react';
 import type { ViewStyle } from 'react-native';
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
-import { DebugProvider } from '../debug';
-import type { PartialBy } from '../helperTypes';
-import { useWarnOnPropChange } from '../hooks';
-import type { Animatable } from '../integrations/reanimated';
+import { DebugProvider } from '../../debug';
+import type { PartialBy } from '../../helperTypes';
+import { useWarnOnPropChange } from '../../hooks';
+import type { Animatable } from '../../integrations/reanimated';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
@@ -16,19 +16,17 @@ import type {
   ItemDragSettings,
   ItemsLayoutTransitionMode,
   SortableCallbacks
-} from '../types';
-import {
-  AutoScrollProvider,
-  CommonValuesProvider,
-  CustomHandleProvider,
-  DragProvider,
-  LayerProvider,
-  MeasurementsProvider,
-  useMultiZoneContext
-} from './shared';
-import { ContextProviderComposer } from './utils';
+} from '../../types';
+import { ContextProviderComposer } from '../utils';
+import { AutoScrollProvider } from './AutoScrollProvider';
+import { CommonValuesProvider } from './CommonValuesProvider';
+import { CustomHandleProvider } from './CustomHandleProvider';
+import { DragProvider } from './DragProvider';
+import { LayerProvider } from './LayerProvider';
+import { MeasurementsProvider } from './MeasurementsProvider';
+import { useMultiZoneContext } from './MultiZoneProvider';
 
-type SharedProviderProps = PropsWithChildren<
+export type SharedProviderProps = PropsWithChildren<
   ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &

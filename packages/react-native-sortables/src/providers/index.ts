@@ -1,3 +1,3 @@
-export * from './layout';
+export * from './flex';
+export * from './grid';
 export * from './shared';
-export { default as SharedProvider } from './SharedProvider';

@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 
-import type { Simplify } from '../../helperTypes';
+import type { DefaultProps, Simplify } from '../../helperTypes';
 import type {
   AlignContent,
   AlignItems,
@@ -9,7 +9,7 @@ import type {
   JustifyContent
 } from '../layout/flex';
 import type { SortStrategyFactory } from '../providers';
-import type { DragEndParams, SharedProps } from './shared';
+import type { DefaultSharedProps, DragEndParams, SharedProps } from './shared';
 
 /** Parameters passed to the onDragEnd callback of a sortable flex container */
 export type SortableFlexDragEndParams = DragEndParams & {
@@ -101,4 +101,29 @@ export type SortableFlexProps = Simplify<
         onDragEnd?: SortableFlexDragEndCallback;
       }
   >
+>;
+
+type OptionalDefaultFlexProps =
+  | 'children'
+  | 'columnGap'
+  | 'height'
+  | 'maxHeight'
+  | 'maxWidth'
+  | 'minHeight'
+  | 'minWidth'
+  | 'paddingBottom'
+  | 'paddingHorizontal'
+  | 'paddingLeft'
+  | 'paddingRight'
+  | 'paddingTop'
+  | 'paddingVertical'
+  | 'rowGap'
+  | 'width';
+
+type ExcludedFromDefaultFlexProps = 'onDragEnd';
+
+export type DefaultSortableFlexProps = DefaultProps<
+  Omit<SortableFlexProps, keyof DefaultSharedProps>,
+  OptionalDefaultFlexProps,
+  ExcludedFromDefaultFlexProps
 >;

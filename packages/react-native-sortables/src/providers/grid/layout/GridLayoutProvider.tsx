@@ -18,7 +18,7 @@ const DEBUG_COLORS = {
   borderColor: '#825500'
 };
 
-type GridLayoutProviderProps = PropsWithChildren<{
+export type GridLayoutProviderProps = PropsWithChildren<{
   numItems: number;
   numGroups: number;
   isVertical: boolean;
