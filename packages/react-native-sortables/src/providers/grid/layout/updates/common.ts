@@ -253,8 +253,8 @@ export const createGridStrategy =
         newIndex === activeIndex ||
         fixedItemKeys?.value[idxToKey[newIndex]!]
       ) {
-        return;
       }
+      return;
 
       // return the new order of items
       return reorder(idxToKey, activeIndex, newIndex, fixedItemKeys?.value);
