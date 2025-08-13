@@ -120,12 +120,14 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     (props, previousProps) => {
       const activeKey = activeItemKey.value;
       if (activeKey !== null) {
-        additionalCrossOffset.value = calculateActiveItemCrossOffset(
+        const calculatedOffset = calculateActiveItemCrossOffset(
           activeKey,
           keyToIndex.value,
           itemPositions.value,
           props
         );
+
+        additionalCrossOffset.value = calculatedOffset;
       } else {
         additionalCrossOffset.value = 0;
       }
@@ -175,6 +177,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       </>
     ),
     value: {
+      additionalCrossOffset,
       crossGap,
       isVertical,
       mainGap,

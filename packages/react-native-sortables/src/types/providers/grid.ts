@@ -5,4 +5,5 @@ export type GridLayoutContextType = {
   mainGap: SharedValue<number>;
   crossGap: SharedValue<number>;
   isVertical: boolean;
+  additionalCrossOffset: SharedValue<number>;
 };
