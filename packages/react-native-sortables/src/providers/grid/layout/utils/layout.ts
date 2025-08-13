@@ -1,21 +1,25 @@
+'worklet';
 import type {
   Coordinate,
   GridLayout,
   GridLayoutProps,
+  ItemSizes,
   Vector
 } from '../../../../types';
 import { resolveDimension } from '../../../../utils';
 import { getCrossIndex, getMainIndex } from './helpers';
 
-export const calculateLayout = ({
-  gaps,
-  indexToKey,
-  isVertical,
-  itemHeights,
-  itemWidths,
-  numGroups
-}: GridLayoutProps): GridLayout | null => {
-  'worklet';
+export const calculateLayout = (
+  {
+    gaps,
+    indexToKey,
+    isVertical,
+    itemHeights,
+    itemWidths,
+    numGroups
+  }: GridLayoutProps,
+  additionalCrossOffset: number = 0
+): GridLayout | null => {
   const mainGroupSize = (isVertical ? itemWidths : itemHeights) as
     | null
     | number;
@@ -24,8 +28,10 @@ export const calculateLayout = ({
     return null;
   }
 
-  const crossAxisOffsets = [0];
+  const crossAxisOffsets = [additionalCrossOffset];
   const itemPositions: Record<string, Vector> = {};
+
+  console.log({ additionalCrossOffset, itemHeights });
 
   let mainCoordinate: Coordinate;
   let crossCoordinate: Coordinate;
@@ -80,4 +86,62 @@ export const calculateLayout = ({
     crossAxisOffsets,
     itemPositions
   };
+};
+
+export const calculateActiveItemCrossOffset = (
+  activeItemKey: string,
+  keyToIndex: Record<string, number>,
+  itemPositions: Record<string, Vector>,
+  {
+    gaps,
+    indexToKey,
+    isVertical,
+    itemHeights,
+    itemWidths,
+    numGroups
+  }: GridLayoutProps
+): number => {
+  let crossCoordinate: Coordinate;
+  let crossItemSizes: ItemSizes;
+
+  if (isVertical) {
+    crossItemSizes = itemHeights;
+    crossCoordinate = 'y';
+  } else {
+    crossItemSizes = itemWidths;
+    crossCoordinate = 'x';
+  }
+
+  let activeItemCrossOffset = 0;
+  let currentGroupCrossSize = 0;
+  let currentGroupCrossIndex = 0;
+
+  // Find new active item position
+  for (let i = 0; i < indexToKey.length; i++) {
+    const crossIndex = getCrossIndex(i, numGroups);
+
+    if (crossIndex !== currentGroupCrossIndex) {
+      activeItemCrossOffset += currentGroupCrossSize + gaps.cross;
+      currentGroupCrossIndex = crossIndex;
+      currentGroupCrossSize = 0;
+    }
+
+    const key = indexToKey[i]!;
+    currentGroupCrossSize = Math.max(
+      currentGroupCrossSize,
+      resolveDimension(crossItemSizes, key) ?? 0
+    );
+
+    if (key === activeItemKey) {
+      break;
+    }
+  }
+
+  activeItemCrossOffset = Math.max(0, activeItemCrossOffset);
+  const activeItemIndex = keyToIndex[activeItemKey];
+  const itemAtActiveIndexKey = indexToKey[activeItemIndex!];
+  const itemAtActiveIndexOffset =
+    itemPositions[itemAtActiveIndexKey!]?.[crossCoordinate] ?? 0;
+
+  return itemAtActiveIndexOffset - activeItemCrossOffset;
 };

@@ -1,14 +1,17 @@
 import { type PropsWithChildren } from 'react';
-import { useAnimatedReaction } from 'react-native-reanimated';
+import Animated, { useAnimatedReaction } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type { Animatable } from '../../../integrations/reanimated';
-import { useAnimatableValue } from '../../../integrations/reanimated';
+import {
+  useAnimatableValue,
+  useMutableValue
+} from '../../../integrations/reanimated';
 import type { GridLayoutContextType } from '../../../types';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
-import { calculateLayout } from './utils';
+import { calculateActiveItemCrossOffset, calculateLayout } from './utils';
 
 const DEBUG_COLORS = {
   backgroundColor: '#ffa500',
@@ -27,6 +30,7 @@ export type GridLayoutProviderProps = PropsWithChildren<{
 const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   'GridLayout'
 )<GridLayoutProviderProps, GridLayoutContextType>(({
+  children,
   columnGap: columnGap_,
   isVertical,
   numGroups,
@@ -35,11 +39,13 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowHeight
 }) => {
   const {
+    activeItemKey,
     containerWidth,
     indexToKey,
     itemHeights,
     itemPositions,
     itemWidths,
+    keyToIndex,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
@@ -96,6 +102,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     }
   );
 
+  const additionalCrossOffset = useMutableValue(0);
+
   // GRID LAYOUT UPDATER
   useAnimatedReaction(
     () => ({
@@ -110,7 +118,19 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       numGroups
     }),
     (props, previousProps) => {
-      const layout = calculateLayout(props);
+      const activeKey = activeItemKey.value;
+      if (activeKey !== null) {
+        additionalCrossOffset.value = calculateActiveItemCrossOffset(
+          activeKey,
+          keyToIndex.value,
+          itemPositions.value,
+          props
+        );
+      } else {
+        additionalCrossOffset.value = 0;
+      }
+
+      const layout = calculateLayout(props, additionalCrossOffset.value);
 
       // On web, animate layout only if parent container is not resized
       // (e.g. skip animation when the browser window is resized)
@@ -147,6 +167,13 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   );
 
   return {
+    children: (
+      <>
+        {children}
+        {/* TODO - apply the height intelligently */}
+        <Animated.View style={{ height: 2000 }} />
+      </>
+    ),
     value: {
       crossGap,
       isVertical,

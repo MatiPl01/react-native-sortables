@@ -7,7 +7,7 @@ import Sortable from 'react-native-sortables';
 import { ScrollScreen } from '@/components';
 import { colors, radius, sizes, spacing, text } from '@/theme';
 
-const DATA = Array.from({ length: 2 }, (_, index) => `Item ${index + 1}`);
+const DATA = Array.from({ length: 5 }, (_, index) => `Item ${index + 1}`);
 
 export default function CollapsibleItemsExample() {
   const [collapsed, setCollapsed] = useState(false);
