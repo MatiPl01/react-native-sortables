@@ -1,8 +1,10 @@
-import { type SharedValue, useDerivedValue } from 'react-native-reanimated';
+import { type SharedValue, useAnimatedReaction } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../../../integrations/reanimated';
 import type {
   Coordinate,
   Dimension,
+  GridLayout,
   ReorderFunction,
   SortStrategyFactory
 } from '../../../../types';
@@ -28,23 +30,12 @@ export const createGridStrategy =
       itemHeights,
       itemWidths
     } = useCommonValuesContext();
-    const { crossGap, isVertical, mainGap, numGroups } = useGridLayoutContext();
+    const { additionalCrossOffset, crossGap, isVertical, mainGap, numGroups } =
+      useGridLayoutContext();
     const { fixedItemKeys } = useCustomHandleContext() ?? {};
 
     const othersIndexToKey = useInactiveIndexToKey();
-    const othersLayout = useDerivedValue(() =>
-      calculateLayout({
-        gaps: {
-          cross: crossGap.value,
-          main: mainGap.value
-        },
-        indexToKey: othersIndexToKey.value,
-        isVertical,
-        itemHeights: itemHeights.value,
-        itemWidths: itemWidths.value,
-        numGroups
-      })
-    );
+    const othersLayout = useMutableValue<GridLayout | null>(null);
     const debugBox = useDebugBoundingBox();
 
     let mainContainerSize: SharedValue<null | number>;
@@ -66,6 +57,32 @@ export const createGridStrategy =
       crossCoordinate = 'x';
       crossDimension = 'width';
     }
+
+    useAnimatedReaction(
+      () => additionalCrossOffset.value,
+      additionalOffset => {
+        othersLayout.value = calculateLayout(
+          {
+            gaps: {
+              cross: crossGap.value,
+              main: mainGap.value
+            },
+            indexToKey: othersIndexToKey.value,
+            isVertical,
+            itemHeights: itemHeights.value,
+            itemWidths: itemWidths.value,
+            numGroups
+          },
+          additionalOffset
+        );
+
+        console.log(
+          'othersLayout',
+          othersLayout.value,
+          additionalCrossOffset.value
+        );
+      }
+    );
 
     return ({ activeIndex, dimensions, position }) => {
       'worklet';
@@ -90,7 +107,7 @@ export const createGridStrategy =
 
       const getItemCrossSize = (index: number) =>
         crossAxisOffsets[index] !== undefined
-          ? crossAxisOffsets[index + 1]! -
+          ? crossAxisOffsets[index + 1] -
             crossAxisOffsets[index] -
             crossGap.value
           : null;
@@ -253,8 +270,8 @@ export const createGridStrategy =
         newIndex === activeIndex ||
         fixedItemKeys?.value[idxToKey[newIndex]!]
       ) {
+        return;
       }
-      return;
 
       // return the new order of items
       return reorder(idxToKey, activeIndex, newIndex, fixedItemKeys?.value);
