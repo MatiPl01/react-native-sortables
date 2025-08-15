@@ -1,3 +1,4 @@
+'worklet';
 import type { MeasuredDimensions } from 'react-native-reanimated';
 
 import type { DebugLineUpdater, DebugRectUpdater } from '../../../types';
@@ -16,7 +17,6 @@ export const handleMeasurementsVertical = (
   debugRects: Record<'end' | 'start', DebugRectUpdater> | undefined,
   debugLine: DebugLineUpdater | undefined
 ) => {
-  'worklet';
   const { height: sH, pageY: sY } = scrollableMeasurements;
   const { height: cH, pageY: cY } = containerMeasurements;
   maxOverScrollOffset ??= threshold;
@@ -65,7 +65,6 @@ export const handleMeasurementsHorizontal = (
   debugRects: Record<'end' | 'start', DebugRectUpdater> | undefined,
   debugLine: DebugLineUpdater | undefined
 ) => {
-  'worklet';
   const { pageX: sX, width: sW } = scrollableMeasurements;
   const { pageX: cX, width: cW } = containerMeasurements;
   maxOverScrollOffset ??= threshold;

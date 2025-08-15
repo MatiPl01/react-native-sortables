@@ -1,9 +1,9 @@
+'worklet';
 import { type LayoutAnimation, withTiming } from 'react-native-reanimated';
 
 const ITEM_LAYOUT_ANIMATION_DURATION = 300;
 
 export const SortableItemExiting = (): LayoutAnimation => {
-  'worklet';
   const animations = {
     opacity: withTiming(0, {
       duration: ITEM_LAYOUT_ANIMATION_DURATION
@@ -27,7 +27,6 @@ export const SortableItemExiting = (): LayoutAnimation => {
 };
 
 export const SortableItemEntering = (): LayoutAnimation => {
-  'worklet';
   const animations = {
     opacity: withTiming(1, {
       duration: ITEM_LAYOUT_ANIMATION_DURATION
