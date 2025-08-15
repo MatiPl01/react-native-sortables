@@ -31,8 +31,6 @@ export const calculateLayout = (
   const crossAxisOffsets = [additionalCrossOffset];
   const itemPositions: Record<string, Vector> = {};
 
-  console.log({ additionalCrossOffset, itemHeights });
-
   let mainCoordinate: Coordinate;
   let crossCoordinate: Coordinate;
   let crossItemSizes;

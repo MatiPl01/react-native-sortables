@@ -28,6 +28,7 @@ export const createGridStrategy =
       containerWidth,
       indexToKey,
       itemHeights,
+      itemPositions,
       itemWidths
     } = useCommonValuesContext();
     const { additionalCrossOffset, crossGap, isVertical, mainGap, numGroups } =
@@ -59,27 +60,25 @@ export const createGridStrategy =
     }
 
     useAnimatedReaction(
-      () => additionalCrossOffset.value,
-      additionalOffset => {
+      () => ({
+        additionalOffset: additionalCrossOffset.value,
+        indexToKey: othersIndexToKey.value,
+        itemPositions: itemPositions.value
+      }),
+      props => {
         othersLayout.value = calculateLayout(
           {
             gaps: {
               cross: crossGap.value,
               main: mainGap.value
             },
-            indexToKey: othersIndexToKey.value,
+            indexToKey: props.indexToKey,
             isVertical,
             itemHeights: itemHeights.value,
             itemWidths: itemWidths.value,
             numGroups
           },
-          additionalOffset
-        );
-
-        console.log(
-          'othersLayout',
-          othersLayout.value,
-          additionalCrossOffset.value
+          props.additionalOffset
         );
       }
     );
