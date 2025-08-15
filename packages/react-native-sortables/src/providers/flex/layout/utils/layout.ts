@@ -1,3 +1,4 @@
+'worklet';
 import { IS_WEB } from '../../../../constants';
 import type {
   AlignContent,
@@ -24,7 +25,6 @@ const createGroups = (
   groups: Array<Array<string>>;
   crossAxisGroupSizes: Array<number>;
 } => {
-  'worklet';
   const groups: Array<Array<string>> = [];
   const crossAxisGroupSizes: Array<number> = [];
 
@@ -77,7 +77,6 @@ const calculateAlignment = (
   totalSize: number;
   adjustedGap: number;
 } => {
-  'worklet';
   let startOffset = 0;
   let adjustedGap = providedGap;
 
@@ -151,7 +150,6 @@ const handleLayoutCalculation = (
   isReverse: boolean,
   shouldWrap: boolean
 ) => {
-  'worklet';
   const isRow = axisDirections.main === 'row';
   const expandMultiGroup = !IS_WEB && groups.length > 1; // expands to max height/width
   const paddingHorizontal = paddings.left + paddings.right;
@@ -334,7 +332,6 @@ export const calculateLayout = ({
   limits,
   paddings
 }: FlexLayoutProps): FlexLayout | null => {
-  'worklet';
   if (!limits) {
     return null;
   }

@@ -1,3 +1,4 @@
+'worklet';
 import { makeMutable } from 'react-native-reanimated';
 
 import type { AnyFunction } from '../../../helperTypes';
@@ -8,7 +9,6 @@ const TIMEOUT_ID = makeMutable(0);
 export type AnimatedTimeoutID = number;
 
 function removeFromPendingTimeouts(id: AnimatedTimeoutID): void {
-  'worklet';
   PENDING_TIMEOUTS.modify(pendingTimeouts => {
     'worklet';
     delete pendingTimeouts[id];
@@ -20,7 +20,6 @@ export function setAnimatedTimeout<F extends AnyFunction>(
   callback: F,
   delay: number
 ): AnimatedTimeoutID {
-  'worklet';
   let startTimestamp: number;
 
   const currentId = TIMEOUT_ID.value;
@@ -46,6 +45,5 @@ export function setAnimatedTimeout<F extends AnyFunction>(
 }
 
 export function clearAnimatedTimeout(handle: AnimatedTimeoutID): void {
-  'worklet';
   removeFromPendingTimeouts(handle);
 }

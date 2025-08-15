@@ -1,3 +1,4 @@
+'worklet';
 import type { ControlledSizes } from '../../../../../types';
 import { reorderInsert, resolveDimension } from '../../../../../utils';
 
@@ -27,7 +28,6 @@ const getGroupItemIndex = (
   group: Array<string>,
   keyToIndex: Record<string, number>
 ) => {
-  'worklet';
   const key = group[inGroupIndex];
   if (key === undefined) return null;
   return keyToIndex[key] ?? null;
@@ -38,8 +38,6 @@ export const getTotalGroupSize = (
   mainItemSizes: ControlledSizes,
   gap: number
 ) => {
-  'worklet';
-
   const sizesSum = group.reduce(
     (total, key) => total + (resolveDimension(mainItemSizes, key) ?? 0),
     0
@@ -64,7 +62,6 @@ const getIndexesWhenSwappedToGroupBefore = ({
   mainGap,
   mainItemSizes
 }: ItemGroupSwapProps): SwappedGroupIndexesResult => {
-  'worklet';
   if (groupSizeLimit === Infinity) {
     return null;
   }
@@ -149,7 +146,6 @@ const getIndexesWhenSwappedToGroupAfter = ({
   mainGap,
   mainItemSizes
 }: ItemGroupSwapProps): SwappedGroupIndexesResult => {
-  'worklet';
   const activeGroup = itemGroups[currentGroupIndex];
   if (groupSizeLimit === Infinity || activeGroup === undefined) {
     return null;
@@ -231,7 +227,6 @@ const getIndexesWhenSwappedToGroupAfter = ({
 export const getSwappedToGroupBeforeIndices = (
   props: ItemGroupSwapProps
 ): ItemGroupSwapResult | null => {
-  'worklet';
   const indexes = getIndexesWhenSwappedToGroupBefore(props);
   if (indexes === null) return null;
 
@@ -252,7 +247,6 @@ export const getSwappedToGroupBeforeIndices = (
 export const getSwappedToGroupAfterIndices = (
   props: ItemGroupSwapProps
 ): ItemGroupSwapResult | null => {
-  'worklet';
   const indexes = getIndexesWhenSwappedToGroupAfter(props);
   if (indexes === null) return null;
 
