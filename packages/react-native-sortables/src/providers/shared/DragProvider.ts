@@ -28,9 +28,9 @@ import type {
 } from '../../types';
 import { DragActivationState, LayerState } from '../../types';
 import {
+  calculateSnapOffset,
   getItemDimensions,
-  getKeyToIndex,
-  getOffsetDistance
+  getKeyToIndex
 } from '../../utils';
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
@@ -141,9 +141,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX: snapOffsetX.value,
       offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
-      snapDimensions:
+      snapAreaDimensions:
         activeHandleMeasurements?.value ?? activeItemDimensions.value,
-      snapOffset: activeHandleOffset?.value,
+      snapAreaOffset: activeHandleOffset?.value,
       startTouch: touchStartTouch.value,
       startTouchPosition: dragStartTouchPosition.value,
       touch: currentTouch.value
@@ -159,8 +159,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX,
       offsetY,
       progress,
-      snapDimensions,
-      snapOffset,
+      snapAreaDimensions,
+      snapAreaOffset,
       startTouch,
       startTouchPosition,
       touch
@@ -170,7 +170,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         containerH === null ||
         containerW === null ||
         !activeDimensions ||
-        !snapDimensions ||
+        !snapAreaDimensions ||
         !itemTouchOffset ||
         !startTouchPosition ||
         !touch ||
@@ -195,12 +195,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       let tY = itemTouchOffset.y;
 
       if (enableSnap) {
-        tX =
-          (snapOffset?.x ?? 0) +
-          getOffsetDistance(offsetX, snapDimensions.width);
-        tY =
-          (snapOffset?.y ?? 0) +
-          getOffsetDistance(offsetY, snapDimensions.height);
+        const offset = calculateSnapOffset(
+          offsetX,
+          offsetY,
+          snapAreaDimensions,
+          snapAreaOffset
+        );
+        tX = offset.x;
+        tY = offset.y;
       }
 
       const translate = (from: number, to: number) =>
