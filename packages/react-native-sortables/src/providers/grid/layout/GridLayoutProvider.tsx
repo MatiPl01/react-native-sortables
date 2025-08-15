@@ -9,7 +9,12 @@ import {
   useMutableValue
 } from '../../../integrations/reanimated';
 import type { GridLayoutContextType } from '../../../types';
-import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
+import { calculateSnapOffset } from '../../../utils';
+import {
+  useCommonValuesContext,
+  useCustomHandleContext,
+  useMeasurementsContext
+} from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateActiveItemCrossOffset, calculateLayout } from './utils';
 
@@ -39,6 +44,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowHeight
 }) => {
   const {
+    activeItemDimensions,
     activeItemKey,
     containerWidth,
     indexToKey,
@@ -46,8 +52,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     itemPositions,
     itemWidths,
     keyToIndex,
-    shouldAnimateLayout
+    shouldAnimateLayout,
+    snapOffsetX,
+    snapOffsetY,
+    touchPosition
   } = useCommonValuesContext();
+  const { activeHandleMeasurements } = useCustomHandleContext() ?? {};
   const { applyControlledContainerDimensions } = useMeasurementsContext();
   const debugContext = useDebugContext();
 
@@ -119,22 +129,39 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     }),
     (props, previousProps) => {
       const activeKey = activeItemKey.value;
-      if (activeKey !== null) {
-        const calculatedOffset = calculateActiveItemCrossOffset(
+      if (activeKey !== null && activeItemDimensions.value) {
+        let calculatedOffset = calculateActiveItemCrossOffset(
           activeKey,
           keyToIndex.value,
           itemPositions.value,
           props
         );
-
+        if (calculatedOffset !== additionalCrossOffset.value) {
+          const touchY = touchPosition.value?.y ?? 0;
+          const snapY = calculateSnapOffset(
+            snapOffsetY.value,
+            snapOffsetY.value,
+            activeHandleMeasurements?.value ?? activeItemDimensions.value,
+            touchPosition.value
+          ).y;
+          calculatedOffset += snapY - touchY;
+        }
         additionalCrossOffset.value = calculatedOffset;
       } else {
         additionalCrossOffset.value = 0;
       }
 
       const layout = calculateLayout(props, additionalCrossOffset.value);
+      if (!layout) {
+        return;
+      }
 
-      // On web, animate layout only if parent container is not resized
+      // Update item positions
+      itemPositions.value = layout.itemPositions;
+      // Update controlled container dimensions
+      applyControlledContainerDimensions(layout.controlledContainerDimensions);
+
+      // On the web, animate layout only if parent container is not resized
       // (e.g. skip animation when the browser window is resized)
       shouldAnimateLayout.value =
         !IS_WEB ||
@@ -143,15 +170,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         isVertical
           ? props.itemWidths === previousProps?.itemWidths
           : props.itemHeights === previousProps?.itemHeights;
-
-      if (!layout || !itemHeights.value || !itemWidths.value) {
-        return;
-      }
-
-      // Update item positions
-      itemPositions.value = layout.itemPositions;
-      // Update controlled container dimensions
-      applyControlledContainerDimensions(layout.controlledContainerDimensions);
 
       // DEBUG ONLY
       if (debugCrossGapRects) {
