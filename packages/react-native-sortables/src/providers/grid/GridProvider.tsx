@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import type { PropsWithChildren } from 'react';
 
+import { useAnimatableValue } from '../../integrations/reanimated';
 import type { ReorderTriggerOrigin, SortableGridStrategy } from '../../types';
 import type { SharedProviderProps } from '../shared';
 import {
@@ -9,6 +10,7 @@ import {
   useStrategyKey
 } from '../shared';
 import { ContextProviderComposer } from '../utils';
+import { AdditionalCrossOffsetProvider } from './AdditionalCrossOffsetProvider';
 import type { GridLayoutProviderProps } from './layout';
 import { GRID_STRATEGIES, GridLayoutProvider } from './layout';
 
@@ -22,24 +24,32 @@ type GridProviderProps = PropsWithChildren<
 
 export default function GridProvider({
   children,
-  columnGap,
+  columnGap: columnGap_,
   isVertical,
   numGroups,
   numItems,
   reorderTriggerOrigin,
-  rowGap,
+  rowGap: rowGap_,
   rowHeight,
   strategy,
   ...sharedProps
 }: GridProviderProps) {
+  const rowGap = useAnimatableValue(rowGap_);
+  const columnGap = useAnimatableValue(columnGap_);
+
+  const sharedGridProviderProps = {
+    columnGap,
+    isVertical,
+    numGroups,
+    rowGap
+  };
+
   const providers = [
     <SharedProvider {...sharedProps} />,
+    <AdditionalCrossOffsetProvider {...sharedGridProviderProps} />,
     <GridLayoutProvider
-      columnGap={columnGap}
-      isVertical={isVertical}
-      numGroups={numGroups}
+      {...sharedGridProviderProps}
       numItems={numItems}
-      rowGap={rowGap}
       rowHeight={rowHeight}
     />
   ];

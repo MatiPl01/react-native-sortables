@@ -1,8 +1,8 @@
 import type { DebugRectUpdater } from '../../../../debug';
 import type {
-  ItemSizes,
   FlexDirection,
   FlexLayout,
+  ItemSizes,
   Vector
 } from '../../../../types';
 import { resolveDimension } from '../../../../utils';

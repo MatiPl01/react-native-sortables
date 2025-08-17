@@ -1,10 +1,8 @@
-import { type SharedValue, useAnimatedReaction } from 'react-native-reanimated';
+import { type SharedValue, useDerivedValue } from 'react-native-reanimated';
 
-import { useMutableValue } from '../../../../integrations/reanimated';
 import type {
   Coordinate,
   Dimension,
-  GridLayout,
   ReorderFunction,
   SortStrategyFactory
 } from '../../../../types';
@@ -14,6 +12,7 @@ import {
   useCustomHandleContext,
   useDebugBoundingBox
 } from '../../../shared';
+import { useAdditionalCrossOffsetContext } from '../../AdditionalCrossOffsetProvider';
 import { useGridLayoutContext } from '../GridLayoutProvider';
 import { calculateLayout, getCrossIndex, getMainIndex } from '../utils';
 
@@ -28,16 +27,33 @@ export const createGridStrategy =
       containerWidth,
       indexToKey,
       itemHeights,
-      itemPositions,
       itemWidths
     } = useCommonValuesContext();
-    const { additionalCrossOffset, crossGap, isVertical, mainGap, numGroups } =
-      useGridLayoutContext();
+    const { crossGap, isVertical, mainGap, numGroups } = useGridLayoutContext();
+    const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
     const { fixedItemKeys } = useCustomHandleContext() ?? {};
 
     const othersIndexToKey = useInactiveIndexToKey();
-    const othersLayout = useMutableValue<GridLayout | null>(null);
     const debugBox = useDebugBoundingBox();
+
+    const othersLayout = useDerivedValue(() =>
+      additionalCrossOffset?.value === null
+        ? null
+        : calculateLayout(
+            {
+              gaps: {
+                cross: crossGap.value,
+                main: mainGap.value
+              },
+              indexToKey: othersIndexToKey.value,
+              isVertical,
+              itemHeights: itemHeights.value,
+              itemWidths: itemWidths.value,
+              numGroups
+            },
+            additionalCrossOffset?.value
+          )
+    );
 
     let mainContainerSize: SharedValue<null | number>;
     let crossContainerSize: SharedValue<null | number>;
@@ -58,30 +74,6 @@ export const createGridStrategy =
       crossCoordinate = 'x';
       crossDimension = 'width';
     }
-
-    useAnimatedReaction(
-      () => ({
-        additionalOffset: additionalCrossOffset.value,
-        indexToKey: othersIndexToKey.value,
-        itemPositions: itemPositions.value
-      }),
-      props => {
-        othersLayout.value = calculateLayout(
-          {
-            gaps: {
-              cross: crossGap.value,
-              main: mainGap.value
-            },
-            indexToKey: props.indexToKey,
-            isVertical,
-            itemHeights: itemHeights.value,
-            itemWidths: itemWidths.value,
-            numGroups
-          },
-          props.additionalOffset
-        );
-      }
-    );
 
     return ({ activeIndex, dimensions, position }) => {
       'worklet';
@@ -105,8 +97,9 @@ export const createGridStrategy =
       let mainIndex = startMainIndex;
 
       const getItemCrossSize = (index: number) =>
-        crossAxisOffsets[index] !== undefined
-          ? crossAxisOffsets[index + 1] -
+        crossAxisOffsets[index] !== undefined &&
+        crossAxisOffsets[index + 1] !== undefined
+          ? crossAxisOffsets[index + 1]! -
             crossAxisOffsets[index] -
             crossGap.value
           : null;

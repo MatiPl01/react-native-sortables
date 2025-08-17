@@ -9,6 +9,7 @@ import {
   interpolate,
   measure,
   useAnimatedReaction,
+  useDerivedValue,
   withTiming
 } from 'react-native-reanimated';
 
@@ -128,22 +129,33 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const stableOnOrderChange = useStableCallbackValue(onOrderChange);
   const stableOnActiveItemDropped = useStableCallbackValue(onActiveItemDropped);
 
+  const snapOffsetPosition = useDerivedValue(() => {
+    const snapItemDimensions =
+      activeHandleMeasurements?.value ?? activeItemDimensions.value;
+
+    if (!enableActiveItemSnap.value || !snapItemDimensions) {
+      return null;
+    }
+
+    return calculateSnapOffset(
+      snapOffsetX.value,
+      snapOffsetY.value,
+      snapItemDimensions,
+      activeHandleOffset?.value
+    );
+  });
+
   // ACTIVE ITEM POSITION UPDATER
   useAnimatedReaction(
     () => ({
       activeDimensions: activeItemDimensions.value,
       containerH: containerHeight.value,
       containerW: containerWidth.value,
-      enableSnap: enableActiveItemSnap.value,
       itemTouchOffset: dragStartItemTouchOffset.value,
       key: activeItemKey.value,
       offsetDiff: scrollOffsetDiff?.value,
-      offsetX: snapOffsetX.value,
-      offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
-      snapAreaDimensions:
-        activeHandleMeasurements?.value ?? activeItemDimensions.value,
-      snapAreaOffset: activeHandleOffset?.value,
+      snapOffset: snapOffsetPosition.value,
       startTouch: touchStartTouch.value,
       startTouchPosition: dragStartTouchPosition.value,
       touch: currentTouch.value
@@ -152,15 +164,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeDimensions,
       containerH,
       containerW,
-      enableSnap,
       itemTouchOffset,
       key,
       offsetDiff,
-      offsetX,
-      offsetY,
       progress,
-      snapAreaDimensions,
-      snapAreaOffset,
+      snapOffset,
       startTouch,
       startTouchPosition,
       touch
@@ -170,7 +178,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         containerH === null ||
         containerW === null ||
         !activeDimensions ||
-        !snapAreaDimensions ||
+        !snapOffset ||
         !itemTouchOffset ||
         !startTouchPosition ||
         !touch ||
@@ -191,25 +199,17 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           (offsetDiff?.y ?? 0)
       };
 
-      let tX = itemTouchOffset.x;
-      let tY = itemTouchOffset.y;
-
-      if (enableSnap) {
-        const offset = calculateSnapOffset(
-          offsetX,
-          offsetY,
-          snapAreaDimensions,
-          snapAreaOffset
-        );
-        tX = offset.x;
-        tY = offset.y;
-      }
-
       const translate = (from: number, to: number) =>
         from === to ? from : interpolate(progress, [0, 1], [from, to]);
 
-      const snapX = translate(itemTouchOffset.x, tX);
-      const snapY = translate(itemTouchOffset.y, tY);
+      const snapX = translate(
+        itemTouchOffset.x,
+        snapOffset?.x ?? itemTouchOffset.x
+      );
+      const snapY = translate(
+        itemTouchOffset.y,
+        snapOffset?.y ?? itemTouchOffset.y
+      );
 
       const unclampedActiveX = touchPosition.value.x - snapX;
       const unclampedActiveY = touchPosition.value.y - snapY;
@@ -609,7 +609,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       handleDragEnd,
       handleOrderChange,
       handleTouchesMove,
-      handleTouchStart
+      handleTouchStart,
+      snapOffsetPosition
     }
   };
 });

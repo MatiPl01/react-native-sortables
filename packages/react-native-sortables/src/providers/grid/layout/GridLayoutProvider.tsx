@@ -1,22 +1,14 @@
 import { type PropsWithChildren } from 'react';
+import type { SharedValue } from 'react-native-reanimated';
 import Animated, { useAnimatedReaction } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
-import type { Animatable } from '../../../integrations/reanimated';
-import {
-  useAnimatableValue,
-  useMutableValue
-} from '../../../integrations/reanimated';
 import type { GridLayoutContextType } from '../../../types';
-import { calculateSnapOffset } from '../../../utils';
-import {
-  useCommonValuesContext,
-  useCustomHandleContext,
-  useMeasurementsContext
-} from '../../shared';
+import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
-import { calculateActiveItemCrossOffset, calculateLayout } from './utils';
+import { useAdditionalCrossOffsetContext } from '../AdditionalCrossOffsetProvider';
+import { calculateLayout } from './utils';
 
 const DEBUG_COLORS = {
   backgroundColor: '#ffa500',
@@ -27,8 +19,8 @@ export type GridLayoutProviderProps = PropsWithChildren<{
   numItems: number;
   numGroups: number;
   isVertical: boolean;
-  rowGap: Animatable<number>;
-  columnGap: Animatable<number>;
+  rowGap: SharedValue<number>;
+  columnGap: SharedValue<number>;
   rowHeight?: number;
 }>;
 
@@ -36,38 +28,29 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   'GridLayout'
 )<GridLayoutProviderProps, GridLayoutContextType>(({
   children,
-  columnGap: columnGap_,
+  columnGap,
   isVertical,
   numGroups,
   numItems,
-  rowGap: rowGap_,
+  rowGap,
   rowHeight
 }) => {
   const {
-    activeItemDimensions,
-    activeItemKey,
     containerWidth,
     indexToKey,
     itemHeights,
     itemPositions,
     itemWidths,
-    keyToIndex,
-    shouldAnimateLayout,
-    snapOffsetX,
-    snapOffsetY,
-    touchPosition
+    shouldAnimateLayout
   } = useCommonValuesContext();
-  const { activeHandleMeasurements } = useCustomHandleContext() ?? {};
   const { applyControlledContainerDimensions } = useMeasurementsContext();
+  const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
   const debugContext = useDebugContext();
 
   const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
   const debugCrossGapRects = debugContext?.useDebugRects(
     Math.ceil(numItems / numGroups) - 1
   );
-
-  const columnGap = useAnimatableValue(columnGap_);
-  const rowGap = useAnimatableValue(rowGap_);
 
   const mainGap = isVertical ? columnGap : rowGap;
   const crossGap = isVertical ? rowGap : columnGap;
@@ -112,8 +95,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     }
   );
 
-  const additionalCrossOffset = useMutableValue(0);
-
   // GRID LAYOUT UPDATER
   useAnimatedReaction(
     () => ({
@@ -128,30 +109,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       numGroups
     }),
     (props, previousProps) => {
-      const activeKey = activeItemKey.value;
-      if (activeKey !== null && activeItemDimensions.value) {
-        let calculatedOffset = calculateActiveItemCrossOffset(
-          activeKey,
-          keyToIndex.value,
-          itemPositions.value,
-          props
-        );
-        if (calculatedOffset !== additionalCrossOffset.value) {
-          const touchY = touchPosition.value?.y ?? 0;
-          const snapY = calculateSnapOffset(
-            snapOffsetY.value,
-            snapOffsetY.value,
-            activeHandleMeasurements?.value ?? activeItemDimensions.value,
-            touchPosition.value
-          ).y;
-          calculatedOffset += snapY - touchY;
-        }
-        additionalCrossOffset.value = calculatedOffset;
-      } else {
-        additionalCrossOffset.value = 0;
-      }
-
-      const layout = calculateLayout(props, additionalCrossOffset.value);
+      const layout = calculateLayout(props, additionalCrossOffset?.value);
       if (!layout) {
         return;
       }
@@ -195,7 +153,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       </>
     ),
     value: {
-      additionalCrossOffset,
       crossGap,
       isVertical,
       mainGap,

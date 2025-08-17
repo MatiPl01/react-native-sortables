@@ -1,9 +1,9 @@
 'worklet';
 import type {
+  AdditionalCrossOffsetProps,
   Coordinate,
   GridLayout,
   GridLayoutProps,
-  ItemSizes,
   Vector
 } from '../../../../types';
 import { resolveDimension } from '../../../../utils';
@@ -18,7 +18,7 @@ export const calculateLayout = (
     itemWidths,
     numGroups
   }: GridLayoutProps,
-  additionalCrossOffset: number = 0
+  additionalCrossOffset = 0
 ): GridLayout | null => {
   const mainGroupSize = (isVertical ? itemWidths : itemHeights) as
     | null
@@ -86,30 +86,16 @@ export const calculateLayout = (
   };
 };
 
-export const calculateActiveItemCrossOffset = (
-  activeItemKey: string,
-  keyToIndex: Record<string, number>,
-  itemPositions: Record<string, Vector>,
-  {
-    gaps,
-    indexToKey,
-    isVertical,
-    itemHeights,
-    itemWidths,
-    numGroups
-  }: GridLayoutProps
-): number => {
-  let crossCoordinate: Coordinate;
-  let crossItemSizes: ItemSizes;
-
-  if (isVertical) {
-    crossItemSizes = itemHeights;
-    crossCoordinate = 'y';
-  } else {
-    crossItemSizes = itemWidths;
-    crossCoordinate = 'x';
-  }
-
+export const calculateActiveItemCrossOffset = ({
+  activeItemKey,
+  crossCoordinate,
+  crossGap,
+  crossItemSizes,
+  indexToKey,
+  itemPositions,
+  keyToIndex,
+  numGroups
+}: AdditionalCrossOffsetProps): number => {
   let activeItemCrossOffset = 0;
   let currentGroupCrossSize = 0;
   let currentGroupCrossIndex = 0;
@@ -119,7 +105,7 @@ export const calculateActiveItemCrossOffset = (
     const crossIndex = getCrossIndex(i, numGroups);
 
     if (crossIndex !== currentGroupCrossIndex) {
-      activeItemCrossOffset += currentGroupCrossSize + gaps.cross;
+      activeItemCrossOffset += currentGroupCrossSize + crossGap;
       currentGroupCrossIndex = crossIndex;
       currentGroupCrossSize = 0;
     }

@@ -1,16 +1,21 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import Animated, { LinearTransition } from 'react-native-reanimated';
+import Animated, {
+  LinearTransition,
+  useAnimatedRef
+} from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { ScrollScreen } from '@/components';
-import { colors, radius, sizes, spacing, text } from '@/theme';
+import { Screen } from '@/components';
+import { IS_WEB } from '@/constants';
+import { colors, radius, sizes, spacing, style, text } from '@/theme';
 
 const DATA = Array.from({ length: 5 }, (_, index) => `Item ${index + 1}`);
 
 export default function CollapsibleItemsExample() {
   const [collapsed, setCollapsed] = useState(false);
+  const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   // TODO - fix portal case
   const renderItem = useCallback<SortableGridRenderItem<string>>(
@@ -27,18 +32,24 @@ export default function CollapsibleItemsExample() {
   );
 
   return (
-    <ScrollScreen contentContainerStyle={styles.container} includeNavBarHeight>
-      <Sortable.Grid
-        activeItemScale={1.05}
-        columnGap={10}
-        data={DATA}
-        overDrag='vertical'
-        renderItem={renderItem}
-        rowGap={10}
-        onActiveItemDropped={() => setCollapsed(false)}
-        onDragStart={() => setCollapsed(true)}
-      />
-    </ScrollScreen>
+    <Screen>
+      <Animated.ScrollView
+        contentContainerStyle={[styles.container, IS_WEB && style.webContent]}
+        ref={scrollableRef}>
+        <Sortable.Grid
+          activeItemScale={1.05}
+          columnGap={10}
+          data={DATA}
+          overDrag='vertical'
+          renderItem={renderItem}
+          rowGap={10}
+          // TODO - add correct auto scroll support for collapsible items
+          scrollableRef={scrollableRef}
+          onActiveItemDropped={() => setCollapsed(false)}
+          onDragStart={() => setCollapsed(true)}
+        />
+      </Animated.ScrollView>
+    </Screen>
   );
 }
 
