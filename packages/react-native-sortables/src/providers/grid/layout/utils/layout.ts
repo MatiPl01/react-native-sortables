@@ -94,7 +94,8 @@ export const calculateActiveItemCrossOffset = ({
   indexToKey,
   itemPositions,
   keyToIndex,
-  numGroups
+  numGroups,
+  snapBasedOffset
 }: AdditionalCrossOffsetProps): number => {
   let activeItemCrossOffset = 0;
   let currentGroupCrossSize = 0;
@@ -121,11 +122,13 @@ export const calculateActiveItemCrossOffset = ({
     }
   }
 
-  activeItemCrossOffset = Math.max(0, activeItemCrossOffset);
   const activeItemIndex = keyToIndex[activeItemKey];
   const itemAtActiveIndexKey = indexToKey[activeItemIndex!];
   const itemAtActiveIndexOffset =
     itemPositions[itemAtActiveIndexKey!]?.[crossCoordinate] ?? 0;
 
-  return itemAtActiveIndexOffset - activeItemCrossOffset;
+  return Math.max(
+    0,
+    itemAtActiveIndexOffset - activeItemCrossOffset + snapBasedOffset
+  );
 };

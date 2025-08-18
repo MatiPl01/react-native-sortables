@@ -2,6 +2,7 @@ import type { SharedValue } from 'react-native-reanimated';
 
 export type AdditionalCrossOffsetContextType = {
   additionalCrossOffset: SharedValue<number>;
+  additionalCrossSnapOffset: SharedValue<number>;
 };
 
 export type GridLayoutContextType = {

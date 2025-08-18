@@ -24,17 +24,17 @@ export const getOffsetDistance = (
 export const calculateSnapOffset = (
   snapOffsetX: Offset,
   snapOffsetY: Offset,
-  snapAreaDimensions: Dimensions,
-  snapAreaOffset?: Maybe<Vector>
+  snapItemDimensions: Dimensions,
+  snapItemOffset?: Maybe<Vector>
 ) => {
   'worklet';
   return {
     x:
-      (snapAreaOffset?.x ?? 0) +
-      getOffsetDistance(snapOffsetX, snapAreaDimensions.width),
+      (snapItemOffset?.x ?? 0) +
+      getOffsetDistance(snapOffsetX, snapItemDimensions.width),
     y:
-      (snapAreaOffset?.y ?? 0) +
-      getOffsetDistance(snapOffsetY, snapAreaDimensions.height)
+      (snapItemOffset?.y ?? 0) +
+      getOffsetDistance(snapOffsetY, snapItemDimensions.height)
   };
 };
 

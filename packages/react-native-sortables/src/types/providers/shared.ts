@@ -101,7 +101,6 @@ export type AutoScrollContextType = {
 // DRAG
 
 export type DragContextType = {
-  snapOffsetPosition: SharedValue<null | Vector>;
   handleTouchStart: (
     e: GestureTouchEvent,
     key: string,

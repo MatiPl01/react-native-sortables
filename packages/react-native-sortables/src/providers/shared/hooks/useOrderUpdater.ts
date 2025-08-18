@@ -1,18 +1,31 @@
-import { useAnimatedReaction } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
 import type {
-  OrderUpdater,
+  PredefinedStrategies,
   ReorderTriggerOrigin,
+  SortStrategyFactory,
   Vector
 } from '../../../types';
+import { error } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
-export default function useOrderUpdater(
-  updater: OrderUpdater,
-  triggerOrigin: ReorderTriggerOrigin
+export default function useOrderUpdater<
+  P extends PredefinedStrategies = PredefinedStrategies
+>(
+  strategy: keyof P | SortStrategyFactory,
+  predefinedStrategies: P,
+  triggerOrigin: SharedValue<null | ReorderTriggerOrigin | Vector>
 ) {
+  const useStrategy =
+    typeof strategy === 'string' ? predefinedStrategies[strategy] : strategy;
+
+  if (!useStrategy || typeof useStrategy !== 'function') {
+    throw error(`'${String(useStrategy)}' is not a valid ordering strategy`);
+  }
+
   const {
     activeItemDimensions,
     activeItemKey,
@@ -25,24 +38,35 @@ export default function useOrderUpdater(
 
   const debugCross = debugContext?.useDebugCross();
 
-  const isCenter = triggerOrigin === 'center';
+  const triggerOriginPosition = useDerivedValue(() => {
+    if (triggerOrigin.value === 'touch') {
+      return touchPosition.value;
+    }
+
+    if (triggerOrigin.value === 'center') {
+      if (!activeItemPosition.value || !activeItemDimensions.value) {
+        return null;
+      }
+
+      return {
+        x: activeItemPosition.value.x + activeItemDimensions.value.width / 2,
+        y: activeItemPosition.value.y + activeItemDimensions.value.height / 2
+      };
+    }
+
+    return triggerOrigin.value;
+  });
+
+  const updater = useStrategy();
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
       dimensions: activeItemDimensions.value,
-      positions: {
-        activeItem: activeItemPosition.value,
-        touch: touchPosition.value
-      }
+      position: triggerOriginPosition.value
     }),
-    ({ activeKey, dimensions, positions }) => {
-      if (
-        !activeKey ||
-        !dimensions ||
-        !positions.touch ||
-        !positions.activeItem
-      ) {
+    ({ activeKey, dimensions, position }) => {
+      if (!activeKey || !dimensions || !position) {
         if (debugCross) debugCross.set({ position: null });
         return;
       }
@@ -50,16 +74,6 @@ export default function useOrderUpdater(
       const activeIndex = keyToIndex.value[activeKey];
       if (activeIndex === undefined) {
         return;
-      }
-
-      let position: Vector;
-      if (isCenter) {
-        position = {
-          x: positions.activeItem.x + dimensions.width / 2,
-          y: positions.activeItem.y + dimensions.height / 2
-        };
-      } else {
-        position = positions.touch;
       }
 
       if (debugCross) {

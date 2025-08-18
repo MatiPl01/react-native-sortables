@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { useDerivedValue } from 'react-native-reanimated';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
 import type { AdditionalCrossOffsetContextType } from '../../types';
-import { useCommonValuesContext } from '../shared';
+import { calculateSnapOffset } from '../../utils';
+import { useCommonValuesContext, useCustomHandleContext } from '../shared';
 import { createProvider } from '../utils';
 import { calculateActiveItemCrossOffset } from './layout/utils';
 
@@ -24,18 +25,22 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
     rowGap
   }) => {
     const {
-      activeItemDropped,
+      activeItemDimensions,
       activeItemKey,
       activeItemPosition,
+      enableActiveItemSnap,
       indexToKey,
       itemHeights,
       itemPositions,
       itemWidths,
       keyToIndex,
       prevActiveItemKey,
-      snapOffsetPosition,
+      snapOffsetX,
+      snapOffsetY,
       touchPosition
     } = useCommonValuesContext();
+    const { activeHandleMeasurements, activeHandleOffset } =
+      useCustomHandleContext() ?? {};
 
     let crossCoordinate, crossGap, crossItemSizes;
     if (isVertical) {
@@ -48,34 +53,72 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       crossCoordinate = 'x' as const;
     }
 
+    const additionalCrossSnapOffset = useSharedValue(0);
+
     const getRemainingProps = useCallback(() => {
       'worklet';
+      const key = activeItemKey.value ?? prevActiveItemKey.value;
+      if (key === null) {
+        return 0;
+      }
+
+      if (
+        enableActiveItemSnap.value &&
+        touchPosition.value &&
+        activeItemPosition.value &&
+        activeItemDimensions.value
+      ) {
+        const offset = calculateSnapOffset(
+          snapOffsetX.value,
+          snapOffsetY.value,
+          activeHandleMeasurements?.value ?? activeItemDimensions.value,
+          activeHandleOffset?.value
+        );
+        additionalCrossSnapOffset.value = isVertical
+          ? touchPosition.value.y - activeItemPosition.value.y - offset.y
+          : touchPosition.value.x - activeItemPosition.value.x - offset.x;
+      }
+
       return {
-        activeItemKey: activeItemKey.value ?? prevActiveItemKey.value,
-        itemPositions: itemPositions.value
+        activeItemKey: key,
+        itemPositions: itemPositions.value,
+        snapBasedOffset: additionalCrossSnapOffset.value
       };
-    }, [activeItemKey, itemPositions, prevActiveItemKey]);
+    }, [
+      activeHandleMeasurements,
+      activeHandleOffset,
+      activeItemDimensions,
+      additionalCrossSnapOffset,
+      enableActiveItemSnap,
+      snapOffsetX,
+      snapOffsetY,
+      activeItemKey,
+      activeItemPosition,
+      itemPositions,
+      prevActiveItemKey,
+      touchPosition,
+      isVertical
+    ]);
 
     const additionalCrossOffset = useDerivedValue(() => {
-      const { activeItemKey: activeKey, ...rest } = getRemainingProps();
+      const props = getRemainingProps();
 
-      if (!activeItemDropped.value && activeKey !== null) {
+      if (props) {
         return calculateActiveItemCrossOffset({
-          activeItemKey: activeKey,
           crossCoordinate,
           crossGap: crossGap.value,
           crossItemSizes: crossItemSizes.value,
           indexToKey: indexToKey.value,
           keyToIndex: keyToIndex.value,
           numGroups,
-          ...rest
+          ...props
         });
       }
 
       return 0;
     });
 
-    return { value: { additionalCrossOffset } };
+    return { value: { additionalCrossOffset, additionalCrossSnapOffset } };
   });
 
 export { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext };

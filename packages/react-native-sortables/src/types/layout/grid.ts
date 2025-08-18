@@ -27,4 +27,5 @@ export type AdditionalCrossOffsetProps = {
   crossItemSizes: ItemSizes;
   crossCoordinate: Coordinate;
   numGroups: number;
+  snapBasedOffset: number;
 };

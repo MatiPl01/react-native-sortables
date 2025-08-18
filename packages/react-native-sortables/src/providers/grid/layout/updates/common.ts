@@ -37,22 +37,20 @@ export const createGridStrategy =
     const debugBox = useDebugBoundingBox();
 
     const othersLayout = useDerivedValue(() =>
-      additionalCrossOffset?.value === null
-        ? null
-        : calculateLayout(
-            {
-              gaps: {
-                cross: crossGap.value,
-                main: mainGap.value
-              },
-              indexToKey: othersIndexToKey.value,
-              isVertical,
-              itemHeights: itemHeights.value,
-              itemWidths: itemWidths.value,
-              numGroups
-            },
-            additionalCrossOffset?.value
-          )
+      calculateLayout(
+        {
+          gaps: {
+            cross: crossGap.value,
+            main: mainGap.value
+          },
+          indexToKey: othersIndexToKey.value,
+          isVertical,
+          itemHeights: itemHeights.value,
+          itemWidths: itemWidths.value,
+          numGroups
+        },
+        additionalCrossOffset?.value
+      )
     );
 
     let mainContainerSize: SharedValue<null | number>;
@@ -246,7 +244,6 @@ export const createGridStrategy =
         }
       }
 
-      // Swap the active item with the item at the new index
       const idxToKey = indexToKey.value;
       const itemsCount = idxToKey.length;
       const limitedCrossIndex = Math.max(
@@ -264,6 +261,7 @@ export const createGridStrategy =
       ) {
         return;
       }
+      console.log('newIndex', newIndex, idxToKey[newIndex]);
 
       // return the new order of items
       return reorder(idxToKey, activeIndex, newIndex, fixedItemKeys?.value);
