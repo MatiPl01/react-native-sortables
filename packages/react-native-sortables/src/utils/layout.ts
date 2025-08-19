@@ -4,7 +4,7 @@ import type { Dimensions, Offset, Vector } from '../types';
 import { gt, lt } from './equality';
 import { error } from './logs';
 
-export const getOffsetDistance = (
+const getOffsetDistance = (
   providedOffset: Offset,
   distance: number
 ): number => {
