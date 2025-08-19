@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import Animated, { useAnimatedReaction } from 'react-native-reanimated';
+import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
@@ -27,7 +27,6 @@ export type GridLayoutProviderProps = PropsWithChildren<{
 const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   'GridLayout'
 )<GridLayoutProviderProps, GridLayoutContextType>(({
-  children,
   columnGap,
   isVertical,
   numGroups,
@@ -117,7 +116,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       // Update item positions
       itemPositions.value = layout.itemPositions;
       // Update controlled container dimensions
-      applyControlledContainerDimensions(layout.controlledContainerDimensions);
+      applyControlledContainerDimensions(layout.controlledContainerDimensions); // TODO - adjust container height properly to prevent content jumps when items are collapsed
 
       // On the web, animate layout only if parent container is not resized
       // (e.g. skip animation when the browser window is resized)
@@ -145,13 +144,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   );
 
   return {
-    children: (
-      <>
-        {children}
-        {/* TODO - apply the height intelligently */}
-        <Animated.View style={{ height: 2000 }} />
-      </>
-    ),
     value: {
       crossGap,
       isVertical,

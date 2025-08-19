@@ -3,11 +3,11 @@ import { IS_WEB } from '../../../../constants';
 import type {
   AlignContent,
   AlignItems,
-  ItemSizes,
   Direction,
   FlexAlignments,
   FlexLayout,
   FlexLayoutProps,
+  ItemSizes,
   JustifyContent,
   Vector
 } from '../../../../types';

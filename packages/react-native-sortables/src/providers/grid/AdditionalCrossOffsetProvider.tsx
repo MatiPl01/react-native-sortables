@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from 'react';
 import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useDerivedValue } from 'react-native-reanimated';
@@ -8,12 +9,12 @@ import { useCommonValuesContext, useCustomHandleContext } from '../shared';
 import { createProvider } from '../utils';
 import { calculateActiveItemCrossOffset } from './layout/utils';
 
-type AdditionalCrossOffsetProviderProps = {
+type AdditionalCrossOffsetProviderProps = PropsWithChildren<{
   isVertical: boolean;
   columnGap: SharedValue<number>;
   rowGap: SharedValue<number>;
   numGroups: number;
-};
+}>;
 
 const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
   createProvider('AdditionalCrossOffset', {
@@ -105,17 +106,6 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       const props = getRemainingProps();
 
       if (props) {
-        console.log(
-          'calc',
-          props,
-          calculateActiveItemCrossOffset({
-            crossCoordinate,
-            crossGap: crossGap.value,
-            crossItemSizes: crossItemSizes.value,
-            numGroups,
-            ...props
-          })
-        );
         return calculateActiveItemCrossOffset({
           crossCoordinate,
           crossGap: crossGap.value,
@@ -124,8 +114,6 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
           ...props
         });
       }
-
-      console.log('no calc');
 
       return 0;
     });

@@ -261,7 +261,6 @@ export const createGridStrategy =
       ) {
         return;
       }
-      console.log('newIndex', newIndex, idxToKey[newIndex]);
 
       // return the new order of items
       return reorder(idxToKey, activeIndex, newIndex, fixedItemKeys?.value);

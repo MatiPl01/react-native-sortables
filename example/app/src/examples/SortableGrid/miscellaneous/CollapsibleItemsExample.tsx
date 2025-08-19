@@ -41,11 +41,11 @@ export default function CollapsibleItemsExample() {
           columnGap={10}
           data={DATA}
           overDrag='vertical'
+          // overflow='visible'
           renderItem={renderItem}
           reorderTriggerOrigin='center'
           rowGap={10}
-          // TODO - add correct auto scroll support for collapsible items
-          scrollableRef={scrollableRef}
+          scrollableRef={scrollableRef} // TODO - add correct auto scroll support for collapsible items
           debug
           onActiveItemDropped={() => setCollapsed(false)}
           onDragStart={() => setCollapsed(true)}
@@ -64,7 +64,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   container: {
-    padding: spacing.md
+    padding: spacing.md,
+    paddingBottom: 120
   },
   text: {
     ...text.label2,

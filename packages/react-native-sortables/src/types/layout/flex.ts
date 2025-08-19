@@ -1,7 +1,7 @@
 import type { ViewStyle } from 'react-native';
 
 import type { NoUndef } from '../../helperTypes';
-import type { ItemSizes, Dimensions, Vector } from './shared';
+import type { Dimensions, ItemSizes, Vector } from './shared';
 
 export type AlignContent = Exclude<
   NoUndef<ViewStyle['alignContent']>,

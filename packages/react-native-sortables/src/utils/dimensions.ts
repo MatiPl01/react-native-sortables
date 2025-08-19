@@ -1,5 +1,5 @@
 'worklet';
-import type { ItemSizes, Dimensions } from '../types';
+import type { Dimensions, ItemSizes } from '../types';
 
 export const resolveDimension = (dimension: ItemSizes, key: string) =>
   dimension &&
