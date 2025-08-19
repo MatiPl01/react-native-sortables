@@ -7,8 +7,8 @@ import type { SharedProviderProps } from '../shared';
 import { SharedProvider, useOrderUpdater, useStrategyKey } from '../shared';
 import { ContextProviderComposer } from '../utils';
 import { AdditionalCrossOffsetProvider } from './AdditionalCrossOffsetProvider';
-import type { GridLayoutProviderProps } from './layout';
-import { GRID_STRATEGIES, GridLayoutProvider } from './layout';
+import type { GridLayoutProviderProps } from './GridLayoutProvider';
+import { GRID_STRATEGIES, GridLayoutProvider } from './GridLayoutProvider';
 
 type GridProviderProps = PropsWithChildren<
   GridLayoutProviderProps &

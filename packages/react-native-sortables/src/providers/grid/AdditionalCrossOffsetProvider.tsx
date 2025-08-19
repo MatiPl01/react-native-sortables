@@ -7,7 +7,7 @@ import type { AdditionalCrossOffsetContextType } from '../../types';
 import { calculateSnapOffset } from '../../utils';
 import { useCommonValuesContext, useCustomHandleContext } from '../shared';
 import { createProvider } from '../utils';
-import { calculateActiveItemCrossOffset } from './layout/utils';
+import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
 
 type AdditionalCrossOffsetProviderProps = PropsWithChildren<{
   isVertical: boolean;
