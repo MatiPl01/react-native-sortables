@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import type { AdditionalCrossOffsetContextType } from '../../types';
 import { calculateSnapOffset } from '../../utils';
@@ -53,14 +53,14 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       crossCoordinate = 'x' as const;
     }
 
-    const additionalCrossSnapOffset = useSharedValue(0);
-
     const getRemainingProps = useCallback(() => {
       'worklet';
       const key = activeItemKey.value ?? prevActiveItemKey.value;
       if (key === null) {
         return 0;
       }
+
+      let snapBasedOffset = 0;
 
       if (
         enableActiveItemSnap.value &&
@@ -74,21 +74,24 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
           activeHandleMeasurements?.value ?? activeItemDimensions.value,
           activeHandleOffset?.value
         );
-        additionalCrossSnapOffset.value = isVertical
+        snapBasedOffset = isVertical
           ? touchPosition.value.y - activeItemPosition.value.y - offset.y
           : touchPosition.value.x - activeItemPosition.value.x - offset.x;
       }
 
       return {
         activeItemKey: key,
+        indexToKey: indexToKey.value,
         itemPositions: itemPositions.value,
-        snapBasedOffset: additionalCrossSnapOffset.value
+        keyToIndex: keyToIndex.value,
+        snapBasedOffset
       };
     }, [
+      indexToKey,
+      keyToIndex,
       activeHandleMeasurements,
       activeHandleOffset,
       activeItemDimensions,
-      additionalCrossSnapOffset,
       enableActiveItemSnap,
       snapOffsetX,
       snapOffsetY,
@@ -108,8 +111,6 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
           crossCoordinate,
           crossGap: crossGap.value,
           crossItemSizes: crossItemSizes.value,
-          indexToKey: indexToKey.value,
-          keyToIndex: keyToIndex.value,
           numGroups,
           ...props
         });
@@ -118,7 +119,11 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       return 0;
     });
 
-    return { value: { additionalCrossOffset, additionalCrossSnapOffset } };
+    return {
+      value: {
+        additionalCrossOffset
+      }
+    };
   });
 
 export { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext };

@@ -42,6 +42,7 @@ export default function CollapsibleItemsExample() {
           data={DATA}
           overDrag='vertical'
           renderItem={renderItem}
+          reorderTriggerOrigin='center'
           debug
           onActiveItemDropped={() => setCollapsed(false)}
           onDragStart={() => setCollapsed(true)}

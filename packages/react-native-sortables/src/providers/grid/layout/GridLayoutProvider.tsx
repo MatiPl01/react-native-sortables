@@ -109,7 +109,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       numGroups
     }),
     (props, previousProps) => {
-      const layout = calculateLayout(props, additionalCrossOffset?.value);
+      const layout = calculateLayout(props, additionalCrossOffset?.value ?? 0);
       if (!layout) {
         return;
       }

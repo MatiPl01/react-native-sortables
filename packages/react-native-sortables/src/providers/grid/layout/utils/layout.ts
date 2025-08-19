@@ -127,6 +127,8 @@ export const calculateActiveItemCrossOffset = ({
   const itemAtActiveIndexOffset =
     itemPositions[itemAtActiveIndexKey!]?.[crossCoordinate] ?? 0;
 
+  console.log(itemAtActiveIndexOffset, activeItemCrossOffset, snapBasedOffset);
+
   return Math.max(
     0,
     itemAtActiveIndexOffset - activeItemCrossOffset + snapBasedOffset

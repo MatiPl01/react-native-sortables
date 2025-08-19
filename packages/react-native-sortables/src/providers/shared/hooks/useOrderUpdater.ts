@@ -1,12 +1,10 @@
-import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
 import type {
   PredefinedStrategies,
   ReorderTriggerOrigin,
-  SortStrategyFactory,
-  Vector
+  SortStrategyFactory
 } from '../../../types';
 import { error } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
@@ -17,7 +15,7 @@ export default function useOrderUpdater<
 >(
   strategy: keyof P | SortStrategyFactory,
   predefinedStrategies: P,
-  triggerOrigin: SharedValue<null | ReorderTriggerOrigin | Vector>
+  triggerOrigin: ReorderTriggerOrigin
 ) {
   const useStrategy =
     typeof strategy === 'string' ? predefinedStrategies[strategy] : strategy;
@@ -39,11 +37,7 @@ export default function useOrderUpdater<
   const debugCross = debugContext?.useDebugCross();
 
   const triggerOriginPosition = useDerivedValue(() => {
-    if (triggerOrigin.value === 'touch') {
-      return touchPosition.value;
-    }
-
-    if (triggerOrigin.value === 'center') {
+    if (triggerOrigin === 'center') {
       if (!activeItemPosition.value || !activeItemDimensions.value) {
         return null;
       }
@@ -54,7 +48,7 @@ export default function useOrderUpdater<
       };
     }
 
-    return triggerOrigin.value;
+    return touchPosition.value;
   });
 
   const updater = useStrategy();
