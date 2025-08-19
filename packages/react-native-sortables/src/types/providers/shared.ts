@@ -169,7 +169,7 @@ export type PortalContextType = {
   portalOutletMeasurements: SharedValue<MeasuredDimensions | null>;
   measurePortalOutlet: () => void;
   teleport: (id: string, node: ReactNode) => void;
-  subscribe: (id: string, subscriber: PortalSubscription) => () => void;
+  isTeleported: (id: string) => boolean;
 };
 
 // MULTI ZONE

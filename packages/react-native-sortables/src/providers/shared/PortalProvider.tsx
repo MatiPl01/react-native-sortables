@@ -13,11 +13,7 @@ import { measure, useAnimatedRef } from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../constants';
 import { useMutableValue } from '../../integrations/reanimated';
-import type {
-  PortalContextType,
-  PortalSubscription,
-  Vector
-} from '../../types';
+import type { PortalContextType, Vector } from '../../types';
 import { createProvider } from '../utils';
 import { PortalOutletProvider } from './PortalOutletProvider';
 
@@ -50,7 +46,7 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
 
   const [teleportedNodes, setTeleportedNodes] =
     useState<Record<string, React.ReactNode>>(EMPTY_OBJECT);
-  const subscribersRef = useRef<Record<string, Set<PortalSubscription>>>({});
+  const teleportedNodeIdsRef = useRef<Set<string>>(new Set());
   const portalOutletRef = useAnimatedRef<View>();
 
   const activeItemAbsolutePosition = useMutableValue<null | Vector>(null);
@@ -66,36 +62,21 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     }
   }, [enabled, shouldPropagate]);
 
-  const notifySubscribers = useCallback((id: string, isTeleported: boolean) => {
-    subscribersRef.current?.[id]?.forEach(subscriber =>
-      subscriber(isTeleported)
-    );
+  const teleport = useCallback((id: string, node: React.ReactNode) => {
+    if (node) {
+      teleportedNodeIdsRef.current.add(id);
+      setTeleportedNodes(prev => ({ ...prev, [id]: node }));
+    } else if (teleportedNodeIdsRef.current.has(id)) {
+      teleportedNodeIdsRef.current.delete(id);
+      setTeleportedNodes(prev => {
+        const { [id]: _, ...rest } = prev;
+        return rest;
+      });
+    }
   }, []);
 
-  const teleport = useCallback(
-    (id: string, node: React.ReactNode) => {
-      if (node) {
-        setTeleportedNodes(prev => ({ ...prev, [id]: node }));
-        notifySubscribers(id, true);
-      } else {
-        setTeleportedNodes(prev => {
-          const { [id]: _, ...rest } = prev;
-          return rest;
-        });
-        notifySubscribers(id, false);
-      }
-    },
-    [notifySubscribers]
-  );
-
-  const subscribe = useCallback(
-    (id: string, subscriber: PortalSubscription) => {
-      subscribersRef.current[id] = subscribersRef.current[id] ?? new Set();
-      subscribersRef.current[id].add(subscriber);
-      return () => {
-        subscribersRef.current[id]?.delete(subscriber);
-      };
-    },
+  const isTeleported = useCallback(
+    (id: string) => teleportedNodeIdsRef.current.has(id),
     []
   );
 
@@ -103,16 +84,6 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     'worklet';
     portalOutletMeasurements.value = measure(portalOutletRef);
   }, [portalOutletRef, portalOutletMeasurements]);
-
-  const value = shouldPropagate
-    ? outerPortalContext
-    : {
-        activeItemAbsolutePosition,
-        measurePortalOutlet,
-        portalOutletMeasurements,
-        subscribe,
-        teleport
-      };
 
   const outlet = useMemo(
     () =>
@@ -127,6 +98,16 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
       ),
     [measurePortalOutlet, portalOutletRef, shouldPropagate, teleportedNodes]
   );
+
+  const value = shouldPropagate
+    ? outerPortalContext
+    : {
+        activeItemAbsolutePosition,
+        isTeleported,
+        measurePortalOutlet,
+        portalOutletMeasurements,
+        teleport
+      };
 
   return {
     children: (

@@ -9,7 +9,9 @@ export default function useStableCallback<C extends AnyFunction>(callback: C) {
     callbackRef.current = callback;
   }, [callback]);
 
-  return useCallback((...args: Parameters<C>) => {
-    callbackRef.current(...args);
-  }, []);
+  return useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    (...args: Parameters<C>) => callbackRef.current(...args) as ReturnType<C>,
+    []
+  );
 }
