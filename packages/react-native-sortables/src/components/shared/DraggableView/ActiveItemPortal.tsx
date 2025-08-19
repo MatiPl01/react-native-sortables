@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { ManualGesture } from 'react-native-gesture-handler';
 import {
   runOnJS,
@@ -43,6 +43,7 @@ export default function ActiveItemPortal({
 }: ActiveItemPortalProps) {
   const { isTeleported, measurePortalOutlet, teleport } =
     usePortalContext() ?? {};
+  const updateTimeoutRef = useRef(-1);
   const teleportEnabled = useMutableValue(false);
 
   const renderTeleportedItemCell = useCallback(
@@ -84,6 +85,7 @@ export default function ActiveItemPortal({
   });
 
   const disableTeleport = useCallback(() => {
+    clearTimeout(updateTimeoutRef.current);
     teleport?.(teleportedItemId, null);
     onTeleport(false);
   }, [teleport, teleportedItemId, onTeleport]);
@@ -98,9 +100,7 @@ export default function ActiveItemPortal({
       // onDragStart callback (e.g. in collapsible items) when we want to
       // render the view unchanged at first and change it a while later to
       // properly trigger all layout transitions that the item has.
-      setTimeout(() => {
-        teleport?.(teleportedItemId, renderTeleportedItemCell());
-      queueMicrotask(() => {
+      updateTimeoutRef.current = setTimeout(() => {
         teleport?.(teleportedItemId, renderTeleportedItemCell());
       });
     }
