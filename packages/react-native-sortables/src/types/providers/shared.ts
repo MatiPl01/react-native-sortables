@@ -162,8 +162,6 @@ export type CustomHandleContextType = {
 
 // PORTAL
 
-export type PortalSubscription = (isTeleported: boolean) => void;
-
 export type PortalContextType = {
   activeItemAbsolutePosition: SharedValue<null | Vector>;
   portalOutletMeasurements: SharedValue<MeasuredDimensions | null>;
