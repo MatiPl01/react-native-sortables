@@ -6,6 +6,8 @@ export type AnyFunction = (...args: Array<any>) => any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyRecord = Record<string, any>;
 
+export type EmptyRecord = Record<string, never>;
+
 export type Simplify<T> = {
   [K in keyof T]: T[K];
 } & {};

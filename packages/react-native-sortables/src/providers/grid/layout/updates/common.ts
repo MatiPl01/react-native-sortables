@@ -12,6 +12,7 @@ import {
   useCustomHandleContext,
   useDebugBoundingBox
 } from '../../../shared';
+import { useAdditionalCrossOffsetContext } from '../../AdditionalCrossOffsetProvider';
 import { useGridLayoutContext } from '../GridLayoutProvider';
 import { calculateLayout, getCrossIndex, getMainIndex } from '../utils';
 
@@ -28,26 +29,29 @@ export const createGridStrategy =
       itemHeights,
       itemWidths
     } = useCommonValuesContext();
-    const { crossGap, isVertical, mainGap, mainGroupSize, numGroups } =
-      useGridLayoutContext();
+    const { crossGap, isVertical, mainGap, numGroups } = useGridLayoutContext();
+    const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
     const { fixedItemKeys } = useCustomHandleContext() ?? {};
 
     const othersIndexToKey = useInactiveIndexToKey();
-    const othersLayout = useDerivedValue(() =>
-      calculateLayout({
-        gaps: {
-          cross: crossGap.value,
-          main: mainGap.value
-        },
-        indexToKey: othersIndexToKey.value,
-        isVertical,
-        itemHeights: itemHeights.value,
-        itemWidths: itemWidths.value,
-        mainGroupSize: mainGroupSize.value,
-        numGroups
-      })
-    );
     const debugBox = useDebugBoundingBox();
+
+    const othersLayout = useDerivedValue(() =>
+      calculateLayout(
+        {
+          gaps: {
+            cross: crossGap.value,
+            main: mainGap.value
+          },
+          indexToKey: othersIndexToKey.value,
+          isVertical,
+          itemHeights: itemHeights.value,
+          itemWidths: itemWidths.value,
+          numGroups
+        },
+        additionalCrossOffset?.value
+      )
+    );
 
     let mainContainerSize: SharedValue<null | number>;
     let crossContainerSize: SharedValue<null | number>;
@@ -71,11 +75,14 @@ export const createGridStrategy =
 
     return ({ activeIndex, dimensions, position }) => {
       'worklet';
+      const mainGroupSize = (isVertical ? itemWidths : itemHeights).value;
+
       if (
         !othersLayout.value ||
         crossContainerSize.value === null ||
         mainContainerSize.value === null ||
-        mainGroupSize.value === null
+        mainGroupSize === null ||
+        typeof mainGroupSize !== 'number'
       ) {
         return;
       }
@@ -88,7 +95,8 @@ export const createGridStrategy =
       let mainIndex = startMainIndex;
 
       const getItemCrossSize = (index: number) =>
-        crossAxisOffsets[index] !== undefined
+        crossAxisOffsets[index] !== undefined &&
+        crossAxisOffsets[index + 1] !== undefined
           ? crossAxisOffsets[index + 1]! -
             crossAxisOffsets[index] -
             crossGap.value
@@ -162,7 +170,7 @@ export const createGridStrategy =
         if (mainBeforeBound !== Infinity) {
           mainIndex--;
         }
-        mainBeforeOffset = mainIndex * (mainGroupSize.value + mainGap.value);
+        mainBeforeOffset = mainIndex * (mainGroupSize + mainGap.value);
         mainBeforeBound = mainBeforeOffset - additionalOffset;
       } while (
         mainBeforeBound > 0 &&
@@ -178,8 +186,7 @@ export const createGridStrategy =
           mainIndex++;
         }
         mainAfterOffset =
-          mainIndex * (mainGroupSize.value + mainGap.value) +
-          mainGroupSize.value;
+          mainIndex * (mainGroupSize + mainGap.value) + mainGroupSize;
         mainAfterBound = mainAfterOffset + additionalOffset;
       } while (
         mainAfterBound < mainContainerSize.value &&
@@ -237,7 +244,6 @@ export const createGridStrategy =
         }
       }
 
-      // Swap the active item with the item at the new index
       const idxToKey = indexToKey.value;
       const itemsCount = idxToKey.length;
       const limitedCrossIndex = Math.max(

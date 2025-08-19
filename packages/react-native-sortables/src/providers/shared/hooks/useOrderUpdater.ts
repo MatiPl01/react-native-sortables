@@ -1,48 +1,38 @@
 import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
-import type {
-  OrderUpdater,
-  ReorderTriggerOrigin,
-  Vector
-} from '../../../types';
+import type { PredefinedStrategies, SortStrategyFactory } from '../../../types';
+import { error } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
-export default function useOrderUpdater(
-  updater: OrderUpdater,
-  triggerOrigin: ReorderTriggerOrigin
-) {
-  const {
-    activeItemDimensions,
-    activeItemKey,
-    activeItemPosition,
-    keyToIndex,
-    touchPosition
-  } = useCommonValuesContext();
-  const { handleOrderChange } = useDragContext();
+export default function useOrderUpdater<
+  P extends PredefinedStrategies = PredefinedStrategies
+>(strategy: keyof P | SortStrategyFactory, predefinedStrategies: P) {
+  const useStrategy =
+    typeof strategy === 'string' ? predefinedStrategies[strategy] : strategy;
+
+  if (!useStrategy || typeof useStrategy !== 'function') {
+    throw error(`'${String(useStrategy)}' is not a valid ordering strategy`);
+  }
+
+  const { activeItemDimensions, activeItemKey, keyToIndex } =
+    useCommonValuesContext();
+  const { handleOrderChange, triggerOriginPosition } = useDragContext();
   const debugContext = useDebugContext();
 
   const debugCross = debugContext?.useDebugCross();
 
-  const isCenter = triggerOrigin === 'center';
+  const updater = useStrategy();
 
   useAnimatedReaction(
     () => ({
       activeKey: activeItemKey.value,
       dimensions: activeItemDimensions.value,
-      positions: {
-        activeItem: activeItemPosition.value,
-        touch: touchPosition.value
-      }
+      position: triggerOriginPosition.value
     }),
-    ({ activeKey, dimensions, positions }) => {
-      if (
-        !activeKey ||
-        !dimensions ||
-        !positions.touch ||
-        !positions.activeItem
-      ) {
+    ({ activeKey, dimensions, position }) => {
+      if (!activeKey || !dimensions || !position) {
         if (debugCross) debugCross.set({ position: null });
         return;
       }
@@ -50,16 +40,6 @@ export default function useOrderUpdater(
       const activeIndex = keyToIndex.value[activeKey];
       if (activeIndex === undefined) {
         return;
-      }
-
-      let position: Vector;
-      if (isCenter) {
-        position = {
-          x: positions.activeItem.x + dimensions.width / 2,
-          y: positions.activeItem.y + dimensions.height / 2
-        };
-      } else {
-        position = positions.touch;
       }
 
       if (debugCross) {

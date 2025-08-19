@@ -1,9 +1,10 @@
 'worklet';
-import type { Offset, Vector } from '../types';
+import type { Maybe } from '../helperTypes';
+import type { Dimensions, Offset, Vector } from '../types';
 import { gt, lt } from './equality';
 import { error } from './logs';
 
-export const getOffsetDistance = (
+const getOffsetDistance = (
   providedOffset: Offset,
   distance: number
 ): number => {
@@ -18,6 +19,23 @@ export const getOffsetDistance = (
 
   const percentage = parseFloat(match[0]) / 100;
   return distance * percentage;
+};
+
+export const calculateSnapOffset = (
+  snapOffsetX: Offset,
+  snapOffsetY: Offset,
+  snapItemDimensions: Dimensions,
+  snapItemOffset?: Maybe<Vector>
+) => {
+  'worklet';
+  return {
+    x:
+      (snapItemOffset?.x ?? 0) +
+      getOffsetDistance(snapOffsetX, snapItemDimensions.width),
+    y:
+      (snapItemOffset?.y ?? 0) +
+      getOffsetDistance(snapOffsetY, snapItemDimensions.height)
+  };
 };
 
 export const reorderInsert = (

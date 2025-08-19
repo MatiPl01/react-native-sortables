@@ -27,6 +27,7 @@ import { type DraggableViewProps } from './shared';
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
     rest: {
+      autoAdjustOffsetDuringDrag,
       columnGap,
       columns,
       data,
@@ -92,6 +93,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   return (
     <GridProvider
       {...sharedProps}
+      autoAdjustOffsetDuringDrag={autoAdjustOffsetDuringDrag}
       columnGap={columnGapValue}
       controlledContainerDimensions={controlledContainerDimensions}
       controlledItemDimensions={controlledItemDimensions}

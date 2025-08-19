@@ -23,14 +23,15 @@ import type {
   Dimensions,
   DragContextType,
   OverDrag,
+  ReorderTriggerOrigin,
   SortableCallbacks,
   Vector
 } from '../../types';
 import { DragActivationState, LayerState } from '../../types';
 import {
+  calculateSnapOffset,
   getItemDimensions,
-  getKeyToIndex,
-  getOffsetDistance
+  getKeyToIndex
 } from '../../utils';
 import { createProvider } from '../utils';
 import { useAutoScrollContext } from './AutoScrollProvider';
@@ -45,6 +46,7 @@ type DragProviderProps = PropsWithChildren<
   Required<SortableCallbacks> & {
     hapticsEnabled: boolean;
     overDrag: OverDrag;
+    reorderTriggerOrigin: ReorderTriggerOrigin;
   }
 >;
 
@@ -58,7 +60,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   onDragMove,
   onDragStart,
   onOrderChange,
-  overDrag
+  overDrag,
+  reorderTriggerOrigin
 }) => {
   const {
     activationAnimationDuration,
@@ -118,7 +121,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const dragStartTouchPosition = useMutableValue<null | Vector>(null);
   const dragStartIndex = useMutableValue(-1);
 
-  // used for activation and deactivation (drop)
+  // Used to trigger order change of items when the active item is dragged around
+  const triggerOriginPosition = useMutableValue<null | Vector>(null);
+
+  // Used for activation and deactivation (drop)
   const activationTimeoutId = useMutableValue(-1);
 
   // Create stable callbacks to avoid re-rendering when the callback
@@ -141,9 +147,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX: snapOffsetX.value,
       offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
-      snapDimensions:
+      snapItemDimensions:
         activeHandleMeasurements?.value ?? activeItemDimensions.value,
-      snapOffset: activeHandleOffset?.value,
+      snapItemOffset: activeHandleOffset?.value,
       startTouch: touchStartTouch.value,
       startTouchPosition: dragStartTouchPosition.value,
       touch: currentTouch.value
@@ -159,8 +165,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       offsetX,
       offsetY,
       progress,
-      snapDimensions,
-      snapOffset,
+      snapItemDimensions,
+      snapItemOffset,
       startTouch,
       startTouchPosition,
       touch
@@ -170,15 +176,18 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         containerH === null ||
         containerW === null ||
         !activeDimensions ||
-        !snapDimensions ||
+        !snapItemDimensions ||
         !itemTouchOffset ||
         !startTouchPosition ||
         !touch ||
         !startTouch
       ) {
         touchPosition.value = null;
+        triggerOriginPosition.value = null;
         return;
       }
+
+      // Touch position
 
       touchPosition.value = {
         x:
@@ -191,43 +200,62 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           (offsetDiff?.y ?? 0)
       };
 
-      let tX = itemTouchOffset.x;
-      let tY = itemTouchOffset.y;
-
-      if (enableSnap) {
-        tX =
-          (snapOffset?.x ?? 0) +
-          getOffsetDistance(offsetX, snapDimensions.width);
-        tY =
-          (snapOffset?.y ?? 0) +
-          getOffsetDistance(offsetY, snapDimensions.height);
-      }
+      // Active item position
 
       const translate = (from: number, to: number) =>
         from === to ? from : interpolate(progress, [0, 1], [from, to]);
 
-      const snapX = translate(itemTouchOffset.x, tX);
-      const snapY = translate(itemTouchOffset.y, tY);
+      const maybeClampPosition = (x: number, y: number) => ({
+        x: hasHorizontalOverDrag
+          ? x
+          : clamp(x, 0, containerW - activeDimensions.width),
+        y: hasVerticalOverDrag
+          ? y
+          : clamp(y, 0, containerH - activeDimensions.height)
+      });
+
+      const snapOffset = enableSnap
+        ? calculateSnapOffset(
+            offsetX,
+            offsetY,
+            snapItemDimensions,
+            snapItemOffset
+          )
+        : itemTouchOffset;
+
+      const snapX = translate(itemTouchOffset.x, snapOffset.x);
+      const snapY = translate(itemTouchOffset.y, snapOffset.y);
 
       const unclampedActiveX = touchPosition.value.x - snapX;
       const unclampedActiveY = touchPosition.value.y - snapY;
 
-      const activeX = hasHorizontalOverDrag
-        ? unclampedActiveX
-        : clamp(unclampedActiveX, 0, containerW - activeDimensions.width);
-      const activeY = hasVerticalOverDrag
-        ? unclampedActiveY
-        : clamp(unclampedActiveY, 0, containerH - activeDimensions.height);
+      activeItemPosition.value = maybeClampPosition(
+        unclampedActiveX,
+        unclampedActiveY
+      );
 
-      activeItemPosition.value = {
-        x: activeX,
-        y: activeY
-      };
+      // Trigger origin position
+
+      if (reorderTriggerOrigin === 'touch') {
+        triggerOriginPosition.value = touchPosition.value;
+      } else {
+        const activeItemTargetPosition = maybeClampPosition(
+          touchPosition.value.x - snapOffset.x,
+          touchPosition.value.y - snapOffset.y
+        );
+        triggerOriginPosition.value = {
+          x: activeItemTargetPosition.x + activeDimensions.width / 2,
+          y: activeItemTargetPosition.y + activeDimensions.height / 2
+        };
+      }
+
+      // Portal-related values
 
       if (activeItemAbsolutePosition) {
+        const activePosition = activeItemPosition.value;
         activeItemAbsolutePosition.value = {
-          x: touch.absoluteX + activeX - unclampedActiveX - snapX,
-          y: touch.absoluteY + activeY - unclampedActiveY - snapY
+          x: touch.absoluteX + activePosition.x - unclampedActiveX - snapX,
+          y: touch.absoluteY + activePosition.y - unclampedActiveY - snapY
         };
       }
     }
@@ -607,7 +635,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       handleDragEnd,
       handleOrderChange,
       handleTouchesMove,
-      handleTouchStart
+      handleTouchStart,
+      triggerOriginPosition
     }
   };
 });

@@ -30,7 +30,7 @@ export type SharedProviderProps = PropsWithChildren<
   ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     PartialBy<AutoScrollSettings, 'scrollableRef'> &
-    Required<Omit<ItemDragSettings, 'reorderTriggerOrigin'>> &
+    Required<ItemDragSettings> &
     Required<SortableCallbacks> & {
       itemKeys: Array<string>;
       sortEnabled: Animatable<boolean>;
@@ -63,6 +63,7 @@ export default function SharedProvider({
   onDragStart,
   onOrderChange,
   overDrag,
+  reorderTriggerOrigin,
   scrollableRef,
   sortEnabled,
   ...rest
@@ -107,6 +108,7 @@ export default function SharedProvider({
     <DragProvider
       hapticsEnabled={hapticsEnabled}
       overDrag={overDrag}
+      reorderTriggerOrigin={reorderTriggerOrigin}
       onActiveItemDropped={onActiveItemDropped}
       onDragEnd={onDragEnd}
       onDragMove={onDragMove}

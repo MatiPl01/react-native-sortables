@@ -111,6 +111,10 @@ export type SortableGridProps<I> = Simplify<
        * @important Works only for horizontal grids. Requires the rows property to be set.
        */
       rowHeight?: number;
+      /** Whether to automatically adjust positions of items when their size changes during drag.
+       * @default false
+       */
+      autoAdjustOffsetDuringDrag?: boolean;
     }
 >;
 

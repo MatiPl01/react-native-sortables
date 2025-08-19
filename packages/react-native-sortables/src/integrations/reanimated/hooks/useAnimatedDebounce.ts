@@ -16,7 +16,13 @@ export default function useAnimatedDebounce() {
     };
   }, [updateTimeoutId]);
 
-  const debounce = useCallback(
+  const cancel = useCallback(() => {
+    'worklet';
+    clearAnimatedTimeout(updateTimeoutId.value);
+    updateTimeoutId.value = -1;
+  }, [updateTimeoutId]);
+
+  const schedule = useCallback(
     (callback: () => void, timeout: number) => {
       'worklet';
       if (updateTimeoutId.value !== -1) {
@@ -30,5 +36,5 @@ export default function useAnimatedDebounce() {
     [updateTimeoutId]
   );
 
-  return debounce;
+  return { cancel, schedule };
 }

@@ -1,13 +1,12 @@
-import type { ControlledSizes, Dimensions, Vector } from './shared';
+import type { Coordinate, Dimensions, ItemSizes, Vector } from './shared';
 
 export type GridLayoutProps = {
-  mainGroupSize: null | number;
   gaps: {
     main: number;
     cross: number;
   };
-  itemHeights: ControlledSizes;
-  itemWidths: ControlledSizes;
+  itemHeights: ItemSizes;
+  itemWidths: ItemSizes;
   indexToKey: Array<string>;
   isVertical: boolean;
   numGroups: number;
@@ -17,4 +16,16 @@ export type GridLayout = {
   itemPositions: Record<string, Vector>;
   crossAxisOffsets: Array<number>;
   controlledContainerDimensions: Partial<Dimensions>;
+};
+
+export type AdditionalCrossOffsetProps = {
+  activeItemKey: string;
+  indexToKey: Array<string>;
+  keyToIndex: Record<string, number>;
+  itemPositions: Record<string, Vector>;
+  crossGap: number;
+  crossItemSizes: ItemSizes;
+  crossCoordinate: Coordinate;
+  numGroups: number;
+  snapBasedOffset: number;
 };

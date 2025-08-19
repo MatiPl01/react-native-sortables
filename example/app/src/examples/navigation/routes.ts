@@ -76,6 +76,10 @@ const routes: Routes = {
             StaggerAnimation: {
               Component: SortableGrid.miscellaneous.StaggerAnimationExample,
               name: 'Stagger Animation'
+            },
+            CollapsibleItems: {
+              Component: SortableGrid.miscellaneous.CollapsibleItemsExample,
+              name: 'Collapsible Items'
             }
           }
         }

@@ -1,16 +1,13 @@
 import { type PropsWithChildren } from 'react';
+import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
-import type { Animatable } from '../../../integrations/reanimated';
-import {
-  useAnimatableValue,
-  useMutableValue
-} from '../../../integrations/reanimated';
 import type { GridLayoutContextType } from '../../../types';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
+import { useAdditionalCrossOffsetContext } from '../AdditionalCrossOffsetProvider';
 import { calculateLayout } from './utils';
 
 const DEBUG_COLORS = {
@@ -22,19 +19,19 @@ export type GridLayoutProviderProps = PropsWithChildren<{
   numItems: number;
   numGroups: number;
   isVertical: boolean;
-  rowGap: Animatable<number>;
-  columnGap: Animatable<number>;
+  rowGap: SharedValue<number>;
+  columnGap: SharedValue<number>;
   rowHeight?: number;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   'GridLayout'
 )<GridLayoutProviderProps, GridLayoutContextType>(({
-  columnGap: columnGap_,
+  columnGap,
   isVertical,
   numGroups,
   numItems,
-  rowGap: rowGap_,
+  rowGap,
   rowHeight
 }) => {
   const {
@@ -46,6 +43,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
+  const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
   const debugContext = useDebugContext();
 
   const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
@@ -53,18 +51,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     Math.ceil(numItems / numGroups) - 1
   );
 
-  const columnGap = useAnimatableValue(columnGap_);
-  const rowGap = useAnimatableValue(rowGap_);
-
   const mainGap = isVertical ? columnGap : rowGap;
   const crossGap = isVertical ? rowGap : columnGap;
-
-  /**
-   * Size of the group of items determined by the parent container size.
-   * width - in vertical orientation (default) (columns are groups)
-   * height - in horizontal orientation (rows are groups)
-   */
-  const mainGroupSize = useMutableValue<null | number>(rowHeight ?? null);
 
   // MAIN GROUP SIZE UPDATER
   useAnimatedReaction(
@@ -84,7 +72,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         return;
       }
 
-      mainGroupSize.value = value;
       if (isVertical) {
         itemWidths.value = value;
       } else {
@@ -118,27 +105,28 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       isVertical,
       itemHeights: itemHeights.value,
       itemWidths: itemWidths.value,
-      mainGroupSize: mainGroupSize.value,
       numGroups
     }),
     (props, previousProps) => {
-      const layout = calculateLayout(props);
-
-      // On web, animate layout only if parent container is not resized
-      // (e.g. skip animation when the browser window is resized)
-      shouldAnimateLayout.value =
-        !IS_WEB ||
-        !previousProps?.mainGroupSize ||
-        props.mainGroupSize === previousProps.mainGroupSize;
-
-      if (!layout || mainGroupSize.value === null) {
+      const layout = calculateLayout(props, additionalCrossOffset?.value ?? 0);
+      if (!layout) {
         return;
       }
 
       // Update item positions
       itemPositions.value = layout.itemPositions;
       // Update controlled container dimensions
-      applyControlledContainerDimensions(layout.controlledContainerDimensions);
+      applyControlledContainerDimensions(layout.controlledContainerDimensions); // TODO - adjust container height properly to prevent content jumps when items are collapsed
+
+      // On the web, animate layout only if parent container is not resized
+      // (e.g. skip animation when the browser window is resized)
+      shouldAnimateLayout.value =
+        !IS_WEB ||
+        !previousProps?.itemHeights ||
+        !previousProps?.itemWidths ||
+        isVertical
+          ? props.itemWidths === previousProps?.itemWidths
+          : props.itemHeights === previousProps?.itemHeights;
 
       // DEBUG ONLY
       if (debugCrossGapRects) {
@@ -160,7 +148,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       crossGap,
       isVertical,
       mainGap,
-      mainGroupSize,
       numGroups
     }
   };
