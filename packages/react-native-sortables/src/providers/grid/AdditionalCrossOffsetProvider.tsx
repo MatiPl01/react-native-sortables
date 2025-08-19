@@ -34,7 +34,6 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       itemPositions,
       itemWidths,
       keyToIndex,
-      prevActiveItemKey,
       snapOffsetX,
       snapOffsetY,
       touchPosition
@@ -55,9 +54,9 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
 
     const getRemainingProps = useCallback(() => {
       'worklet';
-      const key = activeItemKey.value ?? prevActiveItemKey.value;
+      const key = activeItemKey.value;
       if (key === null) {
-        return 0;
+        return null;
       }
 
       let snapBasedOffset = 0;
@@ -98,7 +97,6 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       activeItemKey,
       activeItemPosition,
       itemPositions,
-      prevActiveItemKey,
       touchPosition,
       isVertical
     ]);
@@ -107,6 +105,17 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       const props = getRemainingProps();
 
       if (props) {
+        console.log(
+          'calc',
+          props,
+          calculateActiveItemCrossOffset({
+            crossCoordinate,
+            crossGap: crossGap.value,
+            crossItemSizes: crossItemSizes.value,
+            numGroups,
+            ...props
+          })
+        );
         return calculateActiveItemCrossOffset({
           crossCoordinate,
           crossGap: crossGap.value,
@@ -115,6 +124,8 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
           ...props
         });
       }
+
+      console.log('no calc');
 
       return 0;
     });

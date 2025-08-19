@@ -47,7 +47,7 @@ export default function CollapsibleItemsExample() {
           // TODO - add correct auto scroll support for collapsible items
           scrollableRef={scrollableRef}
           debug
-          onDragEnd={() => setCollapsed(false)}
+          onActiveItemDropped={() => setCollapsed(false)}
           onDragStart={() => setCollapsed(true)}
         />
       </Animated.ScrollView>
