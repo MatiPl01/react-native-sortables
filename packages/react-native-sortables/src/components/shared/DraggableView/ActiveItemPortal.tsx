@@ -100,7 +100,9 @@ export default function ActiveItemPortal({
       // properly trigger all layout transitions that the item has.
       setTimeout(() => {
         teleport?.(teleportedItemId, renderTeleportedItemCell());
-      }, 0);
+      queueMicrotask(() => {
+        teleport?.(teleportedItemId, renderTeleportedItemCell());
+      });
     }
   }, [isTeleported, renderTeleportedItemCell, teleport, teleportedItemId]);
 
