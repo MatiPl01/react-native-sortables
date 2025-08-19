@@ -137,7 +137,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         } else {
           // In all other cases, debounce the update to reduce the number of
           // updates when dimensions change many times within a short period of time
-          debounce.call(updateDimensions, 100);
+          debounce.schedule(updateDimensions, 100);
         }
       })();
     }
