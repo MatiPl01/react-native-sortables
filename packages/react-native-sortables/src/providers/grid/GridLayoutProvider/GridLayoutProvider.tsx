@@ -5,11 +5,10 @@ import { useAnimatedReaction } from 'react-native-reanimated';
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type { GridLayoutContextType } from '../../../types';
-import { areValuesDifferent } from '../../../utils';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { useAdditionalCrossOffsetContext } from '../AdditionalCrossOffsetProvider';
-import { calculateLayout } from './utils';
+import { calculateLayout, shouldUpdateContainerDimensions } from './utils';
 
 const DEBUG_COLORS = {
   backgroundColor: '#ffa500',
@@ -119,19 +118,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       itemPositions.value = layout.itemPositions;
 
       // Update controlled container dimensions
-      const currentContainerCrossSize = isVertical
-        ? containerHeight.value
-        : containerWidth.value;
-
       if (
-        !currentContainerCrossSize ||
-        (areValuesDifferent(
-          currentContainerCrossSize,
+        shouldUpdateContainerDimensions(
+          isVertical ? containerHeight.value : containerWidth.value,
           layout.containerCrossSize,
-          1
-        ) &&
-          (!additionalCrossOffset?.value ||
-            layout.containerCrossSize > currentContainerCrossSize))
+          !!additionalCrossOffset?.value
+        )
       ) {
         applyControlledContainerDimensions({
           [isVertical ? 'height' : 'width']: layout.containerCrossSize
