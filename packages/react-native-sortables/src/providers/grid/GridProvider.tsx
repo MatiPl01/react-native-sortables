@@ -24,7 +24,6 @@ export default function GridProvider({
   isVertical,
   numGroups,
   numItems,
-  reorderTriggerOrigin,
   rowGap: rowGap_,
   rowHeight,
   strategy,
@@ -52,10 +51,7 @@ export default function GridProvider({
 
   return (
     <ContextProviderComposer providers={providers}>
-      <GridProviderInner
-        key={useStrategyKey(strategy)}
-        reorderTriggerOrigin={reorderTriggerOrigin}
-        strategy={strategy}>
+      <GridProviderInner key={useStrategyKey(strategy)} strategy={strategy}>
         {children}
       </GridProviderInner>
     </ContextProviderComposer>
@@ -64,15 +60,10 @@ export default function GridProvider({
 
 type GridProviderInnerProps = PropsWithChildren<{
   strategy: SortableGridStrategy;
-  reorderTriggerOrigin: ReorderTriggerOrigin;
 }>;
 
-function GridProviderInner({
-  children,
-  reorderTriggerOrigin,
-  strategy
-}: GridProviderInnerProps) {
-  useOrderUpdater(strategy, GRID_STRATEGIES, reorderTriggerOrigin);
+function GridProviderInner({ children, strategy }: GridProviderInnerProps) {
+  useOrderUpdater(strategy, GRID_STRATEGIES);
 
   return <>{children}</>;
 }

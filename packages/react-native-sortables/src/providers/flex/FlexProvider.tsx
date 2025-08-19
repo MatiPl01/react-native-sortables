@@ -24,7 +24,6 @@ type FlexProviderProps = PropsWithChildren<
 
 export default function FlexProvider({
   children,
-  reorderTriggerOrigin,
   strategy,
   styleProps,
   ...sharedProps
@@ -39,10 +38,7 @@ export default function FlexProvider({
 
   return (
     <ContextProviderComposer providers={providers}>
-      <FlexProviderInner
-        key={useStrategyKey(strategy)}
-        reorderTriggerOrigin={reorderTriggerOrigin}
-        strategy={strategy}>
+      <FlexProviderInner key={useStrategyKey(strategy)} strategy={strategy}>
         {children}
       </FlexProviderInner>
     </ContextProviderComposer>
@@ -51,15 +47,10 @@ export default function FlexProvider({
 
 type FlexProviderInnerProps = PropsWithChildren<{
   strategy: SortableFlexStrategy;
-  reorderTriggerOrigin: ReorderTriggerOrigin;
 }>;
 
-function FlexProviderInner({
-  children,
-  reorderTriggerOrigin,
-  strategy
-}: FlexProviderInnerProps) {
-  useOrderUpdater(strategy, FLEX_STRATEGIES, reorderTriggerOrigin);
+function FlexProviderInner({ children, strategy }: FlexProviderInnerProps) {
+  useOrderUpdater(strategy, FLEX_STRATEGIES);
 
   return <>{children}</>;
 }

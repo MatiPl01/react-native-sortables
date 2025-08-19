@@ -43,12 +43,12 @@ export default function CollapsibleItemsExample() {
           overDrag='vertical'
           renderItem={renderItem}
           reorderTriggerOrigin='center'
-          debug
-          onActiveItemDropped={() => setCollapsed(false)}
-          onDragStart={() => setCollapsed(true)}
           rowGap={10}
           // TODO - add correct auto scroll support for collapsible items
           scrollableRef={scrollableRef}
+          debug
+          onDragEnd={() => setCollapsed(false)}
+          onDragStart={() => setCollapsed(true)}
         />
       </Animated.ScrollView>
     </Screen>

@@ -101,6 +101,7 @@ export type AutoScrollContextType = {
 // DRAG
 
 export type DragContextType = {
+  triggerOriginPosition: SharedValue<null | Vector>;
   handleTouchStart: (
     e: GestureTouchEvent,
     key: string,
