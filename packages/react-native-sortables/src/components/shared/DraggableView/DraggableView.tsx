@@ -1,4 +1,4 @@
-import type { PropsWithChildren, ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 import { Fragment, memo, useCallback, useEffect, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -14,7 +14,6 @@ import type {
 } from '../../../integrations/reanimated';
 import { useMutableValue } from '../../../integrations/reanimated';
 import {
-  CommonValuesContext,
   ItemContextProvider,
   useCommonValuesContext,
   useDragContext,
@@ -23,12 +22,8 @@ import {
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
-import { getContextProvider } from '../../../utils';
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
-import TeleportedItemCell from './TeleportedItemCell';
-
-const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
 export type DraggableViewProps = PropsWithChildren<{
   itemKey: string;
@@ -49,9 +44,9 @@ function DraggableView({
   const { handleItemMeasurement, removeItemMeasurements } =
     useMeasurementsContext();
   const { handleDragEnd } = useDragContext();
-  const { activeItemKey, containerId, customHandle } = commonValuesContext;
+  const { activeItemKey, customHandle } = commonValuesContext;
 
-  const [isTeleported, setIsTeleported] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
   const itemStyles = useItemStyles(key, isActive, activationAnimationProgress);
@@ -66,24 +61,6 @@ function DraggableView({
     };
   }, [activationAnimationProgress, handleDragEnd, key, removeItemMeasurements]);
 
-  useEffect(() => {
-    if (!portalContext) {
-      setIsTeleported(false);
-      return;
-    }
-
-    const teleportedItemId = `${containerId}-${key}`;
-    const unsubscribe = portalContext?.subscribe?.(
-      teleportedItemId,
-      setIsTeleported
-    );
-
-    return () => {
-      portalContext?.teleport?.(teleportedItemId, null);
-      unsubscribe?.();
-    };
-  }, [portalContext, containerId, key]);
-
   const onLayout = useCallback(
     ({
       nativeEvent: {
@@ -93,45 +70,37 @@ function DraggableView({
     [handleItemMeasurement, key]
   );
 
-  const withItemContext = (component: ReactNode) => (
-    <ItemContextProvider
-      activationAnimationProgress={activationAnimationProgress}
-      gesture={gesture}
-      isActive={isActive}
-      itemKey={key}>
-      {component}
-    </ItemContextProvider>
-  );
-
-  const sharedCellProps = {
-    activationAnimationProgress,
-    isActive,
-    itemKey: key,
-    onLayout
-  };
-
   const renderItemCell = (hidden = false) => {
     const innerComponent = (
       <ItemCell
-        {...sharedCellProps}
+        activationAnimationProgress={activationAnimationProgress}
         cellStyle={[style, itemStyles]}
         entering={itemEntering ?? undefined}
         exiting={itemExiting ?? undefined}
-        hidden={hidden}>
+        hidden={hidden}
+        isActive={isActive}
+        itemKey={key}
+        onLayout={onLayout}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}
         </LayoutAnimationConfig>
       </ItemCell>
     );
 
-    return withItemContext(
-      customHandle ? (
-        innerComponent
-      ) : (
-        <GestureDetector gesture={gesture} userSelect='none'>
-          {innerComponent}
-        </GestureDetector>
-      )
+    return (
+      <ItemContextProvider
+        activationAnimationProgress={activationAnimationProgress}
+        gesture={gesture}
+        isActive={isActive}
+        itemKey={key}>
+        {customHandle ? (
+          innerComponent
+        ) : (
+          <GestureDetector gesture={gesture} userSelect='none'>
+            {innerComponent}
+          </GestureDetector>
+        )}
+      </ItemContextProvider>
     );
   };
 
@@ -143,28 +112,19 @@ function DraggableView({
 
   // PORTAL CASE
 
-  const renderTeleportedItemCell = () => (
-    // We have to wrap the TeleportedItemCell in context providers as they won't
-    // be accessible otherwise, when the item is rendered in the portal outlet
-    <CommonValuesContextProvider value={commonValuesContext}>
-      {withItemContext(
-        <TeleportedItemCell {...sharedCellProps} cellStyle={style}>
-          {children}
-        </TeleportedItemCell>
-      )}
-    </CommonValuesContextProvider>
-  );
-
   return (
     <Fragment>
       {/* We cannot unmount this item as its gesture detector must be still
       mounted to continue handling the pan gesture */}
-      {renderItemCell(isTeleported)}
+      {renderItemCell(isHidden)}
       <ActiveItemPortal
         activationAnimationProgress={activationAnimationProgress}
+        cellStyle={style}
         commonValuesContext={commonValuesContext}
+        gesture={gesture}
+        isActive={isActive}
         itemKey={key}
-        renderTeleportedItemCell={renderTeleportedItemCell}>
+        onTeleport={setIsHidden}>
         {children}
       </ActiveItemPortal>
     </Fragment>

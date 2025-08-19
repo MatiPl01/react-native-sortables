@@ -26,7 +26,7 @@ export type ItemCellProps = PropsWithChildren<{
   isActive: SharedValue<boolean>;
   activationAnimationProgress: SharedValue<number>;
   cellStyle: AnimatedStyleProp;
-  onLayout: (event: LayoutChangeEvent) => void;
+  onLayout?: (event: LayoutChangeEvent) => void;
   hidden?: boolean;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
@@ -77,7 +77,7 @@ export default function ItemCell({
           dimensionsStyle,
           hidden && styles.hidden
         ]}
-        onLayout={hidden ? undefined : onLayout}>
+        onLayout={onLayout}>
         {children}
       </AnimatedOnLayoutView>
     </Animated.View>

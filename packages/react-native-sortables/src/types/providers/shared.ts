@@ -162,14 +162,12 @@ export type CustomHandleContextType = {
 
 // PORTAL
 
-export type PortalSubscription = (isTeleported: boolean) => void;
-
 export type PortalContextType = {
   activeItemAbsolutePosition: SharedValue<null | Vector>;
   portalOutletMeasurements: SharedValue<MeasuredDimensions | null>;
   measurePortalOutlet: () => void;
   teleport: (id: string, node: ReactNode) => void;
-  subscribe: (id: string, subscriber: PortalSubscription) => () => void;
+  isTeleported: (id: string) => boolean;
 };
 
 // MULTI ZONE

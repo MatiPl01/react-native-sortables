@@ -1,53 +1,112 @@
-import { type PropsWithChildren, type ReactNode, useEffect } from 'react';
+import type { PropsWithChildren } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import type { ManualGesture } from 'react-native-gesture-handler';
 import {
   runOnJS,
   type SharedValue,
   useAnimatedReaction
 } from 'react-native-reanimated';
 
+import { useStableCallback } from '../../../hooks';
+import type { AnimatedStyleProp } from '../../../integrations/reanimated';
 import { useMutableValue } from '../../../integrations/reanimated';
-import { usePortalContext } from '../../../providers';
+import {
+  CommonValuesContext,
+  ItemContextProvider,
+  usePortalContext
+} from '../../../providers';
 import type { CommonValuesContextType } from '../../../types';
+import { getContextProvider } from '../../../utils';
+import TeleportedItemCell from './TeleportedItemCell';
+
+const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
 type ActiveItemPortalProps = PropsWithChildren<{
   itemKey: string;
   activationAnimationProgress: SharedValue<number>;
   commonValuesContext: CommonValuesContextType;
-  renderTeleportedItemCell: () => ReactNode;
+  cellStyle: AnimatedStyleProp;
+  isActive: SharedValue<boolean>;
+  gesture: ManualGesture;
+  onTeleport: (isTeleported: boolean) => void;
 }>;
 
 export default function ActiveItemPortal({
   activationAnimationProgress,
+  cellStyle,
   children,
   commonValuesContext,
+  gesture,
+  isActive,
   itemKey,
-  renderTeleportedItemCell
+  onTeleport
 }: ActiveItemPortalProps) {
-  const { containerId } = commonValuesContext;
-  const { measurePortalOutlet, teleport } = usePortalContext() ?? {};
-
+  const { isTeleported, measurePortalOutlet, teleport } =
+    usePortalContext() ?? {};
+  const updateTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const teleportEnabled = useMutableValue(false);
 
-  const teleportedItemId = `${containerId}-${itemKey}`;
+  const renderTeleportedItemCell = useCallback(
+    () => (
+      // We have to wrap the TeleportedItemCell in context providers as they won't
+      // be accessible otherwise, when the item is rendered in the portal outlet
+      <CommonValuesContextProvider value={commonValuesContext}>
+        <ItemContextProvider
+          activationAnimationProgress={activationAnimationProgress}
+          gesture={gesture}
+          isActive={isActive}
+          itemKey={itemKey}>
+          <TeleportedItemCell
+            activationAnimationProgress={activationAnimationProgress}
+            cellStyle={cellStyle}
+            isActive={isActive}
+            itemKey={itemKey}>
+            {children}
+          </TeleportedItemCell>
+        </ItemContextProvider>
+      </CommonValuesContextProvider>
+    ),
+    [
+      activationAnimationProgress,
+      children,
+      commonValuesContext,
+      gesture,
+      isActive,
+      itemKey,
+      cellStyle
+    ]
+  );
+
+  const teleportedItemId = `${commonValuesContext.containerId}-${itemKey}`;
+
+  const enableTeleport = useStableCallback(() => {
+    teleport?.(teleportedItemId, renderTeleportedItemCell());
+    onTeleport(true);
+  });
+
+  const disableTeleport = useCallback(() => {
+    if (updateTimeoutRef.current !== null) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    teleport?.(teleportedItemId, null);
+    onTeleport(false);
+  }, [teleport, teleportedItemId, onTeleport]);
+
+  useEffect(() => disableTeleport, [disableTeleport]);
 
   useEffect(() => {
-    if (teleportEnabled.value) {
-      teleport?.(teleportedItemId, renderTeleportedItemCell());
+    if (isTeleported?.(teleportedItemId)) {
+      // We have to delay the update in order not to schedule render via this
+      // useEffect at the same time as the enableTeleport render is scheduled.
+      // This may happen if the user changes the item style/content via the
+      // onDragStart callback (e.g. in collapsible items) when we want to
+      // render the view unchanged at first and change it a while later to
+      // properly trigger all layout transitions that the item has.
+      updateTimeoutRef.current = setTimeout(() => {
+        teleport?.(teleportedItemId, renderTeleportedItemCell());
+      });
     }
-    // This is fine, we want to update the teleported item cell only when
-    // the children change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [children]);
-
-  const enableTeleport = () => {
-    teleport?.(teleportedItemId, renderTeleportedItemCell());
-  };
-
-  const disableTeleport = () => {
-    if (teleport) {
-      runOnJS(teleport)(teleportedItemId, null);
-    }
-  };
+  }, [isTeleported, renderTeleportedItemCell, teleport, teleportedItemId]);
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,
