@@ -1,10 +1,11 @@
-import { type PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type { GridLayoutContextType } from '../../../types';
+import { areValuesDifferent } from '../../../utils';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { useAdditionalCrossOffsetContext } from '../AdditionalCrossOffsetProvider';
@@ -35,6 +36,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   rowHeight
 }) => {
   const {
+    containerHeight,
     containerWidth,
     indexToKey,
     itemHeights,
@@ -115,8 +117,26 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       // Update item positions
       itemPositions.value = layout.itemPositions;
+
       // Update controlled container dimensions
-      applyControlledContainerDimensions(layout.controlledContainerDimensions); // TODO - adjust container height properly to prevent content jumps when items are collapsed
+      const currentContainerCrossSize = isVertical
+        ? containerHeight.value
+        : containerWidth.value;
+
+      if (
+        !currentContainerCrossSize ||
+        (areValuesDifferent(
+          currentContainerCrossSize,
+          layout.containerCrossSize,
+          1
+        ) &&
+          (!additionalCrossOffset?.value ||
+            layout.containerCrossSize > currentContainerCrossSize))
+      ) {
+        applyControlledContainerDimensions({
+          [isVertical ? 'height' : 'width']: layout.containerCrossSize
+        });
+      }
 
       // On the web, animate layout only if parent container is not resized
       // (e.g. skip animation when the browser window is resized)

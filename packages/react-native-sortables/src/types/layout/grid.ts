@@ -1,4 +1,4 @@
-import type { Coordinate, Dimensions, ItemSizes, Vector } from './shared';
+import type { Coordinate, ItemSizes, Vector } from './shared';
 
 export type GridLayoutProps = {
   gaps: {
@@ -15,7 +15,7 @@ export type GridLayoutProps = {
 export type GridLayout = {
   itemPositions: Record<string, Vector>;
   crossAxisOffsets: Array<number>;
-  controlledContainerDimensions: Partial<Dimensions>;
+  containerCrossSize: number;
 };
 
 export type AdditionalCrossOffsetProps = {

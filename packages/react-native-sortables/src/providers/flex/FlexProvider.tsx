@@ -9,8 +9,8 @@ import type {
 import type { SharedProviderProps } from '../shared';
 import { SharedProvider, useOrderUpdater, useStrategyKey } from '../shared';
 import { ContextProviderComposer } from '../utils';
-import type { FlexLayoutProviderProps } from './layout';
-import { FLEX_STRATEGIES, FlexLayoutProvider } from './layout';
+import type { FlexLayoutProviderProps } from './FlexLayoutProvider';
+import { FLEX_STRATEGIES, FlexLayoutProvider } from './FlexLayoutProvider';
 
 type FlexProviderProps = PropsWithChildren<
   SharedProviderProps & {

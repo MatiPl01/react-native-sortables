@@ -1,2 +1,2 @@
 export { default as FlexProvider } from './FlexProvider';
-export * from './layout';
+export * from './FlexLayoutProvider';
