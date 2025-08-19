@@ -37,7 +37,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
         handleRefs.value[key] = handleRef;
         if (fixed) {
           fixedItemKeys.value[key] = true;
-          debounce.call(fixedItemKeys.modify, 100);
+          debounce.schedule(fixedItemKeys.modify, 100);
         }
       })();
 
