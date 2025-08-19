@@ -15,10 +15,12 @@ type GridProviderProps = PropsWithChildren<
     SharedProviderProps & {
       strategy: SortableGridStrategy;
       reorderTriggerOrigin: ReorderTriggerOrigin;
+      autoAdjustOffsetDuringDrag: boolean;
     }
 >;
 
 export default function GridProvider({
+  autoAdjustOffsetDuringDrag,
   children,
   columnGap: columnGap_,
   isVertical,
@@ -44,7 +46,9 @@ export default function GridProvider({
     <SharedProvider {...sharedProps} />,
     // Provider with additional cross axis offset calculations to support
     // collapsible items
-    <AdditionalCrossOffsetProvider {...sharedGridProviderProps} />,
+    autoAdjustOffsetDuringDrag && (
+      <AdditionalCrossOffsetProvider {...sharedGridProviderProps} />
+    ),
     // Provider with grid layout calculations
     <GridLayoutProvider
       {...sharedGridProviderProps}
