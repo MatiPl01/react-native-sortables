@@ -114,7 +114,7 @@ export type SortableGridProps<I> = Simplify<
       /** Whether to automatically adjust positions of items when their size changes during drag.
        * @default false
        */
-      autoAdjustOnResizeDuringDrag?: boolean;
+      autoAdjustOffsetDuringDrag?: boolean;
     }
 >;
 

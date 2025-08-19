@@ -63,7 +63,7 @@ export const DEFAULT_SHARED_PROPS = {
 } satisfies DefaultSharedProps;
 
 export const DEFAULT_SORTABLE_GRID_PROPS = {
-  autoAdjustOnResizeDuringDrag: false,
+  autoAdjustOffsetDuringDrag: false,
   columnGap: 0,
   columns: 1,
   keyExtractor: defaultKeyExtractor,

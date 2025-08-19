@@ -29,7 +29,9 @@ export default function FlexProvider({
   ...sharedProps
 }: FlexProviderProps) {
   const providers = [
+    // Provider with common sortables functionality
     <SharedProvider {...sharedProps} />,
+    // Provider with flex layout calculations
     <FlexLayoutProvider
       {...styleProps}
       itemsCount={sharedProps.itemKeys.length}

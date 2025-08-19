@@ -98,7 +98,7 @@ function useItemLayoutStyleFabric(
     ({ current, dropped }) => {
       transformStartPosition.value ??= current;
       if (dropped) {
-        debounce.call(() => {
+        debounce.schedule(() => {
           transformStartPosition.value = null;
         }, 50);
       }

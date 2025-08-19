@@ -41,12 +41,11 @@ export default function CollapsibleItemsExample() {
           columnGap={10}
           data={DATA}
           overDrag='vertical'
-          // overflow='visible'
+          overflow='visible'
           renderItem={renderItem}
-          reorderTriggerOrigin='center'
           rowGap={10}
           scrollableRef={scrollableRef} // TODO - add correct auto scroll support for collapsible items
-          debug
+          autoAdjustOffsetDuringDrag
           onActiveItemDropped={() => setCollapsed(false)}
           onDragStart={() => setCollapsed(true)}
         />

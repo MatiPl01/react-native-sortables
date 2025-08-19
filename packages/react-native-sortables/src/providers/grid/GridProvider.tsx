@@ -40,8 +40,12 @@ export default function GridProvider({
   };
 
   const providers = [
+    // Provider with common sortables functionality
     <SharedProvider {...sharedProps} />,
+    // Provider with additional cross axis offset calculations to support
+    // collapsible items
     <AdditionalCrossOffsetProvider {...sharedGridProviderProps} />,
+    // Provider with grid layout calculations
     <GridLayoutProvider
       {...sharedGridProviderProps}
       numItems={numItems}
