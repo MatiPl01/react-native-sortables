@@ -43,7 +43,7 @@ export default function ActiveItemPortal({
 }: ActiveItemPortalProps) {
   const { isTeleported, measurePortalOutlet, teleport } =
     usePortalContext() ?? {};
-  const updateTimeoutRef = useRef(-1);
+  const updateTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const teleportEnabled = useMutableValue(false);
 
   const renderTeleportedItemCell = useCallback(
@@ -85,7 +85,9 @@ export default function ActiveItemPortal({
   });
 
   const disableTeleport = useCallback(() => {
-    clearTimeout(updateTimeoutRef.current);
+    if (updateTimeoutRef.current !== null) {
+      clearTimeout(updateTimeoutRef.current);
+    }
     teleport?.(teleportedItemId, null);
     onTeleport(false);
   }, [teleport, teleportedItemId, onTeleport]);
