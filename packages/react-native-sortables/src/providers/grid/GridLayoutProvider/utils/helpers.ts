@@ -1,14 +1,11 @@
 'worklet';
-
 import { areValuesDifferent } from '../../../../utils';
 
-export const getMainIndex = (index: number, numGroups: number): number => {
-  return +index % numGroups;
-};
+export const getMainIndex = (index: number, numGroups: number): number =>
+  +index % numGroups;
 
-export const getCrossIndex = (index: number, numGroups: number): number => {
-  return Math.floor(+index / numGroups);
-};
+export const getCrossIndex = (index: number, numGroups: number): number =>
+  Math.floor(+index / numGroups);
 
 export const shouldUpdateContainerDimensions = (
   currentContainerCrossSize: null | number,
