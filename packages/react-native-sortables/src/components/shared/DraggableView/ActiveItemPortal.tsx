@@ -96,22 +96,18 @@ export default function ActiveItemPortal({
 
   useEffect(() => {
     if (isTeleported?.(teleportedItemId)) {
-      // We have to delay the update in order not to schedule render via this
-      // useEffect at the same time as the enableTeleport render is scheduled.
-      // This may happen if the user changes the item style/content via the
-      // onDragStart callback (e.g. in collapsible items) when we want to
-      // render the view unchanged at first and change it a while later to
-      // properly trigger all layout transitions that the item has.
-      updateTimeoutRef.current = setTimeout(() => {
-        teleport?.(teleportedItemId, renderTeleportedItemCell());
-      });
+      teleport?.(teleportedItemId, renderTeleportedItemCell());
     }
   }, [isTeleported, renderTeleportedItemCell, teleport, teleportedItemId]);
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,
     (progress, prevProgress) => {
-      if (prevProgress && progress > prevProgress && !teleportEnabled.value) {
+      if (
+        prevProgress !== null &&
+        progress > prevProgress &&
+        !teleportEnabled.value
+      ) {
         // We have to ensure that the portal outlet ref is measured before the
         // teleported item is rendered within it because portal outlet position
         // must be known to calculate the teleported item position

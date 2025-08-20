@@ -338,14 +338,20 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       inactiveAnimationProgress.value = hasInactiveAnimation ? animate() : 0;
       activeAnimationProgress.value = animate();
+      activationAnimationProgress.value = 0.01;
       activationAnimationProgress.value = animate();
 
       haptics.medium();
-      stableOnDragStart({
-        fromIndex: dragStartIndex.value,
-        indexToKey: indexToKey.value,
-        key,
-        keyToIndex: keyToIndex.value
+
+      // Use timeout to ensure that the callback is called after all animated
+      // reactions are computed in the library
+      setAnimatedTimeout(() => {
+        stableOnDragStart({
+          fromIndex: dragStartIndex.value,
+          indexToKey: indexToKey.value,
+          key,
+          keyToIndex: keyToIndex.value
+        });
       });
     },
     [

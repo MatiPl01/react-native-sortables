@@ -30,6 +30,8 @@ export default function CollapsibleItemsExample() {
     [collapsed]
   );
 
+  console.log('collapsed', collapsed);
+
   return (
     <Screen>
       <Animated.ScrollView
