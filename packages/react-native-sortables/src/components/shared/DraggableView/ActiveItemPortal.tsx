@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import type { ManualGesture } from 'react-native-gesture-handler';
 import {
   runOnJS,
@@ -43,7 +43,6 @@ export default function ActiveItemPortal({
 }: ActiveItemPortalProps) {
   const { isTeleported, measurePortalOutlet, teleport } =
     usePortalContext() ?? {};
-  const updateTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const teleportEnabled = useMutableValue(false);
 
   const renderTeleportedItemCell = useCallback(
@@ -85,9 +84,6 @@ export default function ActiveItemPortal({
   });
 
   const disableTeleport = useCallback(() => {
-    if (updateTimeoutRef.current !== null) {
-      clearTimeout(updateTimeoutRef.current);
-    }
     teleport?.(teleportedItemId, null);
     onTeleport(false);
   }, [teleport, teleportedItemId, onTeleport]);

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, {
   LinearTransition,
   useAnimatedRef
@@ -7,61 +7,87 @@ import Animated, {
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { Group, Screen } from '@/components';
+import { Screen, Section } from '@/components';
 import { IS_WEB } from '@/constants';
 import { colors, radius, sizes, spacing, style, text } from '@/theme';
 
 const DATA = Array.from({ length: 20 }, (_, index) => `Item ${index + 1}`);
 
 export default function CollapsibleItemsExample() {
+  return (
+    <Screen includeNavBarHeight>
+      <Section
+        description='With vertical auto-scroll'
+        padding='none'
+        title='Vertical'
+        fill>
+        <Example />
+      </Section>
+      <Section
+        description='With horizontal auto-scroll '
+        padding='none'
+        title='Horizontal'>
+        <Example horizontal />
+      </Section>
+    </Screen>
+  );
+}
+
+type ExampleProps = {
+  horizontal?: boolean;
+};
+
+function Example({ horizontal }: ExampleProps) {
   const [collapsed, setCollapsed] = useState(false);
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
+
+  const dimension = horizontal ? 'width' : 'height';
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
       <Animated.View
         layout={LinearTransition}
-        style={[styles.card, { height: collapsed ? sizes.lg : sizes.xxxl }]}>
+        style={[
+          styles.card,
+          { [dimension]: collapsed ? sizes.lg : sizes.xxxl }
+        ]}>
         <Animated.Text layout={LinearTransition} style={styles.text}>
           {item}
         </Animated.Text>
       </Animated.View>
     ),
-    [collapsed]
+    [collapsed, dimension]
   );
 
-  console.log('collapsed', collapsed);
+  const props = horizontal
+    ? ({
+        autoScrollDirection: 'horizontal',
+        columnGap: 10,
+        rowHeight: sizes.xl,
+        rows: 1
+      } as const)
+    : {
+        rowGap: 10
+      };
 
   return (
-    <Screen>
-      <Animated.ScrollView
-        contentContainerStyle={[styles.container, IS_WEB && style.webContent]}
-        ref={scrollableRef}>
-        <Group style={styles.group} withMargin={false} bordered center>
-          <Text style={styles.title}>Above Collapsible Items</Text>
-        </Group>
-
-        <Sortable.Grid
-          activeItemScale={1.05}
-          autoScrollMaxOverscroll={[50, 120]}
-          columnGap={10}
-          data={DATA}
-          overDrag='vertical'
-          overflow='visible'
-          renderItem={renderItem}
-          rowGap={10}
-          scrollableRef={scrollableRef}
-          autoAdjustOffsetDuringDrag
-          debug
-          onActiveItemDropped={() => setCollapsed(false)}
-          onDragStart={() => setCollapsed(true)}
-        />
-
-        <Group style={styles.group} withMargin={false} bordered center>
-          <Text style={styles.title}>Below Collapsible Items</Text>
-        </Group>
-      </Animated.ScrollView>
-    </Screen>
+    <Animated.ScrollView
+      contentContainerStyle={[styles.container, IS_WEB && style.webContent]}
+      horizontal={horizontal}
+      ref={scrollableRef}>
+      <Sortable.Grid
+        {...props}
+        activeItemScale={1.05}
+        autoScrollMaxOverscroll={[50, 120]}
+        data={DATA}
+        renderItem={renderItem}
+        scrollableRef={scrollableRef}
+        autoAdjustOffsetDuringDrag
+        // debug
+        onActiveItemDropped={() => setCollapsed(false)}
+        onDragStart={() => setCollapsed(true)}
+      />
+    </Animated.ScrollView>
   );
 }
 
@@ -74,9 +100,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   container: {
-    gap: spacing.md,
-    padding: spacing.md,
-    paddingBottom: 120
+    padding: spacing.md
   },
   group: {
     height: sizes.xxl
