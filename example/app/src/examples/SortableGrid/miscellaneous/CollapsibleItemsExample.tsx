@@ -20,9 +20,9 @@ export default function CollapsibleItemsExample() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
       <Animated.View
-        layout={LinearTransition.delay(40)}
+        layout={LinearTransition}
         style={[styles.card, { height: collapsed ? sizes.lg : sizes.xxxl }]}>
-        <Animated.Text layout={LinearTransition.delay(40)} style={styles.text}>
+        <Animated.Text layout={LinearTransition} style={styles.text}>
           {item}
         </Animated.Text>
       </Animated.View>
@@ -48,8 +48,9 @@ export default function CollapsibleItemsExample() {
           overflow='visible'
           renderItem={renderItem}
           rowGap={10}
-          scrollableRef={scrollableRef} // TODO - add correct auto scroll support for collapsible items
+          scrollableRef={scrollableRef}
           autoAdjustOffsetDuringDrag
+          debug
           onActiveItemDropped={() => setCollapsed(false)}
           onDragStart={() => setCollapsed(true)}
         />
