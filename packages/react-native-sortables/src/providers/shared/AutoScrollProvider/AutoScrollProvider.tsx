@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import {
   measure,
   useAnimatedReaction,
@@ -6,15 +6,14 @@ import {
   useScrollViewOffset
 } from 'react-native-reanimated';
 
-import { useDebugContext } from '../../../debug';
 import type { AutoScrollContextType, AutoScrollSettings } from '../../../types';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
-
-const DEBUG_COLORS = {
-  backgroundColor: '#CE00B5',
-  borderColor: '#4E0044'
-};
+import useDebugHelpers from './useDebugHelpers';
+import {
+  calculateRawProgressHorizontal,
+  calculateRawProgressVertical
+} from './utils';
 
 type AutoScrollProviderProps = PropsWithChildren<AutoScrollSettings>;
 
@@ -60,10 +59,18 @@ function AutoScrollUpdater({
     touchPosition
   } = useCommonValuesContext();
   const currentScrollOffset = useScrollViewOffset(scrollableRef);
-  const debugContext = useDebugContext();
 
-  const debug = !!debugContext;
-  const debugRects = debugContext?.useDebugRects(['start', 'end']);
+  const activationOffset: [number, number] = Array.isArray(
+    autoScrollActivationOffset
+  )
+    ? autoScrollActivationOffset
+    : [autoScrollActivationOffset, autoScrollActivationOffset];
+
+  let debug: ReturnType<typeof useDebugHelpers> = {};
+  if (__DEV__) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    debug = useDebugHelpers(isVertical, activationOffset);
+  }
 
   const contentBounds = useDerivedValue<[number, number] | null>(() => {
     const firstKey = indexToKey.value[0];
@@ -85,6 +92,12 @@ function AutoScrollUpdater({
     return [firstPosition[scrollAxis], lastPosition[scrollAxis]];
   });
 
+  const calculateRawProgress = isVertical
+    ? calculateRawProgressVertical
+    : calculateRawProgressHorizontal;
+
+  // TODO - maybe use frame callback (or only for continuous mode) to calculate
+  // progress properly including the time difference between frames
   useAnimatedReaction(
     () => ({
       bounds: contentBounds.value,
@@ -92,43 +105,22 @@ function AutoScrollUpdater({
       scrollOffset: currentScrollOffset.value
     }),
     ({ bounds, position, scrollOffset }) => {
-      const hideDebugViews = debug
-        ? () => {
-            debugRects?.start?.hide();
-            debugRects?.end?.hide();
-          }
-        : undefined;
-
       if (!bounds || position === null || scrollOffset === null) {
-        hideDebugViews?.();
+        debug?.hideDebugViews?.();
         return;
       }
 
       const contentContainerMeasurements = measure(containerRef);
       const scrollContainerMeasurements = measure(scrollableRef);
       if (!contentContainerMeasurements || !scrollContainerMeasurements) {
-        hideDebugViews?.();
+        debug?.hideDebugViews?.();
         return;
       }
 
-      const { height: cH, pageY: cY } = contentContainerMeasurements;
-      const { height: sH, pageY: sY } = scrollContainerMeasurements;
-
-      const relativeOffset = sY - cY;
-
-      if (debugRects) {
-        debugRects.start.set({
-          ...DEBUG_COLORS,
-          height: 100,
-          y: relativeOffset
-        });
-        debugRects.end.set({
-          ...DEBUG_COLORS,
-          height: 100,
-          positionOrigin: 'bottom',
-          y: relativeOffset + sH
-        });
-      }
+      debug?.updateDebugRects?.(
+        contentContainerMeasurements,
+        scrollContainerMeasurements
+      );
     },
     [debug]
   );
