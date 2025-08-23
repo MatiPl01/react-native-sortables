@@ -1,151 +1,139 @@
-import { useCallback } from 'react';
+import type { PropsWithChildren } from 'react';
 import {
-  runOnJS,
-  scrollTo,
+  measure,
   useAnimatedReaction,
   useDerivedValue,
-  useFrameCallback,
   useScrollViewOffset
 } from 'react-native-reanimated';
 
-import { OFFSET_EPS } from '../../../constants';
-import {
-  useAnimatableValue,
-  useMutableValue
-} from '../../../integrations/reanimated';
+import { useDebugContext } from '../../../debug';
 import type { AutoScrollContextType, AutoScrollSettings } from '../../../types';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
-import useTargetScrollOffset from './useTargetScrollOffset';
+
+const DEBUG_COLORS = {
+  backgroundColor: '#CE00B5',
+  borderColor: '#4E0044'
+};
+
+type AutoScrollProviderProps = PropsWithChildren<AutoScrollSettings>;
 
 const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   'AutoScroll',
   { guarded: false }
-)<AutoScrollSettings, AutoScrollContextType>(({
-  autoScrollActivationOffset,
-  autoScrollDirection,
+)<AutoScrollProviderProps, AutoScrollContextType>(({
   autoScrollEnabled,
-  autoScrollSpeed,
-  maxScrollToOverflowOffset,
-  scrollableRef
+  autoScrollMode,
+  children,
+  ...rest
 }) => {
-  const isHorizontal = autoScrollDirection === 'horizontal';
-  const { activeItemKey } = useCommonValuesContext();
-
-  const scrollOffset = useScrollViewOffset(scrollableRef);
-  const dragStartScrollOffset = useAnimatableValue<null | number>(null);
-  const prevScrollToOffset = useMutableValue<null | number>(null);
-  const scrollOffsetDiff = useDerivedValue(() => {
-    if (dragStartScrollOffset.value === null) {
-      return null;
-    }
-    return {
-      x: isHorizontal ? scrollOffset.value - dragStartScrollOffset.value : 0,
-      y: isHorizontal ? 0 : scrollOffset.value - dragStartScrollOffset.value
-    };
-  });
-
-  const enabled = useAnimatableValue(autoScrollEnabled);
-  const speed = useAnimatableValue(autoScrollSpeed);
-
-  const isFrameCallbackActive = useMutableValue(false);
-
-  const targetScrollOffset = useTargetScrollOffset(
-    scrollableRef,
-    enabled,
-    isHorizontal,
-    autoScrollActivationOffset,
-    maxScrollToOverflowOffset,
-    dragStartScrollOffset
-  );
-
-  // SMOOTH SCROLL POSITION UPDATER
-  // Updates the scroll position smoothly
-  // (quickly at first, then slower if the remaining distance is small)
-  const frameCallbackFunction = useCallback(() => {
-    'worklet';
-    const targetOffset = targetScrollOffset.value;
-    if (!isFrameCallbackActive.value || targetOffset === null) {
-      return;
-    }
-    const currentOffset = scrollOffset.value;
-    const diff = targetOffset - currentOffset;
-
-    if (Math.abs(diff) < OFFSET_EPS) {
-      targetScrollOffset.value = null;
-      return;
-    }
-
-    const direction = diff > 0 ? 1 : -1;
-    const step = speed.value * direction * Math.sqrt(Math.abs(diff));
-    const nextOffset =
-      targetOffset > currentOffset
-        ? Math.min(currentOffset + step, targetOffset)
-        : Math.max(currentOffset + step, targetOffset);
-
-    if (
-      Math.abs(nextOffset - currentOffset) < 0.1 * OFFSET_EPS ||
-      prevScrollToOffset.value === nextOffset
-    ) {
-      targetScrollOffset.value = null;
-      return;
-    }
-
-    if (isHorizontal) {
-      scrollTo(scrollableRef, nextOffset, 0, false);
-    } else {
-      scrollTo(scrollableRef, 0, nextOffset, false);
-    }
-    prevScrollToOffset.value = nextOffset;
-  }, [
-    isFrameCallbackActive,
-    isHorizontal,
-    prevScrollToOffset,
-    scrollableRef,
-    scrollOffset,
-    speed,
-    targetScrollOffset
-  ]);
-
-  const frameCallback = useFrameCallback(frameCallbackFunction, false);
-
-  const toggleFrameCallback = useCallback(
-    (isEnabled: boolean) => frameCallback.setActive(isEnabled),
-    [frameCallback]
-  );
-
-  // Enable/disable frame callback
-  useAnimatedReaction(
-    () => ({
-      isEnabled: enabled.value,
-      itemKey: activeItemKey.value
-    }),
-    ({ isEnabled, itemKey }) => {
-      const shouldBeEnabled = isEnabled && itemKey !== null;
-      if (isFrameCallbackActive.value === shouldBeEnabled) {
-        return;
-      }
-      prevScrollToOffset.value = null;
-      runOnJS(toggleFrameCallback)(shouldBeEnabled);
-      isFrameCallbackActive.value = shouldBeEnabled;
-    }
-  );
-
-  const updateStartScrollOffset = useCallback(
-    (providedOffset?: null | number) => {
-      'worklet';
-      dragStartScrollOffset.value =
-        providedOffset === undefined ? scrollOffset.value : providedOffset;
-    },
-    [dragStartScrollOffset, scrollOffset]
-  );
-
   return {
+    children: (
+      <>
+        {children}
+        {autoScrollEnabled && <AutoScrollUpdater {...rest} />}
+      </>
+    ),
     value: {
-      scrollOffsetDiff,
-      updateStartScrollOffset
+      // scrollOffsetDiff,
+      // updateStartScrollOffset
     }
   };
 });
+
+type AutoScrollUpdaterProps = Omit<AutoScrollSettings, 'autoScrollEnabled'>;
+
+function AutoScrollUpdater({
+  autoScrollActivationOffset,
+  autoScrollDirection,
+  autoScrollSpeed,
+  maxScrollToOverflowOffset,
+  scrollableRef
+}: AutoScrollUpdaterProps) {
+  const isVertical = autoScrollDirection === 'vertical';
+  const scrollAxis = isVertical ? 'y' : 'x';
+  const {
+    activeItemKey,
+    containerRef,
+    indexToKey,
+    itemPositions,
+    touchPosition
+  } = useCommonValuesContext();
+  const currentScrollOffset = useScrollViewOffset(scrollableRef);
+  const debugContext = useDebugContext();
+
+  const debug = !!debugContext;
+  const debugRects = debugContext?.useDebugRects(['start', 'end']);
+
+  const contentBounds = useDerivedValue<[number, number] | null>(() => {
+    const firstKey = indexToKey.value[0];
+    const lastKey = indexToKey.value[indexToKey.value.length - 1];
+    if (
+      activeItemKey.value === null ||
+      firstKey === undefined ||
+      lastKey === undefined
+    ) {
+      return null;
+    }
+
+    const firstPosition = itemPositions.value[firstKey];
+    const lastPosition = itemPositions.value[lastKey];
+    if (!firstPosition || !lastPosition) {
+      return null;
+    }
+
+    return [firstPosition[scrollAxis], lastPosition[scrollAxis]];
+  });
+
+  useAnimatedReaction(
+    () => ({
+      bounds: contentBounds.value,
+      position: touchPosition.value?.[scrollAxis] ?? null,
+      scrollOffset: currentScrollOffset.value
+    }),
+    ({ bounds, position, scrollOffset }) => {
+      const hideDebugViews = debug
+        ? () => {
+            debugRects?.start?.hide();
+            debugRects?.end?.hide();
+          }
+        : undefined;
+
+      if (!bounds || position === null || scrollOffset === null) {
+        hideDebugViews?.();
+        return;
+      }
+
+      const contentContainerMeasurements = measure(containerRef);
+      const scrollContainerMeasurements = measure(scrollableRef);
+      if (!contentContainerMeasurements || !scrollContainerMeasurements) {
+        hideDebugViews?.();
+        return;
+      }
+
+      const { height: cH, pageY: cY } = contentContainerMeasurements;
+      const { height: sH, pageY: sY } = scrollContainerMeasurements;
+
+      const relativeOffset = sY - cY;
+
+      if (debugRects) {
+        debugRects.start.set({
+          ...DEBUG_COLORS,
+          height: 100,
+          y: relativeOffset
+        });
+        debugRects.end.set({
+          ...DEBUG_COLORS,
+          height: 100,
+          positionOrigin: 'bottom',
+          y: relativeOffset + sH
+        });
+      }
+    },
+    [debug]
+  );
+
+  return null;
+}
 
 export { AutoScrollProvider, useAutoScrollContext };

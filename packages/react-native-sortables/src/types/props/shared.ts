@@ -83,19 +83,14 @@ export type ActiveItemSnapSettings = AnimatableProps<{
   snapOffsetY: Offset;
 }>;
 
-export type AutoScrollSettings = AnimatableProps<{
-  /** Distance from the edge of the container that triggers auto-scrolling.
-   * Can be a single number or [top/left, bottom/right] tuple */
-  autoScrollActivationOffset: [number, number] | number;
-  /** Maximum overscroll distance beyond the normal scroll bounds when
-   * scrollToOverflowEnabled is enabled on the scrollable container.
-   * If null, uses the autoScrollActivationOffset value, otherwise uses the provided value */
-  maxScrollToOverflowOffset: [number, number] | null | number;
-  /** Speed at which auto-scrolling occurs */
-  autoScrollSpeed: number;
+export enum AutoScrollExtrapolation {
+  CLAMP = 'clamp',
+  EXTEND = 'extend'
+}
+
+type CommonAutoScrollSettings = {
   /** Whether auto-scrolling is enabled */
   autoScrollEnabled: boolean;
-}> & {
   /** Reference to the animated scrollable container which will be scrolled
    * automatically when the active item is dragged near the edges of the container
    */
@@ -103,7 +98,45 @@ export type AutoScrollSettings = AnimatableProps<{
   scrollableRef: AnimatedRef<any>; // TODO - type this properly
   /** Direction in which auto-scrolling should occur */
   autoScrollDirection: 'horizontal' | 'vertical';
+  /** Distance from the edge of the container that triggers auto-scrolling.
+   * Can be a single number or [top/left, bottom/right] tuple */
+  autoScrollActivationOffset: [number, number] | number;
+  /** Maximum overscroll distance beyond the normal scroll bounds when
+   * scrollToOverflowEnabled is enabled on the scrollable container.
+   * If null, uses the autoScrollActivationOffset value, otherwise uses the provided value */
+  maxScrollToOverflowOffset: [number, number] | null | number;
+  /** Controls behavior beyond the maximum threshold.
+   * @default 'extend' */
+  autoScrollExtrapolation?: AutoScrollExtrapolation;
 };
+
+export type AutoScrollContinuousModeSettings = {
+  /** Discriminator for continuous auto-scroll mode */
+  autoScrollMode: 'continuous';
+  /** Maximum scroll velocity in pixels per second when at the edge.
+   * number -> same for both edges; tuple -> [top/left, bottom/right] */
+  autoScrollMaxVelocity: [number, number] | number;
+  /** Optional absolute velocity cap in pixels per second */
+  autoScrollVelocityCap?: number;
+};
+
+export type AutoScrollStepModeSettings = {
+  /** Discriminator for step-based auto-scroll mode */
+  autoScrollMode: 'step';
+  /** Shortest delay between scrollTo calls (ms) when pressure is high */
+  autoScrollMinInterval: number;
+  /** Longest delay when barely in the zone (ms).
+   * @default 280 */
+  autoScrollMaxInterval?: number;
+  /** Max number of elements (rows/cols) to jump per tick.
+   * number -> same for both directions; tuple -> [up/left, down/right]
+   * @default 3 */
+  autoScrollMaxJump?: [number, number] | number;
+};
+
+export type AutoScrollSettings = CommonAutoScrollSettings &
+  // eslint-disable-next-line perfectionist/sort-intersection-types
+  (AutoScrollContinuousModeSettings | AutoScrollStepModeSettings);
 
 export type DropIndicatorSettings = {
   /** Component to render as the drop indicator */

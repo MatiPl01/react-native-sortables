@@ -17,7 +17,6 @@ export default function CollapsibleItemsExample() {
   const [collapsed, setCollapsed] = useState(false);
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
-  // TODO - fix portal case
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
       <Animated.View
@@ -46,6 +45,7 @@ export default function CollapsibleItemsExample() {
           rowGap={10}
           scrollableRef={scrollableRef} // TODO - add correct auto scroll support for collapsible items
           autoAdjustOffsetDuringDrag
+          debug
           onActiveItemDropped={() => setCollapsed(false)}
           onDragStart={() => setCollapsed(true)}
         />

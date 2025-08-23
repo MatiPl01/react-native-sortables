@@ -29,6 +29,7 @@ import type {
 } from '../../types';
 import { DragActivationState, LayerState } from '../../types';
 import {
+  areVectorsDifferent,
   calculateSnapOffset,
   getItemDimensions,
   getKeyToIndex
@@ -143,7 +144,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       enableSnap: enableActiveItemSnap.value,
       itemTouchOffset: dragStartItemTouchOffset.value,
       key: activeItemKey.value,
-      offsetDiff: scrollOffsetDiff?.value,
+      // offsetDiff: scrollOffsetDiff?.value,
       offsetX: snapOffsetX.value,
       offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
@@ -161,7 +162,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       enableSnap,
       itemTouchOffset,
       key,
-      offsetDiff,
+      // offsetDiff,
       offsetX,
       offsetY,
       progress,
@@ -189,16 +190,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       // Touch position
 
-      touchPosition.value = {
-        x:
-          startTouchPosition.x +
-          (touch.absoluteX - startTouch.absoluteX) +
-          (offsetDiff?.x ?? 0),
-        y:
-          startTouchPosition.y +
-          (touch.absoluteY - startTouch.absoluteY) +
-          (offsetDiff?.y ?? 0)
+      const newTouchPosition = {
+        x: startTouchPosition.x + (touch.absoluteX - startTouch.absoluteX),
+        //  + (offsetDiff?.x ?? 0),
+        y: startTouchPosition.y + (touch.absoluteY - startTouch.absoluteY)
+        // + (offsetDiff?.y ?? 0)
       };
+
+      if (
+        !touchPosition.value ||
+        areVectorsDifferent(newTouchPosition, touchPosition.value)
+      ) {
+        touchPosition.value = newTouchPosition;
+      }
 
       // Active item position
 
