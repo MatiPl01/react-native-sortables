@@ -1,23 +1,37 @@
 import { useCallback } from 'react';
-import type { MeasuredDimensions } from 'react-native-reanimated';
+import type { MeasuredDimensions, SharedValue } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
 
-const DEBUG_COLORS = {
+const TRIGGER_COLORS = {
   backgroundColor: '#CE00B5',
   borderColor: '#4E0044'
 };
 
+const OVERSCROLL_COLORS = {
+  backgroundColor: '#0078CE',
+  borderColor: '#004466'
+};
+
 export default function useDebugHelpers(
   isVertical: boolean,
-  [startOffset, endOffset]: [number, number]
+  [startOffset, endOffset]: [number, number],
+  contentBounds: SharedValue<[number, number] | null>,
+  [maxStartOverscroll, maxEndOverscroll]: [number, number]
 ) {
   const debugContext = useDebugContext();
 
-  const debugRects = debugContext?.useDebugRects(['start', 'end']);
+  const debugRects = debugContext?.useDebugRects([
+    'startOverscroll',
+    'endOverscroll',
+    'start',
+    'end'
+  ]);
 
   const hideDebugViews = useCallback(() => {
     'worklet';
+    debugRects?.startOverscroll.hide();
+    debugRects?.endOverscroll.hide();
     debugRects?.start.hide();
     debugRects?.end.hide();
   }, [debugRects]);
@@ -36,7 +50,7 @@ export default function useDebugHelpers(
         width: sW
       } = scrollContainerMeasurements;
 
-      const startProps = isVertical
+      const startTriggerProps = isVertical
         ? {
             height: startOffset,
             y: sY - cY
@@ -46,7 +60,7 @@ export default function useDebugHelpers(
             x: sX - cX
           };
 
-      const endProps = isVertical
+      const endTriggerProps = isVertical
         ? {
             height: endOffset,
             positionOrigin: 'bottom' as const,
@@ -58,10 +72,54 @@ export default function useDebugHelpers(
             x: sX - cX + sW
           };
 
-      debugRects?.start.set({ ...DEBUG_COLORS, ...startProps });
-      debugRects?.end.set({ ...DEBUG_COLORS, ...endProps });
+      debugRects?.start.set({ ...TRIGGER_COLORS, ...startTriggerProps });
+      debugRects?.end.set({ ...TRIGGER_COLORS, ...endTriggerProps });
+
+      if (!contentBounds.value) {
+        return;
+      }
+
+      const [startBound, endBound] = contentBounds.value;
+      const startOverscrollProps = isVertical
+        ? {
+            height: maxStartOverscroll,
+            positionOrigin: 'bottom' as const,
+            y: startBound
+          }
+        : {
+            positionOrigin: 'right' as const,
+            width: maxStartOverscroll,
+            x: startBound
+          };
+
+      const endOverscrollProps = isVertical
+        ? {
+            height: maxEndOverscroll,
+            y: endBound
+          }
+        : {
+            width: maxEndOverscroll,
+            x: endBound
+          };
+
+      debugRects?.startOverscroll.set({
+        ...OVERSCROLL_COLORS,
+        ...startOverscrollProps
+      });
+      debugRects?.endOverscroll.set({
+        ...OVERSCROLL_COLORS,
+        ...endOverscrollProps
+      });
     },
-    [debugRects, isVertical, startOffset, endOffset]
+    [
+      debugRects,
+      isVertical,
+      startOffset,
+      endOffset,
+      contentBounds,
+      maxStartOverscroll,
+      maxEndOverscroll
+    ]
   );
 
   return debugContext ? { hideDebugViews, updateDebugRects } : {};

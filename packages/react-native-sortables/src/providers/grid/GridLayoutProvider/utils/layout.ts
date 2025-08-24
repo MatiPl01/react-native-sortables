@@ -76,9 +76,10 @@ export const calculateLayout = (
   const lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
 
   return {
-    containerCrossSize: lastCrossOffset
-      ? Math.max(lastCrossOffset - gaps.cross, 0)
-      : 0,
+    containerCrossBounds: [
+      additionalCrossOffset,
+      lastCrossOffset ? Math.max(lastCrossOffset - gaps.cross, 0) : 0
+    ],
     crossAxisOffsets,
     itemPositions
   };

@@ -95,6 +95,7 @@ export type MeasurementsContextType = {
 
 export type AutoScrollContextType = {
   scrollOffsetDiff: SharedValue<null | Partial<Vector>>;
+  contentBounds: SharedValue<[number, number] | null>;
 };
 
 // DRAG

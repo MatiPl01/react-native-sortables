@@ -10,12 +10,16 @@ import {
 
 import { useMutableValue } from '../../../../integrations/reanimated';
 import type { AutoScrollContinuousModeSettings } from '../../../../types';
+import { toPair } from '../../../../utils';
 import { useCommonValuesContext } from '../../CommonValuesProvider';
 
 type ContinuousModeUpdaterProps = AutoScrollContinuousModeSettings & {
   progress: SharedValue<number>;
   scrollBy: (distance: number, animated?: boolean) => void;
 };
+
+// Maximum elapsed time multiplier to prevent excessive scrolling distances when app lags
+const MAX_ELAPSED_TIME_MULTIPLIER = 2;
 
 export default function ContinuousModeUpdater({
   autoScrollInterval,
@@ -25,22 +29,25 @@ export default function ContinuousModeUpdater({
 }: ContinuousModeUpdaterProps) {
   const { activeItemKey } = useCommonValuesContext();
 
-  const [maxStartVelocity, maxEndVelocity]: [number, number] = Array.isArray(
-    autoScrollMaxVelocity
-  )
-    ? autoScrollMaxVelocity
-    : [autoScrollMaxVelocity, autoScrollMaxVelocity];
-
   const lastUpdateTimestamp = useMutableValue<null | number>(null);
+  const [maxStartVelocity, maxEndVelocity] = toPair(autoScrollMaxVelocity);
 
   const frameCallbackFunction = useCallback(
     ({ timestamp }: FrameInfo) => {
       'worklet';
+      if (progress.value === 0) {
+        return;
+      }
+
       lastUpdateTimestamp.value ??= timestamp;
       const elapsedTime = timestamp - lastUpdateTimestamp.value;
       if (elapsedTime < autoScrollInterval) {
         return;
       }
+
+      // Cap the elapsed time to prevent excessive scrolling distances when app lags
+      const maxElapsedTime = autoScrollInterval * MAX_ELAPSED_TIME_MULTIPLIER;
+      const cappedElapsedTime = Math.min(elapsedTime, maxElapsedTime);
       lastUpdateTimestamp.value = timestamp;
 
       const velocity = interpolate(
@@ -49,7 +56,7 @@ export default function ContinuousModeUpdater({
         [-maxStartVelocity, 0, maxEndVelocity]
       );
 
-      const distance = velocity * (elapsedTime / 1000);
+      const distance = velocity * (cappedElapsedTime / 1000);
 
       scrollBy(distance, autoScrollInterval > 200);
     },

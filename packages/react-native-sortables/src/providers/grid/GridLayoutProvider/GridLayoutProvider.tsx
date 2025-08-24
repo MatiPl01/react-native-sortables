@@ -5,7 +5,11 @@ import { useAnimatedReaction } from 'react-native-reanimated';
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import type { GridLayoutContextType } from '../../../types';
-import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
+import {
+  useAutoScrollContext,
+  useCommonValuesContext,
+  useMeasurementsContext
+} from '../../shared';
 import { createProvider } from '../../utils';
 import { useAdditionalCrossOffsetContext } from '../AdditionalCrossOffsetProvider';
 import { calculateLayout, shouldUpdateContainerDimensions } from './utils';
@@ -45,6 +49,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
   const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
+  const { contentBounds } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
   const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
@@ -121,14 +126,17 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       if (
         shouldUpdateContainerDimensions(
           isVertical ? containerHeight.value : containerWidth.value,
-          layout.containerCrossSize,
+          layout.containerCrossBounds[1],
           !!additionalCrossOffset?.value
         )
       ) {
         applyControlledContainerDimensions({
-          [isVertical ? 'height' : 'width']: layout.containerCrossSize
+          [isVertical ? 'height' : 'width']: layout.containerCrossBounds[1]
         });
       }
+
+      // Update content bounds
+      if (contentBounds) contentBounds.value = layout.containerCrossBounds;
 
       // On the web, animate layout only if parent container is not resized
       // (e.g. skip animation when the browser window is resized)

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
   LinearTransition,
   useAnimatedRef
@@ -11,7 +11,7 @@ import { Screen } from '@/components';
 import { IS_WEB } from '@/constants';
 import { colors, radius, sizes, spacing, style, text } from '@/theme';
 
-const DATA = Array.from({ length: 5 }, (_, index) => `Item ${index + 1}`);
+const DATA = Array.from({ length: 20 }, (_, index) => `Item ${index + 1}`);
 
 export default function CollapsibleItemsExample() {
   const [collapsed, setCollapsed] = useState(false);
@@ -35,8 +35,10 @@ export default function CollapsibleItemsExample() {
       <Animated.ScrollView
         contentContainerStyle={[styles.container, IS_WEB && style.webContent]}
         ref={scrollableRef}>
+        <View style={{ backgroundColor: 'red', height: 100 }} />
         <Sortable.Grid
           activeItemScale={1.05}
+          autoScrollMaxOverscroll={[50, 120]}
           columnGap={10}
           data={DATA}
           overDrag='vertical'
@@ -45,10 +47,10 @@ export default function CollapsibleItemsExample() {
           rowGap={10}
           scrollableRef={scrollableRef} // TODO - add correct auto scroll support for collapsible items
           autoAdjustOffsetDuringDrag
-          debug
           onActiveItemDropped={() => setCollapsed(false)}
           onDragStart={() => setCollapsed(true)}
         />
+        <View style={{ backgroundColor: 'red', height: 100 }} />
       </Animated.ScrollView>
     </Screen>
   );
