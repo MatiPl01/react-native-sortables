@@ -73,12 +73,25 @@ export const calculateLayout = (
     } as Vector;
   }
 
-  const lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
+  let lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
+  lastCrossOffset = lastCrossOffset
+    ? Math.max(lastCrossOffset - gaps.cross, 0)
+    : 0;
+
+  const mainSize = (mainGroupSize + gaps.main) * numGroups - gaps.main;
 
   return {
-    containerCrossSize: lastCrossOffset
-      ? Math.max(lastCrossOffset - gaps.cross, 0)
-      : 0,
+    containerCrossSize: lastCrossOffset,
+    contentBounds: [
+      {
+        [crossCoordinate]: additionalCrossOffset,
+        [mainCoordinate]: 0
+      } as Vector,
+      {
+        [crossCoordinate]: lastCrossOffset,
+        [mainCoordinate]: mainSize
+      } as Vector
+    ],
     crossAxisOffsets,
     itemPositions
   };

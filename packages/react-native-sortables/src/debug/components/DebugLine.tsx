@@ -16,6 +16,7 @@ export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
       isAbsolute,
       thickness = 3,
       to,
+      type,
       visible = true,
       x,
       y
@@ -31,15 +32,15 @@ export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
       angle = Math.atan2(to.y - from.y, to.x - from.x);
       tY = from.y;
       tX = from.x;
-    } else if (isPresent(x)) {
-      length = 3 * screenDiagonal;
+    } else if (isPresent(x) && (type === 'vertical' || !isPresent(y))) {
+      length = 2 * screenDiagonal;
       angle = Math.PI / 2;
-      tY = -screenDiagonal;
+      tY = (y ?? 0) - screenDiagonal;
       tX = x;
-    } else if (isPresent(y)) {
-      length = 3 * screenDiagonal;
+    } else if (isPresent(y) && (type === 'horizontal' || !isPresent(x))) {
+      length = 2 * screenDiagonal;
       tY = y;
-      tX = -screenDiagonal;
+      tX = (x ?? 0) - screenDiagonal;
     } else {
       return { display: 'none' };
     }

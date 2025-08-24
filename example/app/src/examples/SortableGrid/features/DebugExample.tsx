@@ -72,6 +72,7 @@ export default function DebugExample() {
             </Group>
 
             <Sortable.Grid
+              autoScrollMaxOverscroll={200}
               columnGap={spacing.sm}
               columns={COLUMNS}
               data={DATA}

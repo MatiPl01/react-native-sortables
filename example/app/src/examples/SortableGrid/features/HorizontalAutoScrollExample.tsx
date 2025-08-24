@@ -74,6 +74,7 @@ function HorizontalSameSizeItems() {
         horizontal>
         <Sortable.Grid
           autoScrollDirection='horizontal'
+          autoScrollMaxVelocity={500}
           columnGap={10}
           data={DATA}
           renderItem={renderItem}
@@ -108,6 +109,7 @@ function HorizontalDifferentSizeItems() {
         horizontal>
         <Sortable.Grid
           autoScrollDirection='horizontal'
+          autoScrollMaxVelocity={500}
           columnGap={10}
           data={DATA}
           renderItem={renderItem}

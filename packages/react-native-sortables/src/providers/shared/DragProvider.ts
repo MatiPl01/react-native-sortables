@@ -29,6 +29,7 @@ import type {
 } from '../../types';
 import { DragActivationState, LayerState } from '../../types';
 import {
+  areVectorsDifferent,
   calculateSnapOffset,
   getItemDimensions,
   getKeyToIndex
@@ -96,8 +97,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   } = useCommonValuesContext();
   const { handleContainerMeasurement } = useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
-  const { scrollOffsetDiff, updateStartScrollOffset } =
-    useAutoScrollContext() ?? {};
+  const { scrollOffsetDiff } = useAutoScrollContext() ?? {};
   const {
     activeHandleMeasurements,
     activeHandleOffset,
@@ -189,7 +189,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       // Touch position
 
-      touchPosition.value = {
+      const newTouchPosition = {
         x:
           startTouchPosition.x +
           (touch.absoluteX - startTouch.absoluteX) +
@@ -199,6 +199,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           (touch.absoluteY - startTouch.absoluteY) +
           (offsetDiff?.y ?? 0)
       };
+
+      if (
+        !touchPosition.value ||
+        areVectorsDifferent(newTouchPosition, touchPosition.value)
+      ) {
+        touchPosition.value = newTouchPosition;
+      }
 
       // Active item position
 
@@ -297,7 +304,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       updateLayer?.(LayerState.FOCUSED);
-      updateStartScrollOffset?.();
 
       let touchedItemPosition = position;
 
@@ -368,8 +374,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       stableOnDragStart,
       touchPosition,
       updateLayer,
-      updateActiveHandleMeasurements,
-      updateStartScrollOffset
+      updateActiveHandleMeasurements
     ]
   );
 
@@ -552,7 +557,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveAnimationProgress.value = animate();
       activeAnimationProgress.value = animate();
 
-      updateStartScrollOffset?.(null);
       updateLayer?.(LayerState.INTERMEDIATE);
       haptics.medium();
 
@@ -602,7 +606,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       touchPosition,
       touchStartTouch,
       updateLayer,
-      updateStartScrollOffset,
       activeHandleMeasurements
     ]
   );

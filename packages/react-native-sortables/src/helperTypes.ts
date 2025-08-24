@@ -21,11 +21,15 @@ export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type Maybe<T> = null | T | undefined;
 
+type WithGetters<T extends AnyRecord> = {
+  [K in keyof T]: T[K] | { get: () => T[K] };
+};
+
 export type DefaultProps<
   P extends AnyRecord,
   O extends keyof P = never, // optional props
   E extends keyof P = never // exclude from default props (must be passed by the user)
-> = Omit<RequiredExcept<P, O>, E>;
+> = WithGetters<Omit<RequiredExcept<P, O>, E>>;
 
 export type NoUndef<T> = T extends undefined ? never : T;
 

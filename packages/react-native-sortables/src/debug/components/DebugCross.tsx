@@ -9,13 +9,20 @@ import type {
 import DebugLine from './DebugLine';
 
 export default function DebugCross({ props }: WrappedProps<DebugCrossProps>) {
-  const horizontalLineProps = useDerivedValue(() => ({
+  const sharedProps = useDerivedValue(() => ({
     ...props.value,
+    x: props.value.position?.x ?? props.value.x,
     y: props.value.position?.y ?? props.value.y
   }));
+
+  const horizontalLineProps = useDerivedValue(() => ({
+    ...sharedProps.value,
+    type: 'horizontal'
+  }));
+
   const verticalLineProps = useDerivedValue(() => ({
-    ...props.value,
-    x: props.value.position?.x ?? props.value.x
+    ...sharedProps.value,
+    type: 'vertical'
   }));
 
   return (

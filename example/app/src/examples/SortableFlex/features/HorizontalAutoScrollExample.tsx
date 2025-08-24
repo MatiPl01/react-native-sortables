@@ -41,7 +41,7 @@ function NoWrapExample() {
         <Sortable.Flex
           autoScrollActivationOffset={100}
           autoScrollDirection='horizontal'
-          autoScrollSpeed={0.4}
+          autoScrollMaxVelocity={500}
           flexWrap='nowrap'
           gap={spacing.xs}
           overDrag='horizontal'

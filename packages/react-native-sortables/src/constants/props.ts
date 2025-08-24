@@ -1,4 +1,5 @@
 import type { ViewStyle } from 'react-native';
+import { Extrapolation } from 'react-native-reanimated';
 
 import { DefaultDropIndicator } from '../components/defaults';
 import type {
@@ -8,7 +9,7 @@ import type {
 } from '../types';
 import { defaultKeyExtractor } from '../utils/keys';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
-import { IS_WEB } from './platform';
+import { IS_ANDROID, IS_WEB, isFabric } from './platform';
 
 export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
 
@@ -17,10 +18,14 @@ export const DEFAULT_SHARED_PROPS = {
   activeItemOpacity: 1,
   activeItemScale: 1.1,
   activeItemShadowOpacity: 0.2,
+  animateScrollTo: { get: () => IS_ANDROID && isFabric() },
   autoScrollActivationOffset: 75,
   autoScrollDirection: 'vertical',
   autoScrollEnabled: true,
-  autoScrollSpeed: 1,
+  autoScrollExtrapolation: Extrapolation.EXTEND,
+  autoScrollInterval: { get: () => (IS_ANDROID && isFabric() ? 300 : 0) },
+  autoScrollMaxOverscroll: 50,
+  autoScrollMaxVelocity: 1000,
   bringToFrontWhenActive: true,
   customHandle: false,
   debug: false,
@@ -47,7 +52,6 @@ export const DEFAULT_SHARED_PROPS = {
   itemEntering: IS_WEB ? null : SortableItemEntering,
   itemExiting: IS_WEB ? null : SortableItemExiting,
   itemsLayoutTransitionMode: 'all',
-  maxScrollToOverflowOffset: null,
   onActiveItemDropped: undefined,
   onDragMove: undefined,
   onDragStart: undefined,

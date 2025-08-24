@@ -1,7 +1,11 @@
 import type { ComponentType } from 'react';
 import type { ViewStyle } from 'react-native';
 import type { TouchData } from 'react-native-gesture-handler';
-import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
+import type {
+  AnimatedRef,
+  Extrapolation,
+  SharedValue
+} from 'react-native-reanimated';
 
 import type { DefaultProps, Simplify } from '../../helperTypes';
 import type {
@@ -83,26 +87,64 @@ export type ActiveItemSnapSettings = AnimatableProps<{
   snapOffsetY: Offset;
 }>;
 
-export type AutoScrollSettings = AnimatableProps<{
-  /** Distance from the edge of the container that triggers auto-scrolling.
-   * Can be a single number or [top/left, bottom/right] tuple */
-  autoScrollActivationOffset: [number, number] | number;
-  /** Maximum overscroll distance beyond the normal scroll bounds when
-   * scrollToOverflowEnabled is enabled on the scrollable container.
-   * If null, uses the autoScrollActivationOffset value, otherwise uses the provided value */
-  maxScrollToOverflowOffset: [number, number] | null | number;
-  /** Speed at which auto-scrolling occurs */
-  autoScrollSpeed: number;
-  /** Whether auto-scrolling is enabled */
+export type AutoScrollSettings = {
+  /** Whether auto-scrolling is enabled.
+   *
+   * @default true
+   */
   autoScrollEnabled: boolean;
-}> & {
   /** Reference to the animated scrollable container which will be scrolled
    * automatically when the active item is dragged near the edges of the container
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scrollableRef: AnimatedRef<any>; // TODO - type this properly
-  /** Direction in which auto-scrolling should occur */
+  /** Direction in which auto-scrolling should occur.
+   *
+   * @default 'vertical'
+   */
   autoScrollDirection: 'horizontal' | 'vertical';
+  /** Distance from the edge of the container that triggers auto-scrolling.
+   *
+   * - `number` - same value for both edges
+   * - `[number, number]` - [top/left, bottom/right] values
+   *
+   * @default 75
+   */
+  autoScrollActivationOffset: [number, number] | number;
+  /** Maximum overscroll distance beyond the content bounds when auto-scrolling.
+   *
+   * - `number` - same value for both edges
+   * - `[number, number]` - [top/left, bottom/right] values
+   *
+   * @default 50
+   */
+  autoScrollMaxOverscroll: [number, number] | number;
+  /** Controls behavior beyond the maximum threshold.
+   *
+   * @default Extrapolation.EXTEND
+   */
+  autoScrollExtrapolation: Extrapolation;
+  /** Maximum scroll velocity in pixels per second when at the edge.
+   *
+   * - `number` - same value for both edges
+   * - `[number, number]` - [top/left, bottom/right] values
+   *
+   * @default 1000
+   */
+  autoScrollMaxVelocity: [number, number] | number;
+  /** Interval between scrollTo calls in milliseconds.
+   *
+   * @default 0 on iOS, 0 on Android (old architecture), 300 on Android (new architecture)
+   */
+  autoScrollInterval: number;
+  /** Whether to animate scrollTo calls.
+   *
+   * The main purpose of this prop is to ensure that scroll position changes
+   * are animated when the autoScrollInterval is set to a large value.
+   *
+   * @default false on iOS, true on Android
+   */
+  animateScrollTo: boolean;
 };
 
 export type DropIndicatorSettings = {

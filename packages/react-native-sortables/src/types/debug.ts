@@ -36,6 +36,16 @@ export type DebugLineProps = MutuallyExclusiveUnion<
     },
     {
       x: Maybe<number>;
+      y?: Maybe<number>;
+      type: 'vertical';
+    },
+    {
+      y: Maybe<number>;
+      x?: Maybe<number>;
+      type: 'horizontal';
+    },
+    {
+      x: Maybe<number>;
     },
     {
       y: Maybe<number>;

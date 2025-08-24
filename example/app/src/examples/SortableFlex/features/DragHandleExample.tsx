@@ -47,6 +47,8 @@ export default function DragHandleExample() {
         style={flex.fill}>
         <Sortable.Flex
           activeItemScale={1}
+          autoScrollActivationOffset={[50, 150]}
+          autoScrollMaxOverscroll={[50, 100]}
           columnGap={10}
           dragActivationDelay={0}
           overDrag={overDrag}

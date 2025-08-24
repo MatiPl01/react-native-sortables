@@ -27,10 +27,10 @@ export default function MaxOverscrollOffsetExample() {
         removeClippedSubviews={false}
         scrollToOverflowEnabled>
         <Sortable.Grid
+          autoScrollMaxOverscroll={[200, 300]}
           columnGap={spacing.md}
           columns={3}
           data={DATA}
-          maxScrollToOverflowOffset={[200, 300]}
           renderItem={renderItem}
           rowGap={spacing.md}
           scrollableRef={scrollableRef}

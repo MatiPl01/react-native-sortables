@@ -1,105 +1,117 @@
 'worklet';
-import type { MeasuredDimensions } from 'react-native-reanimated';
+import type {
+  ExtrapolationType,
+  MeasuredDimensions
+} from 'react-native-reanimated';
+import { Extrapolation, interpolate } from 'react-native-reanimated';
 
-import type { DebugLineUpdater, DebugRectUpdater } from '../../../types';
+type CalculateRawProgressFunction = (
+  position: number,
+  contentContainerMeasurements: MeasuredDimensions,
+  scrollContainerMeasurements: MeasuredDimensions,
+  activationOffset: [number, number],
+  contentBounds: [number, number],
+  maxOverscroll: [number, number],
+  extrapolation: ExtrapolationType
+) => number;
 
-const DEBUG_COLORS = {
-  backgroundColor: '#CE00B5',
-  borderColor: '#4E0044'
-};
-
-export const handleMeasurementsVertical = (
-  threshold: [number, number],
-  maxOverScrollOffset: [number, number] | null,
-  touchOffset: number,
-  scrollableMeasurements: MeasuredDimensions,
-  containerMeasurements: MeasuredDimensions,
-  debugRects: Record<'end' | 'start', DebugRectUpdater> | undefined,
-  debugLine: DebugLineUpdater | undefined
+const calculateRawProgress = (
+  position: number,
+  contentPos: number,
+  scrollablePos: number,
+  scrollableSize: number,
+  [startOffset, endOffset]: [number, number],
+  [startContent, endContent]: [number, number],
+  [maxStartOverscroll, maxEndOverscroll]: [number, number],
+  extrapolation: ExtrapolationType
 ) => {
-  const { height: sH, pageY: sY } = scrollableMeasurements;
-  const { height: cH, pageY: cY } = containerMeasurements;
-  maxOverScrollOffset ??= threshold;
+  const startBound = scrollablePos - contentPos;
+  const startThreshold = startBound + startOffset;
+  const endBound = startBound + scrollableSize;
+  const endThreshold = endBound - endOffset;
 
-  const startDistance = sY + maxOverScrollOffset[0] - cY;
-  const endDistance = cY + cH - (sY + sH - maxOverScrollOffset[1]);
+  const startBoundProgress = -interpolate(
+    position,
+    [startContent - maxStartOverscroll, startContent + startOffset],
+    [0, 1],
+    Extrapolation.CLAMP
+  );
 
-  const startOverflow = sY + threshold[0] - (cY + touchOffset);
-  const endOverflow = cY + touchOffset - (sY + sH - threshold[1]);
+  const endBoundProgress = interpolate(
+    position,
+    [endContent - endOffset, endContent + maxEndOverscroll],
+    [1, 0],
+    Extrapolation.CLAMP
+  );
 
-  if (debugRects) {
-    debugRects.start.set({
-      ...DEBUG_COLORS,
-      height: threshold[0],
-      y: sY - cY
-    });
-    debugRects.end.set({
-      ...DEBUG_COLORS,
-      height: threshold[1],
-      positionOrigin: 'bottom',
-      y: sY - cY + sH
-    });
-  }
-  if (debugLine) {
-    debugLine.set({
-      color: DEBUG_COLORS.backgroundColor,
-      y: touchOffset
-    });
-  }
-
-  return {
-    containerPosition: cY,
-    endDistance,
-    endOverflow,
-    startDistance,
-    startOverflow
-  };
+  return interpolate(
+    position,
+    [startBound, startThreshold, endThreshold, endBound],
+    [startBoundProgress, 0, 0, endBoundProgress],
+    extrapolation
+  );
 };
 
-export const handleMeasurementsHorizontal = (
-  threshold: [number, number],
-  maxOverScrollOffset: [number, number] | null,
-  touchOffset: number,
-  scrollableMeasurements: MeasuredDimensions,
-  containerMeasurements: MeasuredDimensions,
-  debugRects: Record<'end' | 'start', DebugRectUpdater> | undefined,
-  debugLine: DebugLineUpdater | undefined
+export const calculateRawProgressVertical: CalculateRawProgressFunction = (
+  position,
+  { pageY: cY },
+  { height: sH, pageY: sY },
+  ...rest
+) => calculateRawProgress(position, cY, sY, sH, ...rest);
+
+export const calculateRawProgressHorizontal: CalculateRawProgressFunction = (
+  position,
+  { pageX: cX },
+  { pageX: sX, width: sW },
+  ...rest
+) => calculateRawProgress(position, cX, sX, sW, ...rest);
+
+type ClampDistanceFunction = (
+  distance: number,
+  contentContainerMeasurements: MeasuredDimensions,
+  scrollContainerMeasurements: MeasuredDimensions,
+  contentBounds: [number, number],
+  maxOverscroll: [number, number]
+) => number;
+
+const clampDistance = (
+  distance: number,
+  containerOffset: number,
+  scrollableSize: number,
+  [startOffset, endOffset]: [number, number],
+  [maxStartOverscroll, maxEndOverscroll]: [number, number]
 ) => {
-  const { pageX: sX, width: sW } = scrollableMeasurements;
-  const { pageX: cX, width: cW } = containerMeasurements;
-  maxOverScrollOffset ??= threshold;
-
-  const startDistance = sX + maxOverScrollOffset[0] - cX;
-  const endDistance = cX + cW - (sX + sW - maxOverScrollOffset[1]);
-
-  const startOverflow = sX + threshold[0] - (cX + touchOffset);
-  const endOverflow = cX + touchOffset - (sX + sW - threshold[1]);
-
-  if (debugRects) {
-    debugRects.start.set({
-      ...DEBUG_COLORS,
-      width: threshold[0],
-      x: sX - cX
-    });
-    debugRects.end.set({
-      ...DEBUG_COLORS,
-      positionOrigin: 'right',
-      width: threshold[1],
-      x: sX - cX + sW
-    });
-  }
-  if (debugLine) {
-    debugLine.set({
-      color: DEBUG_COLORS.backgroundColor,
-      x: touchOffset
-    });
+  if (distance < 0) {
+    // Scrolling up
+    return (
+      Math.max(containerOffset + distance, startOffset - maxStartOverscroll) -
+      containerOffset
+    );
   }
 
-  return {
-    containerPosition: cX,
-    endDistance,
-    endOverflow,
-    startDistance,
-    startOverflow
-  };
+  if (distance > 0) {
+    // Scrolling down
+    return (
+      Math.min(
+        containerOffset + distance,
+        endOffset - scrollableSize + maxEndOverscroll
+      ) - containerOffset
+    );
+  }
+
+  return 0;
 };
+
+export const clampDistanceVertical: ClampDistanceFunction = (
+  distance,
+  { pageY: cY },
+  { height: sH, pageY: sY },
+  ...rest
+) => clampDistance(distance, sY - cY, sH, ...rest);
+
+export const clampDistanceHorizontal: ClampDistanceFunction = (
+  distance,
+  { pageX: cX },
+  { pageX: sX, width: sW },
+  ...rest
+) => clampDistance(distance, sX - cX, sW, ...rest);

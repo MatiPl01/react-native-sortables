@@ -55,4 +55,5 @@ export type FlexLayout = {
   totalDimensions: Dimensions;
   adjustedCrossGap: number;
   groupSizeLimit: number;
+  contentBounds: [Vector, Vector];
 };

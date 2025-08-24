@@ -29,7 +29,7 @@ import { useMultiZoneContext } from './MultiZoneProvider';
 export type SharedProviderProps = PropsWithChildren<
   ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
-    PartialBy<AutoScrollSettings, 'scrollableRef'> &
+    PartialBy<Required<AutoScrollSettings>, 'scrollableRef'> &
     Required<ItemDragSettings> &
     Required<SortableCallbacks> & {
       itemKeys: Array<string>;
@@ -46,17 +46,20 @@ export type SharedProviderProps = PropsWithChildren<
 >;
 
 export default function SharedProvider({
+  animateScrollTo,
   autoScrollActivationOffset,
   autoScrollDirection,
   autoScrollEnabled,
-  autoScrollSpeed,
+  autoScrollExtrapolation,
+  autoScrollInterval,
+  autoScrollMaxOverscroll,
+  autoScrollMaxVelocity,
   bringToFrontWhenActive,
   children,
   customHandle,
   debug,
   hapticsEnabled,
   itemKeys,
-  maxScrollToOverflowOffset,
   onActiveItemDropped,
   onDragEnd,
   onDragMove,
@@ -94,11 +97,14 @@ export default function SharedProvider({
     // edge of the container
     scrollableRef && (
       <AutoScrollProvider
+        animateScrollTo={animateScrollTo}
         autoScrollActivationOffset={autoScrollActivationOffset}
         autoScrollDirection={autoScrollDirection}
         autoScrollEnabled={autoScrollEnabled}
-        autoScrollSpeed={autoScrollSpeed}
-        maxScrollToOverflowOffset={maxScrollToOverflowOffset}
+        autoScrollExtrapolation={autoScrollExtrapolation}
+        autoScrollInterval={autoScrollInterval}
+        autoScrollMaxOverscroll={autoScrollMaxOverscroll}
+        autoScrollMaxVelocity={autoScrollMaxVelocity}
         scrollableRef={scrollableRef}
       />
     ),
