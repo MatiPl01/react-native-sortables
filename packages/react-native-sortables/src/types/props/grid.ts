@@ -1,6 +1,10 @@
 import type { ReactNode } from 'react';
 
-import type { DefaultProps, Simplify } from '../../helperTypes';
+import type {
+  DefaultProps,
+  MutuallyExclusiveUnion,
+  Simplify
+} from '../../helperTypes';
 import type { AnimatableProps } from '../../integrations/reanimated';
 import type { SortStrategyFactory } from '../providers';
 import type { DefaultSharedProps, DragEndParams, SharedProps } from './shared';
@@ -18,26 +22,25 @@ export type SortableGridDragEndCallback<I> = (
   params: SortableGridDragEndParams<I>
 ) => void;
 
-type SortableGridLayoutSettings = Partial<
-  AnimatableProps<{
-    /** Vertical spacing between grid items */
-    rowGap: number;
-    /** Horizontal spacing between grid items */
-    columnGap: number;
-  }>
+type SortableGridLayoutSettings = MutuallyExclusiveUnion<
+  [
+    {
+      columns?: number;
+    },
+    {
+      rows: number;
+      rowHeight: number;
+    }
+  ]
 > &
-  (
-    | {
-        columns?: number;
-        rows?: never;
-        rowHeight?: number;
-      }
-    | {
-        rows: number;
-        rowHeight: number;
-        columns?: number;
-      }
-  );
+  Partial<
+    AnimatableProps<{
+      /** Vertical spacing between grid items */
+      rowGap: number;
+      /** Horizontal spacing between grid items */
+      columnGap: number;
+    }>
+  >;
 
 /** Information passed to the renderItem function */
 export type SortableGridRenderItemInfo<I> = {

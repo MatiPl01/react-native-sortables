@@ -1,7 +1,7 @@
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { Maybe } from '../helperTypes';
+import type { Maybe, MutuallyExclusiveUnion } from '../helperTypes';
 import type { Vector } from './layout/shared';
 
 export enum DebugComponentType {
@@ -10,97 +10,79 @@ export enum DebugComponentType {
   RECT = 'rect'
 }
 
-export type DebugCrossProps = Pick<
-  DebugLineProps,
-  'color' | 'opacity' | 'style' | 'thickness' | 'visible'
-> & {
-  isAbsolute?: boolean;
-} & (
-    | {
-        x: Maybe<number>;
-        y: Maybe<number>;
-        position?: never;
-      }
-    | {
-        x?: never;
-        y?: never;
-        position: Maybe<Vector>;
-      }
-  );
+export type DebugCrossProps = MutuallyExclusiveUnion<
+  [
+    {
+      x: Maybe<number>;
+      y: Maybe<number>;
+    },
+    {
+      position: Maybe<Vector>;
+    }
+  ]
+> &
+  Pick<
+    DebugLineProps,
+    'color' | 'opacity' | 'style' | 'thickness' | 'visible'
+  > & {
+    isAbsolute?: boolean;
+  };
 
-export type DebugLineProps = {
+export type DebugLineProps = MutuallyExclusiveUnion<
+  [
+    {
+      from: Maybe<Vector>;
+      to: Maybe<Vector>;
+    },
+    {
+      x: Maybe<number>;
+    },
+    {
+      y: Maybe<number>;
+    }
+  ]
+> & {
   isAbsolute?: boolean;
   visible?: boolean;
   color?: ViewStyle['borderColor'];
   thickness?: number;
   style?: ViewStyle['borderStyle'];
   opacity?: number;
-} & (
-  | {
+};
+
+export type DebugRectProps = MutuallyExclusiveUnion<
+  [
+    {
       from: Maybe<Vector>;
       to: Maybe<Vector>;
-      x?: never;
-      y?: never;
-    }
-  | {
+    },
+    {
       x: Maybe<number>;
-      y?: never;
-      from?: never;
-      to?: never;
-    }
-  | {
-      x?: never;
       y: Maybe<number>;
-      from?: never;
-      to?: never;
+      width: Maybe<number>;
+      height: Maybe<number>;
+      positionOrigin?: `${'left' | 'right'} ${'bottom' | 'top'}`;
+    },
+    {
+      x: Maybe<number>;
+      width: Maybe<number>;
+      positionOrigin?: `${'left' | 'right'}`;
+    },
+    {
+      y: Maybe<number>;
+      height: Maybe<number>;
+      positionOrigin?: `${'bottom' | 'top'}`;
     }
-);
-
-export type DebugRectProps = Pick<
-  ViewStyle,
-  'backgroundColor' | 'borderColor' | 'borderStyle' | 'borderWidth'
-> & {
-  isAbsolute?: boolean;
-  backgroundOpacity?: number;
-  visible?: boolean;
-} & (
-    | {
-        from: Maybe<Vector>;
-        to: Maybe<Vector>;
-        x?: never;
-        y?: never;
-        width?: never;
-        height?: never;
-        positionOrigin?: never;
-      }
-    | {
-        x: Maybe<number>;
-        y: Maybe<number>;
-        from?: never;
-        to?: never;
-        width: Maybe<number>;
-        height: Maybe<number>;
-        positionOrigin?: `${'left' | 'right'} ${'bottom' | 'top'}`;
-      }
-    | {
-        x: Maybe<number>;
-        y?: never;
-        from?: never;
-        to?: never;
-        width: Maybe<number>;
-        height?: never;
-        positionOrigin?: `${'left' | 'right'}`;
-      }
-    | {
-        x?: never;
-        y: Maybe<number>;
-        from?: never;
-        to?: never;
-        width?: never;
-        height: Maybe<number>;
-        positionOrigin?: `${'bottom' | 'top'}`;
-      }
-  );
+  ]
+> &
+  Pick<
+    ViewStyle,
+    'backgroundColor' | 'borderColor' | 'borderStyle' | 'borderWidth'
+  > & {
+    isAbsolute?: boolean;
+    backgroundOpacity?: number;
+    visible?: boolean;
+  };
 
 export type WrappedProps<P> = { props: SharedValue<P> };
 
