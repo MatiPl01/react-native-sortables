@@ -18,6 +18,7 @@ export const DEFAULT_SHARED_PROPS = {
   activeItemOpacity: 1,
   activeItemScale: 1.1,
   activeItemShadowOpacity: 0.2,
+  animateScrollTo: { get: () => IS_ANDROID && isFabric() },
   autoScrollActivationOffset: 75,
   autoScrollDirection: 'vertical',
   autoScrollEnabled: true,

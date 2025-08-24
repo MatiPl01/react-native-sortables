@@ -104,6 +104,7 @@ type AutoScrollUpdaterProps = Omit<
 };
 
 function AutoScrollUpdater({
+  animateScrollTo,
   autoScrollActivationOffset,
   autoScrollExtrapolation,
   autoScrollInterval,
@@ -199,7 +200,7 @@ function AutoScrollUpdater({
   );
 
   const scrollBy = useCallback(
-    (distance: number, animated = false) => {
+    (distance: number) => {
       'worklet';
       const bounds = contentAxisBounds.value;
       const containerMeasurements = measure(containerRef);
@@ -232,7 +233,7 @@ function AutoScrollUpdater({
         scrollableRef,
         isVertical ? 0 : targetOffset,
         isVertical ? targetOffset : 0,
-        animated
+        animateScrollTo
       );
     },
     [
@@ -243,7 +244,8 @@ function AutoScrollUpdater({
       containerRef,
       contentAxisBounds,
       clampDistance,
-      maxOverscroll
+      maxOverscroll,
+      animateScrollTo
     ]
   );
 
@@ -273,7 +275,7 @@ function AutoScrollUpdater({
 
       const distance = velocity * (cappedElapsedTime / 1000);
 
-      scrollBy(distance, autoScrollInterval > 200);
+      scrollBy(distance);
     },
     [
       scrollBy,
