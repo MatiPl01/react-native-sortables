@@ -1,38 +1,47 @@
-import { type PropsWithChildren } from 'react';
+import { type PropsWithChildren, useCallback } from 'react';
 import {
   measure,
+  scrollTo,
   useAnimatedReaction,
   useDerivedValue,
   useScrollViewOffset
 } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../../integrations/reanimated';
 import type {
   AutoScrollContextType,
   AutoScrollSettingsInternal
 } from '../../../types';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
+import { ContinuousModeUpdater } from './modes';
 import useDebugHelpers from './useDebugHelpers';
 import {
   calculateRawProgressHorizontal,
   calculateRawProgressVertical
 } from './utils';
 
-type AutoScrollProviderProps = PropsWithChildren<AutoScrollSettingsInternal>;
+type AutoScrollProviderProps = PropsWithChildren<
+  Required<
+    Omit<AutoScrollSettingsInternal, 'autoScrollMode'> & {
+      autoScrollMode: AutoScrollSettingsInternal['autoScrollMode'];
+    }
+  >
+>;
 
 const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   'AutoScroll',
   { guarded: false }
-)<AutoScrollProviderProps, AutoScrollContextType>(({
-  autoScrollEnabled,
-  children,
-  ...rest
-}) => {
+)<AutoScrollProviderProps, AutoScrollContextType>(({ children, ...props }) => {
   return {
     children: (
       <>
         {children}
-        {autoScrollEnabled && <AutoScrollUpdater {...rest} />}
+        {props.autoScrollEnabled && (
+          <AutoScrollUpdater
+            {...(props as Required<AutoScrollSettingsInternal>)}
+          />
+        )}
       </>
     ),
     value: {
@@ -42,19 +51,14 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   };
 });
 
-type AutoScrollUpdaterProps = Omit<
-  AutoScrollSettingsInternal,
-  'autoScrollEnabled'
->;
+function AutoScrollUpdater(props: AutoScrollSettingsInternal) {
+  const {
+    autoScrollActivationOffset,
+    autoScrollDirection,
+    autoScrollExtrapolation,
+    scrollableRef
+  } = props;
 
-function AutoScrollUpdater({
-  autoScrollActivationOffset,
-  autoScrollDirection,
-  autoScrollExtrapolation,
-  autoScrollSpeed,
-  maxScrollToOverflowOffset,
-  scrollableRef
-}: AutoScrollUpdaterProps) {
   const isVertical = autoScrollDirection === 'vertical';
   const scrollAxis = isVertical ? 'y' : 'x';
   const {
@@ -65,6 +69,8 @@ function AutoScrollUpdater({
     touchPosition
   } = useCommonValuesContext();
   const currentScrollOffset = useScrollViewOffset(scrollableRef);
+
+  const progress = useMutableValue(0);
 
   const activationOffset: [number, number] = Array.isArray(
     autoScrollActivationOffset
@@ -102,8 +108,6 @@ function AutoScrollUpdater({
     ? calculateRawProgressVertical
     : calculateRawProgressHorizontal;
 
-  // TODO - maybe use frame callback (or only for continuous mode) to calculate
-  // progress properly including the time difference between frames
   useAnimatedReaction(
     () => ({
       bounds: contentBounds.value,
@@ -123,15 +127,13 @@ function AutoScrollUpdater({
         return;
       }
 
-      const rawProgress = calculateRawProgress(
+      progress.value = calculateRawProgress(
         position,
         contentContainerMeasurements,
         scrollContainerMeasurements,
         activationOffset,
         autoScrollExtrapolation
       );
-
-      console.log('rawProgress', rawProgress);
 
       debug?.updateDebugRects?.(
         contentContainerMeasurements,
@@ -141,7 +143,31 @@ function AutoScrollUpdater({
     [debug]
   );
 
-  return null;
+  const handleScroll = useCallback(
+    (offset: number, animated = false) => {
+      'worklet';
+      scrollTo(
+        scrollableRef,
+        isVertical ? 0 : offset,
+        isVertical ? offset : 0,
+        animated
+      );
+    },
+    [isVertical, scrollableRef]
+  );
+
+  switch (props.autoScrollMode) {
+    case 'continuous':
+      return (
+        <ContinuousModeUpdater
+          {...props}
+          handleScroll={handleScroll}
+          progress={progress}
+        />
+      );
+    case 'step':
+      return null; // <StepModeUpdater {...props} />;
+  }
 }
 
 export { AutoScrollProvider, useAutoScrollContext };

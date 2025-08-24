@@ -329,6 +329,6 @@ type OptionalSharedProps =
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
 export type DefaultSharedProps = DefaultProps<
-  Partial<AutoScrollSettingsInternal> & SharedProps,
+  AutoScrollSettingsInternal & SharedProps,
   OptionalSharedProps
 >;
