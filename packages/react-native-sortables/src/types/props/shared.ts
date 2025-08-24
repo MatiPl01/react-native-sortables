@@ -7,11 +7,7 @@ import type {
   SharedValue
 } from 'react-native-reanimated';
 
-import type {
-  DefaultProps,
-  MutuallyExclusiveUnion,
-  Simplify
-} from '../../helperTypes';
+import type { DefaultProps, Simplify } from '../../helperTypes';
 import type {
   Animatable,
   AnimatableProps,
@@ -91,7 +87,7 @@ export type ActiveItemSnapSettings = AnimatableProps<{
   snapOffsetY: Offset;
 }>;
 
-type CommonAutoScrollSettings = {
+export type AutoScrollSettings = {
   /** Whether auto-scrolling is enabled */
   autoScrollEnabled: boolean;
   /** Reference to the animated scrollable container which will be scrolled
@@ -111,11 +107,6 @@ type CommonAutoScrollSettings = {
   /** Controls behavior beyond the maximum threshold.
    * @default Extrapolation.EXTEND */
   autoScrollExtrapolation: Extrapolation;
-};
-
-export type AutoScrollContinuousModeSettings = {
-  /** Discriminator for continuous auto-scroll mode */
-  autoScrollMode: 'continuous';
   /** Maximum scroll velocity in pixels per second when at the edge.
    * number -> same for both edges; tuple -> [top/left, bottom/right]
    * @default 100 */
@@ -125,31 +116,6 @@ export type AutoScrollContinuousModeSettings = {
    */
   autoScrollInterval: number;
 };
-
-export type AutoScrollStepModeSettings = {
-  /** Discriminator for step-based auto-scroll mode */
-  autoScrollMode: 'step';
-  /** Shortest delay between scrollTo calls (ms) when pressure is high
-   * @default 100
-   */
-  autoScrollMinInterval: number;
-  /** Longest delay when barely in the zone (ms).
-   * @default 500 */
-  autoScrollMaxInterval: number;
-  /** Max number of elements (rows/cols) to jump per tick.
-   * number -> same for both directions; tuple -> [up/left, down/right]
-   * @default 3 */
-  autoScrollMaxJump: [number, number] | number;
-};
-
-type AutoScrollSettings = CommonAutoScrollSettings &
-  // eslint-disable-next-line perfectionist/sort-intersection-types
-  (AutoScrollContinuousModeSettings | AutoScrollStepModeSettings);
-
-export type AutoScrollSettingsInternal = CommonAutoScrollSettings &
-  MutuallyExclusiveUnion<
-    [AutoScrollContinuousModeSettings, AutoScrollStepModeSettings]
-  >;
 
 export type DropIndicatorSettings = {
   /** Component to render as the drop indicator */
@@ -328,14 +294,8 @@ export type SharedProps = Simplify<
     >
 >;
 
-export type SharedPropsInternal = Partial<AutoScrollSettingsInternal> &
-  SharedProps;
-
 type OptionalSharedProps =
   | 'scrollableRef'
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
-export type DefaultSharedProps = DefaultProps<
-  SharedPropsInternal,
-  OptionalSharedProps
->;
+export type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;

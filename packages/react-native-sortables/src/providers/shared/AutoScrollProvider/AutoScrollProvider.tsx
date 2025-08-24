@@ -1,22 +1,22 @@
 import { type PropsWithChildren, useCallback } from 'react';
 import {
+  type FrameInfo,
+  interpolate,
   measure,
   scrollTo,
   type SharedValue,
   useAnimatedReaction,
   useDerivedValue,
+  useFrameCallback,
   useScrollViewOffset
 } from 'react-native-reanimated';
+import { runOnJS } from 'react-native-worklets';
 
 import { useMutableValue } from '../../../integrations/reanimated';
-import type {
-  AutoScrollContextType,
-  AutoScrollSettingsInternal
-} from '../../../types';
+import type { AutoScrollContextType, AutoScrollSettings } from '../../../types';
 import { toPair } from '../../../utils';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
-import { ContinuousModeUpdater } from './modes';
 import useDebugHelpers from './useDebugHelpers';
 import {
   calculateRawProgressHorizontal,
@@ -25,23 +25,26 @@ import {
   clampDistanceVertical
 } from './utils';
 
-type AutoScrollProviderProps = PropsWithChildren<
-  Required<
-    Omit<AutoScrollSettingsInternal, 'autoScrollMode'> & {
-      autoScrollMode: AutoScrollSettingsInternal['autoScrollMode'];
-    }
-  >
->;
+// Maximum elapsed time multiplier to prevent excessive scrolling distances when app lags
+const MAX_ELAPSED_TIME_MULTIPLIER = 2;
+
+type AutoScrollProviderProps = PropsWithChildren<Required<AutoScrollSettings>>;
 
 const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   'AutoScroll',
   { guarded: false }
-)<AutoScrollProviderProps, AutoScrollContextType>(({ children, ...props }) => {
-  const currentScrollOffset = useScrollViewOffset(props.scrollableRef);
+)<AutoScrollProviderProps, AutoScrollContextType>(({
+  autoScrollDirection,
+  autoScrollEnabled,
+  children,
+  scrollableRef,
+  ...rest
+}) => {
+  const currentScrollOffset = useScrollViewOffset(scrollableRef);
   const dragStartScrollOffset = useMutableValue<null | number>(null);
   const contentBounds = useMutableValue<[number, number] | null>(null);
 
-  const isVertical = props.autoScrollDirection === 'vertical';
+  const isVertical = autoScrollDirection === 'vertical';
 
   const scrollOffsetDiff = useDerivedValue(() => {
     if (dragStartScrollOffset.value === null) {
@@ -58,13 +61,14 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     children: (
       <>
         {children}
-        {props.autoScrollEnabled && (
+        {autoScrollEnabled && (
           <AutoScrollUpdater
             contentBounds={contentBounds}
             currentScrollOffset={currentScrollOffset}
             dragStartScrollOffset={dragStartScrollOffset}
             isVertical={isVertical}
-            {...(props as Required<AutoScrollSettingsInternal>)}
+            scrollableRef={scrollableRef}
+            {...rest}
           />
         )}
       </>
@@ -76,34 +80,39 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   };
 });
 
-type AutoScrollUpdaterProps = AutoScrollSettingsInternal & {
+type AutoScrollUpdaterProps = Omit<
+  AutoScrollSettings,
+  'autoScrollDirection' | 'autoScrollEnabled'
+> & {
   currentScrollOffset: SharedValue<number>;
   dragStartScrollOffset: SharedValue<null | number>;
   contentBounds: SharedValue<[number, number] | null>;
   isVertical: boolean;
 };
 
-function AutoScrollUpdater(props: AutoScrollUpdaterProps) {
-  const {
-    autoScrollActivationOffset,
-    autoScrollExtrapolation,
-    autoScrollMaxOverscroll,
-    contentBounds,
-    currentScrollOffset,
-    dragStartScrollOffset,
-    isVertical,
-    scrollableRef
-  } = props;
-
+function AutoScrollUpdater({
+  autoScrollActivationOffset,
+  autoScrollExtrapolation,
+  autoScrollInterval,
+  autoScrollMaxOverscroll,
+  autoScrollMaxVelocity,
+  contentBounds,
+  currentScrollOffset,
+  dragStartScrollOffset,
+  isVertical,
+  scrollableRef
+}: AutoScrollUpdaterProps) {
   const { activeItemKey, containerRef, touchPosition } =
     useCommonValuesContext();
 
   const targetScrollOffset = useMutableValue<null | number>(null);
+  const lastUpdateTimestamp = useMutableValue<null | number>(null);
   const progress = useMutableValue(0);
 
   const scrollAxis = isVertical ? 'y' : 'x';
   const activationOffset = toPair(autoScrollActivationOffset);
   const maxOverscroll = toPair(autoScrollMaxOverscroll);
+  const [maxStartVelocity, maxEndVelocity] = toPair(autoScrollMaxVelocity);
 
   let debug: ReturnType<typeof useDebugHelpers> = {};
   if (__DEV__) {
@@ -172,19 +181,6 @@ function AutoScrollUpdater(props: AutoScrollUpdaterProps) {
     [debug]
   );
 
-  useAnimatedReaction(
-    () => activeItemKey.value !== null,
-    active => {
-      if (active) {
-        dragStartScrollOffset.value = currentScrollOffset.value;
-      } else {
-        dragStartScrollOffset.value = null;
-        targetScrollOffset.value = null;
-      }
-    },
-    [currentScrollOffset]
-  );
-
   const scrollBy = useCallback(
     (distance: number, animated = false) => {
       'worklet';
@@ -234,18 +230,70 @@ function AutoScrollUpdater(props: AutoScrollUpdaterProps) {
     ]
   );
 
-  switch (props.autoScrollMode) {
-    case 'continuous':
-      return (
-        <ContinuousModeUpdater
-          {...props}
-          progress={progress}
-          scrollBy={scrollBy}
-        />
+  const frameCallbackFunction = useCallback(
+    ({ timestamp }: FrameInfo) => {
+      'worklet';
+      if (progress.value === 0) {
+        return;
+      }
+
+      lastUpdateTimestamp.value ??= timestamp;
+      const elapsedTime = timestamp - lastUpdateTimestamp.value;
+      if (elapsedTime < autoScrollInterval) {
+        return;
+      }
+
+      // Cap the elapsed time to prevent excessive scrolling distances when app lags
+      const maxElapsedTime = autoScrollInterval * MAX_ELAPSED_TIME_MULTIPLIER;
+      const cappedElapsedTime = Math.min(elapsedTime, maxElapsedTime);
+      lastUpdateTimestamp.value = timestamp;
+
+      const velocity = interpolate(
+        progress.value,
+        [-1, 0, 1],
+        [-maxStartVelocity, 0, maxEndVelocity]
       );
-    case 'step':
-      return null; // <StepModeUpdater {...props} />;
-  }
+
+      const distance = velocity * (cappedElapsedTime / 1000);
+
+      scrollBy(distance, autoScrollInterval > 200);
+    },
+    [
+      scrollBy,
+      maxStartVelocity,
+      maxEndVelocity,
+      progress,
+      autoScrollInterval,
+      lastUpdateTimestamp
+    ]
+  );
+
+  const frameCallback = useFrameCallback(frameCallbackFunction, false);
+
+  const toggleFrameCallback = useCallback(
+    (enabled: boolean) => {
+      frameCallback.setActive(enabled);
+    },
+    [frameCallback]
+  );
+
+  useAnimatedReaction(
+    () => activeItemKey.value !== null,
+    active => {
+      if (active) {
+        dragStartScrollOffset.value = currentScrollOffset.value;
+        lastUpdateTimestamp.value = null;
+        runOnJS(toggleFrameCallback)(true);
+      } else {
+        dragStartScrollOffset.value = null;
+        targetScrollOffset.value = null;
+        runOnJS(toggleFrameCallback)(false);
+      }
+    },
+    [currentScrollOffset]
+  );
+
+  return null;
 }
 
 export { AutoScrollProvider, useAutoScrollContext };

@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 
 import { DEFAULT_SHARED_PROPS, STYLE_PROPS } from '../constants/props';
 import type { AnyRecord, RequiredBy } from '../helperTypes';
-import type { SharedProps, SharedPropsInternal } from '../types';
+import type { SharedProps } from '../types';
 
 const hasStyleProp = <K extends string, P extends AnyRecord>(
   styleKey: K,
@@ -13,10 +13,10 @@ const hasStyleProp = <K extends string, P extends AnyRecord>(
 };
 
 type PropsWithDefaults<P extends AnyRecord, D extends AnyRecord> = {
-  sharedProps: Required<SharedPropsInternal>;
+  sharedProps: Required<SharedProps>;
   rest: Omit<
     Omit<P, keyof D> & RequiredBy<P, keyof D & keyof P>,
-    keyof SharedPropsInternal
+    keyof SharedProps
   >;
 };
 

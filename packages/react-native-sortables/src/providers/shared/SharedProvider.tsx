@@ -11,7 +11,7 @@ import type { Animatable } from '../../integrations/reanimated';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
-  AutoScrollSettingsInternal,
+  AutoScrollSettings,
   ControlledDimensions,
   ItemDragSettings,
   ItemsLayoutTransitionMode,
@@ -29,7 +29,7 @@ import { useMultiZoneContext } from './MultiZoneProvider';
 export type SharedProviderProps = PropsWithChildren<
   ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
-    PartialBy<Required<AutoScrollSettingsInternal>, 'scrollableRef'> &
+    PartialBy<Required<AutoScrollSettings>, 'scrollableRef'> &
     Required<ItemDragSettings> &
     Required<SortableCallbacks> & {
       itemKeys: Array<string>;
@@ -51,18 +51,14 @@ export default function SharedProvider({
   autoScrollEnabled,
   autoScrollExtrapolation,
   autoScrollInterval,
-  autoScrollMaxInterval,
-  autoScrollMaxJump,
+  autoScrollMaxOverscroll,
   autoScrollMaxVelocity,
-  autoScrollMinInterval,
-  autoScrollMode,
   bringToFrontWhenActive,
   children,
   customHandle,
   debug,
   hapticsEnabled,
   itemKeys,
-  autoScrollMaxOverscroll,
   onActiveItemDropped,
   onDragEnd,
   onDragMove,
@@ -105,12 +101,8 @@ export default function SharedProvider({
         autoScrollEnabled={autoScrollEnabled}
         autoScrollExtrapolation={autoScrollExtrapolation}
         autoScrollInterval={autoScrollInterval}
-        autoScrollMaxInterval={autoScrollMaxInterval}
-        autoScrollMaxJump={autoScrollMaxJump}
-        autoScrollMaxVelocity={autoScrollMaxVelocity}
-        autoScrollMinInterval={autoScrollMinInterval}
-        autoScrollMode={autoScrollMode}
         autoScrollMaxOverscroll={autoScrollMaxOverscroll}
+        autoScrollMaxVelocity={autoScrollMaxVelocity}
         scrollableRef={scrollableRef}
       />
     ),
