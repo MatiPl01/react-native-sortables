@@ -78,7 +78,6 @@ function Example({ horizontal }: ExampleProps) {
       <Sortable.Grid
         {...props}
         activeItemScale={1.05}
-        autoScrollMaxOverscroll={[50, 120]}
         data={DATA}
         renderItem={renderItem}
         scrollableRef={scrollableRef}
@@ -102,16 +101,8 @@ const styles = StyleSheet.create({
   container: {
     padding: spacing.md
   },
-  group: {
-    height: sizes.xxl
-  },
   text: {
     ...text.label2,
     color: colors.white
-  },
-  title: {
-    ...text.subHeading2,
-    marginLeft: spacing.md,
-    marginTop: spacing.sm
   }
 });
