@@ -1,33 +1,26 @@
 import type { PropsWithChildren } from 'react';
 import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
+import { useDerivedValue } from 'react-native-reanimated';
 
-import {
-  setAnimatedTimeout,
-  useMutableValue
-} from '../../integrations/reanimated';
-import type { AdditionalCrossOffsetContextType } from '../../types';
+import { useMutableValue } from '../../integrations/reanimated';
+import type { AutoOffsetAdjustmentContextType, Vector } from '../../types';
 import { calculateSnapOffset } from '../../utils';
-import {
-  useAutoScrollContext,
-  useCommonValuesContext,
-  useCustomHandleContext
-} from '../shared';
+import { useCommonValuesContext, useCustomHandleContext } from '../shared';
 import { createProvider } from '../utils';
 import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
 
-type AdditionalCrossOffsetProviderProps = PropsWithChildren<{
+type AutoOffsetAdjustmentProviderProps = PropsWithChildren<{
   isVertical: boolean;
   columnGap: SharedValue<number>;
   rowGap: SharedValue<number>;
   numGroups: number;
 }>;
 
-const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
-  createProvider('AdditionalCrossOffset', {
+const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
+  createProvider('AutoOffsetAdjustment', {
     guarded: false
-  })<AdditionalCrossOffsetProviderProps, AdditionalCrossOffsetContextType>(({
+  })<AutoOffsetAdjustmentProviderProps, AutoOffsetAdjustmentContextType>(({
     columnGap,
     isVertical,
     numGroups,
@@ -44,16 +37,14 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       itemWidths,
       keyToIndex,
       prevActiveItemKey,
-      shouldAnimateLayout,
       snapOffsetX,
       snapOffsetY,
       touchPosition
     } = useCommonValuesContext();
     const { activeHandleMeasurements, activeHandleOffset } =
       useCustomHandleContext() ?? {};
-    const { scrollBy } = useAutoScrollContext() ?? {};
 
-    const isManaged = useMutableValue(false);
+    const wasPreviouslyActive = useMutableValue(false);
 
     let crossCoordinate, crossGap, crossItemSizes;
     if (isVertical) {
@@ -115,19 +106,10 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       isVertical
     ]);
 
-    const updateIsManaged = useCallback(
-      (managed: boolean) => {
-        'worklet';
-        isManaged.value = managed;
-      },
-      [isManaged]
-    );
-
     const additionalCrossOffset = useDerivedValue(() => {
       const props = getRemainingProps();
 
       if (props) {
-        updateIsManaged(true);
         return calculateActiveItemCrossOffset({
           crossCoordinate,
           crossGap: crossGap.value,
@@ -137,40 +119,42 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
         });
       }
 
-      updateIsManaged(false);
       return 0;
     });
 
-    useAnimatedReaction(
-      () => ({
-        managed: isManaged.value,
-        positions: itemPositions.value
-      }),
-      (props, prev) => {
+    const calculateOffsetShift = useCallback(
+      (
+        newItemPositions: Record<string, Vector>,
+        prevItemPositions: Record<string, Vector>
+      ): null | number => {
+        'worklet';
+        const isActive = activeItemKey.value !== null;
+        const wasActive = wasPreviouslyActive.value;
+        wasPreviouslyActive.value = isActive;
         const key = prevActiveItemKey.value;
-        if (key === null) {
-          return;
+
+        if (isActive || !wasActive || key === null) {
+          return null;
         }
 
-        if (!props.managed && prev?.managed) {
-          const currPos = props.positions[key]?.[crossCoordinate];
-          const prevPos = prev.positions[key]?.[crossCoordinate];
+        const newPos = newItemPositions[key];
+        const prevPos = prevItemPositions[key];
 
-          if (currPos !== undefined && prevPos !== undefined) {
-            setAnimatedTimeout(() => {
-              shouldAnimateLayout.value = false;
-              scrollBy?.(currPos - prevPos, false);
-            });
-          }
+        if (!newPos || !prevPos) {
+          return null;
         }
-      }
+
+        return newPos[crossCoordinate] - prevPos[crossCoordinate];
+      },
+      [activeItemKey, wasPreviouslyActive, prevActiveItemKey, crossCoordinate]
     );
 
     return {
       value: {
-        additionalCrossOffset
+        additionalCrossOffset,
+        calculateOffsetShift
       }
     };
   });
 
-export { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext };
+export { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext };

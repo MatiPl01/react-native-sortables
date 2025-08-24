@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { ManualGesture } from 'react-native-gesture-handler';
 import {
   runOnJS,
@@ -44,6 +44,7 @@ export default function ActiveItemPortal({
   const { isTeleported, measurePortalOutlet, teleport } =
     usePortalContext() ?? {};
   const teleportEnabled = useMutableValue(false);
+  const isFirstUpdateRef = useRef(true);
 
   const renderTeleportedItemCell = useCallback(
     () => (
@@ -79,6 +80,7 @@ export default function ActiveItemPortal({
   const teleportedItemId = `${commonValuesContext.containerId}-${itemKey}`;
 
   const enableTeleport = useStableCallback(() => {
+    isFirstUpdateRef.current = true;
     teleport?.(teleportedItemId, renderTeleportedItemCell());
     onTeleport(true);
   });
@@ -91,8 +93,18 @@ export default function ActiveItemPortal({
   useEffect(() => disableTeleport, [disableTeleport]);
 
   useEffect(() => {
-    if (isTeleported?.(teleportedItemId)) {
+    const checkTeleported = () => isTeleported?.(teleportedItemId);
+    if (!checkTeleported()) return;
+
+    const update = () =>
       teleport?.(teleportedItemId, renderTeleportedItemCell());
+
+    if (isFirstUpdateRef.current) {
+      isFirstUpdateRef.current = false;
+      // Needed for proper collapsible items behavior
+      setTimeout(update);
+    } else {
+      update();
     }
   }, [isTeleported, renderTeleportedItemCell, teleport, teleportedItemId]);
 
