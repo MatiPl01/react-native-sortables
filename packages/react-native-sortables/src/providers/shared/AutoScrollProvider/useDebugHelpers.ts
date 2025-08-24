@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { MeasuredDimensions, SharedValue } from 'react-native-reanimated';
+import type { MeasuredDimensions } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
 
@@ -16,7 +16,6 @@ const OVERSCROLL_COLORS = {
 export default function useDebugHelpers(
   isVertical: boolean,
   [startOffset, endOffset]: [number, number],
-  contentBounds: SharedValue<[number, number] | null>,
   [maxStartOverscroll, maxEndOverscroll]: [number, number]
 ) {
   const debugContext = useDebugContext();
@@ -42,7 +41,12 @@ export default function useDebugHelpers(
       scrollContainerMeasurements: MeasuredDimensions
     ) => {
       'worklet';
-      const { pageX: cX, pageY: cY } = contentContainerMeasurements;
+      const {
+        height: cH,
+        pageX: cX,
+        pageY: cY,
+        width: cW
+      } = contentContainerMeasurements;
       const {
         height: sH,
         pageX: sX,
@@ -75,31 +79,26 @@ export default function useDebugHelpers(
       debugRects?.start.set({ ...TRIGGER_COLORS, ...startTriggerProps });
       debugRects?.end.set({ ...TRIGGER_COLORS, ...endTriggerProps });
 
-      if (!contentBounds.value) {
-        return;
-      }
-
-      const [startBound, endBound] = contentBounds.value;
       const startOverscrollProps = isVertical
         ? {
             height: maxStartOverscroll,
             positionOrigin: 'bottom' as const,
-            y: startBound
+            y: 0
           }
         : {
             positionOrigin: 'right' as const,
             width: maxStartOverscroll,
-            x: startBound
+            x: 0
           };
 
       const endOverscrollProps = isVertical
         ? {
             height: maxEndOverscroll,
-            y: endBound
+            y: cH
           }
         : {
             width: maxEndOverscroll,
-            x: endBound
+            x: cW
           };
 
       debugRects?.startOverscroll.set({
@@ -114,9 +113,8 @@ export default function useDebugHelpers(
     [
       debugRects,
       isVertical,
-      startOffset,
       endOffset,
-      contentBounds,
+      startOffset,
       maxStartOverscroll,
       maxEndOverscroll
     ]

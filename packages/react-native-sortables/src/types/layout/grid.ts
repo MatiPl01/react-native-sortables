@@ -16,7 +16,6 @@ export type GridLayout = {
   itemPositions: Record<string, Vector>;
   crossAxisOffsets: Array<number>;
   containerCrossSize: number;
-  contentBounds: [Vector, Vector];
 };
 
 export type AdditionalCrossOffsetProps = {

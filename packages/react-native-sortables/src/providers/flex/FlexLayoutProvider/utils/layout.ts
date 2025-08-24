@@ -405,13 +405,6 @@ export const calculateLayout = ({
 
   return {
     adjustedCrossGap: layoutResult.adjustedCrossGap,
-    contentBounds: [
-      { x: 0, y: 0 },
-      {
-        x: layoutResult.totalDimensions.width,
-        y: layoutResult.totalDimensions.height
-      }
-    ],
     crossAxisGroupOffsets: layoutResult.crossAxisGroupOffsets,
     crossAxisGroupSizes,
     groupSizeLimit,

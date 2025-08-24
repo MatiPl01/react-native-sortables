@@ -10,7 +10,6 @@ type CalculateRawProgressFunction = (
   contentContainerMeasurements: MeasuredDimensions,
   scrollContainerMeasurements: MeasuredDimensions,
   activationOffset: [number, number],
-  contentBounds: [number, number],
   maxOverscroll: [number, number],
   extrapolation: ExtrapolationType
 ) => number;
@@ -20,8 +19,8 @@ const calculateRawProgress = (
   contentPos: number,
   scrollablePos: number,
   scrollableSize: number,
+  containerSize: number,
   [startOffset, endOffset]: [number, number],
-  [startContent, endContent]: [number, number],
   [maxStartOverscroll, maxEndOverscroll]: [number, number],
   extrapolation: ExtrapolationType
 ) => {
@@ -32,14 +31,14 @@ const calculateRawProgress = (
 
   const startBoundProgress = -interpolate(
     position,
-    [startContent - maxStartOverscroll, startContent + startOffset],
+    [-maxStartOverscroll, startOffset],
     [0, 1],
     Extrapolation.CLAMP
   );
 
   const endBoundProgress = interpolate(
     position,
-    [endContent - endOffset, endContent + maxEndOverscroll],
+    [containerSize - endOffset, containerSize + maxEndOverscroll],
     [1, 0],
     Extrapolation.CLAMP
   );
@@ -54,23 +53,22 @@ const calculateRawProgress = (
 
 export const calculateRawProgressVertical: CalculateRawProgressFunction = (
   position,
-  { pageY: cY },
+  { height: cH, pageY: cY },
   { height: sH, pageY: sY },
   ...rest
-) => calculateRawProgress(position, cY, sY, sH, ...rest);
+) => calculateRawProgress(position, cY, sY, sH, cH, ...rest);
 
 export const calculateRawProgressHorizontal: CalculateRawProgressFunction = (
   position,
-  { pageX: cX },
+  { pageX: cX, width: cW },
   { pageX: sX, width: sW },
   ...rest
-) => calculateRawProgress(position, cX, sX, sW, ...rest);
+) => calculateRawProgress(position, cX, sX, sW, cW, ...rest);
 
 type ClampDistanceFunction = (
   distance: number,
   contentContainerMeasurements: MeasuredDimensions,
   scrollContainerMeasurements: MeasuredDimensions,
-  contentBounds: [number, number],
   maxOverscroll: [number, number]
 ) => number;
 
@@ -78,13 +76,13 @@ const clampDistance = (
   distance: number,
   containerOffset: number,
   scrollableSize: number,
-  [startOffset, endOffset]: [number, number],
+  containerSize: number,
   [maxStartOverscroll, maxEndOverscroll]: [number, number]
 ) => {
   if (distance < 0) {
     // Scrolling up
     return (
-      Math.max(containerOffset + distance, startOffset - maxStartOverscroll) -
+      Math.max(containerOffset + distance, -maxStartOverscroll) -
       containerOffset
     );
   }
@@ -94,7 +92,7 @@ const clampDistance = (
     return (
       Math.min(
         containerOffset + distance,
-        endOffset - scrollableSize + maxEndOverscroll
+        containerSize - scrollableSize + maxEndOverscroll
       ) - containerOffset
     );
   }
@@ -104,14 +102,14 @@ const clampDistance = (
 
 export const clampDistanceVertical: ClampDistanceFunction = (
   distance,
-  { pageY: cY },
+  { height: cH, pageY: cY },
   { height: sH, pageY: sY },
   ...rest
-) => clampDistance(distance, sY - cY, sH, ...rest);
+) => clampDistance(distance, sY - cY, sH, cH, ...rest);
 
 export const clampDistanceHorizontal: ClampDistanceFunction = (
   distance,
-  { pageX: cX },
+  { pageX: cX, width: cW },
   { pageX: sX, width: sW },
   ...rest
-) => clampDistance(distance, sX - cX, sW, ...rest);
+) => clampDistance(distance, sX - cX, sW, cW, ...rest);

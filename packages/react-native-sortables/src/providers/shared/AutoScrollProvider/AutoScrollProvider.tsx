@@ -13,11 +13,7 @@ import {
 } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../../integrations/reanimated';
-import type {
-  AutoScrollContextType,
-  AutoScrollSettings,
-  Vector
-} from '../../../types';
+import type { AutoScrollContextType, AutoScrollSettings } from '../../../types';
 import { toPair } from '../../../utils';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
@@ -47,18 +43,8 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
 }) => {
   const currentScrollOffset = useScrollViewOffset(scrollableRef);
   const dragStartScrollOffset = useMutableValue<null | number>(null);
-  const contentBounds = useMutableValue<[Vector, Vector] | null>(null);
 
   const isVertical = autoScrollDirection === 'vertical';
-  const scrollAxis = isVertical ? 'y' : 'x';
-
-  const contentAxisBounds = useDerivedValue<[number, number] | null>(() => {
-    if (!contentBounds.value) {
-      return null;
-    }
-    const [start, end] = contentBounds.value;
-    return [start[scrollAxis], end[scrollAxis]];
-  });
 
   const scrollOffsetDiff = useDerivedValue(() => {
     if (dragStartScrollOffset.value === null) {
@@ -77,7 +63,6 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         {children}
         {autoScrollEnabled && (
           <AutoScrollUpdater
-            contentAxisBounds={contentAxisBounds}
             currentScrollOffset={currentScrollOffset}
             dragStartScrollOffset={dragStartScrollOffset}
             isVertical={isVertical}
@@ -88,7 +73,6 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
       </>
     ),
     value: {
-      contentBounds,
       scrollOffsetDiff
     }
   };
@@ -100,7 +84,6 @@ type AutoScrollUpdaterProps = Omit<
 > & {
   currentScrollOffset: SharedValue<number>;
   dragStartScrollOffset: SharedValue<null | number>;
-  contentAxisBounds: SharedValue<[number, number] | null>;
   isVertical: boolean;
 };
 
@@ -111,7 +94,6 @@ function AutoScrollUpdater({
   autoScrollInterval,
   autoScrollMaxOverscroll,
   autoScrollMaxVelocity,
-  contentAxisBounds,
   currentScrollOffset,
   dragStartScrollOffset,
   isVertical,
@@ -132,12 +114,7 @@ function AutoScrollUpdater({
   let debug: ReturnType<typeof useDebugHelpers> = {};
   if (__DEV__) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    debug = useDebugHelpers(
-      isVertical,
-      activationOffset,
-      contentAxisBounds,
-      maxOverscroll
-    );
+    debug = useDebugHelpers(isVertical, activationOffset, maxOverscroll);
   }
 
   let calculateRawProgress, clampDistance;
@@ -160,13 +137,10 @@ function AutoScrollUpdater({
         position += targetScrollOffset.value - currentScrollOffset.value;
       }
 
-      return {
-        bounds: contentAxisBounds.value,
-        position
-      };
+      return position;
     },
-    ({ bounds, position }) => {
-      if (!position || !bounds) {
+    position => {
+      if (!position) {
         debug?.hideDebugViews?.();
         return;
       }
@@ -183,7 +157,6 @@ function AutoScrollUpdater({
         contentContainerMeasurements,
         scrollContainerMeasurements,
         activationOffset,
-        bounds,
         maxOverscroll,
         autoScrollExtrapolation
       );
@@ -203,10 +176,9 @@ function AutoScrollUpdater({
   const scrollBy = useCallback(
     (distance: number) => {
       'worklet';
-      const bounds = contentAxisBounds.value;
       const containerMeasurements = measure(containerRef);
       const scrollableMeasurements = measure(scrollableRef);
-      if (!bounds || !scrollableMeasurements || !containerMeasurements) {
+      if (!scrollableMeasurements || !containerMeasurements) {
         return;
       }
 
@@ -219,7 +191,6 @@ function AutoScrollUpdater({
         distance + pendingDistance,
         containerMeasurements,
         scrollableMeasurements,
-        bounds,
         maxOverscroll
       );
 
@@ -242,11 +213,10 @@ function AutoScrollUpdater({
       targetScrollOffset,
       isVertical,
       scrollableRef,
-      containerRef,
-      contentAxisBounds,
+      animateScrollTo,
       clampDistance,
-      maxOverscroll,
-      animateScrollTo
+      containerRef,
+      maxOverscroll
     ]
   );
 

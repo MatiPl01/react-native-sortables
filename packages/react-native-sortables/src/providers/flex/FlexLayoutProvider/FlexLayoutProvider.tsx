@@ -13,11 +13,7 @@ import type {
   SortableFlexStyle
 } from '../../../types';
 import { haveEqualPropValues } from '../../../utils';
-import {
-  useAutoScrollContext,
-  useCommonValuesContext,
-  useMeasurementsContext
-} from '../../shared';
+import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';
 
@@ -67,7 +63,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
-  const { contentBounds } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
   const keyToGroup = useMutableValue<Record<string, number>>({});
@@ -165,9 +160,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       keyToGroup.value = Object.fromEntries(
         layout.itemGroups.flatMap((group, i) => group.map(key => [key, i]))
       );
-
-      // Update content bounds
-      if (contentBounds) contentBounds.value = layout.contentBounds;
 
       // DEBUG ONLY
       if (debugCrossAxisGapRects && debugMainAxisGapRects) {
