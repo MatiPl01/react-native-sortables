@@ -104,10 +104,10 @@ type CommonAutoScrollSettings = {
   /** Distance from the edge of the container that triggers auto-scrolling.
    * Can be a single number or [top/left, bottom/right] tuple */
   autoScrollActivationOffset: [number, number] | number;
-  /** Maximum overscroll distance beyond the normal scroll bounds when
-   * scrollToOverflowEnabled is enabled on the scrollable container.
-   * If null, uses the autoScrollActivationOffset value, otherwise uses the provided value */
-  maxScrollToOverflowOffset: [number, number] | null | number;
+  /** Maximum overscroll distance beyond the content bounds when auto-scrolling.
+   * number -> same for both edges; tuple -> [top/left, bottom/right]
+   * @default 50 */
+  autoScrollMaxOverscroll: [number, number] | number;
   /** Controls behavior beyond the maximum threshold.
    * @default Extrapolation.EXTEND */
   autoScrollExtrapolation: Extrapolation;
@@ -118,8 +118,12 @@ export type AutoScrollContinuousModeSettings = {
   autoScrollMode: 'continuous';
   /** Maximum scroll velocity in pixels per second when at the edge.
    * number -> same for both edges; tuple -> [top/left, bottom/right]
-   * @default 500 */
+   * @default 100 */
   autoScrollMaxVelocity: [number, number] | number;
+  /** Interval between scrollTo calls (ms)
+   * @default 0 on iOS, 0 on Android (old architecture), 300 on Android (new architecture)
+   */
+  autoScrollInterval: number;
 };
 
 export type AutoScrollStepModeSettings = {
@@ -324,11 +328,14 @@ export type SharedProps = Simplify<
     >
 >;
 
+export type SharedPropsInternal = Partial<AutoScrollSettingsInternal> &
+  SharedProps;
+
 type OptionalSharedProps =
   | 'scrollableRef'
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
 export type DefaultSharedProps = DefaultProps<
-  AutoScrollSettingsInternal & SharedProps,
+  SharedPropsInternal,
   OptionalSharedProps
 >;

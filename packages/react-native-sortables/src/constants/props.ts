@@ -9,7 +9,7 @@ import type {
 } from '../types';
 import { defaultKeyExtractor } from '../utils/keys';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
-import { IS_WEB } from './platform';
+import { IS_ANDROID, IS_WEB, isFabric } from './platform';
 
 export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
 
@@ -22,9 +22,11 @@ export const DEFAULT_SHARED_PROPS = {
   autoScrollDirection: 'vertical',
   autoScrollEnabled: true,
   autoScrollExtrapolation: Extrapolation.EXTEND,
+  autoScrollInterval: { get: () => (IS_ANDROID && isFabric() ? 300 : 0) },
   autoScrollMaxInterval: 500,
   autoScrollMaxJump: 3,
-  autoScrollMaxVelocity: 500,
+  autoScrollMaxOverscroll: 50,
+  autoScrollMaxVelocity: 1000,
   autoScrollMinInterval: 100,
   autoScrollMode: 'continuous',
   bringToFrontWhenActive: true,
@@ -53,7 +55,6 @@ export const DEFAULT_SHARED_PROPS = {
   itemEntering: IS_WEB ? null : SortableItemEntering,
   itemExiting: IS_WEB ? null : SortableItemExiting,
   itemsLayoutTransitionMode: 'all',
-  maxScrollToOverflowOffset: null,
   onActiveItemDropped: undefined,
   onDragMove: undefined,
   onDragStart: undefined,

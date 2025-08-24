@@ -3,13 +3,14 @@ import type {
   ExtrapolationType,
   MeasuredDimensions
 } from 'react-native-reanimated';
-import { interpolate } from 'react-native-reanimated';
+import { Extrapolation, interpolate } from 'react-native-reanimated';
 
 type CalculateRawProgressFunction = (
   position: number,
   contentContainerMeasurements: MeasuredDimensions,
   scrollContainerMeasurements: MeasuredDimensions,
   activationOffset: [number, number],
+  contentBounds: [number, number],
   extrapolation: ExtrapolationType
 ) => number;
 
@@ -19,6 +20,7 @@ const calculateRawProgress = (
   scrollablePos: number,
   scrollableSize: number,
   [startOffset, endOffset]: [number, number],
+  [startContent, endContent]: [number, number],
   extrapolation: ExtrapolationType
 ) => {
   const startBound = scrollablePos - contentPos;
@@ -26,10 +28,24 @@ const calculateRawProgress = (
   const endBound = startBound + scrollableSize;
   const endThreshold = endBound - endOffset;
 
+  const startBoundProgress = -interpolate(
+    position,
+    [startContent, startContent + startOffset],
+    [0, 1],
+    Extrapolation.CLAMP
+  );
+
+  const endBoundProgress = interpolate(
+    position,
+    [endContent - endOffset, endContent],
+    [1, 0],
+    Extrapolation.CLAMP
+  );
+
   return interpolate(
     position,
     [startBound, startThreshold, endThreshold, endBound],
-    [-1, 0, 0, 1],
+    [startBoundProgress, 0, 0, endBoundProgress],
     extrapolation
   );
 };
@@ -38,30 +54,12 @@ export const calculateRawProgressVertical: CalculateRawProgressFunction = (
   position,
   { pageY: cY },
   { height: sH, pageY: sY },
-  [startOffset, endOffset],
-  extrapolation
-) =>
-  calculateRawProgress(
-    position,
-    cY,
-    sY,
-    sH,
-    [startOffset, endOffset],
-    extrapolation
-  );
+  ...rest
+) => calculateRawProgress(position, cY, sY, sH, ...rest);
 
 export const calculateRawProgressHorizontal: CalculateRawProgressFunction = (
   position,
   { pageX: cX },
   { pageX: sX, width: sW },
-  [startOffset, endOffset],
-  extrapolation
-) =>
-  calculateRawProgress(
-    position,
-    cX,
-    sX,
-    sW,
-    [startOffset, endOffset],
-    extrapolation
-  );
+  ...rest
+) => calculateRawProgress(position, cX, sX, sW, ...rest);

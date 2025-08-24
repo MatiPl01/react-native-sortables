@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 
 import { DEFAULT_SHARED_PROPS, STYLE_PROPS } from '../constants/props';
 import type { AnyRecord, RequiredBy } from '../helperTypes';
-import type { SharedProps } from '../types';
+import type { SharedProps, SharedPropsInternal } from '../types';
 
 const hasStyleProp = <K extends string, P extends AnyRecord>(
   styleKey: K,
@@ -13,55 +13,76 @@ const hasStyleProp = <K extends string, P extends AnyRecord>(
 };
 
 type PropsWithDefaults<P extends AnyRecord, D extends AnyRecord> = {
-  sharedProps: Required<{ [K in keyof SharedProps]: P[K] }>;
+  sharedProps: Required<SharedPropsInternal>;
   rest: Omit<
     Omit<P, keyof D> & RequiredBy<P, keyof D & keyof P>,
-    keyof SharedProps
+    keyof SharedPropsInternal
   >;
 };
 
-export const getPropsWithDefaults = <P extends AnyRecord, D extends AnyRecord>(
+const isDefaultValueGetter = <T>(
+  value: T | { get: () => T }
+): value is { get: () => T } => {
+  return typeof value === 'object' && value !== null && 'get' in value;
+};
+
+export const getPropsWithDefaults = <
+  P extends SharedProps,
+  D extends AnyRecord
+>(
   props: P,
   componentDefaultProps: D
 ): PropsWithDefaults<P, D> => {
-  const propsWithDefaults = {
-    ...DEFAULT_SHARED_PROPS,
-    ...componentDefaultProps
-  } as unknown as P;
+  const keys = new Set([
+    ...Object.keys(componentDefaultProps),
+    ...Object.keys(DEFAULT_SHARED_PROPS),
+    ...Object.keys(props)
+  ]);
 
-  for (const key in props) {
+  const propsWithDefaults = {} as P;
+
+  // Merge user-defined props with defaults
+  for (const key of keys) {
     if (props[key] !== undefined) {
-      propsWithDefaults[key] = props[key];
+      propsWithDefaults[key as keyof P] = props[key as keyof P];
+    } else {
+      const defaultProp =
+        componentDefaultProps[key as keyof typeof componentDefaultProps] ??
+        DEFAULT_SHARED_PROPS[key as keyof typeof DEFAULT_SHARED_PROPS];
+
+      propsWithDefaults[key as keyof P] = (
+        isDefaultValueGetter(defaultProp) ? defaultProp.get() : defaultProp
+      ) as P[keyof P];
     }
   }
 
   // merge styles from props and defaults
   for (const styleKey of STYLE_PROPS) {
-    if (hasStyleProp(styleKey, propsWithDefaults)) {
-      const style: ViewStyle = {
-        ...(hasStyleProp(styleKey, DEFAULT_SHARED_PROPS) &&
-          DEFAULT_SHARED_PROPS[styleKey]),
-        ...(hasStyleProp(styleKey, componentDefaultProps) &&
-          componentDefaultProps[styleKey])
-      };
-
-      const propsStyle = hasStyleProp(styleKey, props)
-        ? StyleSheet.flatten(props[styleKey])
-        : {};
-
-      // Only override defaultStyle with defined values from propsStyle
-      Object.entries(propsStyle).forEach(([key, value]) => {
-        if (value !== undefined) {
-          // @ts-expect-error This is fine
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          style[key] = value;
-        }
-      });
-
-      propsWithDefaults[styleKey] = style;
+    if (!hasStyleProp(styleKey, propsWithDefaults)) {
+      continue;
     }
+
+    const style: ViewStyle = {};
+
+    Object.assign(style, DEFAULT_SHARED_PROPS[styleKey]);
+    Object.assign(style, componentDefaultProps[styleKey]);
+
+    const propsStyle = hasStyleProp(styleKey, props)
+      ? StyleSheet.flatten(props[styleKey])
+      : {};
+
+    for (const key in propsStyle) {
+      const k = key as keyof ViewStyle;
+      if (propsStyle[k] !== undefined) {
+        // @ts-expect-error This is fine
+        style[k] = propsStyle[k];
+      }
+    }
+
+    propsWithDefaults[styleKey] = style;
   }
 
+  // Split props into shared and rest
   const sharedProps: AnyRecord = {};
   const rest: AnyRecord = {};
 

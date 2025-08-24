@@ -50,6 +50,7 @@ export default function SharedProvider({
   autoScrollDirection,
   autoScrollEnabled,
   autoScrollExtrapolation,
+  autoScrollInterval,
   autoScrollMaxInterval,
   autoScrollMaxJump,
   autoScrollMaxVelocity,
@@ -61,7 +62,7 @@ export default function SharedProvider({
   debug,
   hapticsEnabled,
   itemKeys,
-  maxScrollToOverflowOffset,
+  autoScrollMaxOverscroll,
   onActiveItemDropped,
   onDragEnd,
   onDragMove,
@@ -103,12 +104,13 @@ export default function SharedProvider({
         autoScrollDirection={autoScrollDirection}
         autoScrollEnabled={autoScrollEnabled}
         autoScrollExtrapolation={autoScrollExtrapolation}
+        autoScrollInterval={autoScrollInterval}
         autoScrollMaxInterval={autoScrollMaxInterval}
         autoScrollMaxJump={autoScrollMaxJump}
         autoScrollMaxVelocity={autoScrollMaxVelocity}
         autoScrollMinInterval={autoScrollMinInterval}
         autoScrollMode={autoScrollMode}
-        maxScrollToOverflowOffset={maxScrollToOverflowOffset}
+        autoScrollMaxOverscroll={autoScrollMaxOverscroll}
         scrollableRef={scrollableRef}
       />
     ),

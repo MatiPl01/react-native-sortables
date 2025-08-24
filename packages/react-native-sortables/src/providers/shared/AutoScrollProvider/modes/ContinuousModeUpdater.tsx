@@ -8,18 +8,20 @@ import {
   useFrameCallback
 } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../../../integrations/reanimated';
 import type { AutoScrollContinuousModeSettings } from '../../../../types';
 import { useCommonValuesContext } from '../../CommonValuesProvider';
 
 type ContinuousModeUpdaterProps = AutoScrollContinuousModeSettings & {
   progress: SharedValue<number>;
-  handleScroll: (offset: number, animated?: boolean) => void;
+  scrollBy: (distance: number, animated?: boolean) => void;
 };
 
 export default function ContinuousModeUpdater({
+  autoScrollInterval,
   autoScrollMaxVelocity,
-  handleScroll,
-  progress
+  progress,
+  scrollBy
 }: ContinuousModeUpdaterProps) {
   const { activeItemKey } = useCommonValuesContext();
 
@@ -29,12 +31,17 @@ export default function ContinuousModeUpdater({
     ? autoScrollMaxVelocity
     : [autoScrollMaxVelocity, autoScrollMaxVelocity];
 
+  const lastUpdateTimestamp = useMutableValue<null | number>(null);
+
   const frameCallbackFunction = useCallback(
-    ({ timeSincePreviousFrame }: FrameInfo) => {
+    ({ timestamp }: FrameInfo) => {
       'worklet';
-      if (!timeSincePreviousFrame) {
+      lastUpdateTimestamp.value ??= timestamp;
+      const elapsedTime = timestamp - lastUpdateTimestamp.value;
+      if (elapsedTime < autoScrollInterval) {
         return;
       }
+      lastUpdateTimestamp.value = timestamp;
 
       const velocity = interpolate(
         progress.value,
@@ -42,11 +49,18 @@ export default function ContinuousModeUpdater({
         [-maxStartVelocity, 0, maxEndVelocity]
       );
 
-      const distance = (velocity * timeSincePreviousFrame) / 1000;
+      const distance = velocity * (elapsedTime / 1000);
 
-      handleScroll(distance);
+      scrollBy(distance, autoScrollInterval > 200);
     },
-    [handleScroll, maxStartVelocity, maxEndVelocity, progress]
+    [
+      scrollBy,
+      maxStartVelocity,
+      maxEndVelocity,
+      progress,
+      autoScrollInterval,
+      lastUpdateTimestamp
+    ]
   );
 
   const frameCallback = useFrameCallback(frameCallbackFunction, false);
@@ -60,7 +74,10 @@ export default function ContinuousModeUpdater({
 
   useAnimatedReaction(
     () => !!activeItemKey.value,
-    enabled => runOnJS(toggleFrameCallback)(enabled),
+    enabled => {
+      lastUpdateTimestamp.value = null;
+      runOnJS(toggleFrameCallback)(enabled);
+    },
     [toggleFrameCallback]
   );
 
