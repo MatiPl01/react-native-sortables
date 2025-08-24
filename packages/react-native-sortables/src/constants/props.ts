@@ -1,4 +1,5 @@
 import type { ViewStyle } from 'react-native';
+import { Extrapolation } from 'react-native-reanimated';
 
 import { DefaultDropIndicator } from '../components/defaults';
 import type {
@@ -20,7 +21,12 @@ export const DEFAULT_SHARED_PROPS = {
   autoScrollActivationOffset: 75,
   autoScrollDirection: 'vertical',
   autoScrollEnabled: true,
-  autoScrollSpeed: 1,
+  autoScrollExtrapolation: Extrapolation.EXTEND,
+  autoScrollMaxInterval: 500,
+  autoScrollMaxJump: 3,
+  autoScrollMaxVelocity: 500,
+  autoScrollMinInterval: 100,
+  autoScrollMode: 'continuous',
   bringToFrontWhenActive: true,
   customHandle: false,
   debug: false,

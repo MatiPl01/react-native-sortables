@@ -1,9 +1,17 @@
 import type { ComponentType } from 'react';
 import type { ViewStyle } from 'react-native';
 import type { TouchData } from 'react-native-gesture-handler';
-import type { AnimatedRef, SharedValue } from 'react-native-reanimated';
+import type {
+  AnimatedRef,
+  Extrapolation,
+  SharedValue
+} from 'react-native-reanimated';
 
-import type { DefaultProps, Simplify } from '../../helperTypes';
+import type {
+  DefaultProps,
+  MutuallyExclusiveUnion,
+  Simplify
+} from '../../helperTypes';
 import type {
   Animatable,
   AnimatableProps,
@@ -83,11 +91,6 @@ export type ActiveItemSnapSettings = AnimatableProps<{
   snapOffsetY: Offset;
 }>;
 
-export enum AutoScrollExtrapolation {
-  CLAMP = 'clamp',
-  EXTEND = 'extend'
-}
-
 type CommonAutoScrollSettings = {
   /** Whether auto-scrolling is enabled */
   autoScrollEnabled: boolean;
@@ -106,37 +109,43 @@ type CommonAutoScrollSettings = {
    * If null, uses the autoScrollActivationOffset value, otherwise uses the provided value */
   maxScrollToOverflowOffset: [number, number] | null | number;
   /** Controls behavior beyond the maximum threshold.
-   * @default 'extend' */
-  autoScrollExtrapolation?: AutoScrollExtrapolation;
+   * @default Extrapolation.EXTEND */
+  autoScrollExtrapolation: Extrapolation;
 };
 
 export type AutoScrollContinuousModeSettings = {
   /** Discriminator for continuous auto-scroll mode */
   autoScrollMode: 'continuous';
   /** Maximum scroll velocity in pixels per second when at the edge.
-   * number -> same for both edges; tuple -> [top/left, bottom/right] */
+   * number -> same for both edges; tuple -> [top/left, bottom/right]
+   * @default 500 */
   autoScrollMaxVelocity: [number, number] | number;
-  /** Optional absolute velocity cap in pixels per second */
-  autoScrollVelocityCap?: number;
 };
 
 export type AutoScrollStepModeSettings = {
   /** Discriminator for step-based auto-scroll mode */
   autoScrollMode: 'step';
-  /** Shortest delay between scrollTo calls (ms) when pressure is high */
+  /** Shortest delay between scrollTo calls (ms) when pressure is high
+   * @default 100
+   */
   autoScrollMinInterval: number;
   /** Longest delay when barely in the zone (ms).
-   * @default 280 */
-  autoScrollMaxInterval?: number;
+   * @default 500 */
+  autoScrollMaxInterval: number;
   /** Max number of elements (rows/cols) to jump per tick.
    * number -> same for both directions; tuple -> [up/left, down/right]
    * @default 3 */
-  autoScrollMaxJump?: [number, number] | number;
+  autoScrollMaxJump: [number, number] | number;
 };
 
-export type AutoScrollSettings = CommonAutoScrollSettings &
+type AutoScrollSettings = CommonAutoScrollSettings &
   // eslint-disable-next-line perfectionist/sort-intersection-types
   (AutoScrollContinuousModeSettings | AutoScrollStepModeSettings);
+
+export type AutoScrollSettingsInternal = CommonAutoScrollSettings &
+  MutuallyExclusiveUnion<
+    [AutoScrollContinuousModeSettings, AutoScrollStepModeSettings]
+  >;
 
 export type DropIndicatorSettings = {
   /** Component to render as the drop indicator */
@@ -319,4 +328,7 @@ type OptionalSharedProps =
   | 'scrollableRef'
   | keyof Omit<SortableCallbacks, 'onDragEnd'>;
 
-export type DefaultSharedProps = DefaultProps<SharedProps, OptionalSharedProps>;
+export type DefaultSharedProps = DefaultProps<
+  Partial<AutoScrollSettingsInternal> & SharedProps,
+  OptionalSharedProps
+>;

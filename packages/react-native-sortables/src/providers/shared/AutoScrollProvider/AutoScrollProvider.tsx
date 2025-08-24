@@ -6,7 +6,10 @@ import {
   useScrollViewOffset
 } from 'react-native-reanimated';
 
-import type { AutoScrollContextType, AutoScrollSettings } from '../../../types';
+import type {
+  AutoScrollContextType,
+  AutoScrollSettingsInternal
+} from '../../../types';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useDebugHelpers from './useDebugHelpers';
@@ -15,14 +18,13 @@ import {
   calculateRawProgressVertical
 } from './utils';
 
-type AutoScrollProviderProps = PropsWithChildren<AutoScrollSettings>;
+type AutoScrollProviderProps = PropsWithChildren<AutoScrollSettingsInternal>;
 
 const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   'AutoScroll',
   { guarded: false }
 )<AutoScrollProviderProps, AutoScrollContextType>(({
   autoScrollEnabled,
-  autoScrollMode,
   children,
   ...rest
 }) => {
@@ -40,11 +42,15 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   };
 });
 
-type AutoScrollUpdaterProps = Omit<AutoScrollSettings, 'autoScrollEnabled'>;
+type AutoScrollUpdaterProps = Omit<
+  AutoScrollSettingsInternal,
+  'autoScrollEnabled'
+>;
 
 function AutoScrollUpdater({
   autoScrollActivationOffset,
   autoScrollDirection,
+  autoScrollExtrapolation,
   autoScrollSpeed,
   maxScrollToOverflowOffset,
   scrollableRef
@@ -116,6 +122,16 @@ function AutoScrollUpdater({
         debug?.hideDebugViews?.();
         return;
       }
+
+      const rawProgress = calculateRawProgress(
+        position,
+        contentContainerMeasurements,
+        scrollContainerMeasurements,
+        activationOffset,
+        autoScrollExtrapolation
+      );
+
+      console.log('rawProgress', rawProgress);
 
       debug?.updateDebugRects?.(
         contentContainerMeasurements,
