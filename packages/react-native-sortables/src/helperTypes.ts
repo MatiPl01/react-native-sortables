@@ -38,3 +38,19 @@ export type DeepReadonly<T> = {
       ? DeepReadonly<T[K]>
       : Readonly<T[K]>;
 };
+
+type AllKeys<U> = U extends unknown ? keyof U : never;
+
+export type MutuallyExclusiveUnion<
+  T extends ReadonlyArray<unknown>,
+  Processed extends ReadonlyArray<unknown> = []
+> = T extends readonly [infer First, ...infer Rest]
+  ?
+      | (First & {
+          [K in Exclude<
+            AllKeys<[...Processed, ...Rest][number]>,
+            keyof First
+          >]?: never;
+        })
+      | MutuallyExclusiveUnion<Rest, readonly [...Processed, First]>
+  : never;
