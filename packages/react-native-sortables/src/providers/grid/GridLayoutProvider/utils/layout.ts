@@ -78,24 +78,27 @@ export const calculateLayout = (
     ? Math.max(lastCrossOffset - gaps.cross, 0)
     : 0;
 
-  const mainSize = (mainGroupSize + gaps.main) * numGroups - gaps.main;
-
   return {
     containerCrossSize: lastCrossOffset,
-    contentBounds: [
-      {
-        [crossCoordinate]: additionalCrossOffset,
-        [mainCoordinate]: 0
-      } as Vector,
-      {
-        [crossCoordinate]: lastCrossOffset,
-        [mainCoordinate]: mainSize
-      } as Vector
-    ],
     crossAxisOffsets,
     itemPositions
   };
 };
+
+export const shiftLayoutInCrossAxis = (
+  layout: GridLayout,
+  crossCoordinate: Coordinate,
+  offset: number
+): GridLayout => ({
+  containerCrossSize: layout.containerCrossSize + offset,
+  crossAxisOffsets: layout.crossAxisOffsets.map(prev => prev + offset),
+  itemPositions: Object.fromEntries(
+    Object.entries(layout.itemPositions).map(([key, position]) => [
+      key,
+      { ...position, [crossCoordinate]: position[crossCoordinate] + offset }
+    ])
+  )
+});
 
 export const calculateActiveItemCrossOffset = ({
   activeItemKey,

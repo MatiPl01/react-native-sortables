@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { Fragment, memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
@@ -113,7 +113,7 @@ function DraggableView({
   // PORTAL CASE
 
   return (
-    <Fragment>
+    <>
       {/* We cannot unmount this item as its gesture detector must be still
       mounted to continue handling the pan gesture */}
       {renderItemCell(isHidden)}
@@ -127,7 +127,7 @@ function DraggableView({
         onTeleport={setIsHidden}>
         {children}
       </ActiveItemPortal>
-    </Fragment>
+    </>
   );
 }
 

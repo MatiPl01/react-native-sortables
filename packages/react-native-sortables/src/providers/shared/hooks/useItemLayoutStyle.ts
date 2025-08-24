@@ -172,9 +172,10 @@ export default function useItemLayoutStyle(
     () => ({
       activationProgress: activationAnimationProgress.value,
       active: isActive.value,
-      itemPosition: layoutPosition.value
+      itemPosition: layoutPosition.value,
+      shouldAnimate: shouldAnimateLayout.value
     }),
-    ({ activationProgress, active, itemPosition }, prev) => {
+    ({ activationProgress, active, itemPosition, shouldAnimate }, prev) => {
       if (!itemPosition || active) {
         dropStartValues.value = null;
         return;
@@ -220,12 +221,12 @@ export default function useItemLayoutStyle(
         return;
       }
 
-      if (!positionChanged) {
+      if (!positionChanged && shouldAnimate === prev?.shouldAnimate) {
         return;
       }
 
       if (
-        shouldAnimateLayout.value &&
+        shouldAnimate &&
         (!animateLayoutOnReorderOnly.value || activeItemKey.value !== null)
       ) {
         position.value = withTiming(itemPosition);

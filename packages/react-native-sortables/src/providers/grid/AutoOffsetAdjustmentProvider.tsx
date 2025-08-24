@@ -3,23 +3,24 @@ import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useDerivedValue } from 'react-native-reanimated';
 
-import type { AdditionalCrossOffsetContextType } from '../../types';
+import { useMutableValue } from '../../integrations/reanimated';
+import type { AutoOffsetAdjustmentContextType, Vector } from '../../types';
 import { calculateSnapOffset } from '../../utils';
 import { useCommonValuesContext, useCustomHandleContext } from '../shared';
 import { createProvider } from '../utils';
 import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
 
-type AdditionalCrossOffsetProviderProps = PropsWithChildren<{
+type AutoOffsetAdjustmentProviderProps = PropsWithChildren<{
   isVertical: boolean;
   columnGap: SharedValue<number>;
   rowGap: SharedValue<number>;
   numGroups: number;
 }>;
 
-const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
-  createProvider('AdditionalCrossOffset', {
+const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
+  createProvider('AutoOffsetAdjustment', {
     guarded: false
-  })<AdditionalCrossOffsetProviderProps, AdditionalCrossOffsetContextType>(({
+  })<AutoOffsetAdjustmentProviderProps, AutoOffsetAdjustmentContextType>(({
     columnGap,
     isVertical,
     numGroups,
@@ -35,12 +36,15 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       itemPositions,
       itemWidths,
       keyToIndex,
+      prevActiveItemKey,
       snapOffsetX,
       snapOffsetY,
       touchPosition
     } = useCommonValuesContext();
     const { activeHandleMeasurements, activeHandleOffset } =
       useCustomHandleContext() ?? {};
+
+    const wasPreviouslyActive = useMutableValue(false);
 
     let crossCoordinate, crossGap, crossItemSizes;
     if (isVertical) {
@@ -118,11 +122,39 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       return 0;
     });
 
+    const calculateOffsetShift = useCallback(
+      (
+        newItemPositions: Record<string, Vector>,
+        prevItemPositions: Record<string, Vector>
+      ): null | number => {
+        'worklet';
+        const isActive = activeItemKey.value !== null;
+        const wasActive = wasPreviouslyActive.value;
+        wasPreviouslyActive.value = isActive;
+        const key = prevActiveItemKey.value;
+
+        if (isActive || !wasActive || key === null) {
+          return null;
+        }
+
+        const newPos = newItemPositions[key];
+        const prevPos = prevItemPositions[key];
+
+        if (!newPos || !prevPos) {
+          return null;
+        }
+
+        return newPos[crossCoordinate] - prevPos[crossCoordinate];
+      },
+      [activeItemKey, wasPreviouslyActive, prevActiveItemKey, crossCoordinate]
+    );
+
     return {
       value: {
-        additionalCrossOffset
+        additionalCrossOffset,
+        calculateOffsetShift
       }
     };
   });
 
-export { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext };
+export { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext };

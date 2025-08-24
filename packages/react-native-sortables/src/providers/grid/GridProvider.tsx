@@ -6,7 +6,7 @@ import type { ReorderTriggerOrigin, SortableGridStrategy } from '../../types';
 import type { SharedProviderProps } from '../shared';
 import { SharedProvider, useOrderUpdater, useStrategyKey } from '../shared';
 import { ContextProviderComposer } from '../utils';
-import { AdditionalCrossOffsetProvider } from './AdditionalCrossOffsetProvider';
+import { AutoOffsetAdjustmentProvider } from './AutoOffsetAdjustmentProvider';
 import type { GridLayoutProviderProps } from './GridLayoutProvider';
 import { GRID_STRATEGIES, GridLayoutProvider } from './GridLayoutProvider';
 
@@ -47,7 +47,7 @@ export default function GridProvider({
     // Provider with additional cross axis offset calculations to support
     // collapsible items
     autoAdjustOffsetDuringDrag && (
-      <AdditionalCrossOffsetProvider {...sharedGridProviderProps} />
+      <AutoOffsetAdjustmentProvider {...sharedGridProviderProps} />
     ),
     // Provider with grid layout calculations
     <GridLayoutProvider
