@@ -43,14 +43,15 @@ export const getPropsWithDefaults = <
 
   // Merge user-defined props with defaults
   for (const key of keys) {
-    if (props[key] !== undefined) {
-      propsWithDefaults[key as keyof P] = props[key as keyof P];
+    const k = key as keyof P;
+    if (props[k] !== undefined) {
+      propsWithDefaults[k] = props[k];
     } else {
       const defaultProp =
         componentDefaultProps[key as keyof typeof componentDefaultProps] ??
         DEFAULT_SHARED_PROPS[key as keyof typeof DEFAULT_SHARED_PROPS];
 
-      propsWithDefaults[key as keyof P] = (
+      propsWithDefaults[k] = (
         isDefaultValueGetter(defaultProp) ? defaultProp.get() : defaultProp
       ) as P[keyof P];
     }
