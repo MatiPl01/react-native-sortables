@@ -3,6 +3,7 @@ import {
   type FrameInfo,
   interpolate,
   measure,
+  runOnJS,
   scrollTo,
   type SharedValue,
   useAnimatedReaction,
@@ -10,7 +11,6 @@ import {
   useFrameCallback,
   useScrollViewOffset
 } from 'react-native-reanimated';
-import { runOnJS } from 'react-native-worklets';
 
 import { useMutableValue } from '../../../integrations/reanimated';
 import type {
@@ -31,6 +31,7 @@ import {
 
 // Maximum elapsed time multiplier to prevent excessive scrolling distances when app lags
 const MAX_ELAPSED_TIME_MULTIPLIER = 2;
+const MIN_ELAPSED_TIME_CAP = 100;
 
 type AutoScrollProviderProps = PropsWithChildren<Required<AutoScrollSettings>>;
 
@@ -263,7 +264,10 @@ function AutoScrollUpdater({
       }
 
       // Cap the elapsed time to prevent excessive scrolling distances when app lags
-      const maxElapsedTime = autoScrollInterval * MAX_ELAPSED_TIME_MULTIPLIER;
+      const maxElapsedTime = Math.max(
+        autoScrollInterval * MAX_ELAPSED_TIME_MULTIPLIER,
+        MIN_ELAPSED_TIME_CAP
+      );
       const cappedElapsedTime = Math.min(elapsedTime, maxElapsedTime);
       lastUpdateTimestamp.value = timestamp;
 

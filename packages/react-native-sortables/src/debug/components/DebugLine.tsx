@@ -32,12 +32,12 @@ export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
       angle = Math.atan2(to.y - from.y, to.x - from.x);
       tY = from.y;
       tX = from.x;
-    } else if (isPresent(x) && (type === 'vertical' || isPresent(y))) {
+    } else if (isPresent(x) && (type === 'vertical' || !isPresent(y))) {
       length = 2 * screenDiagonal;
       angle = Math.PI / 2;
       tY = (y ?? 0) - screenDiagonal;
       tX = x;
-    } else if (isPresent(y) && (type === 'horizontal' || isPresent(x))) {
+    } else if (isPresent(y) && (type === 'horizontal' || !isPresent(x))) {
       length = 2 * screenDiagonal;
       tY = y;
       tX = (x ?? 0) - screenDiagonal;
