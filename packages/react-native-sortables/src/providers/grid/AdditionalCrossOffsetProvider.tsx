@@ -1,11 +1,19 @@
 import type { PropsWithChildren } from 'react';
 import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { useDerivedValue } from 'react-native-reanimated';
+import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
+import {
+  setAnimatedTimeout,
+  useMutableValue
+} from '../../integrations/reanimated';
 import type { AdditionalCrossOffsetContextType } from '../../types';
 import { calculateSnapOffset } from '../../utils';
-import { useCommonValuesContext, useCustomHandleContext } from '../shared';
+import {
+  useAutoScrollContext,
+  useCommonValuesContext,
+  useCustomHandleContext
+} from '../shared';
 import { createProvider } from '../utils';
 import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
 
@@ -35,12 +43,17 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       itemPositions,
       itemWidths,
       keyToIndex,
+      prevActiveItemKey,
+      shouldAnimateLayout,
       snapOffsetX,
       snapOffsetY,
       touchPosition
     } = useCommonValuesContext();
     const { activeHandleMeasurements, activeHandleOffset } =
       useCustomHandleContext() ?? {};
+    const { scrollBy } = useAutoScrollContext() ?? {};
+
+    const isManaged = useMutableValue(false);
 
     let crossCoordinate, crossGap, crossItemSizes;
     if (isVertical) {
@@ -102,10 +115,19 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
       isVertical
     ]);
 
+    const updateIsManaged = useCallback(
+      (managed: boolean) => {
+        'worklet';
+        isManaged.value = managed;
+      },
+      [isManaged]
+    );
+
     const additionalCrossOffset = useDerivedValue(() => {
       const props = getRemainingProps();
 
       if (props) {
+        updateIsManaged(true);
         return calculateActiveItemCrossOffset({
           crossCoordinate,
           crossGap: crossGap.value,
@@ -115,8 +137,34 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
         });
       }
 
+      updateIsManaged(false);
       return 0;
     });
+
+    useAnimatedReaction(
+      () => ({
+        managed: isManaged.value,
+        positions: itemPositions.value
+      }),
+      (props, prev) => {
+        const key = prevActiveItemKey.value;
+        if (key === null) {
+          return;
+        }
+
+        if (!props.managed && prev?.managed) {
+          const currPos = props.positions[key]?.[crossCoordinate];
+          const prevPos = prev.positions[key]?.[crossCoordinate];
+
+          if (currPos !== undefined && prevPos !== undefined) {
+            setAnimatedTimeout(() => {
+              shouldAnimateLayout.value = false;
+              scrollBy?.(currPos - prevPos, false);
+            });
+          }
+        }
+      }
+    );
 
     return {
       value: {

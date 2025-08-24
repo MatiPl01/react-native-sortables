@@ -13,11 +13,8 @@ export default function useItemZIndex(
     if (activeItemKey.value === key) {
       return 3;
     }
-    if (prevActiveItemKey.value === key) {
-      return 2;
-    }
     if (activationAnimationProgress.value > 0) {
-      return 1;
+      return prevActiveItemKey.value === key ? 2 : 1;
     }
     return 0;
   });

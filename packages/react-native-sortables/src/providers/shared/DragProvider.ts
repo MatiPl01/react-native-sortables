@@ -289,7 +289,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       activeAnimationProgress.value = 0;
       activeItemDropped.value = false;
-      prevActiveItemKey.value = activeItemKey.value;
+      prevActiveItemKey.value = null;
       activeItemKey.value = key;
       activeItemPosition.value = position;
       activeItemDimensions.value = dimensions;
@@ -365,6 +365,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemKey,
       activeItemPosition,
       containerId,
+      containerRef,
       dragStartIndex,
       dragStartItemTouchOffset,
       dragStartTouchPosition,
@@ -375,7 +376,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       indexToKey,
       keyToIndex,
       multiZoneActiveItemDimensions,
-      containerRef,
       prevActiveItemKey,
       stableOnDragStart,
       touchPosition,
@@ -575,7 +575,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       });
 
       setAnimatedTimeout(() => {
-        prevActiveItemKey.value = null;
         activeItemDropped.value = true;
         updateLayer?.(LayerState.IDLE);
         stableOnActiveItemDropped({

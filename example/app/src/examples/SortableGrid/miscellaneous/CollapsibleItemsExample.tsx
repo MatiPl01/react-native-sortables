@@ -82,7 +82,6 @@ function Example({ horizontal }: ExampleProps) {
         renderItem={renderItem}
         scrollableRef={scrollableRef}
         autoAdjustOffsetDuringDrag
-        // debug
         onActiveItemDropped={() => setCollapsed(false)}
         onDragStart={() => setCollapsed(true)}
       />

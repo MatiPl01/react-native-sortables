@@ -40,17 +40,27 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   { guarded: false }
 )<AutoScrollProviderProps, AutoScrollContextType>(({
   autoScrollDirection,
-  autoScrollEnabled,
+  autoScrollEnabled: enabled,
+  autoScrollMaxOverscroll,
   children,
   scrollableRef,
   ...rest
 }) => {
+  const { containerRef } = useCommonValuesContext();
+
   const currentScrollOffset = useScrollViewOffset(scrollableRef);
   const dragStartScrollOffset = useMutableValue<null | number>(null);
   const contentBounds = useMutableValue<[Vector, Vector] | null>(null);
+  const targetScrollOffset = useMutableValue<null | number>(null);
+
+  const maxOverscroll = toPair(autoScrollMaxOverscroll);
 
   const isVertical = autoScrollDirection === 'vertical';
   const scrollAxis = isVertical ? 'y' : 'x';
+
+  const clampDistance = isVertical
+    ? clampDistanceVertical
+    : clampDistanceHorizontal;
 
   const contentAxisBounds = useDerivedValue<[number, number] | null>(() => {
     if (!contentBounds.value) {
@@ -71,24 +81,78 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     };
   });
 
+  const scrollBy = useCallback(
+    (distance: number, animated = false) => {
+      'worklet';
+      const bounds = contentAxisBounds.value;
+      const containerMeasurements = measure(containerRef);
+      const scrollableMeasurements = measure(scrollableRef);
+      if (!bounds || !scrollableMeasurements || !containerMeasurements) {
+        return;
+      }
+
+      const pendingDistance =
+        targetScrollOffset.value !== null
+          ? targetScrollOffset.value - currentScrollOffset.value
+          : 0;
+
+      const clampedDistance = clampDistance(
+        distance + pendingDistance,
+        containerMeasurements,
+        scrollableMeasurements,
+        bounds,
+        maxOverscroll
+      );
+
+      const targetOffset = currentScrollOffset.value + clampedDistance;
+      targetScrollOffset.value = targetOffset;
+
+      if (Math.abs(clampedDistance) < 1) {
+        return;
+      }
+
+      scrollTo(
+        scrollableRef,
+        isVertical ? 0 : targetOffset,
+        isVertical ? targetOffset : 0,
+        animated
+      );
+    },
+    [
+      currentScrollOffset,
+      targetScrollOffset,
+      isVertical,
+      scrollableRef,
+      containerRef,
+      contentAxisBounds,
+      clampDistance,
+      maxOverscroll
+    ]
+  );
+
   return {
     children: (
       <>
         {children}
-        {autoScrollEnabled && (
+        {enabled && (
           <AutoScrollUpdater
+            {...rest}
             contentAxisBounds={contentAxisBounds}
             currentScrollOffset={currentScrollOffset}
             dragStartScrollOffset={dragStartScrollOffset}
             isVertical={isVertical}
+            maxOverscroll={maxOverscroll}
             scrollableRef={scrollableRef}
-            {...rest}
+            scrollBy={scrollBy}
+            targetScrollOffset={targetScrollOffset}
           />
         )}
       </>
     ),
+    enabled,
     value: {
       contentBounds,
+      scrollBy,
       scrollOffsetDiff
     }
   };
@@ -96,12 +160,15 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
 
 type AutoScrollUpdaterProps = Omit<
   AutoScrollSettings,
-  'autoScrollDirection' | 'autoScrollEnabled'
+  'autoScrollDirection' | 'autoScrollEnabled' | 'autoScrollMaxOverscroll'
 > & {
   currentScrollOffset: SharedValue<number>;
   dragStartScrollOffset: SharedValue<null | number>;
   contentAxisBounds: SharedValue<[number, number] | null>;
+  targetScrollOffset: SharedValue<null | number>;
+  maxOverscroll: [number, number];
   isVertical: boolean;
+  scrollBy: (distance: number, animated: boolean) => void;
 };
 
 function AutoScrollUpdater({
@@ -109,24 +176,24 @@ function AutoScrollUpdater({
   autoScrollActivationOffset,
   autoScrollExtrapolation,
   autoScrollInterval,
-  autoScrollMaxOverscroll,
   autoScrollMaxVelocity,
   contentAxisBounds,
   currentScrollOffset,
   dragStartScrollOffset,
   isVertical,
-  scrollableRef
+  maxOverscroll,
+  scrollableRef,
+  scrollBy,
+  targetScrollOffset
 }: AutoScrollUpdaterProps) {
   const { activeItemKey, containerRef, touchPosition } =
     useCommonValuesContext();
 
-  const targetScrollOffset = useMutableValue<null | number>(null);
   const lastUpdateTimestamp = useMutableValue<null | number>(null);
   const progress = useMutableValue(0);
 
   const scrollAxis = isVertical ? 'y' : 'x';
   const activationOffset = toPair(autoScrollActivationOffset);
-  const maxOverscroll = toPair(autoScrollMaxOverscroll);
   const [maxStartVelocity, maxEndVelocity] = toPair(autoScrollMaxVelocity);
 
   let debug: ReturnType<typeof useDebugHelpers> = {};
@@ -140,14 +207,9 @@ function AutoScrollUpdater({
     );
   }
 
-  let calculateRawProgress, clampDistance;
-  if (isVertical) {
-    calculateRawProgress = calculateRawProgressVertical;
-    clampDistance = clampDistanceVertical;
-  } else {
-    calculateRawProgress = calculateRawProgressHorizontal;
-    clampDistance = clampDistanceHorizontal;
-  }
+  const calculateRawProgress = isVertical
+    ? calculateRawProgressVertical
+    : calculateRawProgressHorizontal;
 
   useAnimatedReaction(
     () => {
@@ -200,56 +262,6 @@ function AutoScrollUpdater({
     [debug]
   );
 
-  const scrollBy = useCallback(
-    (distance: number) => {
-      'worklet';
-      const bounds = contentAxisBounds.value;
-      const containerMeasurements = measure(containerRef);
-      const scrollableMeasurements = measure(scrollableRef);
-      if (!bounds || !scrollableMeasurements || !containerMeasurements) {
-        return;
-      }
-
-      const pendingDistance =
-        targetScrollOffset.value !== null
-          ? targetScrollOffset.value - currentScrollOffset.value
-          : 0;
-
-      const clampedDistance = clampDistance(
-        distance + pendingDistance,
-        containerMeasurements,
-        scrollableMeasurements,
-        bounds,
-        maxOverscroll
-      );
-
-      const targetOffset = currentScrollOffset.value + clampedDistance;
-      targetScrollOffset.value = targetOffset;
-
-      if (Math.abs(clampedDistance) < 1) {
-        return;
-      }
-
-      scrollTo(
-        scrollableRef,
-        isVertical ? 0 : targetOffset,
-        isVertical ? targetOffset : 0,
-        animateScrollTo
-      );
-    },
-    [
-      currentScrollOffset,
-      targetScrollOffset,
-      isVertical,
-      scrollableRef,
-      containerRef,
-      contentAxisBounds,
-      clampDistance,
-      maxOverscroll,
-      animateScrollTo
-    ]
-  );
-
   const frameCallbackFunction = useCallback(
     ({ timestamp }: FrameInfo) => {
       'worklet';
@@ -279,7 +291,7 @@ function AutoScrollUpdater({
 
       const distance = velocity * (cappedElapsedTime / 1000);
 
-      scrollBy(distance);
+      scrollBy(distance, animateScrollTo);
     },
     [
       scrollBy,
@@ -287,6 +299,7 @@ function AutoScrollUpdater({
       maxEndVelocity,
       progress,
       autoScrollInterval,
+      animateScrollTo,
       lastUpdateTimestamp
     ]
   );
@@ -306,10 +319,10 @@ function AutoScrollUpdater({
       if (active) {
         dragStartScrollOffset.value = currentScrollOffset.value;
         lastUpdateTimestamp.value = null;
+        targetScrollOffset.value = null;
         runOnJS(toggleFrameCallback)(true);
       } else {
         dragStartScrollOffset.value = null;
-        targetScrollOffset.value = null;
         runOnJS(toggleFrameCallback)(false);
       }
     },
