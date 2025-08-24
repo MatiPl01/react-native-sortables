@@ -126,17 +126,17 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       if (
         shouldUpdateContainerDimensions(
           isVertical ? containerHeight.value : containerWidth.value,
-          layout.containerCrossBounds[1],
+          layout.containerCrossSize,
           !!additionalCrossOffset?.value
         )
       ) {
         applyControlledContainerDimensions({
-          [isVertical ? 'height' : 'width']: layout.containerCrossBounds[1]
+          [isVertical ? 'height' : 'width']: layout.containerCrossSize
         });
       }
 
       // Update content bounds
-      if (contentBounds) contentBounds.value = layout.containerCrossBounds;
+      if (contentBounds) contentBounds.value = layout.contentBounds;
 
       // On the web, animate layout only if parent container is not resized
       // (e.g. skip animation when the browser window is resized)

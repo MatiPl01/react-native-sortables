@@ -167,13 +167,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       );
 
       // Update content bounds
-      if (contentBounds) {
-        const offsets = layout.crossAxisGroupOffsets.filter(Boolean);
-        contentBounds.value = [
-          offsets[0] ?? 0,
-          offsets[offsets.length - 1] ?? 0
-        ];
-      }
+      if (contentBounds) contentBounds.value = layout.contentBounds;
 
       // DEBUG ONLY
       if (debugCrossAxisGapRects && debugMainAxisGapRects) {

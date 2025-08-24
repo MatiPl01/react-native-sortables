@@ -13,7 +13,11 @@ import {
 import { runOnJS } from 'react-native-worklets';
 
 import { useMutableValue } from '../../../integrations/reanimated';
-import type { AutoScrollContextType, AutoScrollSettings } from '../../../types';
+import type {
+  AutoScrollContextType,
+  AutoScrollSettings,
+  Vector
+} from '../../../types';
 import { toPair } from '../../../utils';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
@@ -42,9 +46,18 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
 }) => {
   const currentScrollOffset = useScrollViewOffset(scrollableRef);
   const dragStartScrollOffset = useMutableValue<null | number>(null);
-  const contentBounds = useMutableValue<[number, number] | null>(null);
+  const contentBounds = useMutableValue<[Vector, Vector] | null>(null);
 
   const isVertical = autoScrollDirection === 'vertical';
+  const scrollAxis = isVertical ? 'y' : 'x';
+
+  const contentAxisBounds = useDerivedValue<[number, number] | null>(() => {
+    if (!contentBounds.value) {
+      return null;
+    }
+    const [start, end] = contentBounds.value;
+    return [start[scrollAxis], end[scrollAxis]];
+  });
 
   const scrollOffsetDiff = useDerivedValue(() => {
     if (dragStartScrollOffset.value === null) {
@@ -63,7 +76,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         {children}
         {autoScrollEnabled && (
           <AutoScrollUpdater
-            contentBounds={contentBounds}
+            contentAxisBounds={contentAxisBounds}
             currentScrollOffset={currentScrollOffset}
             dragStartScrollOffset={dragStartScrollOffset}
             isVertical={isVertical}
@@ -86,7 +99,7 @@ type AutoScrollUpdaterProps = Omit<
 > & {
   currentScrollOffset: SharedValue<number>;
   dragStartScrollOffset: SharedValue<null | number>;
-  contentBounds: SharedValue<[number, number] | null>;
+  contentAxisBounds: SharedValue<[number, number] | null>;
   isVertical: boolean;
 };
 
@@ -96,7 +109,7 @@ function AutoScrollUpdater({
   autoScrollInterval,
   autoScrollMaxOverscroll,
   autoScrollMaxVelocity,
-  contentBounds,
+  contentAxisBounds,
   currentScrollOffset,
   dragStartScrollOffset,
   isVertical,
@@ -120,7 +133,7 @@ function AutoScrollUpdater({
     debug = useDebugHelpers(
       isVertical,
       activationOffset,
-      contentBounds,
+      contentAxisBounds,
       maxOverscroll
     );
   }
@@ -146,7 +159,7 @@ function AutoScrollUpdater({
       }
 
       return {
-        bounds: contentBounds.value,
+        bounds: contentAxisBounds.value,
         position
       };
     },
@@ -173,6 +186,10 @@ function AutoScrollUpdater({
         autoScrollExtrapolation
       );
 
+      if (progress.value === 0) {
+        targetScrollOffset.value = null;
+      }
+
       debug?.updateDebugRects?.(
         contentContainerMeasurements,
         scrollContainerMeasurements
@@ -184,7 +201,7 @@ function AutoScrollUpdater({
   const scrollBy = useCallback(
     (distance: number, animated = false) => {
       'worklet';
-      const bounds = contentBounds.value;
+      const bounds = contentAxisBounds.value;
       const containerMeasurements = measure(containerRef);
       const scrollableMeasurements = measure(scrollableRef);
       if (!bounds || !scrollableMeasurements || !containerMeasurements) {
@@ -224,7 +241,7 @@ function AutoScrollUpdater({
       isVertical,
       scrollableRef,
       containerRef,
-      contentBounds,
+      contentAxisBounds,
       clampDistance,
       maxOverscroll
     ]

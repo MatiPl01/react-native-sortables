@@ -3,7 +3,7 @@ import type {
   ExtrapolationType,
   MeasuredDimensions
 } from 'react-native-reanimated';
-import { clamp, Extrapolation, interpolate } from 'react-native-reanimated';
+import { Extrapolation, interpolate } from 'react-native-reanimated';
 
 type CalculateRawProgressFunction = (
   position: number,
@@ -80,12 +80,27 @@ const clampDistance = (
   scrollableSize: number,
   [startOffset, endOffset]: [number, number],
   [maxStartOverscroll, maxEndOverscroll]: [number, number]
-) =>
-  clamp(
-    containerOffset + distance,
-    startOffset - maxStartOverscroll,
-    endOffset - scrollableSize + maxEndOverscroll
-  ) - containerOffset;
+) => {
+  if (distance < 0) {
+    // Scrolling up
+    return (
+      Math.max(containerOffset + distance, startOffset - maxStartOverscroll) -
+      containerOffset
+    );
+  }
+
+  if (distance > 0) {
+    // Scrolling down
+    return (
+      Math.min(
+        containerOffset + distance,
+        endOffset - scrollableSize + maxEndOverscroll
+      ) - containerOffset
+    );
+  }
+
+  return 0;
+};
 
 export const clampDistanceVertical: ClampDistanceFunction = (
   distance,

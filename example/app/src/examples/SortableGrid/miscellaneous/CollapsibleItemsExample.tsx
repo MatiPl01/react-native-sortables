@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import Animated, {
   LinearTransition,
   useAnimatedRef
@@ -7,7 +7,7 @@ import Animated, {
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { Screen } from '@/components';
+import { Group, Screen } from '@/components';
 import { IS_WEB } from '@/constants';
 import { colors, radius, sizes, spacing, style, text } from '@/theme';
 
@@ -35,7 +35,10 @@ export default function CollapsibleItemsExample() {
       <Animated.ScrollView
         contentContainerStyle={[styles.container, IS_WEB && style.webContent]}
         ref={scrollableRef}>
-        <View style={{ backgroundColor: 'red', height: 100 }} />
+        <Group style={styles.group} withMargin={false} bordered center>
+          <Text style={styles.title}>Above Collapsible Items</Text>
+        </Group>
+
         <Sortable.Grid
           activeItemScale={1.05}
           autoScrollMaxOverscroll={[50, 120]}
@@ -50,7 +53,10 @@ export default function CollapsibleItemsExample() {
           onActiveItemDropped={() => setCollapsed(false)}
           onDragStart={() => setCollapsed(true)}
         />
-        <View style={{ backgroundColor: 'red', height: 100 }} />
+
+        <Group style={styles.group} withMargin={false} bordered center>
+          <Text style={styles.title}>Below Collapsible Items</Text>
+        </Group>
       </Animated.ScrollView>
     </Screen>
   );
@@ -65,11 +71,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   container: {
+    gap: spacing.md,
     padding: spacing.md,
     paddingBottom: 120
+  },
+  group: {
+    height: sizes.xxl
   },
   text: {
     ...text.label2,
     color: colors.white
+  },
+  title: {
+    ...text.subHeading2,
+    marginLeft: spacing.md,
+    marginTop: spacing.sm
   }
 });

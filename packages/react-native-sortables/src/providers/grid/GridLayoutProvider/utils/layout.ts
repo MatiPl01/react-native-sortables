@@ -73,12 +73,19 @@ export const calculateLayout = (
     } as Vector;
   }
 
-  const lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
+  let lastCrossOffset = crossAxisOffsets[crossAxisOffsets.length - 1];
+  lastCrossOffset = lastCrossOffset
+    ? Math.max(lastCrossOffset - gaps.cross, 0)
+    : 0;
 
   return {
-    containerCrossBounds: [
-      additionalCrossOffset,
-      lastCrossOffset ? Math.max(lastCrossOffset - gaps.cross, 0) : 0
+    containerCrossSize: lastCrossOffset,
+    contentBounds: [
+      { x: 0, y: additionalCrossOffset },
+      {
+        x: (mainGroupSize + gaps.main) * numGroups - gaps.main,
+        y: lastCrossOffset
+      }
     ],
     crossAxisOffsets,
     itemPositions

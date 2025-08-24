@@ -146,7 +146,6 @@ function VerticalSameSizeItems() {
             renderItem={renderItem}
             rowGap={10}
             scrollableRef={scrollableRef}
-            debug
           />
         </View>
       </Animated.ScrollView>
