@@ -225,7 +225,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         );
         // Delay the application of the new layout in order to immediately shift
         // items with the old layout when they change from collapsed to expanded
-        setAnimatedTimeout(() => applyLayout(layout, true), 100);
+        setAnimatedTimeout(() => applyLayout(layout, true));
       } else {
         console.log('[2] layout');
         applyLayout(layout, shouldAnimate);
