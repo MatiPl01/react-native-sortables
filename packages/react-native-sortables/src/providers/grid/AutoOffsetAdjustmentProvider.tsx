@@ -3,23 +3,23 @@ import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useDerivedValue } from 'react-native-reanimated';
 
-import type { AdditionalCrossOffsetContextType } from '../../types';
+import type { AutoOffsetAdjustmentContextType } from '../../types';
 import { calculateSnapOffset } from '../../utils';
 import { useCommonValuesContext, useCustomHandleContext } from '../shared';
 import { createProvider } from '../utils';
 import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
 
-type AdditionalCrossOffsetProviderProps = PropsWithChildren<{
+type AutoOffsetAdjustmentProviderProps = PropsWithChildren<{
   isVertical: boolean;
   columnGap: SharedValue<number>;
   rowGap: SharedValue<number>;
   numGroups: number;
 }>;
 
-const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
-  createProvider('AdditionalCrossOffset', {
+const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
+  createProvider('AutoOffsetAdjustment', {
     guarded: false
-  })<AdditionalCrossOffsetProviderProps, AdditionalCrossOffsetContextType>(({
+  })<AutoOffsetAdjustmentProviderProps, AutoOffsetAdjustmentContextType>(({
     columnGap,
     isVertical,
     numGroups,
@@ -125,4 +125,4 @@ const { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext } =
     };
   });
 
-export { AdditionalCrossOffsetProvider, useAdditionalCrossOffsetContext };
+export { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext };

@@ -18,7 +18,7 @@ export type GridLayout = {
   containerCrossSize: number;
 };
 
-export type AdditionalCrossOffsetProps = {
+export type AutoOffsetAdjustmentProps = {
   activeItemKey: string;
   indexToKey: Array<string>;
   keyToIndex: Record<string, number>;

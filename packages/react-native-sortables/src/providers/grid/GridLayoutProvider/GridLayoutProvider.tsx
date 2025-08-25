@@ -7,7 +7,7 @@ import { useDebugContext } from '../../../debug';
 import type { GridLayoutContextType } from '../../../types';
 import { useCommonValuesContext, useMeasurementsContext } from '../../shared';
 import { createProvider } from '../../utils';
-import { useAdditionalCrossOffsetContext } from '../AdditionalCrossOffsetProvider';
+import { useAutoOffsetAdjustmentContext } from '../AutoOffsetAdjustmentProvider';
 import { calculateLayout, shouldUpdateContainerDimensions } from './utils';
 
 const DEBUG_COLORS = {
@@ -44,7 +44,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
-  const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
+  const { additionalCrossOffset } = useAutoOffsetAdjustmentContext() ?? {};
   const debugContext = useDebugContext();
 
   const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
