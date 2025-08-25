@@ -193,11 +193,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x:
           startTouchPosition.x +
           (touch.absoluteX - startTouch.absoluteX) +
-          (offsetDiff?.x ?? 0),
+          (offsetDiff?.x ?? 0) / 3,
         y:
           startTouchPosition.y +
           (touch.absoluteY - startTouch.absoluteY) +
-          (offsetDiff?.y ?? 0)
+          (offsetDiff?.y ?? 0) / 3
       };
 
       if (

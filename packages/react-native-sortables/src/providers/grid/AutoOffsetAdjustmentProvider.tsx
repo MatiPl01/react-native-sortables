@@ -1,11 +1,18 @@
 import type { PropsWithChildren } from 'react';
 import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { useDerivedValue } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue
+} from 'react-native-reanimated';
 
 import type { AutoOffsetAdjustmentContextType } from '../../types';
 import { calculateSnapOffset } from '../../utils';
-import { useCommonValuesContext, useCustomHandleContext } from '../shared';
+import {
+  useAutoScrollContext,
+  useCommonValuesContext,
+  useCustomHandleContext
+} from '../shared';
 import { createProvider } from '../utils';
 import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
 
@@ -20,6 +27,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
   createProvider('AutoOffsetAdjustment', {
     guarded: false
   })<AutoOffsetAdjustmentProviderProps, AutoOffsetAdjustmentContextType>(({
+    children,
     columnGap,
     isVertical,
     numGroups,
@@ -29,6 +37,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       activeItemDimensions,
       activeItemKey,
       activeItemPosition,
+      containerHeight,
+      containerWidth,
       enableActiveItemSnap,
       indexToKey,
       itemHeights,
@@ -39,17 +49,20 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       snapOffsetY,
       touchPosition
     } = useCommonValuesContext();
+    const { scrollOffsetDiff } = useAutoScrollContext() ?? {};
     const { activeHandleMeasurements, activeHandleOffset } =
       useCustomHandleContext() ?? {};
 
-    let crossCoordinate, crossGap, crossItemSizes;
+    let crossContainerSize, crossCoordinate, crossGap, crossItemSizes;
     if (isVertical) {
       crossGap = rowGap;
       crossItemSizes = itemHeights;
+      crossContainerSize = containerHeight;
       crossCoordinate = 'y' as const;
     } else {
       crossGap = columnGap;
       crossItemSizes = itemWidths;
+      crossContainerSize = containerWidth;
       crossCoordinate = 'x' as const;
     }
 
@@ -118,7 +131,38 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       return 0;
     });
 
+    const sizeRatio = useDerivedValue(() => {
+      const sizes = crossItemSizes.value;
+      const containerSize = crossContainerSize.value;
+      if (!sizes || !containerSize || typeof sizes !== 'object') {
+        return 0;
+      }
+
+      const contentSize = Math.max(
+        0,
+        Object.values(sizes).reduce(
+          (acc, size) => acc + size + crossGap.value,
+          -crossGap.value
+        )
+      );
+
+      console.log('...', contentSize / containerSize);
+
+      return contentSize / containerSize;
+    });
+
+    const animatedContainerStyle = useAnimatedStyle(() => ({
+      transform: [
+        {
+          translateY: (scrollOffsetDiff?.value?.y ?? 0) * (1 - sizeRatio.value)
+        }
+      ]
+    }));
+
     return {
+      children: (
+        <Animated.View style={animatedContainerStyle}>{children}</Animated.View>
+      ),
       value: {
         additionalCrossOffset
       }
