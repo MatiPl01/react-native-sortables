@@ -289,7 +289,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       activeAnimationProgress.value = 0;
       activeItemDropped.value = false;
-      prevActiveItemKey.value = activeItemKey.value;
+      prevActiveItemKey.value = null;
       activeItemKey.value = key;
       activeItemPosition.value = position;
       activeItemDimensions.value = dimensions;
@@ -305,23 +305,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       updateLayer?.(LayerState.FOCUSED);
 
-      let touchedItemPosition = position;
-
       // We need to update the custom handle measurements if the custom handle
       // is used (touch position is relative to the handle in this case)
       updateActiveHandleMeasurements?.(key);
-      if (activeHandleMeasurements?.value) {
-        const { pageX, pageY } = activeHandleMeasurements.value;
-        touchedItemPosition = {
-          x: pageX - containerMeasurements.pageX,
-          y: pageY - containerMeasurements.pageY
-        };
-      }
 
       // Touch position relative to the top-left corner of the sortable
       // container
-      const touchX = touchedItemPosition.x + touch.x;
-      const touchY = touchedItemPosition.y + touch.y;
+      const touchX = touch.absoluteX - containerMeasurements.pageX;
+      const touchY = touch.absoluteY - containerMeasurements.pageY;
 
       touchPosition.value = { x: touchX, y: touchY };
       dragStartTouchPosition.value = touchPosition.value;
@@ -338,27 +329,33 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       inactiveAnimationProgress.value = hasInactiveAnimation ? animate() : 0;
       activeAnimationProgress.value = animate();
+      activationAnimationProgress.value = 0.01;
       activationAnimationProgress.value = animate();
 
       haptics.medium();
-      stableOnDragStart({
-        fromIndex: dragStartIndex.value,
-        indexToKey: indexToKey.value,
-        key,
-        keyToIndex: keyToIndex.value
+
+      // Use timeout to ensure that the callback is called after all animated
+      // reactions are computed in the library
+      setAnimatedTimeout(() => {
+        stableOnDragStart({
+          fromIndex: dragStartIndex.value,
+          indexToKey: indexToKey.value,
+          key,
+          keyToIndex: keyToIndex.value
+        });
       });
     },
     [
       activationAnimationDuration,
       activeAnimationProgress,
       activeContainerId,
-      activeHandleMeasurements,
       activeItemDimensions,
       activeItemDropped,
       activationState,
       activeItemKey,
       activeItemPosition,
       containerId,
+      containerRef,
       dragStartIndex,
       dragStartItemTouchOffset,
       dragStartTouchPosition,
@@ -369,7 +366,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       indexToKey,
       keyToIndex,
       multiZoneActiveItemDimensions,
-      containerRef,
       prevActiveItemKey,
       stableOnDragStart,
       touchPosition,
@@ -569,7 +565,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       });
 
       setAnimatedTimeout(() => {
-        prevActiveItemKey.value = null;
         activeItemDropped.value = true;
         updateLayer?.(LayerState.IDLE);
         stableOnActiveItemDropped({
