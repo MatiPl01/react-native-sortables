@@ -18,7 +18,7 @@ function removeFromPendingTimeouts(id: AnimatedTimeoutID): void {
 
 export function setAnimatedTimeout<F extends AnyFunction>(
   callback: F,
-  delay: number
+  delay = 0
 ): AnimatedTimeoutID {
   let startTimestamp: number;
 
