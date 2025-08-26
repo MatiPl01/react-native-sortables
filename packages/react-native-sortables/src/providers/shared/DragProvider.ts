@@ -329,7 +329,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       inactiveAnimationProgress.value = hasInactiveAnimation ? animate() : 0;
       activeAnimationProgress.value = animate();
-      activationAnimationProgress.value = 0.01;
       activationAnimationProgress.value = animate();
 
       haptics.medium();
