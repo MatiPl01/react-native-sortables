@@ -12,7 +12,7 @@ import {
   useCustomHandleContext,
   useDebugBoundingBox
 } from '../../../shared';
-import { useAdditionalCrossOffsetContext } from '../../AdditionalCrossOffsetProvider';
+import { useAutoOffsetAdjustmentContext } from '../../AutoOffsetAdjustmentProvider';
 import { useGridLayoutContext } from '../GridLayoutProvider';
 import { calculateLayout, getCrossIndex, getMainIndex } from '../utils';
 
@@ -30,7 +30,7 @@ export const createGridStrategy =
       itemWidths
     } = useCommonValuesContext();
     const { crossGap, isVertical, mainGap, numGroups } = useGridLayoutContext();
-    const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
+    const { additionalCrossOffset } = useAutoOffsetAdjustmentContext() ?? {};
     const { fixedItemKeys } = useCustomHandleContext() ?? {};
 
     const othersIndexToKey = useInactiveIndexToKey();

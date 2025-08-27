@@ -66,9 +66,22 @@ export type SortableGridRenderItem<I> = (
  */
 export type SortableGridStrategy = 'insert' | 'swap' | SortStrategyFactory;
 
+export type AutoAdjustOffsetSettings = {
+  /** Whether to automatically adjust positions of items when their size changes during drag.
+   * @default false
+   */
+  autoAdjustOffsetDuringDrag: boolean;
+  /** Padding to add when adjusting the scroll offset after the active item is released.
+   * @note This takes effect only if autoAdjustOffsetDuringDrag is true and the scrollableRef is provided.
+   * @default 25
+   */
+  autoAdjustOffsetScrollPadding: [number, number] | number;
+};
+
 /** Props for the SortableGrid component */
 export type SortableGridProps<I> = Simplify<
   Omit<SharedProps, 'onDragEnd'> &
+    Partial<AutoAdjustOffsetSettings> &
     SortableGridLayoutSettings & {
       /** Array of items to render in the grid */
       data: Array<I>;
@@ -114,10 +127,6 @@ export type SortableGridProps<I> = Simplify<
        * @important Works only for horizontal grids. Requires the rows property to be set.
        */
       rowHeight?: number;
-      /** Whether to automatically adjust positions of items when their size changes during drag.
-       * @default false
-       */
-      autoAdjustOffsetDuringDrag?: boolean;
     }
 >;
 

@@ -2,25 +2,30 @@
 import type { PropsWithChildren } from 'react';
 
 import { useAnimatableValue } from '../../integrations/reanimated';
-import type { ReorderTriggerOrigin, SortableGridStrategy } from '../../types';
+import type {
+  AutoAdjustOffsetSettings,
+  ReorderTriggerOrigin,
+  SortableGridStrategy
+} from '../../types';
 import type { SharedProviderProps } from '../shared';
 import { SharedProvider, useOrderUpdater, useStrategyKey } from '../shared';
 import { ContextProviderComposer } from '../utils';
-import { AdditionalCrossOffsetProvider } from './AdditionalCrossOffsetProvider';
+import { AutoOffsetAdjustmentProvider } from './AutoOffsetAdjustmentProvider';
 import type { GridLayoutProviderProps } from './GridLayoutProvider';
 import { GRID_STRATEGIES, GridLayoutProvider } from './GridLayoutProvider';
 
 type GridProviderProps = PropsWithChildren<
-  GridLayoutProviderProps &
+  AutoAdjustOffsetSettings &
+    GridLayoutProviderProps &
     SharedProviderProps & {
       strategy: SortableGridStrategy;
       reorderTriggerOrigin: ReorderTriggerOrigin;
-      autoAdjustOffsetDuringDrag: boolean;
     }
 >;
 
 export default function GridProvider({
   autoAdjustOffsetDuringDrag,
+  autoAdjustOffsetScrollPadding,
   children,
   columnGap: columnGap_,
   isVertical,
@@ -47,7 +52,10 @@ export default function GridProvider({
     // Provider with additional cross axis offset calculations to support
     // collapsible items
     autoAdjustOffsetDuringDrag && (
-      <AdditionalCrossOffsetProvider {...sharedGridProviderProps} />
+      <AutoOffsetAdjustmentProvider
+        {...sharedGridProviderProps}
+        autoAdjustOffsetScrollPadding={autoAdjustOffsetScrollPadding}
+      />
     ),
     // Provider with grid layout calculations
     <GridLayoutProvider

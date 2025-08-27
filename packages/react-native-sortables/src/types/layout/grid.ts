@@ -19,7 +19,7 @@ export type GridLayout = {
   contentBounds: [Vector, Vector];
 };
 
-export type AdditionalCrossOffsetProps = {
+export type AutoOffsetAdjustmentProps = {
   activeItemKey: string;
   indexToKey: Array<string>;
   keyToIndex: Record<string, number>;
