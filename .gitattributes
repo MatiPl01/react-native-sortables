@@ -1,0 +1,13 @@
+# Default: treat text files as text and store with LF in the repo
+* text=auto eol=lf
+
+# Keep CRLF where it’s required (override per type)
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Never touch binaries
+*.png   binary
+*.jpg   binary
+*.pdf   binary
+*.zip   binary
+*.exe   binary
