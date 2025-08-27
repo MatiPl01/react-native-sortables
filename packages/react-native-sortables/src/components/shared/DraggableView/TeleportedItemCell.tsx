@@ -9,6 +9,7 @@ type TeleportedItemCellProps = Pick<
   | 'activationAnimationProgress'
   | 'cellStyle'
   | 'children'
+  | 'innerCellStyle'
   | 'isActive'
   | 'itemKey'
   | 'onLayout'
@@ -18,6 +19,7 @@ export default function TeleportedItemCell({
   activationAnimationProgress,
   cellStyle,
   children,
+  innerCellStyle,
   isActive,
   itemKey,
   onLayout
@@ -32,6 +34,7 @@ export default function TeleportedItemCell({
     <ItemCell
       activationAnimationProgress={activationAnimationProgress}
       cellStyle={[cellStyle, teleportedItemStyles]}
+      innerCellStyle={innerCellStyle}
       isActive={isActive}
       itemKey={itemKey}
       onLayout={onLayout}>
