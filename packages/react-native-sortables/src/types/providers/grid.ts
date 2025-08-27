@@ -1,7 +1,7 @@
 import type { SharedValue } from 'react-native-reanimated';
 
 export type AutoOffsetAdjustmentContextType = {
-  additionalCrossOffset: SharedValue<number>;
+  additionalCrossOffset: SharedValue<null | number>;
   layoutUpdateProgress: SharedValue<null | number>;
 };
 

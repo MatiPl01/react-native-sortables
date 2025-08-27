@@ -11,7 +11,11 @@ import {
   useScrollViewOffset
 } from 'react-native-reanimated';
 
-import { useMutableValue } from '../../integrations/reanimated';
+import {
+  clearAnimatedTimeout,
+  setAnimatedTimeout,
+  useMutableValue
+} from '../../integrations/reanimated';
 import type {
   AutoOffsetAdjustmentContextType,
   Coordinate,
@@ -30,6 +34,14 @@ import {
 } from '../shared';
 import { createProvider } from '../utils';
 import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
+
+const SORT_ENABLED_RESTORE_TIMEOUT = 300;
+
+type StateContext = {
+  offsetInterpolationBounds?: [number, number];
+  prevSortEnabled?: boolean;
+  restoreSortEnabledTimeoutId?: number;
+};
 
 type AutoOffsetAdjustmentProviderProps = PropsWithChildren<{
   isVertical: boolean;
@@ -62,6 +74,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       keyToIndex,
       snapOffsetX,
       snapOffsetY,
+      sortEnabled,
       touchPosition
     } = useCommonValuesContext();
     const { activeHandleMeasurements, activeHandleOffset } =
@@ -69,6 +82,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const hasAutoScroll = !!useAutoScrollContext();
 
     const layoutUpdateProgress = useMutableValue<null | number>(null);
+
+    const context = useMutableValue<StateContext>({});
 
     let crossCoordinate, crossGap, crossItemSizes;
     if (isVertical) {
@@ -143,8 +158,30 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         });
       }
 
-      return 0;
+      return null;
     });
+
+    useAnimatedReaction(
+      () => additionalCrossOffset.value !== null,
+      isManaged => {
+        const ctx = context.value;
+        const prev = ctx.prevSortEnabled;
+
+        if (ctx.restoreSortEnabledTimeoutId) {
+          clearAnimatedTimeout(ctx.restoreSortEnabledTimeoutId);
+        }
+
+        if (isManaged && prev === undefined) {
+          ctx.prevSortEnabled = sortEnabled.value;
+          sortEnabled.value = false;
+        } else if (prev !== undefined) {
+          ctx.restoreSortEnabledTimeoutId = setAnimatedTimeout(() => {
+            sortEnabled.value = prev;
+            delete ctx.prevSortEnabled;
+          }, SORT_ENABLED_RESTORE_TIMEOUT);
+        }
+      }
+    );
 
     return {
       children: (
@@ -155,6 +192,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
               autoAdjustOffsetScrollPadding={autoAdjustOffsetScrollPadding}
               crossCoordinate={crossCoordinate}
               crossItemSizes={crossItemSizes}
+              ctx={context}
               isVertical={isVertical}
               layoutUpdateProgress={layoutUpdateProgress}
             />
@@ -174,12 +212,14 @@ type ScrollOffsetUpdaterProps = {
   crossItemSizes: SharedValue<ItemSizes>;
   autoAdjustOffsetScrollPadding: [number, number] | number;
   layoutUpdateProgress: SharedValue<null | number>;
+  ctx: SharedValue<StateContext>;
 };
 
 function ScrollOffsetUpdater({
   autoAdjustOffsetScrollPadding,
   crossCoordinate,
   crossItemSizes,
+  ctx,
   isVertical,
   layoutUpdateProgress
 }: ScrollOffsetUpdaterProps) {
@@ -190,14 +230,16 @@ function ScrollOffsetUpdater({
   const [paddingBefore, paddingAfter] = toPair(autoAdjustOffsetScrollPadding);
 
   const scrollOffset = useScrollViewOffset(scrollableRef);
-  const offsetInterpolationBounds = useMutableValue<[number, number] | null>(
-    null
-  );
+
+  const finishOffsetInterpolation = useCallback(() => {
+    'worklet';
+    layoutUpdateProgress.value = null;
+    delete ctx.value.offsetInterpolationBounds;
+  }, [layoutUpdateProgress, ctx]);
 
   useAnimatedReaction(
     () => itemPositions.value,
     (newPositions, oldPositions) => {
-      offsetInterpolationBounds.value = null;
       if (!oldPositions || prevActiveItemKey.value === null) {
         return;
       }
@@ -241,7 +283,8 @@ function ScrollOffsetUpdater({
       const distance = newPos - oldPos + (oldPosOffset - newPosOffset);
       const currentOffset = scrollOffset.value;
 
-      offsetInterpolationBounds.value = [
+      layoutUpdateProgress.value = 0;
+      ctx.value.offsetInterpolationBounds = [
         currentOffset,
         currentOffset + distance
       ];
@@ -250,13 +293,10 @@ function ScrollOffsetUpdater({
   );
 
   useAnimatedReaction(
-    () => ({
-      bounds: offsetInterpolationBounds.value,
-      offset: scrollOffset.value
-    }),
-    ({ bounds, offset }) => {
+    () => scrollOffset.value,
+    offset => {
+      const bounds = ctx.value.offsetInterpolationBounds;
       if (!bounds) {
-        layoutUpdateProgress.value = null;
         return;
       }
 
@@ -266,8 +306,9 @@ function ScrollOffsetUpdater({
         [0, 1],
         Extrapolation.CLAMP
       );
+
       if (!areValuesDifferent(layoutUpdateProgress.value, 1, 0.01)) {
-        layoutUpdateProgress.value = 1;
+        finishOffsetInterpolation();
       }
     }
   );

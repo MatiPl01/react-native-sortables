@@ -1,5 +1,4 @@
 import { type PropsWithChildren, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../integrations/reanimated';
@@ -32,21 +31,11 @@ const { LayerProvider, useLayerContext } = createProvider('Layer', {
   }));
 
   return {
-    children: (
-      <Animated.View style={[styles.container, animatedStyle]}>
-        {children}
-      </Animated.View>
-    ),
+    children: <Animated.View style={animatedStyle}>{children}</Animated.View>,
     value: {
       updateLayer
     }
   };
-});
-
-const styles = StyleSheet.create({
-  container: {
-    minWidth: '100%'
-  }
 });
 
 export { LayerProvider, useLayerContext };
