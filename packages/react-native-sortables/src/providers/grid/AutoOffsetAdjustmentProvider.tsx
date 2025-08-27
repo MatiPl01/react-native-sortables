@@ -3,17 +3,26 @@ import { useCallback } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   clamp,
+  Extrapolation,
+  interpolate,
   measure,
   useAnimatedReaction,
-  useDerivedValue
+  useDerivedValue,
+  useScrollViewOffset
 } from 'react-native-reanimated';
 
+import { useMutableValue } from '../../integrations/reanimated';
 import type {
   AutoOffsetAdjustmentContextType,
   Coordinate,
   ItemSizes
 } from '../../types';
-import { calculateSnapOffset, resolveDimension, toPair } from '../../utils';
+import {
+  areValuesDifferent,
+  calculateSnapOffset,
+  resolveDimension,
+  toPair
+} from '../../utils';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
@@ -58,6 +67,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const { activeHandleMeasurements, activeHandleOffset } =
       useCustomHandleContext() ?? {};
     const hasAutoScroll = !!useAutoScrollContext();
+
+    const layoutUpdateProgress = useMutableValue<null | number>(null);
 
     let crossCoordinate, crossGap, crossItemSizes;
     if (isVertical) {
@@ -145,12 +156,14 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
               crossCoordinate={crossCoordinate}
               crossItemSizes={crossItemSizes}
               isVertical={isVertical}
+              layoutUpdateProgress={layoutUpdateProgress}
             />
           )}
         </>
       ),
       value: {
-        additionalCrossOffset
+        additionalCrossOffset,
+        layoutUpdateProgress
       }
     };
   });
@@ -160,13 +173,15 @@ type ScrollOffsetUpdaterProps = {
   crossCoordinate: Coordinate;
   crossItemSizes: SharedValue<ItemSizes>;
   autoAdjustOffsetScrollPadding: [number, number] | number;
+  layoutUpdateProgress: SharedValue<null | number>;
 };
 
 function ScrollOffsetUpdater({
   autoAdjustOffsetScrollPadding,
   crossCoordinate,
   crossItemSizes,
-  isVertical
+  isVertical,
+  layoutUpdateProgress
 }: ScrollOffsetUpdaterProps) {
   const { containerRef, itemPositions, prevActiveItemKey } =
     useCommonValuesContext();
@@ -174,11 +189,15 @@ function ScrollOffsetUpdater({
 
   const [paddingBefore, paddingAfter] = toPair(autoAdjustOffsetScrollPadding);
 
+  const scrollOffset = useScrollViewOffset(scrollableRef);
+  const offsetInterpolationBounds = useMutableValue<[number, number] | null>(
+    null
+  );
+
   useAnimatedReaction(
     () => itemPositions.value,
     (newPositions, oldPositions) => {
-      'worklet';
-
+      offsetInterpolationBounds.value = null;
       if (!oldPositions || prevActiveItemKey.value === null) {
         return;
       }
@@ -220,17 +239,36 @@ function ScrollOffsetUpdater({
       );
 
       const distance = newPos - oldPos + (oldPosOffset - newPosOffset);
+      const currentOffset = scrollOffset.value;
 
-      console.log(
-        'posDiff',
-        newPos - oldPos,
-        'newPosOffset',
-        newPosOffset,
-        'oldPosOffset',
-        oldPosOffset
-      );
-
+      offsetInterpolationBounds.value = [
+        currentOffset,
+        currentOffset + distance
+      ];
       scrollBy?.(distance, true);
+    }
+  );
+
+  useAnimatedReaction(
+    () => ({
+      bounds: offsetInterpolationBounds.value,
+      offset: scrollOffset.value
+    }),
+    ({ bounds, offset }) => {
+      if (!bounds) {
+        layoutUpdateProgress.value = null;
+        return;
+      }
+
+      layoutUpdateProgress.value = interpolate(
+        offset,
+        bounds,
+        [0, 1],
+        Extrapolation.CLAMP
+      );
+      if (!areValuesDifferent(layoutUpdateProgress.value, 1, 0.01)) {
+        layoutUpdateProgress.value = 1;
+      }
     }
   );
 

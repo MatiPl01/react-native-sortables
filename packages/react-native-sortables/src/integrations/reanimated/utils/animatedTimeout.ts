@@ -31,7 +31,7 @@ export function setAnimatedTimeout<F extends AnyFunction>(
       return;
     }
     startTimestamp ??= newTimestamp;
-    if (newTimestamp >= startTimestamp + delay) {
+    if (newTimestamp > startTimestamp + delay) {
       removeFromPendingTimeouts(currentId);
       callback();
       return;

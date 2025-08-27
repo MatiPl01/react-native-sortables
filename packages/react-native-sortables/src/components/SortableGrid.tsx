@@ -10,6 +10,7 @@ import { useAnimatableValue } from '../integrations/reanimated';
 import {
   GridProvider,
   useGridLayoutContext,
+  useAutoOffsetAdjustmentContext,
   useMeasurementsContext
 } from '../providers';
 import type {
@@ -172,6 +173,8 @@ function SortableGridInner<I>({
   const { handleContainerMeasurement, resetMeasurements } =
     useMeasurementsContext();
   const { mainGroupSize } = useGridLayoutContext();
+  const { layoutUpdateProgress } = useAutoOffsetAdjustmentContext() ?? {};
+
   const isFirstRenderRef = useRef(true);
 
   useLayoutEffect(() => {
@@ -245,6 +248,7 @@ function SortableGridInner<I>({
           item={item}
           itemKey={key}
           key={key}
+          layoutUpdateProgress={layoutUpdateProgress}
         />
       ))}
     </SortableContainer>
@@ -255,6 +259,7 @@ type SortableGridItemProps<I> = DraggableViewProps & {
   index: number;
   item: I;
   renderItem: SortableGridRenderItem<I>;
+  layoutUpdateProgress: SharedValue<null | number> | undefined;
 };
 
 function SortableGridItem<I>({

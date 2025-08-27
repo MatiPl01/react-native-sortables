@@ -1,13 +1,8 @@
 import type { SharedValue } from 'react-native-reanimated';
 
-import type { Vector } from '../layout';
-
 export type AutoOffsetAdjustmentContextType = {
   additionalCrossOffset: SharedValue<number>;
-  onBeforeItemPositionsUpdate?: (
-    oldPositions: Record<string, Vector>,
-    newPositions: Record<string, Vector>
-  ) => void;
+  layoutUpdateProgress: SharedValue<null | number>;
 };
 
 export type GridLayoutContextType = {
