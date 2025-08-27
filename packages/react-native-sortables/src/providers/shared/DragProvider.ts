@@ -327,7 +327,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       haptics.medium();
 
       // Use timeout to ensure that the callback is called after all animated
-      // reactions are computed in the library
+      // reactions are computed in the library (e.g. for the portal and collapsible
+      // items case when the size of the active item must change after it is teleported)
       setAnimatedTimeout(() => {
         stableOnDragStart({
           fromIndex: dragStartIndex.value,

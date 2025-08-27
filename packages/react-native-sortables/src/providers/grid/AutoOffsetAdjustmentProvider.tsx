@@ -145,10 +145,23 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       isVertical
     ]);
 
+    // TODO - change to the function called in sync from the layout updater?
+    // needs to be calculated before layout update
+    // and only on item sizes update
     const additionalCrossOffset = useDerivedValue(() => {
       const props = getRemainingProps();
 
       if (props) {
+        console.log(
+          'calculateActiveItemCrossOffset',
+          calculateActiveItemCrossOffset({
+            crossCoordinate,
+            crossGap: crossGap.value,
+            crossItemSizes: crossItemSizes.value,
+            numGroups,
+            ...props
+          })
+        );
         return calculateActiveItemCrossOffset({
           crossCoordinate,
           crossGap: crossGap.value,
@@ -223,7 +236,7 @@ function ScrollOffsetUpdater({
   isVertical,
   layoutUpdateProgress
 }: ScrollOffsetUpdaterProps) {
-  const { containerRef, itemPositions, prevActiveItemKey } =
+  const { activeItemKey, containerRef, itemPositions, prevActiveItemKey } =
     useCommonValuesContext();
   const { scrollableRef, scrollBy } = useAutoScrollContext()!;
 
@@ -240,7 +253,11 @@ function ScrollOffsetUpdater({
   useAnimatedReaction(
     () => itemPositions.value,
     (newPositions, oldPositions) => {
-      if (!oldPositions || prevActiveItemKey.value === null) {
+      if (
+        !oldPositions ||
+        activeItemKey.value !== null ||
+        prevActiveItemKey.value === null
+      ) {
         return;
       }
 
@@ -283,6 +300,19 @@ function ScrollOffsetUpdater({
       const distance = newPos - oldPos + (oldPosOffset - newPosOffset);
       const currentOffset = scrollOffset.value;
 
+      console.log(
+        newPos,
+        oldPos,
+        oldPosOffset,
+        newPosOffset,
+        currentOffset,
+        activeItemKey.value
+      );
+
+      // TODO - debounce these calls or do sth else as sometimes, when the item is
+      // immediately released after drag starts, we get 2 dimension updates in a row
+      // matching conditions of this reaction, which results in the scrollBy being
+      // called with an invalid distance
       layoutUpdateProgress.value = 0;
       ctx.value.offsetInterpolationBounds = [
         currentOffset,
