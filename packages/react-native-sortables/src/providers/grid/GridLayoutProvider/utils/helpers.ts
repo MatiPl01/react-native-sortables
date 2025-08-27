@@ -10,7 +10,7 @@ export const getCrossIndex = (index: number, numGroups: number): number =>
 export const shouldUpdateContainerDimensions = (
   currentContainerCrossSize: null | number,
   calculatedContainerCrossSize: number,
-  hasAdditionalCrossOffset: boolean
+  hasAutoOffsetAdjustment: boolean
 ): boolean =>
   !currentContainerCrossSize ||
   (areValuesDifferent(
@@ -18,5 +18,5 @@ export const shouldUpdateContainerDimensions = (
     calculatedContainerCrossSize,
     1
   ) &&
-    (!hasAdditionalCrossOffset ||
+    (!hasAutoOffsetAdjustment ||
       calculatedContainerCrossSize > currentContainerCrossSize));

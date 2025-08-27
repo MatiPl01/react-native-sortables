@@ -12,7 +12,7 @@ import {
   useMeasurementsContext
 } from '../../shared';
 import { createProvider } from '../../utils';
-import { useAdditionalCrossOffsetContext } from '../AdditionalCrossOffsetProvider';
+import { useAutoOffsetAdjustmentContext } from '../AutoOffsetAdjustmentProvider';
 import { calculateLayout, shouldUpdateContainerDimensions } from './utils';
 
 const DEBUG_COLORS = {
@@ -49,7 +49,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
-  const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
+  const { additionalCrossOffset } = useAutoOffsetAdjustmentContext() ?? {};
   const { contentBounds } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 

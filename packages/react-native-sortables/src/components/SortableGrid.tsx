@@ -32,6 +32,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
     rest: {
       autoAdjustOffsetDuringDrag,
+      autoAdjustOffsetScrollPadding,
       columnGap,
       columns,
       data,
@@ -98,6 +99,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     <GridProvider
       {...sharedProps}
       autoAdjustOffsetDuringDrag={autoAdjustOffsetDuringDrag}
+      autoAdjustOffsetScrollPadding={autoAdjustOffsetScrollPadding}
       columnGap={columnGapValue}
       controlledContainerDimensions={controlledContainerDimensions}
       controlledItemDimensions={controlledItemDimensions}
