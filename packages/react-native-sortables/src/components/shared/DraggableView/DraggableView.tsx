@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { Fragment, memo, useCallback, useEffect, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
+import type { SharedValue } from 'react-native-reanimated';
 import {
   LayoutAnimationConfig,
   runOnUI,
@@ -30,6 +31,7 @@ export type DraggableViewProps = PropsWithChildren<{
   itemEntering: LayoutAnimation | null;
   itemExiting: LayoutAnimation | null;
   style?: AnimatedStyleProp;
+  layoutUpdateProgress?: SharedValue<null | number>;
 }>;
 
 function DraggableView({
@@ -37,6 +39,7 @@ function DraggableView({
   itemEntering,
   itemExiting,
   itemKey: key,
+  layoutUpdateProgress,
   style
 }: DraggableViewProps) {
   const portalContext = usePortalContext();
@@ -50,7 +53,12 @@ function DraggableView({
   const [isHidden, setIsHidden] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
-  const layoutStyle = useItemStyles(key, isActive, activationAnimationProgress);
+  const layoutStyle = useItemStyles(
+    key,
+    isActive,
+    activationAnimationProgress,
+    layoutUpdateProgress
+  );
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
   useEffect(() => {
