@@ -59,6 +59,7 @@ export default function ActiveItemPortal({
           <TeleportedItemCell
             activationAnimationProgress={activationAnimationProgress}
             cellStyle={cellStyle}
+            innerCellStyle={commonValuesContext.controlledDimensionsStyle}
             isActive={isActive}
             itemKey={itemKey}>
             {children}

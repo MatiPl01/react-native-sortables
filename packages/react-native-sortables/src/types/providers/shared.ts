@@ -6,6 +6,7 @@ import type {
 } from 'react-native-gesture-handler';
 import type {
   AnimatedRef,
+  AnimatedStyle,
   MeasuredDimensions,
   SharedValue
 } from 'react-native-reanimated';
@@ -62,6 +63,7 @@ export type CommonValuesContextType =
       containerHeight: SharedValue<null | number>;
       itemWidths: SharedValue<ItemSizes>;
       itemHeights: SharedValue<ItemSizes>;
+      controlledDimensionsStyle: AnimatedStyle<Partial<Dimensions>>;
       activeItemDimensions: SharedValue<Dimensions | null>;
 
       // DRAG STATE

@@ -6,25 +6,21 @@ import {
   type ViewStyle
 } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import Animated, {
-  useAnimatedStyle,
-  useDerivedValue
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 import { HIDDEN_X_OFFSET } from '../../../constants';
 import type {
   AnimatedStyleProp,
   LayoutAnimation
 } from '../../../integrations/reanimated';
-import { useCommonValuesContext, useItemDecoration } from '../../../providers';
-import type { Dimensions } from '../../../types';
-import { resolveDimension } from '../../../utils';
+import { useItemDecorationStyle } from '../../../providers';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
 export type ItemCellProps = PropsWithChildren<{
   itemKey: string;
   isActive: SharedValue<boolean>;
   activationAnimationProgress: SharedValue<number>;
+  innerCellStyle: AnimatedStyleProp;
   cellStyle: AnimatedStyleProp;
   onLayout?: (event: LayoutChangeEvent) => void;
   hidden?: boolean;
@@ -39,32 +35,16 @@ export default function ItemCell({
   entering,
   exiting,
   hidden,
+  innerCellStyle,
   isActive,
   itemKey,
   onLayout
 }: ItemCellProps) {
-  const { controlledItemDimensions, itemHeights, itemWidths } =
-    useCommonValuesContext();
-
-  const decoration = useItemDecoration(
+  const decorationStyle = useItemDecorationStyle(
     itemKey,
     isActive,
     activationAnimationProgress
   );
-
-  const controlledDimensions = useDerivedValue(() => {
-    const result: Partial<Dimensions> = {};
-    if (controlledItemDimensions.width) {
-      result.width = resolveDimension(itemWidths.value, itemKey) ?? undefined;
-    }
-    if (controlledItemDimensions.height) {
-      result.height = resolveDimension(itemHeights.value, itemKey) ?? undefined;
-    }
-    return result;
-  });
-
-  const decorationStyle = useAnimatedStyle(() => decoration.value);
-  const dimensionsStyle = useAnimatedStyle(() => controlledDimensions.value);
 
   return (
     <Animated.View style={cellStyle}>
@@ -74,7 +54,7 @@ export default function ItemCell({
         style={[
           styles.decoration,
           decorationStyle,
-          dimensionsStyle,
+          innerCellStyle,
           hidden && styles.hidden
         ]}
         onLayout={onLayout}>
