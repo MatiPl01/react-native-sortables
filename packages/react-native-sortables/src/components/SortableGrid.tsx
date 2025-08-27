@@ -7,7 +7,11 @@ import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
-import { GridProvider, useMeasurementsContext } from '../providers';
+import {
+  GridProvider,
+  useAutoOffsetAdjustmentContext,
+  useMeasurementsContext
+} from '../providers';
 import type {
   DropIndicatorSettings,
   SortableGridProps,
@@ -28,6 +32,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
     rest: {
       autoAdjustOffsetDuringDrag,
+      autoAdjustOffsetScrollPadding,
       columnGap,
       columns,
       data,
@@ -94,6 +99,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     <GridProvider
       {...sharedProps}
       autoAdjustOffsetDuringDrag={autoAdjustOffsetDuringDrag}
+      autoAdjustOffsetScrollPadding={autoAdjustOffsetScrollPadding}
       columnGap={columnGapValue}
       controlledContainerDimensions={controlledContainerDimensions}
       controlledItemDimensions={controlledItemDimensions}
@@ -165,6 +171,7 @@ function SortableGridInner<I>({
 }: SortableGridInnerProps<I>) {
   const { handleContainerMeasurement, resetMeasurements } =
     useMeasurementsContext();
+  const { layoutUpdateProgress } = useAutoOffsetAdjustmentContext() ?? {};
 
   useEffect(resetMeasurements, [groups, resetMeasurements]);
 
@@ -228,6 +235,7 @@ function SortableGridInner<I>({
           item={item}
           itemKey={key}
           key={key}
+          layoutUpdateProgress={layoutUpdateProgress}
         />
       ))}
     </SortableContainer>
@@ -238,6 +246,7 @@ type SortableGridItemProps<I> = DraggableViewProps & {
   index: number;
   item: I;
   renderItem: SortableGridRenderItem<I>;
+  layoutUpdateProgress: SharedValue<null | number> | undefined;
 };
 
 function SortableGridItem<I>({

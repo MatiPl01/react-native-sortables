@@ -13,6 +13,7 @@ import {
 import { HIDDEN_X_OFFSET, IS_WEB, isFabric } from '../../../constants';
 import {
   type AnimatedStyleProp,
+  interpolateVector,
   useAnimatedDebounce,
   useMutableValue
 } from '../../../integrations/reanimated';
@@ -140,7 +141,8 @@ function useItemLayoutStyleFabric(
 export default function useItemLayoutStyle(
   key: string,
   isActive: SharedValue<boolean>,
-  activationAnimationProgress: SharedValue<number>
+  activationAnimationProgress: SharedValue<number>,
+  layoutUpdateProgress: SharedValue<null | number> | undefined
 ): AnimatedStyleProp {
   const {
     activeItemKey,
@@ -156,7 +158,7 @@ export default function useItemLayoutStyle(
   );
 
   const positionRef = useRef<SharedValue<null | Vector>>(null);
-  const dropStartValues = useMutableValue<null | {
+  const interpolationStartValues = useMutableValue<null | {
     position: Vector;
     progress: number;
   }>(null);
@@ -170,13 +172,13 @@ export default function useItemLayoutStyle(
   // Inactive item updater
   useAnimatedReaction(
     () => ({
-      activationProgress: activationAnimationProgress.value,
       active: isActive.value,
-      itemPosition: layoutPosition.value
+      itemPosition: layoutPosition.value,
+      progress: layoutUpdateProgress?.value ?? activationAnimationProgress.value
     }),
-    ({ activationProgress, active, itemPosition }, prev) => {
+    ({ active, itemPosition, progress }, prev) => {
       if (!itemPosition || active) {
-        dropStartValues.value = null;
+        interpolationStartValues.value = null;
         return;
       }
 
@@ -189,34 +191,37 @@ export default function useItemLayoutStyle(
         prev?.itemPosition &&
         areVectorsDifferent(prev.itemPosition, itemPosition, 1);
 
-      if (activationProgress === 0) {
-        if (dropStartValues.value) {
-          dropStartValues.value = null;
+      if (progress === 0) {
+        if (interpolationStartValues.value) {
+          interpolationStartValues.value = null;
           position.value = itemPosition;
           return;
         }
       }
       // Set dropStartValues only if the item was previously active or if is
       // already during the drop animation and the target position changed
-      else if (dropStartValues.value ? positionChanged : prev?.active) {
-        dropStartValues.value = {
+      else if (
+        interpolationStartValues.value ? positionChanged : prev?.active
+      ) {
+        interpolationStartValues.value = {
           position: position.value,
-          progress: activationProgress
+          progress
         };
       }
 
-      if (dropStartValues.value) {
-        const {
-          position: { x, y },
-          progress
-        } = dropStartValues.value;
-        const animate = (from: number, to: number) =>
-          interpolate(activationProgress, [progress, 0], [from, to]);
-
-        position.value = {
-          x: animate(x, itemPosition.x),
-          y: animate(y, itemPosition.y)
-        };
+      if (interpolationStartValues.value) {
+        const { position: startPosition, progress: startProgress } =
+          interpolationStartValues.value;
+        const currentProgress = interpolate(
+          progress,
+          [startProgress, 0],
+          [0, 1]
+        );
+        position.value = interpolateVector(
+          currentProgress,
+          startPosition,
+          itemPosition
+        );
         return;
       }
 

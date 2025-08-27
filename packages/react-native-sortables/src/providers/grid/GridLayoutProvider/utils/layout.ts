@@ -1,6 +1,6 @@
 'worklet';
 import type {
-  AdditionalCrossOffsetProps,
+  AutoOffsetAdjustmentProps,
   Coordinate,
   GridLayout,
   GridLayoutProps,
@@ -107,7 +107,7 @@ export const calculateActiveItemCrossOffset = ({
   keyToIndex,
   numGroups,
   snapBasedOffset
-}: AdditionalCrossOffsetProps): number => {
+}: AutoOffsetAdjustmentProps): number => {
   let activeItemCrossOffset = 0;
   let currentGroupCrossSize = 0;
   let currentGroupCrossIndex = 0;
