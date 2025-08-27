@@ -125,7 +125,7 @@ function AutoScrollUpdater({
   isVertical,
   scrollableRef
 }: AutoScrollUpdaterProps) {
-  const { activeItemKey, containerRef, touchPosition } =
+  const { activeAnimationProgress, containerRef, touchPosition } =
     useCommonValuesContext();
 
   const progress = useMutableValue(0);
@@ -136,6 +136,8 @@ function AutoScrollUpdater({
   const activationOffset = toPair(autoScrollActivationOffset);
   const [maxStartVelocity, maxEndVelocity] = toPair(autoScrollMaxVelocity);
   const maxOverscroll = toPair(autoScrollMaxOverscroll);
+
+  const isActive = useDerivedValue(() => activeAnimationProgress.value === 1);
 
   const contentAxisBounds = useDerivedValue<[number, number] | null>(() => {
     if (!contentBounds.value) {
@@ -312,7 +314,7 @@ function AutoScrollUpdater({
   );
 
   useAnimatedReaction(
-    () => activeItemKey.value !== null,
+    () => isActive.value,
     active => {
       if (active) {
         dragStartScrollOffset.value = currentScrollOffset.value;

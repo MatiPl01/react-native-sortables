@@ -530,8 +530,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemKey.value = null;
       dragStartIndex.value = -1;
 
+      // This ensures that the drop duration is reduced if the item activation
+      // animation didn't complete yet
+      const dropDuration =
+        activeAnimationProgress.value * dropAnimationDuration.value;
+
       const animate = (callback?: (finished: boolean | undefined) => void) =>
-        withTiming(0, { duration: dropAnimationDuration.value }, callback);
+        withTiming(0, { duration: dropDuration }, callback);
 
       activationAnimationProgress.value = animate();
       inactiveAnimationProgress.value = animate();
@@ -558,7 +563,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           keyToIndex: keyToIndex.value,
           toIndex
         });
-      }, dropAnimationDuration.value);
+      }, dropDuration);
     },
     [
       activeContainerId,

@@ -50,7 +50,7 @@ export const createGridStrategy =
           itemWidths: itemWidths.value,
           numGroups
         },
-        additionalCrossOffset?.value
+        additionalCrossOffset?.value ?? 0
       )
     );
 
