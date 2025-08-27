@@ -18,8 +18,8 @@ import {
   ItemContextProvider,
   useCommonValuesContext,
   useDragContext,
+  useItemLayoutStyle,
   useItemPanGesture,
-  useItemStyles,
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
@@ -53,7 +53,7 @@ function DraggableView({
   const [isHidden, setIsHidden] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
-  const layoutStyle = useItemStyles(
+  const layoutStyle = useItemLayoutStyle(
     key,
     isActive,
     activationAnimationProgress,
