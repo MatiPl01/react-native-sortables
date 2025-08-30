@@ -2,8 +2,8 @@
   "name": "example-paper",
   "version": "1.0.0",
   "dependencies": {
-    "react-native": "0.80.0",
-    "react-native-reanimated": "3.19.0",
+    "react-native": "0.81.1",
+    "react-native-reanimated": "3.19.1",
     "react-native-sortables": "workspace:*"
   },
   "installConfig": {

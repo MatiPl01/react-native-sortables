@@ -4,7 +4,7 @@
   "dependencies": {
     "expo": "53.0.20",
     "react-dom": "19.1.0",
-    "react-native": "0.80.0",
+    "react-native": "0.81.1",
     "react-native-sortables": "workspace:*",
     "react-native-web": "0.20.0"
   },
