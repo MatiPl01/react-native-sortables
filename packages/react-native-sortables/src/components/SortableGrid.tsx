@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { DimensionValue } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
@@ -165,8 +165,15 @@ function SortableGridInner<I>({
 }: SortableGridInnerProps<I>) {
   const { handleContainerMeasurement, resetMeasurements } =
     useMeasurementsContext();
+  const isFirstRenderRef = useRef(true);
 
-  useEffect(resetMeasurements, [groups, resetMeasurements]);
+  useEffect(() => {
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
+      return;
+    }
+    resetMeasurements();
+  }, [groups, resetMeasurements]);
 
   const animatedInnerStyle = useAnimatedStyle(() =>
     isVertical
