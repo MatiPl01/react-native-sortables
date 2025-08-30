@@ -1,4 +1,4 @@
-import { AnimatedFlashList, type FlashList } from '@shopify/flash-list';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import { FlatList, StyleSheet, Text } from 'react-native';
 import type { AnimatedRef } from 'react-native-reanimated';
 import Animated, { useAnimatedRef } from 'react-native-reanimated';
@@ -22,9 +22,8 @@ const FEW_CATEGORIES = getCategories(IS_WEB ? 12 : 6);
 
 const LIST_ITEM_SECTIONS = ['List item 1', 'List item 2', 'List item 3'];
 
-const AnimatedFlatList = Animated.createAnimatedComponent(
-  FlatList
-) as typeof FlatList;
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<string>);
+const AnimatedFlashList = Animated.createAnimatedComponent(FlashList<string>);
 
 export default function AutoScrollExample() {
   return (
@@ -106,7 +105,7 @@ function FlatListExample() {
 }
 
 function FlashListExample() {
-  const scrollableRef = useAnimatedRef<FlashList<string>>();
+  const scrollableRef = useAnimatedRef<FlashListRef<string>>();
 
   return (
     // FlashList doesn't accept width prop in the style property,
@@ -114,7 +113,6 @@ function FlashListExample() {
     <Screen noPadding>
       <AnimatedFlashList
         data={LIST_ITEM_SECTIONS}
-        estimatedItemSize={152}
         ref={scrollableRef}
         ListFooterComponent={
           <>
@@ -140,11 +138,11 @@ function FlashListExample() {
 }
 
 type CategoriesSectionProps = {
-  scrollableRef: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | AnimatedRef<Animated.FlatList<any>>
+  scrollableRef:
+    | AnimatedRef<Animated.FlatList>
     | AnimatedRef<Animated.ScrollView>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    | AnimatedRef<FlashList<any>>;
+    | AnimatedRef<FlashListRef<any>>;
 };
 
 function ManyCategories({ scrollableRef }: CategoriesSectionProps) {
