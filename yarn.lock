@@ -8449,11 +8449,11 @@ __metadata:
     prettier: "npm:^3.3.2"
     react: "npm:19.1.0"
     react-native: "npm:0.81.1"
-    react-native-gesture-handler: "npm:2.26.0"
+    react-native-gesture-handler: "npm:2.28.0"
     react-native-haptic-feedback: "npm:2.3.3"
     react-native-reanimated: "patch:react-native-reanimated@npm%3A4.1.0#~/.yarn/patches/react-native-reanimated-npm-4.1.0-f13c1e8648.patch"
     react-native-safe-area-context: "npm:5.3.0"
-    react-native-screens: "npm:4.11.1"
+    react-native-screens: "npm:4.15.4"
     react-native-sortables: "workspace:*"
     react-native-svg: "npm:15.12.0"
     react-native-worklets: "npm:0.5.0"
@@ -15089,9 +15089,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:2.26.0, react-native-gesture-handler@npm:^2.26.0":
-  version: 2.26.0
-  resolution: "react-native-gesture-handler@npm:2.26.0"
+"react-native-gesture-handler@npm:2.28.0":
+  version: 2.28.0
+  resolution: "react-native-gesture-handler@npm:2.28.0"
   dependencies:
     "@egjs/hammerjs": "npm:^2.0.17"
     hoist-non-react-statics: "npm:^3.3.0"
@@ -15099,7 +15099,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/43aee4f0aeb7be9e2e72a9abaeaff38104c188a44ffc1a5634940a851adca5f10ee3a8d1b4828eb654574d4d45aa0f0c2af5a7b4ed2e9bca4e76d0d932f13955
+  checksum: 10c0/4240c8eedca69eb36b5d3e375b71867251cf8b87a755ba7066b3f73cfdbc80574042dbd4ff821041fd1539c4cd90dbf7ee34586f5a0ea6cc38052375b3169f2e
   languageName: node
   linkType: hard
 
@@ -15126,7 +15126,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-is-edge-to-edge@npm:1.1.7, react-native-is-edge-to-edge@npm:^1.1.6, react-native-is-edge-to-edge@npm:^1.1.7":
+"react-native-is-edge-to-edge@npm:1.1.7, react-native-is-edge-to-edge@npm:^1.1.6":
   version: 1.1.7
   resolution: "react-native-is-edge-to-edge@npm:1.1.7"
   peerDependencies:
@@ -15234,17 +15234,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-screens@npm:4.11.1":
-  version: 4.11.1
-  resolution: "react-native-screens@npm:4.11.1"
+"react-native-screens@npm:4.15.4":
+  version: 4.15.4
+  resolution: "react-native-screens@npm:4.15.4"
   dependencies:
     react-freeze: "npm:^1.0.0"
-    react-native-is-edge-to-edge: "npm:^1.1.7"
+    react-native-is-edge-to-edge: "npm:^1.2.1"
     warn-once: "npm:^0.1.0"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/88a33ba419bd571cc318e80d25eb172f5829677f2dd80dcb69cbeaa6a35ba26214e0e82af87baa375182afe41a276e8ef1a9d13b826f662f3a389982492c2879
+  checksum: 10c0/0e0e998688742741f323a332e9a2c502f10e9e73c21cd9a25457dd71f24a1bec5091141385d5fb25cf86f78c9f1799e145f0a9a4c6af5ffd97ecf7e9a53acd95
   languageName: node
   linkType: hard
 
@@ -15290,7 +15290,7 @@ __metadata:
     react: "npm:19.1.0"
     react-native: "npm:0.81.1"
     react-native-builder-bob: "npm:0.39.0"
-    react-native-gesture-handler: "npm:^2.26.0"
+    react-native-gesture-handler: "npm:2.28.0"
     react-native-haptic-feedback: "npm:>=2.0.0"
     react-native-reanimated: "patch:react-native-reanimated@npm%3A4.1.0#~/.yarn/patches/react-native-reanimated-npm-4.1.0-f13c1e8648.patch"
     react-native-worklets: "npm:^0.5.0"
