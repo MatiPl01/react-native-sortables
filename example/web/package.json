@@ -6,7 +6,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.1",
     "react-native-sortables": "workspace:*",
-    "react-native-web": "0.20.0"
+    "react-native-web": "0.21.1"
   },
   "devDependencies": {
     "@expo/metro-runtime": "~5.0.4",
