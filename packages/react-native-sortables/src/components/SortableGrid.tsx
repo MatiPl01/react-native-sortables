@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import type { DimensionValue } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
@@ -7,7 +7,11 @@ import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
-import { GridProvider, useMeasurementsContext } from '../providers';
+import {
+  GridProvider,
+  useGridLayoutContext,
+  useMeasurementsContext
+} from '../providers';
 import type {
   DropIndicatorSettings,
   SortableGridProps,
@@ -165,9 +169,10 @@ function SortableGridInner<I>({
 }: SortableGridInnerProps<I>) {
   const { handleContainerMeasurement, resetMeasurements } =
     useMeasurementsContext();
+  const { mainGroupSize } = useGridLayoutContext();
   const isFirstRenderRef = useRef(true);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false;
       return;
@@ -199,8 +204,9 @@ function SortableGridInner<I>({
               `calc((100% - ${columnGap.value * (groups - 1)}px) / ${groups})` as DimensionValue
           }
         : {
-            flexBasis: `${100 / groups}%`,
-            paddingHorizontal: columnGap.value / 2
+            flexBasis: mainGroupSize.value ? undefined : `${100 / groups}%`,
+            paddingHorizontal: columnGap.value / 2,
+            width: mainGroupSize.value
           }
       : { height: rowHeight }
   );

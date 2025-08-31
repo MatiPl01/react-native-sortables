@@ -29,7 +29,8 @@ export const createGridStrategy =
       itemHeights,
       itemWidths
     } = useCommonValuesContext();
-    const { crossGap, isVertical, mainGap, numGroups } = useGridLayoutContext();
+    const { crossGap, isVertical, mainGap, mainGroupSize, numGroups } =
+      useGridLayoutContext();
     const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
     const { fixedItemKeys } = useCustomHandleContext() ?? {};
 
@@ -75,14 +76,11 @@ export const createGridStrategy =
 
     return ({ activeIndex, dimensions, position }) => {
       'worklet';
-      const mainGroupSize = (isVertical ? itemWidths : itemHeights).value;
-
       if (
         !othersLayout.value ||
         crossContainerSize.value === null ||
         mainContainerSize.value === null ||
-        mainGroupSize === null ||
-        typeof mainGroupSize !== 'number'
+        mainGroupSize.value === null
       ) {
         return;
       }
@@ -170,7 +168,7 @@ export const createGridStrategy =
         if (mainBeforeBound !== Infinity) {
           mainIndex--;
         }
-        mainBeforeOffset = mainIndex * (mainGroupSize + mainGap.value);
+        mainBeforeOffset = mainIndex * (mainGroupSize.value + mainGap.value);
         mainBeforeBound = mainBeforeOffset - additionalOffset;
       } while (
         mainBeforeBound > 0 &&
@@ -186,7 +184,8 @@ export const createGridStrategy =
           mainIndex++;
         }
         mainAfterOffset =
-          mainIndex * (mainGroupSize + mainGap.value) + mainGroupSize;
+          mainIndex * (mainGroupSize.value + mainGap.value) +
+          mainGroupSize.value;
         mainAfterBound = mainAfterOffset + additionalOffset;
       } while (
         mainAfterBound < mainContainerSize.value &&
