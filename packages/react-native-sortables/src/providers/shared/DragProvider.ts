@@ -318,8 +318,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       };
       dragStartTouchPosition.value = touchPosition.value;
 
-      console.log('touchPosition.value', touchPosition.value);
-
       const hasInactiveAnimation =
         inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
 
@@ -347,6 +345,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationAnimationDuration,
       activeAnimationProgress,
       activeContainerId,
+      activeHandleOffset,
       activeItemDimensions,
       activeItemDropped,
       activationState,
