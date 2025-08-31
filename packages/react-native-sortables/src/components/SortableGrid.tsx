@@ -207,6 +207,8 @@ function SortableGridInner<I>({
             flexBasis: mainGroupSize.value ? undefined : `${100 / groups}%`,
             paddingHorizontal: columnGap.value / 2,
             width: mainGroupSize.value
+              ? mainGroupSize.value + columnGap.value
+              : undefined
           }
       : { height: rowHeight }
   );
