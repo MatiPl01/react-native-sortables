@@ -97,14 +97,10 @@ export const calculateLayout = ({
 
 export const calculateActiveItemCrossOffset = ({
   activeItemKey,
-  crossCoordinate,
   crossGap,
   crossItemSizes,
   indexToKey,
-  itemPositions,
-  keyToIndex,
-  numGroups,
-  snapBasedOffset
+  numGroups
 }: AutoOffsetAdjustmentProps): number => {
   let activeItemCrossOffset = 0;
   let currentGroupCrossSize = 0;
@@ -131,13 +127,5 @@ export const calculateActiveItemCrossOffset = ({
     }
   }
 
-  const activeItemIndex = keyToIndex[activeItemKey];
-  const itemAtActiveIndexKey = indexToKey[activeItemIndex!];
-  const itemAtActiveIndexOffset =
-    itemPositions[itemAtActiveIndexKey!]?.[crossCoordinate] ?? 0;
-
-  return Math.max(
-    0,
-    itemAtActiveIndexOffset - activeItemCrossOffset + snapBasedOffset
-  );
+  return activeItemCrossOffset;
 };

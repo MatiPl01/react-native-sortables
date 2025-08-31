@@ -50,6 +50,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       enableActiveItemSnap,
       itemPositions,
       keyToIndex,
+      prevActiveItemKey,
       snapOffsetX,
       snapOffsetY,
       sortEnabled,
@@ -57,7 +58,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     } = useCommonValuesContext();
     const { activeHandleMeasurements, activeHandleOffset } =
       useCustomHandleContext() ?? {};
-    const hasAutoScroll = !!useAutoScrollContext();
+    const { scrollBy } = useAutoScrollContext() ?? {};
 
     const additionalCrossOffset = useMutableValue<null | number>(null);
     const layoutUpdateProgress = useMutableValue<null | number>(null);
@@ -65,14 +66,11 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const context = useMutableValue<StateContext>({});
 
     const adaptLayoutProps = useCallback(
-      (props: GridLayoutProps, prevProps: GridLayoutProps | null) => {
+      (
+        props: GridLayoutProps,
+        prevProps: GridLayoutProps | null
+      ): GridLayoutProps => {
         'worklet';
-        const activeKey = activeItemKey.value;
-        if (activeKey === null) {
-          additionalCrossOffset.value = null;
-          return props;
-        }
-
         const {
           gaps,
           indexToKey,
@@ -85,10 +83,49 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         const prevCrossIteSizes = isVertical
           ? prevProps?.itemHeights
           : prevProps?.itemWidths;
-        const sizesChanged = crossItemSizes !== prevCrossIteSizes;
+        const crossOffsetsChanged =
+          crossItemSizes !== prevCrossIteSizes ||
+          gaps.cross !== prevProps?.gaps.cross;
 
-        if (!sizesChanged) {
+        if (!crossOffsetsChanged) {
           return { ...props, startCrossOffset: additionalCrossOffset.value };
+        }
+
+        const crossCoordinate = isVertical ? 'y' : 'x';
+        const autoOffsetAdjustmentCommonProps = {
+          crossGap: gaps.cross,
+          crossItemSizes,
+          indexToKey: indexToKey,
+          numGroups
+        } as const;
+
+        const activeKey = activeItemKey.value;
+        if (activeKey === null) {
+          if (additionalCrossOffset.value !== null && prevCrossIteSizes) {
+            additionalCrossOffset.value = null;
+            const prevActiveKey = prevActiveItemKey.value!;
+            const oldCrossOffset =
+              itemPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
+            const newCrossOffset = calculateActiveItemCrossOffset({
+              ...autoOffsetAdjustmentCommonProps,
+              activeItemKey: prevActiveKey
+            });
+
+            console.log('>>>', oldCrossOffset, newCrossOffset);
+
+            const distance = newCrossOffset - oldCrossOffset;
+            scrollBy?.(distance, false);
+
+            return {
+              ...props,
+              [isVertical ? 'itemHeights' : 'itemWidths']: prevCrossIteSizes,
+              requestNextLayout: true,
+              shouldAnimateLayout: false,
+              startCrossOffset: distance
+            };
+          }
+
+          return props;
         }
 
         let snapBasedOffset = 0;
@@ -110,18 +147,20 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
             : touchPosition.value.x - activeItemPosition.value.x - offset.x;
         }
 
-        const startCrossOffset = calculateActiveItemCrossOffset({
-          activeItemKey: activeKey,
-          crossCoordinate: isVertical ? 'y' : 'x',
-          crossGap: gaps.cross,
-          crossItemSizes,
-          indexToKey: indexToKey,
-          itemPositions: itemPositions.value,
-          keyToIndex: keyToIndex.value,
-          numGroups,
-          snapBasedOffset
+        const activeItemCrossOffset = calculateActiveItemCrossOffset({
+          ...autoOffsetAdjustmentCommonProps,
+          activeItemKey: activeKey
         });
 
+        const activeItemIndex = keyToIndex.value[activeKey];
+        const itemAtActiveIndexKey = indexToKey[activeItemIndex!];
+        const itemAtActiveIndexOffset =
+          itemPositions.value[itemAtActiveIndexKey!]?.[crossCoordinate] ?? 0;
+
+        const startCrossOffset = Math.max(
+          0,
+          itemAtActiveIndexOffset - activeItemCrossOffset + snapBasedOffset
+        );
         additionalCrossOffset.value = startCrossOffset;
 
         return {
@@ -139,12 +178,15 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         enableActiveItemSnap,
         itemPositions,
         keyToIndex,
+        prevActiveItemKey,
         snapOffsetX,
         snapOffsetY,
-        touchPosition
+        touchPosition,
+        scrollBy
       ]
     );
 
+    // TODO - check if we have to block sorting or if there is a better way to handle this
     // useAnimatedReaction(
     //   () => additionalCrossOffset.value !== null,
     //   isManaged => {

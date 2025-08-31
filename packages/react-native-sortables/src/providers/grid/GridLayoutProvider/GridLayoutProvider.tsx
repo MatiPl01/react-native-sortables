@@ -5,7 +5,7 @@ import { useAnimatedReaction } from 'react-native-reanimated';
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import { useMutableValue } from '../../../integrations/reanimated';
-import type { GridLayoutContextType } from '../../../types';
+import type { GridLayoutContextType, GridLayoutProps } from '../../../types';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
@@ -111,6 +111,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   // GRID LAYOUT UPDATER
   useAnimatedReaction(
     () => ({
+      _: layoutRequestId.value, // Helper to force layout re-calculation
       gaps: {
         cross: crossGap.value,
         main: mainGap.value
@@ -122,9 +123,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       numGroups
     }),
     (props, prevProps) => {
-      const layout = calculateLayout(
-        adaptLayoutProps?.(props, prevProps) ?? props
-      );
+      const adaptedProps: GridLayoutProps =
+        adaptLayoutProps?.(props, prevProps) ?? props;
+      const layout = calculateLayout(adaptedProps);
       if (!layout) {
         return;
       }
@@ -137,7 +138,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         shouldUpdateContainerDimensions(
           isVertical ? containerHeight.value : containerWidth.value,
           layout.containerCrossSize,
-          !!additionalCrossOffset?.value
+          adaptedProps.startCrossOffset !== undefined
         )
       ) {
         applyControlledContainerDimensions({
@@ -148,26 +149,30 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       // Update content bounds
       if (contentBounds) contentBounds.value = layout.contentBounds;
 
-      // On the web, animate layout only if parent container is not resized
-      // (e.g. skip animation when the browser window is resized)
-      if (IS_WEB) {
-        const shouldAnimate =
-          !prevProps?.itemHeights ||
-          !prevProps?.itemWidths ||
-          (isVertical
-            ? props.itemWidths === prevProps?.itemWidths
-            : props.itemHeights === prevProps?.itemHeights);
+      if (adaptedProps.shouldAnimateLayout !== undefined) {
+        shouldAnimateLayout.value = adaptedProps.shouldAnimateLayout;
+      } else {
+        // On the web, animate layout only if parent container is not resized
+        // (e.g. skip animation when the browser window is resized)
+        if (IS_WEB) {
+          const shouldAnimate =
+            !prevProps?.itemHeights ||
+            !prevProps?.itemWidths ||
+            (isVertical
+              ? props.itemWidths === prevProps?.itemWidths
+              : props.itemHeights === prevProps?.itemHeights);
 
-        if (shouldAnimateTimeoutId.value !== null) {
-          clearTimeout(shouldAnimateTimeoutId.value);
+          if (shouldAnimateTimeoutId.value !== null) {
+            clearTimeout(shouldAnimateTimeoutId.value);
+          }
+          if (!shouldAnimate) {
+            shouldAnimateLayout.value = false;
+          }
+          // Enable after timeout when the user stops resizing the browser window
+          shouldAnimateTimeoutId.value = setTimeout(() => {
+            shouldAnimateLayout.value = true;
+          }, 100);
         }
-        if (!shouldAnimate) {
-          shouldAnimateLayout.value = false;
-        }
-        // Enable after timeout when the user stops resizing the browser window
-        shouldAnimateTimeoutId.value = setTimeout(() => {
-          shouldAnimateLayout.value = true;
-        }, 100);
       }
 
       // DEBUG ONLY
