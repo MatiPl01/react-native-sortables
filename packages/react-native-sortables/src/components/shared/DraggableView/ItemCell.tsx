@@ -11,7 +11,8 @@ import Animated from 'react-native-reanimated';
 import { HIDDEN_X_OFFSET } from '../../../constants';
 import type {
   AnimatedStyleProp,
-  LayoutAnimation
+  LayoutAnimation,
+  LayoutTransition
 } from '../../../integrations/reanimated';
 import { useItemDecorationStyle } from '../../../providers';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
@@ -22,10 +23,11 @@ export type ItemCellProps = PropsWithChildren<{
   activationAnimationProgress: SharedValue<number>;
   innerCellStyle: AnimatedStyleProp;
   cellStyle: AnimatedStyleProp;
-  onLayout?: (event: LayoutChangeEvent) => void;
+  layout?: LayoutTransition;
   hidden?: boolean;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
+  onLayout?: (event: LayoutChangeEvent) => void;
 }>;
 
 export default function ItemCell({
@@ -38,6 +40,7 @@ export default function ItemCell({
   innerCellStyle,
   isActive,
   itemKey,
+  layout,
   onLayout
 }: ItemCellProps) {
   const decorationStyle = useItemDecorationStyle(
@@ -47,7 +50,7 @@ export default function ItemCell({
   );
 
   return (
-    <Animated.View style={cellStyle}>
+    <Animated.View layout={layout} style={cellStyle}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}

@@ -17,8 +17,8 @@ import {
   ItemContextProvider,
   useCommonValuesContext,
   useDragContext,
+  useItemLayout,
   useItemPanGesture,
-  useItemStyles,
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
@@ -50,7 +50,11 @@ function DraggableView({
   const [isHidden, setIsHidden] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
-  const layoutStyle = useItemStyles(key, isActive, activationAnimationProgress);
+  const { layout, style: layoutStyle } = useItemLayout(
+    key,
+    isActive,
+    activationAnimationProgress
+  );
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
   useEffect(() => {
@@ -82,6 +86,7 @@ function DraggableView({
         innerCellStyle={controlledDimensionsStyle}
         isActive={isActive}
         itemKey={key}
+        layout={layout}
         onLayout={onLayout}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           {children}

@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 
-import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
+import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB, isFabric } from '../constants';
 import { useDragEndHandler } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
 import {
@@ -204,7 +204,10 @@ function SortableGridInner<I>({
               `calc((100% - ${columnGap.value * (groups - 1)}px) / ${groups})` as DimensionValue
           }
         : {
-            flexBasis: mainGroupSize.value ? undefined : `${100 / groups}%`,
+            flexBasis:
+              mainGroupSize.value && isFabric()
+                ? undefined
+                : `${100 / groups}%`,
             paddingHorizontal: columnGap.value / 2,
             width: mainGroupSize.value
           }
