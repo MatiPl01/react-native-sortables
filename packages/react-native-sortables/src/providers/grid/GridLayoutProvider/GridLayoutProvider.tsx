@@ -49,7 +49,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
-  const { additionalCrossOffset } = useAutoOffsetAdjustmentContext() ?? {};
+  const { adaptLayoutProps, additionalCrossOffset } =
+    useAutoOffsetAdjustmentContext() ?? {};
   const { contentBounds } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
@@ -120,8 +121,10 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       itemWidths: itemWidths.value,
       numGroups
     }),
-    (props, previousProps) => {
-      const layout = calculateLayout(props, additionalCrossOffset?.value ?? 0);
+    (props, prevProps) => {
+      const layout = calculateLayout(
+        adaptLayoutProps?.(props, prevProps) ?? props
+      );
       if (!layout) {
         return;
       }
@@ -134,7 +137,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         shouldUpdateContainerDimensions(
           isVertical ? containerHeight.value : containerWidth.value,
           layout.containerCrossSize,
-          typeof additionalCrossOffset?.value === 'number'
+          !!additionalCrossOffset?.value
         )
       ) {
         applyControlledContainerDimensions({
@@ -149,11 +152,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       // (e.g. skip animation when the browser window is resized)
       if (IS_WEB) {
         const shouldAnimate =
-          !previousProps?.itemHeights ||
-          !previousProps?.itemWidths ||
+          !prevProps?.itemHeights ||
+          !prevProps?.itemWidths ||
           (isVertical
-            ? props.itemWidths === previousProps?.itemWidths
-            : props.itemHeights === previousProps?.itemHeights);
+            ? props.itemWidths === prevProps?.itemWidths
+            : props.itemHeights === prevProps?.itemHeights);
 
         if (shouldAnimateTimeoutId.value !== null) {
           clearTimeout(shouldAnimateTimeoutId.value);

@@ -1,3 +1,4 @@
+import type { Maybe } from '../../helperTypes';
 import type { Coordinate, ItemSizes, Vector } from './shared';
 
 export type GridLayoutProps = {
@@ -10,6 +11,7 @@ export type GridLayoutProps = {
   indexToKey: Array<string>;
   isVertical: boolean;
   numGroups: number;
+  startCrossOffset?: Maybe<number>;
 };
 
 export type GridLayout = {

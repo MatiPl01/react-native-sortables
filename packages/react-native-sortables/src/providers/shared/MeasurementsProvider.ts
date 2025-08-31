@@ -119,10 +119,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
             dimension: Dimension,
             sizes: SharedValue<ItemSizes>
           ) => {
+            const newSizes = { ...(sizes.value as Record<string, number>) };
             for (const [k, dims] of ctx.queuedMeasurements.entries()) {
-              (sizes.value as Record<string, number>)[k] = dims[dimension];
+              newSizes[k] = dims[dimension];
             }
-            sizes.modify();
+            sizes.value = newSizes;
           };
 
           if (!isWidthControlled) {
