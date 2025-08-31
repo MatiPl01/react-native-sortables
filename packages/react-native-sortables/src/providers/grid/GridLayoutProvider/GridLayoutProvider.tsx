@@ -4,6 +4,7 @@ import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
+import { useMutableValue } from '../../../integrations/reanimated';
 import type { GridLayoutContextType } from '../../../types';
 import {
   useAutoScrollContext,
@@ -60,6 +61,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const mainGap = isVertical ? columnGap : rowGap;
   const crossGap = isVertical ? rowGap : columnGap;
 
+  const mainGroupSize = useMutableValue<null | number>(null);
+
   // MAIN GROUP SIZE UPDATER
   useAnimatedReaction(
     () => {
@@ -83,6 +86,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       } else {
         itemHeights.value = value;
       }
+      mainGroupSize.value = value;
 
       // DEBUG ONLY
       if (debugMainGapRects) {
@@ -168,6 +172,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       crossGap,
       isVertical,
       mainGap,
+      mainGroupSize,
       numGroups
     }
   };

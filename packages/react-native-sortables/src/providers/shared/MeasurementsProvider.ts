@@ -19,6 +19,13 @@ import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 
+const DEBOUNCE_DURATION = 100;
+
+type StateContext = {
+  measuredItemKeys: Set<string>;
+  queuedMeasurements: Map<string, Dimensions>;
+};
+
 type MeasurementsProviderProps = {
   itemsCount: number;
 };
@@ -40,10 +47,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
     useMultiZoneContext() ?? {};
 
-  const measuredItemsCount = useMutableValue(0);
-  const queuedMeasurements = useMutableValue<Map<string, Dimensions> | null>(
-    null
-  );
+  const context = useMutableValue<null | StateContext>(null);
   const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
   const debounce = useAnimatedDebounce();
 
@@ -79,19 +83,23 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       previousItemDimensionsRef.current[key] = dimensions;
 
       runOnUI(() => {
-        queuedMeasurements.value ??= new Map();
-        const queued = queuedMeasurements.value;
+        context.value ??= {
+          measuredItemKeys: new Set(),
+          queuedMeasurements: new Map()
+        };
+
+        const ctx = context.value;
 
         const isNewItem =
-          !queued.get(key) &&
+          !ctx.measuredItemKeys.has(key) &&
           (resolveDimension(itemWidths.value, key) === null ||
             resolveDimension(itemHeights.value, key) === null);
 
         if (isNewItem) {
-          measuredItemsCount.value += 1;
+          ctx.measuredItemKeys.add(key);
         }
 
-        queued.set(key, dimensions);
+        ctx.queuedMeasurements.set(key, dimensions);
 
         if (activeItemKey.value === key) {
           activeItemDimensions.value = dimensions;
@@ -102,7 +110,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
         // Update the array of item dimensions only after all items have been
         // measured to reduce the number of times animated reactions are triggered
-        if (measuredItemsCount.value !== itemsCount) {
+        if (ctx.measuredItemKeys.size !== itemsCount) {
           return;
         }
 
@@ -111,7 +119,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
             dimension: Dimension,
             sizes: SharedValue<ItemSizes>
           ) => {
-            for (const [k, dims] of queued.entries()) {
+            for (const [k, dims] of ctx.queuedMeasurements.entries()) {
               (sizes.value as Record<string, number>)[k] = dims[dimension];
             }
             sizes.modify();
@@ -124,11 +132,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
             updateDimension('height', itemHeights);
           }
 
-          queuedMeasurements.value = null;
+          ctx.queuedMeasurements.clear();
           debounce.cancel();
         };
 
-        if (isNewItem || queued.size === itemsCount) {
+        if (isNewItem || ctx.queuedMeasurements.size === itemsCount) {
           // Update dimensions immediately to avoid unnecessary delays when:
           // - measurements were triggered because of adding new items and all new items have been measured
           // - all sortable container items' dimensions have changed (e.g. when someone creates collapsible
@@ -137,7 +145,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         } else {
           // In all other cases, debounce the update to reduce the number of
           // updates when dimensions change many times within a short period of time
-          debounce.schedule(updateDimensions, 100);
+          debounce.schedule(updateDimensions, DEBOUNCE_DURATION);
         }
       })();
     }
@@ -159,10 +167,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         if (itemHeights.value && typeof itemHeights.value === 'object') {
           delete itemHeights.value[key];
         }
-        measuredItemsCount.value -= 1;
+        context.value?.measuredItemKeys.delete(key);
       })();
     },
-    [controlledItemDimensions, itemHeights, itemWidths, measuredItemsCount]
+    [controlledItemDimensions, itemHeights, itemWidths, context]
   );
 
   const handleContainerMeasurement = useCallback(
@@ -196,7 +204,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
       if (!usesAbsoluteLayout.value) {
         // Add timeout for safety, to prevent too many layout recalculations
-        // in a short period of time (this may cause issues on low end devices)
+        // in a short period of time (this may cause issues on low-end devices)
         setAnimatedTimeout(() => {
           usesAbsoluteLayout.value = true;
         }, 100);
@@ -213,8 +221,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   const resetMeasurements = useCallback(() => {
     previousItemDimensionsRef.current = {};
     runOnUI(() => {
-      measuredItemsCount.value = 0;
-      queuedMeasurements.value = null;
+      context.value = null;
       if (typeof itemWidths.value === 'object') {
         itemWidths.value = {};
       }
@@ -222,7 +229,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         itemHeights.value = {};
       }
     })();
-  }, [itemHeights, itemWidths, measuredItemsCount, queuedMeasurements]);
+  }, [itemHeights, itemWidths, context]);
 
   return {
     value: {
