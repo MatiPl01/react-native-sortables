@@ -48,8 +48,8 @@ export default function CollapsibleItemsExample() {
           overflow='visible'
           renderItem={renderItem}
           rowGap={10}
-          scrollableRef={scrollableRef} // TODO - add correct auto scroll support for collapsible items
-          autoAdjustOffsetDuringDrag
+          // scrollableRef={scrollableRef} // TODO - add correct auto scroll support for collapsible items
+          // autoAdjustOffsetDuringDrag
           onActiveItemDropped={() => setCollapsed(false)}
           onDragStart={() => setCollapsed(true)}
         />
