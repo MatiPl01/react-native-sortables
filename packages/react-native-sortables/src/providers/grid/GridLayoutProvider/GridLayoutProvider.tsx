@@ -62,6 +62,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const crossGap = isVertical ? rowGap : columnGap;
 
   const mainGroupSize = useMutableValue<null | number>(null);
+  const shouldAnimateTimeoutId = useMutableValue(-1);
 
   // MAIN GROUP SIZE UPDATER
   useAnimatedReaction(
@@ -144,13 +145,23 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       // On the web, animate layout only if parent container is not resized
       // (e.g. skip animation when the browser window is resized)
-      shouldAnimateLayout.value =
-        !IS_WEB ||
-        !previousProps?.itemHeights ||
-        !previousProps?.itemWidths ||
-        isVertical
-          ? props.itemWidths === previousProps?.itemWidths
-          : props.itemHeights === previousProps?.itemHeights;
+      if (IS_WEB) {
+        const shouldAnimate =
+          !previousProps?.itemHeights ||
+          !previousProps?.itemWidths ||
+          (isVertical
+            ? props.itemWidths === previousProps?.itemWidths
+            : props.itemHeights === previousProps?.itemHeights);
+
+        clearTimeout(shouldAnimateTimeoutId.value);
+        if (!shouldAnimate) {
+          shouldAnimateLayout.value = false;
+        }
+        // Enable after timeout when the user stops resizing the browser window
+        shouldAnimateTimeoutId.value = setTimeout(() => {
+          shouldAnimateLayout.value = true;
+        }, 100);
+      }
 
       // DEBUG ONLY
       if (debugCrossGapRects) {
