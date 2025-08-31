@@ -30,6 +30,17 @@ const HIDDEN_STYLE: ViewStyle = {
   position: 'absolute'
 };
 
+/**
+ * Handles item positioning for Paper (old React Native architecture).
+ *
+ * On Paper, we can safely use layout props (top/left) for positioning because:
+ * - Child onLayout callbacks are typically not triggered when parent position changes
+ * - This allows for efficient animation without performance issues
+ * - TextInput components work properly with layout-based positioning
+ *
+ * We must use layout props instead of transforms to ensure TextInput components
+ * work correctly (see issue https://github.com/MatiPl01/react-native-sortables/issues/430)
+ */
 function useItemLayoutStylePaper(
   position: SharedValue<null | Vector>,
   zIndex: SharedValue<number>
@@ -54,6 +65,25 @@ function useItemLayoutStylePaper(
   });
 }
 
+/**
+ * Handles item positioning for Fabric (new React Native architecture).
+ *
+ * On Fabric, there's a performance issue where any change to parent layout
+ * triggers child onLayout callbacks, causing numerous calls from C++ to JS
+ * and significant performance loss. This is especially problematic when one
+ * of the items is being dragged around.
+ *
+ * To solve this, we use a hybrid approach:
+ * 1. Use layout props (top/left) when items are not being animated
+ * 2. Use layout transitions for inactive items to animate their position
+ * 3. Switch to transforms only for the active item when it's being dragged around
+ *
+ * Since Fabric updates non-layout and layout props simultaneously, it's safe
+ * to switch between transforms and layout props without visual glitches.
+ *
+ * We still use layout props for TextInput compatibility
+ * (see issue https://github.com/MatiPl01/react-native-sortables/issues/430)
+ */
 function useItemLayoutStyleFabric(
   position: SharedValue<null | Vector>,
   zIndex: SharedValue<number>,
