@@ -276,23 +276,17 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     (
       touch: TouchData,
       key: string,
-      position: Vector,
-      dimensions: Dimensions,
+      itemPosition: Vector,
+      itemDimensions: Dimensions,
       activationAnimationProgress: SharedValue<number>
     ) => {
       'worklet';
-      const containerMeasurements = measure(containerRef);
-
-      if (!position || !dimensions || !containerMeasurements) {
-        return;
-      }
-
       activeAnimationProgress.value = 0;
       activeItemDropped.value = false;
       prevActiveItemKey.value = null;
       activeItemKey.value = key;
-      activeItemPosition.value = position;
-      activeItemDimensions.value = dimensions;
+      activeItemPosition.value = itemPosition;
+      activeItemDimensions.value = itemDimensions;
       dragStartIndex.value = keyToIndex.value[key] ?? -1;
       activationState.value = DragActivationState.ACTIVE;
 
@@ -300,7 +294,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         activeContainerId.value = containerId;
       }
       if (multiZoneActiveItemDimensions) {
-        multiZoneActiveItemDimensions.value = dimensions;
+        multiZoneActiveItemDimensions.value = itemDimensions;
       }
 
       updateLayer?.(LayerState.FOCUSED);
@@ -311,15 +305,18 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       // Touch position relative to the top-left corner of the sortable
       // container
-      const touchX = touch.absoluteX - containerMeasurements.pageX;
-      const touchY = touch.absoluteY - containerMeasurements.pageY;
-
-      touchPosition.value = { x: touchX, y: touchY };
-      dragStartTouchPosition.value = touchPosition.value;
       dragStartItemTouchOffset.value = {
-        x: touchX - position.x,
-        y: touchY - position.y
+        x: touch.x + (activeHandleOffset?.value?.x ?? 0),
+        y: touch.y + (activeHandleOffset?.value?.y ?? 0)
       };
+      // Must be calculated relative to the item position instead of using
+      // measure on the containerRef, because measure doesn't work properly
+      // on Android on Fabric and returns wrong value on the second measurement
+      touchPosition.value = {
+        x: itemPosition.x + dragStartItemTouchOffset.value.x,
+        y: itemPosition.y + dragStartItemTouchOffset.value.y
+      };
+      dragStartTouchPosition.value = touchPosition.value;
 
       const hasInactiveAnimation =
         inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
@@ -348,13 +345,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationAnimationDuration,
       activeAnimationProgress,
       activeContainerId,
+      activeHandleOffset,
       activeItemDimensions,
       activeItemDropped,
       activationState,
       activeItemKey,
       activeItemPosition,
       containerId,
-      containerRef,
       dragStartIndex,
       dragStartItemTouchOffset,
       dragStartTouchPosition,
@@ -396,6 +393,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
+      // This should never happen but is added here for extra safety
       if (!usesAbsoluteLayout.value) {
         const measurements = measure(containerRef);
         if (measurements) {
@@ -416,22 +414,22 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           return;
         }
 
-        const position = itemPositions.value[key];
-        const dimensions = getItemDimensions(
+        const itemPosition = itemPositions.value[key];
+        const itemDimensions = getItemDimensions(
           key,
           itemWidths.value,
           itemHeights.value
         );
 
-        if (!position || !dimensions) {
+        if (!itemPosition || !itemDimensions) {
           return;
         }
 
         handleDragStart(
           touch,
           key,
-          position,
-          dimensions,
+          itemPosition,
+          itemDimensions,
           activationAnimationProgress
         );
         activate();
