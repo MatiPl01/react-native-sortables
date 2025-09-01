@@ -1,0 +1,96 @@
+---
+sidebar_position: 9
+description: ''
+---
+
+# Custom Shadow
+
+## Description
+
+This example demonstrates how to create a **custom shadow** for the active item during drag. By disabling the default shadow with `activeItemShadowOpacity={0}` and using the [useItemContext](/hooks/useItemContext) hook, you can animate the `box-shadow` property of the item based on the activation animation progress.
+
+This is particularly useful when you want to add shadows on **Android**, where shadows are not supported by default and must be implemented by the user.
+
+## Source Code
+
+```tsx
+import { memo, useCallback } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle
+} from 'react-native-reanimated';
+import type { SortableGridRenderItem } from 'react-native-sortables';
+import Sortable, { useItemContext } from 'react-native-sortables';
+
+const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
+
+export default function Example() {
+  const renderItem = useCallback<SortableGridRenderItem<string>>(
+    ({ item }) => <GridItem item={item} />,
+    []
+  );
+
+  return (
+    <View style={styles.container}>
+      <Sortable.Grid
+        // Disable default shadow as we will apply our
+        // box-shadow in the item component
+        activeItemShadowOpacity={0}
+        columnGap={10}
+        columns={3}
+        data={DATA}
+        renderItem={renderItem}
+        rowGap={10}
+      />
+    </View>
+  );
+}
+
+const GridItem = memo(function GridItem({ item }: { item: string }) {
+  const { activationAnimationProgress } = useItemContext();
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const color = interpolateColor(
+      activationAnimationProgress.value,
+      [0, 1],
+      ['transparent', '#1a433f']
+    );
+    return {
+      boxShadow: `0 5px 10px ${color}`
+    };
+  });
+
+  return (
+    <Animated.View style={[styles.card, animatedStyle]}>
+      <Text style={styles.text}>{item}</Text>
+    </Animated.View>
+  );
+});
+
+const styles = StyleSheet.create({
+  card: {
+    alignItems: 'center',
+    backgroundColor: '#36877F',
+    borderRadius: 10,
+    height: 100,
+    justifyContent: 'center'
+  },
+  container: {
+    padding: 16
+  },
+  text: {
+    color: 'white',
+    fontWeight: 'bold'
+  }
+});
+```
+
+## Result
+
+import customShadowVideoAndroid from '@site/static/video/grid-custom-shadow-android.mp4';
+import customShadowVideoIOS from '@site/static/video/grid-custom-shadow-ios.mp4';
+
+| Android                                                                                                                                            | iOS                                                                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| <div style={{ textAlign: 'center' }}><video autoPlay loop muted width="100%" style={{ maxWidth: '300px' }} src={customShadowVideoAndroid} /></div> | <div style={{ textAlign: 'center' }}><video autoPlay loop muted width="100%" style={{ maxWidth: '300px' }} src={customShadowVideoIOS} /></div> |

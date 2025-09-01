@@ -1,3 +1,5 @@
+import type { ViewStyle } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   interpolate,
@@ -7,14 +9,15 @@ import {
   withTiming
 } from 'react-native-reanimated';
 
-import { IS_WEB } from '../../../constants';
+import { IS_ANDROID, IS_WEB } from '../../../constants';
+import type { AnimatedStyleProp } from '../../../integrations/reanimated';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
-export default function useItemDecorationStyle(
+export default function useItemDecorationStyles(
   key: string,
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
-) {
+): AnimatedStyleProp {
   const {
     activationAnimationDuration,
     activeItemOpacity,
@@ -51,15 +54,17 @@ export default function useItemDecorationStyle(
       [1, inactiveItemScale.value]
     );
 
-    const shadowColor = interpolateColor(
-      interpolate(progress, [0, 1], [0, activeItemShadowOpacity.value]),
-      [0, 1],
-      ['transparent', 'black']
-    );
-
-    const shadow = IS_WEB
-      ? { filter: `drop-shadow(0px 0px 5px ${shadowColor})` }
-      : { shadowColor };
+    let shadow;
+    if (!IS_ANDROID) {
+      const shadowColor = interpolateColor(
+        interpolate(progress, [0, 1], [0, activeItemShadowOpacity.value]),
+        [0, 1],
+        ['transparent', 'black']
+      );
+      shadow = IS_WEB
+        ? { filter: `drop-shadow(0px 0px 5px ${shadowColor})` }
+        : { shadowColor };
+    }
 
     return {
       ...shadow,
@@ -80,5 +85,22 @@ export default function useItemDecorationStyle(
     };
   });
 
-  return useAnimatedStyle(() => decoration.value);
+  return [styles.decoration, useAnimatedStyle(() => decoration.value)];
 }
+
+const styles = StyleSheet.create({
+  decoration: Platform.select<ViewStyle>({
+    default: {},
+    native: {
+      shadowOffset: {
+        height: 0,
+        width: 0
+      },
+      shadowOpacity: 1,
+      shadowRadius: 5
+    },
+    web: {
+      flex: 1
+    }
+  })
+});
