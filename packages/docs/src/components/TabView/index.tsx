@@ -1,12 +1,12 @@
 import { clsx } from 'clsx';
-import type { ReactElement } from 'react';
 import type React from 'react';
+import type { ReactElement } from 'react';
 import { Children, useMemo, useState } from 'react';
 
 import styles from './styles.module.css';
 
 type TabsProps = {
-  children: Array<React.ReactElement<TabItemProps>>;
+  children: Array<ReactElement<TabItemProps>>;
 };
 
 function TabView({ children }: TabsProps) {

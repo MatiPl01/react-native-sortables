@@ -2,6 +2,8 @@
 sidebar_position: 2
 ---
 
+import PlatformBadges from '@site/src/components/PlatformBadges';
+
 # Props
 
 :::info
@@ -385,13 +387,19 @@ Opacity to which the pressed item is animated when active.
 
 ---
 
-### activeItemShadowOpacity
+### activeItemShadowOpacity<PlatformBadges platforms={['ios', 'web']} />
 
 Shadow opacity of the active item.
 
 | type                 | default | required |
 | -------------------- | ------- | -------- |
 | `Animatable<number>` | 0.2     | NO       |
+
+:::info
+
+If you want to use shadows on **Android**, please refer to the [Custom Shadow](/grid/examples/custom-shadow) example.
+
+:::
 
 ---
 

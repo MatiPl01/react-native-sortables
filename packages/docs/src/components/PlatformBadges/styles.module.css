@@ -1,0 +1,58 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin: 0 0.125rem;
+}
+
+.badgeContainer {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.125rem;
+  margin: 0 0 0 0.5rem;
+  vertical-align: middle;
+  transform: translateY(-0.1em);
+}
+
+.ios {
+  background-color: rgba(0, 122, 255, 0.15);
+  color: #007aff;
+  border: 1px solid rgba(0, 122, 255, 0.25);
+}
+
+.android {
+  background-color: rgba(61, 220, 132, 0.15);
+  color: #3ddc84;
+  border: 1px solid rgba(61, 220, 132, 0.25);
+}
+
+.web {
+  background-color: rgba(255, 107, 53, 0.15);
+  color: #ff6b35;
+  border: 1px solid rgba(255, 107, 53, 0.25);
+}
+
+/* Dark mode support */
+[data-theme='dark'] .ios {
+  background-color: rgba(0, 122, 255, 0.25);
+  color: #5ac8fa;
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+[data-theme='dark'] .android {
+  background-color: rgba(61, 220, 132, 0.25);
+  color: #7cff9b;
+  border-color: rgba(61, 220, 132, 0.4);
+}
+
+[data-theme='dark'] .web {
+  background-color: rgba(255, 107, 53, 0.25);
+  color: #ff8a65;
+  border-color: rgba(255, 107, 53, 0.4);
+}

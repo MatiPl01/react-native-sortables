@@ -1,5 +1,5 @@
 export { default as useDebugBoundingBox } from './useDebugBoundingBox';
-export { default as useItemDecorationStyle } from './useItemDecorationStyle';
+export { default as useItemDecorationStyles } from './useItemDecorationStyles';
 export { default as useItemDimensions } from './useItemDimensions';
 export { default as useItemStyles } from './useItemLayoutStyle';
 export { default as useItemPanGesture } from './useItemPanGesture';
