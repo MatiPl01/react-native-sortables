@@ -4,7 +4,10 @@ import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
-import { useMutableValue } from '../../../integrations/reanimated';
+import {
+  setAnimatedTimeout,
+  useMutableValue
+} from '../../../integrations/reanimated';
 import type { GridLayoutContextType, GridLayoutProps } from '../../../types';
 import {
   useAutoScrollContext,
@@ -49,8 +52,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
-  const { adaptLayoutProps, additionalCrossOffset } =
-    useAutoOffsetAdjustmentContext() ?? {};
+  const { adaptLayoutProps } = useAutoOffsetAdjustmentContext() ?? {};
   const { contentBounds } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
@@ -63,9 +65,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const crossGap = isVertical ? rowGap : columnGap;
 
   const mainGroupSize = useMutableValue<null | number>(null);
-  const shouldAnimateTimeoutId = useMutableValue<null | ReturnType<
-    typeof setTimeout
-  >>(null);
+  const layoutRequestId = useMutableValue(0);
 
   // MAIN GROUP SIZE UPDATER
   useAnimatedReaction(
@@ -154,25 +154,19 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       } else {
         // On the web, animate layout only if parent container is not resized
         // (e.g. skip animation when the browser window is resized)
-        if (IS_WEB) {
-          const shouldAnimate =
-            !prevProps?.itemHeights ||
-            !prevProps?.itemWidths ||
-            (isVertical
-              ? props.itemWidths === prevProps?.itemWidths
-              : props.itemHeights === prevProps?.itemHeights);
+        shouldAnimateLayout.value =
+          !IS_WEB ||
+          !prevProps?.itemHeights ||
+          !prevProps?.itemWidths ||
+          isVertical
+            ? props.itemWidths === prevProps?.itemWidths
+            : props.itemHeights === prevProps?.itemHeights;
+      }
 
-          if (shouldAnimateTimeoutId.value !== null) {
-            clearTimeout(shouldAnimateTimeoutId.value);
-          }
-          if (!shouldAnimate) {
-            shouldAnimateLayout.value = false;
-          }
-          // Enable after timeout when the user stops resizing the browser window
-          shouldAnimateTimeoutId.value = setTimeout(() => {
-            shouldAnimateLayout.value = true;
-          }, 100);
-        }
+      if (adaptedProps.requestNextLayout) {
+        setAnimatedTimeout(() => {
+          // layoutRequestId.value++;
+        });
       }
 
       // DEBUG ONLY

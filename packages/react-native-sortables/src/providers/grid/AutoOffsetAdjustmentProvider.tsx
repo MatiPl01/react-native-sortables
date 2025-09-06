@@ -1,12 +1,7 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import {
-  clamp,
-  measure,
-  useAnimatedReaction,
-  useScrollViewOffset
-} from 'react-native-reanimated';
+import { makeMutable, useAnimatedReaction } from 'react-native-reanimated';
 
 import {
   clearAnimatedTimeout,
@@ -15,11 +10,9 @@ import {
 } from '../../integrations/reanimated';
 import type {
   AutoOffsetAdjustmentContextType,
-  Coordinate,
-  GridLayoutProps,
-  ItemSizes
+  GridLayoutProps
 } from '../../types';
-import { calculateSnapOffset, resolveDimension, toPair } from '../../utils';
+import { calculateSnapOffset } from '../../utils';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
@@ -28,11 +21,17 @@ import {
 import { createProvider } from '../utils';
 import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
 
-const SORT_ENABLED_RESTORE_TIMEOUT = 300;
+enum AutoOffsetAdjustmentState {
+  ENABLED, // Auto adjustment is enabled but the additional cross offset is not applied yet
+  DISABLED, // Auto adjustment is disabled
+  APPLIED, // Additional cross offset is applied
+  RESET // Additional cross offset is being reset (intermediate state after APPLIED)
+}
 
 type StateContext = {
-  enabled?: boolean;
-  resetTimeoutId?: number;
+  state: AutoOffsetAdjustmentState;
+  resetTimeoutId: number;
+  prevSortEnabled: boolean;
 };
 
 type AutoOffsetAdjustmentProviderProps = PropsWithChildren<{
@@ -45,8 +44,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     guarded: false
   })<AutoOffsetAdjustmentProviderProps, AutoOffsetAdjustmentContextType>(({
     autoAdjustOffsetResetTimeout,
-    autoAdjustOffsetScrollPadding,
-    children
+    autoAdjustOffsetScrollPadding
   }) => {
     const {
       activeItemDimensions,
@@ -69,21 +67,35 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const additionalCrossOffset = useMutableValue<null | number>(null);
     const layoutUpdateProgress = useMutableValue<null | number>(null);
 
-    const context = useMutableValue<StateContext>({});
+    const contextRef = useRef<null | SharedValue<StateContext>>(null);
+    contextRef.current ??= makeMutable<StateContext>({
+      prevSortEnabled: sortEnabled.value,
+      resetTimeoutId: 0,
+      state: AutoOffsetAdjustmentState.DISABLED
+    });
+    const context = contextRef.current;
+
+    const disableAutoOffsetAdjustment = useCallback(() => {
+      'worklet';
+      clearAnimatedTimeout(context.value.resetTimeoutId);
+      context.value.state = AutoOffsetAdjustmentState.DISABLED;
+      sortEnabled.value = context.value.prevSortEnabled;
+    }, [context, sortEnabled]);
 
     useAnimatedReaction(
       () => activeItemDropped.value,
       dropped => {
-        const currentTimeoutId = context.value.resetTimeoutId;
-        if (currentTimeoutId !== undefined) {
-          clearAnimatedTimeout(currentTimeoutId);
-        }
-        if (dropped) {
-          context.value.resetTimeoutId = setAnimatedTimeout(() => {
-            context.value.enabled = false;
-          }, autoAdjustOffsetResetTimeout);
+        clearAnimatedTimeout(context.value.resetTimeoutId);
+        if (
+          dropped &&
+          context.value.state !== AutoOffsetAdjustmentState.DISABLED
+        ) {
+          context.value.resetTimeoutId = setAnimatedTimeout(
+            disableAutoOffsetAdjustment,
+            autoAdjustOffsetResetTimeout
+          );
         } else {
-          context.value.enabled = true;
+          context.value.state = AutoOffsetAdjustmentState.ENABLED;
         }
       }
     );
@@ -94,7 +106,12 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         prevProps: GridLayoutProps | null
       ): GridLayoutProps => {
         'worklet';
-        if (!context.value.enabled) {
+        const ctx = context.value;
+        if (ctx.state === AutoOffsetAdjustmentState.DISABLED) {
+          return props;
+        }
+        if (ctx.state === AutoOffsetAdjustmentState.RESET) {
+          disableAutoOffsetAdjustment();
           return props;
         }
 
@@ -126,39 +143,46 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           numGroups
         } as const;
 
-        const activeKey = activeItemKey.value ?? prevActiveItemKey.value;
+        const itemKey = activeItemKey.value ?? prevActiveItemKey.value;
 
         if (
-          activeKey === null ||
+          itemKey === null ||
           (activeItemKey.value === null &&
             additionalCrossOffset.value !== null &&
             prevCrossIteSizes !== null)
         ) {
-          context.value.enabled = false;
+          const prevActiveKey = prevActiveItemKey.value!;
+          const oldCrossOffset =
+            itemPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
+          const newCrossOffset = calculateActiveItemCrossOffset({
+            ...autoOffsetAdjustmentCommonProps,
+            activeItemKey: prevActiveKey
+          });
+
+          ctx.state = AutoOffsetAdjustmentState.RESET;
+
+          const offsetDiff = newCrossOffset - oldCrossOffset;
           additionalCrossOffset.value = null;
-          return props;
-          // // Disable as soon as the additional cross offset is reset
 
-          // const prevActiveKey = prevActiveItemKey.value!;
-          // const oldCrossOffset =
-          //   itemPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
-          // const newCrossOffset = calculateActiveItemCrossOffset({
-          //   ...autoOffsetAdjustmentCommonProps,
-          //   activeItemKey: prevActiveKey
-          // });
+          scrollBy?.(offsetDiff, false);
+          console.log(
+            '>>>',
+            oldCrossOffset,
+            newCrossOffset,
+            offsetDiff,
+            crossItemSizes,
+            prevCrossIteSizes
+          );
 
-          // console.log('>>>', oldCrossOffset, newCrossOffset);
-
-          // const distance = newCrossOffset - oldCrossOffset;
-          // scrollBy?.(distance, false);
-
-          // return {
-          //   ...props,
-          //   [isVertical ? 'itemHeights' : 'itemWidths']: prevCrossIteSizes,
-          //   requestNextLayout: true,
-          //   shouldAnimateLayout: false,
-          //   startCrossOffset: distance
-          // };
+          return {
+            ...props,
+            shouldAnimateLayout: false
+            // gaps: prevProps?.gaps ?? gaps,
+            // [isVertical ? 'itemHeights' : 'itemWidths']: prevCrossIteSizes,
+            // requestNextLayout: true,
+            // shouldAnimateLayout: false,
+            // startCrossOffset: offsetDiff
+          };
         }
 
         let snapBasedOffset = 0;
@@ -175,12 +199,6 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
             activeHandleMeasurements?.value ?? activeItemDimensions.value,
             activeHandleOffset?.value
           );
-          console.log(
-            'snap',
-            touchPosition.value.y,
-            activeItemPosition.value.y,
-            offset.y
-          );
           snapBasedOffset = isVertical
             ? touchPosition.value.y - activeItemPosition.value.y - offset.y
             : touchPosition.value.x - activeItemPosition.value.x - offset.x;
@@ -188,10 +206,10 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
 
         const activeItemCrossOffset = calculateActiveItemCrossOffset({
           ...autoOffsetAdjustmentCommonProps,
-          activeItemKey: activeKey
+          activeItemKey: itemKey
         });
 
-        const activeItemIndex = keyToIndex.value[activeKey];
+        const activeItemIndex = keyToIndex.value[itemKey];
         const itemAtActiveIndexKey = indexToKey[activeItemIndex!];
         const itemAtActiveIndexOffset =
           itemPositions.value[itemAtActiveIndexKey!]?.[crossCoordinate] ?? 0;
@@ -200,15 +218,10 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           0,
           itemAtActiveIndexOffset - activeItemCrossOffset + snapBasedOffset
         );
-        additionalCrossOffset.value = startCrossOffset;
 
-        console.log(
-          '>>>',
-          activeItemDimensions.value,
-          startCrossOffset,
-          snapBasedOffset,
-          activeKey
-        );
+        additionalCrossOffset.value = startCrossOffset;
+        ctx.prevSortEnabled = sortEnabled.value;
+        sortEnabled.value = false;
 
         return {
           ...props,
@@ -229,48 +242,13 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         snapOffsetX,
         snapOffsetY,
         touchPosition,
-        scrollBy
+        scrollBy,
+        context,
+        sortEnabled
       ]
     );
 
-    // TODO - check if we have to block sorting or if there is a better way to handle this
-    // useAnimatedReaction(
-    //   () => additionalCrossOffset.value !== null,
-    //   isManaged => {
-    //     const ctx = context.value;
-    //     const prev = ctx.prevSortEnabled;
-
-    //     if (ctx.restoreSortEnabledTimeoutId) {
-    //       clearAnimatedTimeout(ctx.restoreSortEnabledTimeoutId);
-    //     }
-
-    //     if (isManaged && prev === undefined) {
-    //       ctx.prevSortEnabled = sortEnabled.value;
-    //       sortEnabled.value = false;
-    //     } else if (prev !== undefined) {
-    //       ctx.restoreSortEnabledTimeoutId = setAnimatedTimeout(() => {
-    //         sortEnabled.value = prev;
-    //         delete ctx.prevSortEnabled;
-    //       }, SORT_ENABLED_RESTORE_TIMEOUT);
-    //     }
-    //   }
-    // );
-
     return {
-      children: (
-        <>
-          {children}
-          {/* {hasAutoScroll && (
-            <ScrollOffsetUpdater
-              autoAdjustOffsetScrollPadding={autoAdjustOffsetScrollPadding}
-              crossCoordinate={crossCoordinate}
-              crossItemSizes={crossItemSizes}
-              ctx={context}
-              isVertical={isVertical}
-            />
-          )} */}
-        </>
-      ),
       value: {
         adaptLayoutProps,
         additionalCrossOffset,
@@ -278,138 +256,5 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       }
     };
   });
-
-type ScrollOffsetUpdaterProps = {
-  isVertical: boolean;
-  crossCoordinate: Coordinate;
-  crossItemSizes: SharedValue<ItemSizes>;
-  autoAdjustOffsetScrollPadding: [number, number] | number;
-  // layoutUpdateProgress: SharedValue<null | number>;
-  ctx: SharedValue<StateContext>;
-};
-
-function ScrollOffsetUpdater({
-  autoAdjustOffsetScrollPadding,
-  crossCoordinate,
-  crossItemSizes,
-  ctx,
-  isVertical
-  // layoutUpdateProgress
-}: ScrollOffsetUpdaterProps) {
-  const {
-    activeItemKey,
-    containerRef,
-    itemPositions,
-    prevActiveItemKey,
-    shouldAnimateLayout
-  } = useCommonValuesContext();
-  const { scrollableRef, scrollBy } = useAutoScrollContext()!;
-
-  const [paddingBefore, paddingAfter] = toPair(autoAdjustOffsetScrollPadding);
-
-  const scrollOffset = useScrollViewOffset(scrollableRef);
-
-  // const finishOffsetInterpolation = useCallback(() => {
-  //   'worklet';
-  //   layoutUpdateProgress.value = null;
-  //   delete ctx.value.offsetInterpolationBounds;
-  // }, [layoutUpdateProgress, ctx]);
-
-  useAnimatedReaction(
-    () => itemPositions.value,
-    (newPositions, oldPositions) => {
-      if (
-        !oldPositions ||
-        activeItemKey.value !== null ||
-        prevActiveItemKey.value === null
-      ) {
-        return;
-      }
-
-      const oldPos = oldPositions[prevActiveItemKey.value]?.[crossCoordinate];
-      const newPos = newPositions[prevActiveItemKey.value]?.[crossCoordinate];
-      const scrollableMeasurements = measure(scrollableRef);
-      const containerMeasurements = measure(containerRef);
-      const newSize = resolveDimension(
-        crossItemSizes.value,
-        prevActiveItemKey.value
-      );
-
-      if (
-        newPos === undefined ||
-        oldPos === undefined ||
-        newSize === null ||
-        !scrollableMeasurements ||
-        !containerMeasurements
-      ) {
-        return;
-      }
-
-      const {
-        height: sH,
-        pageX: sX,
-        pageY: sY,
-        width: sW
-      } = scrollableMeasurements;
-      const { pageX: cX, pageY: cY } = containerMeasurements;
-
-      const scrollableCrossSize = isVertical ? sH : sW;
-      const relativeOffset = isVertical ? sY - cY : sX - cX;
-      const oldPosOffset = oldPos - relativeOffset;
-      const newPosOffset = clamp(
-        oldPosOffset,
-        paddingBefore,
-        scrollableCrossSize - newSize - paddingAfter
-      );
-
-      const distance = newPos - oldPos + (oldPosOffset - newPosOffset);
-      const currentOffset = scrollOffset.value;
-
-      console.log(
-        newPos,
-        oldPos,
-        oldPosOffset,
-        newPosOffset,
-        currentOffset,
-        activeItemKey.value
-      );
-
-      // TODO - debounce these calls or do sth else as sometimes, when the item is
-      // immediately released after drag starts, we get 2 dimension updates in a row
-      // matching conditions of this reaction, which results in the scrollBy being
-      // called with an invalid distance
-      // layoutUpdateProgress.value = 0;
-      // ctx.value.offsetInterpolationBounds = [
-      //   currentOffset,
-      //   currentOffset + distance
-      // ];
-      // shouldAnimateLayout.value = false;
-      // scrollBy?.(distance, false);
-    }
-  );
-
-  // useAnimatedReaction(
-  //   () => scrollOffset.value,
-  //   offset => {
-  //     const bounds = ctx.value.offsetInterpolationBounds;
-  //     if (!bounds) {
-  //       return;
-  //     }
-
-  //     layoutUpdateProgress.value = interpolate(
-  //       offset,
-  //       bounds,
-  //       [0, 1],
-  //       Extrapolation.CLAMP
-  //     );
-
-  //     if (!areValuesDifferent(layoutUpdateProgress.value, 1, 0.01)) {
-  //       finishOffsetInterpolation();
-  //     }
-  //   }
-  // );
-
-  return null;
-}
 
 export { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext };
