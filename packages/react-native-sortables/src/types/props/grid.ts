@@ -71,6 +71,16 @@ export type AutoAdjustOffsetSettings = {
    * @default false
    */
   autoAdjustOffsetDuringDrag: boolean;
+  /** Timeout in milliseconds to wait for layout updates after the active item is released.
+   *
+   * This timeout is needed because React's state changes happen asynchronously after the drag end
+   * callback is called. During this period, the item might no longer be marked as active when
+   * the layout update arrives, but we must still consider the previously active item as active
+   * to prevent content jumps and ensure smooth visual transitions.
+   *
+   * @default 1000
+   */
+  autoAdjustOffsetResetTimeout: number;
   /** Padding to add when adjusting the scroll offset after the active item is released.
    * @note This takes effect only if autoAdjustOffsetDuringDrag is true and the scrollableRef is provided.
    * @default 25

@@ -38,18 +38,20 @@ export const createGridStrategy =
     const debugBox = useDebugBoundingBox();
 
     const othersLayout = useDerivedValue(() =>
-      calculateLayout({
-        gaps: {
-          cross: crossGap.value,
-          main: mainGap.value
-        },
-        indexToKey: othersIndexToKey.value,
-        isVertical,
-        itemHeights: itemHeights.value,
-        itemWidths: itemWidths.value,
-        numGroups,
-        startCrossOffset: additionalCrossOffset?.value
-      })
+      additionalCrossOffset?.value === null
+        ? null
+        : calculateLayout({
+            gaps: {
+              cross: crossGap.value,
+              main: mainGap.value
+            },
+            indexToKey: othersIndexToKey.value,
+            isVertical,
+            itemHeights: itemHeights.value,
+            itemWidths: itemWidths.value,
+            numGroups,
+            startCrossOffset: additionalCrossOffset?.value
+          })
     );
 
     let mainContainerSize: SharedValue<null | number>;

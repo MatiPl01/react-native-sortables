@@ -8,7 +8,11 @@ import {
   useScrollViewOffset
 } from 'react-native-reanimated';
 
-import { useMutableValue } from '../../integrations/reanimated';
+import {
+  clearAnimatedTimeout,
+  setAnimatedTimeout,
+  useMutableValue
+} from '../../integrations/reanimated';
 import type {
   AutoOffsetAdjustmentContextType,
   Coordinate,
@@ -27,12 +31,12 @@ import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
 const SORT_ENABLED_RESTORE_TIMEOUT = 300;
 
 type StateContext = {
-  offsetInterpolationBounds?: [number, number];
-  prevSortEnabled?: boolean;
-  restoreSortEnabledTimeoutId?: number;
+  enabled?: boolean;
+  resetTimeoutId?: number;
 };
 
 type AutoOffsetAdjustmentProviderProps = PropsWithChildren<{
+  autoAdjustOffsetResetTimeout: number;
   autoAdjustOffsetScrollPadding: [number, number] | number;
 }>;
 
@@ -40,11 +44,13 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
   createProvider('AutoOffsetAdjustment', {
     guarded: false
   })<AutoOffsetAdjustmentProviderProps, AutoOffsetAdjustmentContextType>(({
+    autoAdjustOffsetResetTimeout,
     autoAdjustOffsetScrollPadding,
     children
   }) => {
     const {
       activeItemDimensions,
+      activeItemDropped,
       activeItemKey,
       activeItemPosition,
       enableActiveItemSnap,
@@ -65,12 +71,33 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
 
     const context = useMutableValue<StateContext>({});
 
+    useAnimatedReaction(
+      () => activeItemDropped.value,
+      dropped => {
+        const currentTimeoutId = context.value.resetTimeoutId;
+        if (currentTimeoutId !== undefined) {
+          clearAnimatedTimeout(currentTimeoutId);
+        }
+        if (dropped) {
+          context.value.resetTimeoutId = setAnimatedTimeout(() => {
+            context.value.enabled = false;
+          }, autoAdjustOffsetResetTimeout);
+        } else {
+          context.value.enabled = true;
+        }
+      }
+    );
+
     const adaptLayoutProps = useCallback(
       (
         props: GridLayoutProps,
         prevProps: GridLayoutProps | null
       ): GridLayoutProps => {
         'worklet';
+        if (!context.value.enabled) {
+          return props;
+        }
+
         const {
           gaps,
           indexToKey,
@@ -99,33 +126,39 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           numGroups
         } as const;
 
-        const activeKey = activeItemKey.value;
-        if (activeKey === null) {
-          if (additionalCrossOffset.value !== null && prevCrossIteSizes) {
-            additionalCrossOffset.value = null;
-            const prevActiveKey = prevActiveItemKey.value!;
-            const oldCrossOffset =
-              itemPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
-            const newCrossOffset = calculateActiveItemCrossOffset({
-              ...autoOffsetAdjustmentCommonProps,
-              activeItemKey: prevActiveKey
-            });
+        const activeKey = activeItemKey.value ?? prevActiveItemKey.value;
 
-            console.log('>>>', oldCrossOffset, newCrossOffset);
-
-            const distance = newCrossOffset - oldCrossOffset;
-            scrollBy?.(distance, false);
-
-            return {
-              ...props,
-              [isVertical ? 'itemHeights' : 'itemWidths']: prevCrossIteSizes,
-              requestNextLayout: true,
-              shouldAnimateLayout: false,
-              startCrossOffset: distance
-            };
-          }
-
+        if (
+          activeKey === null ||
+          (activeItemKey.value === null &&
+            additionalCrossOffset.value !== null &&
+            prevCrossIteSizes !== null)
+        ) {
+          context.value.enabled = false;
+          additionalCrossOffset.value = null;
           return props;
+          // // Disable as soon as the additional cross offset is reset
+
+          // const prevActiveKey = prevActiveItemKey.value!;
+          // const oldCrossOffset =
+          //   itemPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
+          // const newCrossOffset = calculateActiveItemCrossOffset({
+          //   ...autoOffsetAdjustmentCommonProps,
+          //   activeItemKey: prevActiveKey
+          // });
+
+          // console.log('>>>', oldCrossOffset, newCrossOffset);
+
+          // const distance = newCrossOffset - oldCrossOffset;
+          // scrollBy?.(distance, false);
+
+          // return {
+          //   ...props,
+          //   [isVertical ? 'itemHeights' : 'itemWidths']: prevCrossIteSizes,
+          //   requestNextLayout: true,
+          //   shouldAnimateLayout: false,
+          //   startCrossOffset: distance
+          // };
         }
 
         let snapBasedOffset = 0;
@@ -141,6 +174,12 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
             snapOffsetY.value,
             activeHandleMeasurements?.value ?? activeItemDimensions.value,
             activeHandleOffset?.value
+          );
+          console.log(
+            'snap',
+            touchPosition.value.y,
+            activeItemPosition.value.y,
+            offset.y
           );
           snapBasedOffset = isVertical
             ? touchPosition.value.y - activeItemPosition.value.y - offset.y
@@ -162,6 +201,14 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           itemAtActiveIndexOffset - activeItemCrossOffset + snapBasedOffset
         );
         additionalCrossOffset.value = startCrossOffset;
+
+        console.log(
+          '>>>',
+          activeItemDimensions.value,
+          startCrossOffset,
+          snapBasedOffset,
+          activeKey
+        );
 
         return {
           ...props,

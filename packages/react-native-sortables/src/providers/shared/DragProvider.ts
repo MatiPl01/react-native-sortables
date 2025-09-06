@@ -201,6 +201,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         areVectorsDifferent(newTouchPosition, touchPosition.value)
       ) {
         touchPosition.value = newTouchPosition;
+        console.log('update >>>', touchPosition.value);
       }
 
       // Active item position
@@ -312,6 +313,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         x: itemPosition.x + dragStartItemTouchOffset.value.x,
         y: itemPosition.y + dragStartItemTouchOffset.value.y
       };
+      console.log('set >>>', touchPosition.value);
       dragStartTouchPosition.value = touchPosition.value;
 
       const hasInactiveAnimation =

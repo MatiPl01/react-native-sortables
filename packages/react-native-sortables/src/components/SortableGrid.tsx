@@ -9,8 +9,8 @@ import { useDragEndHandler } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
 import {
   GridProvider,
-  useGridLayoutContext,
   useAutoOffsetAdjustmentContext,
+  useGridLayoutContext,
   useMeasurementsContext
 } from '../providers';
 import type {
@@ -33,6 +33,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
     rest: {
       autoAdjustOffsetDuringDrag,
+      autoAdjustOffsetResetTimeout,
       autoAdjustOffsetScrollPadding,
       columnGap,
       columns,
@@ -100,6 +101,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     <GridProvider
       {...sharedProps}
       autoAdjustOffsetDuringDrag={autoAdjustOffsetDuringDrag}
+      autoAdjustOffsetResetTimeout={autoAdjustOffsetResetTimeout}
       autoAdjustOffsetScrollPadding={autoAdjustOffsetScrollPadding}
       columnGap={columnGapValue}
       controlledContainerDimensions={controlledContainerDimensions}

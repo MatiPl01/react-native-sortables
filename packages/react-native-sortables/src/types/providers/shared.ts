@@ -51,9 +51,9 @@ export type CommonValuesContextType =
       keyToIndex: SharedValue<Record<string, number>>;
 
       // POSITIONS
-      itemPositions: SharedValue<Record<string, Vector>>;
       touchPosition: SharedValue<null | Vector>;
       activeItemPosition: SharedValue<null | Vector>;
+      itemPositions: SharedValue<Record<string, Vector>>;
 
       // DIMENSIONS
       controlledContainerDimensions: ControlledDimensions;

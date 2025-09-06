@@ -25,6 +25,7 @@ type GridProviderProps = PropsWithChildren<
 
 export default function GridProvider({
   autoAdjustOffsetDuringDrag,
+  autoAdjustOffsetResetTimeout,
   autoAdjustOffsetScrollPadding,
   children,
   columnGap: columnGap_,
@@ -54,6 +55,7 @@ export default function GridProvider({
     autoAdjustOffsetDuringDrag && (
       <AutoOffsetAdjustmentProvider
         {...sharedGridProviderProps}
+        autoAdjustOffsetResetTimeout={autoAdjustOffsetResetTimeout}
         autoAdjustOffsetScrollPadding={autoAdjustOffsetScrollPadding}
       />
     ),

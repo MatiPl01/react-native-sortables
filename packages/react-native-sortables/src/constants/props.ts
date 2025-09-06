@@ -68,6 +68,7 @@ export const DEFAULT_SHARED_PROPS = {
 
 export const DEFAULT_SORTABLE_GRID_PROPS = {
   autoAdjustOffsetDuringDrag: false,
+  autoAdjustOffsetResetTimeout: 1000,
   autoAdjustOffsetScrollPadding: 25,
   columnGap: 0,
   columns: 1,
