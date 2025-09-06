@@ -10,7 +10,6 @@ type CalculateRawProgressFunction = (
   contentContainerMeasurements: MeasuredDimensions,
   scrollContainerMeasurements: MeasuredDimensions,
   activationOffset: [number, number],
-  contentBounds: [number, number],
   maxOverscroll: [number, number],
   extrapolation: ExtrapolationType
 ) => number;
@@ -21,7 +20,6 @@ const calculateRawProgress = (
   scrollablePos: number,
   scrollableSize: number,
   [startOffset, endOffset]: [number, number],
-  [startContent, endContent]: [number, number],
   [maxStartOverscroll, maxEndOverscroll]: [number, number],
   extrapolation: ExtrapolationType
 ) => {
@@ -31,15 +29,15 @@ const calculateRawProgress = (
   const endThreshold = endBound - endOffset;
 
   const startBoundProgress = -interpolate(
-    position,
-    [startContent - maxStartOverscroll, startContent + startOffset],
+    startBound,
+    [-maxStartOverscroll, startOffset],
     [0, 1],
     Extrapolation.CLAMP
   );
 
   const endBoundProgress = interpolate(
-    position,
-    [endContent - endOffset, endContent + maxEndOverscroll],
+    endBound,
+    [endOffset, maxEndOverscroll],
     [1, 0],
     Extrapolation.CLAMP
   );

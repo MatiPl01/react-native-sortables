@@ -159,14 +159,10 @@ function AutoScrollUpdater({
         // position of the view is not changed (because of too small scroll distance).
         position += targetScrollOffset.value - currentScrollOffset.value;
       }
-
-      return {
-        bounds: contentAxisBounds.value,
-        position
-      };
+      return position;
     },
-    ({ bounds, position }) => {
-      if (!position || !bounds) {
+    position => {
+      if (position === null) {
         debug?.hideDebugViews?.();
         return;
       }
@@ -183,7 +179,6 @@ function AutoScrollUpdater({
         contentContainerMeasurements,
         scrollContainerMeasurements,
         activationOffset,
-        bounds,
         maxOverscroll,
         autoScrollExtrapolation
       );

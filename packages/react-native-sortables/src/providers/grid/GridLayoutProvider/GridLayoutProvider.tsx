@@ -62,7 +62,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const crossGap = isVertical ? rowGap : columnGap;
 
   const mainGroupSize = useMutableValue<null | number>(null);
-  const shouldAnimateTimeoutId = useMutableValue(-1);
+  const shouldAnimateTimeoutId = useMutableValue<null | ReturnType<
+    typeof setTimeout
+  >>(null);
 
   // MAIN GROUP SIZE UPDATER
   useAnimatedReaction(
@@ -153,7 +155,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
             ? props.itemWidths === previousProps?.itemWidths
             : props.itemHeights === previousProps?.itemHeights);
 
-        clearTimeout(shouldAnimateTimeoutId.value);
+        if (shouldAnimateTimeoutId.value !== null) {
+          clearTimeout(shouldAnimateTimeoutId.value);
+        }
         if (!shouldAnimate) {
           shouldAnimateLayout.value = false;
         }
