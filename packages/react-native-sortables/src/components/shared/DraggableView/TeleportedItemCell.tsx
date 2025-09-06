@@ -1,15 +1,14 @@
 import { LayoutAnimationConfig } from 'react-native-reanimated';
 
-import { useTeleportedItemStyles } from '../../../providers';
+import { useTeleportedItemLayout } from '../../../providers';
 import type { ItemCellProps } from './ItemCell';
 import ItemCell from './ItemCell';
 
 type TeleportedItemCellProps = Pick<
   ItemCellProps,
   | 'activationAnimationProgress'
-  | 'cellStyle'
+  | 'baseStyle'
   | 'children'
-  | 'innerCellStyle'
   | 'isActive'
   | 'itemKey'
   | 'onLayout'
@@ -17,14 +16,13 @@ type TeleportedItemCellProps = Pick<
 
 export default function TeleportedItemCell({
   activationAnimationProgress,
-  cellStyle,
+  baseStyle,
   children,
-  innerCellStyle,
   isActive,
   itemKey,
   onLayout
 }: TeleportedItemCellProps) {
-  const teleportedItemStyles = useTeleportedItemStyles(
+  const teleportedItemLayoutValue = useTeleportedItemLayout(
     itemKey,
     isActive,
     activationAnimationProgress
@@ -33,10 +31,10 @@ export default function TeleportedItemCell({
   return (
     <ItemCell
       activationAnimationProgress={activationAnimationProgress}
-      cellStyle={[cellStyle, teleportedItemStyles]}
-      innerCellStyle={innerCellStyle}
+      baseStyle={baseStyle}
       isActive={isActive}
       itemKey={itemKey}
+      layoutStyleValue={teleportedItemLayoutValue}
       onLayout={onLayout}>
       <LayoutAnimationConfig skipEntering>{children}</LayoutAnimationConfig>
     </ItemCell>

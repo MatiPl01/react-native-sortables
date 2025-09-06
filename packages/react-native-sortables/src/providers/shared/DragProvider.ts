@@ -7,7 +7,6 @@ import type { SharedValue } from 'react-native-reanimated';
 import {
   clamp,
   interpolate,
-  measure,
   useAnimatedReaction,
   withTiming
 } from 'react-native-reanimated';
@@ -39,7 +38,6 @@ import { useAutoScrollContext } from './AutoScrollProvider';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useCustomHandleContext } from './CustomHandleProvider';
 import { useLayerContext } from './LayerProvider';
-import { useMeasurementsContext } from './MeasurementsProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 import { usePortalContext } from './PortalProvider';
 
@@ -74,7 +72,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activeItemPosition,
     containerHeight,
     containerId,
-    containerRef,
     containerWidth,
     dragActivationDelay,
     dragActivationFailOffset,
@@ -95,7 +92,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     touchPosition,
     usesAbsoluteLayout
   } = useCommonValuesContext();
-  const { handleContainerMeasurement } = useMeasurementsContext();
   const { updateLayer } = useLayerContext() ?? {};
   const { scrollOffsetDiff } = useAutoScrollContext() ?? {};
   const {
@@ -382,23 +378,16 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const touch = e.allTouches[0];
       if (
         !touch ||
-        // Ignore touch if another item is already being touched/activated
-        // if the current item is still animated to the drag end position
-        // or sorting is disabled at all
+        // Sorting is disabled
         !sortEnabled.value ||
+        // Absolute layout is not applied yet
+        !usesAbsoluteLayout.value ||
+        // Another item is already being touched/activated
         activationAnimationProgress.value > 0 ||
         activeItemKey.value !== null
       ) {
         fail();
         return;
-      }
-
-      // This should never happen but is added here for extra safety
-      if (!usesAbsoluteLayout.value) {
-        const measurements = measure(containerRef);
-        if (measurements) {
-          handleContainerMeasurement(measurements.width, measurements.height);
-        }
       }
 
       touchStartTouch.value = touch;
@@ -439,10 +428,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemKey,
       activationState,
       activationTimeoutId,
-      containerRef,
       currentTouch,
       dragActivationDelay,
-      handleContainerMeasurement,
       handleDragStart,
       itemHeights,
       itemWidths,

@@ -1,10 +1,6 @@
 import { type PropsWithChildren, useEffect, useMemo, useRef } from 'react';
 import type { View } from 'react-native';
-import {
-  useAnimatedRef,
-  useAnimatedStyle,
-  useDerivedValue
-} from 'react-native-reanimated';
+import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
 
 import type { Animatable } from '../../integrations/reanimated';
 import {
@@ -86,12 +82,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const itemHeights = useMutableValue<ItemSizes>(
       controlledItemDimensions.height ? null : {}
     );
-    const controlledHeight = useDerivedValue(() =>
-      controlledItemDimensions.height ? (itemHeights.value as number) : null
-    );
-    const controlledWidth = useDerivedValue(() =>
-      controlledItemDimensions.width ? (itemWidths.value as number) : null
-    );
     const activeItemDimensions = useMutableValue<Dimensions | null>(null);
 
     // DRAG STATE
@@ -143,17 +133,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       }
     }, [itemKeys, indexToKey]);
 
-    const controlledDimensionsStyle = useAnimatedStyle(() => {
-      const result: Partial<Dimensions> = {};
-      if (controlledHeight.value !== null) {
-        result.height = controlledHeight.value;
-      }
-      if (controlledWidth.value !== null) {
-        result.width = controlledWidth.value;
-      }
-      return result;
-    });
-
     return {
       value: {
         activationAnimationDuration,
@@ -172,7 +151,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         containerRef,
         containerWidth,
         controlledContainerDimensions,
-        controlledDimensionsStyle,
         controlledItemDimensions,
         customHandle,
         dragActivationDelay,

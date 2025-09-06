@@ -1,22 +1,29 @@
 import type { PropsWithChildren } from 'react';
-import { type LayoutChangeEvent, StyleSheet } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
-import Animated from 'react-native-reanimated';
+import {
+  type LayoutChangeEvent,
+  Platform,
+  StyleSheet,
+  type ViewStyle
+} from 'react-native';
+import type { SharedValue, TransformArrayItem } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { HIDDEN_X_OFFSET } from '../../../constants';
 import type {
   AnimatedStyleProp,
   LayoutAnimation
 } from '../../../integrations/reanimated';
-import { useItemDecorationStyles } from '../../../providers';
+import { useItemDecoration } from '../../../providers';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
+
+type TransformsArray = Array<TransformArrayItem>;
 
 export type ItemCellProps = PropsWithChildren<{
   itemKey: string;
   isActive: SharedValue<boolean>;
   activationAnimationProgress: SharedValue<number>;
-  innerCellStyle: AnimatedStyleProp;
-  cellStyle: AnimatedStyleProp;
+  baseStyle: AnimatedStyleProp;
+  layoutStyleValue: SharedValue<ViewStyle>;
   hidden?: boolean;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
@@ -25,28 +32,37 @@ export type ItemCellProps = PropsWithChildren<{
 
 export default function ItemCell({
   activationAnimationProgress,
-  cellStyle,
+  baseStyle,
   children,
   entering,
   exiting,
   hidden,
-  innerCellStyle,
   isActive,
   itemKey,
+  layoutStyleValue,
   onLayout
 }: ItemCellProps) {
-  const decorationStyles = useItemDecorationStyles(
+  const decorationStyleValue = useItemDecoration(
     itemKey,
     isActive,
     activationAnimationProgress
   );
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    ...decorationStyleValue.value,
+    ...layoutStyleValue.value,
+    transform: [
+      ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
+      ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
+    ]
+  }));
+
   return (
-    <Animated.View style={cellStyle}>
+    <Animated.View style={[baseStyle, styles.decoration, animatedStyle]}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={[decorationStyles, innerCellStyle, hidden && styles.hidden]}
+        style={hidden && styles.hidden}
         onLayout={onLayout}>
         {children}
       </AnimatedOnLayoutView>
@@ -55,6 +71,18 @@ export default function ItemCell({
 }
 
 const styles = StyleSheet.create({
+  decoration: Platform.select<ViewStyle>({
+    android: {},
+    default: {},
+    native: {
+      shadowOffset: {
+        height: 0,
+        width: 0
+      },
+      shadowOpacity: 1,
+      shadowRadius: 5
+    }
+  }),
   hidden: {
     // We change the x position to hide items when teleported (we can't use
     // non-layout props like opacity as they are sometimes not updated via
