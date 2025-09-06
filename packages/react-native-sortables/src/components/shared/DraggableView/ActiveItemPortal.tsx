@@ -1,14 +1,9 @@
 import type { PropsWithChildren } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import type { ManualGesture } from 'react-native-gesture-handler';
-import {
-  runOnJS,
-  type SharedValue,
-  useAnimatedReaction
-} from 'react-native-reanimated';
+import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
 import { useStableCallback } from '../../../hooks';
-import type { AnimatedStyleProp } from '../../../integrations/reanimated';
 import { useMutableValue } from '../../../integrations/reanimated';
 import {
   CommonValuesContext,
@@ -17,23 +12,25 @@ import {
 } from '../../../providers';
 import type { CommonValuesContextType } from '../../../types';
 import { getContextProvider } from '../../../utils';
+import type { ItemCellProps } from './ItemCell';
 import TeleportedItemCell from './TeleportedItemCell';
 
 const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
-type ActiveItemPortalProps = PropsWithChildren<{
-  itemKey: string;
-  activationAnimationProgress: SharedValue<number>;
-  commonValuesContext: CommonValuesContextType;
-  cellStyle: AnimatedStyleProp;
-  isActive: SharedValue<boolean>;
-  gesture: ManualGesture;
-  onTeleport: (isTeleported: boolean) => void;
-}>;
+type ActiveItemPortalProps = PropsWithChildren<
+  Pick<
+    ItemCellProps,
+    'activationAnimationProgress' | 'baseStyle' | 'isActive' | 'itemKey'
+  > & {
+    commonValuesContext: CommonValuesContextType;
+    gesture: ManualGesture;
+    onTeleport: (isTeleported: boolean) => void;
+  }
+>;
 
 export default function ActiveItemPortal({
   activationAnimationProgress,
-  cellStyle,
+  baseStyle,
   children,
   commonValuesContext,
   gesture,
@@ -58,8 +55,7 @@ export default function ActiveItemPortal({
           itemKey={itemKey}>
           <TeleportedItemCell
             activationAnimationProgress={activationAnimationProgress}
-            cellStyle={cellStyle}
-            innerCellStyle={commonValuesContext.controlledDimensionsStyle}
+            baseStyle={baseStyle}
             isActive={isActive}
             itemKey={itemKey}>
             {children}
@@ -74,7 +70,7 @@ export default function ActiveItemPortal({
       gesture,
       isActive,
       itemKey,
-      cellStyle
+      baseStyle
     ]
   );
 

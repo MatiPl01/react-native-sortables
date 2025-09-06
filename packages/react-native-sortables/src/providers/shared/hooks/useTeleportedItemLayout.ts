@@ -1,16 +1,16 @@
-import { type StyleProp, type ViewStyle } from 'react-native';
-import type { AnimatedStyle, SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle } from 'react-native-reanimated';
+import { type ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import { usePortalContext } from '../PortalProvider';
 import useItemZIndex from './useItemZIndex';
 import useTeleportedItemPosition from './useTeleportedItemPosition';
 
-export default function useTeleportedItemStyles(
+export default function useTeleportedItemLayout(
   key: string,
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
-): StyleProp<AnimatedStyle<ViewStyle>> {
+): SharedValue<ViewStyle> {
   const { portalOutletMeasurements } = usePortalContext() ?? {};
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
@@ -20,7 +20,7 @@ export default function useTeleportedItemStyles(
     activationAnimationProgress
   );
 
-  return useAnimatedStyle(() => {
+  return useDerivedValue<ViewStyle>(() => {
     if (!portalOutletMeasurements?.value || !position.value) {
       // This should never happen
       return { display: 'none' };

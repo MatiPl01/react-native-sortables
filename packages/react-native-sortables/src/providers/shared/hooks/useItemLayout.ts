@@ -5,14 +5,12 @@ import {
   interpolate,
   makeMutable,
   useAnimatedReaction,
-  useAnimatedStyle,
   useDerivedValue,
   withTiming
 } from 'react-native-reanimated';
 
 import { HIDDEN_X_OFFSET, IS_WEB, isFabric } from '../../../constants';
 import {
-  type AnimatedStyleProp,
   useAnimatedDebounce,
   useMutableValue
 } from '../../../integrations/reanimated';
@@ -41,13 +39,13 @@ const HIDDEN_STYLE: ViewStyle = {
  * We must use layout props instead of transforms to ensure TextInput components
  * work correctly (see issue https://github.com/MatiPl01/react-native-sortables/issues/430)
  */
-function useItemLayoutStylePaper(
+function useItemLayoutPaper(
   position: SharedValue<null | Vector>,
   zIndex: SharedValue<number>
-) {
+): SharedValue<ViewStyle> {
   const { usesAbsoluteLayout } = useCommonValuesContext();
 
-  return useAnimatedStyle(() => {
+  return useDerivedValue(() => {
     if (!usesAbsoluteLayout.value) {
       return RELATIVE_STYLE;
     }
@@ -85,10 +83,10 @@ function useItemLayoutStylePaper(
  * (see issue https://github.com/MatiPl01/react-native-sortables/issues/430)
  * but minimize their use during animations for better performance.
  */
-function useItemLayoutStyleFabric(
+function useItemLayoutFabric(
   position: SharedValue<null | Vector>,
   zIndex: SharedValue<number>
-) {
+): SharedValue<ViewStyle> {
   const { activeItemDropped, usesAbsoluteLayout } = useCommonValuesContext();
   const transformStartPosition = useMutableValue<null | Vector>(null);
   const debounce = useAnimatedDebounce();
@@ -105,7 +103,7 @@ function useItemLayoutStyleFabric(
     }
   );
 
-  return useAnimatedStyle(() => {
+  return useDerivedValue(() => {
     if (!usesAbsoluteLayout.value) {
       return RELATIVE_STYLE;
     }
@@ -137,11 +135,11 @@ function useItemLayoutStyleFabric(
   });
 }
 
-export default function useItemLayoutStyle(
+export default function useItemLayout(
   key: string,
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
-): AnimatedStyleProp {
+): SharedValue<ViewStyle> {
   const {
     activeItemKey,
     activeItemPosition,
@@ -250,7 +248,7 @@ export default function useItemLayoutStyle(
 
   return isFabric() || IS_WEB
     ? // eslint-disable-next-line react-hooks/rules-of-hooks
-      useItemLayoutStyleFabric(position, zIndex)
+      useItemLayoutFabric(position, zIndex)
     : // eslint-disable-next-line react-hooks/rules-of-hooks
-      useItemLayoutStylePaper(position, zIndex);
+      useItemLayoutPaper(position, zIndex);
 }

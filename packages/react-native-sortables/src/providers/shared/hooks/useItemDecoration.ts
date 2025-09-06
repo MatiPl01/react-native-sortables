@@ -1,23 +1,20 @@
 import type { ViewStyle } from 'react-native';
-import { Platform, StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   interpolate,
   interpolateColor,
-  useAnimatedStyle,
   useDerivedValue,
   withTiming
 } from 'react-native-reanimated';
 
 import { IS_ANDROID, IS_WEB } from '../../../constants';
-import type { AnimatedStyleProp } from '../../../integrations/reanimated';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 
-export default function useItemDecorationStyles(
+export default function useItemDecoration(
   key: string,
   isActive: SharedValue<boolean>,
   activationAnimationProgress: SharedValue<number>
-): AnimatedStyleProp {
+): SharedValue<ViewStyle> {
   const {
     activationAnimationDuration,
     activeItemOpacity,
@@ -41,7 +38,7 @@ export default function useItemDecorationStyles(
     );
   });
 
-  const decoration = useDerivedValue(() => {
+  return useDerivedValue(() => {
     const progress = activationAnimationProgress.value;
     const zeroProgressOpacity = interpolate(
       adjustedInactiveProgress.value,
@@ -84,23 +81,4 @@ export default function useItemDecorationStyles(
       ]
     };
   });
-
-  return [styles.decoration, useAnimatedStyle(() => decoration.value)];
 }
-
-const styles = StyleSheet.create({
-  decoration: Platform.select<ViewStyle>({
-    default: {},
-    native: {
-      shadowOffset: {
-        height: 0,
-        width: 0
-      },
-      shadowOpacity: 1,
-      shadowRadius: 5
-    },
-    web: {
-      flex: 1
-    }
-  })
-});
