@@ -83,15 +83,17 @@ const clampDistance = (
 ) => {
   if (distance < 0) {
     // Scrolling up
-    return (
+    return Math.min(
+      0,
       Math.max(containerOffset + distance, startOffset - maxStartOverscroll) -
-      containerOffset
+        containerOffset
     );
   }
 
   if (distance > 0) {
     // Scrolling down
-    return (
+    return Math.max(
+      0,
       Math.min(
         containerOffset + distance,
         endOffset - scrollableSize + maxEndOverscroll
