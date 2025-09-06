@@ -38,7 +38,7 @@ export default function useItemDecoration(
     );
   });
 
-  return useDerivedValue(() => {
+  return useDerivedValue<ViewStyle>(() => {
     const progress = activationAnimationProgress.value;
     const zeroProgressOpacity = interpolate(
       adjustedInactiveProgress.value,
