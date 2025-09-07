@@ -43,13 +43,6 @@ const calculateRawProgress = (
     Extrapolation.CLAMP
   );
 
-  console.log(
-    endBound,
-    contentSize - endOffset,
-    contentSize + maxEndOverscroll,
-    endBoundProgress
-  );
-
   return interpolate(
     position,
     [startBound, startThreshold, endThreshold, endBound],

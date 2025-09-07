@@ -103,7 +103,6 @@ const SortableFlexInner = memo(function SortableFlexInner({
   width,
   ...rest
 }: SortableFlexInnerProps) {
-  console.log('>>> SortableFlexInner');
   const isColumn = flexDirection.startsWith('column');
 
   const controlledContainerDimensions = useMemo(

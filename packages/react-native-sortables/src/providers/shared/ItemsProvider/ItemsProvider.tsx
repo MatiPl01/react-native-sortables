@@ -24,7 +24,6 @@ const { ItemsContext, ItemsProvider, useItemsContext } = createProvider(
   const [store] = useState(() => createItemsStore(items, renderItem));
 
   useEffect(() => {
-    console.log('>>> ItemsProvider update', items);
     store.update(items, renderItem);
   }, [items, renderItem, store]);
 
@@ -58,8 +57,6 @@ const ItemsOutlet = memo(function ItemsOutlet({
     getKeys // SSR fallback
   );
 
-  console.log('>>> ItemsOutlet', keys);
-
   return keys.map(key => (
     <DraggableView {...rest} itemKey={key} key={key} style={itemStyle} />
   ));
@@ -73,15 +70,11 @@ const ItemOutlet = memo(function ItemOutlet({ itemKey }: ItemOutletProps) {
   const { getNode, subscribeItem } = useItemsContext();
 
   // This outlet re-renders only when the item's node changes
-  const node = useSyncExternalStore(
+  return useSyncExternalStore(
     callback => subscribeItem(itemKey, callback),
     () => getNode(itemKey),
     () => getNode(itemKey) // SSR fallback
   );
-
-  console.log(itemKey, !!node);
-
-  return node;
 });
 
 const TypedItemsProvider = ItemsProvider as <I>(

@@ -64,7 +64,7 @@ export default function DebugExample() {
             // (scrollableRef and debug properties of the sortable component
             // shouldn't be changed on the fly)
             contentContainerStyle={styles.scrollViewContent}
-            key={2 * +debugEnabled + +autoScrollEnabled}
+            key={+debugEnabled}
             ref={scrollableRef}
             style={flex.fill}>
             <Group style={styles.boundGroup} withMargin={false} bordered center>

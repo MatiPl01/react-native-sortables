@@ -118,8 +118,6 @@ const SortableGridInner = typedMemo(function SortableGridInner<I>({
     [isVertical]
   );
 
-  console.log('>>> scrollable?', rest.scrollableRef);
-
   return (
     <GridProvider
       {...rest}
