@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-import { useItemsContext } from './ItemsProvider';
+import { useItemsContext } from '../ItemsProvider';
 
 export default function useItemsCount(): number {
   const { getKeys, subscribeKeys } = useItemsContext();

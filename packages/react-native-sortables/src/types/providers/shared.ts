@@ -183,6 +183,7 @@ export type PortalContextType = {
   portalOutletMeasurements: SharedValue<MeasuredDimensions | null>;
   measurePortalOutlet: () => void;
   teleport: (id: string, node: ReactNode) => void;
+  isTeleported: (id: string) => boolean;
 };
 
 // MULTI ZONE

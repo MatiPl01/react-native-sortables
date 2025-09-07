@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { ManualGesture } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
@@ -7,9 +7,7 @@ import { useMutableValue } from '../../../integrations/reanimated';
 import {
   CommonValuesContext,
   ItemContextProvider,
-  ItemOutlet,
-  ItemsContext,
-  useItemsContext,
+  useItemNode,
   usePortalContext
 } from '../../../providers';
 import type { CommonValuesContextType } from '../../../types';
@@ -17,7 +15,6 @@ import { getContextProvider } from '../../../utils';
 import type { ItemCellProps } from './ItemCell';
 import TeleportedItemCell from './TeleportedItemCell';
 
-const ItemsContextProvider = getContextProvider(ItemsContext);
 const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
 type ActiveItemPortalProps = Pick<
@@ -38,41 +35,40 @@ export default function ActiveItemPortal({
   itemKey,
   onTeleport
 }: ActiveItemPortalProps) {
-  const dataContext = useItemsContext();
-  const { measurePortalOutlet, teleport } = usePortalContext() ?? {};
+  const node = useItemNode(itemKey);
+  const { isTeleported, measurePortalOutlet, teleport } =
+    usePortalContext() ?? {};
 
   const teleportEnabled = useMutableValue(false);
-  // const isFirstUpdateRef = useRef(true);
+  const isFirstUpdateRef = useRef(true);
 
   const renderTeleportedItemCell = useCallback(
     () => (
       // We have to wrap the TeleportedItemCell in context providers as they won't
       // be accessible otherwise, when the item is rendered in the portal outlet
-      <ItemsContextProvider value={dataContext}>
-        <CommonValuesContextProvider value={commonValuesContext}>
-          <ItemContextProvider
+      <CommonValuesContextProvider value={commonValuesContext}>
+        <ItemContextProvider
+          activationAnimationProgress={activationAnimationProgress}
+          gesture={gesture}
+          isActive={isActive}
+          itemKey={itemKey}>
+          <TeleportedItemCell
             activationAnimationProgress={activationAnimationProgress}
-            gesture={gesture}
+            baseStyle={baseStyle}
             isActive={isActive}
             itemKey={itemKey}>
-            <TeleportedItemCell
-              activationAnimationProgress={activationAnimationProgress}
-              baseStyle={baseStyle}
-              isActive={isActive}
-              itemKey={itemKey}>
-              <ItemOutlet itemKey={itemKey} />
-            </TeleportedItemCell>
-          </ItemContextProvider>
-        </CommonValuesContextProvider>
-      </ItemsContextProvider>
+            {node}
+          </TeleportedItemCell>
+        </ItemContextProvider>
+      </CommonValuesContextProvider>
     ),
     [
       activationAnimationProgress,
       baseStyle,
       commonValuesContext,
-      dataContext,
       gesture,
       isActive,
+      node,
       itemKey
     ]
   );
@@ -92,22 +88,21 @@ export default function ActiveItemPortal({
 
   useEffect(() => disableTeleport, [disableTeleport]);
 
-  // TODO - check if this works and remove isTeleported from portal if this is not needed
-  // useEffect(() => {
-  //   const checkTeleported = () => isTeleported?.(teleportedItemId);
-  //   if (!checkTeleported()) return;
+  useEffect(() => {
+    const checkTeleported = () => isTeleported?.(teleportedItemId);
+    if (!checkTeleported()) return;
 
-  //   const update = () =>
-  //     teleport?.(teleportedItemId, renderTeleportedItemCell());
+    const update = () =>
+      teleport?.(teleportedItemId, renderTeleportedItemCell());
 
-  //   if (isFirstUpdateRef.current) {
-  //     isFirstUpdateRef.current = false;
-  //     // Needed for proper collapsible items behavior
-  //     setTimeout(update);
-  //   } else {
-  //     update();
-  //   }
-  // }, [isTeleported, renderTeleportedItemCell, teleport, teleportedItemId]);
+    if (isFirstUpdateRef.current) {
+      isFirstUpdateRef.current = false;
+      // Needed for proper collapsible items behavior
+      setTimeout(update);
+    } else {
+      update();
+    }
+  }, [isTeleported, renderTeleportedItemCell, teleport, teleportedItemId]);
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,

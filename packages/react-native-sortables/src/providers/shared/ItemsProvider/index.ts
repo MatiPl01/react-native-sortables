@@ -1,2 +1,3 @@
+export * from './components';
+export * from './hooks';
 export * from './ItemsProvider';
-export { default as useItemsCount } from './useItemsCount';
