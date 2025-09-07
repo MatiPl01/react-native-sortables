@@ -1,3 +1,3 @@
-export * from './components';
 export * from './hooks';
+export { default as ItemOutlet } from './ItemOutlet';
 export * from './ItemsProvider';

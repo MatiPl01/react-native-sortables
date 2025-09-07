@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-import { useItemNode } from '../hooks';
+import { useItemNode } from './hooks';
 
 type ItemOutletProps = {
   itemKey: string;
