@@ -97,12 +97,15 @@ export default function SortableContainer({
       layout={animateLayout ? LinearTransition : undefined}
       // @ts-expect-error - contain is a correct CSS prop on web
       style={[outerContainerStyle, IS_WEB && { contain: 'layout' }]}>
+      {/* Drop indicator */}
       {showDropIndicator && (
         <DropIndicator
           DropIndicatorComponent={DropIndicatorComponent}
           style={dropIndicatorStyle}
         />
       )}
+
+      {/* Sortable component data */}
       <AnimatedOnLayoutView
         ref={containerRef}
         style={[containerStyle, innerContainerStyle]}
@@ -115,7 +118,8 @@ export default function SortableContainer({
           itemStyle={itemStyle}
         />
       </AnimatedOnLayoutView>
-      {/* Renders an overlay view helpful for debugging */}
+
+      {/* Debug overlay */}
       {debug && <DebugOutlet />}
     </Animated.View>
   );

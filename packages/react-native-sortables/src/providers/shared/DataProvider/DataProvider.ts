@@ -1,13 +1,8 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import { useCallback, useRef } from 'react';
 
 import type { DraggableViewProps } from '../../../components';
 import type { AnimatedStyleProp } from '../../../integrations/reanimated';
-import type {
-  DataContextType,
-  DataState,
-  DataSubscriber
-} from '../../../types';
+import type { DataContextType } from '../../../types';
 import { createProvider } from '../../utils';
 
 type DataProviderProps<I> = PropsWithChildren<{
@@ -17,29 +12,18 @@ type DataProviderProps<I> = PropsWithChildren<{
 const { DataContext, DataProvider, useDataContext } = createProvider('Data')<
   DataProviderProps<unknown>,
   DataContextType
->(() => {
-  const stateRef = useRef<DataState | null>(null);
-  const subscribersRef = useRef<Set<DataSubscriber>>(new Set());
-
-  const subscribe = useCallback((subscriber: DataSubscriber) => {
-    subscribersRef.current.add(subscriber);
-    return () => subscribersRef.current.delete(subscriber);
-  }, []);
-
-  const getStateData = useCallback(() => stateRef.current, []);
-
-  return {
-    value: { getData: getStateData, subscribe }
-  };
+>(({ items }) => {
+  return {};
 });
 
-type DataOutletProps = Omit<DraggableViewProps, 'children' | 'itemKey'> & {
+type DataOutletProps = Pick<
+  DraggableViewProps,
+  'itemEntering' | 'itemExiting' | 'itemKey'
+> & {
   itemStyle?: AnimatedStyleProp;
 };
 
 function DataOutlet(props: DataOutletProps) {
-  const { items } = useDataContext();
-
   return null;
 }
 
