@@ -17,6 +17,7 @@ type CalculateRawProgressFunction = (
 const calculateRawProgress = (
   position: number,
   contentPos: number,
+  contentSize: number,
   scrollablePos: number,
   scrollableSize: number,
   [startOffset, endOffset]: [number, number],
@@ -37,9 +38,16 @@ const calculateRawProgress = (
 
   const endBoundProgress = interpolate(
     endBound,
-    [endOffset, maxEndOverscroll],
+    [contentSize - endOffset, contentSize + maxEndOverscroll],
     [1, 0],
     Extrapolation.CLAMP
+  );
+
+  console.log(
+    endBound,
+    contentSize - endOffset,
+    contentSize + maxEndOverscroll,
+    endBoundProgress
   );
 
   return interpolate(
@@ -52,17 +60,17 @@ const calculateRawProgress = (
 
 export const calculateRawProgressVertical: CalculateRawProgressFunction = (
   position,
-  { pageY: cY },
+  { height: cH, pageY: cY },
   { height: sH, pageY: sY },
   ...rest
-) => calculateRawProgress(position, cY, sY, sH, ...rest);
+) => calculateRawProgress(position, cY, cH, sY, sH, ...rest);
 
 export const calculateRawProgressHorizontal: CalculateRawProgressFunction = (
   position,
-  { pageX: cX },
+  { pageX: cX, width: cW },
   { pageX: sX, width: sW },
   ...rest
-) => calculateRawProgress(position, cX, sX, sW, ...rest);
+) => calculateRawProgress(position, cX, cW, sX, sW, ...rest);
 
 type ClampDistanceFunction = (
   distance: number,

@@ -9,33 +9,39 @@ import { colors, radius, sizes, spacing, text } from '@/theme';
 const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
 
 const INITIAL_FIXED_ITEMS = new Set(['Item 1', 'Item 5', 'Item 12']);
+const INITIAL_DATA = DATA.map(title => ({
+  fixed: INITIAL_FIXED_ITEMS.has(title),
+  title
+}));
+
+type Item = {
+  fixed: boolean;
+  title: string;
+};
 
 export default function FixedOrderItemsExample() {
-  const [fixedItems, setFixedItems] =
-    useState<Set<string>>(INITIAL_FIXED_ITEMS);
+  const [data, setData] = useState<Array<Item>>(INITIAL_DATA);
 
-  const handleItemPress = useCallback((item: string) => {
-    setFixedItems(oldItems => {
-      const newItems = new Set(oldItems);
-      if (newItems.has(item)) {
-        newItems.delete(item);
-      } else {
-        newItems.add(item);
-      }
+  const handleItemPress = useCallback((title: string) => {
+    setData(oldItems => {
+      const newItems = [...oldItems];
+      const index = newItems.findIndex(item => item.title === title);
+      newItems[index] = {
+        ...newItems[index]!,
+        fixed: !newItems[index]!.fixed
+      };
       return newItems;
     });
   }, []);
 
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <GridItem
-        fixed={fixedItems.has(item)}
-        item={item}
-        onTap={handleItemPress}
-      />
+  const renderItem = useCallback<SortableGridRenderItem<Item>>(
+    ({ item: { fixed, title } }) => (
+      <GridItem fixed={fixed} title={title} onTap={handleItemPress} />
     ),
-    [fixedItems, handleItemPress]
+    [handleItemPress]
   );
+
+  const keyExtractor = useCallback((item: Item) => item.title, []);
 
   return (
     <ScrollScreen contentContainerStyle={styles.container} includeNavBarHeight>
@@ -52,7 +58,8 @@ export default function FixedOrderItemsExample() {
       <Sortable.Grid
         columnGap={10}
         columns={3}
-        data={DATA}
+        data={data}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         rowGap={10}
         customHandle
@@ -62,21 +69,25 @@ export default function FixedOrderItemsExample() {
 }
 
 type GridItemProps = {
-  item: string;
+  title: string;
   fixed: boolean;
   onTap: (item: string) => void;
 };
 
-const GridItem = memo(function GridItem({ fixed, item, onTap }: GridItemProps) {
+const GridItem = memo(function GridItem({
+  fixed,
+  onTap,
+  title
+}: GridItemProps) {
   return (
-    <Sortable.Touchable onTap={() => onTap(item)}>
+    <Sortable.Touchable onTap={() => onTap(title)}>
       <Sortable.Handle mode={fixed ? 'fixed-order' : 'draggable'}>
         <View
           style={[
             styles.card,
             { backgroundColor: fixed ? '#555' : colors.primary }
           ]}>
-          <Text style={styles.text}>{item}</Text>
+          <Text style={styles.text}>{title}</Text>
         </View>
       </Sortable.Handle>
     </Sortable.Touchable>

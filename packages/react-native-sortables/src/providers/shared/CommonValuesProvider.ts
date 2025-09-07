@@ -21,7 +21,7 @@ import type {
 import { DragActivationState } from '../../types';
 import { getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
-import { useDataContext } from './DataProvider';
+import { useItemsContext } from './ItemsProvider';
 
 let nextId = 0;
 
@@ -60,12 +60,12 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     snapOffsetY: _snapOffsetY,
     sortEnabled: _sortEnabled
   }) => {
-    const { subscribe } = useDataContext();
+    const { getKeys, subscribeKeys } = useItemsContext();
 
     const containerId = useMemo(() => nextId++, []);
 
     // ORDER
-    const indexToKey = useMutableValue<Array<string>>(itemKeys);
+    const indexToKey = useMutableValue<Array<string>>(getKeys());
     const keyToIndex = useDerivedValue(() => getKeyToIndex(indexToKey.value));
 
     // POSITIONS
@@ -128,12 +128,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
 
     useEffect(
       () =>
-        subscribe((state, prevState) => {
-          if (state.itemKeys !== prevState.itemKeys) {
-            indexToKey.value = state.itemKeys;
-          }
+        subscribeKeys(() => {
+          indexToKey.value = getKeys();
         }),
-      [subscribe, indexToKey]
+      [getKeys, subscribeKeys, indexToKey]
     );
 
     return {

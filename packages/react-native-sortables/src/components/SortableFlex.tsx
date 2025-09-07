@@ -1,4 +1,3 @@
-import type { ReactElement } from 'react';
 import { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
@@ -9,54 +8,73 @@ import type { RequiredBy } from '../helperTypes';
 import type { PropsWithDefaults } from '../hooks';
 import { useDragEndHandler, usePropsWithDefaults } from '../hooks';
 import {
-  DataProvider,
   FLEX_STRATEGIES,
   FlexProvider,
+  ItemsProvider,
   useCommonValuesContext,
   useMeasurementsContext,
   useOrderUpdater,
   useStrategyKey
 } from '../providers';
-import type { SortableFlexProps, SortableFlexStyle } from '../types';
+import type {
+  DragEndCallback,
+  SortableFlexProps,
+  SortableFlexStyle
+} from '../types';
 import { orderItems, processChildren } from '../utils';
 import { SortableContainer } from './shared';
+
+function SortableFlex(props: SortableFlexProps) {
+  const {
+    children,
+    onDragEnd: _onDragEnd,
+    strategy,
+    ...rest
+  } = usePropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
+
+  const items = processChildren(children);
+
+  const onDragEnd = useDragEndHandler(_onDragEnd, {
+    order: params =>
+      function <I>(data: Array<I>) {
+        return orderItems(data, items, params, true);
+      }
+  });
+
+  return (
+    <ItemsProvider items={items}>
+      <SortableFlexInner
+        {...rest}
+        key={useStrategyKey(strategy)}
+        strategy={strategy}
+        onDragEnd={onDragEnd}
+      />
+    </ItemsProvider>
+  );
+}
 
 const CONTROLLED_ITEM_DIMENSIONS = {
   height: false,
   width: false
 };
 
-function SortableFlex(props: SortableFlexProps) {
-  const { children, strategy, ...rest } = usePropsWithDefaults(
-    props,
-    DEFAULT_SORTABLE_FLEX_PROPS
-  );
-
-  const items = processChildren(children);
-
-  return (
-    <DataProvider items={items}>
-      <SortableFlexInner
-        {...rest}
-        items={items}
-        key={useStrategyKey(strategy)}
-        strategy={strategy}
-      />
-    </DataProvider>
-  );
-}
+type StyleProps = RequiredBy<
+  SortableFlexStyle,
+  keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
+>;
 
 type SortableFlexInnerProps = PropsWithDefaults<
   SortableFlexProps,
   typeof DEFAULT_SORTABLE_FLEX_PROPS
 > & {
-  items: Array<[string, ReactElement]>;
+  onDragEnd: DragEndCallback;
 };
 
 const SortableFlexInner = memo(function SortableFlexInner({
   alignContent,
   alignItems,
   columnGap,
+  debug,
   dimensionsAnimationType,
   DropIndicatorComponent,
   dropIndicatorStyle,
@@ -66,13 +84,11 @@ const SortableFlexInner = memo(function SortableFlexInner({
   height,
   itemEntering,
   itemExiting,
-  items,
   justifyContent,
   maxHeight,
   maxWidth,
   minHeight,
   minWidth,
-  onDragEnd: _onDragEnd,
   overflow,
   padding,
   paddingBottom,
@@ -87,34 +103,21 @@ const SortableFlexInner = memo(function SortableFlexInner({
   width,
   ...rest
 }: SortableFlexInnerProps) {
-  const { usesAbsoluteLayout } = useCommonValuesContext();
-  const { handleContainerMeasurement } = useMeasurementsContext();
-
+  console.log('>>> SortableFlexInner');
   const isColumn = flexDirection.startsWith('column');
 
-  useOrderUpdater(strategy, FLEX_STRATEGIES);
+  const controlledContainerDimensions = useMemo(
+    () =>
+      flexWrap === 'nowrap'
+        ? { height: height === undefined, width: width === undefined }
+        : {
+            height: height === undefined,
+            width: isColumn && width === undefined
+          },
+    [flexWrap, isColumn, height, width]
+  );
 
-  const controlledContainerDimensions = useMemo(() => {
-    if (flexWrap === 'nowrap') {
-      return { height: height === undefined, width: width === undefined };
-    }
-    return {
-      height: height === undefined,
-      width: isColumn && width === undefined
-    };
-  }, [flexWrap, isColumn, height, width]);
-
-  const onDragEnd = useDragEndHandler(_onDragEnd, {
-    order: params =>
-      function <I>(data: Array<I>) {
-        return orderItems(data, items, params, true);
-      }
-  });
-
-  const styleProps: RequiredBy<
-    SortableFlexStyle,
-    keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
-  > = {
+  const styleProps: StyleProps = {
     alignContent,
     alignItems,
     columnGap,
@@ -137,6 +140,65 @@ const SortableFlexInner = memo(function SortableFlexInner({
     rowGap,
     width
   } as const;
+
+  return (
+    <FlexProvider
+      {...rest}
+      controlledContainerDimensions={controlledContainerDimensions}
+      controlledItemDimensions={CONTROLLED_ITEM_DIMENSIONS}
+      debug={debug}
+      strategy={strategy}
+      styleProps={styleProps}>
+      <SortableFlexComponent
+        debug={debug}
+        dimensionsAnimationType={dimensionsAnimationType}
+        DropIndicatorComponent={DropIndicatorComponent}
+        dropIndicatorStyle={dropIndicatorStyle}
+        itemEntering={itemEntering}
+        itemExiting={itemExiting}
+        overflow={overflow}
+        showDropIndicator={showDropIndicator}
+        strategy={strategy}
+        styleProps={styleProps}
+      />
+    </FlexProvider>
+  );
+});
+
+type SortableFlexComponentProps = Pick<
+  SortableFlexInnerProps,
+  | 'debug'
+  | 'dimensionsAnimationType'
+  | 'DropIndicatorComponent'
+  | 'dropIndicatorStyle'
+  | 'itemEntering'
+  | 'itemExiting'
+  | 'overflow'
+  | 'showDropIndicator'
+  | 'strategy'
+> & {
+  styleProps: StyleProps;
+};
+
+function SortableFlexComponent({
+  strategy,
+  styleProps,
+  ...rest
+}: SortableFlexComponentProps) {
+  const { usesAbsoluteLayout } = useCommonValuesContext();
+  const { handleContainerMeasurement } = useMeasurementsContext();
+
+  const {
+    alignContent,
+    alignItems,
+    flexDirection,
+    flexWrap,
+    height,
+    justifyContent,
+    width
+  } = styleProps;
+
+  useOrderUpdater(strategy, FLEX_STRATEGIES);
 
   const baseContainerStyle: ViewStyle = {
     ...styleProps,
@@ -168,30 +230,16 @@ const SortableFlexInner = memo(function SortableFlexInner({
   );
 
   return (
-    <FlexProvider
+    <SortableContainer
       {...rest}
-      controlledContainerDimensions={controlledContainerDimensions}
-      controlledItemDimensions={CONTROLLED_ITEM_DIMENSIONS}
-      strategy={strategy}
-      styleProps={styleProps}
-      onDragEnd={onDragEnd}>
-      <SortableContainer
-        containerStyle={[baseContainerStyle, animatedContainerStyle]}
-        dimensionsAnimationType={dimensionsAnimationType}
-        DropIndicatorComponent={DropIndicatorComponent}
-        dropIndicatorStyle={dropIndicatorStyle}
-        itemEntering={itemEntering}
-        itemExiting={itemExiting}
-        itemStyle={styles.styleOverride}
-        overflow={overflow}
-        showDropIndicator={showDropIndicator}
-        onLayout={runOnUI((w, h) => {
-          handleContainerMeasurement(w, h);
-        })}
-      />
-    </FlexProvider>
+      containerStyle={[baseContainerStyle, animatedContainerStyle]}
+      itemStyle={styles.styleOverride}
+      onLayout={runOnUI((w, h) => {
+        handleContainerMeasurement(w, h);
+      })}
+    />
   );
-});
+}
 
 const styles = StyleSheet.create({
   styleOverride: {

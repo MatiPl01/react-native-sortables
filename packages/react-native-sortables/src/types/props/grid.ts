@@ -1,12 +1,14 @@
-import type { ReactNode } from 'react';
-
 import type {
   DefaultProps,
   MutuallyExclusiveUnion,
   Simplify
 } from '../../helperTypes';
 import type { AnimatableProps } from '../../integrations/reanimated';
-import type { SortStrategyFactory } from '../providers';
+import type {
+  RenderItem,
+  RenderItemInfo,
+  SortStrategyFactory
+} from '../providers';
 import type { DefaultSharedProps, DragEndParams, SharedProps } from './shared';
 
 /** Parameters passed to the onDragEnd callback of a sortable grid */
@@ -42,21 +44,17 @@ type SortableGridLayoutSettings = MutuallyExclusiveUnion<
     }>
   >;
 
-/** Information passed to the renderItem function */
-export type SortableGridRenderItemInfo<I> = {
-  /** The item to render */
-  item: I;
-  /** Index of the item in the data array */
-  index: number;
-};
+/** Information passed to the renderItem function
+ * @param item The item to render
+ * @param index The index of the item in the data array
+ */
+export type SortableGridRenderItemInfo<I> = RenderItemInfo<I>;
 
 /** Function to render an individual item in the grid
  * @param info Object containing the item and its index
  * @returns React node to render
  */
-export type SortableGridRenderItem<I> = (
-  info: SortableGridRenderItemInfo<I>
-) => ReactNode;
+export type SortableGridRenderItem<I> = RenderItem<I>;
 
 /** Strategy to use for reordering items:
  * - 'insert': Shifts all items between the dragged item and the target

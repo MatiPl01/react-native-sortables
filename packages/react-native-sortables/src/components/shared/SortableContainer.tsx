@@ -8,7 +8,7 @@ import Animated, {
 import { EMPTY_OBJECT, IS_WEB } from '../../constants';
 import { DebugOutlet } from '../../debug';
 import type { AnimatedStyleProp } from '../../integrations/reanimated';
-import { DataOutlet, useCommonValuesContext } from '../../providers';
+import { ItemsOutlet, useCommonValuesContext } from '../../providers';
 import type {
   DimensionsAnimation,
   DropIndicatorSettings,
@@ -112,7 +112,7 @@ export default function SortableContainer({
         onLayout={({ nativeEvent: { layout } }) => {
           onLayout(layout.width, layout.height);
         }}>
-        <DataOutlet
+        <ItemsOutlet
           itemEntering={itemEntering}
           itemExiting={itemExiting}
           itemStyle={itemStyle}

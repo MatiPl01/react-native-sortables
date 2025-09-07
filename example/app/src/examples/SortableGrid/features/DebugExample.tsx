@@ -72,14 +72,15 @@ export default function DebugExample() {
             </Group>
 
             <Sortable.Grid
-              autoScrollMaxOverscroll={200}
+              autoScrollEnabled={autoScrollEnabled}
+              autoScrollMaxOverscroll={125}
               columnGap={spacing.sm}
               columns={COLUMNS}
               data={DATA}
               debug={debugEnabled}
               renderItem={renderItem}
               rowGap={spacing.xs}
-              scrollableRef={autoScrollEnabled ? scrollableRef : undefined}
+              scrollableRef={scrollableRef}
             />
 
             <Group style={styles.boundGroup} withMargin={false} bordered center>

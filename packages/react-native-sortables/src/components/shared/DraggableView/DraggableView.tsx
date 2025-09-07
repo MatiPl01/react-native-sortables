@@ -13,8 +13,8 @@ import type {
 } from '../../../integrations/reanimated';
 import { useMutableValue } from '../../../integrations/reanimated';
 import {
-  DataItemOutlet,
   ItemContextProvider,
+  ItemOutlet,
   useCommonValuesContext,
   useDragContext,
   useItemLayout,
@@ -86,7 +86,7 @@ function DraggableView({
         layoutStyleValue={layoutStyleValue}
         onLayout={onLayout}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
-          <DataItemOutlet itemKey={key} />
+          <ItemOutlet itemKey={key} />
         </LayoutAnimationConfig>
       </ItemCell>
     );

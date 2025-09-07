@@ -17,6 +17,7 @@ import { haveEqualPropValues } from '../../../utils';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
+  useItemsCount,
   useMeasurementsContext
 } from '../../shared';
 import { createProvider } from '../../utils';

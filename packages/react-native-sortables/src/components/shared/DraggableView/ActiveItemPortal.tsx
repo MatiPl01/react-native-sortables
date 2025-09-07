@@ -6,10 +6,10 @@ import { useStableCallback } from '../../../hooks';
 import { useMutableValue } from '../../../integrations/reanimated';
 import {
   CommonValuesContext,
-  DataContext,
-  DataItemOutlet,
   ItemContextProvider,
-  useDataContext,
+  ItemOutlet,
+  ItemsContext,
+  useItemsContext,
   usePortalContext
 } from '../../../providers';
 import type { CommonValuesContextType } from '../../../types';
@@ -17,7 +17,7 @@ import { getContextProvider } from '../../../utils';
 import type { ItemCellProps } from './ItemCell';
 import TeleportedItemCell from './TeleportedItemCell';
 
-const DataContextProvider = getContextProvider(DataContext);
+const ItemsContextProvider = getContextProvider(ItemsContext);
 const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
 type ActiveItemPortalProps = Pick<
@@ -38,7 +38,7 @@ export default function ActiveItemPortal({
   itemKey,
   onTeleport
 }: ActiveItemPortalProps) {
-  const dataContext = useDataContext();
+  const dataContext = useItemsContext();
   const { measurePortalOutlet, teleport } = usePortalContext() ?? {};
 
   const teleportEnabled = useMutableValue(false);
@@ -48,7 +48,7 @@ export default function ActiveItemPortal({
     () => (
       // We have to wrap the TeleportedItemCell in context providers as they won't
       // be accessible otherwise, when the item is rendered in the portal outlet
-      <DataContextProvider value={dataContext}>
+      <ItemsContextProvider value={dataContext}>
         <CommonValuesContextProvider value={commonValuesContext}>
           <ItemContextProvider
             activationAnimationProgress={activationAnimationProgress}
@@ -60,11 +60,11 @@ export default function ActiveItemPortal({
               baseStyle={baseStyle}
               isActive={isActive}
               itemKey={itemKey}>
-              <DataItemOutlet itemKey={itemKey} />
+              <ItemOutlet itemKey={itemKey} />
             </TeleportedItemCell>
           </ItemContextProvider>
         </CommonValuesContextProvider>
-      </DataContextProvider>
+      </ItemsContextProvider>
     ),
     [
       activationAnimationProgress,

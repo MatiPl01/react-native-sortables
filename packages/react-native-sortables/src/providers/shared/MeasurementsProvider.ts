@@ -17,7 +17,7 @@ import type {
 import { areValuesDifferent, resolveDimension } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
-import { useDataContext } from './DataProvider';
+import { useItemsContext } from './ItemsProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 
 const DEBOUNCE_DURATION = 100;
@@ -43,7 +43,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
     useMultiZoneContext() ?? {};
-  const { getData } = useDataContext();
+  const { getKeys } = useItemsContext();
 
   const context = useMutableValue<null | StateContext>(null);
   const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
@@ -79,7 +79,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       previousItemDimensionsRef.current[key] = dimensions;
-      const itemsCount = getData().itemKeys.length;
+      const itemsCount = getKeys().length;
 
       runOnUI(() => {
         context.value ??= {
