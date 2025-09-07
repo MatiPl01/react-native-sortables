@@ -32,7 +32,6 @@ export type SharedProviderProps = PropsWithChildren<
     PartialBy<Required<AutoScrollSettings>, 'scrollableRef'> &
     Required<ItemDragSettings> &
     Required<SortableCallbacks> & {
-      itemKeys: Array<string>;
       sortEnabled: Animatable<boolean>;
       hapticsEnabled: boolean;
       customHandle: boolean;
@@ -59,7 +58,6 @@ export default function SharedProvider({
   customHandle,
   debug,
   hapticsEnabled,
-  itemKeys,
   onActiveItemDropped,
   onDragEnd,
   onDragMove,
@@ -87,12 +85,11 @@ export default function SharedProvider({
     // Provider used for shared values between all providers below
     <CommonValuesProvider
       customHandle={customHandle}
-      itemKeys={itemKeys}
       sortEnabled={sortEnabled}
       {...rest}
     />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider itemsCount={itemKeys.length} />,
+    <MeasurementsProvider />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (

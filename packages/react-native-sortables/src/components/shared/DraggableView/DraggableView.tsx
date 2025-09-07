@@ -1,4 +1,3 @@
-import type { PropsWithChildren } from 'react';
 import { Fragment, memo, useCallback, useEffect, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -14,6 +13,7 @@ import type {
 } from '../../../integrations/reanimated';
 import { useMutableValue } from '../../../integrations/reanimated';
 import {
+  DataItemOutlet,
   ItemContextProvider,
   useCommonValuesContext,
   useDragContext,
@@ -25,15 +25,14 @@ import {
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
 
-export type DraggableViewProps = PropsWithChildren<{
+export type DraggableViewProps = {
   itemKey: string;
   itemEntering: LayoutAnimation | null;
   itemExiting: LayoutAnimation | null;
   style?: AnimatedStyleProp;
-}>;
+};
 
 function DraggableView({
-  children,
   itemEntering,
   itemExiting,
   itemKey: key,
@@ -87,7 +86,7 @@ function DraggableView({
         layoutStyleValue={layoutStyleValue}
         onLayout={onLayout}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
-          {children}
+          <DataItemOutlet itemKey={key} />
         </LayoutAnimationConfig>
       </ItemCell>
     );
@@ -129,9 +128,8 @@ function DraggableView({
         gesture={gesture}
         isActive={isActive}
         itemKey={key}
-        onTeleport={setIsHidden}>
-        {children}
-      </ActiveItemPortal>
+        onTeleport={setIsHidden}
+      />
     </Fragment>
   );
 }

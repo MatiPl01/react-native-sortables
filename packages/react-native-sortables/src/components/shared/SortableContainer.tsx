@@ -1,4 +1,3 @@
-import type { PropsWithChildren } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import Animated, {
   LinearTransition,
@@ -8,35 +7,39 @@ import Animated, {
 
 import { EMPTY_OBJECT, IS_WEB } from '../../constants';
 import { DebugOutlet } from '../../debug';
-import { useCommonValuesContext } from '../../providers';
+import type { AnimatedStyleProp } from '../../integrations/reanimated';
+import { DataOutlet, useCommonValuesContext } from '../../providers';
 import type {
   DimensionsAnimation,
   DropIndicatorSettings,
   Overflow
 } from '../../types';
+import type { DraggableViewProps } from '..';
 import AnimatedOnLayoutView from './AnimatedOnLayoutView';
 import DropIndicator from './DropIndicator';
 
-export type SortableContainerProps = PropsWithChildren<
-  DropIndicatorSettings & {
+export type SortableContainerProps = DropIndicatorSettings &
+  Pick<DraggableViewProps, 'itemEntering' | 'itemExiting'> & {
     dimensionsAnimationType: DimensionsAnimation;
     overflow: Overflow;
+    itemStyle?: AnimatedStyleProp;
     debug?: boolean;
-    style?: StyleProp<ViewStyle>;
+    containerStyle?: StyleProp<ViewStyle>;
     onLayout: (width: number, height: number) => void;
-  }
->;
+  };
 
 export default function SortableContainer({
-  children,
+  containerStyle,
   debug,
   dimensionsAnimationType,
   DropIndicatorComponent,
   dropIndicatorStyle,
+  itemEntering,
+  itemExiting,
+  itemStyle,
   onLayout,
   overflow,
-  showDropIndicator,
-  style
+  showDropIndicator
 }: SortableContainerProps) {
   const {
     activeItemDropped,
@@ -102,11 +105,15 @@ export default function SortableContainer({
       )}
       <AnimatedOnLayoutView
         ref={containerRef}
-        style={[style, innerContainerStyle]}
+        style={[containerStyle, innerContainerStyle]}
         onLayout={({ nativeEvent: { layout } }) => {
           onLayout(layout.width, layout.height);
         }}>
-        {children}
+        <DataOutlet
+          itemEntering={itemEntering}
+          itemExiting={itemExiting}
+          itemStyle={itemStyle}
+        />
       </AnimatedOnLayoutView>
       {/* Renders an overlay view helpful for debugging */}
       {debug && <DebugOutlet />}

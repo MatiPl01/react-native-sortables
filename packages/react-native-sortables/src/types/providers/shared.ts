@@ -27,11 +27,25 @@ import type {
 } from '../props/shared';
 import type { DragActivationState, LayerState } from '../state';
 
+// ITEMS
+
+export type DataState = {
+  itemKeys: Array<string>;
+};
+
+export type DataSubscriber = (
+  current: DataState,
+  prev: DataState | null
+) => void;
+
+export type DataContextType = {
+  subscribe: (callback: DataSubscriber) => () => void;
+  getData: () => DataState;
+};
+
 // COMMON VALUES
 
 export type ControlledDimensions = { width: boolean; height: boolean };
-
-// COMMON VALUES
 
 /**
  * Context values shared between all providers.
@@ -167,7 +181,6 @@ export type PortalContextType = {
   portalOutletMeasurements: SharedValue<MeasuredDimensions | null>;
   measurePortalOutlet: () => void;
   teleport: (id: string, node: ReactNode) => void;
-  isTeleported: (id: string) => boolean;
 };
 
 // MULTI ZONE

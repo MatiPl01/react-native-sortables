@@ -6,6 +6,7 @@ import { useDebugContext } from '../../../debug';
 import type { RequiredBy } from '../../../helperTypes';
 import { useMutableValue } from '../../../integrations/reanimated';
 import type {
+  DebugRectUpdater,
   DimensionLimits,
   FlexLayout,
   FlexLayoutContextType,
@@ -25,9 +26,7 @@ export type FlexLayoutProviderProps = PropsWithChildren<
   RequiredBy<
     SortableFlexStyle,
     keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
-  > & {
-    itemsCount: number;
-  }
+  >
 >;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
@@ -40,7 +39,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   flexWrap,
   gap,
   height,
-  itemsCount,
   justifyContent,
   maxHeight,
   maxWidth,
@@ -113,13 +111,18 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   });
 
   const appliedLayout = useMutableValue<FlexLayout | null>(null);
+  let debugCrossAxisGapRects: Array<DebugRectUpdater> | undefined;
+  let debugMainAxisGapRects: Array<DebugRectUpdater> | undefined;
 
-  // Because the number of groups can dynamically change after order change
-  // and we can't detect that in the React runtime, we are creating debug
-  // rects for the maximum number of groups that can be displayed (which
-  // is the number of items minus 1 in the worst case for just a single group)
-  const debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
-  const debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
+  if (__DEV__) {
+    // Because the number of groups can dynamically change after order change
+    // and we can't detect that in the React runtime, we are creating debug
+    // rects for the maximum number of groups that can be displayed (which
+    // is the number of items minus 1 in the worst case for just a single group)
+    const itemsCount = useItemsCount();
+    debugCrossAxisGapRects = debugContext?.useDebugRects(itemsCount - 1);
+    debugMainAxisGapRects = debugContext?.useDebugRects(itemsCount);
+  }
 
   // FLEX LAYOUT UPDATER
   useAnimatedReaction(

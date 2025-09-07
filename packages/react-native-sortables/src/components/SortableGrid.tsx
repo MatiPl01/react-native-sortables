@@ -1,61 +1,36 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import type { DimensionValue } from 'react-native';
 import { StyleSheet } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
-import { useDragEndHandler } from '../hooks';
+import type { PropsWithDefaults } from '../hooks';
+import { useDragEndHandler, usePropsWithDefaults } from '../hooks';
 import { useAnimatableValue } from '../integrations/reanimated';
 import {
+  DataProvider,
+  GRID_STRATEGIES,
   GridProvider,
   useGridLayoutContext,
-  useMeasurementsContext
+  useMeasurementsContext,
+  useOrderUpdater,
+  useStrategyKey
 } from '../providers';
-import type {
-  DropIndicatorSettings,
-  SortableGridProps,
-  SortableGridRenderItem
-} from '../types';
-import {
-  defaultKeyExtractor,
-  error,
-  getPropsWithDefaults,
-  orderItems,
-  typedMemo,
-  zipArrays
-} from '../utils';
-import { DraggableView, SortableContainer } from './shared';
-import { type DraggableViewProps } from './shared';
+import type { SortableGridProps } from '../types';
+import { defaultKeyExtractor, error, orderItems, typedMemo } from '../utils';
+import { SortableContainer } from './shared';
 
 function SortableGrid<I>(props: SortableGridProps<I>) {
   const {
-    rest: {
-      autoAdjustOffsetDuringDrag,
-      columnGap,
-      columns,
-      data,
-      keyExtractor = defaultKeyExtractor,
-      onDragEnd: _onDragEnd,
-      renderItem,
-      rowGap,
-      rowHeight,
-      rows,
-      strategy
-    },
-    sharedProps: {
-      debug,
-      dimensionsAnimationType,
-      DropIndicatorComponent,
-      dropIndicatorStyle,
-      itemEntering,
-      itemExiting,
-      overflow,
-      reorderTriggerOrigin,
-      showDropIndicator,
-      ...sharedProps
-    }
-  } = getPropsWithDefaults(props, DEFAULT_SORTABLE_GRID_PROPS);
+    columns,
+    data,
+    keyExtractor = defaultKeyExtractor,
+    renderItem,
+    rowHeight,
+    rows,
+    strategy,
+    ...rest
+  } = usePropsWithDefaults(props, DEFAULT_SORTABLE_GRID_PROPS);
 
   const isVertical = rows === undefined;
   const groups = rows ?? columns;
@@ -70,8 +45,74 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     throw error('rows must be greater than 0');
   }
 
-  const columnGapValue = useAnimatableValue(columnGap);
-  const rowGapValue = useAnimatableValue(rowGap);
+  const items = useMemo<Array<[string, I]>>(
+    () => data.map(item => [keyExtractor(item), item]),
+    [data, keyExtractor]
+  );
+
+  return (
+    <DataProvider items={items}>
+      <SortableGridInner
+        {...rest}
+        data={data}
+        groups={groups}
+        isVertical={isVertical}
+        items={items}
+        key={useStrategyKey(strategy)}
+        renderItem={renderItem}
+        rowHeight={rowHeight} // must be specified for horizontal grids
+        strategy={strategy}
+      />
+    </DataProvider>
+  );
+}
+
+type SortableGridInnerProps<I> = PropsWithDefaults<
+  Omit<SortableGridProps<I>, 'columns' | 'keyExtractor'>,
+  typeof DEFAULT_SORTABLE_GRID_PROPS
+> & {
+  items: Array<[string, I]>;
+  groups: number;
+  isVertical: boolean;
+};
+
+const SortableGridInner = typedMemo(function SortableGridInner<I>({
+  columnGap: _columnGap,
+  data,
+  dimensionsAnimationType,
+  DropIndicatorComponent,
+  dropIndicatorStyle,
+  groups,
+  isVertical,
+  itemEntering,
+  itemExiting,
+  items,
+  onDragEnd: _onDragEnd,
+  overflow,
+  renderItem,
+  rowGap: _rowGap,
+  rowHeight = 0,
+  showDropIndicator,
+  strategy,
+  ...rest
+}: SortableGridInnerProps<I>) {
+  const { handleContainerMeasurement, resetMeasurements } =
+    useMeasurementsContext();
+  const { mainGroupSize } = useGridLayoutContext();
+  const isFirstRenderRef = useRef(true);
+
+  const columnGap = useAnimatableValue(_columnGap);
+  const rowGap = useAnimatableValue(_rowGap);
+
+  useOrderUpdater(strategy, GRID_STRATEGIES);
+
+  useLayoutEffect(() => {
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
+      return;
+    }
+    resetMeasurements();
+  }, [groups, resetMeasurements]);
 
   const controlledContainerDimensions = useMemo(
     () => ({
@@ -88,97 +129,9 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     [isVertical]
   );
 
-  const itemKeys = useMemo(() => data.map(keyExtractor), [data, keyExtractor]);
-
   const onDragEnd = useDragEndHandler(_onDragEnd, {
-    data: params => orderItems(data, itemKeys, params, true)
+    data: params => orderItems(data, items, params, true)
   });
-
-  return (
-    <GridProvider
-      {...sharedProps}
-      autoAdjustOffsetDuringDrag={autoAdjustOffsetDuringDrag}
-      columnGap={columnGapValue}
-      controlledContainerDimensions={controlledContainerDimensions}
-      controlledItemDimensions={controlledItemDimensions}
-      debug={debug}
-      isVertical={isVertical}
-      itemKeys={itemKeys}
-      numGroups={groups}
-      numItems={data.length}
-      reorderTriggerOrigin={reorderTriggerOrigin}
-      rowGap={rowGapValue}
-      rowHeight={rowHeight} // must be specified for horizontal grids
-      strategy={strategy}
-      onDragEnd={onDragEnd}>
-      <SortableGridInner
-        columnGap={columnGapValue}
-        data={data}
-        debug={debug}
-        dimensionsAnimationType={dimensionsAnimationType}
-        DropIndicatorComponent={DropIndicatorComponent}
-        dropIndicatorStyle={dropIndicatorStyle}
-        groups={groups}
-        isVertical={isVertical}
-        itemEntering={itemEntering}
-        itemExiting={itemExiting}
-        itemKeys={itemKeys}
-        overflow={overflow}
-        renderItem={renderItem}
-        rowGap={rowGapValue}
-        rowHeight={rowHeight!} // must be specified for horizontal grids
-        showDropIndicator={showDropIndicator}
-      />
-    </GridProvider>
-  );
-}
-
-type SortableGridInnerProps<I> = DropIndicatorSettings &
-  Required<
-    Pick<
-      SortableGridProps<I>,
-      | 'data'
-      | 'debug'
-      | 'dimensionsAnimationType'
-      | 'itemEntering'
-      | 'itemExiting'
-      | 'overflow'
-      | 'renderItem'
-      | 'rowHeight'
-    >
-  > & {
-    itemKeys: Array<string>;
-    rowGap: SharedValue<number>;
-    columnGap: SharedValue<number>;
-    groups: number;
-    isVertical: boolean;
-  };
-
-function SortableGridInner<I>({
-  columnGap,
-  data,
-  groups,
-  isVertical,
-  itemEntering,
-  itemExiting,
-  itemKeys,
-  renderItem,
-  rowGap,
-  rowHeight,
-  ...containerProps
-}: SortableGridInnerProps<I>) {
-  const { handleContainerMeasurement, resetMeasurements } =
-    useMeasurementsContext();
-  const { mainGroupSize } = useGridLayoutContext();
-  const isFirstRenderRef = useRef(true);
-
-  useLayoutEffect(() => {
-    if (isFirstRenderRef.current) {
-      isFirstRenderRef.current = false;
-      return;
-    }
-    resetMeasurements();
-  }, [groups, resetMeasurements]);
 
   const animatedInnerStyle = useAnimatedStyle(() =>
     isVertical
@@ -218,56 +171,37 @@ function SortableGridInner<I>({
     [animatedItemStyle, isVertical]
   );
 
-  const sharedItemProps = {
-    itemEntering,
-    itemExiting,
-    itemKeys,
-    renderItem,
-    style: itemStyle
-  };
-
   return (
-    <SortableContainer
-      {...containerProps}
-      style={[styles.gridContainer, animatedInnerStyle]}
-      onLayout={runOnUI((width, height) => {
-        handleContainerMeasurement(
-          width - (isVertical && !IS_WEB ? columnGap.value : 0),
-          height
-        );
-      })}>
-      {zipArrays(data, itemKeys).map(([item, key], index) => (
-        <SortableGridItem
-          {...sharedItemProps}
-          index={index}
-          item={item}
-          itemKey={key}
-          key={key}
-        />
-      ))}
-    </SortableContainer>
+    <GridProvider
+      {...rest}
+      columnGap={columnGap}
+      controlledContainerDimensions={controlledContainerDimensions}
+      controlledItemDimensions={controlledItemDimensions}
+      isVertical={isVertical}
+      numGroups={groups}
+      rowGap={rowGap}
+      strategy={strategy}
+      onDragEnd={onDragEnd}>
+      <SortableContainer
+        containerStyle={[styles.gridContainer, animatedInnerStyle]}
+        dimensionsAnimationType={dimensionsAnimationType}
+        DropIndicatorComponent={DropIndicatorComponent}
+        dropIndicatorStyle={dropIndicatorStyle}
+        itemEntering={itemEntering}
+        itemExiting={itemExiting}
+        itemStyle={itemStyle}
+        overflow={overflow}
+        showDropIndicator={showDropIndicator}
+        onLayout={runOnUI((w, h) => {
+          handleContainerMeasurement(
+            w - (isVertical && !IS_WEB ? columnGap.value : 0),
+            h
+          );
+        })}
+      />
+    </GridProvider>
   );
-}
-
-type SortableGridItemProps<I> = DraggableViewProps & {
-  index: number;
-  item: I;
-  renderItem: SortableGridRenderItem<I>;
-};
-
-function SortableGridItem<I>({
-  index,
-  item,
-  renderItem,
-  ...rest
-}: SortableGridItemProps<I>) {
-  const children = useMemo(
-    () => renderItem({ index, item }),
-    [renderItem, index, item]
-  );
-
-  return <DraggableView {...rest}>{children}</DraggableView>;
-}
+});
 
 const styles = StyleSheet.create({
   gridContainer: {

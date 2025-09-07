@@ -4,6 +4,7 @@ export {
   useCommonValuesContext
 } from './CommonValuesProvider';
 export { useCustomHandleContext } from './CustomHandleProvider';
+export * from './DataProvider';
 export { useDragContext } from './DragProvider';
 export * from './hooks';
 export { ItemContextProvider, useItemContext } from './ItemContextProvider';
