@@ -29,7 +29,7 @@ export default function MultiZoneExample() {
             data={data}
             dimensionsAnimationType='worklet'
             renderItem={renderItem}
-            rowGap={50}
+            rowGap={spacing.xs}
             debug
             onDragEnd={({ data: newData }) => setData(newData)}
             onActiveItemDropped={() => {

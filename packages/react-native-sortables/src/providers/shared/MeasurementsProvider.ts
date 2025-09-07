@@ -17,6 +17,7 @@ import type {
 import { areValuesDifferent, resolveDimension } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
+import { useItemsContext } from './ItemsProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 
 const DEBOUNCE_DURATION = 100;
@@ -26,13 +27,9 @@ type StateContext = {
   queuedMeasurements: Map<string, Dimensions>;
 };
 
-type MeasurementsProviderProps = {
-  itemsCount: number;
-};
-
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<MeasurementsProviderProps, MeasurementsContextType>(({ itemsCount }) => {
+)<Record<string, never>, MeasurementsContextType>(() => {
   const {
     activeItemDimensions,
     activeItemKey,
@@ -46,6 +43,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
     useMultiZoneContext() ?? {};
+  const { getKeys } = useItemsContext();
 
   const context = useMutableValue<null | StateContext>(null);
   const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
@@ -81,6 +79,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       previousItemDimensionsRef.current[key] = dimensions;
+      const itemsCount = getKeys().length;
 
       runOnUI(() => {
         context.value ??= {

@@ -5,10 +5,11 @@ import { useAnimatedReaction } from 'react-native-reanimated';
 import { IS_WEB } from '../../../constants';
 import { useDebugContext } from '../../../debug';
 import { useMutableValue } from '../../../integrations/reanimated';
-import type { GridLayoutContextType } from '../../../types';
+import type { DebugRectUpdater, GridLayoutContextType } from '../../../types';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
+  useItemsCount,
   useMeasurementsContext
 } from '../../shared';
 import { createProvider } from '../../utils';
@@ -21,7 +22,6 @@ const DEBUG_COLORS = {
 };
 
 export type GridLayoutProviderProps = PropsWithChildren<{
-  numItems: number;
   numGroups: number;
   isVertical: boolean;
   rowGap: SharedValue<number>;
@@ -35,7 +35,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   columnGap,
   isVertical,
   numGroups,
-  numItems,
   rowGap,
   rowHeight
 }) => {
@@ -53,10 +52,16 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const { contentBounds } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
-  const debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
-  const debugCrossGapRects = debugContext?.useDebugRects(
-    Math.ceil(numItems / numGroups) - 1
-  );
+  let debugCrossGapRects: Array<DebugRectUpdater> | undefined;
+  let debugMainGapRects: Array<DebugRectUpdater> | undefined;
+
+  if (__DEV__) {
+    const itemsCount = useItemsCount();
+    debugMainGapRects = debugContext?.useDebugRects(numGroups - 1);
+    debugCrossGapRects = debugContext?.useDebugRects(
+      Math.ceil(itemsCount / numGroups) - 1
+    );
+  }
 
   const mainGap = isVertical ? columnGap : rowGap;
   const crossGap = isVertical ? rowGap : columnGap;

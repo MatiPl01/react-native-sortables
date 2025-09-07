@@ -7,6 +7,7 @@ export { useCustomHandleContext } from './CustomHandleProvider';
 export { useDragContext } from './DragProvider';
 export * from './hooks';
 export { ItemContextProvider, useItemContext } from './ItemContextProvider';
+export * from './ItemsProvider';
 export { LayerProvider } from './LayerProvider';
 export { useMeasurementsContext } from './MeasurementsProvider';
 export * from './MultiZoneProvider';

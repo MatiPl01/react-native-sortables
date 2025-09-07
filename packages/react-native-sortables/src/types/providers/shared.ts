@@ -27,11 +27,27 @@ import type {
 } from '../props/shared';
 import type { DragActivationState, LayerState } from '../state';
 
+// ITEMS
+
+export type RenderItemInfo<I> = {
+  /** The item to render */
+  item: I;
+  /** Index of the item in the data array */
+  index: number;
+};
+
+export type RenderItem<I> = (info: RenderItemInfo<I>) => ReactNode;
+
+export type ItemsContextType = {
+  getKeys: () => Array<string>;
+  subscribeKeys: (callback: () => void) => () => void;
+  getNode: (key: string) => ReactNode | undefined;
+  subscribeItem: (key: string, callback: () => void) => () => void;
+};
+
 // COMMON VALUES
 
 export type ControlledDimensions = { width: boolean; height: boolean };
-
-// COMMON VALUES
 
 /**
  * Context values shared between all providers.
