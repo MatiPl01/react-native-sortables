@@ -105,11 +105,13 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         prevProps: GridLayoutProps | null
       ): GridLayoutProps => {
         'worklet';
+        const itemKey = activeItemKey.value ?? prevActiveItemKey.value;
+
         const ctx = context.value;
         if (ctx.state === AutoOffsetAdjustmentState.DISABLED) {
           return props;
         }
-        if (ctx.state === AutoOffsetAdjustmentState.RESET) {
+        if (ctx.state === AutoOffsetAdjustmentState.RESET || itemKey === null) {
           disableAutoOffsetAdjustment();
           return props;
         }
@@ -142,13 +144,10 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           numGroups
         } as const;
 
-        const itemKey = activeItemKey.value ?? prevActiveItemKey.value;
-
         if (
-          itemKey === null ||
-          (activeItemKey.value === null &&
-            additionalCrossOffset.value !== null &&
-            prevCrossIteSizes !== null)
+          activeItemKey.value === null &&
+          additionalCrossOffset.value !== null &&
+          prevCrossIteSizes !== null
         ) {
           const prevActiveKey = prevActiveItemKey.value!;
           const oldCrossOffset =
@@ -179,12 +178,11 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
 
           return {
             ...props,
-            shouldAnimateLayout: false
-            // gaps: prevProps?.gaps ?? gaps,
-            // [isVertical ? 'itemHeights' : 'itemWidths']: prevCrossIteSizes,
-            // requestNextLayout: true,
-            // shouldAnimateLayout: false,
-            // startCrossOffset: offsetDiff
+            gaps: prevProps?.gaps ?? gaps,
+            [isVertical ? 'itemHeights' : 'itemWidths']: prevCrossIteSizes,
+            requestNextLayout: true,
+            shouldAnimateLayout: false,
+            startCrossOffset: offsetDiff
           };
         }
 
@@ -238,6 +236,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         activeItemDimensions,
         activeItemPosition,
         additionalCrossOffset,
+        disableAutoOffsetAdjustment,
         enableActiveItemSnap,
         itemPositions,
         keyToIndex,

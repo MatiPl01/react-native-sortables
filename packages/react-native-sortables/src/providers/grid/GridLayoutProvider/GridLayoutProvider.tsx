@@ -174,7 +174,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       if (adaptedProps.requestNextLayout) {
         setAnimatedTimeout(() => {
-          // layoutRequestId.value++;
+          layoutRequestId.value++;
         });
       }
 
