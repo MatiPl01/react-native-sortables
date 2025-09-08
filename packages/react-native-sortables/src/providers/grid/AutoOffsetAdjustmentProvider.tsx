@@ -104,7 +104,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       clearAnimatedTimeout(ctx.resetTimeoutId);
       ctx.state = AutoOffsetAdjustmentState.DISABLED;
       sortEnabled.value = ctx.prevSortEnabled;
-    }, [context, sortEnabled]);
+      additionalCrossOffset.value = null;
+    }, [context, sortEnabled, additionalCrossOffset]);
 
     useAnimatedReaction(
       () => activeItemDropped.value,
@@ -229,6 +230,11 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           additionalCrossOffset.value !== null &&
           prevCrossIteSizes !== null
         ) {
+          if (!scrollableRef) {
+            disableAutoOffsetAdjustment();
+            return props;
+          }
+
           const prevActiveKey = prevActiveItemKey.value!;
           const oldCrossOffset =
             itemPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
@@ -239,9 +245,6 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
 
           const scrollDistance = newCrossOffset - oldCrossOffset;
           const startCrossOffset = additionalCrossOffset.value + scrollDistance;
-
-          additionalCrossOffset.value = null;
-          ctx.state = AutoOffsetAdjustmentState.RESET;
 
           const itemCrossSize = resolveDimension(crossItemSizes, prevActiveKey);
           ctx.keepInViewData =
@@ -258,6 +261,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           // in reaction to the itemPositions change, so the new layout is committed
           // in the next frame). We use this timeout to execute the scroll in the next frame.
           setAnimatedTimeout(() => scrollBy?.(scrollDistance, false));
+
+          ctx.state = AutoOffsetAdjustmentState.RESET;
 
           return {
             ...props,
@@ -331,7 +336,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         scrollPadding,
         scrollBy,
         context,
-        sortEnabled
+        sortEnabled,
+        scrollableRef
       ]
     );
 

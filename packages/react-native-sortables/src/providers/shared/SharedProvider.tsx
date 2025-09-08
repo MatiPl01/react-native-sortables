@@ -7,14 +7,13 @@ import { LayoutAnimationConfig } from 'react-native-reanimated';
 import { DebugProvider } from '../../debug';
 import type { PartialBy } from '../../helperTypes';
 import { useWarnOnPropChange } from '../../hooks';
-import type { Animatable } from '../../integrations/reanimated';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
   AutoScrollSettings,
   ControlledDimensions,
   ItemDragSettings,
-  ItemsLayoutTransitionMode,
+  SharedProps,
   SortableCallbacks
 } from '../../types';
 import { ContextProviderComposer } from '../utils';
@@ -31,15 +30,21 @@ export type SharedProviderProps = PropsWithChildren<
     ActiveItemSnapSettings &
     PartialBy<Required<AutoScrollSettings>, 'scrollableRef'> &
     Required<ItemDragSettings> &
+    Required<
+      Pick<
+        SharedProps,
+        | 'bringToFrontWhenActive'
+        | 'customHandle'
+        | 'debug'
+        | 'hapticsEnabled'
+        | 'itemsLayoutTransitionMode'
+        | 'measureDebounceDelay'
+        | 'sortEnabled'
+      >
+    > &
     Required<SortableCallbacks> & {
-      sortEnabled: Animatable<boolean>;
-      hapticsEnabled: boolean;
-      customHandle: boolean;
-      debug: boolean;
       controlledContainerDimensions: ControlledDimensions;
       controlledItemDimensions: ControlledDimensions;
-      itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
-      bringToFrontWhenActive: boolean;
       dropIndicatorStyle?: ViewStyle;
     }
 >;
@@ -58,6 +63,7 @@ export default function SharedProvider({
   customHandle,
   debug,
   hapticsEnabled,
+  measureDebounceDelay,
   onActiveItemDropped,
   onDragEnd,
   onDragMove,
@@ -89,7 +95,7 @@ export default function SharedProvider({
       {...rest}
     />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider />,
+    <MeasurementsProvider measureDebounceDelay={measureDebounceDelay} />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (

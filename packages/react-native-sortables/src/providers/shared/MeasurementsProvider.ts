@@ -20,16 +20,20 @@ import { useCommonValuesContext } from './CommonValuesProvider';
 import { useItemsContext } from './ItemsProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 
-const DEBOUNCE_DURATION = 100;
-
 type StateContextType = {
   measuredItemKeys: Set<string>;
   queuedMeasurements: Map<string, Dimensions>;
 };
 
+type MeasurementsProviderProps = {
+  measureDebounceDelay: number;
+};
+
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<Record<string, never>, MeasurementsContextType>(() => {
+)<MeasurementsProviderProps, MeasurementsContextType>(({
+  measureDebounceDelay
+}) => {
   const {
     activeItemDimensions,
     activeItemKey,
@@ -145,7 +149,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         } else {
           // In all other cases, debounce the update to reduce the number of
           // updates when dimensions change many times within a short period of time
-          debounce.schedule(updateDimensions, DEBOUNCE_DURATION);
+          debounce.schedule(updateDimensions, measureDebounceDelay);
         }
       })();
     }
@@ -223,10 +227,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     runOnUI(() => {
       context.value = null;
       if (typeof itemWidths.value === 'object') {
-        itemWidths.value = {};
+        itemWidths.value = null;
       }
       if (typeof itemHeights.value === 'object') {
-        itemHeights.value = {};
+        itemHeights.value = null;
       }
     })();
   }, [itemHeights, itemWidths, context]);

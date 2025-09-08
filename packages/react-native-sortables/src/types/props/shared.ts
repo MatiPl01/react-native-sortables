@@ -302,22 +302,39 @@ export type SharedProps = Simplify<
         DropIndicatorSettings &
         ItemDragSettings &
         ItemLayoutAnimationSettings & {
-          /** Whether and how to animate container dimensions changes */
+          /** Delay after the last item measurement and the measurements commit
+           * triggering the layout calculation
+           * @default 0
+           */
+          measureDebounceDelay: number;
+          /** Whether and how to animate container dimensions changes
+           * @default 'none'
+           */
           dimensionsAnimationType: DimensionsAnimation;
-          /** Enable haptic feedback when sorting items */
+          /** Enable haptic feedback when sorting items
+           * @default false
+           */
           hapticsEnabled: boolean;
-          /** Controls whether sorting functionality is enabled */
+          /** Controls whether sorting functionality is enabled
+           * @default true
+           */
           sortEnabled: Animatable<boolean>;
-          /** Whether to use a custom handle component for dragging */
+          /** Whether to use a custom handle component for dragging
+           * @default false
+           */
           customHandle: boolean;
-          /** Specifies how content overflowing the container should be handled */
+          /** Specifies how content overflowing the container should be handled
+           * @default 'visible'
+           */
           overflow: Overflow;
           /** Enables debug mode to show additional visual helpers and console logs.
            * @note This only works in development builds and has no effect in production.
+           * @default false
            */
           debug: boolean;
           /** Whether the zIndex of the sortable container should be changed when
            * drag starts
+           * @default true
            */
           bringToFrontWhenActive: boolean;
         }
