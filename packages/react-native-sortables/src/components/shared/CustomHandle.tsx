@@ -1,4 +1,5 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { runOnUI, useAnimatedRef } from 'react-native-reanimated';
@@ -12,6 +13,7 @@ import { error } from '../../utils';
 
 /** Props for the Sortable Handle component */
 export type CustomHandleProps = PropsWithChildren<{
+  style?: StyleProp<ViewStyle>;
   /** Controls how the item behaves in the sortable component
    * - 'draggable': Item can be dragged and moves with reordering (default)
    * - 'non-draggable': Item cannot be dragged but moves with reordering
@@ -21,7 +23,11 @@ export type CustomHandleProps = PropsWithChildren<{
   mode?: 'draggable' | 'fixed-order' | 'non-draggable';
 }>;
 
-export default function CustomHandle(props: CustomHandleProps) {
+export default function CustomHandle({
+  children,
+  mode,
+  style
+}: CustomHandleProps) {
   // The item is teleported when it is rendered within the PortalOutlet
   // component
   const isTeleported = useIsInPortalOutlet();
@@ -29,15 +35,18 @@ export default function CustomHandle(props: CustomHandleProps) {
   // In case of teleported handle items, we want to render just the
   // handle component without any functionality
   return isTeleported ? (
-    <View>{props.children}</View>
+    <View style={style}>{children}</View>
   ) : (
-    <CustomHandleComponent {...props} />
+    <CustomHandleComponent mode={mode} style={style}>
+      {children}
+    </CustomHandleComponent>
   );
 }
 
 function CustomHandleComponent({
   children,
-  mode = 'draggable'
+  mode = 'draggable',
+  style
 }: CustomHandleProps) {
   const customHandleContext = useCustomHandleContext();
   if (!customHandleContext) {
@@ -66,7 +75,11 @@ function CustomHandleComponent({
 
   return (
     <GestureDetector gesture={gesture.enabled(dragEnabled)} userSelect='none'>
-      <View collapsable={false} ref={handleRef} onLayout={runOnUI(onLayout)}>
+      <View
+        collapsable={false}
+        ref={handleRef}
+        style={style}
+        onLayout={runOnUI(onLayout)}>
         {children}
       </View>
     </GestureDetector>
