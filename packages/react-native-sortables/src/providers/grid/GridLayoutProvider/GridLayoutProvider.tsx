@@ -168,8 +168,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
           !prevProps?.itemHeights ||
           !prevProps?.itemWidths ||
           isVertical
-            ? props.itemWidths === prevProps?.itemWidths
-            : props.itemHeights === prevProps?.itemHeights;
+            ? props.itemHeights === prevProps?.itemHeights
+            : props.itemWidths === prevProps?.itemWidths;
       }
 
       if (adaptedProps.requestNextLayout) {

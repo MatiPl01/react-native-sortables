@@ -39,7 +39,7 @@ type KeepInViewData = {
   isVertical: boolean;
 };
 
-type StateContext = {
+type StateContextType = {
   state: AutoOffsetAdjustmentState;
   resetTimeoutId: number;
   prevSortEnabled: boolean;
@@ -87,8 +87,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       [autoAdjustOffsetScrollPadding]
     );
 
-    const contextRef = useRef<null | SharedValue<StateContext>>(null);
-    contextRef.current ??= makeMutable<StateContext>({
+    const contextRef = useRef<null | SharedValue<StateContextType>>(null);
+    contextRef.current ??= makeMutable<StateContextType>({
       keepInViewData: null,
       prevSortEnabled: sortEnabled.value,
       resetTimeoutId: 0,

@@ -2,7 +2,7 @@
 
 import { Extrapolation, interpolate } from 'react-native-reanimated';
 
-import type { Vector } from '../../../types';
+import type { Vector } from '../../../types/layout';
 
 export const interpolateVector = (
   progress: number,

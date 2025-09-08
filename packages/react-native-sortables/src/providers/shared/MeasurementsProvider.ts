@@ -22,7 +22,7 @@ import { useMultiZoneContext } from './MultiZoneProvider';
 
 const DEBOUNCE_DURATION = 100;
 
-type StateContext = {
+type StateContextType = {
   measuredItemKeys: Set<string>;
   queuedMeasurements: Map<string, Dimensions>;
 };
@@ -45,7 +45,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     useMultiZoneContext() ?? {};
   const { getKeys } = useItemsContext();
 
-  const context = useMutableValue<null | StateContext>(null);
+  const context = useMutableValue<null | StateContextType>(null);
   const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
   const debounce = useAnimatedDebounce();
 
