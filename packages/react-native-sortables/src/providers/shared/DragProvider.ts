@@ -15,8 +15,7 @@ import { useHaptics } from '../../integrations/haptics';
 import {
   clearAnimatedTimeout,
   setAnimatedTimeout,
-  useMutableValue,
-  useStableCallbackValue
+  useMutableValue
 } from '../../integrations/reanimated';
 import type {
   Dimensions,
@@ -40,6 +39,22 @@ import { useCustomHandleContext } from './CustomHandleProvider';
 import { useLayerContext } from './LayerProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 import { usePortalContext } from './PortalProvider';
+
+type StateContextType = {
+  touchStartTouch: null | TouchData;
+  dragStartItemTouchOffset: null | Vector;
+  dragStartTouchPosition: null | Vector;
+  dragStartIndex: number;
+  activationTimeoutId: number;
+};
+
+const INITIAL_STATE: StateContextType = {
+  activationTimeoutId: -1,
+  dragStartIndex: -1,
+  dragStartItemTouchOffset: null,
+  dragStartTouchPosition: null,
+  touchStartTouch: null
+};
 
 type DragProviderProps = PropsWithChildren<
   Required<SortableCallbacks> & {
@@ -111,24 +126,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     overDrag === 'horizontal' || overDrag === 'both';
   const hasVerticalOverDrag = overDrag === 'vertical' || overDrag === 'both';
 
-  const touchStartTouch = useMutableValue<null | TouchData>(null);
-  const currentTouch = useMutableValue<null | TouchData>(null);
-  const dragStartItemTouchOffset = useMutableValue<null | Vector>(null);
-  const dragStartTouchPosition = useMutableValue<null | Vector>(null);
-  const dragStartIndex = useMutableValue(-1);
+  const context = useMutableValue<StateContextType>(INITIAL_STATE);
 
+  const currentTouch = useMutableValue<null | TouchData>(null);
   // Used to trigger order change of items when the active item is dragged around
   const triggerOriginPosition = useMutableValue<null | Vector>(null);
-
-  // Used for activation and deactivation (drop)
-  const activationTimeoutId = useMutableValue(-1);
-
-  // Create stable callbacks to avoid re-rendering when the callback
-  // function is not memoized
-  const stableOnDragStart = useStableCallbackValue(onDragStart);
-  const stableOnDragMove = useStableCallbackValue(onDragMove);
-  const stableOnOrderChange = useStableCallbackValue(onOrderChange);
-  const stableOnActiveItemDropped = useStableCallbackValue(onActiveItemDropped);
 
   // ACTIVE ITEM POSITION UPDATER
   useAnimatedReaction(
@@ -137,7 +139,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       containerH: containerHeight.value,
       containerW: containerWidth.value,
       enableSnap: enableActiveItemSnap.value,
-      itemTouchOffset: dragStartItemTouchOffset.value,
+      itemTouchOffset: context.value.dragStartItemTouchOffset,
       key: activeItemKey.value,
       offsetDiff: scrollOffsetDiff?.value,
       offsetX: snapOffsetX.value,
@@ -146,8 +148,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       snapItemDimensions:
         activeHandleMeasurements?.value ?? activeItemDimensions.value,
       snapItemOffset: activeHandleOffset?.value,
-      startTouch: touchStartTouch.value,
-      startTouchPosition: dragStartTouchPosition.value,
+      startTouch: context.value.touchStartTouch,
+      startTouchPosition: context.value.dragStartTouchPosition,
       touch: currentTouch.value
     }),
     ({
@@ -277,14 +279,15 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationAnimationProgress: SharedValue<number>
     ) => {
       'worklet';
+      const ctx = context.value;
       activeAnimationProgress.value = 0;
       activeItemDropped.value = false;
       prevActiveItemKey.value = null;
       activeItemKey.value = key;
       activeItemPosition.value = itemPosition;
       activeItemDimensions.value = itemDimensions;
-      dragStartIndex.value = keyToIndex.value[key] ?? -1;
       activationState.value = DragActivationState.ACTIVE;
+      ctx.dragStartIndex = keyToIndex.value[key] ?? -1;
 
       if (activeContainerId) {
         activeContainerId.value = containerId;
@@ -301,18 +304,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       // Touch position relative to the top-left corner of the sortable
       // container
-      dragStartItemTouchOffset.value = {
+      const dragStartItemTouchOffset = {
         x: touch.x + (activeHandleOffset?.value?.x ?? 0),
         y: touch.y + (activeHandleOffset?.value?.y ?? 0)
       };
+      ctx.dragStartItemTouchOffset = dragStartItemTouchOffset;
       // Must be calculated relative to the item position instead of using
       // measure on the containerRef, because measure doesn't work properly
       // on Android on Fabric and returns wrong value on the second measurement
       touchPosition.value = {
-        x: itemPosition.x + dragStartItemTouchOffset.value.x,
-        y: itemPosition.y + dragStartItemTouchOffset.value.y
+        x: itemPosition.x + dragStartItemTouchOffset.x,
+        y: itemPosition.y + dragStartItemTouchOffset.y
       };
-      dragStartTouchPosition.value = touchPosition.value;
+      ctx.dragStartTouchPosition = touchPosition.value;
 
       const hasInactiveAnimation =
         inactiveItemOpacity.value !== 1 || inactiveItemScale.value !== 1;
@@ -330,8 +334,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // reactions are computed in the library (e.g. for the portal and collapsible
       // items case when the size of the active item must change after it is teleported)
       setAnimatedTimeout(() => {
-        stableOnDragStart({
-          fromIndex: dragStartIndex.value,
+        onDragStart({
+          fromIndex: ctx.dragStartIndex,
           indexToKey: indexToKey.value,
           key,
           keyToIndex: keyToIndex.value
@@ -348,10 +352,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activationState,
       activeItemKey,
       activeItemPosition,
+      context,
       containerId,
-      dragStartIndex,
-      dragStartItemTouchOffset,
-      dragStartTouchPosition,
       haptics,
       inactiveAnimationProgress,
       inactiveItemOpacity,
@@ -360,7 +362,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       keyToIndex,
       multiZoneActiveItemDimensions,
       prevActiveItemKey,
-      stableOnDragStart,
+      onDragStart,
       touchPosition,
       updateLayer,
       updateActiveHandleMeasurements
@@ -391,15 +393,16 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
-      touchStartTouch.value = touch;
+      const ctx = context.value;
+      ctx.touchStartTouch = touch;
       currentTouch.value = touch;
       activationState.value = DragActivationState.TOUCHED;
 
-      clearAnimatedTimeout(activationTimeoutId.value);
+      clearAnimatedTimeout(ctx.activationTimeoutId);
 
       // Start handling touch after a delay to prevent accidental activation
       // e.g. while scrolling the ScrollView
-      activationTimeoutId.value = setAnimatedTimeout(() => {
+      ctx.activationTimeoutId = setAnimatedTimeout(() => {
         if (!usesAbsoluteLayout.value) {
           return;
         }
@@ -428,7 +431,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     [
       activeItemKey,
       activationState,
-      activationTimeoutId,
+      context,
       currentTouch,
       dragActivationDelay,
       handleDragStart,
@@ -436,7 +439,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       itemWidths,
       itemPositions,
       sortEnabled,
-      touchStartTouch,
       usesAbsoluteLayout
     ]
   );
@@ -452,21 +454,23 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
+      const ctx = context.value;
+
       if (activeItemKey.value) {
-        stableOnDragMove({
-          fromIndex: dragStartIndex.value,
+        onDragMove({
+          fromIndex: ctx.dragStartIndex,
           key: activeItemKey.value,
           touchData: touch
         });
       }
 
       if (activationState.value === DragActivationState.TOUCHED) {
-        if (!touchStartTouch.value) {
+        if (!ctx.touchStartTouch) {
           fail();
           return;
         }
-        const dX = touch.absoluteX - touchStartTouch.value.absoluteX;
-        const dY = touch.absoluteY - touchStartTouch.value.absoluteY;
+        const dX = touch.absoluteX - ctx.touchStartTouch.absoluteX;
+        const dY = touch.absoluteY - ctx.touchStartTouch.absoluteY;
 
         // Cancel touch if the touch moved too far from the initial position
         // before the item activation animation starts
@@ -485,11 +489,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     [
       activationState,
       activeItemKey,
-      currentTouch,
       dragActivationFailOffset,
-      touchStartTouch,
-      dragStartIndex,
-      stableOnDragMove
+      currentTouch,
+      context,
+      onDragMove
     ]
   );
 
@@ -500,12 +503,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         return;
       }
 
-      clearAnimatedTimeout(activationTimeoutId.value);
+      const ctx = context.value;
+      clearAnimatedTimeout(ctx.activationTimeoutId);
 
-      const fromIndex = dragStartIndex.value;
+      const fromIndex = ctx.dragStartIndex;
       const toIndex = keyToIndex.value[key]!;
 
-      touchStartTouch.value = null;
+      ctx.touchStartTouch = null;
       currentTouch.value = null;
       activationState.value = DragActivationState.INACTIVE;
 
@@ -523,13 +527,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       prevActiveItemKey.value = activeItemKey.value;
-      dragStartItemTouchOffset.value = null;
-      dragStartTouchPosition.value = null;
+      ctx.dragStartItemTouchOffset = null;
+      ctx.dragStartTouchPosition = null;
       activeItemPosition.value = null;
       activeItemDimensions.value = null;
       touchPosition.value = null;
       activeItemKey.value = null;
-      dragStartIndex.value = -1;
+      ctx.dragStartIndex = -1;
 
       // This ensures that the drop duration is reduced if the item activation
       // animation didn't complete yet
@@ -557,7 +561,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       setAnimatedTimeout(() => {
         activeItemDropped.value = true;
         updateLayer?.(LayerState.IDLE);
-        stableOnActiveItemDropped({
+        onActiveItemDropped({
           fromIndex,
           indexToKey: indexToKey.value,
           key,
@@ -573,23 +577,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemDropped,
       activeItemPosition,
       prevActiveItemKey,
-      activationTimeoutId,
+      context,
       activeAnimationProgress,
       activationState,
       currentTouch,
       dropAnimationDuration,
-      dragStartIndex,
-      dragStartItemTouchOffset,
-      dragStartTouchPosition,
       haptics,
       inactiveAnimationProgress,
       indexToKey,
       keyToIndex,
       multiZoneActiveItemDimensions,
-      stableOnActiveItemDropped,
+      onActiveItemDropped,
       stableOnDragEnd,
       touchPosition,
-      touchStartTouch,
       updateLayer,
       activeHandleMeasurements
     ]
@@ -606,7 +606,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       indexToKey.value = newOrder;
       haptics.light();
 
-      stableOnOrderChange({
+      onOrderChange({
         fromIndex,
         indexToKey: indexToKey.value,
         key,
@@ -614,12 +614,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         toIndex
       });
     },
-    [indexToKey, stableOnOrderChange, haptics]
+    [indexToKey, onOrderChange, haptics]
   );
 
   return {
     value: {
-      dropAnimationDuration,
       handleDragEnd,
       handleOrderChange,
       handleTouchesMove,
