@@ -45,18 +45,22 @@ function Example({ horizontal }: ExampleProps) {
   const dimension = horizontal ? 'width' : 'height';
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <Animated.View
-        layout={LinearTransition}
-        style={[
-          styles.card,
-          { [dimension]: collapsed ? sizes.lg : sizes.xxxl }
-        ]}>
-        <Animated.Text layout={LinearTransition} style={styles.text}>
-          {item}
-        </Animated.Text>
-      </Animated.View>
-    ),
+    ({ item }) => {
+      const layoutTransition = LinearTransition.delay(collapsed ? 0 : 50);
+
+      return (
+        <Animated.View
+          layout={layoutTransition}
+          style={[
+            styles.card,
+            { [dimension]: collapsed ? sizes.lg : sizes.xxxl }
+          ]}>
+          <Animated.Text layout={layoutTransition} style={styles.text}>
+            {item}
+          </Animated.Text>
+        </Animated.View>
+      );
+    },
     [collapsed, dimension]
   );
 

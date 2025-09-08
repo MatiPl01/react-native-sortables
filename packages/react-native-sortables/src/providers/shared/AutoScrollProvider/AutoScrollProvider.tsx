@@ -64,6 +64,10 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   const scrollBy = useCallback(
     (distance: number, animated: boolean) => {
       'worklet';
+      if (distance === 0) {
+        return;
+      }
+
       const offset = currentScrollOffset.value + distance;
       scrollTo(
         scrollableRef,
