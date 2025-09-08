@@ -19,7 +19,7 @@ import {
   useCustomHandleContext
 } from '../shared';
 import { createProvider } from '../utils';
-import { calculateActiveItemCrossOffset } from './GridLayoutProvider/utils';
+import { calculateItemCrossOffset } from './GridLayoutProvider/utils';
 
 enum AutoOffsetAdjustmentState {
   ENABLED, // Auto adjustment is enabled but the additional cross offset is not applied yet
@@ -112,6 +112,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           return props;
         }
         if (ctx.state === AutoOffsetAdjustmentState.RESET || itemKey === null) {
+          console.log('>>> reset');
           disableAutoOffsetAdjustment();
           return props;
         }
@@ -152,29 +153,25 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           const prevActiveKey = prevActiveItemKey.value!;
           const oldCrossOffset =
             itemPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
-          const newCrossOffset = calculateActiveItemCrossOffset({
+          const newCrossOffset = calculateItemCrossOffset({
             ...autoOffsetAdjustmentCommonProps,
-            activeItemKey: prevActiveKey
+            itemKey: prevActiveKey
           });
 
           ctx.state = AutoOffsetAdjustmentState.RESET;
 
-          const offsetDiff = newCrossOffset - oldCrossOffset;
+          const scrollDistance = newCrossOffset - oldCrossOffset;
+          const startCrossOffset = additionalCrossOffset.value + scrollDistance;
           additionalCrossOffset.value = null;
 
           // Since the scrollBy function is executed synchronously, it would be called
           // before the new layout is actually applied (the animated style is calculated
           // in reaction to the itemPositions change, so the new layout is committed
           // in the next frame). We use this timeout to execute the scroll in the next frame.
-          setAnimatedTimeout(() => scrollBy?.(offsetDiff, false));
-          console.log(
-            '>>>',
-            oldCrossOffset,
-            newCrossOffset,
-            offsetDiff,
-            crossItemSizes,
-            prevCrossIteSizes
-          );
+          setAnimatedTimeout(() => {
+            console.log('>>> scroll', scrollDistance);
+            scrollBy?.(scrollDistance, false);
+          });
 
           return {
             ...props,
@@ -182,7 +179,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
             [isVertical ? 'itemHeights' : 'itemWidths']: prevCrossIteSizes,
             requestNextLayout: true,
             shouldAnimateLayout: false,
-            startCrossOffset: offsetDiff
+            startCrossOffset
           };
         }
 
@@ -205,9 +202,9 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
             : touchPosition.value.x - activeItemPosition.value.x - offset.x;
         }
 
-        const activeItemCrossOffset = calculateActiveItemCrossOffset({
+        const activeItemCrossOffset = calculateItemCrossOffset({
           ...autoOffsetAdjustmentCommonProps,
-          activeItemKey: itemKey
+          itemKey
         });
 
         const activeItemIndex = keyToIndex.value[itemKey];

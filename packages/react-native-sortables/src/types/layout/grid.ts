@@ -24,7 +24,7 @@ export type GridLayout = {
 };
 
 export type AutoOffsetAdjustmentProps = {
-  activeItemKey: string;
+  itemKey: string;
   crossGap: number;
   crossItemSizes: ItemSizes;
   indexToKey: Array<string>;

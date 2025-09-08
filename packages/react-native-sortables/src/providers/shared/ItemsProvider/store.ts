@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { RenderItemInfo } from '../../../types';
-
-export type RenderNode<I> = (info: RenderItemInfo<I>) => ReactNode;
+import type { RenderItem } from '../../../types';
 
 export type Store<I> = {
   getKeys: () => Array<string>;
@@ -13,7 +11,7 @@ export type Store<I> = {
 
   update: (
     entries: Array<[key: string, item: I]>,
-    renderNode?: RenderNode<I>
+    renderItem?: RenderItem<I>
   ) => void;
 };
 
@@ -22,7 +20,7 @@ const shallowEq = (a: Array<string>, b: Array<string>) =>
 
 export function createItemsStore<I>(
   initialItems?: Array<[string, I]>,
-  initialRenderNode?: RenderNode<I>
+  initialRenderItem?: RenderItem<I>
 ): Store<I> {
   let keys: Array<string> = [];
   const nodes = new Map<string, ReactNode>();
@@ -32,7 +30,7 @@ export function createItemsStore<I>(
   const itemListeners = new Map<string, Set<() => void>>();
 
   // Track the renderer to detect changes
-  let currentRenderer: RenderNode<I> | undefined = initialRenderNode;
+  let currentRenderer: RenderItem<I> | undefined = initialRenderItem;
 
   const getKeys = () => keys;
   const getNode = (key: string) => nodes.get(key);
@@ -55,15 +53,15 @@ export function createItemsStore<I>(
   // Core logic for init + updates
   function apply(
     entries: Array<[string, I]>,
-    renderNode?: RenderNode<I>,
+    renderItem?: RenderItem<I>,
     notify = true
   ) {
     const nextKeys = entries.map(([k]) => k);
     const keysChanged = !shallowEq(keys, nextKeys);
 
-    // If renderer changed, we’ll force-recompute all nodes
-    const rendererChanged = renderNode !== currentRenderer;
-    currentRenderer = renderNode;
+    // If renderer changed, we’ll force-recompute all items
+    const rendererChanged = renderItem !== currentRenderer;
+    currentRenderer = renderItem;
 
     if (keysChanged) {
       const nextSet = new Set(nextKeys);
@@ -87,7 +85,7 @@ export function createItemsStore<I>(
 
       const info = { index, item };
       meta.set(k, info);
-      nodes.set(k, renderNode ? renderNode(info) : (item as ReactNode));
+      nodes.set(k, renderItem ? renderItem(info) : (item as ReactNode));
       touched.add(k);
     });
 
@@ -101,10 +99,10 @@ export function createItemsStore<I>(
   }
 
   // Initial snapshot (sync), no notifications
-  if (initialItems) apply(initialItems, initialRenderNode, false);
+  if (initialItems) apply(initialItems, initialRenderItem, false);
 
-  const update: Store<I>['update'] = (entries, renderNode) =>
-    apply(entries, renderNode, true);
+  const update: Store<I>['update'] = (entries, renderItem) =>
+    apply(entries, renderItem, true);
 
   return { getKeys, getNode, subscribeItem, subscribeKeys, update };
 }
