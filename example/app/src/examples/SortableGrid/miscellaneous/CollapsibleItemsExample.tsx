@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import type { ViewStyle } from 'react-native';
 import { StyleSheet, Text } from 'react-native';
 import Animated, {
   LinearTransition,
@@ -7,58 +8,108 @@ import Animated, {
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 
-import { Group, Screen } from '@/components';
+import { Group, Screen, Section } from '@/components';
 import { IS_WEB } from '@/constants';
 import { colors, radius, sizes, spacing, style, text } from '@/theme';
 
-const DATA = Array.from({ length: 20 }, (_, index) => `Item ${index + 1}`);
+const DATA = Array.from({ length: 15 }, (_, index) => `Item ${index + 1}`);
 
 export default function CollapsibleItemsExample() {
+  return (
+    <Screen includeNavBarHeight>
+      <Section
+        description='With vertical auto-scroll'
+        padding='none'
+        title='Vertical'
+        fill>
+        <Example />
+      </Section>
+      <Section
+        description='With horizontal auto-scroll '
+        padding='none'
+        title='Horizontal'>
+        <Example horizontal />
+      </Section>
+    </Screen>
+  );
+}
+
+type ExampleProps = {
+  horizontal?: boolean;
+};
+
+function Example({ horizontal }: ExampleProps) {
   const [collapsed, setCollapsed] = useState(false);
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
+
+  const dimension = horizontal ? 'width' : 'height';
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => (
       <Animated.View
-        layout={LinearTransition.delay(40)}
-        style={[styles.card, { height: collapsed ? sizes.lg : sizes.xxxl }]}>
-        <Animated.Text layout={LinearTransition.delay(40)} style={styles.text}>
+        layout={LinearTransition}
+        style={[
+          styles.card,
+          { [dimension]: collapsed ? sizes.lg : sizes.xxxl }
+        ]}>
+        <Animated.Text layout={LinearTransition} style={styles.text}>
           {item}
         </Animated.Text>
       </Animated.View>
     ),
-    [collapsed]
+    [collapsed, dimension]
   );
 
+  const props = horizontal
+    ? ({
+        autoScrollDirection: 'horizontal',
+        columnGap: 10,
+        overDrag: 'horizontal',
+        rowHeight: sizes.xl,
+        rows: 1
+      } as const)
+    : ({
+        overDrag: 'vertical',
+        rowGap: 10
+      } as const);
+
+  const groupStyle: ViewStyle = horizontal
+    ? { height: sizes.xl, width: sizes.xxl }
+    : { height: sizes.xl };
+
   return (
-    <Screen>
-      <Animated.ScrollView
-        contentContainerStyle={[styles.container, IS_WEB && style.webContent]}
-        ref={scrollableRef}>
-        <Group style={styles.group} withMargin={false} bordered center>
-          <Text style={styles.title}>Above Collapsible Items</Text>
-        </Group>
+    <Animated.ScrollView
+      contentContainerStyle={[styles.container, IS_WEB && style.webContent]}
+      horizontal={horizontal}
+      ref={scrollableRef}>
+      <Group style={groupStyle} withMargin={false} bordered center>
+        <Text style={styles.title}>Before Collapsible Items</Text>
+      </Group>
 
-        <Sortable.Grid
-          activeItemScale={1.05}
-          autoScrollMaxOverscroll={[50, 120]}
-          columnGap={10}
-          data={DATA}
-          overDrag='vertical'
-          overflow='visible'
-          renderItem={renderItem}
-          rowGap={10}
-          // scrollableRef={scrollableRef} // TODO - add correct auto scroll support for collapsible items
-          // autoAdjustOffsetDuringDrag
-          onActiveItemDropped={() => setCollapsed(false)}
-          onDragStart={() => setCollapsed(true)}
-        />
+      <Sortable.Grid
+        {...props}
+        activeItemScale={1.05}
+        autoScrollMaxVelocity={750}
+        data={DATA}
+        dimensionsAnimationType='worklet'
+        overflow='visible'
+        renderItem={renderItem}
+        scrollableRef={scrollableRef}
+        autoAdjustOffsetDuringDrag
+        onActiveItemDropped={() => {
+          console.log('onActiveItemDropped');
+          setCollapsed(false);
+        }}
+        onDragStart={() => {
+          console.log('onDragStart');
+          setCollapsed(true);
+        }}
+      />
 
-        <Group style={styles.group} withMargin={false} bordered center>
-          <Text style={styles.title}>Below Collapsible Items</Text>
-        </Group>
-      </Animated.ScrollView>
-    </Screen>
+      <Group style={groupStyle} withMargin={false} bordered center>
+        <Text style={styles.title}>After Collapsible Items</Text>
+      </Group>
+    </Animated.ScrollView>
   );
 }
 
@@ -72,19 +123,13 @@ const styles = StyleSheet.create({
   },
   container: {
     gap: spacing.md,
-    padding: spacing.md,
-    paddingBottom: 120
-  },
-  group: {
-    height: sizes.xxl
+    padding: spacing.md
   },
   text: {
     ...text.label2,
     color: colors.white
   },
   title: {
-    ...text.subHeading2,
-    marginLeft: spacing.md,
-    marginTop: spacing.sm
+    ...text.subHeading2
   }
 });

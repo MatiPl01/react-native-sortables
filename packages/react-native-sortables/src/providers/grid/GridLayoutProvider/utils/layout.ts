@@ -1,6 +1,6 @@
 'worklet';
 import type {
-  AdditionalCrossOffsetProps,
+  AutoOffsetAdjustmentProps,
   Coordinate,
   GridLayout,
   GridLayoutProps,
@@ -9,17 +9,15 @@ import type {
 import { resolveDimension } from '../../../../utils';
 import { getCrossIndex, getMainIndex } from './helpers';
 
-export const calculateLayout = (
-  {
-    gaps,
-    indexToKey,
-    isVertical,
-    itemHeights,
-    itemWidths,
-    numGroups
-  }: GridLayoutProps,
-  additionalCrossOffset = 0
-): GridLayout | null => {
+export const calculateLayout = ({
+  gaps,
+  indexToKey,
+  isVertical,
+  itemHeights,
+  itemWidths,
+  numGroups,
+  startCrossOffset
+}: GridLayoutProps): GridLayout | null => {
   const mainGroupSize = (isVertical ? itemWidths : itemHeights) as
     | null
     | number;
@@ -28,7 +26,7 @@ export const calculateLayout = (
     return null;
   }
 
-  const crossAxisOffsets = [additionalCrossOffset];
+  const crossAxisOffsets = [startCrossOffset ?? 0];
   const itemPositions: Record<string, Vector> = {};
 
   let mainCoordinate: Coordinate;
@@ -84,7 +82,7 @@ export const calculateLayout = (
     containerCrossSize: lastCrossOffset,
     contentBounds: [
       {
-        [crossCoordinate]: additionalCrossOffset,
+        [crossCoordinate]: startCrossOffset ?? 0,
         [mainCoordinate]: 0
       } as Vector,
       {
@@ -97,17 +95,13 @@ export const calculateLayout = (
   };
 };
 
-export const calculateActiveItemCrossOffset = ({
-  activeItemKey,
-  crossCoordinate,
+export const calculateItemCrossOffset = ({
   crossGap,
   crossItemSizes,
   indexToKey,
-  itemPositions,
-  keyToIndex,
-  numGroups,
-  snapBasedOffset
-}: AdditionalCrossOffsetProps): number => {
+  itemKey,
+  numGroups
+}: AutoOffsetAdjustmentProps): number => {
   let activeItemCrossOffset = 0;
   let currentGroupCrossSize = 0;
   let currentGroupCrossIndex = 0;
@@ -128,18 +122,10 @@ export const calculateActiveItemCrossOffset = ({
       resolveDimension(crossItemSizes, key) ?? 0
     );
 
-    if (key === activeItemKey) {
+    if (key === itemKey) {
       break;
     }
   }
 
-  const activeItemIndex = keyToIndex[activeItemKey];
-  const itemAtActiveIndexKey = indexToKey[activeItemIndex!];
-  const itemAtActiveIndexOffset =
-    itemPositions[itemAtActiveIndexKey!]?.[crossCoordinate] ?? 0;
-
-  return Math.max(
-    0,
-    itemAtActiveIndexOffset - activeItemCrossOffset + snapBasedOffset
-  );
+  return activeItemCrossOffset;
 };

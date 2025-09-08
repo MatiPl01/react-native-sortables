@@ -181,6 +181,7 @@ function SortableGridComponent<I>({
   const { handleContainerMeasurement, resetMeasurements } =
     useMeasurementsContext();
   const { mainGroupSize } = useGridLayoutContext();
+
   const isFirstRenderRef = useRef(true);
 
   useOrderUpdater(strategy, GRID_STRATEGIES);

@@ -93,6 +93,7 @@ export default function ActiveItemPortal({
     if (!checkTeleported()) return;
 
     const update = () =>
+      checkTeleported() &&
       teleport?.(teleportedItemId, renderTeleportedItemCell());
 
     if (isFirstUpdateRef.current) {

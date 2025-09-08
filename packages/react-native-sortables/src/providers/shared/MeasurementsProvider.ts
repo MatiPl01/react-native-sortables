@@ -22,7 +22,7 @@ import { useMultiZoneContext } from './MultiZoneProvider';
 
 const DEBOUNCE_DURATION = 100;
 
-type StateContext = {
+type StateContextType = {
   measuredItemKeys: Set<string>;
   queuedMeasurements: Map<string, Dimensions>;
 };
@@ -45,7 +45,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     useMultiZoneContext() ?? {};
   const { getKeys } = useItemsContext();
 
-  const context = useMutableValue<null | StateContext>(null);
+  const context = useMutableValue<null | StateContextType>(null);
   const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
   const debounce = useAnimatedDebounce();
 
@@ -118,10 +118,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
             dimension: Dimension,
             sizes: SharedValue<ItemSizes>
           ) => {
+            const newSizes = { ...(sizes.value as Record<string, number>) };
             for (const [k, dims] of ctx.queuedMeasurements.entries()) {
-              (sizes.value as Record<string, number>)[k] = dims[dimension];
+              newSizes[k] = dims[dimension];
             }
-            sizes.modify();
+            sizes.value = newSizes;
           };
 
           if (!isWidthControlled) {

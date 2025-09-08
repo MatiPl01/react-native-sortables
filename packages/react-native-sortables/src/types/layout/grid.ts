@@ -1,4 +1,5 @@
-import type { Coordinate, ItemSizes, Vector } from './shared';
+import type { Maybe } from '../../helperTypes';
+import type { ItemSizes, Vector } from './shared';
 
 export type GridLayoutProps = {
   gaps: {
@@ -10,6 +11,9 @@ export type GridLayoutProps = {
   indexToKey: Array<string>;
   isVertical: boolean;
   numGroups: number;
+  shouldAnimateLayout?: boolean;
+  requestNextLayout?: boolean;
+  startCrossOffset?: Maybe<number>;
 };
 
 export type GridLayout = {
@@ -19,14 +23,10 @@ export type GridLayout = {
   contentBounds: [Vector, Vector];
 };
 
-export type AdditionalCrossOffsetProps = {
-  activeItemKey: string;
-  indexToKey: Array<string>;
-  keyToIndex: Record<string, number>;
-  itemPositions: Record<string, Vector>;
+export type AutoOffsetAdjustmentProps = {
+  itemKey: string;
   crossGap: number;
   crossItemSizes: ItemSizes;
-  crossCoordinate: Coordinate;
+  indexToKey: Array<string>;
   numGroups: number;
-  snapBasedOffset: number;
 };

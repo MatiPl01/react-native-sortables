@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { View } from 'react-native';
+import type { ScrollView, View } from 'react-native';
 import type {
   GestureTouchEvent,
   GestureType
@@ -67,9 +67,9 @@ export type CommonValuesContextType =
       keyToIndex: SharedValue<Record<string, number>>;
 
       // POSITIONS
-      itemPositions: SharedValue<Record<string, Vector>>;
       touchPosition: SharedValue<null | Vector>;
       activeItemPosition: SharedValue<null | Vector>;
+      itemPositions: SharedValue<Record<string, Vector>>;
 
       // DIMENSIONS
       controlledContainerDimensions: ControlledDimensions;
@@ -110,8 +110,10 @@ export type MeasurementsContextType = {
 // AUTO SCROLL
 
 export type AutoScrollContextType = {
+  scrollableRef: AnimatedRef<ScrollView>;
   scrollOffsetDiff: SharedValue<null | Partial<Vector>>;
   contentBounds: SharedValue<[Vector, Vector] | null>;
+  scrollBy: (distance: number, animated: boolean) => void;
 };
 
 // DRAG

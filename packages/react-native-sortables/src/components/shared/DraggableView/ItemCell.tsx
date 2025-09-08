@@ -48,14 +48,16 @@ export default function ItemCell({
     activationAnimationProgress
   );
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    ...decorationStyleValue.value,
-    ...layoutStyleValue.value,
-    transform: [
-      ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
-      ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
-    ]
-  }));
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      ...decorationStyleValue.value,
+      ...layoutStyleValue.value,
+      transform: [
+        ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
+        ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
+      ]
+    };
+  });
 
   return (
     <Animated.View style={[baseStyle, styles.decoration, animatedStyle]}>

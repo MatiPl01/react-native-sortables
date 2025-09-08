@@ -327,7 +327,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       haptics.medium();
 
       // Use timeout to ensure that the callback is called after all animated
-      // reactions are computed in the library
+      // reactions are computed in the library (e.g. for the portal and collapsible
+      // items case when the size of the active item must change after it is teleported)
       setAnimatedTimeout(() => {
         stableOnDragStart({
           fromIndex: dragStartIndex.value,
@@ -530,8 +531,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemKey.value = null;
       dragStartIndex.value = -1;
 
+      // This ensures that the drop duration is reduced if the item activation
+      // animation didn't complete yet
+      const dropDuration =
+        activeAnimationProgress.value * dropAnimationDuration.value;
+
       const animate = (callback?: (finished: boolean | undefined) => void) =>
-        withTiming(0, { duration: dropAnimationDuration.value }, callback);
+        withTiming(0, { duration: dropDuration }, callback);
 
       activationAnimationProgress.value = animate();
       inactiveAnimationProgress.value = animate();
@@ -558,7 +564,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           keyToIndex: keyToIndex.value,
           toIndex
         });
-      }, dropAnimationDuration.value);
+      }, dropDuration);
     },
     [
       activeContainerId,

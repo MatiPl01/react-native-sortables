@@ -69,9 +69,9 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const keyToIndex = useDerivedValue(() => getKeyToIndex(indexToKey.value));
 
     // POSITIONS
-    const itemPositions = useMutableValue<Record<string, Vector>>({});
     const touchPosition = useMutableValue<null | Vector>(null);
     const activeItemPosition = useMutableValue<null | Vector>(null);
+    const itemPositions = useMutableValue<Record<string, Vector>>({});
 
     // DIMENSIONS
     const containerWidth = useMutableValue<null | number>(null);

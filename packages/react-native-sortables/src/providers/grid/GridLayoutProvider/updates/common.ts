@@ -12,7 +12,7 @@ import {
   useCustomHandleContext,
   useDebugBoundingBox
 } from '../../../shared';
-import { useAdditionalCrossOffsetContext } from '../../AdditionalCrossOffsetProvider';
+import { useAutoOffsetAdjustmentContext } from '../../AutoOffsetAdjustmentProvider';
 import { useGridLayoutContext } from '../GridLayoutProvider';
 import { calculateLayout, getCrossIndex, getMainIndex } from '../utils';
 
@@ -31,27 +31,27 @@ export const createGridStrategy =
     } = useCommonValuesContext();
     const { crossGap, isVertical, mainGap, mainGroupSize, numGroups } =
       useGridLayoutContext();
-    const { additionalCrossOffset } = useAdditionalCrossOffsetContext() ?? {};
+    const { additionalCrossOffset } = useAutoOffsetAdjustmentContext() ?? {};
     const { fixedItemKeys } = useCustomHandleContext() ?? {};
 
     const othersIndexToKey = useInactiveIndexToKey();
     const debugBox = useDebugBoundingBox();
 
     const othersLayout = useDerivedValue(() =>
-      calculateLayout(
-        {
-          gaps: {
-            cross: crossGap.value,
-            main: mainGap.value
-          },
-          indexToKey: othersIndexToKey.value,
-          isVertical,
-          itemHeights: itemHeights.value,
-          itemWidths: itemWidths.value,
-          numGroups
-        },
-        additionalCrossOffset?.value
-      )
+      additionalCrossOffset?.value === null
+        ? null
+        : calculateLayout({
+            gaps: {
+              cross: crossGap.value,
+              main: mainGap.value
+            },
+            indexToKey: othersIndexToKey.value,
+            isVertical,
+            itemHeights: itemHeights.value,
+            itemWidths: itemWidths.value,
+            numGroups,
+            startCrossOffset: additionalCrossOffset?.value
+          })
     );
 
     let mainContainerSize: SharedValue<null | number>;
