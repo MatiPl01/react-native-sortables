@@ -25,8 +25,7 @@ import useDebugHelpers from './useDebugHelpers';
 import {
   calculateRawProgressHorizontal,
   calculateRawProgressVertical,
-  clampDistanceHorizontal,
-  clampDistanceVertical
+  clampDistance
 } from './utils';
 
 // Maximum elapsed time multiplier to prevent excessive scrolling distances when app lags
@@ -102,6 +101,18 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   };
 });
 
+type StateContextType = {
+  targetScrollOffset: null | number;
+  prevContainerOffset: null | number;
+  lastUpdateTimestamp: null | number;
+};
+
+const INITIAL_STATE: StateContextType = {
+  lastUpdateTimestamp: null,
+  prevContainerOffset: null,
+  targetScrollOffset: null
+};
+
 type AutoScrollUpdaterProps = Omit<
   AutoScrollSettings,
   'autoScrollDirection' | 'autoScrollEnabled'
@@ -129,8 +140,7 @@ function AutoScrollUpdater({
     useCommonValuesContext();
 
   const progress = useMutableValue(0);
-  const lastUpdateTimestamp = useMutableValue<null | number>(null);
-  const targetScrollOffset = useMutableValue<null | number>(null);
+  const context = useMutableValue<StateContextType>(INITIAL_STATE);
 
   const scrollAxis = isVertical ? 'y' : 'x';
   const activationOffset = toPair(autoScrollActivationOffset);
@@ -158,29 +168,26 @@ function AutoScrollUpdater({
     );
   }
 
-  let calculateRawProgress, clampDistance;
-  if (isVertical) {
-    calculateRawProgress = calculateRawProgressVertical;
-    clampDistance = clampDistanceVertical;
-  } else {
-    calculateRawProgress = calculateRawProgressHorizontal;
-    clampDistance = clampDistanceHorizontal;
-  }
+  const calculateRawProgress = isVertical
+    ? calculateRawProgressVertical
+    : calculateRawProgressHorizontal;
 
   useAnimatedReaction(
     () => {
+      const ctx = context.value;
       let position = touchPosition.value?.[scrollAxis] ?? null;
-      if (position !== null && targetScrollOffset.value !== null) {
+      if (position !== null && ctx.targetScrollOffset !== null) {
         // Sometimes the scroll distance is so small that the scrollTo takes
         // no effect. To handle this case, we have to update the position
         // of the view used to determine the progress, even if the actual
         // position of the view is not changed (because of too small scroll distance).
-        position += targetScrollOffset.value - currentScrollOffset.value;
+        position += ctx.targetScrollOffset - currentScrollOffset.value;
       }
       return position;
     },
     position => {
       if (position === null) {
+        context.value.targetScrollOffset = null;
         debug?.hideDebugViews?.();
         return;
       }
@@ -202,7 +209,7 @@ function AutoScrollUpdater({
       );
 
       if (progress.value === 0) {
-        targetScrollOffset.value = null;
+        context.value.targetScrollOffset = null;
       }
 
       debug?.updateDebugRects?.(
@@ -223,26 +230,46 @@ function AutoScrollUpdater({
         return;
       }
 
+      const ctx = context.value;
       const pendingDistance =
-        targetScrollOffset.value !== null
-          ? targetScrollOffset.value - currentScrollOffset.value
+        ctx.targetScrollOffset !== null
+          ? ctx.targetScrollOffset - currentScrollOffset.value
           : 0;
+
+      const containerOffset = isVertical
+        ? scrollableMeasurements.pageY - containerMeasurements.pageY
+        : scrollableMeasurements.pageX - containerMeasurements.pageX;
+      const scrollableCrossSize = isVertical
+        ? scrollableMeasurements.height
+        : scrollableMeasurements.width;
+
+      if (
+        pendingDistance !== 0 &&
+        containerOffset === ctx.prevContainerOffset
+      ) {
+        // Return if measurements haven't been updated yet (we scroll based on the
+        // relative position of the container in the ScrollView so we have to ensure
+        // that the last update is already applied)
+        return;
+      }
 
       const clampedDistance = clampDistance(
         distance + pendingDistance,
-        containerMeasurements,
-        scrollableMeasurements,
+        containerOffset,
+        scrollableCrossSize,
         bounds,
         maxOverscroll
       );
 
       const targetOffset = currentScrollOffset.value + clampedDistance;
-      targetScrollOffset.value = targetOffset;
+
+      ctx.targetScrollOffset = targetOffset;
 
       if (Math.abs(clampedDistance) < 1) {
         return;
       }
 
+      ctx.prevContainerOffset = containerOffset;
       scrollTo(
         scrollableRef,
         isVertical ? 0 : targetOffset,
@@ -251,13 +278,12 @@ function AutoScrollUpdater({
       );
     },
     [
+      context,
       currentScrollOffset,
-      targetScrollOffset,
       isVertical,
       scrollableRef,
       containerRef,
       contentAxisBounds,
-      clampDistance,
       maxOverscroll
     ]
   );
@@ -269,8 +295,9 @@ function AutoScrollUpdater({
         return;
       }
 
-      lastUpdateTimestamp.value ??= timestamp;
-      const elapsedTime = timestamp - lastUpdateTimestamp.value;
+      const ctx = context.value;
+      ctx.lastUpdateTimestamp ??= timestamp;
+      const elapsedTime = timestamp - ctx.lastUpdateTimestamp;
       if (elapsedTime < autoScrollInterval) {
         return;
       }
@@ -281,7 +308,7 @@ function AutoScrollUpdater({
         MIN_ELAPSED_TIME_CAP
       );
       const cappedElapsedTime = Math.min(elapsedTime, maxElapsedTime);
-      lastUpdateTimestamp.value = timestamp;
+      ctx.lastUpdateTimestamp = timestamp;
 
       const velocity = interpolate(
         progress.value,
@@ -294,13 +321,13 @@ function AutoScrollUpdater({
       scrollBy(distance, animateScrollTo);
     },
     [
+      context,
       scrollBy,
       maxStartVelocity,
       maxEndVelocity,
       progress,
       autoScrollInterval,
-      animateScrollTo,
-      lastUpdateTimestamp
+      animateScrollTo
     ]
   );
 
@@ -318,8 +345,10 @@ function AutoScrollUpdater({
     active => {
       if (active) {
         dragStartScrollOffset.value = currentScrollOffset.value;
-        lastUpdateTimestamp.value = null;
-        targetScrollOffset.value = null;
+        const ctx = context.value;
+        ctx.lastUpdateTimestamp = null;
+        ctx.targetScrollOffset = null;
+        ctx.prevContainerOffset = null;
         runOnJS(toggleFrameCallback)(true);
       } else {
         dragStartScrollOffset.value = null;

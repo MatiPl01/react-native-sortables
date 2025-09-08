@@ -65,15 +65,7 @@ export const calculateRawProgressHorizontal: CalculateRawProgressFunction = (
   ...rest
 ) => calculateRawProgress(position, cX, cW, sX, sW, ...rest);
 
-type ClampDistanceFunction = (
-  distance: number,
-  contentContainerMeasurements: MeasuredDimensions,
-  scrollContainerMeasurements: MeasuredDimensions,
-  contentBounds: [number, number],
-  maxOverscroll: [number, number]
-) => number;
-
-const clampDistance = (
+export const clampDistance = (
   distance: number,
   containerOffset: number,
   scrollableSize: number,
@@ -102,17 +94,3 @@ const clampDistance = (
 
   return 0;
 };
-
-export const clampDistanceVertical: ClampDistanceFunction = (
-  distance,
-  { pageY: cY },
-  { height: sH, pageY: sY },
-  ...rest
-) => clampDistance(distance, sY - cY, sH, ...rest);
-
-export const clampDistanceHorizontal: ClampDistanceFunction = (
-  distance,
-  { pageX: cX },
-  { pageX: sX, width: sW },
-  ...rest
-) => clampDistance(distance, sX - cX, sW, ...rest);
