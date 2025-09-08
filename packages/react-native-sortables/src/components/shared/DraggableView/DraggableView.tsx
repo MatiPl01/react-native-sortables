@@ -1,8 +1,6 @@
-import type { PropsWithChildren } from 'react';
 import { Fragment, memo, useCallback, useEffect, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import type { SharedValue } from 'react-native-reanimated';
 import {
   LayoutAnimationConfig,
   runOnUI,
@@ -16,6 +14,7 @@ import type {
 import { useMutableValue } from '../../../integrations/reanimated';
 import {
   ItemContextProvider,
+  ItemOutlet,
   useCommonValuesContext,
   useDragContext,
   useItemLayout,
@@ -26,20 +25,17 @@ import {
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
 
-export type DraggableViewProps = PropsWithChildren<{
+export type DraggableViewProps = {
   itemKey: string;
   itemEntering: LayoutAnimation | null;
   itemExiting: LayoutAnimation | null;
   style?: AnimatedStyleProp;
-  layoutUpdateProgress?: SharedValue<null | number>;
-}>;
+};
 
 function DraggableView({
-  children,
   itemEntering,
   itemExiting,
   itemKey: key,
-  layoutUpdateProgress,
   style
 }: DraggableViewProps) {
   const portalContext = usePortalContext();
@@ -55,8 +51,7 @@ function DraggableView({
   const layoutStyleValue = useItemLayout(
     key,
     isActive,
-    activationAnimationProgress,
-    layoutUpdateProgress
+    activationAnimationProgress
   );
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
@@ -91,7 +86,7 @@ function DraggableView({
         layoutStyleValue={layoutStyleValue}
         onLayout={onLayout}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
-          {children}
+          <ItemOutlet itemKey={key} />
         </LayoutAnimationConfig>
       </ItemCell>
     );
@@ -133,9 +128,8 @@ function DraggableView({
         gesture={gesture}
         isActive={isActive}
         itemKey={key}
-        onTeleport={setIsHidden}>
-        {children}
-      </ActiveItemPortal>
+        onTeleport={setIsHidden}
+      />
     </Fragment>
   );
 }

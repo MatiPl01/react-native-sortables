@@ -8,13 +8,13 @@ import type {
   SortableGridStrategy
 } from '../../types';
 import type { SharedProviderProps } from '../shared';
-import { SharedProvider, useOrderUpdater, useStrategyKey } from '../shared';
+import { SharedProvider } from '../shared';
 import { ContextProviderComposer } from '../utils';
 import { AutoOffsetAdjustmentProvider } from './AutoOffsetAdjustmentProvider';
 import type { GridLayoutProviderProps } from './GridLayoutProvider';
-import { GRID_STRATEGIES, GridLayoutProvider } from './GridLayoutProvider';
+import { GridLayoutProvider } from './GridLayoutProvider';
 
-type GridProviderProps = PropsWithChildren<
+export type GridProviderProps = PropsWithChildren<
   AutoAdjustOffsetSettings &
     GridLayoutProviderProps &
     SharedProviderProps & {
@@ -31,7 +31,6 @@ export default function GridProvider({
   columnGap: columnGap_,
   isVertical,
   numGroups,
-  numItems,
   rowGap: rowGap_,
   rowHeight,
   strategy,
@@ -60,28 +59,12 @@ export default function GridProvider({
       />
     ),
     // Provider with grid layout calculations
-    <GridLayoutProvider
-      {...sharedGridProviderProps}
-      numItems={numItems}
-      rowHeight={rowHeight}
-    />
+    <GridLayoutProvider {...sharedGridProviderProps} rowHeight={rowHeight} />
   ];
 
   return (
     <ContextProviderComposer providers={providers}>
-      <GridProviderInner key={useStrategyKey(strategy)} strategy={strategy}>
-        {children}
-      </GridProviderInner>
+      {children}
     </ContextProviderComposer>
   );
-}
-
-type GridProviderInnerProps = PropsWithChildren<{
-  strategy: SortableGridStrategy;
-}>;
-
-function GridProviderInner({ children, strategy }: GridProviderInnerProps) {
-  useOrderUpdater(strategy, GRID_STRATEGIES);
-
-  return <>{children}</>;
 }

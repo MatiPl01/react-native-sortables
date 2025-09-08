@@ -3,7 +3,7 @@ import { Children, Fragment, isValidElement } from 'react';
 
 import { logger } from './logs';
 
-export const validateChildren = (
+export const processChildren = (
   children: ReactNode
 ): Array<[string, ReactElement]> =>
   Children.toArray(children).reduce(
@@ -14,7 +14,7 @@ export const validateChildren = (
 
       // Handle React Fragments by recursively processing their children
       if (child.type === Fragment) {
-        const fragmentChildren = validateChildren(
+        const fragmentChildren = processChildren(
           (child.props as { children: ReactNode }).children
         );
         return [...acc, ...fragmentChildren];

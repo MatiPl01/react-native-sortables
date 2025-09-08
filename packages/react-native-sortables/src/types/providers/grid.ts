@@ -4,7 +4,6 @@ import type { GridLayoutProps } from '../layout';
 
 export type AutoOffsetAdjustmentContextType = {
   additionalCrossOffset: SharedValue<null | number>;
-  layoutUpdateProgress: SharedValue<null | number>;
   adaptLayoutProps: (
     props: GridLayoutProps,
     prevProps: GridLayoutProps | null

@@ -1,4 +1,3 @@
-import type { PropsWithChildren } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import type { ManualGesture } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
@@ -8,6 +7,7 @@ import { useMutableValue } from '../../../integrations/reanimated';
 import {
   CommonValuesContext,
   ItemContextProvider,
+  useItemNode,
   usePortalContext
 } from '../../../providers';
 import type { CommonValuesContextType } from '../../../types';
@@ -17,29 +17,28 @@ import TeleportedItemCell from './TeleportedItemCell';
 
 const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
-type ActiveItemPortalProps = PropsWithChildren<
-  Pick<
-    ItemCellProps,
-    'activationAnimationProgress' | 'baseStyle' | 'isActive' | 'itemKey'
-  > & {
-    commonValuesContext: CommonValuesContextType;
-    gesture: ManualGesture;
-    onTeleport: (isTeleported: boolean) => void;
-  }
->;
+type ActiveItemPortalProps = Pick<
+  ItemCellProps,
+  'activationAnimationProgress' | 'baseStyle' | 'isActive' | 'itemKey'
+> & {
+  commonValuesContext: CommonValuesContextType;
+  gesture: ManualGesture;
+  onTeleport: (isTeleported: boolean) => void;
+};
 
 export default function ActiveItemPortal({
   activationAnimationProgress,
   baseStyle,
-  children,
   commonValuesContext,
   gesture,
   isActive,
   itemKey,
   onTeleport
 }: ActiveItemPortalProps) {
+  const node = useItemNode(itemKey);
   const { isTeleported, measurePortalOutlet, teleport } =
     usePortalContext() ?? {};
+
   const teleportEnabled = useMutableValue(false);
   const isFirstUpdateRef = useRef(true);
 
@@ -58,26 +57,26 @@ export default function ActiveItemPortal({
             baseStyle={baseStyle}
             isActive={isActive}
             itemKey={itemKey}>
-            {children}
+            {node}
           </TeleportedItemCell>
         </ItemContextProvider>
       </CommonValuesContextProvider>
     ),
     [
       activationAnimationProgress,
-      children,
+      baseStyle,
       commonValuesContext,
       gesture,
       isActive,
-      itemKey,
-      baseStyle
+      node,
+      itemKey
     ]
   );
 
   const teleportedItemId = `${commonValuesContext.containerId}-${itemKey}`;
 
   const enableTeleport = useStableCallback(() => {
-    isFirstUpdateRef.current = true;
+    // isFirstUpdateRef.current = true;
     teleport?.(teleportedItemId, renderTeleportedItemCell());
     onTeleport(true);
   });

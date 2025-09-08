@@ -2,7 +2,7 @@ import type { DragEndParams } from '../types';
 
 export const orderItems = <I>(
   data: Array<I>,
-  itemKeys: Array<string>,
+  items: Array<[string, unknown]>,
   { fromIndex, keyToIndex, toIndex }: DragEndParams,
   skipIfNoChange?: boolean
 ): Array<I> => {
@@ -11,8 +11,8 @@ export const orderItems = <I>(
   }
 
   const result: Array<I> = [];
-  for (let i = 0; i < itemKeys.length; i++) {
-    result[keyToIndex[itemKeys[i]!]!] = data[i]!;
+  for (let i = 0; i < items.length; i++) {
+    result[keyToIndex[items[i]![0]]!] = data[i]!;
   }
   return result;
 };

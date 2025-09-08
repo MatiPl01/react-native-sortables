@@ -64,7 +64,7 @@ export default function DebugExample() {
             // (scrollableRef and debug properties of the sortable component
             // shouldn't be changed on the fly)
             contentContainerStyle={styles.scrollViewContent}
-            key={2 * +debugEnabled + +autoScrollEnabled}
+            key={+debugEnabled}
             ref={scrollableRef}
             style={flex.fill}>
             <Group style={styles.boundGroup} withMargin={false} bordered center>
@@ -72,14 +72,15 @@ export default function DebugExample() {
             </Group>
 
             <Sortable.Grid
-              autoScrollMaxOverscroll={200}
+              autoScrollEnabled={autoScrollEnabled}
+              autoScrollMaxOverscroll={125}
               columnGap={spacing.sm}
               columns={COLUMNS}
               data={DATA}
               debug={debugEnabled}
               renderItem={renderItem}
               rowGap={spacing.xs}
-              scrollableRef={autoScrollEnabled ? scrollableRef : undefined}
+              scrollableRef={scrollableRef}
             />
 
             <Group style={styles.boundGroup} withMargin={false} bordered center>

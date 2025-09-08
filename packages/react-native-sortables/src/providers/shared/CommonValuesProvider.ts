@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useEffect, useMemo, useRef } from 'react';
+import { type PropsWithChildren, useEffect, useMemo } from 'react';
 import type { View } from 'react-native';
 import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
 
@@ -19,8 +19,9 @@ import type {
   Vector
 } from '../../types';
 import { DragActivationState } from '../../types';
-import { areArraysDifferent, getKeyToIndex } from '../../utils';
+import { getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
+import { useItemsContext } from './ItemsProvider';
 
 let nextId = 0;
 
@@ -30,7 +31,6 @@ type CommonValuesProviderProps = PropsWithChildren<
     Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'> & {
       sortEnabled: Animatable<boolean>;
       customHandle: boolean;
-      itemKeys: Array<string>;
       controlledContainerDimensions: ControlledDimensions;
       controlledItemDimensions: ControlledDimensions;
       itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
@@ -55,17 +55,17 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     enableActiveItemSnap: _enableActiveItemSnap,
     inactiveItemOpacity: _inactiveItemOpacity,
     inactiveItemScale: _inactiveItemScale,
-    itemKeys,
     itemsLayoutTransitionMode,
     snapOffsetX: _snapOffsetX,
     snapOffsetY: _snapOffsetY,
     sortEnabled: _sortEnabled
   }) => {
+    const { getKeys, subscribeKeys } = useItemsContext();
+
     const containerId = useMemo(() => nextId++, []);
-    const prevKeysRef = useRef<Array<string>>([]);
 
     // ORDER
-    const indexToKey = useMutableValue<Array<string>>(itemKeys);
+    const indexToKey = useMutableValue<Array<string>>(getKeys());
     const keyToIndex = useDerivedValue(() => getKeyToIndex(indexToKey.value));
 
     // POSITIONS
@@ -126,12 +126,13 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       [itemsLayoutTransitionMode]
     );
 
-    useEffect(() => {
-      if (areArraysDifferent(itemKeys, prevKeysRef.current)) {
-        indexToKey.value = itemKeys;
-        prevKeysRef.current = itemKeys;
-      }
-    }, [itemKeys, indexToKey]);
+    useEffect(
+      () =>
+        subscribeKeys(() => {
+          indexToKey.value = getKeys();
+        }),
+      [getKeys, subscribeKeys, indexToKey]
+    );
 
     return {
       value: {

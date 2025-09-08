@@ -65,7 +65,6 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const { scrollBy } = useAutoScrollContext() ?? {};
 
     const additionalCrossOffset = useMutableValue<null | number>(null);
-    const layoutUpdateProgress = useMutableValue<null | number>(null);
 
     const contextRef = useRef<null | SharedValue<StateContext>>(null);
     contextRef.current ??= makeMutable<StateContext>({
@@ -164,7 +163,11 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           const offsetDiff = newCrossOffset - oldCrossOffset;
           additionalCrossOffset.value = null;
 
-          scrollBy?.(offsetDiff, false);
+          // Since the scrollBy function is executed synchronously, it would be called
+          // before the new layout is actually applied (the animated style is calculated
+          // in reaction to the itemPositions change, so the new layout is committed
+          // in the next frame). We use this timeout to execute the scroll in the next frame.
+          setAnimatedTimeout(() => scrollBy?.(offsetDiff, false));
           console.log(
             '>>>',
             oldCrossOffset,
@@ -251,8 +254,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     return {
       value: {
         adaptLayoutProps,
-        additionalCrossOffset,
-        layoutUpdateProgress
+        additionalCrossOffset
       }
     };
   });

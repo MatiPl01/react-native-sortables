@@ -11,8 +11,6 @@ import { defaultKeyExtractor } from '../utils/keys';
 import { SortableItemEntering, SortableItemExiting } from './layoutAnimations';
 import { IS_ANDROID, IS_WEB, isFabric } from './platform';
 
-export const STYLE_PROPS = ['dropIndicatorStyle'] as const;
-
 export const DEFAULT_SHARED_PROPS = {
   activationAnimationDuration: 300,
   activeItemOpacity: 1,

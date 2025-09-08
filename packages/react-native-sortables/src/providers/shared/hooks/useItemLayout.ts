@@ -139,8 +139,7 @@ function useItemLayoutFabric(
 export default function useItemLayout(
   key: string,
   isActive: SharedValue<boolean>,
-  activationAnimationProgress: SharedValue<number>,
-  layoutUpdateProgress: SharedValue<null | number> | undefined
+  activationAnimationProgress: SharedValue<number>
 ): SharedValue<ViewStyle> {
   const {
     activeItemKey,
@@ -172,7 +171,7 @@ export default function useItemLayout(
     () => ({
       active: isActive.value,
       itemPosition: layoutPosition.value,
-      progress: layoutUpdateProgress?.value ?? activationAnimationProgress.value
+      progress: activationAnimationProgress.value
     }),
     ({ active, itemPosition, progress }, prev) => {
       if (!itemPosition || active) {
