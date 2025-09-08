@@ -15,8 +15,7 @@ import { useHaptics } from '../../integrations/haptics';
 import {
   clearAnimatedTimeout,
   setAnimatedTimeout,
-  useMutableValue,
-  useStableCallbackValue
+  useMutableValue
 } from '../../integrations/reanimated';
 import type {
   Dimensions,
@@ -122,13 +121,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
   // Used for activation and deactivation (drop)
   const activationTimeoutId = useMutableValue(-1);
-
-  // Create stable callbacks to avoid re-rendering when the callback
-  // function is not memoized
-  const stableOnDragStart = useStableCallbackValue(onDragStart);
-  const stableOnDragMove = useStableCallbackValue(onDragMove);
-  const stableOnOrderChange = useStableCallbackValue(onOrderChange);
-  const stableOnActiveItemDropped = useStableCallbackValue(onActiveItemDropped);
 
   // ACTIVE ITEM POSITION UPDATER
   useAnimatedReaction(
@@ -330,7 +322,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // reactions are computed in the library (e.g. for the portal and collapsible
       // items case when the size of the active item must change after it is teleported)
       setAnimatedTimeout(() => {
-        stableOnDragStart({
+        onDragStart({
           fromIndex: dragStartIndex.value,
           indexToKey: indexToKey.value,
           key,
@@ -360,7 +352,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       keyToIndex,
       multiZoneActiveItemDimensions,
       prevActiveItemKey,
-      stableOnDragStart,
+      onDragStart,
       touchPosition,
       updateLayer,
       updateActiveHandleMeasurements
@@ -453,7 +445,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       if (activeItemKey.value) {
-        stableOnDragMove({
+        onDragMove({
           fromIndex: dragStartIndex.value,
           key: activeItemKey.value,
           touchData: touch
@@ -489,7 +481,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       dragActivationFailOffset,
       touchStartTouch,
       dragStartIndex,
-      stableOnDragMove
+      onDragMove
     ]
   );
 
@@ -557,7 +549,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       setAnimatedTimeout(() => {
         activeItemDropped.value = true;
         updateLayer?.(LayerState.IDLE);
-        stableOnActiveItemDropped({
+        onActiveItemDropped({
           fromIndex,
           indexToKey: indexToKey.value,
           key,
@@ -586,7 +578,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       indexToKey,
       keyToIndex,
       multiZoneActiveItemDimensions,
-      stableOnActiveItemDropped,
+      onActiveItemDropped,
       stableOnDragEnd,
       touchPosition,
       touchStartTouch,
@@ -606,7 +598,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       indexToKey.value = newOrder;
       haptics.light();
 
-      stableOnOrderChange({
+      onOrderChange({
         fromIndex,
         indexToKey: indexToKey.value,
         key,
@@ -614,7 +606,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         toIndex
       });
     },
-    [indexToKey, stableOnOrderChange, haptics]
+    [indexToKey, onOrderChange, haptics]
   );
 
   return {

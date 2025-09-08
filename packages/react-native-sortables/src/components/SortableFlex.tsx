@@ -7,6 +7,7 @@ import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import type { RequiredBy } from '../helperTypes';
 import type { PropsWithDefaults } from '../hooks';
 import { useDragEndHandler, usePropsWithDefaults } from '../hooks';
+import { useStableCallbackValues } from '../integrations/reanimated';
 import {
   FLEX_STRATEGIES,
   FlexProvider,
@@ -27,12 +28,23 @@ import { SortableContainer } from './shared';
 function SortableFlex(props: SortableFlexProps) {
   const {
     children,
+    onActiveItemDropped,
     onDragEnd: _onDragEnd,
+    onDragMove,
+    onDragStart,
+    onOrderChange,
     strategy,
     ...rest
   } = usePropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
 
   const items = processChildren(children);
+
+  const callbacks = useStableCallbackValues({
+    onActiveItemDropped,
+    onDragMove,
+    onDragStart,
+    onOrderChange
+  });
 
   const onDragEnd = useDragEndHandler(_onDragEnd, {
     order: params =>
@@ -45,6 +57,7 @@ function SortableFlex(props: SortableFlexProps) {
     <ItemsProvider items={items}>
       <SortableFlexInner
         {...rest}
+        {...callbacks}
         key={useStrategyKey(strategy)}
         strategy={strategy}
         onDragEnd={onDragEnd}

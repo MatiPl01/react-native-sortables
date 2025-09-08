@@ -97,11 +97,9 @@ function Example({ horizontal }: ExampleProps) {
         scrollableRef={scrollableRef}
         autoAdjustOffsetDuringDrag
         onActiveItemDropped={() => {
-          console.log('onActiveItemDropped');
           setCollapsed(false);
         }}
         onDragStart={() => {
-          console.log('onDragStart');
           setCollapsed(true);
         }}
       />

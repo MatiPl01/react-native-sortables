@@ -7,7 +7,10 @@ import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import type { PropsWithDefaults } from '../hooks';
 import { useDragEndHandler, usePropsWithDefaults } from '../hooks';
-import { useAnimatableValue } from '../integrations/reanimated';
+import {
+  useAnimatableValue,
+  useStableCallbackValues
+} from '../integrations/reanimated';
 import {
   GRID_STRATEGIES,
   GridProvider,
@@ -26,7 +29,11 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     columns,
     data,
     keyExtractor = defaultKeyExtractor,
+    onActiveItemDropped,
     onDragEnd: _onDragEnd,
+    onDragMove,
+    onDragStart,
+    onOrderChange,
     renderItem,
     rowHeight,
     rows,
@@ -52,6 +59,13 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     [data, keyExtractor]
   );
 
+  const callbacks = useStableCallbackValues({
+    onActiveItemDropped,
+    onDragMove,
+    onDragStart,
+    onOrderChange
+  });
+
   const onDragEnd = useDragEndHandler(_onDragEnd, {
     data: params => orderItems(data, items, params, true)
   });
@@ -60,6 +74,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     <ItemsProvider items={items} renderItem={renderItem}>
       <SortableGridInner
         {...rest}
+        {...callbacks}
         groups={groups}
         isVertical={isVertical}
         key={useStrategyKey(strategy)}
