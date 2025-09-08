@@ -1,7 +1,12 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
-import { makeMutable, useAnimatedReaction } from 'react-native-reanimated';
+import {
+  clamp,
+  makeMutable,
+  measure,
+  useAnimatedReaction
+} from 'react-native-reanimated';
 
 import {
   clearAnimatedTimeout,
@@ -12,7 +17,7 @@ import type {
   AutoOffsetAdjustmentContextType,
   GridLayoutProps
 } from '../../types';
-import { calculateSnapOffset } from '../../utils';
+import { calculateSnapOffset, resolveDimension } from '../../utils';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
@@ -28,10 +33,17 @@ enum AutoOffsetAdjustmentState {
   RESET // Additional cross offset is being reset (intermediate state after APPLIED)
 }
 
+type KeepInViewData = {
+  itemCrossOffset: number;
+  itemCrossSize: number;
+  isVertical: boolean;
+};
+
 type StateContext = {
   state: AutoOffsetAdjustmentState;
   resetTimeoutId: number;
   prevSortEnabled: boolean;
+  keepInViewData: KeepInViewData | null;
 };
 
 type AutoOffsetAdjustmentProviderProps = PropsWithChildren<{
@@ -51,6 +63,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       activeItemDropped,
       activeItemKey,
       activeItemPosition,
+      containerRef,
       enableActiveItemSnap,
       itemPositions,
       keyToIndex,
@@ -62,12 +75,21 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     } = useCommonValuesContext();
     const { activeHandleMeasurements, activeHandleOffset } =
       useCustomHandleContext() ?? {};
-    const { scrollBy } = useAutoScrollContext() ?? {};
+    const { scrollableRef, scrollBy } = useAutoScrollContext() ?? {};
 
     const additionalCrossOffset = useMutableValue<null | number>(null);
 
+    const scrollPadding = useMemo<[number, number]>(
+      () =>
+        Array.isArray(autoAdjustOffsetScrollPadding)
+          ? autoAdjustOffsetScrollPadding
+          : [autoAdjustOffsetScrollPadding, autoAdjustOffsetScrollPadding],
+      [autoAdjustOffsetScrollPadding]
+    );
+
     const contextRef = useRef<null | SharedValue<StateContext>>(null);
     contextRef.current ??= makeMutable<StateContext>({
+      keepInViewData: null,
       prevSortEnabled: sortEnabled.value,
       resetTimeoutId: 0,
       state: AutoOffsetAdjustmentState.DISABLED
@@ -76,9 +98,10 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
 
     const disableAutoOffsetAdjustment = useCallback(() => {
       'worklet';
-      clearAnimatedTimeout(context.value.resetTimeoutId);
-      context.value.state = AutoOffsetAdjustmentState.DISABLED;
-      sortEnabled.value = context.value.prevSortEnabled;
+      const ctx = context.value;
+      clearAnimatedTimeout(ctx.resetTimeoutId);
+      ctx.state = AutoOffsetAdjustmentState.DISABLED;
+      sortEnabled.value = ctx.prevSortEnabled;
     }, [context, sortEnabled]);
 
     useAnimatedReaction(
@@ -99,6 +122,47 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       }
     );
 
+    const adjustScrollToKeepItemInView = useCallback(() => {
+      'worklet';
+      const keepInViewData = context.value.keepInViewData;
+      if (!scrollBy || !scrollableRef || !keepInViewData) {
+        return;
+      }
+
+      const containerMeasurements = measure(containerRef);
+      const scrollableMeasurements = measure(scrollableRef);
+      if (!containerMeasurements || !scrollableMeasurements) {
+        return;
+      }
+
+      const { isVertical, itemCrossOffset, itemCrossSize } = keepInViewData;
+      const {
+        height: scrollableHeight,
+        pageX: scrollableX,
+        pageY: scrollableY,
+        width: scrollableWidth
+      } = scrollableMeasurements;
+      const { pageX: containerX, pageY: containerY } = containerMeasurements;
+
+      const scrollableCrossSize = isVertical
+        ? scrollableHeight
+        : scrollableWidth;
+      const relativeScrollOffset = isVertical
+        ? scrollableY - containerY
+        : scrollableX - containerX;
+      const relativeItemOffset = itemCrossOffset - relativeScrollOffset;
+
+      const clampedRelativeItemOffset = clamp(
+        relativeItemOffset,
+        scrollPadding[0],
+        scrollableCrossSize - itemCrossSize - scrollPadding[1]
+      );
+
+      scrollBy(relativeItemOffset - clampedRelativeItemOffset, true);
+
+      context.value.keepInViewData = null;
+    }, [containerRef, scrollableRef, context, scrollPadding, scrollBy]);
+
     const adaptLayoutProps = useCallback(
       (
         props: GridLayoutProps,
@@ -112,7 +176,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           return props;
         }
         if (ctx.state === AutoOffsetAdjustmentState.RESET || itemKey === null) {
-          console.log('>>> reset');
+          // This auto adjustment must be delayed one frame after the scrollBy call
+          setAnimatedTimeout(adjustScrollToKeepItemInView);
           disableAutoOffsetAdjustment();
           return props;
         }
@@ -158,20 +223,27 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
             itemKey: prevActiveKey
           });
 
-          ctx.state = AutoOffsetAdjustmentState.RESET;
-
           const scrollDistance = newCrossOffset - oldCrossOffset;
           const startCrossOffset = additionalCrossOffset.value + scrollDistance;
+
           additionalCrossOffset.value = null;
+          ctx.state = AutoOffsetAdjustmentState.RESET;
+
+          const itemCrossSize = resolveDimension(crossItemSizes, prevActiveKey);
+          ctx.keepInViewData =
+            itemCrossSize === null
+              ? null
+              : {
+                  isVertical,
+                  itemCrossOffset: newCrossOffset,
+                  itemCrossSize
+                };
 
           // Since the scrollBy function is executed synchronously, it would be called
           // before the new layout is actually applied (the animated style is calculated
           // in reaction to the itemPositions change, so the new layout is committed
           // in the next frame). We use this timeout to execute the scroll in the next frame.
-          setAnimatedTimeout(() => {
-            console.log('>>> scroll', scrollDistance);
-            scrollBy?.(scrollDistance, false);
-          });
+          setAnimatedTimeout(() => scrollBy?.(scrollDistance, false));
 
           return {
             ...props,
@@ -233,6 +305,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         activeItemDimensions,
         activeItemPosition,
         additionalCrossOffset,
+        adjustScrollToKeepItemInView,
         disableAutoOffsetAdjustment,
         enableActiveItemSnap,
         itemPositions,
