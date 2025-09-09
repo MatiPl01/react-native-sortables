@@ -2,13 +2,13 @@
   "name": "example-expo",
   "version": "1.0.0",
   "dependencies": {
-    "expo": "54.0.0-preview.11",
-    "expo-status-bar": "~3.0.5",
+    "expo": "54.0.0-preview.16",
+    "expo-status-bar": "~3.0.7",
     "react": "19.1.0",
     "react-native": "0.81.1",
     "react-native-gesture-handler": "~2.28.0",
-    "react-native-reanimated": "~4.0.2",
-    "react-native-worklets": "0.4.2"
+    "react-native-reanimated": "~4.1.0",
+    "react-native-worklets": "~0.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren, useCallback, useRef } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { useAnimatedReaction } from 'react-native-reanimated';
 
@@ -22,6 +22,11 @@ import {
 import { createProvider } from '../../utils';
 import { useAutoOffsetAdjustmentContext } from '../AutoOffsetAdjustmentProvider';
 import { calculateLayout, shouldUpdateContainerDimensions } from './utils';
+
+type UpdateShouldAnimateWeb = (
+  props: GridLayoutProps,
+  prevProps: GridLayoutProps | null
+) => void;
 
 const DEBUG_COLORS = {
   backgroundColor: '#ffa500',
@@ -75,6 +80,39 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
   const mainGroupSize = useMutableValue<null | number>(null);
   const layoutRequestId = useMutableValue(0);
+
+  let updateShouldAnimateWeb: null | UpdateShouldAnimateWeb = null;
+
+  if (IS_WEB) {
+    const shouldAnimateTimeoutRef = useRef<null | ReturnType<
+      typeof setTimeout
+    >>(null);
+
+    updateShouldAnimateWeb = useCallback<UpdateShouldAnimateWeb>(
+      (props, prevProps) => {
+        // On the web, animate layout only if parent container is not resized
+        // (e.g. skip animation when the browser window is resized)
+        const shouldAnimate =
+          !prevProps?.itemHeights ||
+          !prevProps?.itemWidths ||
+          (isVertical
+            ? props.itemWidths === prevProps?.itemWidths
+            : props.itemHeights === prevProps?.itemHeights);
+
+        if (shouldAnimateTimeoutRef.current !== null) {
+          clearTimeout(shouldAnimateTimeoutRef.current);
+        }
+        if (!shouldAnimate) {
+          shouldAnimateLayout.value = false;
+        }
+        // Enable after timeout when the user stops resizing the browser window
+        shouldAnimateTimeoutRef.current = setTimeout(() => {
+          shouldAnimateLayout.value = true;
+        }, 100);
+      },
+      [shouldAnimateLayout, isVertical]
+    );
+  }
 
   // MAIN GROUP SIZE UPDATER
   useAnimatedReaction(
@@ -160,16 +198,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       if (adaptedProps.shouldAnimateLayout !== undefined) {
         shouldAnimateLayout.value = adaptedProps.shouldAnimateLayout;
-      } else {
-        // On the web, animate layout only if parent container is not resized
-        // (e.g. skip animation when the browser window is resized)
-        shouldAnimateLayout.value =
-          !IS_WEB ||
-          !prevProps?.itemHeights ||
-          !prevProps?.itemWidths ||
-          (isVertical
-            ? props.itemWidths === prevProps?.itemWidths
-            : props.itemHeights === prevProps?.itemHeights);
+      } else if (IS_WEB) {
+        updateShouldAnimateWeb?.(adaptedProps, prevProps);
       }
 
       if (adaptedProps.requestNextLayout) {

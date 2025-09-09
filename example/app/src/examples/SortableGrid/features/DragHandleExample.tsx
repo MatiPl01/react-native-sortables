@@ -92,7 +92,6 @@ export default function DragHandleExample() {
           rowGap={10}
           scrollableRef={scrollableRef}
           customHandle
-          debug
         />
         <Spacer height={bottomNavBarHeight} />
       </Animated.ScrollView>
