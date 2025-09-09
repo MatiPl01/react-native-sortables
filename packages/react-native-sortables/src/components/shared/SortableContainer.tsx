@@ -1,9 +1,8 @@
-import { memo, useMemo, useSyncExternalStore } from 'react';
+import { memo, useSyncExternalStore } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import Animated, {
   LinearTransition,
   useAnimatedStyle,
-  useDerivedValue,
   withTiming
 } from 'react-native-reanimated';
 
@@ -39,7 +38,7 @@ export default function SortableContainer({
   dropIndicatorStyle,
   itemEntering,
   itemExiting,
-  itemStyle: _itemStyle,
+  itemStyle,
   onLayout,
   overflow,
   showDropIndicator
@@ -51,8 +50,6 @@ export default function SortableContainer({
     containerRef,
     containerWidth,
     controlledContainerDimensions,
-    itemHeights,
-    itemWidths,
     shouldAnimateLayout,
     usesAbsoluteLayout
   } = useCommonValuesContext();
@@ -96,23 +93,6 @@ export default function SortableContainer({
         width: containerWidth.value
       })
   }));
-
-  const controlledItemWidth = useDerivedValue(() =>
-    typeof itemWidths.value === 'number' ? itemWidths.value : undefined
-  );
-  const controlledItemHeight = useDerivedValue(() =>
-    typeof itemHeights.value === 'number' ? itemHeights.value : undefined
-  );
-
-  const controlledItemDimensionsStyle = useAnimatedStyle(() => ({
-    height: controlledItemHeight.value,
-    width: controlledItemWidth.value
-  }));
-
-  const itemStyle = useMemo(
-    () => [_itemStyle, controlledItemDimensionsStyle],
-    [_itemStyle, controlledItemDimensionsStyle]
-  );
 
   return (
     <Animated.View

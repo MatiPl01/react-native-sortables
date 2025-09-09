@@ -1,6 +1,10 @@
 import { type PropsWithChildren, useEffect, useMemo } from 'react';
-import type { View } from 'react-native';
-import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
+import type { View, ViewStyle } from 'react-native';
+import {
+  useAnimatedRef,
+  useAnimatedStyle,
+  useDerivedValue
+} from 'react-native-reanimated';
 
 import type { Animatable } from '../../integrations/reanimated';
 import {
@@ -83,6 +87,16 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       controlledItemDimensions.height ? null : {}
     );
     const activeItemDimensions = useMutableValue<Dimensions | null>(null);
+    const controlledItemWidth = useDerivedValue(() =>
+      typeof itemWidths.value === 'number' ? itemWidths.value : undefined
+    );
+    const controlledItemHeight = useDerivedValue(() =>
+      typeof itemHeights.value === 'number' ? itemHeights.value : undefined
+    );
+    const controlledItemDimensionsStyle = useAnimatedStyle<ViewStyle>(() => ({
+      height: controlledItemHeight.value,
+      width: controlledItemWidth.value
+    }));
 
     // DRAG STATE
     const activeItemKey = useMutableValue<null | string>(null);
@@ -153,6 +167,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         containerWidth,
         controlledContainerDimensions,
         controlledItemDimensions,
+        controlledItemDimensionsStyle,
         customHandle,
         dragActivationDelay,
         dragActivationFailOffset,
