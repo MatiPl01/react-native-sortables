@@ -76,7 +76,7 @@ export default function ActiveItemPortal({
   const teleportedItemId = `${commonValuesContext.containerId}-${itemKey}`;
 
   const enableTeleport = useStableCallback(() => {
-    // isFirstUpdateRef.current = true;
+    isFirstUpdateRef.current = true;
     teleport?.(teleportedItemId, renderTeleportedItemCell());
     onTeleport(true);
   });

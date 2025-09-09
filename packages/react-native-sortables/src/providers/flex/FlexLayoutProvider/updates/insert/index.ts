@@ -52,7 +52,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
   let crossCoordinate: Coordinate;
   let mainDimension: Dimension;
   let crossDimension: Dimension;
-  let mainGap: SharedValue<number>;
+  let mainGap: number;
   let mainItemSizes: SharedValue<ItemSizes>;
 
   if (isRow) {
@@ -99,7 +99,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
             indexToKey: indexToKey.value,
             itemGroups: appliedLayout.value.itemGroups,
             keyToIndex: keyToIndex.value,
-            mainGap: mainGap.value,
+            mainGap,
             mainItemSizes: isRow ? itemWidths.value : itemHeights.value
           }
         : null,
@@ -136,7 +136,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
       activeItemKey: activeKey,
       fixedKeys: fixedItemKeys?.value,
       groupSizeLimit: currentLayout.groupSizeLimit,
-      mainGap: mainGap.value,
+      mainGap,
       mainItemSizes: isRow ? itemWidths.value : itemHeights.value
     };
 
@@ -334,7 +334,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
       swapItemAfterBound =
         averageOffset + (isCurrentBeforeNext ? 1 : -1) * additionalSwapOffset;
 
-      totalGroupSize += itemMainSize + mainGap.value;
+      totalGroupSize += itemMainSize + mainGap;
       if (totalGroupSize + activeItemMainSize > currentLayout.groupSizeLimit) {
         break;
       }
@@ -350,10 +350,10 @@ const useInsertStrategy: SortStrategyFactory = () => {
       const groupBeforeSize = getTotalGroupSize(
         groupBefore,
         mainItemSizes.value,
-        mainGap.value
+        mainGap
       );
       canBeFirst =
-        groupBeforeSize + activeItemMainSize + mainGap.value >
+        groupBeforeSize + activeItemMainSize + mainGap >
         currentLayout.groupSizeLimit;
     }
 
