@@ -200,6 +200,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         shouldAnimateLayout.value = adaptedProps.shouldAnimateLayout;
       } else if (IS_WEB) {
         updateShouldAnimateWeb?.(adaptedProps, prevProps);
+      } else {
+        shouldAnimateLayout.value = true;
       }
 
       if (adaptedProps.requestNextLayout) {

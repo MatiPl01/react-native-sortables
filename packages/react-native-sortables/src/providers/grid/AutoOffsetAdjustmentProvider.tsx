@@ -42,7 +42,7 @@ type KeepInViewData = {
 type StateContextType = {
   state: AutoOffsetAdjustmentState;
   resetTimeoutId: number;
-  prevSortEnabled: boolean;
+  prevSortEnabled: boolean | null;
   keepInViewData: KeepInViewData | null;
 };
 
@@ -101,9 +101,13 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const disableAutoOffsetAdjustment = useCallback(() => {
       'worklet';
       const ctx = context.value;
+      if (ctx.prevSortEnabled === null) {
+        return;
+      }
       clearAnimatedTimeout(ctx.resetTimeoutId);
       ctx.state = AutoOffsetAdjustmentState.DISABLED;
       sortEnabled.value = ctx.prevSortEnabled;
+      ctx.prevSortEnabled = null;
       additionalCrossOffset.value = null;
     }, [context, sortEnabled, additionalCrossOffset]);
 
@@ -256,10 +260,6 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
                   itemCrossSize
                 };
 
-          // Since the scrollBy function is executed synchronously, it would be called
-          // before the new layout is actually applied (the animated style is calculated
-          // in reaction to the itemPositions change, so the new layout is committed
-          // in the next frame). We use this timeout to execute the scroll in the next frame.
           setAnimatedTimeout(() => scrollBy?.(scrollDistance, false));
 
           ctx.state = AutoOffsetAdjustmentState.RESET;
@@ -309,7 +309,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         );
 
         additionalCrossOffset.value = startCrossOffset;
-        ctx.prevSortEnabled = sortEnabled.value;
+        ctx.prevSortEnabled ??= sortEnabled.value;
         sortEnabled.value = false;
 
         return {
