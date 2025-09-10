@@ -76,9 +76,6 @@ jobs:
         app: [fabric, paper]
         platform: [ios, android]
       fail-fast: false
-    concurrency:
-      group: build-${{ matrix.app }}-${{ matrix.platform }}-${{ github.ref }}
-      cancel-in-progress: true
 
     steps:
       - name: 🛒 Checkout code
