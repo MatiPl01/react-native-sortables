@@ -113,7 +113,8 @@ export type MeasurementsContextType = {
 
 export type AutoScrollContextType = {
   scrollableRef: AnimatedRef<ScrollView>;
-  scrollOffsetDiff: SharedValue<null | Partial<Vector>>;
+  scrollOffsetDiff: SharedValue<number>;
+  isVerticalScroll: boolean;
   contentBounds: SharedValue<[Vector, Vector] | null>;
   scrollBy: (distance: number, animated: boolean) => void;
 };

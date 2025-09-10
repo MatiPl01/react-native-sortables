@@ -64,33 +64,3 @@ export const calculateRawProgressHorizontal: CalculateRawProgressFunction = (
   { pageX: sX, width: sW },
   ...rest
 ) => calculateRawProgress(position, cX, cW, sX, sW, ...rest);
-
-export const clampDistance = (
-  distance: number,
-  containerOffset: number,
-  scrollableSize: number,
-  [startOffset, endOffset]: [number, number],
-  [maxStartOverscroll, maxEndOverscroll]: [number, number]
-) => {
-  if (distance < 0) {
-    // Scrolling up
-    return Math.min(
-      0,
-      Math.max(containerOffset + distance, startOffset - maxStartOverscroll) -
-        containerOffset
-    );
-  }
-
-  if (distance > 0) {
-    // Scrolling down
-    return Math.max(
-      0,
-      Math.min(
-        containerOffset + distance,
-        endOffset - scrollableSize + maxEndOverscroll
-      ) - containerOffset
-    );
-  }
-
-  return 0;
-};

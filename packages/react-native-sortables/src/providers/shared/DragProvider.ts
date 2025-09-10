@@ -108,7 +108,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     usesAbsoluteLayout
   } = useCommonValuesContext();
   const { updateLayer } = useLayerContext() ?? {};
-  const { scrollOffsetDiff } = useAutoScrollContext() ?? {};
+  const { isVerticalScroll, scrollOffsetDiff } = useAutoScrollContext() ?? {};
   const {
     activeHandleMeasurements,
     activeHandleOffset,
@@ -141,10 +141,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       enableSnap: enableActiveItemSnap.value,
       itemTouchOffset: context.value.dragStartItemTouchOffset,
       key: activeItemKey.value,
-      offsetDiff: scrollOffsetDiff?.value,
       offsetX: snapOffsetX.value,
       offsetY: snapOffsetY.value,
       progress: activeAnimationProgress.value,
+      scrollDiff: scrollOffsetDiff?.value,
       snapItemDimensions:
         activeHandleMeasurements?.value ?? activeItemDimensions.value,
       snapItemOffset: activeHandleOffset?.value,
@@ -159,10 +159,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       enableSnap,
       itemTouchOffset,
       key,
-      offsetDiff,
       offsetX,
       offsetY,
       progress,
+      scrollDiff,
       snapItemDimensions,
       snapItemOffset,
       startTouch,
@@ -188,15 +188,17 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // Touch position
 
       const newTouchPosition = {
-        x:
-          startTouchPosition.x +
-          (touch.absoluteX - startTouch.absoluteX) +
-          (offsetDiff?.x ?? 0),
-        y:
-          startTouchPosition.y +
-          (touch.absoluteY - startTouch.absoluteY) +
-          (offsetDiff?.y ?? 0)
+        x: startTouchPosition.x + (touch.absoluteX - startTouch.absoluteX),
+        y: startTouchPosition.y + (touch.absoluteY - startTouch.absoluteY)
       };
+
+      if (scrollDiff) {
+        if (isVerticalScroll) {
+          newTouchPosition.y += scrollDiff;
+        } else {
+          newTouchPosition.x += scrollDiff;
+        }
+      }
 
       if (
         !touchPosition.value ||
