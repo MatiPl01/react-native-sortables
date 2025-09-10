@@ -13,7 +13,7 @@ import type {
   AnimatedStyleProp,
   LayoutAnimation
 } from '../../../integrations/reanimated';
-import { useItemDecoration } from '../../../providers';
+import { useCommonValuesContext, useItemDecoration } from '../../../providers';
 import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
 
 type TransformsArray = Array<TransformArrayItem>;
@@ -42,6 +42,8 @@ export default function ItemCell({
   layoutStyleValue,
   onLayout
 }: ItemCellProps) {
+  const { controlledItemDimensionsStyle } = useCommonValuesContext();
+
   const decorationStyleValue = useItemDecoration(
     itemKey,
     isActive,
@@ -64,7 +66,7 @@ export default function ItemCell({
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={hidden && styles.hidden}
+        style={[controlledItemDimensionsStyle, hidden && styles.hidden]}
         onLayout={onLayout}>
         {children}
       </AnimatedOnLayoutView>

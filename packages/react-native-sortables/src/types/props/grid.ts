@@ -81,9 +81,10 @@ export type AutoAdjustOffsetSettings = {
   autoAdjustOffsetResetTimeout: number;
   /** Padding to add when adjusting the scroll offset after the active item is released.
    * @note This takes effect only if autoAdjustOffsetDuringDrag is true and the scrollableRef is provided.
+   * @note When null, the scrollable container will not automatically scroll to keep the released item visible with padding from the container edges.
    * @default 25
    */
-  autoAdjustOffsetScrollPadding: [number, number] | number;
+  autoAdjustOffsetScrollPadding: [number, number] | null | number;
 };
 
 /** Props for the SortableGrid component */

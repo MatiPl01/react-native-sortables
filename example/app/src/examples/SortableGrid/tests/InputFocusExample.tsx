@@ -4,9 +4,9 @@ import {
   KeyboardAvoidingView,
   StyleSheet,
   Text,
-  TextInput,
   View
 } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable from 'react-native-sortables';
 

@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback } from 'react';
+import { type PropsWithChildren, useCallback, useMemo } from 'react';
 import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
 
 import { type DEFAULT_SORTABLE_FLEX_PROPS, IS_WEB } from '../../../constants';
@@ -10,7 +10,6 @@ import type {
   DimensionLimits,
   FlexLayout,
   FlexLayoutContextType,
-  Paddings,
   SortableFlexStyle
 } from '../../../types';
 import { haveEqualPropValues } from '../../../utils';
@@ -23,22 +22,24 @@ import {
 import { createProvider } from '../../utils';
 import { calculateLayout, updateLayoutDebugRects } from './utils';
 
-export type FlexLayoutProviderProps = PropsWithChildren<
-  RequiredBy<
-    SortableFlexStyle,
-    keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
+export type FlexStyleProps = PropsWithChildren<
+  Omit<
+    RequiredBy<
+      SortableFlexStyle,
+      keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
+    >,
+    'gap'
   >
 >;
 
 const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   'FlexLayout'
-)<FlexLayoutProviderProps, FlexLayoutContextType>(({
+)<FlexStyleProps, FlexLayoutContextType>(({
   alignContent,
   alignItems,
-  columnGap: columnGap_,
+  columnGap = 0,
   flexDirection,
   flexWrap,
-  gap,
   height,
   justifyContent,
   maxHeight,
@@ -52,7 +53,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   paddingRight,
   paddingTop,
   paddingVertical,
-  rowGap: rowGap_,
+  rowGap = 0,
   width
 }) => {
   const {
@@ -71,15 +72,31 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
   const keyToGroup = useMutableValue<Record<string, number>>({});
 
-  const columnGap = useDerivedValue(() => columnGap_ ?? gap);
-  const rowGap = useDerivedValue(() => rowGap_ ?? gap);
+  const gaps = useMemo(
+    () => ({
+      column: columnGap,
+      row: rowGap
+    }),
+    [columnGap, rowGap]
+  );
 
-  const paddings = useDerivedValue<Paddings>(() => ({
-    bottom: paddingBottom ?? paddingVertical ?? padding,
-    left: paddingLeft ?? paddingHorizontal ?? padding,
-    right: paddingRight ?? paddingHorizontal ?? padding,
-    top: paddingTop ?? paddingVertical ?? padding
-  }));
+  const paddings = useMemo(
+    () => ({
+      bottom: paddingBottom ?? paddingVertical ?? padding,
+      left: paddingLeft ?? paddingHorizontal ?? padding,
+      right: paddingRight ?? paddingHorizontal ?? padding,
+      top: paddingTop ?? paddingVertical ?? padding
+    }),
+    [
+      paddingBottom,
+      paddingVertical,
+      padding,
+      paddingLeft,
+      paddingHorizontal,
+      paddingRight,
+      paddingTop
+    ]
+  );
 
   const dimensionsLimits = useDerivedValue<DimensionLimits | null>(() => {
     const h = height === 'fill' ? undefined : height;
@@ -135,15 +152,12 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       },
       flexDirection,
       flexWrap,
-      gaps: {
-        column: columnGap.value,
-        row: rowGap.value
-      },
+      gaps,
       indexToKey: indexToKey.value,
       itemHeights: itemHeights.value,
       itemWidths: itemWidths.value,
       limits: dimensionsLimits.value,
-      paddings: paddings.value
+      paddings
     }),
     (props, previousProps) => {
       const layout = calculateLayout(props);
@@ -198,15 +212,12 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
         },
         flexDirection,
         flexWrap,
-        gaps: {
-          column: columnGap.value,
-          row: rowGap.value
-        },
+        gaps,
         indexToKey: idxToKey,
         itemHeights: itemHeights.value,
         itemWidths: itemWidths.value,
         limits: dimensionsLimits.value,
-        paddings: paddings.value
+        paddings
       });
     },
     [
@@ -215,12 +226,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       justifyContent,
       flexDirection,
       flexWrap,
-      columnGap,
-      rowGap,
       itemHeights,
       itemWidths,
       dimensionsLimits,
-      paddings
+      paddings,
+      gaps
     ]
   );
 

@@ -9,12 +9,12 @@ import type {
 import type { SharedProviderProps } from '../shared';
 import { SharedProvider } from '../shared';
 import { ContextProviderComposer } from '../utils';
-import type { FlexLayoutProviderProps } from './FlexLayoutProvider';
+import type { FlexStyleProps } from './FlexLayoutProvider';
 import { FlexLayoutProvider } from './FlexLayoutProvider';
 
 type FlexProviderProps = PropsWithChildren<
   SharedProviderProps & {
-    styleProps: Omit<FlexLayoutProviderProps, 'itemsCount'>;
+    styleProps: Omit<FlexStyleProps, 'itemsCount'>;
     reorderTriggerOrigin: ReorderTriggerOrigin;
     strategy: SortableFlexStrategy;
     onDragEnd: DragEndCallback;

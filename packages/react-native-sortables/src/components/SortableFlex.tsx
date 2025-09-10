@@ -4,10 +4,10 @@ import { StyleSheet } from 'react-native';
 import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
-import type { RequiredBy } from '../helperTypes';
 import type { PropsWithDefaults } from '../hooks';
 import { useDragEndHandler, usePropsWithDefaults } from '../hooks';
 import { useStableCallbackValues } from '../integrations/reanimated';
+import type { FlexStyleProps } from '../providers';
 import {
   FLEX_STRATEGIES,
   FlexProvider,
@@ -17,11 +17,7 @@ import {
   useOrderUpdater,
   useStrategyKey
 } from '../providers';
-import type {
-  DragEndCallback,
-  SortableFlexProps,
-  SortableFlexStyle
-} from '../types';
+import type { DragEndCallback, SortableFlexProps } from '../types';
 import { orderItems, processChildren } from '../utils';
 import { SortableContainer } from './shared';
 
@@ -70,11 +66,6 @@ const CONTROLLED_ITEM_DIMENSIONS = {
   height: false,
   width: false
 };
-
-type StyleProps = RequiredBy<
-  SortableFlexStyle,
-  keyof SortableFlexStyle & keyof typeof DEFAULT_SORTABLE_FLEX_PROPS
->;
 
 type SortableFlexInnerProps = PropsWithDefaults<
   SortableFlexProps,
@@ -129,13 +120,12 @@ const SortableFlexInner = memo(function SortableFlexInner({
     [flexWrap, isColumn, height, width]
   );
 
-  const styleProps: StyleProps = {
+  const styleProps: FlexStyleProps = {
     alignContent,
     alignItems,
-    columnGap,
+    columnGap: columnGap ?? gap,
     flexDirection,
     flexWrap,
-    gap,
     height,
     justifyContent,
     maxHeight,
@@ -149,7 +139,7 @@ const SortableFlexInner = memo(function SortableFlexInner({
     paddingRight,
     paddingTop,
     paddingVertical,
-    rowGap,
+    rowGap: rowGap ?? gap,
     width
   } as const;
 
@@ -189,7 +179,7 @@ type SortableFlexComponentProps = Pick<
   | 'showDropIndicator'
   | 'strategy'
 > & {
-  styleProps: StyleProps;
+  styleProps: FlexStyleProps;
 };
 
 function SortableFlexComponent({

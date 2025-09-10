@@ -47,10 +47,6 @@ export default function useTeleportedItemPosition(
   );
 
   const absoluteItemPosition = useDerivedValue(() => {
-    if (isActive.value) {
-      return activeItemAbsolutePosition?.value ?? null;
-    }
-
     if (dropStartValues.value) {
       const measurements = measure(containerRef);
       if (!measurements) {
@@ -72,7 +68,7 @@ export default function useTeleportedItemPosition(
       };
     }
 
-    return null;
+    return activeItemAbsolutePosition?.value ?? null;
   });
 
   // Drop start values updater on target position change

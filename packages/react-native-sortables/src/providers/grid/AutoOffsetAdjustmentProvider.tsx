@@ -42,13 +42,13 @@ type KeepInViewData = {
 type StateContextType = {
   state: AutoOffsetAdjustmentState;
   resetTimeoutId: number;
-  prevSortEnabled: boolean;
+  prevSortEnabled: boolean | null;
   keepInViewData: KeepInViewData | null;
 };
 
 type AutoOffsetAdjustmentProviderProps = PropsWithChildren<{
   autoAdjustOffsetResetTimeout: number;
-  autoAdjustOffsetScrollPadding: [number, number] | number;
+  autoAdjustOffsetScrollPadding: [number, number] | null | number;
 }>;
 
 const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
@@ -79,11 +79,13 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
 
     const additionalCrossOffset = useMutableValue<null | number>(null);
 
-    const scrollPadding = useMemo<[number, number]>(
+    const scrollPadding = useMemo<[number, number] | null>(
       () =>
-        Array.isArray(autoAdjustOffsetScrollPadding)
-          ? autoAdjustOffsetScrollPadding
-          : [autoAdjustOffsetScrollPadding, autoAdjustOffsetScrollPadding],
+        autoAdjustOffsetScrollPadding === null
+          ? null
+          : Array.isArray(autoAdjustOffsetScrollPadding)
+            ? autoAdjustOffsetScrollPadding
+            : [autoAdjustOffsetScrollPadding, autoAdjustOffsetScrollPadding],
       [autoAdjustOffsetScrollPadding]
     );
 
@@ -99,10 +101,15 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const disableAutoOffsetAdjustment = useCallback(() => {
       'worklet';
       const ctx = context.value;
+      if (ctx.prevSortEnabled === null) {
+        return;
+      }
       clearAnimatedTimeout(ctx.resetTimeoutId);
       ctx.state = AutoOffsetAdjustmentState.DISABLED;
       sortEnabled.value = ctx.prevSortEnabled;
-    }, [context, sortEnabled]);
+      ctx.prevSortEnabled = null;
+      additionalCrossOffset.value = null;
+    }, [context, sortEnabled, additionalCrossOffset]);
 
     useAnimatedReaction(
       () => activeItemDropped.value,
@@ -122,46 +129,54 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       }
     );
 
-    const adjustScrollToKeepItemInView = useCallback(() => {
-      'worklet';
-      const keepInViewData = context.value.keepInViewData;
-      if (!scrollBy || !scrollableRef || !keepInViewData) {
-        return;
-      }
+    const adjustScrollToKeepItemInView = useCallback(
+      (padding: [number, number]) => {
+        'worklet';
+        const keepInViewData = context.value.keepInViewData;
+        if (!scrollBy || !scrollableRef || !keepInViewData) {
+          return;
+        }
 
-      const containerMeasurements = measure(containerRef);
-      const scrollableMeasurements = measure(scrollableRef);
-      if (!containerMeasurements || !scrollableMeasurements) {
-        return;
-      }
+        const containerMeasurements = measure(containerRef);
+        const scrollableMeasurements = measure(scrollableRef);
+        if (!containerMeasurements || !scrollableMeasurements) {
+          return;
+        }
 
-      const { isVertical, itemCrossOffset, itemCrossSize } = keepInViewData;
-      const {
-        height: scrollableHeight,
-        pageX: scrollableX,
-        pageY: scrollableY,
-        width: scrollableWidth
-      } = scrollableMeasurements;
-      const { pageX: containerX, pageY: containerY } = containerMeasurements;
+        const { isVertical, itemCrossOffset, itemCrossSize } = keepInViewData;
+        const {
+          height: scrollableHeight,
+          pageX: scrollableX,
+          pageY: scrollableY,
+          width: scrollableWidth
+        } = scrollableMeasurements;
+        const { pageX: containerX, pageY: containerY } = containerMeasurements;
 
-      const scrollableCrossSize = isVertical
-        ? scrollableHeight
-        : scrollableWidth;
-      const relativeScrollOffset = isVertical
-        ? scrollableY - containerY
-        : scrollableX - containerX;
-      const relativeItemOffset = itemCrossOffset - relativeScrollOffset;
+        const scrollableCrossSize = isVertical
+          ? scrollableHeight
+          : scrollableWidth;
+        const relativeScrollOffset = isVertical
+          ? scrollableY - containerY
+          : scrollableX - containerX;
+        const relativeItemOffset = itemCrossOffset - relativeScrollOffset;
 
-      const clampedRelativeItemOffset = clamp(
-        relativeItemOffset,
-        scrollPadding[0],
-        scrollableCrossSize - itemCrossSize - scrollPadding[1]
-      );
+        const minOffset = padding[0];
+        const maxOffset = scrollableCrossSize - itemCrossSize - padding[1];
 
-      scrollBy(relativeItemOffset - clampedRelativeItemOffset, true);
+        let clampedOffset = 0;
+        if (minOffset > maxOffset) {
+          // Center the item if padding is too large
+          clampedOffset = (minOffset + maxOffset) / 2;
+        } else {
+          clampedOffset = clamp(relativeItemOffset, minOffset, maxOffset);
+        }
 
-      context.value.keepInViewData = null;
-    }, [containerRef, scrollableRef, context, scrollPadding, scrollBy]);
+        scrollBy(relativeItemOffset - clampedOffset, true);
+
+        context.value.keepInViewData = null;
+      },
+      [containerRef, scrollableRef, context, scrollBy]
+    );
 
     const adaptLayoutProps = useCallback(
       (
@@ -177,7 +192,11 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         }
         if (ctx.state === AutoOffsetAdjustmentState.RESET || itemKey === null) {
           // This auto adjustment must be delayed one frame after the scrollBy call
-          setAnimatedTimeout(adjustScrollToKeepItemInView);
+          if (scrollPadding) {
+            setAnimatedTimeout(() =>
+              adjustScrollToKeepItemInView(scrollPadding)
+            );
+          }
           disableAutoOffsetAdjustment();
           return props;
         }
@@ -215,6 +234,11 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           additionalCrossOffset.value !== null &&
           prevCrossIteSizes !== null
         ) {
+          if (!scrollableRef) {
+            disableAutoOffsetAdjustment();
+            return props;
+          }
+
           const prevActiveKey = prevActiveItemKey.value!;
           const oldCrossOffset =
             itemPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
@@ -226,9 +250,6 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           const scrollDistance = newCrossOffset - oldCrossOffset;
           const startCrossOffset = additionalCrossOffset.value + scrollDistance;
 
-          additionalCrossOffset.value = null;
-          ctx.state = AutoOffsetAdjustmentState.RESET;
-
           const itemCrossSize = resolveDimension(crossItemSizes, prevActiveKey);
           ctx.keepInViewData =
             itemCrossSize === null
@@ -239,11 +260,9 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
                   itemCrossSize
                 };
 
-          // Since the scrollBy function is executed synchronously, it would be called
-          // before the new layout is actually applied (the animated style is calculated
-          // in reaction to the itemPositions change, so the new layout is committed
-          // in the next frame). We use this timeout to execute the scroll in the next frame.
           setAnimatedTimeout(() => scrollBy?.(scrollDistance, false));
+
+          ctx.state = AutoOffsetAdjustmentState.RESET;
 
           return {
             ...props,
@@ -290,7 +309,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         );
 
         additionalCrossOffset.value = startCrossOffset;
-        ctx.prevSortEnabled = sortEnabled.value;
+        ctx.prevSortEnabled ??= sortEnabled.value;
         sortEnabled.value = false;
 
         return {
@@ -314,9 +333,11 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         snapOffsetX,
         snapOffsetY,
         touchPosition,
+        scrollPadding,
         scrollBy,
         context,
-        sortEnabled
+        sortEnabled,
+        scrollableRef
       ]
     );
 

@@ -248,7 +248,7 @@ function AutoScrollUpdater({
         : scrollableMeasurements.width;
 
       if (
-        pendingDistance !== 0 &&
+        Math.abs(pendingDistance) > 1 &&
         containerOffset === ctx.prevContainerOffset
       ) {
         // Return if measurements haven't been updated yet (we scroll based on the

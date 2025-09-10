@@ -80,6 +80,7 @@ export default function DragHandleExample() {
         style={flex.fill}>
         <Sortable.Grid
           activeItemScale={1}
+          autoScrollMaxOverscroll={[50, 120]}
           columnGap={10}
           columns={columns}
           data={DATA}
