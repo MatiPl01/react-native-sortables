@@ -1,0 +1,190 @@
+name: 🏗️ Build Example Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'example/**'
+      - 'packages/react-native-sortables/**'
+      - '.github/workflows/build-examples.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'example/**'
+      - 'packages/react-native-sortables/**'
+      - '.github/workflows/build-examples.yml'
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # Build Expo app locally (no EAS required)
+  build-expo:
+    name: 📱 Build Expo App
+    runs-on: ubuntu-latest
+    concurrency:
+      group: build-expo-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
+      - name: 🏗️ Build library
+        run: yarn build
+
+      - name: 📱 Install Expo CLI
+        run: npm install -g @expo/cli
+
+      - name: 🌐 Install Expo dependencies
+        working-directory: example/expo
+        run: yarn install --immutable
+
+      - name: 🔍 Validate Expo configuration
+        working-directory: example/expo
+        run: npx expo doctor
+
+      - name: 🏗️ Build Expo bundle
+        working-directory: example/expo
+        run: npx expo export --platform all
+
+      - name: 📦 Upload Expo build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: expo-build
+          path: example/expo/dist/
+          retention-days: 7
+
+  # Build React Native apps (Fabric and Paper)
+  build-react-native:
+    name: 📱 Build ${{ matrix.app }} (${{ matrix.platform }})
+    runs-on: macos-15
+    strategy:
+      matrix:
+        app: [fabric, paper]
+        platform: [ios, android]
+    concurrency:
+      group: build-${{ matrix.app }}-${{ matrix.platform }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
+      - name: 🏗️ Build library
+        run: yarn build
+
+      - name: 🍎 Setup Ruby (iOS only)
+        if: matrix.platform == 'ios'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: 🍎 Select Xcode (iOS only)
+        if: matrix.platform == 'ios'
+        run: sudo xcode-select --switch /Applications/Xcode_16.4.app
+
+      - name: ☕ Setup Java (Android only)
+        if: matrix.platform == 'android'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🤖 Setup Android SDK (Android only)
+        if: matrix.platform == 'android'
+        uses: android-actions/setup-android@v3
+
+      - name: 📱 Install dependencies for ${{ matrix.app }}
+        working-directory: example/${{ matrix.app }}
+        run: yarn install --immutable
+
+      - name: 🍎 Install pods (iOS only)
+        if: matrix.platform == 'ios'
+        working-directory: example/${{ matrix.app }}/ios
+        run: |
+          bundle install
+          bundle exec pod update
+
+      - name: 🍎 Build iOS
+        if: matrix.platform == 'ios'
+        working-directory: example/${{ matrix.app }}
+        run: |
+          xcodebuild -workspace ios/*.xcworkspace -scheme * -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' build
+
+      - name: 🤖 Build Android
+        if: matrix.platform == 'android'
+        working-directory: example/${{ matrix.app }}
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: 📦 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-${{ matrix.platform }}-build
+          path: |
+            example/${{ matrix.app }}/ios/build/ (iOS)
+            example/${{ matrix.app }}/android/app/build/ (Android)
+          retention-days: 7
+
+  # Build Web app
+  build-web:
+    name: 🌐 Build Web App
+    runs-on: ubuntu-latest
+    concurrency:
+      group: build-web-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
+      - name: 🏗️ Build library
+        run: yarn build
+
+      - name: 🌐 Install web dependencies
+        working-directory: example/web
+        run: yarn install --immutable
+
+      - name: 🌐 Build web app
+        working-directory: example/web
+        run: yarn expo export -p web
+
+      - name: 📦 Upload web build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: example/web/dist/
+          retention-days: 7
