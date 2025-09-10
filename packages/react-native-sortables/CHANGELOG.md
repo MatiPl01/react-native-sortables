@@ -1,32 +1,35 @@
 # [1.8.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.7.1...v1.8.0) (2025-07-29)
 
+
 ### Bug Fixes
 
-- Allow disabling default layer provider ([#424](https://github.com/MatiPl01/react-native-sortables/issues/424)) ([ded5c92](https://github.com/MatiPl01/react-native-sortables/commit/ded5c92abd78a3071a59d43fe5fc9f48d296d9be)), closes [#417](https://github.com/MatiPl01/react-native-sortables/issues/417) [#36877](https://github.com/MatiPl01/react-native-sortables/issues/36877)
-- Buggy grid swapping in some edge cases ([#414](https://github.com/MatiPl01/react-native-sortables/issues/414)) ([3617f86](https://github.com/MatiPl01/react-native-sortables/commit/3617f8630d80595c986a14e0aa36775226105f56))
-- DragProvider drag end index assignment ([#411](https://github.com/MatiPl01/react-native-sortables/issues/411)) ([69ad8a6](https://github.com/MatiPl01/react-native-sortables/commit/69ad8a612b1797d7ca4c043ee9fe1561b4f5befc))
-- Hiding of the sortable item when teleported ([#436](https://github.com/MatiPl01/react-native-sortables/issues/436)) ([4c3796f](https://github.com/MatiPl01/react-native-sortables/commit/4c3796fcc8301b07ec5aa7c4c7fc16f83fd14969))
-- Invalid flex container height on initial render and other small issues ([#437](https://github.com/MatiPl01/react-native-sortables/issues/437)) ([48e905b](https://github.com/MatiPl01/react-native-sortables/commit/48e905bb0403a262466682728e704e223d3708a1))
-- Invalid ScrollView position on input focus ([#431](https://github.com/MatiPl01/react-native-sortables/issues/431)) ([2693234](https://github.com/MatiPl01/react-native-sortables/commit/26932348587b932d4d4848ec346645483771d6c3)), closes [#ef4444](https://github.com/MatiPl01/react-native-sortables/issues/ef4444)
-- Long drop duration reordering issues ([#406](https://github.com/MatiPl01/react-native-sortables/issues/406)) ([ace7037](https://github.com/MatiPl01/react-native-sortables/commit/ace7037eba178079fa6866d4cc510fe7c1e6f087))
-- Multiple minor improvements ([#439](https://github.com/MatiPl01/react-native-sortables/issues/439)) ([f9d83e3](https://github.com/MatiPl01/react-native-sortables/commit/f9d83e3fec175529a3ca818c7aacb24aff438ed6))
-- Paper flickering and positioning issues ([#426](https://github.com/MatiPl01/react-native-sortables/issues/426)) ([744e291](https://github.com/MatiPl01/react-native-sortables/commit/744e291e72753416f2cc9ffbe24835d66b174d7f))
-- Teleported active item flickering ([#405](https://github.com/MatiPl01/react-native-sortables/issues/405)) ([1413af2](https://github.com/MatiPl01/react-native-sortables/commit/1413af2368e4e8b4a2a77376c26cf5165ba3436a))
+* Allow disabling default layer provider ([#424](https://github.com/MatiPl01/react-native-sortables/issues/424)) ([ded5c92](https://github.com/MatiPl01/react-native-sortables/commit/ded5c92abd78a3071a59d43fe5fc9f48d296d9be)), closes [#417](https://github.com/MatiPl01/react-native-sortables/issues/417) [#36877](https://github.com/MatiPl01/react-native-sortables/issues/36877)
+* Buggy grid swapping in some edge cases ([#414](https://github.com/MatiPl01/react-native-sortables/issues/414)) ([3617f86](https://github.com/MatiPl01/react-native-sortables/commit/3617f8630d80595c986a14e0aa36775226105f56))
+* DragProvider drag end index assignment ([#411](https://github.com/MatiPl01/react-native-sortables/issues/411)) ([69ad8a6](https://github.com/MatiPl01/react-native-sortables/commit/69ad8a612b1797d7ca4c043ee9fe1561b4f5befc))
+* Hiding of the sortable item when teleported ([#436](https://github.com/MatiPl01/react-native-sortables/issues/436)) ([4c3796f](https://github.com/MatiPl01/react-native-sortables/commit/4c3796fcc8301b07ec5aa7c4c7fc16f83fd14969))
+* Invalid flex container height on initial render and other small issues ([#437](https://github.com/MatiPl01/react-native-sortables/issues/437)) ([48e905b](https://github.com/MatiPl01/react-native-sortables/commit/48e905bb0403a262466682728e704e223d3708a1))
+* Invalid ScrollView position on input focus ([#431](https://github.com/MatiPl01/react-native-sortables/issues/431)) ([2693234](https://github.com/MatiPl01/react-native-sortables/commit/26932348587b932d4d4848ec346645483771d6c3)), closes [#ef4444](https://github.com/MatiPl01/react-native-sortables/issues/ef4444)
+* Long drop duration reordering issues ([#406](https://github.com/MatiPl01/react-native-sortables/issues/406)) ([ace7037](https://github.com/MatiPl01/react-native-sortables/commit/ace7037eba178079fa6866d4cc510fe7c1e6f087))
+* Multiple minor improvements ([#439](https://github.com/MatiPl01/react-native-sortables/issues/439)) ([f9d83e3](https://github.com/MatiPl01/react-native-sortables/commit/f9d83e3fec175529a3ca818c7aacb24aff438ed6))
+* Paper flickering and positioning issues ([#426](https://github.com/MatiPl01/react-native-sortables/issues/426)) ([744e291](https://github.com/MatiPl01/react-native-sortables/commit/744e291e72753416f2cc9ffbe24835d66b174d7f))
+* Teleported active item flickering ([#405](https://github.com/MatiPl01/react-native-sortables/issues/405)) ([1413af2](https://github.com/MatiPl01/react-native-sortables/commit/1413af2368e4e8b4a2a77376c26cf5165ba3436a))
+
 
 ### Features
 
-- Base multi zone provider ([#409](https://github.com/MatiPl01/react-native-sortables/issues/409)) ([56f0ef3](https://github.com/MatiPl01/react-native-sortables/commit/56f0ef3c7f9e9f01d58450e3d21cd8a9bf8a6971))
-- Base zone with event callbacks ([#413](https://github.com/MatiPl01/react-native-sortables/issues/413)) ([e51ca61](https://github.com/MatiPl01/react-native-sortables/commit/e51ca61a7dd68b9d323c3c8fb0159281583ebad9))
-- Fixed items support in sortable flex ([#416](https://github.com/MatiPl01/react-native-sortables/issues/416)) ([1d23fcc](https://github.com/MatiPl01/react-native-sortables/commit/1d23fcc107673b0cba19008495809964349e64b3)), closes [#374](https://github.com/MatiPl01/react-native-sortables/issues/374)
-- Max overscroll settings ([#423](https://github.com/MatiPl01/react-native-sortables/issues/423)) ([167dc4e](https://github.com/MatiPl01/react-native-sortables/commit/167dc4e0b9a19fa0aa2ca42e41e8ba92a9d318f9)), closes [#419](https://github.com/MatiPl01/react-native-sortables/issues/419)
-- Separate controlled item dimensions from measured dimensions ([#433](https://github.com/MatiPl01/react-native-sortables/issues/433)) ([cad95e5](https://github.com/MatiPl01/react-native-sortables/commit/cad95e5094c9a44f20a2bb87cd7775382f685129))
+* Base multi zone provider ([#409](https://github.com/MatiPl01/react-native-sortables/issues/409)) ([56f0ef3](https://github.com/MatiPl01/react-native-sortables/commit/56f0ef3c7f9e9f01d58450e3d21cd8a9bf8a6971))
+* Base zone with event callbacks ([#413](https://github.com/MatiPl01/react-native-sortables/issues/413)) ([e51ca61](https://github.com/MatiPl01/react-native-sortables/commit/e51ca61a7dd68b9d323c3c8fb0159281583ebad9))
+* Fixed items support in sortable flex ([#416](https://github.com/MatiPl01/react-native-sortables/issues/416)) ([1d23fcc](https://github.com/MatiPl01/react-native-sortables/commit/1d23fcc107673b0cba19008495809964349e64b3)), closes [#374](https://github.com/MatiPl01/react-native-sortables/issues/374)
+* Max overscroll settings ([#423](https://github.com/MatiPl01/react-native-sortables/issues/423)) ([167dc4e](https://github.com/MatiPl01/react-native-sortables/commit/167dc4e0b9a19fa0aa2ca42e41e8ba92a9d318f9)), closes [#419](https://github.com/MatiPl01/react-native-sortables/issues/419)
+* Separate controlled item dimensions from measured dimensions ([#433](https://github.com/MatiPl01/react-native-sortables/issues/433)) ([cad95e5](https://github.com/MatiPl01/react-native-sortables/commit/cad95e5094c9a44f20a2bb87cd7775382f685129))
+
 
 ### Performance Improvements
 
-- Merge item decoration styles with position styles ([#407](https://github.com/MatiPl01/react-native-sortables/issues/407)) ([5066edd](https://github.com/MatiPl01/react-native-sortables/commit/5066edd181be955f2c07191914d95b1b754a02da))
-- More performant items reordering ([#435](https://github.com/MatiPl01/react-native-sortables/issues/435)) ([be78141](https://github.com/MatiPl01/react-native-sortables/commit/be78141c3a58e7ad2ec3a31b8313efa571060f37))
-- Reduce the number of unnecessary onLayout calls ([#434](https://github.com/MatiPl01/react-native-sortables/issues/434)) ([ce56159](https://github.com/MatiPl01/react-native-sortables/commit/ce56159dc324c443f531f9f7b59ab495ede9973f)), closes [#431](https://github.com/MatiPl01/react-native-sortables/issues/431)
-- Replace useSharedValue with useMutableValue ([#408](https://github.com/MatiPl01/react-native-sortables/issues/408)) ([6994c7a](https://github.com/MatiPl01/react-native-sortables/commit/6994c7ae2a8dfc222e19e7da8e7240b9a7f318b3))
+* Merge item decoration styles with position styles ([#407](https://github.com/MatiPl01/react-native-sortables/issues/407)) ([5066edd](https://github.com/MatiPl01/react-native-sortables/commit/5066edd181be955f2c07191914d95b1b754a02da))
+* More performant items reordering ([#435](https://github.com/MatiPl01/react-native-sortables/issues/435)) ([be78141](https://github.com/MatiPl01/react-native-sortables/commit/be78141c3a58e7ad2ec3a31b8313efa571060f37))
+* Reduce the number of unnecessary onLayout calls ([#434](https://github.com/MatiPl01/react-native-sortables/issues/434)) ([ce56159](https://github.com/MatiPl01/react-native-sortables/commit/ce56159dc324c443f531f9f7b59ab495ede9973f)), closes [#431](https://github.com/MatiPl01/react-native-sortables/issues/431)
+* Replace useSharedValue with useMutableValue ([#408](https://github.com/MatiPl01/react-native-sortables/issues/408)) ([6994c7a](https://github.com/MatiPl01/react-native-sortables/commit/6994c7ae2a8dfc222e19e7da8e7240b9a7f318b3))
 
 ## [1.7.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.7.0...v1.7.1) (2025-06-16)
 
