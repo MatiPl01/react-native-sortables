@@ -54,7 +54,7 @@ jobs:
 
       - name: 🔍 Validate Expo configuration
         working-directory: example/expo
-        run: npx expo doctor
+        run: npx expo-doctor
 
       - name: 🏗️ Build Expo bundle
         working-directory: example/expo
@@ -75,6 +75,7 @@ jobs:
       matrix:
         app: [fabric, paper]
         platform: [ios, android]
+      fail-fast: false
     concurrency:
       group: build-${{ matrix.app }}-${{ matrix.platform }}-${{ github.ref }}
       cancel-in-progress: true
@@ -131,8 +132,7 @@ jobs:
       - name: 🍎 Build iOS
         if: matrix.platform == 'ios'
         working-directory: example/${{ matrix.app }}
-        run: |
-          xcodebuild -workspace ios/*.xcworkspace -scheme * -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' build
+        run: yarn react-native run-ios --no-packager --scheme "reactNativeSortable${{ matrix.app == 'fabric' && 'Fabric' || 'Paper' }}"
 
       - name: 🤖 Build Android
         if: matrix.platform == 'android'
@@ -146,8 +146,8 @@ jobs:
         with:
           name: ${{ matrix.app }}-${{ matrix.platform }}-build
           path: |
-            example/${{ matrix.app }}/ios/build/ (iOS)
-            example/${{ matrix.app }}/android/app/build/ (Android)
+            example/${{ matrix.app }}/ios/build/
+            example/${{ matrix.app }}/android/app/build/
           retention-days: 7
 
   # Build Web app
