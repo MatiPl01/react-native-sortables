@@ -2,7 +2,7 @@
   "name": "example-web",
   "version": "0.0.1",
   "dependencies": {
-    "expo": "54.0.6",
+    "expo": "^54.0.7",
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
     "react-native-sortables": "workspace:*",
