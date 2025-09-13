@@ -2218,9 +2218,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/cli@npm:54.0.4":
-  version: 54.0.4
-  resolution: "@expo/cli@npm:54.0.4"
+"@expo/cli@npm:54.0.5":
+  version: 54.0.5
+  resolution: "@expo/cli@npm:54.0.5"
   dependencies:
     "@0no-co/graphql.web": "npm:^1.0.8"
     "@expo/code-signing-certificates": "npm:^0.0.5"
@@ -2296,7 +2296,7 @@ __metadata:
       optional: true
   bin:
     expo-internal: build/bin/cli
-  checksum: 10c0/3ac7d895090306f02740605d378df8ec26674560e18c20c39732c45f643fef822cc5acf696eb12a8bbdd81749845f583ef67db31410f5a5f2937f3ff723bd32b
+  checksum: 10c0/dd9e0108f5d96783dbe3bda4c6e36bc4cd5acbb87999923a78140f8abeafa0bd2f472a615cf32b67851e15e9482c99f31bfae9f0d6acc26bf8ae08e625b81890
   languageName: node
   linkType: hard
 
@@ -8640,7 +8640,7 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.25.2"
     "@types/react": "npm:~19.1.10"
-    expo: "npm:54.0.6"
+    expo: "npm:^54.0.7"
     expo-status-bar: "npm:~3.0.8"
     react: "npm:19.1.0"
     react-native: "npm:0.81.4"
@@ -8677,7 +8677,7 @@ __metadata:
   dependencies:
     "@expo/metro-runtime": "npm:~6.1.2"
     babel-preset-expo: "npm:~54.0.0"
-    expo: "npm:54.0.6"
+    expo: "npm:^54.0.7"
     react-dom: "npm:19.1.0"
     react-native: "npm:0.81.4"
     react-native-sortables: "workspace:*"
@@ -8884,12 +8884,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo@npm:54.0.6":
-  version: 54.0.6
-  resolution: "expo@npm:54.0.6"
+"expo@npm:^54.0.7":
+  version: 54.0.7
+  resolution: "expo@npm:54.0.7"
   dependencies:
     "@babel/runtime": "npm:^7.20.0"
-    "@expo/cli": "npm:54.0.4"
+    "@expo/cli": "npm:54.0.5"
     "@expo/config": "npm:~12.0.9"
     "@expo/config-plugins": "npm:~54.0.1"
     "@expo/devtools": "npm:0.1.7"
@@ -8926,7 +8926,7 @@ __metadata:
     expo: bin/cli
     expo-modules-autolinking: bin/autolinking
     fingerprint: bin/fingerprint
-  checksum: 10c0/dc0437df5d12a05451c734070b5a1d6a3b00fadf2966dfde61d389e94f6b332702b51da72c97cec7fb0644a0828d25affc2dbbce3c62d459d83ccb9a95d74717
+  checksum: 10c0/7277e08877cdbe0eb1d144900baa1b8b8d84193a132990c4e5e51aed31cf1c1eb1039800d301ba60d4c3aeed9ce194acb955eb5c9948c96da09ca8f120ad1515
   languageName: node
   linkType: hard
 
