@@ -5,7 +5,6 @@ import { Extrapolation, interpolate } from 'react-native-reanimated';
 export const calculateRawProgress = (
   position: number,
   containerPos: number,
-  scrollablePos: number,
   scrollableSize: number,
   activationOffset: [number, number],
   contentBounds: [number, number],
@@ -20,8 +19,8 @@ export const calculateRawProgress = (
     Extrapolation.CLAMP
   );
 
-  const contentEndPos = containerPos + contentBounds[1];
-  const endDistance = scrollablePos + scrollableSize - contentEndPos;
+  const contentSize = contentBounds[1] - contentBounds[0];
+  const endDistance = scrollableSize - contentSize - startDistance;
   const endBoundProgress = interpolate(
     endDistance,
     [-activationOffset[1], maxOverscroll[1]],
@@ -29,12 +28,10 @@ export const calculateRawProgress = (
     Extrapolation.CLAMP
   );
 
-  const startBound = scrollablePos - containerPos;
+  const startBound = -containerPos;
   const startThreshold = startBound + activationOffset[0];
   const endBound = startBound + scrollableSize;
   const endThreshold = endBound - activationOffset[1];
-
-  console.log(position, [startBound, startThreshold, endThreshold, endBound]);
 
   return interpolate(
     position,

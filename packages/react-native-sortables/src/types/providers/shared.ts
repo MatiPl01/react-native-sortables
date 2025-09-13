@@ -116,7 +116,6 @@ export type AutoScrollContextType = {
   scrollOffsetDiff: SharedValue<number>;
   isVerticalScroll: boolean;
   contentBounds: SharedValue<[Vector, Vector] | null>;
-  onContainerLayout: () => void;
   scrollBy: (distance: number, animated: boolean) => void;
 };
 

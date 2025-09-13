@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import type { DimensionValue } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedStyle } from 'react-native-reanimated';
+import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_GRID_PROPS, IS_WEB } from '../constants';
 import type { PropsWithDefaults } from '../hooks';
@@ -249,13 +249,12 @@ function SortableGridComponent<I>({
       {...rest}
       containerStyle={[styles.gridContainer, animatedInnerStyle]}
       itemStyle={itemStyle}
-      onLayout={(w, h) => {
-        'worklet';
+      onLayout={runOnUI((w, h) => {
         handleContainerMeasurement(
           w - (isVertical && !IS_WEB ? columnGap.value : 0),
           h
         );
-      }}
+      })}
     />
   );
 }

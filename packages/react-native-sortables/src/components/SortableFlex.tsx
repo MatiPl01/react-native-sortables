@@ -1,7 +1,7 @@
 import { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
-import { useAnimatedStyle } from 'react-native-reanimated';
+import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
 import type { PropsWithDefaults } from '../hooks';
@@ -236,7 +236,7 @@ function SortableFlexComponent({
       {...rest}
       containerStyle={[baseContainerStyle, animatedContainerStyle]}
       itemStyle={styles.styleOverride}
-      onLayout={handleContainerMeasurement}
+      onLayout={runOnUI(handleContainerMeasurement)}
     />
   );
 }

@@ -155,7 +155,6 @@ function ManyCards({ scrollableRef }: CardsSectionProps) {
       renderItem={({ item }) => <GridCard>{item}</GridCard>}
       rowGap={spacing.xs}
       scrollableRef={scrollableRef}
-      debug
     />
   );
 }
@@ -169,7 +168,6 @@ function FewCards({ scrollableRef }: CardsSectionProps) {
       renderItem={({ item }) => <GridCard>{item}</GridCard>}
       rowGap={spacing.xs}
       scrollableRef={scrollableRef}
-      debug
     />
   );
 }

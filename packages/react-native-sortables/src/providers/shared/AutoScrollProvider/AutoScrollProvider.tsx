@@ -103,20 +103,11 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
 
     const prop = isVertical ? 'pageY' : 'pageX';
     const scrollContainerPosition =
-      scrollableMeasurements[prop] + scrollOffset.value;
+      scrollableMeasurements[prop] - scrollOffset.value;
     const sortableContainerPosition = containerMeasurements[prop];
-
-    console.log(containerMeasurements, scrollableMeasurements);
 
     return sortableContainerPosition - scrollContainerPosition;
   }, [containerRef, scrollableRef, scrollOffset, isVertical]);
-
-  const onContainerLayout = useCallback(() => {
-    'worklet';
-    if (context.value) {
-      context.value.sortableOffset = getSortableOffset() ?? 0;
-    }
-  }, [context, getSortableOffset]);
 
   return {
     children: (
@@ -140,7 +131,6 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     value: {
       contentBounds,
       isVerticalScroll: isVertical,
-      onContainerLayout,
       scrollableRef,
       scrollBy,
       scrollOffsetDiff
@@ -175,8 +165,7 @@ function AutoScrollUpdater({
   scrollOffset,
   scrollToOffset
 }: AutoScrollUpdaterProps) {
-  const { activeAnimationProgress, containerRef, touchPosition } =
-    useCommonValuesContext();
+  const { activeAnimationProgress, touchPosition } = useCommonValuesContext();
 
   const scrollAxis = isVertical ? 'y' : 'x';
   const activationOffset = toPair(autoScrollActivationOffset);
@@ -207,41 +196,46 @@ function AutoScrollUpdater({
   const scrollBy = useCallback(
     (distance: number, animated: boolean) => {
       'worklet';
-      // const ctx = context.value;
-      // const bounds = contentAxisBounds.value;
-      // const containerMeasurements = measure(containerRef);
-      // const scrollableMeasurements = measure(scrollableRef);
-      // if (
-      //   !ctx ||
-      //   !bounds ||
-      //   !scrollableMeasurements ||
-      //   !containerMeasurements
-      // ) {
-      //   return;
-      // }
+      const ctx = context.value;
+      const bounds = contentAxisBounds.value;
+      const scrollableMeasurements = measure(scrollableRef);
+      if (!ctx || !bounds || !scrollableMeasurements) {
+        return;
+      }
 
-      // const newContainerOffset = ctx.targetContainerOffset + distance;
+      const scrollableSize =
+        scrollableMeasurements[isVertical ? 'height' : 'width'];
 
-      // if (distance < 0) {
-      //   // Scroll up
-      // } else if (distance > 0) {
-      //   // Scroll down
-      // }
+      let newScrollOffset = 0;
 
-      // console.log(ctx.targetContainerOffset, distance, newContainerOffset);
+      if (distance > 0) {
+        // scroll down
+        newScrollOffset = Math.min(
+          ctx.targetScrollOffset + distance,
+          ctx.sortableOffset - scrollableSize + bounds[1] + maxOverscroll[1]
+        );
+      } else if (distance < 0) {
+        // scroll up
+        newScrollOffset = Math.max(
+          ctx.targetScrollOffset + distance,
+          ctx.sortableOffset + bounds[0] - maxOverscroll[0]
+        );
+      }
 
-      // ctx.targetContainerOffset = newContainerOffset;
-      // const offsetDiff = newContainerOffset - ctx.startContainerOffset;
+      if (Math.abs(newScrollOffset - ctx.targetScrollOffset) < 1) {
+        return;
+      }
 
-      // scrollToOffset(ctx.startScrollOffset + offsetDiff, animated);
+      ctx.targetScrollOffset = newScrollOffset;
+      scrollToOffset(newScrollOffset, animated);
     },
     [
       context,
-      scrollableRef,
-      containerRef,
+      scrollToOffset,
       contentAxisBounds,
       maxOverscroll,
-      scrollToOffset
+      isVertical,
+      scrollableRef
     ]
   );
 
@@ -346,22 +340,22 @@ function AutoScrollUpdater({
         return;
       }
 
-      const containerPos = scrollOffset.value + ctx.sortableOffset;
+      const scrollableSize =
+        scrollableMeasurements[isVertical ? 'height' : 'width'];
+      const containerPos = ctx.sortableOffset - scrollOffset.value;
+
       ctx.progress = calculateRawProgress(
         position,
         containerPos,
-        scrollableMeasurements[isVertical ? 'pageY' : 'pageX'],
-        scrollableMeasurements[isVertical ? 'height' : 'width'],
+        scrollableSize,
         activationOffset,
         bounds,
         maxOverscroll,
         autoScrollExtrapolation
       );
 
-      // console.log(ctx.progress);
-
       if (debug) {
-        debug?.updateDebugRects?.(containerPos, scrollableMeasurements);
+        debug?.updateDebugRects?.(containerPos, scrollableSize);
       }
     },
     [debug]

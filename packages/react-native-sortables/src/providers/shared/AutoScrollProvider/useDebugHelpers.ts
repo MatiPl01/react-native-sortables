@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { MeasuredDimensions, SharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
 
@@ -37,10 +37,8 @@ export default function useDebugHelpers(
   }, [debugRects]);
 
   const updateDebugRects = useCallback(
-    (containerPos: number, scrollableMeasurements: MeasuredDimensions) => {
+    (containerPos: number, scrollableSize: number) => {
       'worklet';
-      const { height: sH, width: sW } = scrollableMeasurements;
-
       const startTriggerProps = isVertical
         ? {
             height: startActivationOffset,
@@ -55,12 +53,12 @@ export default function useDebugHelpers(
         ? {
             height: endActivationOffset,
             positionOrigin: 'bottom' as const,
-            y: -containerPos + sH
+            y: -containerPos + scrollableSize
           }
         : {
             positionOrigin: 'right' as const,
             width: endActivationOffset,
-            x: -containerPos + sW
+            x: -containerPos + scrollableSize
           };
 
       debugRects?.start.set({ ...TRIGGER_COLORS, ...startTriggerProps });

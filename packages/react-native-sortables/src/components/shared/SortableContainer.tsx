@@ -2,7 +2,6 @@ import { memo, useSyncExternalStore } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import Animated, {
   LinearTransition,
-  runOnUI,
   useAnimatedStyle,
   withTiming
 } from 'react-native-reanimated';
@@ -10,11 +9,7 @@ import Animated, {
 import { EMPTY_OBJECT, IS_WEB } from '../../constants';
 import { DebugOutlet } from '../../debug';
 import type { AnimatedStyleProp } from '../../integrations/reanimated';
-import {
-  useAutoScrollContext,
-  useCommonValuesContext,
-  useItemsContext
-} from '../../providers';
+import { useCommonValuesContext, useItemsContext } from '../../providers';
 import type {
   DimensionsAnimation,
   DropIndicatorSettings,
@@ -58,7 +53,6 @@ export default function SortableContainer({
     shouldAnimateLayout,
     usesAbsoluteLayout
   } = useCommonValuesContext();
-  const { onContainerLayout } = useAutoScrollContext() ?? {};
 
   const animateWorklet = dimensionsAnimationType === 'worklet';
   const animateLayout = dimensionsAnimationType === 'layout';
@@ -122,10 +116,7 @@ export default function SortableContainer({
         ref={containerRef}
         style={[containerStyle, innerContainerStyle]}
         onLayout={({ nativeEvent: { layout } }) =>
-          runOnUI(() => {
-            onContainerLayout?.();
-            onLayout(layout.width, layout.height);
-          })()
+          onLayout(layout.width, layout.height)
         }>
         <ItemsOutlet
           itemEntering={itemEntering}
