@@ -12,6 +12,7 @@ import {
   useScrollViewOffset
 } from 'react-native-reanimated';
 
+import { EMPTY_OBJECT } from '../../../constants';
 import { useMutableValue } from '../../../integrations/reanimated';
 import type {
   AutoScrollContextType,
@@ -22,15 +23,19 @@ import { toPair } from '../../../utils';
 import { createProvider } from '../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useDebugHelpers from './useDebugHelpers';
-import {
-  calculateRawProgressHorizontal,
-  calculateRawProgressVertical,
-  clampDistance
-} from './utils';
+import { calculateRawProgress } from './utils';
 
 // Maximum elapsed time multiplier to prevent excessive scrolling distances when app lags
 const MAX_ELAPSED_TIME_MULTIPLIER = 2;
 const MIN_ELAPSED_TIME_CAP = 100;
+
+type StateContextType = {
+  progress: number;
+  sortableOffset: number;
+  startScrollOffset: number;
+  targetScrollOffset: number;
+  lastUpdateTimestamp?: number;
+};
 
 type AutoScrollProviderProps = PropsWithChildren<Required<AutoScrollSettings>>;
 
@@ -44,31 +49,28 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   scrollableRef,
   ...rest
 }) => {
-  const currentScrollOffset = useScrollViewOffset(scrollableRef);
-  const dragStartScrollOffset = useMutableValue<null | number>(null);
+  const { containerRef } = useCommonValuesContext();
+  const scrollOffset = useScrollViewOffset(scrollableRef);
+
+  const context = useMutableValue<null | StateContextType>(null);
   const contentBounds = useMutableValue<[Vector, Vector] | null>(null);
+
+  const scrollOffsetDiff = useDerivedValue(() => {
+    const startOffset = context.value?.startScrollOffset;
+    if (startOffset === undefined) {
+      return 0;
+    }
+    return scrollOffset.value - startOffset;
+  });
 
   const isVertical = autoScrollDirection === 'vertical';
 
-  const scrollOffsetDiff = useDerivedValue(() => {
-    if (dragStartScrollOffset.value === null) {
-      return null;
-    }
-
-    return {
-      [isVertical ? 'y' : 'x']:
-        currentScrollOffset.value - dragStartScrollOffset.value
-    };
-  });
-
-  const scrollBy = useCallback(
-    (distance: number, animated: boolean) => {
+  const scrollToOffset = useCallback(
+    (offset: number, animated: boolean) => {
       'worklet';
-      if (distance === 0) {
+      if (Math.abs(offset - scrollOffset.value) < 1) {
         return;
       }
-
-      const offset = currentScrollOffset.value + distance;
       scrollTo(
         scrollableRef,
         isVertical ? 0 : offset,
@@ -76,8 +78,36 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
         animated
       );
     },
-    [scrollableRef, isVertical, currentScrollOffset]
+    [isVertical, scrollOffset, scrollableRef]
   );
+
+  const scrollBy = useCallback(
+    (distance: number, animated: boolean) => {
+      'worklet';
+      if (Math.abs(distance) < 1) {
+        return;
+      }
+      scrollToOffset(scrollOffset.value + distance, animated);
+    },
+    [scrollToOffset, scrollOffset]
+  );
+
+  const getSortableOffset = useCallback(() => {
+    'worklet';
+    const containerMeasurements = measure(containerRef);
+    const scrollableMeasurements = measure(scrollableRef);
+
+    if (!containerMeasurements || !scrollableMeasurements) {
+      return null;
+    }
+
+    const prop = isVertical ? 'pageY' : 'pageX';
+    const scrollContainerPosition =
+      scrollableMeasurements[prop] - scrollOffset.value;
+    const sortableContainerPosition = containerMeasurements[prop];
+
+    return sortableContainerPosition - scrollContainerPosition;
+  }, [containerRef, scrollableRef, scrollOffset, isVertical]);
 
   return {
     children: (
@@ -87,10 +117,12 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
           <AutoScrollUpdater
             {...rest}
             contentBounds={contentBounds}
-            currentScrollOffset={currentScrollOffset}
-            dragStartScrollOffset={dragStartScrollOffset}
+            context={context}
+            getSortableOffset={getSortableOffset}
             isVertical={isVertical}
             scrollableRef={scrollableRef}
+            scrollOffset={scrollOffset}
+            scrollToOffset={scrollToOffset}
           />
         )}
       </>
@@ -98,6 +130,7 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
     enabled,
     value: {
       contentBounds,
+      isVerticalScroll: isVertical,
       scrollableRef,
       scrollBy,
       scrollOffsetDiff
@@ -105,26 +138,16 @@ const { AutoScrollProvider, useAutoScrollContext } = createProvider(
   };
 });
 
-type StateContextType = {
-  targetScrollOffset: null | number;
-  prevContainerOffset: null | number;
-  lastUpdateTimestamp: null | number;
-};
-
-const INITIAL_STATE: StateContextType = {
-  lastUpdateTimestamp: null,
-  prevContainerOffset: null,
-  targetScrollOffset: null
-};
-
 type AutoScrollUpdaterProps = Omit<
   AutoScrollSettings,
   'autoScrollDirection' | 'autoScrollEnabled'
 > & {
-  currentScrollOffset: SharedValue<number>;
-  dragStartScrollOffset: SharedValue<null | number>;
+  context: SharedValue<null | StateContextType>;
+  scrollOffset: SharedValue<number>;
   contentBounds: SharedValue<[Vector, Vector] | null>;
   isVertical: boolean;
+  getSortableOffset: () => void;
+  scrollToOffset: (offset: number, animated: boolean) => void;
 };
 
 function AutoScrollUpdater({
@@ -135,16 +158,14 @@ function AutoScrollUpdater({
   autoScrollMaxOverscroll,
   autoScrollMaxVelocity,
   contentBounds,
-  currentScrollOffset,
-  dragStartScrollOffset,
+  context,
+  getSortableOffset,
   isVertical,
-  scrollableRef
+  scrollableRef,
+  scrollOffset,
+  scrollToOffset
 }: AutoScrollUpdaterProps) {
-  const { activeAnimationProgress, containerRef, touchPosition } =
-    useCommonValuesContext();
-
-  const progress = useMutableValue(0);
-  const context = useMutableValue<StateContextType>(INITIAL_STATE);
+  const { activeAnimationProgress, touchPosition } = useCommonValuesContext();
 
   const scrollAxis = isVertical ? 'y' : 'x';
   const activationOffset = toPair(autoScrollActivationOffset);
@@ -161,7 +182,7 @@ function AutoScrollUpdater({
     return [start[scrollAxis], end[scrollAxis]];
   });
 
-  let debug: ReturnType<typeof useDebugHelpers> = {};
+  let debug: ReturnType<typeof useDebugHelpers> = EMPTY_OBJECT;
   if (__DEV__) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     debug = useDebugHelpers(
@@ -172,134 +193,60 @@ function AutoScrollUpdater({
     );
   }
 
-  const calculateRawProgress = isVertical
-    ? calculateRawProgressVertical
-    : calculateRawProgressHorizontal;
-
-  useAnimatedReaction(
-    () => {
-      const ctx = context.value;
-      let position = touchPosition.value?.[scrollAxis] ?? null;
-      if (position !== null && ctx.targetScrollOffset !== null) {
-        // Sometimes the scroll distance is so small that the scrollTo takes
-        // no effect. To handle this case, we have to update the position
-        // of the view used to determine the progress, even if the actual
-        // position of the view is not changed (because of too small scroll distance).
-        position += ctx.targetScrollOffset - currentScrollOffset.value;
-      }
-      return position;
-    },
-    position => {
-      if (position === null) {
-        context.value.targetScrollOffset = null;
-        debug?.hideDebugViews?.();
-        return;
-      }
-
-      const contentContainerMeasurements = measure(containerRef);
-      const scrollContainerMeasurements = measure(scrollableRef);
-      if (!contentContainerMeasurements || !scrollContainerMeasurements) {
-        debug?.hideDebugViews?.();
-        return;
-      }
-
-      progress.value = calculateRawProgress(
-        position,
-        contentContainerMeasurements,
-        scrollContainerMeasurements,
-        activationOffset,
-        maxOverscroll,
-        autoScrollExtrapolation
-      );
-
-      if (progress.value === 0) {
-        context.value.targetScrollOffset = null;
-      }
-
-      debug?.updateDebugRects?.(
-        contentContainerMeasurements,
-        scrollContainerMeasurements
-      );
-    },
-    [debug]
-  );
-
   const scrollBy = useCallback(
     (distance: number, animated: boolean) => {
       'worklet';
-      const bounds = contentAxisBounds.value;
-      const containerMeasurements = measure(containerRef);
-      const scrollableMeasurements = measure(scrollableRef);
-      if (!bounds || !scrollableMeasurements || !containerMeasurements) {
-        return;
-      }
-
       const ctx = context.value;
-      const pendingDistance =
-        ctx.targetScrollOffset !== null
-          ? ctx.targetScrollOffset - currentScrollOffset.value
-          : 0;
-
-      const containerOffset = isVertical
-        ? scrollableMeasurements.pageY - containerMeasurements.pageY
-        : scrollableMeasurements.pageX - containerMeasurements.pageX;
-      const scrollableCrossSize = isVertical
-        ? scrollableMeasurements.height
-        : scrollableMeasurements.width;
-
-      if (
-        Math.abs(pendingDistance) > 1 &&
-        containerOffset === ctx.prevContainerOffset
-      ) {
-        // Return if measurements haven't been updated yet (we scroll based on the
-        // relative position of the container in the ScrollView so we have to ensure
-        // that the last update is already applied)
+      const bounds = contentAxisBounds.value;
+      const scrollableMeasurements = measure(scrollableRef);
+      if (!ctx || !bounds || !scrollableMeasurements) {
         return;
       }
 
-      const clampedDistance = clampDistance(
-        distance + pendingDistance,
-        containerOffset,
-        scrollableCrossSize,
-        bounds,
-        maxOverscroll
-      );
+      const scrollableSize =
+        scrollableMeasurements[isVertical ? 'height' : 'width'];
 
-      const targetOffset = currentScrollOffset.value + clampedDistance;
+      let newScrollOffset = 0;
 
-      ctx.targetScrollOffset = targetOffset;
+      if (distance > 0) {
+        // scroll down
+        newScrollOffset = Math.min(
+          ctx.targetScrollOffset + distance,
+          ctx.sortableOffset - scrollableSize + bounds[1] + maxOverscroll[1]
+        );
+      } else if (distance < 0) {
+        // scroll up
+        newScrollOffset = Math.max(
+          ctx.targetScrollOffset + distance,
+          ctx.sortableOffset + bounds[0] - maxOverscroll[0]
+        );
+      } else return;
 
-      if (Math.abs(clampedDistance) < 1) {
+      if (Math.abs(newScrollOffset - ctx.targetScrollOffset) < 1) {
         return;
       }
 
-      ctx.prevContainerOffset = containerOffset;
-      scrollTo(
-        scrollableRef,
-        isVertical ? 0 : targetOffset,
-        isVertical ? targetOffset : 0,
-        animated
-      );
+      ctx.targetScrollOffset = newScrollOffset;
+      scrollToOffset(newScrollOffset, animated);
     },
     [
       context,
-      currentScrollOffset,
-      isVertical,
-      scrollableRef,
-      containerRef,
+      scrollToOffset,
       contentAxisBounds,
-      maxOverscroll
+      maxOverscroll,
+      isVertical,
+      scrollableRef
     ]
   );
 
   const frameCallbackFunction = useCallback(
     ({ timestamp }: FrameInfo) => {
       'worklet';
-      if (progress.value === 0) {
+      const ctx = context.value;
+      if (!ctx?.progress) {
         return;
       }
 
-      const ctx = context.value;
       ctx.lastUpdateTimestamp ??= timestamp;
       const elapsedTime = timestamp - ctx.lastUpdateTimestamp;
       if (elapsedTime < autoScrollInterval) {
@@ -315,13 +262,14 @@ function AutoScrollUpdater({
       ctx.lastUpdateTimestamp = timestamp;
 
       const velocity = interpolate(
-        progress.value,
+        ctx.progress,
         [-1, 0, 1],
         [-maxStartVelocity, 0, maxEndVelocity]
       );
 
       const distance = velocity * (cappedElapsedTime / 1000);
 
+      console.log('frameCallbackFunction', distance, ctx.progress);
       scrollBy(distance, animateScrollTo);
     },
     [
@@ -329,13 +277,12 @@ function AutoScrollUpdater({
       scrollBy,
       maxStartVelocity,
       maxEndVelocity,
-      progress,
       autoScrollInterval,
       animateScrollTo
     ]
   );
 
-  const frameCallback = useFrameCallback(frameCallbackFunction, false);
+  const frameCallback = useFrameCallback(frameCallbackFunction);
 
   const toggleFrameCallback = useCallback(
     (enabled: boolean) => {
@@ -344,22 +291,75 @@ function AutoScrollUpdater({
     [frameCallback]
   );
 
+  const enableAutoScroll = useCallback(() => {
+    'worklet';
+    if (context.value) {
+      return;
+    }
+
+    context.value = {
+      progress: 0,
+      sortableOffset: getSortableOffset() ?? 0,
+      startScrollOffset: scrollOffset.value,
+      targetScrollOffset: scrollOffset.value
+    };
+
+    runOnJS(toggleFrameCallback)(true);
+  }, [context, scrollOffset, toggleFrameCallback, getSortableOffset]);
+
+  const disableAutoScroll = useCallback(() => {
+    'worklet';
+    if (!context.value) {
+      return;
+    }
+    context.value = null;
+    debug?.hideDebugViews?.();
+    runOnJS(toggleFrameCallback)(false);
+  }, [toggleFrameCallback, context, debug]);
+
   useAnimatedReaction(
     () => isActive.value,
-    active => {
-      if (active) {
-        dragStartScrollOffset.value = currentScrollOffset.value;
-        const ctx = context.value;
-        ctx.lastUpdateTimestamp = null;
-        ctx.targetScrollOffset = null;
-        ctx.prevContainerOffset = null;
-        runOnJS(toggleFrameCallback)(true);
-      } else {
-        dragStartScrollOffset.value = null;
-        runOnJS(toggleFrameCallback)(false);
+    active => (active ? enableAutoScroll() : disableAutoScroll()),
+    [enableAutoScroll, disableAutoScroll]
+  );
+
+  useAnimatedReaction(
+    () => ({
+      bounds: contentAxisBounds.value,
+      ctx: context.value,
+      position: touchPosition.value?.[scrollAxis]
+    }),
+    ({ bounds, ctx, position }) => {
+      if (position === undefined || !bounds || !ctx) {
+        disableAutoScroll();
+        return;
+      }
+
+      const scrollableMeasurements = measure(scrollableRef);
+      if (!scrollableMeasurements) {
+        disableAutoScroll();
+        return;
+      }
+
+      const scrollableSize =
+        scrollableMeasurements[isVertical ? 'height' : 'width'];
+      const containerPos = ctx.sortableOffset - scrollOffset.value;
+
+      ctx.progress = calculateRawProgress(
+        position,
+        containerPos,
+        scrollableSize,
+        activationOffset,
+        bounds,
+        maxOverscroll,
+        autoScrollExtrapolation
+      );
+
+      if (debug) {
+        debug?.updateDebugRects?.(containerPos, scrollableSize);
       }
     },
-    [currentScrollOffset]
+    [debug]
   );
 
   return null;

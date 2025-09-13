@@ -236,9 +236,7 @@ function SortableFlexComponent({
       {...rest}
       containerStyle={[baseContainerStyle, animatedContainerStyle]}
       itemStyle={styles.styleOverride}
-      onLayout={runOnUI((w, h) => {
-        handleContainerMeasurement(w, h);
-      })}
+      onLayout={runOnUI(handleContainerMeasurement)}
     />
   );
 }

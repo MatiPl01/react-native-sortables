@@ -115,9 +115,9 @@ export default function SortableContainer({
       <AnimatedOnLayoutView
         ref={containerRef}
         style={[containerStyle, innerContainerStyle]}
-        onLayout={({ nativeEvent: { layout } }) => {
-          onLayout(layout.width, layout.height);
-        }}>
+        onLayout={({ nativeEvent: { layout } }) =>
+          onLayout(layout.width, layout.height)
+        }>
         <ItemsOutlet
           itemEntering={itemEntering}
           itemExiting={itemExiting}
