@@ -69,21 +69,22 @@ const routes: Routes = {
           }
         }
       },
-      ...(!IS_WEB && {
-        Miscellaneous: {
-          name: 'Miscellaneous',
-          routes: {
+
+      Miscellaneous: {
+        name: 'Miscellaneous',
+        routes: {
+          ...(!IS_WEB && {
             StaggerAnimation: {
               Component: SortableGrid.miscellaneous.StaggerAnimationExample,
               name: 'Stagger Animation'
-            },
-            CollapsibleItems: {
-              Component: SortableGrid.miscellaneous.CollapsibleItemsExample,
-              name: 'Collapsible Items'
             }
+          }),
+          CollapsibleItems: {
+            Component: SortableGrid.miscellaneous.CollapsibleItemsExample,
+            name: 'Collapsible Items'
           }
         }
-      }),
+      },
       Tests: {
         name: 'Test examples',
         routes: {
