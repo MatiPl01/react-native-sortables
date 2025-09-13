@@ -5,10 +5,12 @@ on:
     types: [opened, synchronize, reopened, edited]
 
 jobs:
-  pr-labeler:
+  labeler:
     runs-on: ubuntu-latest
     steps:
       - name: Label the PR
         uses: gerrymanoim/pr-prefix-labeler@v3
+        with:
+          configuration-path: '.github/pr-prefix-labeler.yml'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

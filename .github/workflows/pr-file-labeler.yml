@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened, edited]
 
 jobs:
-  github-pull-request-label-format:
+  labeler:
     permissions:
       contents: read
       pull-requests: write
