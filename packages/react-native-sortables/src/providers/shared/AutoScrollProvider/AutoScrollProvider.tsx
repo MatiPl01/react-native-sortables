@@ -220,7 +220,7 @@ function AutoScrollUpdater({
           ctx.targetScrollOffset + distance,
           ctx.sortableOffset + bounds[0] - maxOverscroll[0]
         );
-      }
+      } else return;
 
       if (Math.abs(newScrollOffset - ctx.targetScrollOffset) < 1) {
         return;
@@ -269,6 +269,7 @@ function AutoScrollUpdater({
 
       const distance = velocity * (cappedElapsedTime / 1000);
 
+      console.log('frameCallbackFunction', distance, ctx.progress);
       scrollBy(distance, animateScrollTo);
     },
     [
