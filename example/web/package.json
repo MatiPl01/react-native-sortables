@@ -2,15 +2,15 @@
   "name": "example-web",
   "version": "0.0.1",
   "dependencies": {
-    "expo": "54.0.0-preview.11",
+    "expo": "54.0.6",
     "react-dom": "19.1.0",
-    "react-native": "0.81.1",
+    "react-native": "0.81.4",
     "react-native-sortables": "workspace:*",
     "react-native-web": "0.21.1"
   },
   "devDependencies": {
-    "@expo/metro-runtime": "~6.1.1",
-    "babel-preset-expo": "~14.0.4",
+    "@expo/metro-runtime": "~6.1.2",
+    "babel-preset-expo": "~54.0.0",
     "serve": "^14.2.4"
   },
   "installConfig": {

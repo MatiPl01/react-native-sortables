@@ -2,7 +2,7 @@
   "name": "example-fabric",
   "version": "1.0.0",
   "dependencies": {
-    "react-native": "0.81.1",
+    "react-native": "0.81.4",
     "react-native-sortables": "workspace:*"
   },
   "installConfig": {
