@@ -8,13 +8,6 @@ on:
       - 'example/**'
       - 'packages/react-native-sortables/**'
       - '.github/workflows/build-examples.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'example/**'
-      - 'packages/react-native-sortables/**'
-      - '.github/workflows/build-examples.yml'
   workflow_dispatch: # Allow manual triggering
 
 env:
