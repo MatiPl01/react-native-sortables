@@ -5,16 +5,40 @@
  * Labels PRs based on the title prefix
  */
 
-const { context, github } = require('@actions/github');
-const core = require('@actions/core');
+const { Octokit } = require('@octokit/rest');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
 
 async function run() {
   try {
-    // Get config file path from input
-    const configFilePath = core.getInput('config-file');
+    // Get environment variables
+    const githubToken = process.env.GITHUB_TOKEN;
+    const configFilePath =
+      process.env.CONFIG_FILE || 'pr-title-labeler-config.yml';
+    const eventPath = process.env.GITHUB_EVENT_PATH;
+    const repository = process.env.GITHUB_REPOSITORY;
+
+    if (!githubToken) {
+      console.error('❌ GITHUB_TOKEN is required');
+      process.exit(1);
+    }
+
+    if (!eventPath) {
+      console.error('❌ GITHUB_EVENT_PATH is required');
+      process.exit(1);
+    }
+
+    // Read GitHub event data
+    const eventData = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+    const pr = eventData.pull_request;
+
+    if (!pr) {
+      console.error('❌ No pull request found in event data');
+      process.exit(1);
+    }
+
+    // Get config file path from environment variable
     const configPath = path.resolve(__dirname, configFilePath);
 
     let labelMappings;
@@ -22,13 +46,13 @@ async function run() {
       const configContent = fs.readFileSync(configPath, 'utf8');
       labelMappings = yaml.load(configContent);
     } catch (error) {
-      core.setFailed(
-        `Error reading config file "${configFilePath}": ${error.message}`
+      console.error(
+        `❌ Error reading config file "${configFilePath}": ${error.message}`
       );
-      return;
+      process.exit(1);
     }
 
-    const title = context.payload.pull_request.title.toLowerCase();
+    const title = pr.title.toLowerCase();
 
     // Find matching prefix and label
     let label = null;

@@ -1,15 +1,15 @@
-name: "PR Title Labeler"
-description: "Automatically label PRs based on their title prefix"
+name: 'PR Title Labeler'
+description: 'Automatically label PRs based on their title prefix'
 inputs:
   github-token:
-    description: "GitHub token for API access"
+    description: 'GitHub token for API access'
     required: true
   config-file:
-    description: "Path to YAML config file with label mappings (default: pr-title-labeler-config.yml)"
+    description: 'Path to YAML config file with label mappings (default: pr-title-labeler-config.yml)'
     required: false
-    default: "pr-title-labeler-config.yml"
+    default: 'pr-title-labeler-config.yml'
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: 📦 Install dependencies
       run: npm install
