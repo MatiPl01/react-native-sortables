@@ -38,12 +38,12 @@ jobs:
       - name: 🏗️ Build library
         run: yarn build
 
-      - name: 📱 Install Expo CLI
-        run: npm install -g @expo/cli
-
       - name: 🌐 Install Expo dependencies
         working-directory: example/expo
         run: yarn install --immutable
+
+      - name: 📱 Install Expo CLI
+        run: npm install -g @expo/cli
 
       - name: 🔍 Validate Expo configuration
         working-directory: example/expo
@@ -86,9 +86,13 @@ jobs:
       - name: 🏗️ Build library
         run: yarn build
 
+      - name: 📱 Install dependencies for ${{ matrix.app }}
+        working-directory: example/${{ matrix.app }}
+        run: yarn install --immutable
+
       - name: 🍎 Setup Ruby (iOS only)
         if: matrix.platform == 'ios'
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v2
         with:
           ruby-version: '3.3'
           bundler-cache: true
@@ -106,11 +110,7 @@ jobs:
 
       - name: 🤖 Setup Android SDK (Android only)
         if: matrix.platform == 'android'
-        uses: android-actions/setup-android@v3
-
-      - name: 📱 Install dependencies for ${{ matrix.app }}
-        working-directory: example/${{ matrix.app }}
-        run: yarn install --immutable
+        uses: android-actions/setup-android@v4
 
       - name: 🍎 Install pods (iOS only)
         if: matrix.platform == 'ios'
