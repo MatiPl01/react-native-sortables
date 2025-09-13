@@ -11,8 +11,9 @@ function createMetroConfig(defaultConfig, currentAppDir, options = {}) {
 
   // Check if we're running expo-doctor (which expects default config)
   // vs actual development (which is needed in the current monorepo setup)
-  const isExpoDoctor = process.env.EXPO_DOCTOR === 'true' || 
-                       process.argv.some(arg => arg.includes('expo-doctor'));
+  const isExpoDoctor =
+    process.env.EXPO_DOCTOR === 'true' ||
+    process.argv.some(arg => arg.includes('expo-doctor'));
 
   if (isExpoDoctor) {
     // For expo-doctor, use a config default config to satisfy its checks
@@ -28,13 +29,13 @@ function createMetroConfig(defaultConfig, currentAppDir, options = {}) {
     ...(defaultConfig.watchFolders || []),
     ...additionalWatchFolders
   ];
-  
+
   config.resolver.nodeModulesPaths = [
     path.resolve(currentAppDir, 'node_modules'),
     path.resolve(currentAppDir, '../app/node_modules'),
     path.resolve(monorepoRoot, 'node_modules')
   ];
-  
+
   config.resolver.disableHierarchicalLookup = true;
 
   if (excludeFromRoot.length > 0) {
