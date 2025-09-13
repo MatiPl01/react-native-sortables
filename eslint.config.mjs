@@ -7,6 +7,7 @@ export default [
       'example/**',
       '!example/app/**',
       'packages/docs/**',
+      'scripts/**',
       '**/bob.config.cjs',
       '**/babel.config.cjs',
       '**/jest.setup.js',

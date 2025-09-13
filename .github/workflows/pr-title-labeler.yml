@@ -8,9 +8,18 @@ jobs:
   labeler:
     runs-on: ubuntu-latest
     steps:
-      - name: Label the PR
-        uses: gerrymanoim/pr-prefix-labeler@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          configuration-path: '.github/pr-prefix-labeler.yml'
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install @actions/github @actions/core
+
+      - name: Label PR based on title prefix
+        run: node scripts/pr-title-labeler.js
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
