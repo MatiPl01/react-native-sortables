@@ -13,8 +13,9 @@ const path = require('path');
 
 async function run() {
   try {
-    // Get config file path from input
-    const configFilePath = core.getInput('config-file');
+    // Get config file path from environment variable
+    const configFilePath =
+      process.env.CONFIG_FILE || 'pr-title-labeler-config.yml';
     const configPath = path.resolve(__dirname, configFilePath);
 
     let labelMappings;

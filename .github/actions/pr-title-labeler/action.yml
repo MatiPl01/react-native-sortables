@@ -9,5 +9,17 @@ inputs:
     required: false
     default: "pr-title-labeler-config.yml"
 runs:
-  using: "node20"
-  main: "index.js"
+  using: "composite"
+  steps:
+    - name: 📦 Install dependencies
+      run: npm install
+      shell: bash
+      working-directory: ${{ github.action_path }}
+
+    - name: 🏷️ Run PR Title Labeler
+      run: node index.js
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        CONFIG_FILE: ${{ inputs.config-file }}
