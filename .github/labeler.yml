@@ -1,37 +1,37 @@
 # Documentation changes
-"documentation":
+'documentation':
   - changed-files:
-      - any-glob-to-any-file: ["packages/docs/**", "README.md"]
+      - any-glob-to-any-file: ['packages/docs/**', 'README.md']
 
 # Example applications
-"example":
+'example':
   - changed-files:
-      - any-glob-to-any-file: ["example/**"]
+      - any-glob-to-any-file: ['example/**']
 
 # Test files
-"test":
+'test':
   - changed-files:
       - any-glob-to-any-file:
           [
-            "**/*.test.*",
-            "**/*.spec.*",
-            "**/__tests__/**",
-            "**/tests/**",
-            "**/__mocks__/**",
+            '**/*.test.*',
+            '**/*.spec.*',
+            '**/__tests__/**',
+            '**/tests/**',
+            '**/__mocks__/**'
           ]
 
 # CI/CD changes
-"ci":
+'ci':
   - changed-files:
-      - any-glob-to-any-file: [".github/**", "**/workflows/**"]
+      - any-glob-to-any-file: ['.github/**', '**/workflows/**']
 
 # Dependencies
-"dependencies":
+'dependencies':
   - changed-files:
       - any-glob-to-any-file:
           [
-            "**/package.json",
-            "**/yarn.lock",
-            "**/package-lock.json",
-            "**/pnpm-lock.yaml",
+            '**/package.json',
+            '**/yarn.lock',
+            '**/package-lock.json',
+            '**/pnpm-lock.yaml'
           ]
