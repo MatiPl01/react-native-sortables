@@ -13,7 +13,57 @@
             "BREAKING CHANGES",
             "BREAKING"
           ]
-        }
+        },
+        "releaseRules": [
+          {
+            "type": "feat",
+            "release": "minor"
+          },
+          {
+            "type": "fix",
+            "release": "patch"
+          },
+          {
+            "type": "perf",
+            "release": "patch"
+          },
+          {
+            "type": "chore",
+            "release": "patch"
+          },
+          {
+            "type": "ci",
+            "release": "patch"
+          },
+          {
+            "type": "build",
+            "release": "patch"
+          },
+          {
+            "type": "refactor",
+            "release": "patch"
+          },
+          {
+            "type": "style",
+            "release": "patch"
+          },
+          {
+            "type": "test",
+            "release": "patch"
+          },
+          {
+            "type": "security",
+            "release": "patch"
+          },
+          {
+            "type": "deps",
+            "release": "patch"
+          },
+          {
+            "breaking": true,
+            "release": "major"
+          }
+        ]
       }
     ],
     [
@@ -27,11 +77,65 @@
             "BREAKING"
           ]
         },
+        "presetConfig": {
+          "types": [
+            {
+              "type": "feat",
+              "section": "✨ Features"
+            },
+            {
+              "type": "fix",
+              "section": "🐛 Bug Fixes"
+            },
+            {
+              "type": "perf",
+              "section": "⚡ Performance Improvements"
+            },
+            {
+              "type": "chore",
+              "section": "🔧 Other Changes"
+            },
+            {
+              "type": "ci",
+              "section": "🔧 Other Changes"
+            },
+            {
+              "type": "build",
+              "section": "🔧 Other Changes"
+            },
+            {
+              "type": "refactor",
+              "section": "♻️ Code Quality"
+            },
+            {
+              "type": "style",
+              "section": "♻️ Code Quality"
+            },
+            {
+              "type": "test",
+              "section": "🔧 Other Changes"
+            },
+            {
+              "type": "security",
+              "section": "🔧 Other Changes"
+            },
+            {
+              "type": "deps",
+              "section": "🔧 Other Changes"
+            },
+            {
+              "type": "revert",
+              "section": "⏪ Reverts"
+            }
+          ]
+        },
         "writerOpts": {
           "commitsSort": [
             "subject",
             "scope"
-          ]
+          ],
+          "groupBy": "type",
+          "commitGroupsSort": "title"
         }
       }
     ],
