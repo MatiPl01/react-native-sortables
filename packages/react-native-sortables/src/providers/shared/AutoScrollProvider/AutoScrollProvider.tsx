@@ -269,7 +269,6 @@ function AutoScrollUpdater({
 
       const distance = velocity * (cappedElapsedTime / 1000);
 
-      console.log('frameCallbackFunction', distance, ctx.progress);
       scrollBy(distance, animateScrollTo);
     },
     [

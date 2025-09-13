@@ -158,7 +158,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   // GRID LAYOUT UPDATER
   useAnimatedReaction(
     () => ({
-      _: layoutRequestId.value, // Helper to force layout re-calculation
       gaps: {
         cross: crossGap.value,
         main: mainGap.value
@@ -167,7 +166,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       isVertical,
       itemHeights: itemHeights.value,
       itemWidths: itemWidths.value,
-      numGroups
+      numGroups,
+      requestId: layoutRequestId.value // Helper to force layout re-calculation
     }),
     (props, prevProps) => {
       const adaptedProps: GridLayoutProps =
@@ -198,7 +198,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       if (adaptedProps.shouldAnimateLayout !== undefined) {
         shouldAnimateLayout.value = adaptedProps.shouldAnimateLayout;
-      } else if (IS_WEB) {
+      } else if (IS_WEB && props.requestId === prevProps?.requestId) {
         updateShouldAnimateWeb?.(adaptedProps, prevProps);
       } else {
         shouldAnimateLayout.value = true;

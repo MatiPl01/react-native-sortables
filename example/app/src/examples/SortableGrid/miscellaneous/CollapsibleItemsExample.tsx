@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { ViewStyle } from 'react-native';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
   LinearTransition,
   useAnimatedRef
@@ -46,6 +46,26 @@ function Example({ horizontal }: ExampleProps) {
 
   const renderItem = useCallback<SortableGridRenderItem<string>>(
     ({ item }) => {
+      if (IS_WEB) {
+        return (
+          // The height/width of the outermost item container must be changed immediately
+          // to the new final value so we set it here as well and change without animation
+          <View style={[{ [dimension]: collapsed ? sizes.lg : sizes.xxxl }]}>
+            <Animated.View
+              style={[
+                styles.card,
+                {
+                  [dimension]: collapsed ? sizes.lg : sizes.xxxl,
+                  // Uses Reanimated 4 CSS transitions
+                  transitionDuration: 300
+                }
+              ]}>
+              <Text style={styles.text}>{item}</Text>
+            </Animated.View>
+          </View>
+        );
+      }
+
       const layoutTransition = LinearTransition.delay(collapsed ? 0 : 50);
 
       return (
