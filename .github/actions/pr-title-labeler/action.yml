@@ -1,0 +1,25 @@
+name: 'PR Title Labeler'
+description: 'Automatically label PRs based on their title prefix'
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+  config-file:
+    description: 'Path to YAML config file with label mappings (default: pr-title-labeler-config.yml)'
+    required: false
+    default: 'pr-title-labeler-config.yml'
+runs:
+  using: 'composite'
+  steps:
+    - name: 📦 Install dependencies
+      run: npm install
+      shell: bash
+      working-directory: ${{ github.action_path }}
+
+    - name: 🏷️ Run PR Title Labeler
+      run: node index.js
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        CONFIG_FILE: ${{ inputs.config-file }}
