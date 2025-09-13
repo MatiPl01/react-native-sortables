@@ -11,15 +11,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install @actions/github @actions/core
-
       - name: Label PR based on title prefix
-        run: node scripts/pr-title-labeler.js
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        uses: ./.github/actions/pr-title-labeler
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          # Optional: Use custom config file (default: pr-title-labeler-config.yml)
+          # config-file: 'custom-label-mappings.yml'

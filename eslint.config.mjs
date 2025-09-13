@@ -8,6 +8,7 @@ export default [
       '!example/app/**',
       'packages/docs/**',
       'scripts/**',
+      '.github/actions/**',
       '**/bob.config.cjs',
       '**/babel.config.cjs',
       '**/jest.setup.js',

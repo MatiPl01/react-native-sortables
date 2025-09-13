@@ -1,0 +1,67 @@
+# PR Title Labeler Configuration
+# Each label can have multiple prefixes that will map to it
+
+- label: feature
+  prefixes:
+    - feat
+    - feature
+
+- label: fix
+  prefixes:
+    - fix
+    - bugfix
+
+- label: documentation
+  prefixes:
+    - docs
+    - doc
+
+- label: cleanup
+  prefixes:
+    - style
+    - format
+
+- label: refactor
+  prefixes:
+    - refactor
+
+- label: performance
+  prefixes:
+    - perf
+    - performance
+
+- label: test
+  prefixes:
+    - test
+    - tests
+
+- label: chore
+  prefixes:
+    - chore
+    - build
+
+- label: ci
+  prefixes:
+    - ci
+
+- label: dependencies
+  prefixes:
+    - deps
+    - dependencies
+
+- label: example
+  prefixes:
+    - example
+    - demo
+
+- label: enhancement
+  prefixes:
+    - enhancement
+
+- label: critical
+  prefixes:
+    - critical
+
+- label: released
+  prefixes:
+    - released
