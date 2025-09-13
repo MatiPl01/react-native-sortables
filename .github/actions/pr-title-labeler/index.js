@@ -13,9 +13,8 @@ const path = require('path');
 
 async function run() {
   try {
-    // Get config file path from environment variable
-    const configFilePath =
-      process.env.CONFIG_FILE || 'pr-title-labeler-config.yml';
+    // Get config file path from input
+    const configFilePath = core.getInput('config-file');
     const configPath = path.resolve(__dirname, configFilePath);
 
     let labelMappings;
@@ -39,7 +38,7 @@ async function run() {
         const prefixWithColon = `${prefix}:`;
         if (title.startsWith(prefixWithColon)) {
           label = mapping.label;
-          core.info(
+          console.log(
             `Found prefix "${prefixWithColon}" -> applying label "${label}"`
           );
           break;
@@ -48,24 +47,33 @@ async function run() {
       if (label) break;
     }
 
+    // Create GitHub client
+    const octokit = new Octokit({
+      auth: githubToken
+    });
+
+    // Parse repository owner and name
+    const [owner, repo] = repository.split('/');
+
     // Apply label if found
     if (label) {
-      await github.rest.issues.addLabels({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        issue_number: context.payload.pull_request.number,
+      await octokit.rest.issues.addLabels({
+        owner,
+        repo,
+        issue_number: pr.number,
         labels: [label]
       });
 
-      core.info(`✅ Successfully applied label: ${label}`);
+      console.log(`✅ Successfully applied label: ${label}`);
     } else {
-      core.info('ℹ️ No matching prefix found in PR title');
-      core.info(`PR title: "${title}"`);
+      console.log('ℹ️ No matching prefix found in PR title');
+      console.log(`PR title: "${title}"`);
       const allPrefixes = labelMappings.flatMap(mapping => mapping.prefixes);
-      core.info('Available prefixes:', allPrefixes.join(', '));
+      console.log('Available prefixes:', allPrefixes.join(', '));
     }
   } catch (error) {
-    core.setFailed(`❌ Error labeling PR: ${error.message}`);
+    console.error(`❌ Error labeling PR: ${error.message}`);
+    process.exit(1);
   }
 }
 
