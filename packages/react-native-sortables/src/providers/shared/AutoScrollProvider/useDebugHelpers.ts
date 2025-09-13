@@ -15,7 +15,7 @@ const OVERSCROLL_COLORS = {
 
 export default function useDebugHelpers(
   isVertical: boolean,
-  [startOffset, endOffset]: [number, number],
+  [startActivationOffset, endActivationOffset]: [number, number],
   contentBounds: SharedValue<[number, number] | null>,
   [maxStartOverscroll, maxEndOverscroll]: [number, number]
 ) {
@@ -37,39 +37,30 @@ export default function useDebugHelpers(
   }, [debugRects]);
 
   const updateDebugRects = useCallback(
-    (
-      contentContainerMeasurements: MeasuredDimensions,
-      scrollContainerMeasurements: MeasuredDimensions
-    ) => {
+    (containerPos: number, scrollableMeasurements: MeasuredDimensions) => {
       'worklet';
-      const { pageX: cX, pageY: cY } = contentContainerMeasurements;
-      const {
-        height: sH,
-        pageX: sX,
-        pageY: sY,
-        width: sW
-      } = scrollContainerMeasurements;
+      const { height: sH, width: sW } = scrollableMeasurements;
 
       const startTriggerProps = isVertical
         ? {
-            height: startOffset,
-            y: sY - cY
+            height: startActivationOffset,
+            y: -containerPos
           }
         : {
-            width: startOffset,
-            x: sX - cX
+            width: startActivationOffset,
+            x: -containerPos
           };
 
       const endTriggerProps = isVertical
         ? {
-            height: endOffset,
+            height: endActivationOffset,
             positionOrigin: 'bottom' as const,
-            y: sY - cY + sH
+            y: -containerPos + sH
           }
         : {
             positionOrigin: 'right' as const,
-            width: endOffset,
-            x: sX - cX + sW
+            width: endActivationOffset,
+            x: -containerPos + sW
           };
 
       debugRects?.start.set({ ...TRIGGER_COLORS, ...startTriggerProps });
@@ -114,11 +105,11 @@ export default function useDebugHelpers(
     [
       debugRects,
       isVertical,
-      startOffset,
-      endOffset,
       contentBounds,
       maxStartOverscroll,
-      maxEndOverscroll
+      maxEndOverscroll,
+      startActivationOffset,
+      endActivationOffset
     ]
   );
 
