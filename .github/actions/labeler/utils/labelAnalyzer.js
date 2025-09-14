@@ -3,7 +3,7 @@
  * Analyzes PR content to determine which labels should be applied
  */
 
-const minimatch = require('minimatch');
+const { minimatch } = require('minimatch');
 
 /**
  * Find matching label based on PR title prefix
