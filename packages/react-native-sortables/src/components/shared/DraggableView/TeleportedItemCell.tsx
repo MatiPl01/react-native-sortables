@@ -11,7 +11,6 @@ type TeleportedItemCellProps = Pick<
   | 'children'
   | 'isActive'
   | 'itemKey'
-  | 'onLayout'
 >;
 
 export default function TeleportedItemCell({
@@ -19,8 +18,7 @@ export default function TeleportedItemCell({
   baseStyle,
   children,
   isActive,
-  itemKey,
-  onLayout
+  itemKey
 }: TeleportedItemCellProps) {
   const teleportedItemLayoutValue = useTeleportedItemLayout(
     itemKey,
@@ -34,8 +32,7 @@ export default function TeleportedItemCell({
       baseStyle={baseStyle}
       isActive={isActive}
       itemKey={itemKey}
-      layoutStyleValue={teleportedItemLayoutValue}
-      onLayout={onLayout}>
+      layoutStyleValue={teleportedItemLayoutValue}>
       <LayoutAnimationConfig skipEntering>{children}</LayoutAnimationConfig>
     </ItemCell>
   );

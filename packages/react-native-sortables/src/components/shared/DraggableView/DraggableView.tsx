@@ -1,9 +1,8 @@
-import { Fragment, memo, useCallback, useEffect, useState } from 'react';
-import type { LayoutChangeEvent } from 'react-native';
+import { Fragment, memo, useRef, useState } from 'react';
 import { GestureDetector } from 'react-native-gesture-handler';
+import type Animated from 'react-native-reanimated';
 import {
   LayoutAnimationConfig,
-  runOnUI,
   useDerivedValue
 } from 'react-native-reanimated';
 
@@ -16,10 +15,8 @@ import {
   ItemContextProvider,
   ItemOutlet,
   useCommonValuesContext,
-  useDragContext,
   useItemLayout,
   useItemPanGesture,
-  useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
 import ActiveItemPortal from './ActiveItemPortal';
@@ -40,11 +37,9 @@ function DraggableView({
 }: DraggableViewProps) {
   const portalContext = usePortalContext();
   const commonValuesContext = useCommonValuesContext();
-  const { handleItemMeasurement, removeItemMeasurements } =
-    useMeasurementsContext();
-  const { handleDragEnd } = useDragContext();
   const { activeItemKey, customHandle } = commonValuesContext;
 
+  const cellRef = useRef<Animated.View>(null);
   const [isHidden, setIsHidden] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
@@ -54,24 +49,6 @@ function DraggableView({
     activationAnimationProgress
   );
   const gesture = useItemPanGesture(key, activationAnimationProgress);
-
-  useEffect(() => {
-    return () => {
-      removeItemMeasurements(key);
-      runOnUI(() => {
-        handleDragEnd(key, activationAnimationProgress);
-      })();
-    };
-  }, [activationAnimationProgress, handleDragEnd, key, removeItemMeasurements]);
-
-  const onLayout = useCallback(
-    ({
-      nativeEvent: {
-        layout: { height, width }
-      }
-    }: LayoutChangeEvent) => handleItemMeasurement(key, { height, width }),
-    [handleItemMeasurement, key]
-  );
 
   const renderItemCell = (hidden = false) => {
     const innerComponent = (
@@ -84,7 +61,7 @@ function DraggableView({
         isActive={isActive}
         itemKey={key}
         layoutStyleValue={layoutStyleValue}
-        onLayout={onLayout}>
+        ref={cellRef}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           <ItemOutlet itemKey={key} />
         </LayoutAnimationConfig>

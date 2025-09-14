@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { ManualGesture } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
@@ -42,7 +42,7 @@ export default function ActiveItemPortal({
   const teleportEnabled = useMutableValue(false);
   const isFirstUpdateRef = useRef(true);
 
-  const renderTeleportedItemCell = useCallback(
+  const teleportedItemCell = useMemo(
     () => (
       // We have to wrap the TeleportedItemCell in context providers as they won't
       // be accessible otherwise, when the item is rendered in the portal outlet
@@ -77,7 +77,7 @@ export default function ActiveItemPortal({
 
   const enableTeleport = useStableCallback(() => {
     isFirstUpdateRef.current = true;
-    teleport?.(teleportedItemId, renderTeleportedItemCell());
+    teleport?.(teleportedItemId, teleportedItemCell);
     onTeleport(true);
   });
 
@@ -93,8 +93,7 @@ export default function ActiveItemPortal({
     if (!checkTeleported()) return;
 
     const update = () =>
-      checkTeleported() &&
-      teleport?.(teleportedItemId, renderTeleportedItemCell());
+      checkTeleported() && teleport?.(teleportedItemId, teleportedItemCell);
 
     if (isFirstUpdateRef.current) {
       isFirstUpdateRef.current = false;
@@ -103,7 +102,7 @@ export default function ActiveItemPortal({
     } else {
       update();
     }
-  }, [isTeleported, renderTeleportedItemCell, teleport, teleportedItemId]);
+  }, [isTeleported, teleportedItemCell, teleport, teleportedItemId]);
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,
