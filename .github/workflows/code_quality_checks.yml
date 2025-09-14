@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  check:
+  circular-deps:
     runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout code
@@ -28,14 +28,74 @@ jobs:
         working-directory: packages/react-native-sortables
         run: yarn circular-dependency-check
 
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
       - name: 🔎 Run typecheck
         run: yarn typecheck
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
 
       - name: 🧹 Run lint
         run: yarn lint
 
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
       - name: 🎨 Run Prettier check
         run: yarn format:check
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
 
       - name: 🧪 Run tests
         run: yarn test
