@@ -9,35 +9,34 @@ const { Octokit } = require('@octokit/rest');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 /**
- * Get labels that were added by this action using GitHub Actions cache
+ * Get labels that were added by this action using a simple file-based cache
  */
 async function getLabelsAddedByAction(owner, repo, issueNumber) {
   try {
-    const cacheKey = `pr-title-labeler-${owner}-${repo}-${issueNumber}`;
-    const cachePath = `/tmp/pr-title-labeler-cache-${issueNumber}.json`;
+    const cacheDir = '/tmp/pr-title-labeler-cache';
+    const cacheFile = path.join(
+      cacheDir,
+      `${owner}-${repo}-${issueNumber}.json`
+    );
 
-    // Try to restore from cache
-    try {
-      execSync(`gh cache restore ${cacheKey} --path ${cachePath}`, {
-        stdio: 'pipe'
-      });
-
-      if (fs.existsSync(cachePath)) {
-        const cacheData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
-        const labels = new Set(cacheData.labels || []);
-        console.log(
-          `💾 Retrieved from cache: [${Array.from(labels).join(', ')}]`
-        );
-        return labels;
-      }
-    } catch (error) {
-      // Cache miss or error - this is normal for first run
-      console.log('💾 No cache found, starting fresh');
+    // Ensure cache directory exists
+    if (!fs.existsSync(cacheDir)) {
+      fs.mkdirSync(cacheDir, { recursive: true });
     }
 
+    // Try to read from cache file
+    if (fs.existsSync(cacheFile)) {
+      const cacheData = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+      const labels = new Set(cacheData.labels || []);
+      console.log(
+        `💾 Retrieved from cache: [${Array.from(labels).join(', ')}]`
+      );
+      return labels;
+    }
+
+    console.log('💾 No cache found, starting fresh');
     return new Set();
   } catch (error) {
     console.log('⚠️ Could not retrieve cache:', error.message);
@@ -46,24 +45,32 @@ async function getLabelsAddedByAction(owner, repo, issueNumber) {
 }
 
 /**
- * Save labels that were added by this action to GitHub Actions cache
+ * Save labels that were added by this action to file-based cache
  */
 async function saveLabelsAddedByAction(owner, repo, issueNumber, labels) {
   try {
-    const cacheKey = `pr-title-labeler-${owner}-${repo}-${issueNumber}`;
-    const cachePath = `/tmp/pr-title-labeler-cache-${issueNumber}.json`;
+    const cacheDir = '/tmp/pr-title-labeler-cache';
+    const cacheFile = path.join(
+      cacheDir,
+      `${owner}-${repo}-${issueNumber}.json`
+    );
+
+    // Ensure cache directory exists
+    if (!fs.existsSync(cacheDir)) {
+      fs.mkdirSync(cacheDir, { recursive: true });
+    }
 
     // Create cache data
     const cacheData = {
       labels: Array.from(labels),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      owner,
+      repo,
+      issueNumber
     };
 
-    // Write to temporary file
-    fs.writeFileSync(cachePath, JSON.stringify(cacheData, null, 2));
-
-    // Save to GitHub Actions cache
-    execSync(`gh cache save ${cacheKey} ${cachePath}`, { stdio: 'pipe' });
+    // Write to cache file
+    fs.writeFileSync(cacheFile, JSON.stringify(cacheData, null, 2));
 
     console.log(`💾 Saved to cache: [${Array.from(labels).join(', ')}]`);
   } catch (error) {
