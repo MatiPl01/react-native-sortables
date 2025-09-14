@@ -72,29 +72,32 @@ titleMappings:
 fileMappings:
   - label: documentation
     patterns:
-      - packages/docs/
-      - README.md
+      - "packages/docs/**"
+      - "**/README.md"
+      - "**/*.md"
 
   - label: example
     patterns:
-      - example/
+      - "example/**"
 
   - label: test
     patterns:
-      - .test.
-      - .spec.
-      - __tests__/
-      - tests/
-      - __mocks__/
+      - "**/*.test.*"
+      - "**/*.spec.*"
+      - "**/__tests__/**"
+      - "**/tests/**"
+      - "**/__mocks__/**"
 
   - label: ci
     patterns:
-      - .github/
-      - workflows/
+      - ".github/**"
+      - "**/workflows/**"
+      - "**/.github/**"
 
   - label: dependencies
     patterns:
-      - package.json
-      - yarn.lock
-      - package-lock.json
-      - pnpm-lock.yaml
+      - "**/package.json"
+      - "**/yarn.lock"
+      - "**/package-lock.json"
+      - "**/pnpm-lock.yaml"
+      - "**/bun.lockb"

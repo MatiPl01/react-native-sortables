@@ -51,7 +51,10 @@ async function addLabels(octokit, labels) {
     });
     console.log(`✅ Successfully applied labels: [${labels.join(', ')}]`);
   } catch (error) {
-    console.log(`⚠️ Could not add labels [${labels.join(', ')}]:`, error.message);
+    console.log(
+      `⚠️ Could not add labels [${labels.join(', ')}]:`,
+      error.message
+    );
   }
 }
 
@@ -61,8 +64,7 @@ async function addLabels(octokit, labels) {
 async function removeLabels(octokit, labels) {
   if (labels.length === 0) return;
 
-  // Remove labels one by one (GitHub API doesn't support batch removal)
-  for (const label of labels) {
+  const removePromises = labels.map(async label => {
     try {
       await octokit.rest.issues.removeLabel({
         owner: context.repo.owner,
@@ -74,7 +76,9 @@ async function removeLabels(octokit, labels) {
     } catch (error) {
       console.log(`⚠️ Could not remove label ${label}:`, error.message);
     }
-  }
+  });
+
+  await Promise.all(removePromises);
 }
 
 module.exports = {

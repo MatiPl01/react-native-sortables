@@ -1,11 +1,12 @@
 {
-  "name": "pr-labeler",
+  "name": "labeler",
   "version": "1.0.0",
-  "description": "PR labeler that handles both title prefixes and file changes",
+  "description": "Labeler that handles both title prefixes and file changes",
   "main": "index.js",
   "dependencies": {
     "@actions/github": "^6.0.0",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "minimatch": "^9.0.3"
   },
   "engines": {
     "node": ">=16"

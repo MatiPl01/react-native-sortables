@@ -3,7 +3,6 @@
 /**
  * PR Labeler Action
  * Labels PRs based on both title prefix AND file changes
- * This eliminates conflicts between multiple labelers
  */
 
 const { context, getOctokit } = require('@actions/github');
@@ -15,10 +14,10 @@ const {
   removeLabels
 } = require('./utils/github');
 const {
-  calculateLabelChanges,
+  determineLabelUpdates,
   findMatchingFileLabels,
   findMatchingTitleLabel
-} = require('./handlers/labeling');
+} = require('./utils/labelAnalyzer');
 
 /**
  * Validate environment variables and GitHub context
@@ -82,8 +81,8 @@ async function analyzePR(octokit, pr, config) {
     `📁 File-based labels: [${fileLabelInfos.map(info => `${info.label} (${info.reason})`).join(', ')}]`
   );
 
-  // Calculate smart label changes
-  const { labelsToAdd, labelsToRemove } = calculateLabelChanges(
+  // Determine which labels need to be updated
+  const { labelsToAdd, labelsToRemove } = determineLabelUpdates(
     currentLabels,
     titleLabelInfo,
     fileLabelInfos,
@@ -125,10 +124,10 @@ function logSummary(titleLabelInfo, fileLabelInfos) {
 
   if (finalTargetLabels.length > 0) {
     console.log(
-      `🎉 PR labeler completed! Final labels: [${finalTargetLabels.join(', ')}]`
+      `🎉 PR Labeler completed! Final labels: [${finalTargetLabels.join(', ')}]`
     );
   } else {
-    console.log('🎉 PR labeler completed! No labels to apply.');
+    console.log('🎉 PR Labeler completed! No labels to apply.');
   }
 }
 

@@ -18,6 +18,5 @@ jobs:
         uses: ./.github/actions/labeler
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
           # Optional: Use custom config file (default: labeler-config.yml)
-          # config-file: 'custom-labeler-config.yml'
+          # CONFIG_FILE: 'custom-labeler-config.yml'

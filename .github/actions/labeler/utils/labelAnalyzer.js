@@ -1,7 +1,9 @@
 /**
- * Labeling logic for PR Labeler
- * Handles both title-based and file-based labeling
+ * Label analysis utilities for PR Labeler
+ * Analyzes PR content to determine which labels should be applied
  */
+
+const minimatch = require('minimatch');
 
 /**
  * Find matching label based on PR title prefix
@@ -36,18 +38,8 @@ function findMatchingFileLabels(changedFiles, fileMappings) {
     const patterns = mapping.patterns || [];
 
     for (const pattern of patterns) {
-      // More precise pattern matching
       const matches = changedFiles.filter(file => {
-        // Handle directory patterns (ending with /)
-        if (pattern.endsWith('/')) {
-          return file.startsWith(pattern);
-        }
-        // Handle file patterns (containing dots or specific files)
-        if (pattern.includes('.')) {
-          return file.includes(pattern);
-        }
-        // Handle directory patterns without trailing slash
-        return file.startsWith(pattern + '/') || file === pattern;
+        return matchesPattern(file, pattern);
       });
 
       if (matches.length > 0) {
@@ -56,7 +48,9 @@ function findMatchingFileLabels(changedFiles, fileMappings) {
           source: 'files',
           reason: `file pattern "${pattern}" matches [${matches.join(', ')}]`
         });
-        console.log(`📁 File pattern "${pattern}" matches [${matches.join(', ')}] -> adding label "${label}"`);
+        console.log(
+          `📁 File pattern "${pattern}" matches [${matches.join(', ')}] -> adding label "${label}"`
+        );
       }
     }
   }
@@ -65,16 +59,45 @@ function findMatchingFileLabels(changedFiles, fileMappings) {
 }
 
 /**
- * Smart label management - determines which labels to add/remove
+ * Check if a file matches a given pattern using minimatch
  */
-function calculateLabelChanges(currentLabels, titleLabelInfo, fileLabelInfos, config) {
+function matchesPattern(file, pattern) {
+  try {
+    // Use minimatch for robust glob pattern matching
+    return minimatch(file, pattern, {
+      dot: true, // Match files starting with dots
+      matchBase: true, // Match basename if no slashes in pattern
+      noglobstar: false // Allow ** patterns
+    });
+  } catch (error) {
+    console.warn(`⚠️ Invalid pattern: ${pattern} - ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Determine which labels should be added or removed based on current state
+ */
+function determineLabelUpdates(
+  currentLabels,
+  titleLabelInfo,
+  fileLabelInfos,
+  config
+) {
   const labelsToAdd = [];
   const labelsToRemove = [];
 
   // Get all configured labels by source
-  const titleConfiguredLabels = new Set((config.titleMappings || []).map(m => m.label));
-  const fileConfiguredLabels = new Set((config.fileMappings || []).map(m => m.label));
-  const allConfiguredLabels = new Set([...titleConfiguredLabels, ...fileConfiguredLabels]);
+  const titleConfiguredLabels = new Set(
+    (config.titleMappings || []).map(m => m.label)
+  );
+  const fileConfiguredLabels = new Set(
+    (config.fileMappings || []).map(m => m.label)
+  );
+  const allConfiguredLabels = new Set([
+    ...titleConfiguredLabels,
+    ...fileConfiguredLabels
+  ]);
 
   // Determine what labels should be present and why
   const targetLabels = new Map(); // label -> { source, reason }
@@ -95,7 +118,11 @@ function calculateLabelChanges(currentLabels, titleLabelInfo, fileLabelInfos, co
     });
   }
 
-  console.log(`🎯 Target labels: ${Array.from(targetLabels.entries()).map(([label, info]) => `${label} (${info.source}: ${info.reason})`).join(', ')}`);
+  console.log(
+    `🎯 Target labels: ${Array.from(targetLabels.entries())
+      .map(([label, info]) => `${label} (${info.source}: ${info.reason})`)
+      .join(', ')}`
+  );
 
   // Determine labels to add (not currently present)
   for (const [label, info] of targetLabels) {
@@ -103,7 +130,9 @@ function calculateLabelChanges(currentLabels, titleLabelInfo, fileLabelInfos, co
       labelsToAdd.push(label);
       console.log(`➕ Will add: ${label} (${info.source}: ${info.reason})`);
     } else {
-      console.log(`✅ Already present: ${label} (${info.source}: ${info.reason})`);
+      console.log(
+        `✅ Already present: ${label} (${info.source}: ${info.reason})`
+      );
     }
   }
 
@@ -116,10 +145,14 @@ function calculateLabelChanges(currentLabels, titleLabelInfo, fileLabelInfos, co
         console.log(`🗑️ Will remove: ${currentLabel} (no longer needed)`);
       } else {
         const targetInfo = targetLabels.get(currentLabel);
-        console.log(`✅ Keeping: ${currentLabel} (${targetInfo.source}: ${targetInfo.reason})`);
+        console.log(
+          `✅ Keeping: ${currentLabel} (${targetInfo.source}: ${targetInfo.reason})`
+        );
       }
     } else {
-      console.log(`🔒 Preserving: ${currentLabel} (not managed by this labeler)`);
+      console.log(
+        `🔒 Preserving: ${currentLabel} (not managed by this labeler)`
+      );
     }
   }
 
@@ -129,5 +162,5 @@ function calculateLabelChanges(currentLabels, titleLabelInfo, fileLabelInfos, co
 module.exports = {
   findMatchingTitleLabel,
   findMatchingFileLabels,
-  calculateLabelChanges
+  determineLabelUpdates
 };

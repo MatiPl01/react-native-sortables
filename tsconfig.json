@@ -2,9 +2,8 @@
   "extends": "eslint-config-react-native-matipl01/tsconfig.base",
   "include": [
     "packages",
-    ".github/actions/labeler",
     "jest.config.ts",
     "packages/react-native-sortables/jest.setup.js"
   ],
-  "exclude": ["example", "**/dist"]
+  "exclude": ["example", "**/dist", ".github/actions"]
 }
