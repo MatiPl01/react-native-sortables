@@ -5,5 +5,24 @@ author: 'Mateusz Łopaciński (https://github.com/MatiPl01)'
 # GITHUB_TOKEN: GitHub token for API access
 # CONFIG_FILE: Path to the labeler configuration file (default: labeler-config.yml)
 runs:
-  using: 'node20'
-  main: 'index.js'
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        echo "📦 Installing dependencies for PR Labeler..."
+        yarn install --immutable
+        echo "✅ Dependencies installed successfully"
+
+    - name: Run labeler
+      shell: bash
+      run: node index.js
+      env:
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+        CONFIG_FILE: ${{ env.CONFIG_FILE }}
