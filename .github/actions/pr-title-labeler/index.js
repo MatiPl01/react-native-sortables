@@ -9,36 +9,65 @@ const { Octokit } = require('@octokit/rest');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 /**
- * Get labels that were added by this action by checking issue events
+ * Get labels that were added by this action using GitHub Actions cache
  */
-async function getLabelsAddedByAction(octokit, owner, repo, issueNumber) {
+async function getLabelsAddedByAction(owner, repo, issueNumber) {
   try {
-    const events = await octokit.rest.issues.listEvents({
-      owner,
-      repo,
-      issue_number: issueNumber,
-      per_page: 100
-    });
+    const cacheKey = `pr-title-labeler-${owner}-${repo}-${issueNumber}`;
+    const cachePath = `/tmp/pr-title-labeler-cache-${issueNumber}.json`;
 
-    const labelsAddedByAction = new Set();
+    // Try to restore from cache
+    try {
+      execSync(`gh cache restore ${cacheKey} --path ${cachePath}`, {
+        stdio: 'pipe'
+      });
 
-    // Look for "labeled" events that were created by the GitHub Actions bot
-    for (const event of events.data) {
-      if (
-        event.event === 'labeled' &&
-        event.actor?.login === 'github-actions[bot]' &&
-        event.label?.name
-      ) {
-        labelsAddedByAction.add(event.label.name);
+      if (fs.existsSync(cachePath)) {
+        const cacheData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+        const labels = new Set(cacheData.labels || []);
+        console.log(
+          `💾 Retrieved from cache: [${Array.from(labels).join(', ')}]`
+        );
+        return labels;
       }
+    } catch (error) {
+      // Cache miss or error - this is normal for first run
+      console.log('💾 No cache found, starting fresh');
     }
 
-    return labelsAddedByAction;
-  } catch (error) {
-    console.log('⚠️ Could not fetch issue events:', error.message);
     return new Set();
+  } catch (error) {
+    console.log('⚠️ Could not retrieve cache:', error.message);
+    return new Set();
+  }
+}
+
+/**
+ * Save labels that were added by this action to GitHub Actions cache
+ */
+async function saveLabelsAddedByAction(owner, repo, issueNumber, labels) {
+  try {
+    const cacheKey = `pr-title-labeler-${owner}-${repo}-${issueNumber}`;
+    const cachePath = `/tmp/pr-title-labeler-cache-${issueNumber}.json`;
+
+    // Create cache data
+    const cacheData = {
+      labels: Array.from(labels),
+      timestamp: new Date().toISOString()
+    };
+
+    // Write to temporary file
+    fs.writeFileSync(cachePath, JSON.stringify(cacheData, null, 2));
+
+    // Save to GitHub Actions cache
+    execSync(`gh cache save ${cacheKey} ${cachePath}`, { stdio: 'pipe' });
+
+    console.log(`💾 Saved to cache: [${Array.from(labels).join(', ')}]`);
+  } catch (error) {
+    console.log('⚠️ Could not save cache:', error.message);
   }
 }
 
@@ -83,12 +112,23 @@ function findMatchingLabel(title, labelMappings) {
 function getLabelsToRemove(labelsAddedByAction, currentLabels, targetLabel) {
   const labelsToRemove = new Set();
 
+  console.log(`🔍 Determining labels to remove...`);
+  console.log(
+    `📋 Labels added by action: [${Array.from(labelsAddedByAction).join(', ')}]`
+  );
+  console.log(`📋 Current labels: [${Array.from(currentLabels).join(', ')}]`);
+  console.log(`🎯 Target label: "${targetLabel || 'none'}"`);
+
   for (const addedLabel of labelsAddedByAction) {
     if (currentLabels.has(addedLabel) && addedLabel !== targetLabel) {
       labelsToRemove.add(addedLabel);
+      console.log(`🗑️ Will remove: "${addedLabel}"`);
     }
   }
 
+  console.log(
+    `📊 Labels to remove: [${Array.from(labelsToRemove).join(', ')}]`
+  );
   return labelsToRemove;
 }
 
@@ -220,7 +260,7 @@ async function run() {
     // Get current state
     const [currentLabels, labelsAddedByAction] = await Promise.all([
       getCurrentLabels(octokit, owner, repo, pr.number),
-      getLabelsAddedByAction(octokit, owner, repo, pr.number)
+      getLabelsAddedByAction(owner, repo, pr.number)
     ]);
 
     // Check if target label already exists
@@ -248,6 +288,26 @@ async function run() {
     } else if (!targetLabel) {
       logNoMatchingPrefix(pr.title, labelMappings);
     }
+
+    // Update cache with current state
+    const newLabelsAddedByAction = new Set(labelsAddedByAction);
+
+    // Remove labels that were removed from the PR
+    for (const removedLabel of labelsToRemove) {
+      newLabelsAddedByAction.delete(removedLabel);
+    }
+
+    // Add new label if it was added by this action
+    if (targetLabel && !currentLabels.has(targetLabel)) {
+      newLabelsAddedByAction.add(targetLabel);
+    }
+
+    await saveLabelsAddedByAction(
+      owner,
+      repo,
+      pr.number,
+      newLabelsAddedByAction
+    );
 
     console.log('🎉 PR title labeler completed successfully!');
   } catch (error) {
