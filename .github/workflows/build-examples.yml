@@ -62,7 +62,7 @@ jobs:
     name: 📱 Build ${{ matrix.app }} (${{ matrix.platform }})
     runs-on: macos-15
     concurrency:
-      group: build-react-native-${{ github.ref }}
+      group: build-react-native-${{ matrix.app }}-${{ matrix.platform }}-${{ github.ref }}
       cancel-in-progress: true
     strategy:
       matrix:
