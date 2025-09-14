@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import type { DimensionValue } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
@@ -193,21 +193,10 @@ function SortableGridComponent<I>({
   strategy,
   ...rest
 }: SortableGridComponentProps<I>) {
-  const { handleContainerMeasurement, resetMeasurements } =
-    useMeasurementsContext();
+  const { handleContainerMeasurement } = useMeasurementsContext();
   const { mainGroupSize } = useGridLayoutContext();
 
-  const isFirstRenderRef = useRef(true);
-
   useOrderUpdater(strategy, GRID_STRATEGIES);
-
-  useLayoutEffect(() => {
-    if (isFirstRenderRef.current) {
-      isFirstRenderRef.current = false;
-      return;
-    }
-    resetMeasurements();
-  }, [groups, resetMeasurements]);
 
   const animatedInnerStyle = useAnimatedStyle(() =>
     isVertical

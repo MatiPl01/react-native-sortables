@@ -14,22 +14,22 @@ export const areArraysDifferent = <T>(
   arr1.some((item, index) => !areEqual(item, arr2[index] as T));
 
 export const areValuesDifferent = (
-  dim1: number | undefined,
-  dim2: number | undefined,
+  value1: number | undefined,
+  value2: number | undefined,
   eps?: number
 ): boolean => {
-  if (dim1 === undefined) {
-    return dim2 !== undefined;
+  if (value1 === undefined) {
+    return value2 !== undefined;
   }
-  if (dim2 === undefined) {
+  if (value2 === undefined) {
     return true;
   }
 
   if (eps) {
-    return Math.abs(dim1 - dim2) > eps;
+    return Math.abs(value1 - value2) > eps;
   }
 
-  return dim1 !== dim2;
+  return value1 !== value2;
 };
 
 export const areVectorsDifferent = (

@@ -38,7 +38,6 @@ export type SharedProviderProps = PropsWithChildren<
         | 'debug'
         | 'hapticsEnabled'
         | 'itemsLayoutTransitionMode'
-        | 'measureDebounceDelay'
         | 'sortEnabled'
       >
     > &
@@ -63,7 +62,6 @@ export default function SharedProvider({
   customHandle,
   debug,
   hapticsEnabled,
-  measureDebounceDelay,
   onActiveItemDropped,
   onDragEnd,
   onDragMove,
@@ -95,7 +93,7 @@ export default function SharedProvider({
       {...rest}
     />,
     // Provider used for measurements of items and the container
-    <MeasurementsProvider measureDebounceDelay={measureDebounceDelay} />,
+    <MeasurementsProvider />,
     // Provider used for auto-scrolling when dragging an item near the
     // edge of the container
     scrollableRef && (

@@ -29,6 +29,7 @@ const { ItemsProvider, useItemsContext } = createProvider('Items')<
       getKeys: store.getKeys,
       getNode: store.getNode,
       subscribeItem: store.subscribeItem,
+      subscribeItems: store.subscribeItems,
       subscribeKeys: store.subscribeKeys
     }
   };

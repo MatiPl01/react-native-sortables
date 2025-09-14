@@ -10,6 +10,7 @@ import type {
   MeasuredDimensions,
   SharedValue
 } from 'react-native-reanimated';
+import type Animated from 'react-native-reanimated';
 
 import type { DeepReadonly, Maybe, Simplify } from '../../helperTypes';
 import type { AnimatedValues } from '../../integrations/reanimated';
@@ -44,6 +45,9 @@ export type ItemsContextType = {
   subscribeKeys: (callback: () => void) => () => void;
   getNode: (key: string) => ReactNode | undefined;
   subscribeItem: (key: string, callback: () => void) => () => void;
+  subscribeItems: (
+    callback: (updatedItemKeys: Array<string>) => void
+  ) => () => void;
 };
 
 // COMMON VALUES
@@ -102,11 +106,12 @@ export type CommonValuesContextType =
 // MEASUREMENTS
 
 export type MeasurementsContextType = {
-  handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
-  removeItemMeasurements: (key: string) => void;
+  registerItem: (
+    key: string,
+    animatedRef: AnimatedRef<Animated.View>
+  ) => () => void;
   handleContainerMeasurement: (width: number, height: number) => void;
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
-  resetMeasurements: () => void;
 };
 
 // AUTO SCROLL

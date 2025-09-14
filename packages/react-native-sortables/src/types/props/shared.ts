@@ -302,11 +302,6 @@ export type SharedProps = Simplify<
         DropIndicatorSettings &
         ItemDragSettings &
         ItemLayoutAnimationSettings & {
-          /** Delay after the last item measurement and the measurements commit
-           * triggering the layout calculation
-           * @default 0
-           */
-          measureDebounceDelay: number;
           /** Whether and how to animate container dimensions changes
            * @default 'none'
            */
