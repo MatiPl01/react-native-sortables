@@ -1,9 +1,8 @@
-import { Fragment, memo, useEffect, useState } from 'react';
+import { Fragment, memo, useCallback, useState } from 'react';
+import type { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import type Animated from 'react-native-reanimated';
 import {
   LayoutAnimationConfig,
-  useAnimatedRef,
   useDerivedValue
 } from 'react-native-reanimated';
 
@@ -39,10 +38,9 @@ function DraggableView({
 }: DraggableViewProps) {
   const portalContext = usePortalContext();
   const commonValuesContext = useCommonValuesContext();
-  const { registerItem } = useMeasurementsContext();
+  const { updateItemRef } = useMeasurementsContext();
   const { activeItemKey, customHandle } = commonValuesContext;
 
-  const itemRef = useAnimatedRef<Animated.View>();
   const [isHidden, setIsHidden] = useState(false);
   const activationAnimationProgress = useMutableValue(0);
   const isActive = useDerivedValue(() => activeItemKey.value === key);
@@ -53,7 +51,10 @@ function DraggableView({
   );
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
-  useEffect(() => registerItem(key, itemRef), [key, registerItem, itemRef]);
+  const ref = useCallback(
+    (instance: null | View) => updateItemRef(key, instance),
+    [key, updateItemRef]
+  );
 
   const renderItemCell = (hidden = false) => {
     const innerComponent = (
@@ -66,7 +67,7 @@ function DraggableView({
         isActive={isActive}
         itemKey={key}
         layoutStyleValue={layoutStyleValue}
-        ref={itemRef}>
+        ref={ref}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           <ItemOutlet itemKey={key} />
         </LayoutAnimationConfig>

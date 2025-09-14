@@ -10,7 +10,6 @@ import type {
   MeasuredDimensions,
   SharedValue
 } from 'react-native-reanimated';
-import type Animated from 'react-native-reanimated';
 
 import type { DeepReadonly, Maybe, Simplify } from '../../helperTypes';
 import type { AnimatedValues } from '../../integrations/reanimated';
@@ -106,10 +105,7 @@ export type CommonValuesContextType =
 // MEASUREMENTS
 
 export type MeasurementsContextType = {
-  registerItem: (
-    key: string,
-    animatedRef: AnimatedRef<Animated.View>
-  ) => () => void;
+  updateItemRef: (key: string, instance: null | View) => void;
   handleContainerMeasurement: (width: number, height: number) => void;
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
 };

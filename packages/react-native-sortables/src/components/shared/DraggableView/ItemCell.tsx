@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from 'react';
-import { Platform, StyleSheet, type ViewStyle } from 'react-native';
+import type { View, ViewStyle } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import type { SharedValue, TransformArrayItem } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
@@ -24,51 +25,49 @@ export type ItemCellProps = PropsWithChildren<{
   exiting?: LayoutAnimation;
 }>;
 
-const ItemCell = componentWithRef<Animated.View, ItemCellProps>(
-  function ItemCell(
-    {
-      activationAnimationProgress,
-      baseStyle,
-      children,
-      entering,
-      exiting,
-      hidden,
-      isActive,
-      itemKey,
-      layoutStyleValue
-    },
-    ref
-  ) {
-    const { controlledItemDimensionsStyle } = useCommonValuesContext();
+const ItemCell = componentWithRef<View, ItemCellProps>(function ItemCell(
+  {
+    activationAnimationProgress,
+    baseStyle,
+    children,
+    entering,
+    exiting,
+    hidden,
+    isActive,
+    itemKey,
+    layoutStyleValue
+  },
+  ref
+) {
+  const { controlledItemDimensionsStyle } = useCommonValuesContext();
 
-    const decorationStyleValue = useItemDecoration(
-      itemKey,
-      isActive,
-      activationAnimationProgress
-    );
+  const decorationStyleValue = useItemDecoration(
+    itemKey,
+    isActive,
+    activationAnimationProgress
+  );
 
-    const animatedStyle = useAnimatedStyle(() => ({
-      ...decorationStyleValue.value,
-      ...layoutStyleValue.value,
-      transform: [
-        ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
-        ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
-      ]
-    }));
+  const animatedStyle = useAnimatedStyle(() => ({
+    ...decorationStyleValue.value,
+    ...layoutStyleValue.value,
+    transform: [
+      ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
+      ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
+    ]
+  }));
 
-    return (
-      <Animated.View style={[baseStyle, styles.decoration, animatedStyle]}>
-        <Animated.View
-          entering={entering}
-          exiting={exiting}
-          ref={ref}
-          style={[controlledItemDimensionsStyle, hidden && styles.hidden]}>
-          {children}
-        </Animated.View>
+  return (
+    <Animated.View style={[baseStyle, styles.decoration, animatedStyle]}>
+      <Animated.View
+        entering={entering}
+        exiting={exiting}
+        ref={ref}
+        style={[controlledItemDimensionsStyle, hidden && styles.hidden]}>
+        {children}
       </Animated.View>
-    );
-  }
-);
+    </Animated.View>
+  );
+});
 
 export default ItemCell;
 
