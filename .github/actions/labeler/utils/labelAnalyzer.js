@@ -1,12 +1,33 @@
 /**
  * Label analysis utilities for PR Labeler
  * Analyzes PR content to determine which labels should be applied
+ *
+ * @fileoverview Utilities for analyzing PR titles and file changes to determine labels
+ * @author Mateusz Łopaciński
+ * @version 1.0.0
  */
 
 const { minimatch } = require('minimatch');
 
+// Constants
+const CONSTANTS = {
+  DISPLAY: {
+    MAX_FILES_IN_SUMMARY: 3,
+    SEPARATOR_LENGTH: 50
+  },
+  MINIMATCH_OPTIONS: {
+    dot: true, // Match files starting with dots
+    matchBase: true, // Match basename if no slashes in pattern
+    noglobstar: false // Allow ** patterns
+  }
+};
+
 /**
- * Find matching label based on PR title prefix
+ * Finds matching label based on PR title prefix
+ *
+ * @param {string} title - The PR title to analyze
+ * @param {Object[]} titleMappings - Array of title mapping configurations
+ * @returns {Object|null} Label information object or null if no match found
  */
 function findMatchingTitleLabel(title, titleMappings) {
   const normalizedTitle = title.toLowerCase();
@@ -28,10 +49,15 @@ function findMatchingTitleLabel(title, titleMappings) {
 }
 
 /**
- * Find matching labels based on file changes
+ * Finds matching labels based on file changes using glob patterns
+ *
+ * @param {string[]} changedFiles - Array of changed file paths
+ * @param {Object[]} fileMappings - Array of file mapping configurations
+ * @returns {Object[]} Array of label information objects
  */
 function findMatchingFileLabels(changedFiles, fileMappings) {
   const matchingLabels = [];
+  const labelMatches = new Map(); // label -> { allMatches, allPatterns }
 
   for (const mapping of fileMappings) {
     const label = mapping.label;
@@ -43,32 +69,70 @@ function findMatchingFileLabels(changedFiles, fileMappings) {
       });
 
       if (matches.length > 0) {
-        matchingLabels.push({
-          label: label,
-          source: 'files',
-          reason: `file pattern "${pattern}" matches [${matches.join(', ')}]`
-        });
-        console.log(
-          `📁 File pattern "${pattern}" matches [${matches.join(', ')}] -> adding label "${label}"`
-        );
+        if (!labelMatches.has(label)) {
+          labelMatches.set(label, {
+            allMatches: new Set(),
+            allPatterns: []
+          });
+        }
+
+        const labelInfo = labelMatches.get(label);
+        matches.forEach(match => labelInfo.allMatches.add(match));
+        labelInfo.allPatterns.push(pattern);
       }
     }
+  }
+
+  // Convert to final format, deduplicating matches
+  for (const [label, info] of labelMatches) {
+    matchingLabels.push({
+      label: label,
+      source: 'files',
+      reason: `file patterns [${info.allPatterns.join(', ')}] match [${Array.from(info.allMatches).join(', ')}]`
+    });
   }
 
   return matchingLabels;
 }
 
 /**
- * Check if a file matches a given pattern using minimatch
+ * Formats reason for display in a more readable way
+ *
+ * @param {string} source - The source of the label ('title' or 'files')
+ * @param {string} reason - The raw reason string
+ * @returns {string} Formatted reason string for display
+ */
+function formatReason(source, reason) {
+  if (source === 'title') {
+    return `title prefix "${reason.split('"')[1]}"`;
+  } else if (source === 'files') {
+    // Extract pattern and file count from reason
+    const match = reason.match(/file patterns \[([^\]]+)\] match \[([^\]]+)\]/);
+    if (match) {
+      const patterns = match[1];
+      const files = match[2].split(', ');
+      const fileCount = files.length;
+      const fileList =
+        fileCount <= CONSTANTS.DISPLAY.MAX_FILES_IN_SUMMARY
+          ? files.join(', ')
+          : `${files.slice(0, CONSTANTS.DISPLAY.MAX_FILES_IN_SUMMARY).join(', ')} and ${fileCount - CONSTANTS.DISPLAY.MAX_FILES_IN_SUMMARY} more`;
+      return `files (${patterns}): ${fileList}`;
+    }
+    return reason;
+  }
+  return reason;
+}
+
+/**
+ * Checks if a file matches a given pattern using minimatch
+ *
+ * @param {string} file - The file path to check
+ * @param {string} pattern - The glob pattern to match against
+ * @returns {boolean} True if the file matches the pattern, false otherwise
  */
 function matchesPattern(file, pattern) {
   try {
-    // Use minimatch for robust glob pattern matching
-    return minimatch(file, pattern, {
-      dot: true, // Match files starting with dots
-      matchBase: true, // Match basename if no slashes in pattern
-      noglobstar: false // Allow ** patterns
-    });
+    return minimatch(file, pattern, CONSTANTS.MINIMATCH_OPTIONS);
   } catch (error) {
     console.warn(`⚠️ Invalid pattern: ${pattern} - ${error.message}`);
     return false;
@@ -76,7 +140,13 @@ function matchesPattern(file, pattern) {
 }
 
 /**
- * Determine which labels should be added or removed based on current state
+ * Determines which labels should be added or removed based on current state
+ *
+ * @param {Set<string>} currentLabels - Currently applied labels
+ * @param {Object|null} titleLabelInfo - Title label information or null
+ * @param {Object[]} fileLabelInfos - Array of file label information objects
+ * @param {Object} config - Configuration object
+ * @returns {Object} Object containing labelsToAdd and labelsToRemove arrays
  */
 function determineLabelUpdates(
   currentLabels,
@@ -118,21 +188,10 @@ function determineLabelUpdates(
     });
   }
 
-  console.log(
-    `🎯 Target labels: ${Array.from(targetLabels.entries())
-      .map(([label, info]) => `${label} (${info.source}: ${info.reason})`)
-      .join(', ')}`
-  );
-
   // Determine labels to add (not currently present)
   for (const [label, info] of targetLabels) {
     if (!currentLabels.has(label)) {
       labelsToAdd.push(label);
-      console.log(`➕ Will add: ${label} (${info.source}: ${info.reason})`);
-    } else {
-      console.log(
-        `✅ Already present: ${label} (${info.source}: ${info.reason})`
-      );
     }
   }
 
@@ -142,19 +201,44 @@ function determineLabelUpdates(
       if (!targetLabels.has(currentLabel)) {
         // This label is configured but no longer needed
         labelsToRemove.push(currentLabel);
-        console.log(`🗑️ Will remove: ${currentLabel} (no longer needed)`);
-      } else {
-        const targetInfo = targetLabels.get(currentLabel);
-        console.log(
-          `✅ Keeping: ${currentLabel} (${targetInfo.source}: ${targetInfo.reason})`
-        );
       }
-    } else {
-      console.log(
-        `🔒 Preserving: ${currentLabel} (not managed by this labeler)`
-      );
     }
   }
+
+  // Log summary in a clean format
+  console.log('\n📋 Label Summary:');
+  console.log('─'.repeat(CONSTANTS.DISPLAY.SEPARATOR_LENGTH));
+
+  if (labelsToAdd.length > 0) {
+    console.log('➕ Labels to add:');
+    for (const label of labelsToAdd) {
+      const info = targetLabels.get(label);
+      const reason = formatReason(info.source, info.reason);
+      console.log(`   • ${label} - ${reason}`);
+    }
+  }
+
+  if (labelsToRemove.length > 0) {
+    console.log('🗑️ Labels to remove:');
+    for (const label of labelsToRemove) {
+      console.log(`   • ${label} - no longer needed`);
+    }
+  }
+
+  const keepingLabels = Array.from(currentLabels).filter(
+    label => allConfiguredLabels.has(label) && targetLabels.has(label)
+  );
+
+  if (keepingLabels.length > 0) {
+    console.log('✅ Labels to keep:');
+    for (const label of keepingLabels) {
+      const info = targetLabels.get(label);
+      const reason = formatReason(info.source, info.reason);
+      console.log(`   • ${label} - ${reason}`);
+    }
+  }
+
+  console.log('─'.repeat(CONSTANTS.DISPLAY.SEPARATOR_LENGTH));
 
   return { labelsToAdd, labelsToRemove };
 }

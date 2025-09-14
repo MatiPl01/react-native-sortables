@@ -3,10 +3,21 @@
 /**
  * PR Labeler Action
  * Labels PRs based on both title prefix AND file changes
+ *
+ * @fileoverview Main entry point for the PR Labeler GitHub Action
+ * @author Mateusz Łopaciński
+ * @version 1.0.0
  */
 
 const { context, getOctokit } = require('@actions/github');
-const { loadConfiguration, validateConfiguration } = require('./utils/config');
+const {
+  validateEnvironment,
+  loadAndValidateConfig,
+  logCurrentState,
+  logTitleAnalysis,
+  logFileAnalysis,
+  logSummary
+} = require('./utils/helpers');
 const {
   addLabels,
   getChangedFiles,
@@ -20,66 +31,34 @@ const {
 } = require('./utils/labelAnalyzer');
 
 /**
- * Validate environment variables and GitHub context
- */
-function validateEnvironment() {
-  const githubToken = process.env.GITHUB_TOKEN;
-
-  if (!githubToken) {
-    console.error('❌ Missing GITHUB_TOKEN environment variable');
-    process.exit(1);
-  }
-
-  if (!context.payload.pull_request) {
-    console.error('❌ No pull request found in context');
-    process.exit(1);
-  }
-
-  return githubToken;
-}
-
-/**
- * Load and validate configuration
- */
-function loadAndValidateConfig() {
-  const configFilePath = process.env.CONFIG_FILE || 'labeler-config.yml';
-  const config = loadConfiguration(configFilePath);
-  validateConfiguration(config);
-  return config;
-}
-
-/**
- * Analyze PR and determine label changes
+ * Analyzes PR and determines which labels should be added or removed
+ *
+ * @param {Object} octokit - GitHub API client
+ * @param {Object} pr - Pull request object from GitHub context
+ * @param {Object} config - Labeler configuration object
+ * @returns {Promise<Object>} Analysis results with labels to add/remove
  */
 async function analyzePR(octokit, pr, config) {
   // Get current state
   const currentLabels = getCurrentLabels();
   const changedFiles = await getChangedFiles(octokit);
 
-  console.log(`🔍 Current labels: [${Array.from(currentLabels).join(', ')}]`);
-  console.log(`📁 Changed files: [${changedFiles.join(', ')}]`);
+  // Log current state
+  logCurrentState(currentLabels, changedFiles);
 
   // Find labels based on title prefix
   const titleLabelInfo = findMatchingTitleLabel(
     pr.title,
     config.titleMappings || []
   );
-  if (titleLabelInfo) {
-    console.log(
-      `🎯 Found title prefix -> applying label "${titleLabelInfo.label}" (${titleLabelInfo.reason})`
-    );
-  } else {
-    console.log(`📝 No matching title prefix found`);
-  }
+  logTitleAnalysis(titleLabelInfo);
 
   // Find labels based on file changes
   const fileLabelInfos = findMatchingFileLabels(
     changedFiles,
     config.fileMappings || []
   );
-  console.log(
-    `📁 File-based labels: [${fileLabelInfos.map(info => `${info.label} (${info.reason})`).join(', ')}]`
-  );
+  logFileAnalysis(fileLabelInfos);
 
   // Determine which labels need to be updated
   const { labelsToAdd, labelsToRemove } = determineLabelUpdates(
@@ -93,13 +72,18 @@ async function analyzePR(octokit, pr, config) {
 }
 
 /**
- * Apply label changes to the PR
+ * Applies label changes to the PR (removes outdated, adds new)
+ *
+ * @param {Object} octokit - GitHub API client
+ * @param {string[]} labelsToAdd - Array of labels to add
+ * @param {string[]} labelsToRemove - Array of labels to remove
+ * @returns {Promise<void>}
  */
 async function applyLabelChanges(octokit, labelsToAdd, labelsToRemove) {
   // Remove outdated labels first
   if (labelsToRemove.length > 0) {
     console.log(
-      `🗑️ Removing ${labelsToRemove.length} labels: [${labelsToRemove.join(', ')}]`
+      `\n🗑️ Removing ${labelsToRemove.length} outdated label(s): [${labelsToRemove.join(', ')}]`
     );
     await removeLabels(octokit, labelsToRemove);
   }
@@ -107,32 +91,16 @@ async function applyLabelChanges(octokit, labelsToAdd, labelsToRemove) {
   // Add new labels
   if (labelsToAdd.length > 0) {
     console.log(
-      `➕ Adding ${labelsToAdd.length} labels: [${labelsToAdd.join(', ')}]`
+      `\n➕ Adding ${labelsToAdd.length} new label(s): [${labelsToAdd.join(', ')}]`
     );
     await addLabels(octokit, labelsToAdd);
   }
 }
 
 /**
- * Log completion summary
- */
-function logSummary(titleLabelInfo, fileLabelInfos) {
-  const finalTargetLabels = [
-    ...(titleLabelInfo ? [titleLabelInfo.label] : []),
-    ...fileLabelInfos.map(info => info.label)
-  ];
-
-  if (finalTargetLabels.length > 0) {
-    console.log(
-      `🎉 PR Labeler completed! Final labels: [${finalTargetLabels.join(', ')}]`
-    );
-  } else {
-    console.log('🎉 PR Labeler completed! No labels to apply.');
-  }
-}
-
-/**
- * Main execution function
+ * Main execution function - orchestrates the entire labeling process
+ *
+ * @returns {Promise<void>}
  */
 async function run() {
   try {
