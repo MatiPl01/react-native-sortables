@@ -5,5 +5,5 @@
     "jest.config.ts",
     "packages/react-native-sortables/jest.setup.js"
   ],
-  "exclude": ["example", "**/dist"]
+  "exclude": ["example", "**/dist", ".github/actions"]
 }

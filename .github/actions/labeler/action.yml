@@ -1,0 +1,31 @@
+name: 'PR Labeler'
+description: 'Labels PRs based on both title prefix AND file changes'
+author: 'Mateusz Łopaciński (https://github.com/MatiPl01)'
+# Uses environment variables:
+# GITHUB_TOKEN: GitHub token for API access
+# CONFIG_FILE: Path to the labeler configuration file (default: labeler-config.yml)
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+        cache-dependency-path: '.github/actions/labeler/yarn.lock'
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: .github/actions/labeler
+      run: |
+        echo "📦 Installing dependencies for PR Labeler..."
+        yarn install --immutable
+        echo "✅ Dependencies installed successfully"
+
+    - name: Run labeler
+      shell: bash
+      working-directory: .github/actions/labeler
+      run: node index.js
+      env:
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+        CONFIG_FILE: ${{ env.CONFIG_FILE }}

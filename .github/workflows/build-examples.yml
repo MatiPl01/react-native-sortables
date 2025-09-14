@@ -89,7 +89,7 @@ jobs:
 
       - name: 🍎 Setup Ruby (iOS only)
         if: matrix.platform == 'ios'
-        uses: ruby/setup-ruby@v2
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
           bundler-cache: true
@@ -107,7 +107,7 @@ jobs:
 
       - name: 🤖 Setup Android SDK (Android only)
         if: matrix.platform == 'android'
-        uses: android-actions/setup-android@v4
+        uses: android-actions/setup-android@v3
 
       - name: 🍎 Install pods (iOS only)
         if: matrix.platform == 'ios'
