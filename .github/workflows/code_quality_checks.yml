@@ -9,16 +9,17 @@ on:
       - main
 
 jobs:
-  check:
+  circular-deps:
+    name: 🔄 Circular Dependencies
     runs-on: ubuntu-latest
     steps:
       - name: 🛒 Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
           cache: 'yarn'
 
       - name: 📦 Install dependencies
@@ -28,14 +29,78 @@ jobs:
         working-directory: packages/react-native-sortables
         run: yarn circular-dependency-check
 
+  typecheck:
+    name: 🔎 TypeScript Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
       - name: 🔎 Run typecheck
         run: yarn typecheck
+
+  lint:
+    name: 🧹 ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
 
       - name: 🧹 Run lint
         run: yarn lint
 
+  format:
+    name: 🎨 Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
       - name: 🎨 Run Prettier check
         run: yarn format:check
+
+  test:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
 
       - name: 🧪 Run tests
         run: yarn test

@@ -5,6 +5,7 @@
     "@types/eslint": "^9.6.1",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.9",
+    "concurrently": "^8.2.2",
     "eslint": "^9.28.0",
     "eslint-config-react-native-matipl01": "^3.2.0",
     "husky": "^9.1.4",
@@ -47,8 +48,8 @@
     "pod": "yarn workspaces foreach -A -p run pod",
     "postinstall": "yarn husky:install",
     "prepare": "husky",
-    "test": "yarn lib test && yarn example:app test",
-    "typecheck": "yarn lib typecheck && yarn example:app typecheck"
+    "test": "concurrently 'yarn lib test' 'yarn example:app test'",
+    "typecheck": "concurrently 'yarn lib typecheck' 'yarn example:app typecheck'"
   },
   "type": "module",
   "workspaces": {
