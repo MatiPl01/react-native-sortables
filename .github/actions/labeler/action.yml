@@ -1,9 +1,9 @@
-name: "PR Labeler"
-description: "Labels PRs based on both title prefix AND file changes"
-author: "Mateusz Łopaciński (https://github.com/MatiPl01)"
+name: 'PR Labeler'
+description: 'Labels PRs based on both title prefix AND file changes'
+author: 'Mateusz Łopaciński (https://github.com/MatiPl01)'
 # Uses environment variables:
 # GITHUB_TOKEN: GitHub token for API access
 # CONFIG_FILE: Path to the labeler configuration file (default: labeler-config.yml)
 runs:
-  using: "node20"
-  main: "index.js"
+  using: 'node20'
+  main: 'index.js'
