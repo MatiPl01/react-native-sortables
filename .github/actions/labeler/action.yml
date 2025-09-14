@@ -12,9 +12,11 @@ runs:
       with:
         node-version: '20'
         cache: 'yarn'
+        cache-dependency-path: '.github/actions/labeler/yarn.lock'
 
     - name: Install dependencies
       shell: bash
+      working-directory: .github/actions/labeler
       run: |
         echo "📦 Installing dependencies for PR Labeler..."
         yarn install --immutable
@@ -22,6 +24,7 @@ runs:
 
     - name: Run labeler
       shell: bash
+      working-directory: .github/actions/labeler
       run: node index.js
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
