@@ -11,70 +11,70 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Get labels that were added by this action using a simple file-based cache
+ * Get labels that were likely added by this action using a conservative approach
+ * Since we can't rely on persistent storage, we'll use a smart heuristic:
+ * 1. Only consider labels that are in our configuration
+ * 2. Only consider labels added by GitHub Actions recently
+ * 3. Be conservative - only remove when we're confident
  */
-async function getLabelsAddedByAction(owner, repo, issueNumber) {
+async function getLabelsAddedByAction(
+  octokit,
+  owner,
+  repo,
+  issueNumber,
+  labelMappings
+) {
   try {
-    const cacheDir = '/tmp/pr-title-labeler-cache';
-    const cacheFile = path.join(
-      cacheDir,
-      `${owner}-${repo}-${issueNumber}.json`
-    );
-
-    // Ensure cache directory exists
-    if (!fs.existsSync(cacheDir)) {
-      fs.mkdirSync(cacheDir, { recursive: true });
-    }
-
-    // Try to read from cache file
-    if (fs.existsSync(cacheFile)) {
-      const cacheData = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
-      const labels = new Set(cacheData.labels || []);
-      console.log(
-        `💾 Retrieved from cache: [${Array.from(labels).join(', ')}]`
-      );
-      return labels;
-    }
-
-    console.log('💾 No cache found, starting fresh');
-    return new Set();
-  } catch (error) {
-    console.log('⚠️ Could not retrieve cache:', error.message);
-    return new Set();
-  }
-}
-
-/**
- * Save labels that were added by this action to file-based cache
- */
-async function saveLabelsAddedByAction(owner, repo, issueNumber, labels) {
-  try {
-    const cacheDir = '/tmp/pr-title-labeler-cache';
-    const cacheFile = path.join(
-      cacheDir,
-      `${owner}-${repo}-${issueNumber}.json`
-    );
-
-    // Ensure cache directory exists
-    if (!fs.existsSync(cacheDir)) {
-      fs.mkdirSync(cacheDir, { recursive: true });
-    }
-
-    // Create cache data
-    const cacheData = {
-      labels: Array.from(labels),
-      timestamp: new Date().toISOString(),
+    const events = await octokit.rest.issues.listEvents({
       owner,
       repo,
-      issueNumber
-    };
+      issue_number: issueNumber,
+      per_page: 100
+    });
 
-    // Write to cache file
-    fs.writeFileSync(cacheFile, JSON.stringify(cacheData, null, 2));
+    const labelsAddedByAction = new Set();
+    const configuredLabels = new Set(
+      labelMappings.map(mapping => mapping.label)
+    );
 
-    console.log(`💾 Saved to cache: [${Array.from(labels).join(', ')}]`);
+    console.log(
+      `🔍 Checking ${events.data.length} events for labels added by this action...`
+    );
+    console.log(
+      `📋 Configured labels: [${Array.from(configuredLabels).join(', ')}]`
+    );
+
+    // Look for "labeled" events that were created by GitHub Actions
+    for (const event of events.data) {
+      if (event.event === 'labeled' && event.label?.name) {
+        const actorLogin = event.actor?.login;
+
+        console.log(
+          `📋 Found labeled event: "${event.label.name}" by "${actorLogin || 'unknown'}"`
+        );
+
+        // Conservative approach: only consider labels that:
+        // 1. Are in our configuration (could have been added by this action)
+        // 2. Were added by GitHub Actions bot
+        if (
+          actorLogin === 'github-actions[bot]' &&
+          configuredLabels.has(event.label.name)
+        ) {
+          labelsAddedByAction.add(event.label.name);
+          console.log(
+            `✅ Added "${event.label.name}" to action-added labels (configured + GitHub Actions)`
+          );
+        }
+      }
+    }
+
+    console.log(
+      `📊 Labels added by this action: [${Array.from(labelsAddedByAction).join(', ')}]`
+    );
+    return labelsAddedByAction;
   } catch (error) {
-    console.log('⚠️ Could not save cache:', error.message);
+    console.log('⚠️ Could not fetch issue events:', error.message);
+    return new Set();
   }
 }
 
@@ -267,7 +267,7 @@ async function run() {
     // Get current state
     const [currentLabels, labelsAddedByAction] = await Promise.all([
       getCurrentLabels(octokit, owner, repo, pr.number),
-      getLabelsAddedByAction(owner, repo, pr.number)
+      getLabelsAddedByAction(octokit, owner, repo, pr.number, labelMappings)
     ]);
 
     // Check if target label already exists
@@ -295,26 +295,6 @@ async function run() {
     } else if (!targetLabel) {
       logNoMatchingPrefix(pr.title, labelMappings);
     }
-
-    // Update cache with current state
-    const newLabelsAddedByAction = new Set(labelsAddedByAction);
-
-    // Remove labels that were removed from the PR
-    for (const removedLabel of labelsToRemove) {
-      newLabelsAddedByAction.delete(removedLabel);
-    }
-
-    // Add new label if it was added by this action
-    if (targetLabel && !currentLabels.has(targetLabel)) {
-      newLabelsAddedByAction.add(targetLabel);
-    }
-
-    await saveLabelsAddedByAction(
-      owner,
-      repo,
-      pr.number,
-      newLabelsAddedByAction
-    );
 
     console.log('🎉 PR title labeler completed successfully!');
   } catch (error) {
