@@ -27,13 +27,12 @@ export default function useItemPanGesture(
           handleTouchesMove(e, manager.fail);
         })
         .onTouchesCancelled((_, manager) => {
+          handleDragEnd(key, activationAnimationProgress);
           manager.fail();
         })
         .onTouchesUp((_, manager) => {
-          manager.end();
-        })
-        .onFinalize(() => {
           handleDragEnd(key, activationAnimationProgress);
+          manager.end();
         }),
     [
       handleDragEnd,
