@@ -174,6 +174,7 @@ export default function useItemLayout(
       progress: activationAnimationProgress.value
     }),
     ({ active, itemPosition, progress }, prev) => {
+      console.log('???', key, active, itemPosition, progress);
       if (!itemPosition || active) {
         interpolationStartValues.value = null;
         return;
@@ -189,7 +190,10 @@ export default function useItemLayout(
         areVectorsDifferent(prev.itemPosition, itemPosition, 1);
 
       if (progress === 0) {
-        if (interpolationStartValues.value) {
+        // interpolationStartValues value is not set when the reduced motion
+        // is enabled as the progress value changes immediately from 1 to 0
+        // and the second if branch below is never entered
+        if (interpolationStartValues.value || prev?.active) {
           interpolationStartValues.value = null;
           position.value = itemPosition;
           return;
