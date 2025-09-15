@@ -508,9 +508,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const ctx = context.value;
       clearAnimatedTimeout(ctx.activationTimeoutId);
 
-      const fromIndex = ctx.dragStartIndex;
-      const toIndex = keyToIndex.value[key]!;
-
       ctx.touchStartTouch = null;
       currentTouch.value = null;
       activationState.value = DragActivationState.INACTIVE;
@@ -527,6 +524,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       if (multiZoneActiveItemDimensions) {
         multiZoneActiveItemDimensions.value = null;
       }
+
+      const fromIndex = ctx.dragStartIndex;
+      const toIndex = keyToIndex.value[key]!;
 
       prevActiveItemKey.value = activeItemKey.value;
       ctx.dragStartItemTouchOffset = null;
