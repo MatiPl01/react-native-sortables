@@ -1,3 +1,11 @@
+## [1.9.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.0...v1.9.1) (2025-09-15)
+
+
+### Bug Fixes
+
+* Active item getting stuck on iOS 26 ([#494](https://github.com/MatiPl01/react-native-sortables/issues/494)) ([55b5269](https://github.com/MatiPl01/react-native-sortables/commit/55b5269f8f69ebba8cf0a8aa73b72f09b6265aeb))
+* Invalid item position after release in reduced motion ([#495](https://github.com/MatiPl01/react-native-sortables/issues/495)) ([9ebee4c](https://github.com/MatiPl01/react-native-sortables/commit/9ebee4c55f42cb9dc87733dfa3155e0d4968f073))
+
 # [1.9.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.8.0...v1.9.0) (2025-09-13)
 
 
