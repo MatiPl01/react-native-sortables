@@ -174,7 +174,6 @@ export default function useItemLayout(
       progress: activationAnimationProgress.value
     }),
     ({ active, itemPosition, progress }, prev) => {
-      console.log('???', key, active, itemPosition, progress);
       if (!itemPosition || active) {
         interpolationStartValues.value = null;
         return;
