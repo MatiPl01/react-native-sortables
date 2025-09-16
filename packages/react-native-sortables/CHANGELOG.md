@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.1...v1.9.2) (2025-09-16)
+
+
+### Bug Fixes
+
+* Remove extraneous console.log ([#496](https://github.com/MatiPl01/react-native-sortables/issues/496)) ([4dbabd9](https://github.com/MatiPl01/react-native-sortables/commit/4dbabd978307232d45f269cf5fa59fced5a0f745))
+
 ## [1.9.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.0...v1.9.1) (2025-09-15)
 
 
