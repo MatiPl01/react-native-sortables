@@ -8,6 +8,9 @@ export type Store<I> = {
 
   getNode: (key: string) => ReactNode | undefined;
   subscribeItem: (key: string, listener: () => void) => () => void;
+  subscribeItems: (
+    listener: (updatedItemKeys: Array<string>) => void
+  ) => () => void;
 
   update: (
     entries: Array<[key: string, item: I]>,
@@ -28,6 +31,7 @@ export function createItemsStore<I>(
 
   const keyListeners = new Set<() => void>();
   const itemListeners = new Map<string, Set<() => void>>();
+  const itemsListeners = new Set<(updatedItemKeys: Array<string>) => void>();
 
   // Track the renderer to detect changes
   let currentRenderer: RenderItem<I> | undefined = initialRenderItem;
@@ -48,6 +52,19 @@ export function createItemsStore<I>(
       set.delete(listener);
       if (!set.size) itemListeners.delete(key);
     };
+  };
+
+  const subscribeItems = (
+    listener: (updatedItemKeys: Array<string>) => void
+  ) => {
+    itemsListeners.add(listener);
+
+    // Notify immediately with current items if any exist
+    if (keys.length > 0) {
+      queueMicrotask(() => listener([...keys]));
+    }
+
+    return () => itemsListeners.delete(listener);
   };
 
   // Core logic for init + updates
@@ -74,7 +91,7 @@ export function createItemsStore<I>(
       keys = nextKeys;
     }
 
-    const touched = new Set<string>();
+    const updatedItemKeys = new Set<string>();
 
     entries.forEach(([k, item], index) => {
       const prev = meta.get(k);
@@ -86,16 +103,24 @@ export function createItemsStore<I>(
       const info = { index, item };
       meta.set(k, info);
       nodes.set(k, renderItem ? renderItem(info) : (item as ReactNode));
-      touched.add(k);
+      updatedItemKeys.add(k);
     });
 
     if (!notify) return;
 
     if (keysChanged) keyListeners.forEach(fn => fn());
-    touched.forEach(k => {
+    updatedItemKeys.forEach(k => {
       const subs = itemListeners.get(k);
       if (subs) subs.forEach(fn => fn());
     });
+
+    // Notify items listeners if any items changed
+    if (updatedItemKeys.size > 0) {
+      const updatedItemKeysArray = Array.from(updatedItemKeys);
+      queueMicrotask(() => {
+        itemsListeners.forEach(fn => fn(updatedItemKeysArray));
+      });
+    }
   }
 
   // Initial snapshot (sync), no notifications
@@ -104,5 +129,12 @@ export function createItemsStore<I>(
   const update: Store<I>['update'] = (entries, renderItem) =>
     apply(entries, renderItem, true);
 
-  return { getKeys, getNode, subscribeItem, subscribeKeys, update };
+  return {
+    getKeys,
+    getNode,
+    subscribeItem,
+    subscribeItems,
+    subscribeKeys,
+    update
+  };
 }

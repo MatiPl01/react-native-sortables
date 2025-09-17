@@ -44,6 +44,9 @@ export type ItemsContextType = {
   subscribeKeys: (callback: () => void) => () => void;
   getNode: (key: string) => ReactNode | undefined;
   subscribeItem: (key: string, callback: () => void) => () => void;
+  subscribeItems: (
+    callback: (updatedItemKeys: Array<string>) => void
+  ) => () => void;
 };
 
 // COMMON VALUES
@@ -102,11 +105,9 @@ export type CommonValuesContextType =
 // MEASUREMENTS
 
 export type MeasurementsContextType = {
-  handleItemMeasurement: (key: string, dimensions: Dimensions) => void;
-  removeItemMeasurements: (key: string) => void;
+  updateItemRef: (key: string, instance: null | View) => void;
   handleContainerMeasurement: (width: number, height: number) => void;
   applyControlledContainerDimensions: (dimensions: Partial<Dimensions>) => void;
-  resetMeasurements: () => void;
 };
 
 // AUTO SCROLL

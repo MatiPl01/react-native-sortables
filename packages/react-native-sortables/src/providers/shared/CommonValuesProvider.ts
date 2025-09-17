@@ -93,10 +93,19 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const controlledItemHeight = useDerivedValue(() =>
       typeof itemHeights.value === 'number' ? itemHeights.value : undefined
     );
-    const controlledItemDimensionsStyle = useAnimatedStyle<ViewStyle>(() => ({
-      height: controlledItemHeight.value,
-      width: controlledItemWidth.value
-    }));
+    const controlledItemDimensionsStyle = useAnimatedStyle<ViewStyle>(() => {
+      console.log(
+        'controlledItemDimensionsStyle',
+        controlledItemWidth.value,
+        controlledItemHeight.value
+      );
+      return {
+        height: controlledItemHeight.value,
+        maxHeight: controlledItemHeight.value,
+        maxWidth: controlledItemWidth.value,
+        width: controlledItemWidth.value
+      };
+    });
 
     // DRAG STATE
     const activeItemKey = useMutableValue<null | string>(null);

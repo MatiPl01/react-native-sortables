@@ -1,9 +1,8 @@
-import { Fragment, memo, useCallback, useEffect, useState } from 'react';
-import type { LayoutChangeEvent } from 'react-native';
+import { Fragment, memo, useCallback, useState } from 'react';
+import type { View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import {
   LayoutAnimationConfig,
-  runOnUI,
   useDerivedValue
 } from 'react-native-reanimated';
 
@@ -16,7 +15,6 @@ import {
   ItemContextProvider,
   ItemOutlet,
   useCommonValuesContext,
-  useDragContext,
   useItemLayout,
   useItemPanGesture,
   useMeasurementsContext,
@@ -40,9 +38,7 @@ function DraggableView({
 }: DraggableViewProps) {
   const portalContext = usePortalContext();
   const commonValuesContext = useCommonValuesContext();
-  const { handleItemMeasurement, removeItemMeasurements } =
-    useMeasurementsContext();
-  const { handleDragEnd } = useDragContext();
+  const { updateItemRef } = useMeasurementsContext();
   const { activeItemKey, customHandle } = commonValuesContext;
 
   const [isHidden, setIsHidden] = useState(false);
@@ -55,22 +51,9 @@ function DraggableView({
   );
   const gesture = useItemPanGesture(key, activationAnimationProgress);
 
-  useEffect(() => {
-    return () => {
-      removeItemMeasurements(key);
-      runOnUI(() => {
-        handleDragEnd(key, activationAnimationProgress);
-      })();
-    };
-  }, [activationAnimationProgress, handleDragEnd, key, removeItemMeasurements]);
-
-  const onLayout = useCallback(
-    ({
-      nativeEvent: {
-        layout: { height, width }
-      }
-    }: LayoutChangeEvent) => handleItemMeasurement(key, { height, width }),
-    [handleItemMeasurement, key]
+  const ref = useCallback(
+    (instance: null | View) => updateItemRef(key, instance),
+    [key, updateItemRef]
   );
 
   const renderItemCell = (hidden = false) => {
@@ -84,7 +67,7 @@ function DraggableView({
         isActive={isActive}
         itemKey={key}
         layoutStyleValue={layoutStyleValue}
-        onLayout={onLayout}>
+        ref={ref}>
         <LayoutAnimationConfig skipEntering={false} skipExiting={false}>
           <ItemOutlet itemKey={key} />
         </LayoutAnimationConfig>

@@ -1,10 +1,6 @@
 import type { PropsWithChildren } from 'react';
-import {
-  type LayoutChangeEvent,
-  Platform,
-  StyleSheet,
-  type ViewStyle
-} from 'react-native';
+import type { View, ViewStyle } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import type { SharedValue, TransformArrayItem } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
@@ -14,7 +10,7 @@ import type {
   LayoutAnimation
 } from '../../../integrations/reanimated';
 import { useCommonValuesContext, useItemDecoration } from '../../../providers';
-import AnimatedOnLayoutView from '../AnimatedOnLayoutView';
+import { componentWithRef } from '../../../utils/react';
 
 type TransformsArray = Array<TransformArrayItem>;
 
@@ -27,21 +23,22 @@ export type ItemCellProps = PropsWithChildren<{
   hidden?: boolean;
   entering?: LayoutAnimation;
   exiting?: LayoutAnimation;
-  onLayout?: (event: LayoutChangeEvent) => void;
 }>;
 
-export default function ItemCell({
-  activationAnimationProgress,
-  baseStyle,
-  children,
-  entering,
-  exiting,
-  hidden,
-  isActive,
-  itemKey,
-  layoutStyleValue,
-  onLayout
-}: ItemCellProps) {
+const ItemCell = componentWithRef<View, ItemCellProps>(function ItemCell(
+  {
+    activationAnimationProgress,
+    baseStyle,
+    children,
+    entering,
+    exiting,
+    hidden,
+    isActive,
+    itemKey,
+    layoutStyleValue
+  },
+  ref
+) {
   const { controlledItemDimensionsStyle } = useCommonValuesContext();
 
   const decorationStyleValue = useItemDecoration(
@@ -50,29 +47,29 @@ export default function ItemCell({
     activationAnimationProgress
   );
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      ...decorationStyleValue.value,
-      ...layoutStyleValue.value,
-      transform: [
-        ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
-        ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
-      ]
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    ...decorationStyleValue.value,
+    ...layoutStyleValue.value,
+    transform: [
+      ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
+      ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
+    ]
+  }));
 
   return (
     <Animated.View style={[baseStyle, styles.decoration, animatedStyle]}>
-      <AnimatedOnLayoutView
+      <Animated.View
         entering={entering}
         exiting={exiting}
-        style={[controlledItemDimensionsStyle, hidden && styles.hidden]}
-        onLayout={onLayout}>
+        ref={ref}
+        style={[controlledItemDimensionsStyle, hidden && styles.hidden]}>
         {children}
-      </AnimatedOnLayoutView>
+      </Animated.View>
     </Animated.View>
   );
-}
+});
+
+export default ItemCell;
 
 const styles = StyleSheet.create({
   decoration: Platform.select<ViewStyle>({

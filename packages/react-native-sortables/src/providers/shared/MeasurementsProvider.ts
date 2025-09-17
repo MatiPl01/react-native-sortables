@@ -1,39 +1,18 @@
-import { useCallback, useRef } from 'react';
-import type { SharedValue } from 'react-native-reanimated';
+import { useCallback, useEffect, useRef } from 'react';
+import type { View } from 'react-native';
 import { runOnUI } from 'react-native-reanimated';
 
-import { useStableCallback } from '../../hooks';
-import {
-  setAnimatedTimeout,
-  useAnimatedDebounce,
-  useMutableValue
-} from '../../integrations/reanimated';
-import type {
-  Dimension,
-  Dimensions,
-  ItemSizes,
-  MeasurementsContextType
-} from '../../types';
-import { areValuesDifferent, resolveDimension } from '../../utils';
+import { setAnimatedTimeout } from '../../integrations/reanimated';
+import type { Dimensions, MeasurementsContextType } from '../../types';
+import { areValuesDifferent } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
 import { useItemsContext } from './ItemsProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 
-type StateContextType = {
-  measuredItemKeys: Set<string>;
-  queuedMeasurements: Map<string, Dimensions>;
-};
-
-type MeasurementsProviderProps = {
-  measureDebounceDelay: number;
-};
-
 const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   'Measurements'
-)<MeasurementsProviderProps, MeasurementsContextType>(({
-  measureDebounceDelay
-}) => {
+)<Record<string, never>, MeasurementsContextType>(() => {
   const {
     activeItemDimensions,
     activeItemKey,
@@ -47,135 +26,114 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
     useMultiZoneContext() ?? {};
-  const { getKeys } = useItemsContext();
+  const { subscribeItems } = useItemsContext();
 
-  const context = useMutableValue<null | StateContextType>(null);
-  const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
-  const debounce = useAnimatedDebounce();
+  const prevItemDimensionsRef = useRef<Record<string, Dimensions>>({});
+  const itemRefs = useRef<Record<string, View>>({});
 
-  const handleItemMeasurement = useStableCallback(
-    (key: string, dimensions: Dimensions) => {
-      const prevDimensions = previousItemDimensionsRef.current[key];
-
-      const { height: isHeightControlled, width: isWidthControlled } =
-        controlledItemDimensions;
-      if (isWidthControlled && isHeightControlled) {
-        return;
-      }
-
-      const changedDimensions: Partial<Dimensions> = {};
-
-      if (
-        !isWidthControlled &&
-        areValuesDifferent(prevDimensions?.width, dimensions.width, 1)
-      ) {
-        changedDimensions.width = dimensions.width;
-      }
-      if (
-        !isHeightControlled &&
-        areValuesDifferent(prevDimensions?.height, dimensions.height, 1)
-      ) {
-        changedDimensions.height = dimensions.height;
-      }
-
-      if (!Object.keys(changedDimensions).length) {
-        return;
-      }
-
-      previousItemDimensionsRef.current[key] = dimensions;
-      const itemsCount = getKeys().length;
-
-      runOnUI(() => {
-        context.value ??= {
-          measuredItemKeys: new Set(),
-          queuedMeasurements: new Map()
+  const updateDimensionsUI = useCallback(
+    (
+      widthUpdates: null | Record<string, number>,
+      heightUpdates: null | Record<string, number>
+    ) => {
+      'worklet';
+      if (widthUpdates) {
+        itemWidths.value = {
+          ...(itemWidths.value as Record<string, number>),
+          ...widthUpdates
         };
-
-        const ctx = context.value;
-
-        const isNewItem =
-          !ctx.measuredItemKeys.has(key) &&
-          (resolveDimension(itemWidths.value, key) === null ||
-            resolveDimension(itemHeights.value, key) === null);
-
-        if (isNewItem) {
-          ctx.measuredItemKeys.add(key);
-        }
-
-        ctx.queuedMeasurements.set(key, dimensions);
-
-        if (activeItemKey.value === key) {
-          activeItemDimensions.value = dimensions;
-          if (multiZoneActiveItemDimensions) {
-            multiZoneActiveItemDimensions.value = dimensions;
-          }
-        }
-
-        // Update the array of item dimensions only after all items have been
-        // measured to reduce the number of times animated reactions are triggered
-        if (ctx.measuredItemKeys.size !== itemsCount) {
-          return;
-        }
-
-        const updateDimensions = () => {
-          const updateDimension = (
-            dimension: Dimension,
-            sizes: SharedValue<ItemSizes>
-          ) => {
-            const newSizes = { ...(sizes.value as Record<string, number>) };
-            for (const [k, dims] of ctx.queuedMeasurements.entries()) {
-              newSizes[k] = dims[dimension];
-            }
-            sizes.value = newSizes;
-          };
-
-          if (!isWidthControlled) {
-            updateDimension('width', itemWidths);
-          }
-          if (!isHeightControlled) {
-            updateDimension('height', itemHeights);
-          }
-
-          ctx.queuedMeasurements.clear();
-          debounce.cancel();
+      }
+      if (heightUpdates) {
+        itemHeights.value = {
+          ...(itemHeights.value as Record<string, number>),
+          ...heightUpdates
         };
+      }
 
-        if (isNewItem || ctx.queuedMeasurements.size === itemsCount) {
-          // Update dimensions immediately to avoid unnecessary delays when:
-          // - measurements were triggered because of adding new items and all new items have been measured
-          // - all sortable container items' dimensions have changed (e.g. when someone creates collapsible
-          //   items which change their height when the user starts dragging them)
-          updateDimensions();
-        } else {
-          // In all other cases, debounce the update to reduce the number of
-          // updates when dimensions change many times within a short period of time
-          debounce.schedule(updateDimensions, measureDebounceDelay);
-        }
-      })();
-    }
-  );
-
-  const removeItemMeasurements = useCallback(
-    (key: string) => {
-      delete previousItemDimensionsRef.current[key];
-      const { height: isHeightControlled, width: isWidthControlled } =
-        controlledItemDimensions;
-      if (isWidthControlled && isHeightControlled) {
+      const activeKey = activeItemKey.value;
+      if (activeKey === null) {
         return;
       }
 
-      runOnUI(() => {
-        if (itemWidths.value && typeof itemWidths.value === 'object') {
-          delete itemWidths.value[key];
-        }
-        if (itemHeights.value && typeof itemHeights.value === 'object') {
-          delete itemHeights.value[key];
-        }
-        context.value?.measuredItemKeys.delete(key);
-      })();
+      const newHeight =
+        heightUpdates?.[activeKey] ?? activeItemDimensions.value?.height;
+      const newWidth =
+        widthUpdates?.[activeKey] ?? activeItemDimensions.value?.width;
+
+      if (newHeight === undefined || newWidth === undefined) {
+        return;
+      }
+
+      activeItemDimensions.value = {
+        height: newHeight,
+        width: newWidth
+      };
+      if (multiZoneActiveItemDimensions) {
+        multiZoneActiveItemDimensions.value = {
+          height: newHeight,
+          width: newWidth
+        };
+      }
     },
-    [controlledItemDimensions, itemHeights, itemWidths, context]
+    [
+      itemHeights,
+      itemWidths,
+      activeItemDimensions,
+      multiZoneActiveItemDimensions,
+      activeItemKey
+    ]
   );
+
+  useEffect(
+    () =>
+      subscribeItems(itemKeys => {
+        const updatedWidths: Record<string, number> = {};
+        let hasWidthUpdates = false;
+        const updatedHeights: Record<string, number> = {};
+        let hasHeightUpdates = false;
+
+        itemKeys.forEach(key => {
+          itemRefs.current[key]?.measure((_x, _y, width, height) => {
+            const prevDimensions = prevItemDimensionsRef.current[key];
+
+            if (
+              !controlledItemDimensions.width &&
+              (!prevDimensions ||
+                areValuesDifferent(prevDimensions.width, width, 1))
+            ) {
+              updatedWidths[key] = width;
+              hasWidthUpdates = true;
+            }
+            if (
+              !controlledItemDimensions.height &&
+              (!prevDimensions ||
+                areValuesDifferent(prevDimensions.height, height, 1))
+            ) {
+              updatedHeights[key] = height;
+              hasHeightUpdates = true;
+            }
+
+            prevItemDimensionsRef.current[key] = { height, width };
+          });
+        });
+
+        const widthUpdates = hasWidthUpdates ? updatedWidths : null;
+        const heightUpdates = hasHeightUpdates ? updatedHeights : null;
+
+        if (widthUpdates || heightUpdates) {
+          runOnUI(updateDimensionsUI)(widthUpdates, heightUpdates);
+        }
+      }),
+    [subscribeItems, itemRefs, updateDimensionsUI, controlledItemDimensions]
+  );
+
+  const updateItemRef = useCallback((key: string, instance: null | View) => {
+    if (instance) {
+      itemRefs.current[key] = instance;
+    } else {
+      delete itemRefs.current[key];
+    }
+  }, []);
 
   const handleContainerMeasurement = useCallback(
     (width: number, height: number) => {
@@ -222,26 +180,11 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     ]
   );
 
-  const resetMeasurements = useCallback(() => {
-    previousItemDimensionsRef.current = {};
-    runOnUI(() => {
-      context.value = null;
-      if (typeof itemWidths.value === 'object') {
-        itemWidths.value = null;
-      }
-      if (typeof itemHeights.value === 'object') {
-        itemHeights.value = null;
-      }
-    })();
-  }, [itemHeights, itemWidths, context]);
-
   return {
     value: {
       applyControlledContainerDimensions,
       handleContainerMeasurement,
-      handleItemMeasurement,
-      removeItemMeasurements,
-      resetMeasurements
+      updateItemRef
     }
   };
 });
