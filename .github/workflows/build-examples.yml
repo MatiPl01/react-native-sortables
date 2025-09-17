@@ -35,10 +35,6 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install --immutable
 
-      - name: 🌐 Install Expo dependencies
-        working-directory: example/expo
-        run: yarn install --immutable
-
       - name: 📱 Install Expo CLI
         run: npm install -g @expo/cli
 
@@ -81,10 +77,6 @@ jobs:
           cache: 'yarn'
 
       - name: 📦 Install dependencies
-        run: yarn install --immutable
-
-      - name: 📱 Install dependencies for ${{ matrix.app }}
-        working-directory: example/${{ matrix.app }}
         run: yarn install --immutable
 
       - name: 🍎 Setup Ruby (iOS only)
@@ -156,10 +148,6 @@ jobs:
           cache: 'yarn'
 
       - name: 📦 Install dependencies
-        run: yarn install --immutable
-
-      - name: 🌐 Install web dependencies
-        working-directory: example/web
         run: yarn install --immutable
 
       - name: 🌐 Build web app
