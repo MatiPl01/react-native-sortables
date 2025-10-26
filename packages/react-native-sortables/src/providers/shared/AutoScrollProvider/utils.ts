@@ -1,4 +1,3 @@
-'worklet';
 import type { ExtrapolationType } from 'react-native-reanimated';
 import { Extrapolation, interpolate } from 'react-native-reanimated';
 
@@ -11,6 +10,7 @@ export const calculateRawProgress = (
   maxOverscroll: [number, number],
   extrapolation: ExtrapolationType
 ) => {
+  'worklet';
   const startDistance = containerPos + contentBounds[0];
   const startBoundProgress = interpolate(
     startDistance,

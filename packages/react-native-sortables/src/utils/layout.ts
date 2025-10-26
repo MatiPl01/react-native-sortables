@@ -1,4 +1,3 @@
-'worklet';
 import type { Maybe } from '../helperTypes';
 import type { Dimensions, Offset, Vector } from '../types';
 import { gt, lt } from './equality';
@@ -8,6 +7,7 @@ const getOffsetDistance = (
   providedOffset: Offset,
   distance: number
 ): number => {
+  'worklet';
   if (typeof providedOffset === 'number') {
     return providedOffset;
   }
@@ -44,6 +44,7 @@ export const reorderInsert = (
   toIndex: number,
   fixedItemKeys: Record<string, boolean> | undefined
 ) => {
+  'worklet';
   toIndex = Math.min(toIndex, indexToKey.length - 1);
   const direction = toIndex > fromIndex ? -1 : 1;
   const fromKey = indexToKey[fromIndex]!;
@@ -75,6 +76,7 @@ export const reorderSwap = (
   fromIndex: number,
   toIndex: number
 ) => {
+  'worklet';
   if (toIndex > indexToKey.length - 1) {
     return indexToKey;
   }
@@ -83,8 +85,12 @@ export const reorderSwap = (
   return result;
 };
 
-const isValidCoordinate = (coordinate: number): boolean =>
-  !isNaN(coordinate) && coordinate > -Infinity && coordinate < Infinity;
+const isValidCoordinate = (coordinate: number): boolean => {
+  'worklet';
+  return !isNaN(coordinate) && coordinate > -Infinity && coordinate < Infinity;
+};
 
-export const isValidVector = (vector: Vector): boolean =>
-  isValidCoordinate(vector.x) && isValidCoordinate(vector.y);
+export const isValidVector = (vector: Vector): boolean => {
+  'worklet';
+  return isValidCoordinate(vector.x) && isValidCoordinate(vector.y);
+};

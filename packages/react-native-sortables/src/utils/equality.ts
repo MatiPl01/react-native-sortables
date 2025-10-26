@@ -2,22 +2,33 @@
 import type { AnyRecord, Maybe } from '../helperTypes';
 import type { Vector } from '../types';
 
-export const lt = (a: number, b: number): boolean => a < b;
-export const gt = (a: number, b: number): boolean => a > b;
+export const lt = (a: number, b: number): boolean => {
+  'worklet';
+  return a < b;
+};
+export const gt = (a: number, b: number): boolean => {
+  'worklet';
+  return a > b;
+};
 
 export const areArraysDifferent = <T>(
   arr1: Array<T>,
   arr2: Array<T>,
   areEqual = (a: T, b: T): boolean => a === b
-): boolean =>
-  arr1.length !== arr2.length ||
-  arr1.some((item, index) => !areEqual(item, arr2[index] as T));
+): boolean => {
+  'worklet';
+  return (
+    arr1.length !== arr2.length ||
+    arr1.some((item, index) => !areEqual(item, arr2[index] as T))
+  );
+};
 
 export const areValuesDifferent = (
   dim1: number | undefined,
   dim2: number | undefined,
   eps?: number
 ): boolean => {
+  'worklet';
   if (dim1 === undefined) {
     return dim2 !== undefined;
   }
@@ -36,14 +47,19 @@ export const areVectorsDifferent = (
   vec1: Vector,
   vec2: Vector,
   eps?: number
-): boolean =>
-  areValuesDifferent(vec1.x, vec2.x, eps) ||
-  areValuesDifferent(vec1.y, vec2.y, eps);
+): boolean => {
+  'worklet';
+  return (
+    areValuesDifferent(vec1.x, vec2.x, eps) ||
+    areValuesDifferent(vec1.y, vec2.y, eps)
+  );
+};
 
 export const haveEqualPropValues = <T extends AnyRecord>(
   obj1: Maybe<T>,
   obj2: Maybe<T>
 ): boolean => {
+  'worklet';
   if (!obj1 || !obj2) {
     return false;
   }
