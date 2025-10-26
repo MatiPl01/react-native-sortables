@@ -2341,7 +2341,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated (3.19.1):
+  - RNReanimated (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2368,11 +2368,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.19.1)
-    - RNReanimated/worklets (= 3.19.1)
+    - RNReanimated/reanimated (= 3.19.3)
+    - RNReanimated/worklets (= 3.19.3)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (3.19.1):
+  - RNReanimated/reanimated (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2399,10 +2399,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 3.19.1)
+    - RNReanimated/reanimated/apple (= 3.19.3)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (3.19.1):
+  - RNReanimated/reanimated/apple (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2431,7 +2431,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets (3.19.1):
+  - RNReanimated/worklets (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2458,10 +2458,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/worklets/apple (= 3.19.1)
+    - RNReanimated/worklets/apple (= 3.19.3)
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets/apple (3.19.1):
+  - RNReanimated/worklets/apple (3.19.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -2848,7 +2848,7 @@ SPEC CHECKSUMS:
   RNFlashList: aa7f4d103a58c6f5fadfdb01b160721bb00c7bff
   RNGestureHandler: 4e01eefc427d3af22b877fdb4f7bc826132daab6
   RNReactNativeHapticFeedback: c56813c4217519c6bff2f640a7d48f07c30902c2
-  RNReanimated: 5a3fd11083fc520b82b8dc944799b4730f36ac66
+  RNReanimated: f3d23875b1a9deb28166ca63cde4cf48072742d6
   RNScreens: 0d9918734aa4382a5c667fc4b3cc8de8b5e97911
   RNSVG: 3e87821b2215b30e19f90232247007e5c313a06c
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

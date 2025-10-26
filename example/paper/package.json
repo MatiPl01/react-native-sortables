@@ -4,7 +4,7 @@
   "dependencies": {
     "@shopify/flash-list": "1.8.3",
     "react-native": "0.81.4",
-    "react-native-reanimated": "3.19.1",
+    "react-native-reanimated": "3.19.3",
     "react-native-sortables": "workspace:*"
   },
   "installConfig": {
