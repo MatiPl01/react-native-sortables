@@ -42,7 +42,7 @@ export default function ItemCell({
   layoutStyleValue,
   onLayout
 }: ItemCellProps) {
-  const { controlledItemDimensionsStyle } = useCommonValuesContext();
+  const { overriddenCellDimensions } = useCommonValuesContext();
 
   const decorationStyleValue = useItemDecoration(
     itemKey,
@@ -50,23 +50,22 @@ export default function ItemCell({
     activationAnimationProgress
   );
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      ...decorationStyleValue.value,
-      ...layoutStyleValue.value,
-      transform: [
-        ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
-        ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
-      ]
-    };
-  });
+  const animatedCellStyle = useAnimatedStyle(() => ({
+    ...overriddenCellDimensions.value,
+    ...decorationStyleValue.value,
+    ...layoutStyleValue.value,
+    transform: [
+      ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
+      ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
+    ]
+  }));
 
   return (
-    <Animated.View style={[baseStyle, styles.decoration, animatedStyle]}>
+    <Animated.View style={[baseStyle, styles.decoration, animatedCellStyle]}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={[controlledItemDimensionsStyle, hidden && styles.hidden]}
+        style={hidden && styles.hidden}
         onLayout={onLayout}>
         {children}
       </AnimatedOnLayoutView>

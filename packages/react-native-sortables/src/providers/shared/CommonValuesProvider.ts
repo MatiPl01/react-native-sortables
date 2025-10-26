@@ -1,11 +1,8 @@
 import { type PropsWithChildren, useEffect, useMemo } from 'react';
-import type { View, ViewStyle } from 'react-native';
-import {
-  useAnimatedRef,
-  useAnimatedStyle,
-  useDerivedValue
-} from 'react-native-reanimated';
+import type { View } from 'react-native';
+import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
 
+import { EMPTY_OBJECT } from '../../constants';
 import type { Animatable } from '../../integrations/reanimated';
 import {
   useAnimatableValue,
@@ -87,16 +84,8 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       controlledItemDimensions.height ? null : {}
     );
     const activeItemDimensions = useMutableValue<Dimensions | null>(null);
-    const controlledItemWidth = useDerivedValue(() =>
-      typeof itemWidths.value === 'number' ? itemWidths.value : undefined
-    );
-    const controlledItemHeight = useDerivedValue(() =>
-      typeof itemHeights.value === 'number' ? itemHeights.value : undefined
-    );
-    const controlledItemDimensionsStyle = useAnimatedStyle<ViewStyle>(() => ({
-      height: controlledItemHeight.value,
-      width: controlledItemWidth.value
-    }));
+    const overriddenCellDimensions =
+      useMutableValue<Partial<Dimensions>>(EMPTY_OBJECT);
 
     // DRAG STATE
     const activeItemKey = useMutableValue<null | string>(null);
@@ -167,7 +156,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         containerWidth,
         controlledContainerDimensions,
         controlledItemDimensions,
-        controlledItemDimensionsStyle,
         customHandle,
         dragActivationDelay,
         dragActivationFailOffset,
@@ -182,6 +170,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         itemsLayoutTransitionMode,
         itemWidths,
         keyToIndex,
+        overriddenCellDimensions,
         prevActiveItemKey,
         shouldAnimateLayout,
         snapOffsetX,
