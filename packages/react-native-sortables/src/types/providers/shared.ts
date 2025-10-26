@@ -1,12 +1,11 @@
 import type { ReactNode } from 'react';
-import type { ScrollView, View, ViewStyle } from 'react-native';
+import type { ScrollView, View } from 'react-native';
 import type {
   GestureTouchEvent,
   GestureType
 } from 'react-native-gesture-handler';
 import type {
   AnimatedRef,
-  AnimatedStyle,
   MeasuredDimensions,
   SharedValue
 } from 'react-native-reanimated';
@@ -79,8 +78,8 @@ export type CommonValuesContextType =
       containerHeight: SharedValue<null | number>;
       itemWidths: SharedValue<ItemSizes>;
       itemHeights: SharedValue<ItemSizes>;
+      overriddenCellDimensions: SharedValue<Partial<Dimensions>>;
       activeItemDimensions: SharedValue<Dimensions | null>;
-      controlledItemDimensionsStyle: AnimatedStyle<ViewStyle>;
 
       // DRAG STATE
       prevActiveItemKey: SharedValue<null | string>;

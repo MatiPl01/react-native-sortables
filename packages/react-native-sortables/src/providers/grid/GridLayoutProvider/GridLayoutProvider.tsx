@@ -57,6 +57,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     itemHeights,
     itemPositions,
     itemWidths,
+    overriddenCellDimensions,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
@@ -134,6 +135,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       if (isVertical) {
         itemWidths.value = value;
+        overriddenCellDimensions.value = { width: value + mainGap.value };
       } else {
         itemHeights.value = value;
       }
