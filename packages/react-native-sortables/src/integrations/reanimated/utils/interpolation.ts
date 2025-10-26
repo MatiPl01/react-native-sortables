@@ -1,5 +1,3 @@
-'worklet';
-
 import { Extrapolation, interpolate } from 'react-native-reanimated';
 
 import type { Vector } from '../../../types/layout';
@@ -10,6 +8,7 @@ export const interpolateVector = (
   to: Vector,
   extrapolation?: Extrapolation
 ) => {
+  'worklet';
   const inputRange = [0, 1];
   const extrapolate = extrapolation ?? Extrapolation.CLAMP;
   return {

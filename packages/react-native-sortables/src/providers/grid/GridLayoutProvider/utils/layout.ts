@@ -1,4 +1,3 @@
-'worklet';
 import type {
   AutoOffsetAdjustmentProps,
   Coordinate,
@@ -18,6 +17,7 @@ export const calculateLayout = ({
   numGroups,
   startCrossOffset
 }: GridLayoutProps): GridLayout | null => {
+  'worklet';
   const mainGroupSize = (isVertical ? itemWidths : itemHeights) as
     | null
     | number;
@@ -102,6 +102,7 @@ export const calculateItemCrossOffset = ({
   itemKey,
   numGroups
 }: AutoOffsetAdjustmentProps): number => {
+  'worklet';
   let activeItemCrossOffset = 0;
   let currentGroupCrossSize = 0;
   let currentGroupCrossIndex = 0;
