@@ -135,7 +135,9 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       if (isVertical) {
         itemWidths.value = value;
-        overriddenCellDimensions.value = { width: value + mainGap.value };
+        overriddenCellDimensions.value = {
+          width: value + (IS_WEB ? 0 : mainGap.value)
+        };
       } else {
         itemHeights.value = value;
       }

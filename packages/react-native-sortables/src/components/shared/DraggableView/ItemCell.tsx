@@ -5,10 +5,14 @@ import {
   StyleSheet,
   type ViewStyle
 } from 'react-native';
-import type { SharedValue, TransformArrayItem } from 'react-native-reanimated';
+import type {
+  AnimatedStyle,
+  SharedValue,
+  TransformArrayItem
+} from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { HIDDEN_X_OFFSET } from '../../../constants';
+import { HIDDEN_X_OFFSET, IS_WEB } from '../../../constants';
 import type {
   AnimatedStyleProp,
   LayoutAnimation
@@ -51,21 +55,27 @@ export default function ItemCell({
   );
 
   const animatedCellStyle = useAnimatedStyle(() => ({
-    ...overriddenCellDimensions.value,
     ...decorationStyleValue.value,
     ...layoutStyleValue.value,
     transform: [
       ...((layoutStyleValue.value.transform ?? []) as TransformsArray),
       ...((decorationStyleValue.value.transform ?? []) as TransformsArray)
-    ]
+    ],
+    ...(!IS_WEB && overriddenCellDimensions.value)
   }));
+
+  let innerAnimatedStyle: AnimatedStyle | undefined;
+  if (IS_WEB) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    innerAnimatedStyle = useAnimatedStyle(() => overriddenCellDimensions.value);
+  }
 
   return (
     <Animated.View style={[baseStyle, styles.decoration, animatedCellStyle]}>
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={hidden && styles.hidden}
+        style={[styles.inner, innerAnimatedStyle, hidden && styles.hidden]}
         onLayout={onLayout}>
         {children}
       </AnimatedOnLayoutView>
@@ -93,5 +103,9 @@ const styles = StyleSheet.create({
     // affect item dimensions, etc., so the safest way is to put the item
     // far away from the viewport to hide it)
     left: HIDDEN_X_OFFSET
-  }
+  },
+  inner: Platform.select<ViewStyle>({
+    default: {},
+    web: { flex: 1 }
+  })
 });
