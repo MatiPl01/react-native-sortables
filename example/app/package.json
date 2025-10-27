@@ -21,7 +21,7 @@
     "react-native-worklets": "0.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
+    "@babel/core": "^7.28.5",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
     "@gorhom/portal": "^1.0.14",
