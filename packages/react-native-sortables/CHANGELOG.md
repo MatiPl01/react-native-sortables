@@ -1,3 +1,12 @@
+## [1.9.3](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.2...v1.9.3) (2025-10-27)
+
+
+### Bug Fixes
+
+* Entering layout animation flickering ([#509](https://github.com/MatiPl01/react-native-sortables/issues/509)) ([a088626](https://github.com/MatiPl01/react-native-sortables/commit/a08862661a89dfe21a14b6975feb97fc1fa80667))
+* Fix Tried to synchronously call a non-worklet function ([#507](https://github.com/MatiPl01/react-native-sortables/issues/507)) ([8d32a45](https://github.com/MatiPl01/react-native-sortables/commit/8d32a45fe6f4b4ab2e649b1d0029159f899dd552))
+* Grid layout issues on web ([#510](https://github.com/MatiPl01/react-native-sortables/issues/510)) ([dc9c3cd](https://github.com/MatiPl01/react-native-sortables/commit/dc9c3cd7cd2a03421960371d2d9a8f0e0ec7e721)), closes [#509](https://github.com/MatiPl01/react-native-sortables/issues/509)
+
 ## [1.9.2](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.1...v1.9.2) (2025-09-16)
 
 
