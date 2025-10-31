@@ -73,7 +73,8 @@ export const DEFAULT_SORTABLE_GRID_PROPS = {
   columns: 1,
   keyExtractor: defaultKeyExtractor,
   rowGap: 0,
-  strategy: 'insert'
+  strategy: 'insert',
+  masonry: false
 } satisfies DefaultSortableGridProps;
 
 export const DEFAULT_SORTABLE_FLEX_PROPS = {
