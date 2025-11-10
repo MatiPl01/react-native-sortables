@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - 'example/**'
-      - 'packages/react-native-sortables/**'
-      - '.github/workflows/build-examples.yml'
+      - "example/**"
+      - "packages/react-native-sortables/**"
+      - ".github/workflows/build-examples.yml"
   workflow_dispatch: # Allow manual triggering
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: "20"
 
 jobs:
   # Build Expo app locally (no EAS required)
@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: 📦 Install dependencies
         run: yarn install --immutable
@@ -76,7 +76,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: 📦 Install dependencies
         run: yarn install --immutable
@@ -85,7 +85,7 @@ jobs:
         if: matrix.platform == 'ios'
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: "3.3"
           bundler-cache: true
 
       - name: 🍎 Select Xcode (iOS only)
@@ -96,8 +96,8 @@ jobs:
         if: matrix.platform == 'android'
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: 🤖 Setup Android SDK (Android only)
         if: matrix.platform == 'android'
@@ -147,7 +147,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: 📦 Install dependencies
         run: yarn install --immutable
