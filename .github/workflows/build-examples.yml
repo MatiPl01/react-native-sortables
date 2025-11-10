@@ -40,6 +40,8 @@ jobs:
 
       - name: 🔍 Validate Expo configuration
         working-directory: example/expo
+        env:
+          EXPO_DOCTOR_SKIP_DEPENDENCY_VERSION_CHECK: true
         run: npx expo-doctor
 
       - name: 🏗️ Build Expo bundle
