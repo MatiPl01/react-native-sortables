@@ -1,3 +1,11 @@
+## [1.9.4](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.3...v1.9.4) (2025-11-24)
+
+
+### Bug Fixes
+
+* Expo doctor check failures ([#516](https://github.com/MatiPl01/react-native-sortables/issues/516)) ([3b11dc7](https://github.com/MatiPl01/react-native-sortables/commit/3b11dc7dbbb2b3dbe06b8c11fade24f71a77fbff))
+* Webpack bundling issue caused by TurboModule import ([#522](https://github.com/MatiPl01/react-native-sortables/issues/522)) ([2c58bfd](https://github.com/MatiPl01/react-native-sortables/commit/2c58bfd51bf7bf6071a245c90247a7ba14c2d6cb))
+
 ## [1.9.3](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.2...v1.9.3) (2025-10-27)
 
 
