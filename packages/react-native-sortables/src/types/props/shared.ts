@@ -327,6 +327,10 @@ export type SharedProps = Simplify<
            * @default 'visible'
            */
           overflow: Overflow;
+          /** Whether to reorder items during drag gesture or after the active item is dropped
+           * @default true
+           */
+          reorderOnDrag: boolean;
           /** Enables debug mode to show additional visual helpers and console logs.
            * @note This only works in development builds and has no effect in production.
            * @default false
