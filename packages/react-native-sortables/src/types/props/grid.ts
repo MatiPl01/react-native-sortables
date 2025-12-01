@@ -136,6 +136,13 @@ export type SortableGridProps<I> = Simplify<
        * @important Works only for horizontal grids. Requires the rows property to be set.
        */
       rowHeight?: number;
+      /** When true, renders the grid in masonry-style layout, allowing items of different sizes to stack without gaps, maintaining the sequential grid order.
+       * 
+       * RowGap and columnGap still apply
+       * 
+       * @default false
+       */
+      masonry?: boolean;
     }
 >;
 

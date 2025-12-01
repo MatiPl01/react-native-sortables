@@ -29,6 +29,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
     columns,
     data,
     keyExtractor = defaultKeyExtractor,
+    masonry,
     onActiveItemDropped,
     onDragEnd: _onDragEnd,
     onDragMove,
@@ -78,6 +79,7 @@ function SortableGrid<I>(props: SortableGridProps<I>) {
         groups={groups}
         isVertical={isVertical}
         key={useStrategyKey(strategy)}
+        masonry={masonry}
         rowHeight={rowHeight} // must be specified for horizontal grids
         strategy={strategy}
         onDragEnd={onDragEnd}
@@ -108,6 +110,7 @@ const SortableGridInner = typedMemo(function SortableGridInner<I>({
   isVertical,
   itemEntering,
   itemExiting,
+  masonry,
   overflow,
   rowGap: _rowGap,
   rowHeight,
@@ -141,6 +144,7 @@ const SortableGridInner = typedMemo(function SortableGridInner<I>({
       controlledItemDimensions={controlledItemDimensions}
       debug={debug}
       isVertical={isVertical}
+      masonry={masonry}
       numGroups={groups}
       rowGap={rowGap}
       rowHeight={rowHeight}

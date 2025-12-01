@@ -30,6 +30,7 @@ export default function GridProvider({
   children,
   columnGap: columnGap_,
   isVertical,
+  masonry,
   numGroups,
   rowGap: rowGap_,
   rowHeight,
@@ -42,6 +43,7 @@ export default function GridProvider({
   const sharedGridProviderProps = {
     columnGap,
     isVertical,
+    masonry,
     numGroups,
     rowGap
   };
