@@ -109,6 +109,7 @@ const SortableGridInner = typedMemo(function SortableGridInner<I>({
   itemEntering,
   itemExiting,
   overflow,
+  reorderOnDrag,
   rowGap: _rowGap,
   rowHeight,
   showDropIndicator,
@@ -156,6 +157,7 @@ const SortableGridInner = typedMemo(function SortableGridInner<I>({
         itemEntering={itemEntering}
         itemExiting={itemExiting}
         overflow={overflow}
+        reorderOnDrag={reorderOnDrag}
         rowGap={rowGap}
         rowHeight={rowHeight}
         showDropIndicator={showDropIndicator}
@@ -176,6 +178,7 @@ type SortableGridComponentProps<I> = Pick<
   | 'itemEntering'
   | 'itemExiting'
   | 'overflow'
+  | 'reorderOnDrag'
   | 'rowHeight'
   | 'showDropIndicator'
   | 'strategy'
@@ -188,6 +191,7 @@ function SortableGridComponent<I>({
   columnGap,
   groups,
   isVertical,
+  reorderOnDrag,
   rowGap,
   rowHeight,
   strategy,
@@ -199,7 +203,7 @@ function SortableGridComponent<I>({
 
   const isFirstRenderRef = useRef(true);
 
-  useOrderUpdater(strategy, GRID_STRATEGIES);
+  useOrderUpdater(strategy, GRID_STRATEGIES, reorderOnDrag);
 
   useLayoutEffect(() => {
     if (isFirstRenderRef.current) {
