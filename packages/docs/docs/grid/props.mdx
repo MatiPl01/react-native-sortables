@@ -121,13 +121,23 @@ Gap between columns in the grid.
 
 ---
 
-### animateHeight
+### dimensionsAnimationType
 
-Whether the height of the grid should be animated when the items are reordered.
+Whether and how to animate container dimensions changes.
 
-| type      | default | required |
-| --------- | ------- | -------- |
-| `boolean` | false   | NO       |
+| type                              | default  | required |
+| --------------------------------- | -------- | -------- |
+| `'layout' \| 'none' \| 'worklet'` | `'none'` | NO       |
+
+- `'none'` - No animation
+- `'layout'` - uses **Reanimated Layout Animations**
+- `'worklet'` - uses **Reanimated worklet-based animations**
+
+:::info
+
+`'layout'` mode is more performant than `'worklet'` but it doesn't affect surrounding views during the animation. If you have content rendered next to the sortable grid, it will update its position immediately instead of animating.
+
+:::
 
 :::warning
 
@@ -549,39 +559,9 @@ type LayoutAnimation =
 
 ---
 
-### itemsLayout
-
-Layout transition to use when items are reordered.
-
-| type               | default                       | required |
-| ------------------ | ----------------------------- | -------- |
-| `LayoutTransition` | LinearTransition\* / null\*\* | NO       |
-
-\*Used as a default value on native platforms
-
-\*\*No default value on Web
-
-<details>
-  <summary>Type definitions</summary>
-
-```tsx
-type LayoutTransition =
-  | BaseAnimationBuilder
-  | LayoutAnimationFunction
-  | typeof BaseAnimationBuilder;
-```
-
-</details>
-
-:::warning Warning (Web)
-
-This prop is **not supported** on Web.
-
-:::
-
 ---
 
-### itemsLayoutTransitionMode
+### itemPositionsAnimationMode
 
 Controls when items positions are animated.
 
