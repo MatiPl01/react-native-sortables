@@ -135,13 +135,8 @@ Whether and how to animate container dimensions changes.
 
 :::info
 
-`'layout'` mode is more performant than `'worklet'` but it doesn't affect surrounding views during the animation. If you have content rendered next to the sortable grid, it will update its position immediately instead of animating.
-
-:::
-
-:::warning
-
-This may sometimes cause **performance issues** as it requires layout recalculations.
+- `'layout'` mode is more performant than `'worklet'` but it doesn't affect surrounding views during the animation (surrounding content updates position immediately).
+- `'worklet'` mode affects surrounding views but is less performant as it requires layout recalculations on every frame.
 
 :::
 
