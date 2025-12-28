@@ -5,73 +5,12 @@ description: ''
 
 # Fixed Items
 
-## Description
-
 The fixed items example demonstrates how to create a **Sortable Grid** with items which have a **fixed position**.
 
 In the example below, the **first**, the **last** and the **item in the middle** are fixed.
 
-## Source Code
+import InteractiveExample from '@site/src/components/InteractiveExample';
+import FixedItemsExample from '@site/src/examples/FixedItems';
+import FixedItemsCode from '!!raw-loader!@site/src/examples/FixedItems';
 
-```tsx
-import { useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import type { SortableGridRenderItem } from 'react-native-sortables';
-import Sortable from 'react-native-sortables';
-
-const DATA = Array.from({ length: 15 }, (_, index) => `Item ${index + 1}`);
-
-const FIXED_ITEMS = [DATA[0], DATA[7], DATA[14]];
-
-export default function Example() {
-  const renderItem = useCallback<SortableGridRenderItem<string>>(({ item }) => {
-    const isFixed = FIXED_ITEMS.includes(item);
-    return (
-      <Sortable.Handle mode={isFixed ? 'fixed' : 'draggable'}>
-        <View
-          style={[
-            styles.card,
-            { backgroundColor: isFixed ? '#9aaeac' : '#36877F' }
-          ]}>
-          <Text style={styles.text}>{item}</Text>
-        </View>
-      </Sortable.Handle>
-    );
-  }, []);
-
-  return (
-    <View style={styles.container}>
-      <Sortable.Grid
-        columnGap={10}
-        customHandle
-        columns={3}
-        data={DATA}
-        renderItem={renderItem}
-        rowGap={10}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  card: {
-    alignItems: 'center',
-    borderRadius: 10,
-    height: 100,
-    justifyContent: 'center'
-  },
-  container: {
-    padding: 10
-  },
-  text: {
-    color: 'white',
-    fontWeight: 'bold'
-  }
-});
-```
-
-## Result
-
-import video from '@site/static/video/grid-fixed-items.mp4';
-
-<video autoPlay loop muted width='300px' src={video} />
+<InteractiveExample component={FixedItemsExample} code={FixedItemsCode} />
