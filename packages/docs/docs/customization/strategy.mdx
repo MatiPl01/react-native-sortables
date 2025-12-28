@@ -13,7 +13,7 @@ While `react-native-sortables` comes with built-in strategies for Grid and Flex 
 
 :::info
 
-This guide describes advanced customization. Familiarity with [Reanimated worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/worklets/) is recommended as strategies run on the UI thread.
+This guide describes advanced customization. Familiarity with [react-native-worklets](https://docs.swmansion.com/react-native-reanimated/docs/guides/worklets/) is recommended as strategies run on the UI thread.
 
 :::
 
@@ -64,13 +64,15 @@ First, we need to access the layout information. `react-native-sortables` expose
 We create a factory hook that prepares the shared values.
 
 ```tsx
-import { useCommonValuesContext } from 'react-native-sortables';
-import { useGridLayoutContext } from 'react-native-sortables';
+import {
+  useCommonValuesContext,
+  useGridLayoutContext
+} from 'react-native-sortables';
 
 const useSimpleGridStrategy = () => {
   // 1. Get shared values from context
-  const { indexToKey, itemWidths, itemHeights } = useCommonValuesContext();
-  const { columns, isVertical } = useGridLayoutContext();
+  const { indexToKey } = useCommonValuesContext();
+  const { numGroups: columns } = useGridLayoutContext();
 
   // 2. Return the worklet function
   return params => {
@@ -94,16 +96,17 @@ function swap(array: string[], from: number, to: number) {
   return newArray;
 }
 
+// 1. Define constants
+const ITEM_WIDTH = 100;
+const ITEM_HEIGHT = 100;
+const GAP = 10;
+
 // ... inside the returned function:
 return ({ activeIndex, position }) => {
   'worklet';
 
-  // 1. Calculate the target index based on position
+  // 2. Calculate the target index based on position
   // (Simplified for this tutorial with constants)
-  const COLUMNS = 3;
-  const ITEM_WIDTH = 100;
-  const ITEM_HEIGHT = 100;
-  const GAP = 10;
 
   // Approximate row and column from position
   const col = Math.floor(
@@ -113,7 +116,7 @@ return ({ activeIndex, position }) => {
     Math.max(0, position.y + ITEM_HEIGHT / 2) / (ITEM_HEIGHT + GAP)
   );
 
-  const targetIndex = row * COLUMNS + col;
+  const targetIndex = row * columns + col;
   const currentOrder = indexToKey.value;
 
   // boundary check
@@ -128,44 +131,36 @@ return ({ activeIndex, position }) => {
 };
 ```
 
-### Full Example
-
-Here is the complete code for a simple strategy that assumes a fixed 3-column grid.
+Here is the complete code for a component that implements and uses a custom strategy. You can copy this entire block into a single file to try it out.
 
 ```tsx
-import { useCallback } from 'react';
-import {
+import React, { useCallback } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Sortable, {
+  SortableGridRenderItem,
+  SortStrategyFactory,
   useCommonValuesContext,
-  SortStrategyFactory
+  useGridLayoutContext
 } from 'react-native-sortables';
 
-// Simple reorder helper
-function swap(array: string[], from: number, to: number) {
-  'worklet';
-  const newArray = [...array];
-  [newArray[from], newArray[to]] = [newArray[to], newArray[from]];
-  return newArray;
-}
+// 1. Define shared constants
+const COLUMNS = 3;
+const ITEM_HEIGHT = 100;
+const GAP = 10;
 
-export const useSimpleSwapStrategy: SortStrategyFactory = () => {
+// 2. Define the Strategy Factory
+const useSimpleSwapStrategy: SortStrategyFactory = () => {
   const { indexToKey } = useCommonValuesContext();
+  const { mainGroupSize: itemWidth, numGroups: columns } =
+    useGridLayoutContext();
 
-  return ({ activeIndex, position, dimensions }) => {
+  return ({ activeIndex, position }) => {
     'worklet';
 
-    const COLUMNS = 3;
-    const ITEM_WIDTH = 100;
-    const ITEM_HEIGHT = 100;
-    const GAP = 10;
+    const col = Math.floor(position.x / ((itemWidth?.value ?? 0) + GAP));
+    const row = Math.floor(position.y / (ITEM_HEIGHT + GAP));
 
-    // Calculate index based on center position of the dragged item
-    const centerX = position.x + dimensions.width / 2;
-    const centerY = position.y + dimensions.height / 2;
-
-    const col = Math.floor(centerX / (ITEM_WIDTH + GAP));
-    const row = Math.floor(centerY / (ITEM_HEIGHT + GAP));
-
-    const targetIndex = row * COLUMNS + col;
+    const targetIndex = row * columns + col;
     const currentOrder = indexToKey.value;
 
     if (
@@ -173,29 +168,20 @@ export const useSimpleSwapStrategy: SortStrategyFactory = () => {
       targetIndex < currentOrder.length &&
       targetIndex !== activeIndex
     ) {
-      return swap(currentOrder, activeIndex, targetIndex);
+      const newOrder = [...currentOrder];
+      [newOrder[activeIndex], newOrder[targetIndex]] = [
+        newOrder[targetIndex]!,
+        newOrder[activeIndex]!
+      ];
+      return newOrder;
     }
 
     return undefined;
   };
 };
 
-// Usage
-// <Sortable.Grid strategy={useSimpleSwapStrategy} ... />
-```
-
-### Usage Example
-
-Here is how you can use the custom strategy in a component.
-
-```tsx
-import React, { useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Sortable, { SortableGridRenderItem } from 'react-native-sortables';
-import { useSimpleSwapStrategy } from './useSimpleSwapStrategy'; // inner file import
-
+// 3. Implement the Component
 const DATA = Array.from({ length: 9 }, (_, i) => `Item ${i + 1}`);
-const COLUMNS = 3;
 
 export default function App() {
   const renderItem = useCallback<SortableGridRenderItem<string>>(
@@ -210,12 +196,11 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Sortable.Grid
+        columnGap={GAP}
+        columns={COLUMNS}
         data={DATA}
         renderItem={renderItem}
-        columns={COLUMNS}
-        rowHeight={100}
-        columnGap={10}
-        rowGap={10}
+        rowGap={GAP}
         strategy={useSimpleSwapStrategy}
       />
     </View>
@@ -223,25 +208,23 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f5'
-  },
   card: {
-    flex: 1,
-    height: 100, // Matches ITEM_HEIGHT in strategy
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
+    borderColor: '#ddd',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd'
+    height: ITEM_HEIGHT,
+    justifyContent: 'center'
+  },
+  container: {
+    backgroundColor: '#f5f5f5',
+    flex: 1,
+    padding: 20
   },
   text: {
-    fontWeight: 'bold',
-    fontSize: 16
+    fontSize: 16,
+    fontWeight: 'bold'
   }
 });
 ```
