@@ -17,6 +17,7 @@ import type {
   ItemDragSettings,
   ItemSizes,
   ItemsLayoutTransitionMode,
+  ItemsStackingOrder,
   Vector
 } from '../../types';
 import { DragActivationState } from '../../types';
@@ -35,6 +36,7 @@ type CommonValuesProviderProps = PropsWithChildren<
       controlledContainerDimensions: ControlledDimensions;
       controlledItemDimensions: ControlledDimensions;
       itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
+      stackingOrder: ItemsStackingOrder;
     }
 >;
 
@@ -59,7 +61,8 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     itemsLayoutTransitionMode,
     snapOffsetX: _snapOffsetX,
     snapOffsetY: _snapOffsetY,
-    sortEnabled: _sortEnabled
+    sortEnabled: _sortEnabled,
+    stackingOrder
   }) => {
     const { getKeys, subscribeKeys } = useItemsContext();
 
@@ -165,6 +168,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         inactiveItemOpacity,
         inactiveItemScale,
         indexToKey,
+        isStackingOrderDesc: stackingOrder === 'desc',
         itemHeights,
         itemPositions,
         itemsLayoutTransitionMode,

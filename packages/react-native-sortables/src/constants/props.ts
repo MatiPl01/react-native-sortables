@@ -62,7 +62,8 @@ export const DEFAULT_SHARED_PROPS = {
   showDropIndicator: false,
   snapOffsetX: '50%',
   snapOffsetY: '50%',
-  sortEnabled: true
+  sortEnabled: true,
+  stackingOrder: 'asc'
 } satisfies DefaultSharedProps;
 
 export const DEFAULT_SORTABLE_GRID_PROPS = {
