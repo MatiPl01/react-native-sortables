@@ -14,14 +14,14 @@ export default function useItemZIndex(
     const itemCount = indexToKey.value.length;
 
     if (activeItemKey.value === key) {
-      return 2 * itemCount;
+      return 2 * itemCount + 1;
     }
 
     const orderZIndex = keyToIndex.value[key] ?? 0;
 
     if (activationAnimationProgress.value > 0) {
       if (prevActiveItemKey.value === key) {
-        return 2 * itemCount - 1;
+        return 2 * itemCount;
       }
 
       return itemCount + orderZIndex;
