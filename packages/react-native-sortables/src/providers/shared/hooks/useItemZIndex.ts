@@ -7,18 +7,26 @@ export default function useItemZIndex(
   key: string,
   activationAnimationProgress: SharedValue<number>
 ): SharedValue<number> {
-  const { activeItemKey, prevActiveItemKey } = useCommonValuesContext();
+  const { activeItemKey, indexToKey, keyToIndex, prevActiveItemKey } =
+    useCommonValuesContext();
 
   return useDerivedValue<number>(() => {
+    const itemCount = indexToKey.value.length;
+
     if (activeItemKey.value === key) {
-      return 3;
+      return 2 * itemCount;
     }
-    if (prevActiveItemKey.value === key) {
-      return 2;
-    }
+
+    const orderZIndex = keyToIndex.value[key] ?? 0;
+
     if (activationAnimationProgress.value > 0) {
-      return 1;
+      if (prevActiveItemKey.value === key) {
+        return 2 * itemCount - 1;
+      }
+
+      return itemCount + orderZIndex;
     }
-    return 0;
+
+    return orderZIndex;
   });
 }
