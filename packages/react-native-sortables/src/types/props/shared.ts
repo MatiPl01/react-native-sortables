@@ -59,6 +59,8 @@ export type Offset = `${number}%` | number;
 export type OverDrag = 'both' | 'horizontal' | 'none' | 'vertical';
 /** Position of the reordering trigger point */
 export type ReorderTriggerOrigin = 'center' | 'touch';
+/** Strategy for setting zIndex of items */
+export type ItemsStackingOrder = 'asc' | 'desc';
 
 export type ItemDragSettings = AnimatableProps<{
   /** Delay in ms before drag gesture is activated */
@@ -337,6 +339,13 @@ export type SharedProps = Simplify<
            * @default true
            */
           bringToFrontWhenActive: boolean;
+          /**
+           * Strategy for setting zIndex of items
+           * - 'asc' - items with higher index have higher zIndex (default)
+           * - 'desc' - items with higher index have lower zIndex
+           * @default 'asc'
+           */
+          stackingOrder: ItemsStackingOrder;
         }
     >
 >;

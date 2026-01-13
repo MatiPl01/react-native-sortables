@@ -96,6 +96,7 @@ export type CommonValuesContextType =
       shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
       animateLayoutOnReorderOnly: SharedValue<boolean>;
       customHandle: boolean;
+      isStackingOrderDesc: boolean;
     };
 
 // MEASUREMENTS

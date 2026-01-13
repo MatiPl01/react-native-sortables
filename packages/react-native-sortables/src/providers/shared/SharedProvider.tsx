@@ -40,6 +40,7 @@ export type SharedProviderProps = PropsWithChildren<
         | 'itemsLayoutTransitionMode'
         | 'measureDebounceDelay'
         | 'sortEnabled'
+        | 'stackingOrder'
       >
     > &
     Required<SortableCallbacks> & {
