@@ -23,7 +23,7 @@ export default function useItemZIndex(
     }
 
     const realIndex = keyToIndex.value[key] ?? 0;
-    const orderZIndex = isStackingOrderDesc ? itemCount - realIndex : realIndex;
+    const orderZIndex = isStackingOrderDesc ? itemCount - realIndex - 1 : realIndex;
 
     if (activationAnimationProgress.value > 0) {
       if (prevActiveItemKey.value === key) {
