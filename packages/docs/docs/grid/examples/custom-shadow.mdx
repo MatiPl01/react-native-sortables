@@ -7,17 +7,20 @@ description: ''
 
 ## Description
 
-This example demonstrates how to create a **custom shadow** for the active item during drag. By disabling the default shadow with `activeItemShadowOpacity={0}` and using the [useItemContext](/hooks/useItemContext) hook, you can animate the `box-shadow` property of the item based on the activation animation progress.
+The **custom shadow example** shows how to create a **custom shadow for the active item**.
 
-This is particularly useful when you want to add shadows on **Android**, where shadows are not supported by default and must be implemented by the user.
+By using the [useItemContext](/hooks/useItemContext) hook, we can detect the **activation animation progress** and use it to animate the **shadow of the item**.
+
+Usually, you should also disable the **default shadow** of the active item by setting the `activeItemShadowOpacity` prop to `0`.
+
+This is especially helpful for **Android**, where you need to implement the shadow on your own.
 
 ## Source Code
 
 ```tsx
-import { memo, useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
-  interpolateColor,
+  interpolate,
   useAnimatedStyle
 } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortables';
@@ -26,17 +29,14 @@ import Sortable, { useItemContext } from 'react-native-sortables';
 const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
 
 export default function Example() {
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => <GridItem item={item} />,
-    []
+  const renderItem = ({ item }: SortableGridRenderItem<string>) => (
+    <Item title={item} />
   );
 
   return (
     <View style={styles.container}>
       <Sortable.Grid
-        // Disable default shadow as we will apply our
-        // box-shadow in the item component
-        activeItemShadowOpacity={0}
+        activeItemShadowOpacity={0} // disable default shadow
         columnGap={10}
         columns={3}
         data={DATA}
@@ -47,26 +47,28 @@ export default function Example() {
   );
 }
 
-const GridItem = memo(function GridItem({ item }: { item: string }) {
-  const { activationAnimationProgress } = useItemContext();
+function Item({ title }: { title: string }) {
+  const { activeAnimationProgress } = useItemContext();
 
-  const animatedStyle = useAnimatedStyle(() => {
-    const color = interpolateColor(
-      activationAnimationProgress.value,
+  const animatedStyle = useAnimatedStyle(() => ({
+    boxShadow: `0px 0px 15px rgba(0, 0, 0, ${interpolate(
+      activeAnimationProgress.value,
       [0, 1],
-      ['transparent', '#1a433f']
-    );
-    return {
-      boxShadow: `0 5px 10px ${color}`
-    };
-  });
+      [0, 0.4]
+    )})`,
+    transform: [
+      {
+        scale: interpolate(activeAnimationProgress.value, [0, 1], [1, 1.1])
+      }
+    ]
+  }));
 
   return (
     <Animated.View style={[styles.card, animatedStyle]}>
-      <Text style={styles.text}>{item}</Text>
+      <Animated.Text style={styles.text}>{title}</Animated.Text>
     </Animated.View>
   );
-});
+}
 
 const styles = StyleSheet.create({
   card: {
@@ -77,7 +79,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   container: {
-    padding: 16
+    padding: 10
   },
   text: {
     color: 'white',
@@ -88,9 +90,13 @@ const styles = StyleSheet.create({
 
 ## Result
 
-import customShadowVideoAndroid from '@site/static/video/grid-custom-shadow-android.mp4';
-import customShadowVideoIOS from '@site/static/video/grid-custom-shadow-ios.mp4';
+import iosVideo from '@site/static/video/grid-custom-shadow-ios.mp4';
+import androidVideo from '@site/static/video/grid-custom-shadow-android.mp4';
 
-| Android                                                                                                                                            | iOS                                                                                                                                            |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| <div style={{ textAlign: 'center' }}><video autoPlay loop muted width="100%" style={{ maxWidth: '300px' }} src={customShadowVideoAndroid} /></div> | <div style={{ textAlign: 'center' }}><video autoPlay loop muted width="100%" style={{ maxWidth: '300px' }} src={customShadowVideoIOS} /></div> |
+### iOS
+
+<video autoPlay loop muted width='300px' src={iosVideo} />
+
+### Android
+
+<video autoPlay loop muted width='300px' src={androidVideo} />
