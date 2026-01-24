@@ -37,7 +37,6 @@ function useInactiveIndexToKey() {
     ({ excludedKey, idxToKey, keyToIdx }) => {
       const excludedIndex = excludedKey ? keyToIdx[excludedKey] : undefined;
       if (excludedIndex === undefined) {
-        result.value = EMPTY_ARRAY;
         return;
       }
 

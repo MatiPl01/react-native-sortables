@@ -1,14 +1,23 @@
+import { useCallback } from 'react';
 import { useAnimatedReaction } from 'react-native-reanimated';
 
 import { useDebugContext } from '../../../debug';
-import type { PredefinedStrategies, SortStrategyFactory } from '../../../types';
+import type {
+  OrderUpdaterCallbackProps,
+  PredefinedStrategies,
+  SortStrategyFactory
+} from '../../../types';
 import { error } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
 export default function useOrderUpdater<
   P extends PredefinedStrategies = PredefinedStrategies
->(strategy: keyof P | SortStrategyFactory, predefinedStrategies: P) {
+>(
+  strategy: keyof P | SortStrategyFactory,
+  predefinedStrategies: P,
+  reorderOnDrag: boolean
+) {
   const useStrategy =
     typeof strategy === 'string' ? predefinedStrategies[strategy] : strategy;
 
@@ -25,25 +34,16 @@ export default function useOrderUpdater<
 
   const updater = useStrategy();
 
-  useAnimatedReaction(
-    () => ({
-      activeKey: activeItemKey.value,
-      dimensions: activeItemDimensions.value,
-      position: triggerOriginPosition.value
-    }),
-    ({ activeKey, dimensions, position }) => {
-      if (!activeKey || !dimensions || !position) {
-        if (debugCross) debugCross.set({ position: null });
-        return;
-      }
-
+  const handleOrderUpdate = useCallback(
+    ({
+      activeKey,
+      dimensions,
+      position
+    }: Omit<OrderUpdaterCallbackProps, 'activeIndex'>) => {
+      'worklet';
       const activeIndex = keyToIndex.value[activeKey];
       if (activeIndex === undefined) {
         return;
-      }
-
-      if (debugCross) {
-        debugCross.set({ color: '#00007e', position });
       }
 
       const newOrder = updater({
@@ -60,6 +60,38 @@ export default function useOrderUpdater<
           newOrder.indexOf(activeKey),
           newOrder
         );
+      }
+    },
+    [handleOrderChange, keyToIndex, updater]
+  );
+
+  useAnimatedReaction(
+    () => ({
+      activeKey: activeItemKey.value,
+      dimensions: activeItemDimensions.value,
+      position: triggerOriginPosition.value
+    }),
+    ({ activeKey, dimensions, position }, prevProps) => {
+      debugCross?.set({ color: '#00007e', position });
+
+      if (reorderOnDrag) {
+        if (activeKey !== null && dimensions && position) {
+          handleOrderUpdate({ activeKey, dimensions, position });
+        } else {
+          debugCross?.set({ position: null });
+        }
+      } else if (
+        activeKey === null &&
+        prevProps?.dimensions &&
+        prevProps?.position &&
+        prevProps?.activeKey !== null
+      ) {
+        debugCross?.set({ position: null });
+        handleOrderUpdate({
+          activeKey: prevProps.activeKey,
+          dimensions: prevProps.dimensions,
+          position: prevProps.position
+        });
       }
     }
   );
