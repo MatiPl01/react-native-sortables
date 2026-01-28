@@ -797,9 +797,29 @@ You can also use any other haptics library but you will have to trigger haptics 
 
 Controls if the overflowing content should be clipped or visible. Applies only when no item is active.
 
-| type                    | default    | required |
+| type                    | default     | required |
+| ----------------------- | ----------- | -------- |
+| `'hidden' \| 'visible'` | `'visible'` | NO       |
+
+---
+
+### stackingOrder
+
+Strategy for setting zIndex of items. This determines which items appear on top when they overlap.
+
+| type              | default | required |
+| ----------------- | ------- | -------- |
+| `'asc' \| 'desc'` | `'asc'` | NO       |
+
+- `'asc'` - items with higher index have higher zIndex (default). This means items at the end of the list of items are rendered on top of items at the beginning.
+- `'desc'` - items with higher index have lower zIndex. This means items at the beginning of the list of items are rendered on top of items at the end.
+
+:::info
+The currently dragged item is always rendered on top of all other items, regardless of this setting.
+:::
+
 | ----------------------- | ---------- | -------- |
-| `'hidden' \| 'visible'` | `'hidden'` | NO       |
+| `'hidden' \| 'visible'` | `'hidden'` | NO |
 
 ---
 
