@@ -42,6 +42,7 @@
     "eslint": "^9.28.0",
     "eslint-plugin-mdx": "^3.4.2",
     "raw-loader": "^4.0.2",
+    "react-native": "^0.84.0",
     "typescript": "^5.8.3",
     "webpack": "^5.97.1"
   },
@@ -58,6 +59,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.0"
+    "node": "20.x"
   }
 }
