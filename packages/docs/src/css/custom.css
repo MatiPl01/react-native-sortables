@@ -149,3 +149,15 @@ details summary + div > div {
 details code {
   min-width: unset !important;
 }
+
+/* Hide default Docusaurus CodeBlock buttons within InteractiveExample */
+.interactive-example-container .code-content-wrapper .clean-btn {
+  display: none !important;
+}
+
+/* Force wrapping when "wrapped" state is active */
+.interactive-example-container .code-content-wrapper.code-wrapped pre,
+.interactive-example-container .code-content-wrapper.code-wrapped code {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}

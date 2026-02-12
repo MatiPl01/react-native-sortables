@@ -8,6 +8,52 @@ interface Props {
   component: React.ComponentType;
 }
 
+const CopyIcon = () => (
+  <svg
+    fill='none'
+    height='16'
+    stroke='currentColor'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    strokeWidth='2'
+    viewBox='0 0 24 24'
+    width='16'>
+    <rect height='13' rx='2' ry='2' width='13' x='9' y='9' />
+    <path d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1' />
+  </svg>
+);
+
+const WrapIcon = () => (
+  <svg
+    fill='none'
+    height='16'
+    stroke='currentColor'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    strokeWidth='2'
+    viewBox='0 0 24 24'
+    width='16'>
+    <line x1='3' x2='21' y1='6' y2='6' />
+    <line x1='3' x2='21' y1='12' y2='12' />
+    <line x1='3' x2='15' y1='18' y2='18' />
+    <polyline points='16 16 18 18 22 14' />
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg
+    fill='none'
+    height='16'
+    stroke='currentColor'
+    strokeLinecap='round'
+    strokeLinejoin='round'
+    strokeWidth='2'
+    viewBox='0 0 24 24'
+    width='16'>
+    <polyline points='20 6 9 17 4 12' />
+  </svg>
+);
+
 export default function InteractiveExample({
   code,
   component: Component
@@ -17,8 +63,16 @@ export default function InteractiveExample({
   const [isDragging, setIsDragging] = useState(false);
   const [isCodeCollapsed, setIsCodeCollapsed] = useState(true); // Default collapsed on mobile
   const [isWrapped, setIsWrapped] = useState(false); // Default unwrapped
+  const [isCopied, setIsCopied] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(code).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    });
+  }, [code]);
 
   const handleReset = () => {
     setKey(prev => prev + 1);
@@ -149,21 +203,40 @@ export default function InteractiveExample({
                 <span>Source Code</span>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button
+                    title={isWrapped ? 'Unwrap code' : 'Wrap code'}
                     style={{
+                      alignItems: 'center',
                       backgroundColor: isWrapped
-                        ? 'var(--ifm-color-emphasis-400)' // Active state
-                        : 'var(--ifm-color-emphasis-0)',
-                      border: '1px solid var(--ifm-color-emphasis-400)',
+                        ? 'var(--ifm-color-emphasis-200)'
+                        : 'transparent',
+                      border: '1px solid var(--ifm-color-emphasis-300)',
                       borderRadius: '4px',
-                      color: isWrapped
-                        ? 'var(--ifm-color-emphasis-0)'
-                        : 'var(--ifm-color-emphasis-800)',
+                      color: 'var(--ifm-color-emphasis-700)',
                       cursor: 'pointer',
-                      fontSize: '0.7rem',
-                      padding: '2px 8px'
+                      display: 'flex',
+                      justifyContent: 'center',
+                      padding: '4px'
                     }}
                     onClick={() => setIsWrapped(!isWrapped)}>
-                    {isWrapped ? 'Unwrap' : 'Wrap'}
+                    <WrapIcon />
+                  </button>
+                  <button
+                    title='Copy code'
+                    style={{
+                      alignItems: 'center',
+                      backgroundColor: 'transparent',
+                      border: '1px solid var(--ifm-color-emphasis-300)',
+                      borderRadius: '4px',
+                      color: isCopied
+                        ? 'var(--ifm-color-success)'
+                        : 'var(--ifm-color-emphasis-700)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      padding: '4px'
+                    }}
+                    onClick={handleCopy}>
+                    {isCopied ? <CheckIcon /> : <CopyIcon />}
                   </button>
                   {/* Mobile Toggle Button */}
                   <button
@@ -183,7 +256,7 @@ export default function InteractiveExample({
                 </div>
               </div>
               <div
-                className={`code-content-wrapper ${isCodeCollapsed ? 'collapsed' : ''}`}
+                className={`code-content-wrapper ${isCodeCollapsed ? 'collapsed' : ''} ${isWrapped ? 'code-wrapped' : ''}`}
                 style={{
                   backgroundColor: 'var(--prism-background-color)',
                   display: 'flex',
@@ -277,7 +350,7 @@ export default function InteractiveExample({
                 cursor: 'pointer',
                 fontSize: '0.7rem',
                 fontWeight: 600,
-                padding: '2px 8px',
+                padding: '4px 12px',
                 transition: 'all 0.15s ease'
               }}
               onClick={handleReset}>
