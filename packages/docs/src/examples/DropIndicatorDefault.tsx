@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Sortable from 'react-native-sortables';
 
@@ -22,6 +22,7 @@ export default function DropIndicatorDefaultExample() {
         data={DATA}
         renderItem={renderItem}
         rowGap={10}
+        // highlight-next-line
         showDropIndicator
       />
     </View>

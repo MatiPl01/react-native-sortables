@@ -6,6 +6,7 @@ import Sortable from 'react-native-sortables';
 const DATA = Array.from({ length: 30 }, (_, index) => `Item ${index + 1}`);
 
 export default function AutoScrollExample() {
+  // highlight-next-line
   const scrollableRef = useAnimatedRef<Animated.ScrollView>();
 
   const renderItem = useCallback(
@@ -20,6 +21,7 @@ export default function AutoScrollExample() {
   return (
     <Animated.ScrollView
       contentContainerStyle={styles.contentContainer}
+      // highlight-next-line
       ref={scrollableRef}
       style={{
         height: 400 // Limit height to enable scrolling in demo
@@ -30,6 +32,7 @@ export default function AutoScrollExample() {
         data={DATA}
         renderItem={renderItem}
         rowGap={10}
+        // highlight-next-line
         scrollableRef={scrollableRef} // required for auto scroll
       />
     </Animated.ScrollView>

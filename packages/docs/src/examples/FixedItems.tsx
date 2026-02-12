@@ -3,12 +3,14 @@ import { StyleSheet, Text, View } from 'react-native';
 import Sortable from 'react-native-sortables';
 
 const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
-const FIXED_ITEMS = [DATA[0], DATA[7], DATA[11]];
+const FIXED_ITEMS = new Set([DATA[0], DATA[7], DATA[11]]);
 
 export default function FixedItemsExample() {
   const renderItem = useCallback(({ item }: { item: string }) => {
-    const isFixed = FIXED_ITEMS.includes(item);
+    const isFixed = FIXED_ITEMS.has(item);
+
     return (
+      // highlight-next-line
       <Sortable.Handle mode={isFixed ? 'fixed-order' : 'draggable'}>
         <View
           style={[
@@ -21,6 +23,7 @@ export default function FixedItemsExample() {
           ]}>
           <Text style={styles.text}>{item}</Text>
         </View>
+        {/* highlight-next-line */}
       </Sortable.Handle>
     );
   }, []);
@@ -33,6 +36,7 @@ export default function FixedItemsExample() {
         data={DATA}
         renderItem={renderItem}
         rowGap={10}
+        // highlight-next-line
         customHandle
       />
     </View>

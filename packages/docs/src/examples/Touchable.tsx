@@ -14,10 +14,13 @@ export default function TouchableExample() {
     ({ item }: { item: string }) => (
       <View style={styles.card}>
         <Text style={styles.text}>{item}</Text>
+        {/* highlight-next-line */}
         <Sortable.Touchable
           style={styles.deleteButton}
+          // highlight-next-line
           onTap={() => setData(prev => prev.filter(i => i !== item))}>
           <Text style={styles.text}>Delete</Text>
+          {/* highlight-next-line */}
         </Sortable.Touchable>
       </View>
     ),

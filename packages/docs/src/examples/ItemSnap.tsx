@@ -34,11 +34,14 @@ export default function ItemSnapExample() {
         columnGap={10}
         columns={2}
         data={DATA}
+        // highlight-next-line
         enableActiveItemSnap={snapEnabled}
         renderItem={renderItem}
         rowGap={10}
+        // highlight-start
         snapOffsetX='50%'
         snapOffsetY='50%'
+        // highlight-end
       />
     </View>
   );

@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "browserslist:update": "npx update-browserslist-db@latest",
-    "docusaurus": "docusaurus",
-    "start": "docusaurus start",
-    "build": "docusaurus build",
+    "docusaurus": "BROWSERSLIST_IGNORE_OLD_DATA=1 docusaurus",
+    "start": "BROWSERSLIST_IGNORE_OLD_DATA=1 docusaurus start",
+    "build": "BROWSERSLIST_IGNORE_OLD_DATA=1 docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

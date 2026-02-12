@@ -29,12 +29,14 @@ const config: Config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'MatiPl01', // Usually your GitHub org/user name.
-
   plugins: [
     function webpackPlugin() {
       return {
         configureWebpack() {
           return {
+            infrastructureLogging: {
+              level: 'error'
+            },
             mergeStrategy: {
               'resolve.extensions': 'prepend'
             },
@@ -73,7 +75,6 @@ const config: Config = {
       };
     }
   ],
-
   presets: [
     [
       'classic',

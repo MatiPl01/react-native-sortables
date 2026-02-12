@@ -9,6 +9,7 @@ const HEIGHTS = [120, 80, 150, 60, 100, 130, 90, 70, 110, 140, 50, 85];
 export default function DifferentItemHeightsExample() {
   const renderItem = useCallback(
     ({ index, item }: { item: string; index: number }) => (
+      // highlight-next-line
       <View style={[styles.card, { height: HEIGHTS[index % HEIGHTS.length] }]}>
         <Text style={styles.text}>{item}</Text>
       </View>

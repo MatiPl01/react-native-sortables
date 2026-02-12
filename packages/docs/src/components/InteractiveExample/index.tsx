@@ -3,6 +3,7 @@ import { useColorMode } from '@docusaurus/theme-common';
 import CodeBlock from '@theme/CodeBlock';
 import { clsx } from 'clsx';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import styles from './styles.module.css';
 
@@ -280,11 +281,11 @@ export default function InteractiveExample({
                   </div>
                 }>
                 {() => (
-                  <div className={styles.gestureHandlerRoot}>
+                  <GestureHandlerRootView className={styles.gestureHandlerRoot}>
                     <React.Fragment key={key}>
                       <Component />
                     </React.Fragment>
-                  </div>
+                  </GestureHandlerRootView>
                 )}
               </BrowserOnly>
             </div>

@@ -10,10 +10,12 @@ export default function CustomHandleExample() {
       <View style={styles.card}>
         <Text style={styles.text}>{item}</Text>
         {/* Wraps the handle component */}
+        {/* highlight-next-line */}
         <Sortable.Handle>
           <View style={styles.handle}>
             <Text style={styles.handleText}>::</Text>
           </View>
+          {/* highlight-next-line */}
         </Sortable.Handle>
       </View>
     ),
@@ -29,6 +31,7 @@ export default function CustomHandleExample() {
         overDrag='vertical'
         renderItem={renderItem}
         rowGap={10}
+        // highlight-next-line
         customHandle // must be set to use a custom handle
       />
     </View>
