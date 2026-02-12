@@ -9,69 +9,13 @@ description: ''
 
 This example shows why the [Sortable.Touchable](/helper-components/touchable) component is useful when you need to **properly detect press events** on **components nested inside** the sortable component item (more precisely, nested within the part of the item that detects the drag gesture - this might be the entire item or just a part of it if the custom handle, like [Sortable.Handle](/helper-components/handle), is used).
 
-## Source Code
+## Example
 
-```tsx
-import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import type { SortableGridRenderItem } from 'react-native-sortables';
-import Sortable from 'react-native-sortables';
+import InteractiveExample from '@site/src/components/InteractiveExample';
+import TouchableExample from '@site/src/examples/Touchable';
+import TouchableCode from '!!raw-loader!@site/src/examples/Touchable';
 
-const DATA = Array.from({ length: 4 }, (_, index) => `Item ${index + 1}`);
-
-export default function Example() {
-  const [data, setData] = useState(DATA);
-
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <View style={styles.card}>
-        <Text style={styles.text}>{item}</Text>
-        <Sortable.Touchable
-          style={styles.deleteButton}
-          onTap={() => setData(prev => prev.filter(i => i !== item))}>
-          <Text style={styles.text}>Delete</Text>
-        </Sortable.Touchable>
-      </View>
-    ),
-    []
-  );
-
-  return (
-    <View style={styles.container}>
-      <Sortable.Grid
-        columnGap={10}
-        columns={2}
-        data={data}
-        renderItem={renderItem}
-        rowGap={10}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  card: {
-    alignItems: 'center',
-    backgroundColor: '#36877F',
-    borderRadius: 10,
-    gap: 10,
-    height: 100,
-    justifyContent: 'center'
-  },
-  container: {
-    padding: 10
-  },
-  deleteButton: {
-    backgroundColor: '#6AA67C',
-    borderRadius: 10,
-    padding: 10
-  },
-  text: {
-    color: 'white',
-    fontWeight: 'bold'
-  }
-});
-```
+<InteractiveExample component={TouchableExample} code={TouchableCode} />
 
 ## Result
 
