@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Sortable from 'react-native-sortables';
 
@@ -8,7 +8,7 @@ const HEIGHTS = [120, 80, 150, 60, 100, 130, 90, 70, 110, 140, 50, 85];
 
 export default function DifferentItemHeightsExample() {
   const renderItem = useCallback(
-    ({ item, index }: { item: string; index: number }) => (
+    ({ index, item }: { item: string; index: number }) => (
       <View style={[styles.card, { height: HEIGHTS[index % HEIGHTS.length] }]}>
         <Text style={styles.text}>{item}</Text>
       </View>
@@ -22,6 +22,7 @@ export default function DifferentItemHeightsExample() {
         columnGap={10}
         columns={3}
         data={DATA}
+        dimensionsAnimationType='worklet'
         renderItem={renderItem}
         rowGap={10}
       />
@@ -32,7 +33,7 @@ export default function DifferentItemHeightsExample() {
 const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
-    backgroundColor: '#36877F',
+    backgroundColor: 'var(--ifm-color-primary)',
     borderRadius: 10,
     justifyContent: 'center'
   },

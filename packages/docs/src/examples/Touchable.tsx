@@ -45,7 +45,7 @@ export default function TouchableExample() {
 const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
-    backgroundColor: '#36877F',
+    backgroundColor: 'var(--ifm-color-primary)',
     borderRadius: 10,
     gap: 10,
     height: 100,
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   deleteButton: {
-    backgroundColor: '#6AA67C',
+    backgroundColor: 'var(--ifm-color-primary-light)',
     borderRadius: 10,
     padding: 8
   },
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: 'var(--ifm-color-emphasis-600)',
     fontStyle: 'italic'
   },
   text: {

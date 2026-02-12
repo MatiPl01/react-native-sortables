@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { StyleSheet, Text, View, Switch } from 'react-native';
+import { useCallback, useState } from 'react';
+import { StyleSheet, Switch, Text, View } from 'react-native';
 import Sortable from 'react-native-sortables';
 
 const DATA = Array.from({ length: 4 }, (_, index) => `Item ${index + 1}`);
@@ -21,19 +21,22 @@ export default function ItemSnapExample() {
       <View style={styles.controls}>
         <Text style={styles.label}>Enable Snap</Text>
         <Switch
-          value={snapEnabled}
-          onValueChange={setSnapEnabled}
-          trackColor={{ false: '#767577', true: '#36877F' }}
           thumbColor={snapEnabled ? '#f4f3f4' : '#f4f3f4'}
+          value={snapEnabled}
+          trackColor={{
+            false: 'var(--ifm-color-emphasis-400)',
+            true: 'var(--ifm-color-primary)'
+          }}
+          onValueChange={setSnapEnabled}
         />
       </View>
       <Sortable.Grid
         columnGap={10}
         columns={2}
         data={DATA}
+        enableActiveItemSnap={snapEnabled}
         renderItem={renderItem}
         rowGap={10}
-        enableActiveItemSnap={snapEnabled}
         snapOffsetX='50%'
         snapOffsetY='50%'
       />
@@ -44,28 +47,28 @@ export default function ItemSnapExample() {
 const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
-    backgroundColor: '#36877F',
+    backgroundColor: 'var(--ifm-color-primary)',
     borderRadius: 10,
     height: 100,
     justifyContent: 'center'
   },
   container: {
-    padding: 10,
-    flex: 1
+    flex: 1,
+    padding: 10
   },
   controls: {
-    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'var(--ifm-color-emphasis-100)',
+    borderRadius: 8,
+    flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 8
+    padding: 10
   },
   label: {
+    color: 'var(--ifm-color-content)',
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333'
+    fontWeight: '600'
   },
   text: {
     color: 'white',

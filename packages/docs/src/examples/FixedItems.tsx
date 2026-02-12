@@ -13,7 +13,11 @@ export default function FixedItemsExample() {
         <View
           style={[
             styles.card,
-            { backgroundColor: isFixed ? '#9aaeac' : '#36877F' }
+            {
+              backgroundColor: isFixed
+                ? 'var(--ifm-color-emphasis-400)'
+                : 'var(--ifm-color-primary)'
+            }
           ]}>
           <Text style={styles.text}>{item}</Text>
         </View>

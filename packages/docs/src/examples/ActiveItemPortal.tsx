@@ -49,20 +49,22 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#DDE2E3'
+    justifyContent: 'center'
+    // backgroundColor: '#DDE2E3' // Removed to inherit theme background
   },
   gridContainer: {
     marginVertical: 15,
     borderRadius: 10,
     height: 400,
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    overflow: 'hidden'
+    backgroundColor: 'var(--ifm-background-surface-color)',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'var(--ifm-color-emphasis-200)'
   },
   card: {
     alignItems: 'center',
-    backgroundColor: '#36877F',
+    backgroundColor: 'var(--ifm-color-primary)',
     borderRadius: 10,
     height: 100,
     justifyContent: 'center'
@@ -75,7 +77,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   buttonText: {
-    color: '#36877F',
+    color: 'var(--ifm-color-primary)',
     fontSize: 18,
     fontWeight: 'bold'
   }

@@ -32,7 +32,7 @@ export default function DropIndicatorCustomStyleExample() {
 const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
-    backgroundColor: '#36877F',
+    backgroundColor: 'var(--ifm-color-primary)',
     borderRadius: 10,
     height: 100,
     justifyContent: 'center'
@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
     padding: 10
   },
   dropIndicator: {
-    backgroundColor: 'rgba(54, 135, 127, 0.5)',
-    borderColor: '#36877f',
+    backgroundColor: 'var(--ifm-color-primary-lightest)',
+    borderColor: 'var(--ifm-color-primary)',
     borderStyle: 'solid',
     borderWidth: 5
   },

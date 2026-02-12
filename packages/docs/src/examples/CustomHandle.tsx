@@ -38,7 +38,7 @@ export default function CustomHandleExample() {
 const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
-    backgroundColor: '#36877F',
+    backgroundColor: 'var(--ifm-color-primary)',
     borderRadius: 12,
     flexDirection: 'row',
     justifyContent: 'center',

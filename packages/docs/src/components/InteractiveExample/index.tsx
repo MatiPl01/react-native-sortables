@@ -1,4 +1,5 @@
 import BrowserOnly from '@docusaurus/BrowserOnly';
+import { useColorMode } from '@docusaurus/theme-common';
 import CodeBlock from '@theme/CodeBlock';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -54,10 +55,24 @@ const CheckIcon = () => (
   </svg>
 );
 
+function colorToHex(color: string): string {
+  if (color.startsWith('#')) return color;
+  const match = color.match(
+    /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
+  );
+  if (!match) return color;
+
+  const r = parseInt(match[1], 10).toString(16).padStart(2, '0');
+  const g = parseInt(match[2], 10).toString(16).padStart(2, '0');
+  const b = parseInt(match[3], 10).toString(16).padStart(2, '0');
+  return `#${r}${g}${b}`.toUpperCase();
+}
+
 export default function InteractiveExample({
   code,
   component: Component
 }: Props) {
+  const { colorMode } = useColorMode();
   const [key, setKey] = useState(0);
   const [splitPosition, setSplitPosition] = useState(50); // percentage for the code side
   const [isDragging, setIsDragging] = useState(false);
@@ -67,12 +82,43 @@ export default function InteractiveExample({
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [displayCode, setDisplayCode] = useState(code);
+
+  useEffect(() => {
+    const regex = /(['"])var\(--([a-zA-Z0-9-]+)\)\1/g;
+    let newCode = code;
+    const matches = [...code.matchAll(regex)];
+
+    if (matches.length > 0) {
+      const computedStyle = getComputedStyle(document.documentElement);
+      const replacements = new Map<string, string>();
+
+      matches.forEach(match => {
+        const fullMatch = match[0];
+        const quote = match[1];
+        const varName = `--${match[2]}`;
+
+        if (!replacements.has(fullMatch)) {
+          const value = computedStyle.getPropertyValue(varName).trim();
+          if (value) {
+            replacements.set(fullMatch, `${quote}${colorToHex(value)}${quote}`);
+          }
+        }
+      });
+
+      replacements.forEach((val, key) => {
+        newCode = newCode.split(key).join(val);
+      });
+    }
+    setDisplayCode(newCode);
+  }, [code, colorMode, key]);
+
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(code).then(() => {
+    navigator.clipboard.writeText(displayCode).then(() => {
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     });
-  }, [code]);
+  }, [displayCode]);
 
   const handleReset = () => {
     setKey(prev => prev + 1);
@@ -278,7 +324,7 @@ export default function InteractiveExample({
                       whiteSpace: isWrapped ? 'pre-wrap' : 'pre',
                       wordBreak: isWrapped ? 'break-word' : 'normal'
                     }}>
-                    {code}
+                    {displayCode}
                   </CodeBlock>
                 </div>
               </div>
