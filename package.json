@@ -59,7 +59,8 @@
       "example/paper",
       "example/expo",
       "example/web",
-      "packages/react-native-sortables"
+      "packages/react-native-sortables",
+      "packages/docs"
     ]
   }
 }

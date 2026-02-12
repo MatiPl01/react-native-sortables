@@ -12650,7 +12650,7 @@ __metadata:
 
 "react-native-sortables@file:../react-native-sortables::locator=docs%40workspace%3A.":
   version: 1.9.4
-  resolution: "react-native-sortables@file:../react-native-sortables#../react-native-sortables::hash=a120f0&locator=docs%40workspace%3A."
+  resolution: "react-native-sortables@file:../react-native-sortables#../react-native-sortables::hash=797027&locator=docs%40workspace%3A."
   dependencies:
     react-native-haptic-feedback: "npm:>=2.0.0"
   peerDependencies:
@@ -12661,7 +12661,7 @@ __metadata:
   dependenciesMeta:
     react-native-haptic-feedback:
       optional: true
-  checksum: 10c0/e65ab9a9c39152b321eae170d689d478e7fbdd6d4f3376f4db431dc96f3eb92c5b01c54370f6d7f782d7a035162d7aed650d814e1dc8dc0e9d3e188d56b62b0e
+  checksum: 10c0/6f928289b9a82cbbdbfa32f1f0cf8d2d03f790e0ffabe9e9d84924b829064b6f90b0096a42cd00c931f055c8bf61b27dec7ba558d0e679d32ec6b738192227b2
   languageName: node
   linkType: hard
 

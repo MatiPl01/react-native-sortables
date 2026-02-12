@@ -115,7 +115,7 @@ const config: Config = {
             plugins: [
               new webpack.DefinePlugin({
                 __DEV__: process.env.NODE_ENV !== 'production',
-                process: { env: {} }
+                ...(isServer ? {} : { process: { env: {} } })
               })
             ],
             resolve: {
