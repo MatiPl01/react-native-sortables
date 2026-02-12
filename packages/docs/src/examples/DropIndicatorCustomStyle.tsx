@@ -16,7 +16,7 @@ export default function DropIndicatorCustomStyleExample() {
 
   return (
     <View style={styles.container}>
-      // highlight-next-line
+      {/* highlight-next-line */}
       <Sortable.Grid
         columnGap={10}
         columns={3}
