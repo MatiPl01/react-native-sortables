@@ -1,8 +1,16 @@
 import type * as Preset from '@docusaurus/preset-classic';
 import type { Config } from '@docusaurus/types';
 import { themes as prismThemes } from 'prism-react-renderer';
+import webpack from 'webpack';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+
+const RESOLVED = {
+  ghModuleWeb: require.resolve(
+    'react-native-gesture-handler/lib/module/RNGestureHandlerModule.web.js'
+  ),
+  processBrowser: require.resolve('process/browser')
+};
 
 const config: Config = {
   // For GitHub pages deployment, it is often '/<projectName>/'
@@ -21,6 +29,51 @@ const config: Config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'MatiPl01', // Usually your GitHub org/user name.
+
+  plugins: [
+    function webpackPlugin() {
+      return {
+        configureWebpack() {
+          return {
+            mergeStrategy: {
+              'resolve.extensions': 'prepend'
+            },
+            module: {
+              rules: [
+                {
+                  include: [
+                    /node_modules[\\/]react-native-reanimated/,
+                    /node_modules[\\/]react-native-gesture-handler/,
+                    /node_modules[\\/]react-native-sortables/
+                  ],
+                  test: /\.(js|jsx|ts|tsx)$/,
+                  use: 'babel-loader'
+                }
+              ]
+            },
+            plugins: [
+              new webpack.ProvidePlugin({
+                process: RESOLVED.processBrowser
+              }),
+              new webpack.DefinePlugin({
+                __DEV__: 'false'
+              })
+            ],
+            resolve: {
+              alias: {
+                'react-native$': 'react-native-web',
+                'react-native-gesture-handler/lib/module/specs/NativeRNGestureHandlerModule$':
+                  RESOLVED.ghModuleWeb
+              },
+              extensions: ['.web.js', '...']
+            }
+          };
+        },
+        name: 'react-native-web-plugin'
+      };
+    }
+  ],
+
   presets: [
     [
       'classic',
@@ -98,7 +151,6 @@ const config: Config = {
   } satisfies Preset.ThemeConfig,
 
   title: 'Sortables',
-
   // Set the production url of your site here
   // TODO - change url
   url: 'https://your-docusaurus-site.example.com'

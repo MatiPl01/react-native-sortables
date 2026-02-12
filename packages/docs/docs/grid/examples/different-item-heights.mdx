@@ -11,60 +11,16 @@ This example shows that the **Sortable Grid** component can handle **different i
 
 Similar to the **Sortable Grid** component, the **Sortable Flex** component can also handle **different item heights**.
 
-## Source Code
+## Example
 
-```tsx
-import { useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import type { SortableGridRenderItem } from 'react-native-sortables';
-import Sortable from 'react-native-sortables';
+import InteractiveExample from '@site/src/components/InteractiveExample';
+import DifferentHeightsExample from '@site/src/examples/DifferentHeights';
+import DifferentHeightsCode from '!!raw-loader!@site/src/examples/DifferentHeights';
 
-const DATA = Array.from({ length: 12 }, (_, index) => `Item ${index + 1}`);
-
-export default function Example() {
-  const renderItem = useCallback<SortableGridRenderItem<string>>(
-    ({ item }) => (
-      <View
-        style={[
-          styles.card,
-          { height: Math.random() * 150 + 50 } // random height for demo purposes
-        ]}>
-        <Text style={styles.text}>{item}</Text>
-      </View>
-    ),
-    []
-  );
-
-  return (
-    <View style={styles.container}>
-      <Sortable.Grid
-        columnGap={10}
-        columns={3}
-        data={DATA}
-        renderItem={renderItem}
-        rowGap={10}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  card: {
-    alignItems: 'center',
-    backgroundColor: '#36877F',
-    borderRadius: 10,
-    height: 100,
-    justifyContent: 'center'
-  },
-  container: {
-    padding: 10
-  },
-  text: {
-    color: 'white',
-    fontWeight: 'bold'
-  }
-});
-```
+<InteractiveExample
+  component={DifferentHeightsExample}
+  code={DifferentHeightsCode}
+/>
 
 ## Result
 
