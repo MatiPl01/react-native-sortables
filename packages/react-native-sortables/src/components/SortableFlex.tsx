@@ -101,6 +101,7 @@ const SortableFlexInner = memo(function SortableFlexInner({
   paddingRight,
   paddingTop,
   paddingVertical,
+  reorderOnDrag,
   rowGap,
   showDropIndicator,
   strategy,
@@ -159,6 +160,7 @@ const SortableFlexInner = memo(function SortableFlexInner({
         itemEntering={itemEntering}
         itemExiting={itemExiting}
         overflow={overflow}
+        reorderOnDrag={reorderOnDrag}
         showDropIndicator={showDropIndicator}
         strategy={strategy}
         styleProps={styleProps}
@@ -176,6 +178,7 @@ type SortableFlexComponentProps = Pick<
   | 'itemEntering'
   | 'itemExiting'
   | 'overflow'
+  | 'reorderOnDrag'
   | 'showDropIndicator'
   | 'strategy'
 > & {
@@ -183,6 +186,7 @@ type SortableFlexComponentProps = Pick<
 };
 
 function SortableFlexComponent({
+  reorderOnDrag,
   strategy,
   styleProps,
   ...rest
@@ -200,7 +204,7 @@ function SortableFlexComponent({
     width
   } = styleProps;
 
-  useOrderUpdater(strategy, FLEX_STRATEGIES);
+  useOrderUpdater(strategy, FLEX_STRATEGIES, reorderOnDrag);
 
   const baseContainerStyle: ViewStyle = {
     ...styleProps,
