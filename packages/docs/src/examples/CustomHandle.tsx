@@ -12,9 +12,6 @@ export default function CustomHandleExample() {
         {/* Wraps the handle component */}
         {/* highlight-next-line */}
         <Sortable.Handle>
-          {/* Disable pointer events so touches reach the drag gesture */}
-          {/* instead of being captured by the handle icon */}
-          {/* highlight-next-line */}
           <View pointerEvents='none' style={styles.handle}>
             <Text style={styles.handleText}>::</Text>
           </View>
