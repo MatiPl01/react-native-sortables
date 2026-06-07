@@ -9,6 +9,7 @@
     "react-native-sortables": "workspace:*"
   },
   "installConfig": {
+    "hoistingLimits": "workspaces",
     "selfReferences": false
   },
   "private": true,
