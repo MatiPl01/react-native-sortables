@@ -2,22 +2,21 @@ import { useCallback, useMemo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { IS_WEB } from '../../../constants';
-import { ReactNativeHapticFeedback } from '../adapters';
+import { Haptics } from '../adapters';
 
 type HapticImpact = {
   light(): void;
   medium(): void;
 };
 
-let hapticFeedback: null | ReturnType<typeof ReactNativeHapticFeedback.load> =
-  null;
+let hapticFeedback: null | ReturnType<typeof Haptics.load> = null;
 
 export default function useHaptics(enabled: boolean): HapticImpact {
   const isEnabled = !IS_WEB && enabled;
   const enabledValue = useDerivedValue(() => isEnabled);
 
   if (isEnabled && !hapticFeedback) {
-    hapticFeedback = ReactNativeHapticFeedback.load();
+    hapticFeedback = Haptics.load();
   }
 
   const light = useCallback(() => {
