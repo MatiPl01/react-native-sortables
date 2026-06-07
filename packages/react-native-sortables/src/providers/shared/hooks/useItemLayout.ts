@@ -170,23 +170,19 @@ export default function useItemLayout(
   useAnimatedReaction(
     () => ({
       active: isActive.value,
-      itemPosition: layoutPosition.value,
+      layoutPos: layoutPosition.value,
       progress: activationAnimationProgress.value
     }),
-    ({ active, itemPosition, progress }, prev) => {
-      if (!itemPosition || active) {
+    ({ active, layoutPos, progress }, prev) => {
+      if (!layoutPos || active) {
         interpolationStartValues.value = null;
         return;
       }
 
       if (!position.value) {
-        position.value = itemPosition;
+        position.value = layoutPos;
         return;
       }
-
-      const positionChanged =
-        prev?.itemPosition &&
-        areVectorsDifferent(prev.itemPosition, itemPosition, 1);
 
       if (progress === 0) {
         // interpolationStartValues value is not set when the reduced motion
@@ -194,14 +190,16 @@ export default function useItemLayout(
         // and the second if branch below is never entered
         if (interpolationStartValues.value || prev?.active) {
           interpolationStartValues.value = null;
-          position.value = itemPosition;
+          position.value = layoutPos;
           return;
         }
       }
       // Set dropStartValues only if the item was previously active or if is
       // already during the drop animation and the target position changed
       else if (
-        interpolationStartValues.value ? positionChanged : prev?.active
+        interpolationStartValues.value
+          ? prev?.layoutPos && areVectorsDifferent(prev.layoutPos, layoutPos, 1)
+          : prev?.active
       ) {
         interpolationStartValues.value = {
           position: position.value,
@@ -220,12 +218,8 @@ export default function useItemLayout(
         position.value = interpolateVector(
           currentProgress,
           startPosition,
-          itemPosition
+          layoutPos
         );
-        return;
-      }
-
-      if (!positionChanged) {
         return;
       }
 
@@ -233,9 +227,14 @@ export default function useItemLayout(
         shouldAnimateLayout.value &&
         (!animateLayoutOnReorderOnly.value || activeItemKey.value !== null)
       ) {
-        position.value = withTiming(itemPosition);
+        // Compare against the current position so sub-pixel changes accumulate
+        // (the previous reaction input advances even when the update is skipped)
+        if (!areVectorsDifferent(position.value, layoutPos, 1)) {
+          return;
+        }
+        position.value = withTiming(layoutPos);
       } else {
-        position.value = itemPosition;
+        position.value = layoutPos;
       }
     }
   );
