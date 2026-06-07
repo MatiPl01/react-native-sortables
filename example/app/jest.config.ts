@@ -7,12 +7,13 @@ const config: JestConfigWithTsJest = {
   fakeTimers: {
     enableGlobally: true
   },
-  moduleDirectories: ['../../node_modules', '<rootDir>'],
+  moduleDirectories: ['node_modules', '../../node_modules', '<rootDir>'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths ?? {}, {
     prefix: '<rootDir>/'
   }),
-  preset: 'react-native',
+  preset: '@react-native/jest-preset',
+  resolver: 'react-native-worklets/jest/resolver.js',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transform: {
     '^.+\\.jsx?$': [

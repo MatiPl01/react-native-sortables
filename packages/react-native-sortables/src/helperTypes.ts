@@ -36,7 +36,11 @@ export type NoUndef<T> = T extends undefined ? never : T;
 type ReadonlySharedValue<V> = Readonly<Omit<SharedValue<V>, 'set'>>;
 
 export type DeepReadonly<T> = {
-  readonly [K in keyof T]: T[K] extends SharedValue<infer U>
+  // `ReadonlySharedValue` (no `set`) matches both mutable shared values and
+  // derived values. Since Reanimated 4.4 `useDerivedValue` returns a distinct
+  // `DerivedValue` type (a shared value without `set`), checking against
+  // `SharedValue` directly would miss derived values.
+  readonly [K in keyof T]: T[K] extends ReadonlySharedValue<infer U>
     ? ReadonlySharedValue<U>
     : T[K] extends AnyRecord
       ? DeepReadonly<T[K]>
