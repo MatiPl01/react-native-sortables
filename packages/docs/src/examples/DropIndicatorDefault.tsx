@@ -20,7 +20,6 @@ export default function DropIndicatorDefaultExample() {
         columnGap={10}
         columns={3}
         data={DATA}
-        dropIndicatorStyle={styles.dropIndicator}
         renderItem={renderItem}
         rowGap={10}
         // highlight-next-line
@@ -40,14 +39,6 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 10
-  },
-  dropIndicator: {
-    backgroundColor: 'var(--ifm-color-emphasis-200)',
-    borderColor: 'var(--ifm-color-emphasis-600)',
-    borderRadius: 10,
-    borderStyle: 'dashed',
-    borderWidth: 2,
-    flex: 1
   },
   text: {
     color: 'white',
