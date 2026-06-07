@@ -42,10 +42,11 @@ const styles = StyleSheet.create({
     padding: 10
   },
   dropIndicator: {
-    backgroundColor: 'var(--ifm-color-primary-lightest)',
+    backgroundColor: 'transparent',
     borderColor: 'var(--ifm-color-primary)',
+    borderRadius: 10,
     borderStyle: 'solid',
-    borderWidth: 5
+    borderWidth: 4
   },
   text: {
     color: 'white',
