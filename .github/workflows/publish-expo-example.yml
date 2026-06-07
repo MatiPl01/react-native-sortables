@@ -1,0 +1,47 @@
+name: 📲 Publish Expo example
+
+# Publishes the Expo example app as an EAS Update so it can be opened in
+# Expo Go via the QR code in the README / docs. Requires an EXPO_TOKEN
+# repository secret (create a free token at https://expo.dev/settings/access-tokens).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'example/expo/**'
+      - 'packages/react-native-sortables/src/**'
+      - '.github/workflows/publish-expo-example.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: publish-expo-example
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: 🚀 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
+      - name: 📲 Publish EAS Update
+        working-directory: example/expo
+        run: eas update --channel production --message "${UPDATE_MESSAGE:-Manual publish}" --environment production --non-interactive
+        env:
+          UPDATE_MESSAGE: ${{ github.event.head_commit.message }}

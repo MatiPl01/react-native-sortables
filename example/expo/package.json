@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "expo": "56.0.9",
+    "expo-haptics": "~56.0.3",
     "expo-status-bar": "~56.0.4",
     "expo-updates": "~56.0.18",
     "react": "19.2.3",

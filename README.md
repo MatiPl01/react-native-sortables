@@ -26,6 +26,14 @@
 
 React Native Sortables is a powerful and easy-to-use library that brings smooth, intuitive content reordering to React Native. It provides specialized components whose children can be dynamically reordered through natural dragging gestures.
 
+## Try it in Expo Go
+
+Install [Expo Go](https://expo.dev/go) and scan the QR code below to open the example app on your device:
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MatiPl01/react-native-sortables/main/packages/docs/static/img/expo-go-qr.png" width="200" alt="Open the example app in Expo Go" />
+</p>
+
 ## Key Features
 
 - 🎯 **Flexible Layouts**

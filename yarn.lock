@@ -8486,6 +8486,7 @@ __metadata:
     "@babel/core": "npm:^7.25.2"
     "@types/react": "npm:~19.2.0"
     expo: "npm:56.0.9"
+    expo-haptics: "npm:~56.0.3"
     expo-status-bar: "npm:~56.0.4"
     expo-updates: "npm:~56.0.18"
     react: "npm:19.2.3"
@@ -8677,6 +8678,15 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/d4d821e6f176596f09ec0e1ee68d5af64d68fa139c8c5da3549d014d6a297bea4d0ccca6503ad753f1c0096e097364754e65ee176cafc74902a72e47ac810655
+  languageName: node
+  linkType: hard
+
+"expo-haptics@npm:~56.0.3":
+  version: 56.0.3
+  resolution: "expo-haptics@npm:56.0.3"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/f6d37336ad5c75e9906c42e7c73aa7540cb63f5364971f5f133adab16ad50d98ac04ae017a1ddd279bf5d32acc19208755c4918edabce0b9b83bbb38ffffba6d
   languageName: node
   linkType: hard
 
