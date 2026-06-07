@@ -35,6 +35,7 @@ export default function TouchableExample() {
         data={data}
         renderItem={renderItem}
         rowGap={10}
+        onDragEnd={({ data: newData }) => setData(newData)}
       />
       {data.length === 0 && (
         <View style={styles.emptyContainer}>
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     padding: 10
   },
   deleteButton: {
-    backgroundColor: 'var(--ifm-color-primary-light)',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     borderRadius: 10,
     padding: 8
   },
