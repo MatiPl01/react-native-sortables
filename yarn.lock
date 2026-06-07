@@ -8510,8 +8510,9 @@ __metadata:
   resolution: "example-paper@workspace:example/paper"
   dependencies:
     "@shopify/flash-list": "npm:1.8.3"
+    react: "npm:19.1.0"
     react-native: "npm:0.81.4"
-    react-native-reanimated: "npm:3.19.3"
+    react-native-reanimated: "npm:3.19.5"
     react-native-sortables: "workspace:*"
   languageName: unknown
   linkType: soft
@@ -14956,9 +14957,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.19.3":
-  version: 3.19.3
-  resolution: "react-native-reanimated@npm:3.19.3"
+"react-native-reanimated@npm:3.19.5":
+  version: 3.19.5
+  resolution: "react-native-reanimated@npm:3.19.5"
   dependencies:
     "@babel/plugin-transform-arrow-functions": "npm:^7.0.0-0"
     "@babel/plugin-transform-class-properties": "npm:^7.0.0-0"
@@ -14976,7 +14977,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 10c0/adf06db4961bbb9dd3acf432f6359c74ee497a71cea6350ed0380c9f231d89e19e6458ac41b298b85e31cc1caffd537f18908f9050dd3d8ae4c5dc95322fc884
+  checksum: 10c0/5da1e142b5c2fefc118a2c6b2bba224deffb98048399b350c22e3496d36ff348ca0d72f7a0b8478db069b1d10e56f42c070c03807fa7e384cf12d9f35c8fc6cf
   languageName: node
   linkType: hard
 
@@ -15254,6 +15255,13 @@ __metadata:
   peerDependencies:
     react: ^19.2.3
   checksum: 10c0/842b82239dbddbc536083a6260c3e1b0507c02a3400bd05879fc19160468fd0f8ab79fec5dceffa6113b131835cc7621212f8415b46ea5156ab66bbfd7e24297
+  languageName: node
+  linkType: hard
+
+"react@npm:19.1.0":
+  version: 19.1.0
+  resolution: "react@npm:19.1.0"
+  checksum: 10c0/530fb9a62237d54137a13d2cfb67a7db6a2156faed43eecc423f4713d9b20c6f2728b026b45e28fcd72e8eadb9e9ed4b089e99f5e295d2f0ad3134251bdd3698
   languageName: node
   linkType: hard
 
