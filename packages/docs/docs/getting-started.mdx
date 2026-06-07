@@ -19,8 +19,10 @@ Before getting started, you need to install and configure the following dependen
 
 ### Optional Dependencies
 
-- **react-native-haptic-feedback**: For haptic feedback support
-  - Follow the installation guide in the [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback) README
+Haptic feedback is optional. The library automatically detects which haptics package is available, preferring **expo-haptics**:
+
+- **expo-haptics**: recommended for Expo apps (already bundled in Expo Go). Install with `npx expo install expo-haptics`
+- **react-native-haptic-feedback**: for bare React Native apps. Follow the installation guide in its [README](https://github.com/mkuczera/react-native-haptic-feedback)
 
 ## 2. Installation
 
