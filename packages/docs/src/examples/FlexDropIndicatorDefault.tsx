@@ -20,7 +20,6 @@ export default function FlexDropIndicatorDefaultExample() {
   return (
     <View style={styles.container}>
       <Sortable.Flex
-        dropIndicatorStyle={styles.dropIndicator}
         gap={10}
         // highlight-next-line
         showDropIndicator>
@@ -47,14 +46,6 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 10
-  },
-  dropIndicator: {
-    backgroundColor: 'var(--ifm-color-emphasis-200)',
-    borderColor: 'var(--ifm-color-emphasis-600)',
-    borderRadius: 9999,
-    borderStyle: 'dashed',
-    borderWidth: 2,
-    flex: 1
   },
   text: {
     color: 'white',
