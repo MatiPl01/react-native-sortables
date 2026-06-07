@@ -1,0 +1,23 @@
+---
+sidebar_position: 9
+description: ''
+---
+
+# Custom Shadow
+
+## Description
+
+This example demonstrates how to create a **custom shadow** for the active item during drag. By disabling the default shadow with `activeItemShadowOpacity={0}` and using the [useItemContext](/hooks/useItemContext) hook, you can animate the `box-shadow` property of the item based on the activation animation progress.
+
+This is particularly useful when you want to add shadows on **Android**, where shadows are not supported by default and must be implemented by the user.
+
+## Example
+
+import InteractiveExample from '@site/src/components/InteractiveExample';
+import FlexCustomShadowExample from '@site/src/examples/FlexCustomShadow';
+import FlexCustomShadowCode from '!!raw-loader!@site/src/examples/FlexCustomShadow';
+
+<InteractiveExample
+  component={FlexCustomShadowExample}
+  code={FlexCustomShadowCode}
+/>
