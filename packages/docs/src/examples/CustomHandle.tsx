@@ -12,7 +12,7 @@ export default function CustomHandleExample() {
         {/* Wraps the handle component */}
         {/* highlight-next-line */}
         <Sortable.Handle>
-          <View style={styles.handle}>
+          <View pointerEvents='none' style={styles.handle}>
             <Text style={styles.handleText}>::</Text>
           </View>
           {/* highlight-next-line */}
