@@ -22,8 +22,6 @@ type ActiveItemPortalProps = Pick<
   'activationAnimationProgress' | 'baseStyle' | 'isActive' | 'itemKey'
 > & {
   commonValuesContext: CommonValuesContextType;
-  // gesture-handler 3.x dropped the `ManualGesture` type; `GestureType` works on
-  // both 2.x and 3.x (and matches `ItemContextType.gesture`)
   gesture: GestureType;
   onTeleport: (isTeleported: boolean) => void;
 };
