@@ -42,6 +42,7 @@ const HIDDEN_STYLE: ViewStyle = {
  */
 function useItemLayoutPaper(
   position: SharedValue<null | Vector>,
+  layoutPosition: SharedValue<null | Vector>,
   zIndex: SharedValue<number>
 ): SharedValue<ViewStyle> {
   const { usesAbsoluteLayout } = useCommonValuesContext();
@@ -51,14 +52,18 @@ function useItemLayoutPaper(
       return RELATIVE_STYLE;
     }
 
-    if (!position.value) {
+    // Fall back to the layout position when the animated position is not yet
+    // propagated (e.g. on the initial mount)
+    // (see issue https://github.com/MatiPl01/react-native-sortables/issues/552)
+    const pos = position.value ?? layoutPosition.value;
+    if (!pos) {
       return HIDDEN_STYLE;
     }
 
     return {
-      left: position.value.x,
+      left: pos.x,
       position: 'absolute',
-      top: position.value.y,
+      top: pos.y,
       zIndex: zIndex.value
     };
   });
@@ -86,6 +91,7 @@ function useItemLayoutPaper(
  */
 function useItemLayoutFabric(
   position: SharedValue<null | Vector>,
+  layoutPosition: SharedValue<null | Vector>,
   zIndex: SharedValue<number>
 ): SharedValue<ViewStyle> {
   const { activeItemDropped, usesAbsoluteLayout } = useCommonValuesContext();
@@ -110,7 +116,19 @@ function useItemLayoutFabric(
     }
 
     if (!position.value) {
-      return HIDDEN_STYLE;
+      // Fall back to the layout position when the animated position is not yet
+      // propagated (e.g. on the initial mount)
+      // (see issue https://github.com/MatiPl01/react-native-sortables/issues/552)
+      if (!layoutPosition.value) {
+        return HIDDEN_STYLE;
+      }
+      return {
+        left: layoutPosition.value.x,
+        position: 'absolute',
+        top: layoutPosition.value.y,
+        transform: [],
+        zIndex: zIndex.value
+      };
     }
 
     const startPosition = transformStartPosition.value;
@@ -255,7 +273,7 @@ export default function useItemLayout(
 
   return isFabric() || IS_WEB
     ? // eslint-disable-next-line react-hooks/rules-of-hooks
-      useItemLayoutFabric(position, zIndex)
+      useItemLayoutFabric(position, layoutPosition, zIndex)
     : // eslint-disable-next-line react-hooks/rules-of-hooks
-      useItemLayoutPaper(position, zIndex);
+      useItemLayoutPaper(position, layoutPosition, zIndex);
 }
