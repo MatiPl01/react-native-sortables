@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import type { ManualGesture } from 'react-native-gesture-handler';
+import type { GestureType } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
 import { useStableCallback } from '../../../hooks';
@@ -22,7 +22,7 @@ type ActiveItemPortalProps = Pick<
   'activationAnimationProgress' | 'baseStyle' | 'isActive' | 'itemKey'
 > & {
   commonValuesContext: CommonValuesContextType;
-  gesture: ManualGesture;
+  gesture: GestureType;
   onTeleport: (isTeleported: boolean) => void;
 };
 
