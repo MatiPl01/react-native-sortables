@@ -34,14 +34,16 @@ target 'reactNativeSortablePaper' do
       # :ccache_enabled => true
     )
 
-    # Xcode 16+ Clang rejects fmt's consteval format-string checks. Build the
-    # fmt pod as C++17 (where consteval doesn't exist) so it falls back to
-    # runtime format-string validation and compiles.
+    # Xcode 16+ Clang rejects fmt's consteval format-string checks. Disable
+    # fmt's consteval usage with a define instead of lowering the C++ standard
+    # (lowering it breaks the iOS 26 SDK's <atomic>, which needs C++20+). fmt
+    # then falls back to runtime format-string validation.
     installer.pods_project.targets.each do |t|
-      if t.name == 'fmt'
-        t.build_configurations.each do |cfg|
-          cfg.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
-        end
+      t.build_configurations.each do |cfg|
+        defs = cfg.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
+        defs = [defs] unless defs.is_a?(Array)
+        defs << 'FMT_USE_CONSTEVAL=0' unless defs.include?('FMT_USE_CONSTEVAL=0')
+        cfg.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = defs
       end
     end
   end
