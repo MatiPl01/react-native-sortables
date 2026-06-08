@@ -117,7 +117,16 @@ jobs:
       - name: 🍎 Build iOS
         if: matrix.platform == 'ios'
         working-directory: example/${{ matrix.app }}
-        run: yarn react-native run-ios --no-packager --scheme "reactNativeSortable${{ matrix.app == 'fabric' && 'Fabric' || 'Paper' }}"
+        run: |
+          SCHEME="reactNativeSortable${{ matrix.app == 'fabric' && 'Fabric' || 'Paper' }}"
+          if [ "${{ matrix.app }}" = "paper" ]; then
+            # Paper builds with Xcode 16.3 (iOS 18.4 SDK). Pin the simulator to an
+            # iOS 18.4 runtime so run-ios doesn't auto-pick iOS 18.5/26 (shared
+            # runtimes from other Xcodes), which Xcode 16.3 can't build for (error 70).
+            yarn react-native run-ios --no-packager --scheme "$SCHEME" --simulator "iPhone 16 Pro (18.4)"
+          else
+            yarn react-native run-ios --no-packager --scheme "$SCHEME"
+          fi
 
       - name: 🤖 Build Android
         if: matrix.platform == 'android'
