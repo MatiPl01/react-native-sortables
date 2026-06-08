@@ -34,17 +34,17 @@ target 'reactNativeSortablePaper' do
       # :ccache_enabled => true
     )
 
-    # Xcode 16+ Clang rejects fmt's consteval format-string checks. Disable
-    # fmt's consteval usage with a define instead of lowering the C++ standard
-    # (lowering it breaks the iOS 26 SDK's <atomic>, which needs C++20+). fmt
-    # then falls back to runtime format-string validation.
-    installer.pods_project.targets.each do |t|
-      t.build_configurations.each do |cfg|
-        defs = cfg.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
-        defs = [defs] unless defs.is_a?(Array)
-        defs << 'FMT_USE_CONSTEVAL=0' unless defs.include?('FMT_USE_CONSTEVAL=0')
-        cfg.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = defs
-      end
+    # fmt 11 hard-codes FMT_USE_CONSTEVAL=1 for Apple Clang >=14, and Xcode 16+
+    # Clang then rejects fmt's consteval format-string checks ("not a constant
+    # expression"). The macro is set unconditionally in the header, so a -D
+    # define can't override it and lowering the C++ standard breaks the iOS 26
+    # SDK's <atomic>. Patch the source to force consteval off (fmt falls back to
+    # runtime validation). Re-applied on every pod install.
+    fmt_base = File.join(installer.sandbox.root, 'fmt', 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base)
+      original = File.read(fmt_base)
+      patched = original.gsub('#  define FMT_USE_CONSTEVAL 1', '#  define FMT_USE_CONSTEVAL 0')
+      File.write(fmt_base, patched) if patched != original
     end
   end
 end
