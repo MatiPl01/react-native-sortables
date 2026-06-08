@@ -4414,16 +4414,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/flash-list@npm:2.0.2":
-  version: 2.0.2
-  resolution: "@shopify/flash-list@npm:2.0.2"
-  dependencies:
-    tslib: "npm:2.8.1"
+"@shopify/flash-list@npm:2.3.1":
+  version: 2.3.1
+  resolution: "@shopify/flash-list@npm:2.3.1"
   peerDependencies:
     "@babel/runtime": "*"
     react: "*"
     react-native: "*"
-  checksum: 10c0/c4e88348ce66e8f51c6213a42574a097d54cebf2125dc3fd8c077f3f7b83e25209c67bcb9a9102a3178c146cf5c23a978febd9a5ed5328ba1d7c663b5a8149d2
+  checksum: 10c0/abe921b93aeb6bf35efb4cd16163ca0126eec1513a40f1b88e370eb646e8bece5daa245e889300aa7ace2a4a81a9ffbd765c1ce2c3f2346611e94cc66c97c6e3
   languageName: node
   linkType: hard
 
@@ -8453,7 +8451,7 @@ __metadata:
     "@react-navigation/bottom-tabs": "npm:7.3.10"
     "@react-navigation/native": "npm:7.0.14"
     "@react-navigation/native-stack": "npm:7.2.0"
-    "@shopify/flash-list": "npm:2.0.2"
+    "@shopify/flash-list": "npm:2.3.1"
     "@testing-library/react-hooks": "npm:^8.0.1"
     "@testing-library/react-native": "npm:^12.5.1"
     "@types/react": "npm:^19.2.0"

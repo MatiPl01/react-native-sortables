@@ -34,12 +34,8 @@ function DebugOutlet() {
 
 const styles = StyleSheet.create({
   container: {
-    bottom: 0,
-    left: 0,
-    pointerEvents: 'none',
-    position: 'absolute',
-    right: 0,
-    top: 0
+    ...StyleSheet.absoluteFill,
+    pointerEvents: 'none'
   }
 });
 
