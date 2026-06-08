@@ -118,14 +118,19 @@ jobs:
         if: matrix.platform == 'ios'
         working-directory: example/${{ matrix.app }}
         run: |
-          SCHEME="reactNativeSortable${{ matrix.app == 'fabric' && 'Fabric' || 'Paper' }}"
           if [ "${{ matrix.app }}" = "paper" ]; then
-            # Paper builds with Xcode 16.3 (iOS 18.4 SDK). Pin the simulator to an
-            # iOS 18.4 runtime so run-ios doesn't auto-pick iOS 18.5/26 (shared
-            # runtimes from other Xcodes), which Xcode 16.3 can't build for (error 70).
-            yarn react-native run-ios --no-packager --scheme "$SCHEME" --simulator "iPhone 16 Pro (18.4)"
+            # Paper runs on Xcode 16.3 (iOS 18.4 SDK). The runner has the 18.4
+            # runtime but no pre-made 18.4 simulator device, and run-ios would
+            # otherwise auto-pick an iOS 18.5/26 runtime (shared across the
+            # runner's Xcodes) that 16.3 can't target. Compile against the
+            # simulator SDK directly with a generic destination — no device,
+            # no launch — which is all CI needs to verify the native build.
+            xcodebuild -workspace ios/reactNativeSortablePaper.xcworkspace \
+              -scheme reactNativeSortablePaper -configuration Debug \
+              -destination 'generic/platform=iOS Simulator' \
+              CODE_SIGNING_ALLOWED=NO build
           else
-            yarn react-native run-ios --no-packager --scheme "$SCHEME"
+            yarn react-native run-ios --no-packager --scheme "reactNativeSortableFabric"
           fi
 
       - name: 🤖 Build Android
