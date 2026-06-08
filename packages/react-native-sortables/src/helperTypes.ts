@@ -36,8 +36,7 @@ export type NoUndef<T> = T extends undefined ? never : T;
 type ReadonlySharedValue<V> = Readonly<Omit<SharedValue<V>, 'set'>>;
 
 export type DeepReadonly<T> = {
-  // Also matches Reanimated 4.4 derived values (shared values without `set`).
-  readonly [K in keyof T]: T[K] extends ReadonlySharedValue<infer U>
+  readonly [K in keyof T]: T[K] extends SharedValue<infer U>
     ? ReadonlySharedValue<U>
     : T[K] extends AnyRecord
       ? DeepReadonly<T[K]>
