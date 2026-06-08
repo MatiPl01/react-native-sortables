@@ -90,11 +90,7 @@ jobs:
 
       - name: 🍎 Select Xcode (iOS only)
         if: matrix.platform == 'ios'
-        # Paper uses old-architecture Reanimated 3.19.x, which imports <stdatomic.h>
-        # and fails to compile against iOS SDKs that guard <atomic> vs <stdatomic.h>
-        # before C++23 (iOS 18.4 in Xcode 16.3 and 18.5 in 16.4 both hit it). Pin
-        # only paper to Xcode 16.2 (iOS 18.2 SDK). fabric stays on 16.4.
-        run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.app == 'paper' && '16.2' || '16.4' }}.app
+        run: sudo xcode-select --switch /Applications/Xcode_16.4.app
 
       - name: ☕ Setup Java (Android only)
         if: matrix.platform == 'android'
@@ -117,20 +113,7 @@ jobs:
       - name: 🍎 Build iOS
         if: matrix.platform == 'ios'
         working-directory: example/${{ matrix.app }}
-        run: |
-          if [ "${{ matrix.app }}" = "paper" ]; then
-            # Paper runs on Xcode 16.2 (iOS 18.2 SDK). run-ios needs a concrete
-            # simulator device and would auto-pick a newer runtime (shared across
-            # the runner's Xcodes) that 16.2 can't target. Compile against the
-            # simulator SDK directly with a generic destination — no device,
-            # no launch — which is all CI needs to verify the native build.
-            xcodebuild -workspace ios/reactNativeSortablePaper.xcworkspace \
-              -scheme reactNativeSortablePaper -configuration Debug \
-              -destination 'generic/platform=iOS Simulator' \
-              CODE_SIGNING_ALLOWED=NO build
-          else
-            yarn react-native run-ios --no-packager --scheme "reactNativeSortableFabric"
-          fi
+        run: yarn react-native run-ios --no-packager --scheme "reactNativeSortable${{ matrix.app == 'fabric' && 'Fabric' || 'Paper' }}"
 
       - name: 🤖 Build Android
         if: matrix.platform == 'android'
