@@ -33,5 +33,16 @@ target 'reactNativeSortablePaper' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Xcode 16+ Clang rejects fmt's consteval format-string checks. Build the
+    # fmt pod as C++17 (where consteval doesn't exist) so it falls back to
+    # runtime format-string validation and compiles.
+    installer.pods_project.targets.each do |t|
+      if t.name == 'fmt'
+        t.build_configurations.each do |cfg|
+          cfg.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        end
+      end
+    end
   end
 end
