@@ -33,5 +33,16 @@ target 'reactNativeSortablePaper' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Reanimated 3.19.x's REANodesManager.mm includes <stdatomic.h>, which the
+    # iOS 18.5 SDK's libc++ refuses to combine with <atomic> before C++23.
+    # Build the Reanimated pod with C++23 so the two headers are compatible.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'RNReanimated'
+
+      target.build_configurations.each do |build_config|
+        build_config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++23'
+      end
+    end
   end
 end
