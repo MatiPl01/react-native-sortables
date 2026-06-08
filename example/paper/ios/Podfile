@@ -33,25 +33,5 @@ target 'reactNativeSortablePaper' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
-
-    # fmt 11 hard-codes FMT_USE_CONSTEVAL=1 for Apple Clang >=14, and Xcode 16+
-    # Clang then rejects fmt's consteval format-string checks ("not a constant
-    # expression"). The macro is set unconditionally in the header, so a -D
-    # define can't override it and lowering the C++ standard breaks the iOS 26
-    # SDK's <atomic>. Patch the source to force consteval off (fmt falls back to
-    # runtime validation). Re-applied on every pod install.
-    begin
-      fmt_base = File.join(installer.sandbox.root.to_s, 'fmt', 'include', 'fmt', 'base.h')
-      if File.file?(fmt_base)
-        original = File.read(fmt_base)
-        patched = original.gsub('#  define FMT_USE_CONSTEVAL 1', '#  define FMT_USE_CONSTEVAL 0')
-        if patched != original
-          File.chmod(0o644, fmt_base) # the vendored source is read-only
-          File.write(fmt_base, patched)
-        end
-      end
-    rescue => e
-      Pod::UI.warn "Could not patch fmt for consteval: #{e.message}"
-    end
   end
 end
