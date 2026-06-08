@@ -30,7 +30,7 @@ const { PortalOutletProvider, usePortalOutletContext } = createProvider(
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     pointerEvents: 'box-none'
   }
 });

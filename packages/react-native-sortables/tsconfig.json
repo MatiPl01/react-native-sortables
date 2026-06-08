@@ -1,8 +1,8 @@
 {
   "extends": "eslint-config-react-native-matipl01/tsconfig.base",
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "jsx": "react-native"
   },
   "exclude": ["dist"]
