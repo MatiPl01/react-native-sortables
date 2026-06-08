@@ -90,11 +90,11 @@ jobs:
 
       - name: 🍎 Select Xcode (iOS only)
         if: matrix.platform == 'ios'
-        # Paper uses old-architecture Reanimated 3.19.x (the last stable 3.x),
-        # which fails to compile against the iOS 18.5 SDK bundled with Xcode 16.4
-        # ("<atomic> is incompatible with <stdatomic.h> before C++23"). Pin only
-        # paper to Xcode 16.3 (iOS 18.4 SDK), where it builds. fabric stays on 16.4.
-        run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.app == 'paper' && '16.3' || '16.4' }}.app
+        # Paper uses old-architecture Reanimated 3.19.x, which imports <stdatomic.h>
+        # and fails to compile against iOS SDKs that guard <atomic> vs <stdatomic.h>
+        # before C++23 (iOS 18.4 in Xcode 16.3 and 18.5 in 16.4 both hit it). Pin
+        # only paper to Xcode 16.2 (iOS 18.2 SDK). fabric stays on 16.4.
+        run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.app == 'paper' && '16.2' || '16.4' }}.app
 
       - name: ☕ Setup Java (Android only)
         if: matrix.platform == 'android'
@@ -119,10 +119,9 @@ jobs:
         working-directory: example/${{ matrix.app }}
         run: |
           if [ "${{ matrix.app }}" = "paper" ]; then
-            # Paper runs on Xcode 16.3 (iOS 18.4 SDK). The runner has the 18.4
-            # runtime but no pre-made 18.4 simulator device, and run-ios would
-            # otherwise auto-pick an iOS 18.5/26 runtime (shared across the
-            # runner's Xcodes) that 16.3 can't target. Compile against the
+            # Paper runs on Xcode 16.2 (iOS 18.2 SDK). run-ios needs a concrete
+            # simulator device and would auto-pick a newer runtime (shared across
+            # the runner's Xcodes) that 16.2 can't target. Compile against the
             # simulator SDK directly with a generic destination — no device,
             # no launch — which is all CI needs to verify the native build.
             xcodebuild -workspace ios/reactNativeSortablePaper.xcworkspace \
