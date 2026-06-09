@@ -16,6 +16,7 @@ export default function FlexCustomHandleExample() {
   return (
     <View style={styles.container}>
       <Sortable.Flex
+        dragActivationDelay={0}
         gap={10}
         // highlight-next-line
         customHandle // must be set to use a custom handle
