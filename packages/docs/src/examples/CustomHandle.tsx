@@ -28,6 +28,7 @@ export default function CustomHandleExample() {
         activeItemScale={1.05}
         columns={1}
         data={DATA}
+        dragActivationDelay={0}
         overDrag='vertical'
         renderItem={renderItem}
         rowGap={10}
