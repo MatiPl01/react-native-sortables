@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
-import type { ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated, {
   interpolateColor,
   runOnUI,
@@ -74,7 +75,7 @@ export default function TabSelector<T extends number | string>({
 type TabProps<T> = {
   isSelected: boolean;
   tab: T;
-  style: ViewStyle;
+  style: StyleProp<AnimatedStyle<ViewStyle>>;
   onSelectTab: (tab: T) => void;
   onMeasureWidth: (width: number) => void;
 };

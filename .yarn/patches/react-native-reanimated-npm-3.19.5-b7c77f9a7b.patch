@@ -1,0 +1,58 @@
+diff --git a/apple/reanimated/apple/REANodesManager.mm b/apple/reanimated/apple/REANodesManager.mm
+index 91ba53ef81e15b9cdf3cd94d442ae92f4f23cabf..7b9ff2e64a78581adf9e7971f18c1a7a26bbed6d 100644
+--- a/apple/reanimated/apple/REANodesManager.mm
++++ b/apple/reanimated/apple/REANodesManager.mm
+@@ -11,7 +11,7 @@
+ #import <react/renderer/core/ShadowNode.h>
+ #import <react/renderer/uimanager/UIManager.h>
+ #else
+-#import <stdatomic.h>
++#import <atomic>
+ #endif // RCT_NEW_ARCH_ENABLED
+ 
+ #if __has_include(<RNScreens/RNSScreenStackHeaderConfig.h>)
+@@ -164,7 +164,7 @@ @implementation REANodesManager {
+   NSMutableDictionary<NSNumber *, NSMutableDictionary *> *_operationsInBatch;
+ #else
+   NSMutableArray<REANativeAnimationOp> *_operationsInBatch;
+-  volatile atomic_bool _shouldFlushUpdateBuffer;
++  std::atomic<bool> _shouldFlushUpdateBuffer;
+ #endif // RCT_NEW_ARCH_ENABLED
+ }
+ 
+@@ -439,7 +439,7 @@ - (void)updateProps:(nonnull NSDictionary *)props
+       propsSnapshot.viewTag = viewTag;
+       propsSnapshot.viewName = viewName;
+       _componentUpdateBuffer[viewTag] = propsSnapshot;
+-      atomic_store(&_shouldFlushUpdateBuffer, true);
++      _shouldFlushUpdateBuffer.store(true);
+     }
+ 
+     return;
+@@ -458,7 +458,7 @@ - (void)updateProps:(nonnull NSDictionary *)props
+     [_componentUpdateBuffer removeObjectForKey:viewTag];
+ 
+     if (_componentUpdateBuffer.count == 0) {
+-      atomic_store(&_shouldFlushUpdateBuffer, false);
++      _shouldFlushUpdateBuffer.store(false);
+     }
+   }
+ 
+@@ -540,7 +540,7 @@ - (NSString *)obtainProp:(nonnull NSNumber *)viewTag propName:(nonnull NSString
+ - (void)maybeFlushUpdateBuffer
+ {
+   RCTAssertUIManagerQueue();
+-  bool shouldFlushUpdateBuffer = atomic_load(&_shouldFlushUpdateBuffer);
++  bool shouldFlushUpdateBuffer = _shouldFlushUpdateBuffer.load();
+   if (!shouldFlushUpdateBuffer) {
+     return;
+   }
+@@ -552,7 +552,7 @@ - (void)maybeFlushUpdateBuffer
+         if (strongSelf == nil) {
+           return;
+         }
+-        atomic_store(&strongSelf->_shouldFlushUpdateBuffer, false);
++        strongSelf->_shouldFlushUpdateBuffer.store(false);
+         NSMutableDictionary *componentUpdateBuffer = [strongSelf->_componentUpdateBuffer copy];
+         strongSelf->_componentUpdateBuffer = [NSMutableDictionary new];
+         for (NSNumber *tag in componentUpdateBuffer) {

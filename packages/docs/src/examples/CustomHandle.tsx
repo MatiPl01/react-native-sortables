@@ -12,7 +12,7 @@ export default function CustomHandleExample() {
         {/* Wraps the handle component */}
         {/* highlight-next-line */}
         <Sortable.Handle>
-          <View style={styles.handle}>
+          <View pointerEvents='none' style={styles.handle}>
             <Text style={styles.handleText}>::</Text>
           </View>
           {/* highlight-next-line */}
@@ -28,6 +28,7 @@ export default function CustomHandleExample() {
         activeItemScale={1.05}
         columns={1}
         data={DATA}
+        dragActivationDelay={0}
         overDrag='vertical'
         renderItem={renderItem}
         rowGap={10}
