@@ -64,7 +64,7 @@ export default function ItemCell({
     ...(!IS_WEB && overriddenCellDimensions.value)
   }));
 
-  let innerAnimatedStyle: AnimatedStyle | undefined;
+  let innerAnimatedStyle: AnimatedStyle<ViewStyle> | undefined;
   if (IS_WEB) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     innerAnimatedStyle = useAnimatedStyle(() => overriddenCellDimensions.value);

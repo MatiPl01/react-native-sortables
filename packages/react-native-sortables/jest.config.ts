@@ -11,17 +11,10 @@ const config: JestConfigWithTsJest = {
   resolver: 'react-native-worklets/jest/resolver.js',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transform: {
-    '^.+\\.jsx?$': [
+    '^.+\\.[jt]sx?$': [
       'babel-jest',
       {
         configFile: '../../test/babel.config.cjs'
-      }
-    ],
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        configFile: '../../test/babel.config.cjs',
-        diagnostics: false
       }
     ]
   },

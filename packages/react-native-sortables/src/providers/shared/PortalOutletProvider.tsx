@@ -20,7 +20,9 @@ const { PortalOutletProvider, usePortalOutletContext } = createProvider(
         collapsable={false}
         ref={portalOutletRef}
         style={styles.container}
-        onLayout={runOnUI(measurePortalOutlet)}>
+        onLayout={() => {
+          runOnUI(measurePortalOutlet)();
+        }}>
         {children}
       </View>
     ),
