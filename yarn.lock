@@ -919,7 +919,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-class-properties@npm:^7.27.1, @babel/plugin-transform-class-properties@npm:^7.28.6":
+"@babel/plugin-transform-class-properties@npm:^7.28.6":
   version: 7.29.7
   resolution: "@babel/plugin-transform-class-properties@npm:7.29.7"
   dependencies:
@@ -959,7 +959,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-classes@npm:^7.28.4, @babel/plugin-transform-classes@npm:^7.28.6":
+"@babel/plugin-transform-classes@npm:^7.28.6":
   version: 7.29.7
   resolution: "@babel/plugin-transform-classes@npm:7.29.7"
   dependencies:
@@ -1243,7 +1243,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-nullish-coalescing-operator@npm:^7.27.1, @babel/plugin-transform-nullish-coalescing-operator@npm:^7.28.6":
+"@babel/plugin-transform-nullish-coalescing-operator@npm:^7.28.6":
   version: 7.29.7
   resolution: "@babel/plugin-transform-nullish-coalescing-operator@npm:7.29.7"
   dependencies:
@@ -1313,7 +1313,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-optional-chaining@npm:^7.27.1, @babel/plugin-transform-optional-chaining@npm:^7.28.6":
+"@babel/plugin-transform-optional-chaining@npm:^7.28.6":
   version: 7.29.7
   resolution: "@babel/plugin-transform-optional-chaining@npm:7.29.7"
   dependencies:
@@ -1833,7 +1833,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-typescript@npm:^7.27.1, @babel/preset-typescript@npm:^7.28.5":
+"@babel/preset-typescript@npm:^7.28.5":
   version: 7.29.7
   resolution: "@babel/preset-typescript@npm:7.29.7"
   dependencies:
@@ -8466,12 +8466,12 @@ __metadata:
     react-native: "npm:0.85.3"
     react-native-gesture-handler: "npm:2.31.1"
     react-native-haptic-feedback: "npm:2.3.3"
-    react-native-reanimated: "npm:4.4.1"
+    react-native-reanimated: "npm:4.5.0"
     react-native-safe-area-context: "npm:5.7.0"
     react-native-screens: "npm:4.25.2"
     react-native-sortables: "workspace:*"
     react-native-svg: "npm:15.15.4"
-    react-native-worklets: "npm:0.9.1"
+    react-native-worklets: "npm:0.10.0"
     react-test-renderer: "npm:19.2.3"
     typescript: "npm:^5.8.3"
   languageName: unknown
@@ -8488,8 +8488,8 @@ __metadata:
     react: "npm:19.2.3"
     react-native: "npm:0.85.3"
     react-native-gesture-handler: "npm:~2.31.1"
-    react-native-reanimated: "npm:4.3.1"
-    react-native-worklets: "npm:0.8.3"
+    react-native-reanimated: "npm:4.5.0"
+    react-native-worklets: "npm:0.10.0"
     typescript: "npm:~5.9.2"
   languageName: unknown
   linkType: soft
@@ -14997,31 +14997,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:4.3.1":
-  version: 4.3.1
-  resolution: "react-native-reanimated@npm:4.3.1"
-  dependencies:
-    react-native-is-edge-to-edge: "npm:^1.3.1"
-    semver: "npm:^7.7.3"
-  peerDependencies:
-    react: "*"
-    react-native: 0.81 - 0.85
-    react-native-worklets: 0.8.x
-  checksum: 10c0/e456e2def81433872e3a43fd8a37b4e8d8be807ecb9f692b876a5d513d71918104c56db388ae0b58417f25764e3ab82c6fda9327079b3fdc73bedc8593d4f189
-  languageName: node
-  linkType: hard
-
-"react-native-reanimated@npm:4.4.1":
-  version: 4.4.1
-  resolution: "react-native-reanimated@npm:4.4.1"
+"react-native-reanimated@npm:4.5.0":
+  version: 4.5.0
+  resolution: "react-native-reanimated@npm:4.5.0"
   dependencies:
     react-native-is-edge-to-edge: "npm:^1.3.1"
     semver: "npm:^7.7.3"
   peerDependencies:
     react: "*"
     react-native: 0.83 - 0.86
-    react-native-worklets: 0.9.x
-  checksum: 10c0/400db6b846c23ee523a74a0b449d07358c6ec20e4ac6e08d867eec3488b1572a2809bc324d4c860479a3fed4e2d182f51146761f24457de07dd10756ffc6de97
+    react-native-worklets: 0.10.x
+  checksum: 10c0/2df754c030a90b9bdbbc5b9fdc9201821b9487f09e72399f7525a23dad95e864470de8ada5f38e28756f8de0c52956125bccb094cec71d5a850c93c83575224a
   languageName: node
   linkType: hard
 
@@ -15142,8 +15128,8 @@ __metadata:
     react-native-builder-bob: "npm:0.40.13"
     react-native-gesture-handler: "npm:2.31.1"
     react-native-haptic-feedback: "npm:>=2.0.0"
-    react-native-reanimated: "npm:4.4.1"
-    react-native-worklets: "npm:0.9.1"
+    react-native-reanimated: "npm:4.5.0"
+    react-native-worklets: "npm:0.10.0"
     semantic-release: "npm:^24.0.0"
     semantic-release-yarn: "npm:^3.0.2"
     syncpack: "npm:^12.3.3"
@@ -15206,33 +15192,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-worklets@npm:0.8.3":
-  version: 0.8.3
-  resolution: "react-native-worklets@npm:0.8.3"
-  dependencies:
-    "@babel/plugin-transform-arrow-functions": "npm:^7.27.1"
-    "@babel/plugin-transform-class-properties": "npm:^7.27.1"
-    "@babel/plugin-transform-classes": "npm:^7.28.4"
-    "@babel/plugin-transform-nullish-coalescing-operator": "npm:^7.27.1"
-    "@babel/plugin-transform-optional-chaining": "npm:^7.27.1"
-    "@babel/plugin-transform-shorthand-properties": "npm:^7.27.1"
-    "@babel/plugin-transform-template-literals": "npm:^7.27.1"
-    "@babel/plugin-transform-unicode-regex": "npm:^7.27.1"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    convert-source-map: "npm:^2.0.0"
-    semver: "npm:^7.7.3"
-  peerDependencies:
-    "@babel/core": "*"
-    "@react-native/metro-config": "*"
-    react: "*"
-    react-native: 0.81 - 0.85
-  checksum: 10c0/9ceb8ff1f1569165be3318c958087ed95d7b89e5e7308b733dc3f8e328d48c2acc7bc7369449b004b1824ed96e14a15a279d2dbee0105d7d62a55001045484ba
-  languageName: node
-  linkType: hard
-
-"react-native-worklets@npm:0.9.1":
-  version: 0.9.1
-  resolution: "react-native-worklets@npm:0.9.1"
+"react-native-worklets@npm:0.10.0":
+  version: 0.10.0
+  resolution: "react-native-worklets@npm:0.10.0"
   dependencies:
     "@babel/plugin-transform-arrow-functions": "npm:^7.27.1"
     "@babel/plugin-transform-class-properties": "npm:^7.28.6"
@@ -15243,6 +15205,7 @@ __metadata:
     "@babel/plugin-transform-template-literals": "npm:^7.27.1"
     "@babel/plugin-transform-unicode-regex": "npm:^7.27.1"
     "@babel/preset-typescript": "npm:^7.28.5"
+    "@babel/types": "npm:^7.27.1"
     convert-source-map: "npm:^2.0.0"
     semver: "npm:^7.7.4"
   peerDependencies:
@@ -15250,7 +15213,7 @@ __metadata:
     "@react-native/metro-config": "*"
     react: "*"
     react-native: 0.83 - 0.86
-  checksum: 10c0/a3612d9c2b3613c789dc0b15ffe4e200681b8e64a715029748d29fb4176930765f1afb9fa4d625c02a2c136f3c331ab488e28fbb75e28295fa15edd4000195f3
+  checksum: 10c0/23144639390ac5d2326b0d088400584849f01eba629f0cbe2b627961c8829a4ee5092f5f4cc5008e00512837e8fbb3c73ea202c2e5ae8bb6312131822b6c9706
   languageName: node
   linkType: hard
 

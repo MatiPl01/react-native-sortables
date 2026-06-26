@@ -79,7 +79,9 @@ function CustomHandleComponent({
         collapsable={false}
         ref={handleRef}
         style={style}
-        onLayout={runOnUI(onLayout)}>
+        onLayout={() => {
+          runOnUI(onLayout)();
+        }}>
         {children}
       </View>
     </GestureDetector>
