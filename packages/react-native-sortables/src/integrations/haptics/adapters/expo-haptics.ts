@@ -15,7 +15,9 @@
 
 import { runOnJS } from 'react-native-reanimated';
 
-const load = () => {
+import type { HapticsAdapter, HapticTrigger } from './types';
+
+const load = (): HapticTrigger | null => {
   const expoHaptics = (globalThis as any).expo?.modules?.ExpoHaptics;
 
   if (!expoHaptics?.impactAsync) {
@@ -35,7 +37,7 @@ const load = () => {
     }
   };
 
-  const trigger = (type = 'impactLight') => {
+  const trigger: HapticTrigger = (type = 'impactLight') => {
     'worklet';
     // expo-haptics runs on the JS thread, so hop over from the UI worklet
     runOnJS(impact)(type === 'impactMedium' ? 'medium' : 'light');
@@ -44,6 +46,6 @@ const load = () => {
   return trigger;
 };
 
-const ExpoHaptics = { load };
+const ExpoHaptics: HapticsAdapter = { load, name: 'expo-haptics' };
 
 export default ExpoHaptics;

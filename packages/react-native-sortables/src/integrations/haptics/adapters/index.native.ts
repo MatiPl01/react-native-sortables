@@ -1,8 +1,25 @@
 import ExpoHaptics from './expo-haptics';
+import Pulsar from './pulsar';
 import ReactNativeHapticFeedback from './react-native-haptic-feedback';
+import type { HapticsAdapter } from './types';
+
+// Tried in priority order; the first available backend provides the trigger.
+const ADAPTERS: Array<HapticsAdapter> = [
+  Pulsar,
+  ExpoHaptics,
+  // Must stay last - always returns a trigger (never null), so it is the
+  // terminal fallback.
+  ReactNativeHapticFeedback
+];
 
 export const Haptics = {
-  // Prefer expo-haptics (available in any Expo app, including Expo Go) and
-  // fall back to react-native-haptic-feedback for bare React Native apps.
-  load: () => ExpoHaptics.load() ?? ReactNativeHapticFeedback.load()
+  load: () => {
+    for (const adapter of ADAPTERS) {
+      const trigger = adapter.load();
+      if (trigger) {
+        return trigger;
+      }
+    }
+    return null;
+  }
 };
