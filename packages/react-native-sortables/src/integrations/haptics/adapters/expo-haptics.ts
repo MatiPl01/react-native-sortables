@@ -1,11 +1,8 @@
 /**
- * Optional expo-haptics adapter.
- *
- * We never import `expo-haptics` directly, because a static import would break
- * Metro bundling for bare React Native apps that don't have it installed.
- * Instead we read its native module from the Expo runtime registry, so it's
- * picked up automatically in any Expo app (including Expo Go) and ignored
- * everywhere else.
+ * Optional expo-haptics adapter. We never import the package (a static import
+ * would break Metro for bare apps without it); instead we read its native
+ * module from the Expo runtime registry, so it is picked up in any Expo app and
+ * ignored elsewhere.
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
