@@ -1,15 +1,10 @@
 /**
- * Optional react-native-pulsar adapter.
- *
- * Pulsar exposes its haptics through a Turbo Module ('RNPulsar'), so it only
- * works on the New Architecture and never in Expo Go. Like the expo-haptics
- * adapter, we never import the package: we look its native module up in the
- * Turbo Module registry, so Pulsar is used automatically when a consumer has
- * installed it and ignored everywhere else. That keeps it out of the
- * dependency tree and leaves bare old-architecture builds untouched.
- *
- * `Pulsar_play` is synchronous and Pulsar's own presets call it from worklets,
- * so we fire it directly on the UI thread without hopping to JS.
+ * Optional react-native-pulsar adapter. Pulsar's haptics live behind a Turbo
+ * Module ('RNPulsar'), available only on the New Architecture. Like the
+ * expo-haptics adapter we never import the package - we look the native module
+ * up in the Turbo Module registry, so it is used automatically when installed
+ * and adds nothing to the dependency tree. Its presets call the synchronous
+ * native method from worklets, so we fire directly on the UI thread.
  */
 
 import { type TurboModule, TurboModuleRegistry } from 'react-native';
