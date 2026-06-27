@@ -20,8 +20,17 @@ import { areVectorsDifferent } from '../../../utils';
 import { useCommonValuesContext } from '../CommonValuesProvider';
 import useItemZIndex from './useItemZIndex';
 
+// When switching back from absolute to relative layout (e.g. after a drop when
+// `idleItemsLayout` is 'relative'), the previously applied absolute positioning
+// props must be explicitly reset. Reanimated does not restore props that are
+// simply omitted from a new style object, so leaving them out would keep the
+// stale absolute `left`/`top`/`transform` and scatter the items.
 const RELATIVE_STYLE: ViewStyle = {
-  position: 'relative'
+  left: 0,
+  position: 'relative',
+  top: 0,
+  transform: [],
+  zIndex: 0
 };
 
 const HIDDEN_STYLE: ViewStyle = {

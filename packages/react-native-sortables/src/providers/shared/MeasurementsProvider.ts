@@ -41,6 +41,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     containerWidth,
     controlledContainerDimensions,
     controlledItemDimensions,
+    idleItemsLayout,
+    isMeasured,
     itemHeights,
     itemWidths,
     usesAbsoluteLayout
@@ -206,11 +208,17 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         containerHeight.value = dimensions.height;
       }
 
-      if (!usesAbsoluteLayout.value) {
+      if (!isMeasured.value) {
         // Add timeout for safety, to prevent too many layout recalculations
         // in a short period of time (this may cause issues on low-end devices)
         setAnimatedTimeout(() => {
-          usesAbsoluteLayout.value = true;
+          isMeasured.value = true;
+          // When items should reflow with the container while idle, keep them
+          // in relative (flex) layout until a drag starts. Otherwise switch to
+          // absolute positioning right away and keep it for the whole lifetime.
+          if (idleItemsLayout !== 'relative') {
+            usesAbsoluteLayout.value = true;
+          }
         }, 100);
       }
     },
@@ -218,6 +226,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       containerHeight,
       containerWidth,
       controlledContainerDimensions,
+      idleItemsLayout,
+      isMeasured,
       usesAbsoluteLayout
     ]
   );

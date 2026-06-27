@@ -275,6 +275,27 @@ Whether the height of the flex component should be animated when the items are r
 
 ---
 
+### idleItemsLayout
+
+Controls how items are positioned while the container is **idle** (no item is being dragged).
+
+| type                       | default      | required |
+| -------------------------- | ------------ | -------- |
+| `'absolute' \| 'relative'` | `'absolute'` | NO       |
+
+- `'absolute'` - idle items keep the **library-computed absolute positions**. This is the default and works best when the container has a **fixed size**.
+- `'relative'` - idle items use the container's **native flex layout**, so they **reflow immediately** when the container is **resized** (e.g. a resizable table cell). The library automatically switches back to absolute positioning while an item is being dragged.
+
+:::info
+
+Use `'relative'` when the `Sortable.Flex` is rendered inside a **container whose size can change** and you want the items to follow the new size without a delay.
+
+When `'relative'` is used, you should **persist the items order** in the `onDragEnd` callback (e.g. `onDragEnd={({ order }) => setItems(order)}`), because idle items follow the **order of the children** rather than the library-computed positions.
+
+:::
+
+---
+
 ## Item Drag
 
 ### overDrag

@@ -22,6 +22,7 @@ import type { Dimensions, ItemSizes, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
+  IdleItemsLayout,
   ItemDragSettings,
   ReorderTriggerOrigin
 } from '../props/shared';
@@ -92,10 +93,16 @@ export type CommonValuesContextType =
       // OTHER
       containerRef: AnimatedRef<View>;
       sortEnabled: SharedValue<boolean>;
+      // Whether items are currently rendered with absolute positions. Toggled
+      // back to false when idle if `idleItemsLayout` is 'relative'.
       usesAbsoluteLayout: SharedValue<boolean>;
+      // Set to true once after the first layout and never reset. Gates the drag
+      // gesture independently of `usesAbsoluteLayout` (which may toggle).
+      isMeasured: SharedValue<boolean>;
       shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
       animateLayoutOnReorderOnly: SharedValue<boolean>;
       customHandle: boolean;
+      idleItemsLayout: IdleItemsLayout;
       isStackingOrderDesc: boolean;
     };
 

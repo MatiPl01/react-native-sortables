@@ -171,6 +171,10 @@ const routes: Routes = {
             Component: SortableFlex.tests.ComplexLayoutExample,
             name: 'Complex Layout'
           },
+          ResizableContainer: {
+            Component: SortableFlex.tests.ResizableContainerExample,
+            name: 'Resizable Container'
+          },
           BottomTabsNavigator: {
             Component: SortableFlex.tests.BottomTabsNavigatorExample,
             name: 'Bottom Tabs Navigator'

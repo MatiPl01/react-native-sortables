@@ -14,6 +14,7 @@ import type {
   CommonValuesContextType,
   ControlledDimensions,
   Dimensions,
+  IdleItemsLayout,
   ItemDragSettings,
   ItemSizes,
   ItemsLayoutTransitionMode,
@@ -35,6 +36,7 @@ type CommonValuesProviderProps = PropsWithChildren<
       customHandle: boolean;
       controlledContainerDimensions: ControlledDimensions;
       controlledItemDimensions: ControlledDimensions;
+      idleItemsLayout?: IdleItemsLayout;
       itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
       stackingOrder: ItemsStackingOrder;
     }
@@ -56,6 +58,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     dragActivationFailOffset: _dragActivationFailOffset,
     dropAnimationDuration: _dropAnimationDuration,
     enableActiveItemSnap: _enableActiveItemSnap,
+    idleItemsLayout = 'absolute',
     inactiveItemOpacity: _inactiveItemOpacity,
     inactiveItemScale: _inactiveItemScale,
     itemsLayoutTransitionMode,
@@ -126,6 +129,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const containerRef = useAnimatedRef<View>();
     const sortEnabled = useAnimatableValue(_sortEnabled);
     const usesAbsoluteLayout = useMutableValue(false);
+    const isMeasured = useMutableValue(false);
     const shouldAnimateLayout = useMutableValue(true);
     const animateLayoutOnReorderOnly = useDerivedValue(
       () => itemsLayoutTransitionMode === 'reorder',
@@ -164,10 +168,12 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         dragActivationFailOffset,
         dropAnimationDuration,
         enableActiveItemSnap,
+        idleItemsLayout,
         inactiveAnimationProgress,
         inactiveItemOpacity,
         inactiveItemScale,
         indexToKey,
+        isMeasured,
         isStackingOrderDesc: stackingOrder === 'desc',
         itemHeights,
         itemPositions,

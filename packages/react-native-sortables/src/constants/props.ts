@@ -85,6 +85,7 @@ export const DEFAULT_SORTABLE_FLEX_PROPS = {
   flexDirection: 'row',
   flexWrap: 'wrap',
   gap: 0,
+  idleItemsLayout: 'absolute',
   justifyContent: 'flex-start',
   padding: 0,
   strategy: 'insert'

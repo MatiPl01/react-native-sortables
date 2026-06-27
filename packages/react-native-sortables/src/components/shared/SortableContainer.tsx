@@ -82,16 +82,26 @@ export default function SortableContainer({
     };
   });
 
-  const innerContainerStyle = useAnimatedStyle(() => ({
-    ...(controlledContainerDimensions.height &&
-      containerHeight.value !== null && {
-        height: containerHeight.value
-      }),
-    ...(controlledContainerDimensions.width &&
-      containerWidth.value !== null && {
-        width: containerWidth.value
-      })
-  }));
+  const innerContainerStyle = useAnimatedStyle(() => {
+    // While items are in relative (flex) layout, let the container size to its
+    // content so it reflows immediately on resize. Pinning the controlled
+    // dimensions here would leave a stale size on the controlled axis (e.g. a
+    // stale height that clips wrapped rows) until the next layout pass.
+    if (!usesAbsoluteLayout.value) {
+      return EMPTY_OBJECT;
+    }
+
+    return {
+      ...(controlledContainerDimensions.height &&
+        containerHeight.value !== null && {
+          height: containerHeight.value
+        }),
+      ...(controlledContainerDimensions.width &&
+        containerWidth.value !== null && {
+          width: containerWidth.value
+        })
+    };
+  });
 
   return (
     <Animated.View

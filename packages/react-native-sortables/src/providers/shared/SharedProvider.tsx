@@ -12,6 +12,7 @@ import type {
   ActiveItemSnapSettings,
   AutoScrollSettings,
   ControlledDimensions,
+  IdleItemsLayout,
   ItemDragSettings,
   SharedProps,
   SortableCallbacks
@@ -46,6 +47,8 @@ export type SharedProviderProps = PropsWithChildren<
     Required<SortableCallbacks> & {
       controlledContainerDimensions: ControlledDimensions;
       controlledItemDimensions: ControlledDimensions;
+      // Flex-only: forwarded to CommonValuesProvider via `...rest`
+      idleItemsLayout?: IdleItemsLayout;
       dropIndicatorStyle?: ViewStyle;
     }
 >;

@@ -92,10 +92,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     dragActivationFailOffset,
     dropAnimationDuration,
     enableActiveItemSnap,
+    idleItemsLayout,
     inactiveAnimationProgress,
     inactiveItemOpacity,
     inactiveItemScale,
     indexToKey,
+    isMeasured,
     itemHeights,
     itemPositions,
     itemWidths,
@@ -282,6 +284,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     ) => {
       'worklet';
       const ctx = context.value;
+      // In idle-relative mode items are laid out by flex while idle. Commit the
+      // switch to absolute positioning synchronously here, before any active
+      // item position starts updating, so the item is absolute on the first
+      // animated frame (itemPositions are kept current in both modes).
+      if (idleItemsLayout === 'relative') {
+        usesAbsoluteLayout.value = true;
+      }
       activeAnimationProgress.value = 0;
       activeItemDropped.value = false;
       prevActiveItemKey.value = null;
@@ -357,6 +366,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       context,
       containerId,
       haptics,
+      idleItemsLayout,
       inactiveAnimationProgress,
       inactiveItemOpacity,
       inactiveItemScale,
@@ -367,7 +377,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       onDragStart,
       touchPosition,
       updateLayer,
-      updateActiveHandleMeasurements
+      updateActiveHandleMeasurements,
+      usesAbsoluteLayout
     ]
   );
 
@@ -385,8 +396,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         !touch ||
         // Sorting is disabled
         !sortEnabled.value ||
-        // Absolute layout is not applied yet
-        !usesAbsoluteLayout.value ||
+        // Items are not measured yet (positions are not ready)
+        !isMeasured.value ||
         // Another item is already being touched/activated
         activationAnimationProgress.value > 0 ||
         activeItemKey.value !== null
@@ -405,7 +416,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // Start handling touch after a delay to prevent accidental activation
       // e.g. while scrolling the ScrollView
       ctx.activationTimeoutId = setAnimatedTimeout(() => {
-        if (!usesAbsoluteLayout.value) {
+        if (!isMeasured.value) {
           return;
         }
 
@@ -437,11 +448,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       currentTouch,
       dragActivationDelay,
       handleDragStart,
+      isMeasured,
       itemHeights,
       itemWidths,
       itemPositions,
-      sortEnabled,
-      usesAbsoluteLayout
+      sortEnabled
     ]
   );
 
@@ -562,6 +573,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       setAnimatedTimeout(() => {
         activeItemDropped.value = true;
+        // Now that the drop animation finished and the sortable is fully idle,
+        // return items to relative (flex) layout so they reflow with the
+        // container until the next drag starts.
+        if (idleItemsLayout === 'relative') {
+          usesAbsoluteLayout.value = false;
+        }
         updateLayer?.(LayerState.IDLE);
         onActiveItemDropped({
           fromIndex,
@@ -585,6 +602,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       currentTouch,
       dropAnimationDuration,
       haptics,
+      idleItemsLayout,
       inactiveAnimationProgress,
       indexToKey,
       keyToIndex,
@@ -593,6 +611,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       stableOnDragEnd,
       touchPosition,
       updateLayer,
+      usesAbsoluteLayout,
       activeHandleMeasurements
     ]
   );

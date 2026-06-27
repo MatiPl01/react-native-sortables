@@ -167,6 +167,16 @@ export type DropIndicatorSettings = {
  */
 export type ItemsLayoutTransitionMode = 'all' | 'reorder';
 
+/**
+ * Controls how items are positioned while the container is idle (no item is
+ * being dragged)
+ * - 'absolute' - items keep the library-computed absolute positions
+ * - 'relative' - items use the container's native flex layout while idle, so
+ *   they reflow immediately when the container is resized. The library switches
+ *   to absolute positioning automatically while an item is being dragged.
+ */
+export type IdleItemsLayout = 'absolute' | 'relative';
+
 type ItemLayoutAnimationSettings = {
   /** Animation to play when an item enters the list */
   itemEntering: LayoutAnimation | null;

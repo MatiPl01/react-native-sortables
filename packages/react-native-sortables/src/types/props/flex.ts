@@ -9,7 +9,12 @@ import type {
   JustifyContent
 } from '../layout/flex';
 import type { SortStrategyFactory } from '../providers';
-import type { DefaultSharedProps, DragEndParams, SharedProps } from './shared';
+import type {
+  DefaultSharedProps,
+  DragEndParams,
+  IdleItemsLayout,
+  SharedProps
+} from './shared';
 
 /** Parameters passed to the onDragEnd callback of a sortable flex container */
 export type SortableFlexDragEndParams = DragEndParams & {
@@ -93,6 +98,16 @@ export type SortableFlexProps = Simplify<
          * @default 'insert'
          */
         strategy?: SortableFlexStrategy;
+        /** Controls how items are positioned while the container is idle (no
+         * item is being dragged).
+         *
+         * Set to `'relative'` to let items use the container's native flex
+         * layout while idle, so they reflow immediately when the container is
+         * resized (e.g. a resizable table column). The library automatically
+         * switches to absolute positioning while an item is being dragged.
+         * @default 'absolute'
+         */
+        idleItemsLayout?: IdleItemsLayout;
         /** Callback fired when drag gesture ends.
          * @note This callback is always called when drag ends, even if the order hasn't changed.
          * The order function provided in the callback parameters will maintain referential
