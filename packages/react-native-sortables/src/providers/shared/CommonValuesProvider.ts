@@ -76,6 +76,9 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const touchPosition = useMutableValue<null | Vector>(null);
     const activeItemPosition = useMutableValue<null | Vector>(null);
     const itemPositions = useMutableValue<Record<string, Vector>>({});
+    // Bumped to force the layout reaction to re-run (e.g. after item dimensions
+    // settle), so positions can't get stuck stale if a reactive update is missed.
+    const layoutRequestId = useMutableValue(0);
 
     // DIMENSIONS
     const containerWidth = useMutableValue<null | number>(null);
@@ -174,6 +177,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         itemsLayoutTransitionMode,
         itemWidths,
         keyToIndex,
+        layoutRequestId,
         overriddenCellDimensions,
         prevActiveItemKey,
         shouldAnimateLayout,
