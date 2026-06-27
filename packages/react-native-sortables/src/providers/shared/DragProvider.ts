@@ -131,6 +131,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const currentTouch = useMutableValue<null | TouchData>(null);
   // Used to trigger order change of items when the active item is dragged around
   const triggerOriginPosition = useMutableValue<null | Vector>(null);
+  // Order computed during a `reorderOnDrag={false}` drag. It isn't applied while
+  // dragging - it's committed in handleDragEnd before the drag-end callbacks fire.
+  const pendingDropOrder = useMutableValue<Array<string> | null>(null);
 
   // ACTIVE ITEM POSITION UPDATER
   useAnimatedReaction(
@@ -526,7 +529,30 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       const fromIndex = ctx.dragStartIndex;
-      const toIndex = keyToIndex.value[key]!;
+
+      // Commit a deferred (reorderOnDrag=false) reorder synchronously here so the
+      // drag-end callbacks below report the final order rather than the pre-drop
+      // one. With reorderOnDrag=true pendingDropOrder stays null and this is a no-op.
+      let dropIndexToKey = indexToKey.value;
+      let dropKeyToIndex = keyToIndex.value;
+      const newOrder = pendingDropOrder.value;
+      if (newOrder) {
+        pendingDropOrder.value = null;
+        indexToKey.value = newOrder;
+        dropIndexToKey = newOrder;
+        dropKeyToIndex = getKeyToIndex(newOrder);
+        const reorderedIndex = dropKeyToIndex[key]!;
+        if (reorderedIndex !== fromIndex) {
+          onOrderChange({
+            fromIndex,
+            indexToKey: newOrder,
+            key,
+            keyToIndex: dropKeyToIndex,
+            toIndex: reorderedIndex
+          });
+        }
+      }
+      const toIndex = dropKeyToIndex[key]!;
 
       prevActiveItemKey.value = activeItemKey.value;
       ctx.dragStartItemTouchOffset = null;
@@ -554,9 +580,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       stableOnDragEnd({
         fromIndex,
-        indexToKey: indexToKey.value,
+        indexToKey: dropIndexToKey,
         key,
-        keyToIndex: keyToIndex.value,
+        keyToIndex: dropKeyToIndex,
         toIndex
       });
 
@@ -565,9 +591,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         updateLayer?.(LayerState.IDLE);
         onActiveItemDropped({
           fromIndex,
-          indexToKey: indexToKey.value,
+          indexToKey: dropIndexToKey,
           key,
-          keyToIndex: keyToIndex.value,
+          keyToIndex: dropKeyToIndex,
           toIndex
         });
       }, dropDuration);
@@ -590,6 +616,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       keyToIndex,
       multiZoneActiveItemDimensions,
       onActiveItemDropped,
+      onOrderChange,
+      pendingDropOrder,
       stableOnDragEnd,
       touchPosition,
       updateLayer,
@@ -625,6 +653,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       handleOrderChange,
       handleTouchesMove,
       handleTouchStart,
+      pendingDropOrder,
       triggerOriginPosition
     }
   };

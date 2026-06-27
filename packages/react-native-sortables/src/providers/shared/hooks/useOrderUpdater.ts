@@ -8,7 +8,11 @@ import { useDragContext } from '../DragProvider';
 
 export default function useOrderUpdater<
   P extends PredefinedStrategies = PredefinedStrategies
->(strategy: keyof P | SortStrategyFactory, predefinedStrategies: P) {
+>(
+  strategy: keyof P | SortStrategyFactory,
+  predefinedStrategies: P,
+  reorderOnDrag: boolean
+) {
   const useStrategy =
     typeof strategy === 'string' ? predefinedStrategies[strategy] : strategy;
 
@@ -18,7 +22,8 @@ export default function useOrderUpdater<
 
   const { activeItemDimensions, activeItemKey, keyToIndex } =
     useCommonValuesContext();
-  const { handleOrderChange, triggerOriginPosition } = useDragContext();
+  const { handleOrderChange, pendingDropOrder, triggerOriginPosition } =
+    useDragContext();
   const debugContext = useDebugContext();
 
   const debugCross = debugContext?.useDebugCross();
@@ -53,13 +58,22 @@ export default function useOrderUpdater<
         position
       });
 
-      if (newOrder) {
+      if (!newOrder) {
+        return;
+      }
+
+      if (reorderOnDrag) {
         handleOrderChange(
           activeKey,
           activeIndex,
           newOrder.indexOf(activeKey),
           newOrder
         );
+      } else {
+        // Keep computing the prospective order during the drag but don't apply
+        // it yet. It's committed in handleDragEnd right before onDragEnd fires,
+        // so the drag-end callbacks report the final order (see DragProvider).
+        pendingDropOrder.value = newOrder;
       }
     }
   );
