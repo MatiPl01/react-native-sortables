@@ -8,20 +8,19 @@ import type {
 export type { GestureTouchEvent, TouchData };
 
 /**
- * A gesture object that can be handed to `<GestureDetector />`.
- *
- * The two gesture-handler major versions model gestures differently (the v2
- * imperative builder returns gesture instances, the v3 hook API returns plain
- * descriptors). We type this with `GestureType`/`ComposedGesture`, which are the
- * only gesture names exported by BOTH majors, so the published types resolve for
+ * A gesture handed to `<GestureDetector />`. Typed with the only gesture names
+ * exported by both gesture-handler majors, so published types resolve for
  * consumers on either version.
  */
 export type SortableGesture = ComposedGesture | GestureType;
 
+/** Re-tags a version-specific gesture object as the unified {@link SortableGesture}. */
+export const asSortableGesture = (gesture: object): SortableGesture =>
+  gesture as SortableGesture;
+
 /**
- * Imperative control over a manual gesture's recognition state. Maps to the v2
- * gesture `manager` argument or to the v3 `GestureStateManager` bound to the
- * gesture's handler tag.
+ * Imperative control over a manual gesture's recognition state - the v2 gesture
+ * `manager`, or the v3 `GestureStateManager` bound to the handler tag.
  */
 export type ManualGestureControl = {
   activate: () => void;

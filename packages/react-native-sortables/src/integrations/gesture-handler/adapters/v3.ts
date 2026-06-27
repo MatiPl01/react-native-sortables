@@ -1,28 +1,21 @@
-// `SingleGesture` only exists in gesture-handler v3; this is a type-only import
-// (erased at runtime) used to bridge the public `SortableGesture` back to the v3
-// hook gesture type, so it never affects the v2 fallback path.
 import type { SingleGesture } from 'react-native-gesture-handler';
 import * as GestureHandler from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../reanimated';
-import type { ManualGestureControl, SortableGesture } from '../types';
+import type { ManualGestureControl } from '../types';
+import { asSortableGesture } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
 /**
- * gesture-handler v3 (hook API) implementation, used when
- * react-native-gesture-handler >= 3 is installed.
+ * gesture-handler v3 hook API, used when gesture-handler >= 3 is installed. This
+ * is what fixes issue #349: v3 hook gestures keep receiving touches after a
+ * screen is detached and re-attached, so a drag no longer gets stuck.
  *
- * This path fixes issue #349: unlike the v2 imperative builder, the v3 hook
- * gestures keep receiving touches after a screen is detached and re-attached
- * (e.g. bottom tabs with `detachInactiveScreens={false}` on iOS + New
- * Architecture), so a drag no longer gets "stuck" or stops activating.
+ * The hooks are resolved through a namespace import so bundlers don't fail on
+ * these (v3-only) names when an older gesture-handler is installed - this
+ * adapter is only ever selected when they exist (see `../index`).
  */
-
-// Resolved lazily at module load; these are `undefined` when an older
-// gesture-handler is installed, in which case this adapter is never selected
-// (see `../index`). The namespace import keeps bundlers from failing on the
-// missing named exports.
 const {
   GestureStateManager,
   useExclusiveGestures,
@@ -38,11 +31,9 @@ function createControl(
 ): ManualGestureControl {
   'worklet';
   return {
-    // The library activates the gesture from a delayed timeout (the drag
-    // activation delay). gesture-handler v3's `_setGestureStateSync` throws when
-    // called outside a gesture event, so we cannot activate from the timeout
-    // directly. Instead we flag the request and perform the actual activation in
-    // the next `onTouchesMove`, which runs inside a gesture event.
+    // `GestureStateManager.activate` throws when called outside a gesture event,
+    // but the library activates from a delayed timeout - so flag it here and run
+    // the real activation in the next in-event `onTouchesMove`.
     activate: () => {
       'worklet';
       pendingActivation.value = true;
@@ -62,54 +53,54 @@ function createControl(
 const useDragGesture: GestureHandlerAdapter['useDragGesture'] = callbacks => {
   const pendingActivation = useMutableValue(false);
 
-  return useManualGesture({
-    onTouchesCancel: event => {
-      'worklet';
-      callbacks.onTouchesCancelled(
-        event,
-        createControl(event.handlerTag, pendingActivation)
-      );
-    },
-    onTouchesDown: event => {
-      'worklet';
-      pendingActivation.value = false;
-      callbacks.onTouchesDown(
-        event,
-        createControl(event.handlerTag, pendingActivation)
-      );
-    },
-    onTouchesMove: event => {
-      'worklet';
-      if (pendingActivation.value) {
+  return asSortableGesture(
+    useManualGesture({
+      onTouchesCancel: event => {
+        'worklet';
+        callbacks.onTouchesCancelled(
+          event,
+          createControl(event.handlerTag, pendingActivation)
+        );
+      },
+      onTouchesDown: event => {
+        'worklet';
         pendingActivation.value = false;
-        GestureStateManager.activate(event.handlerTag);
+        callbacks.onTouchesDown(
+          event,
+          createControl(event.handlerTag, pendingActivation)
+        );
+      },
+      onTouchesMove: event => {
+        'worklet';
+        if (pendingActivation.value) {
+          pendingActivation.value = false;
+          GestureStateManager.activate(event.handlerTag);
+        }
+        callbacks.onTouchesMove(
+          event,
+          createControl(event.handlerTag, pendingActivation)
+        );
+      },
+      onTouchesUp: event => {
+        'worklet';
+        callbacks.onTouchesUp(
+          event,
+          createControl(event.handlerTag, pendingActivation)
+        );
       }
-      callbacks.onTouchesMove(
-        event,
-        createControl(event.handlerTag, pendingActivation)
-      );
-    },
-    onTouchesUp: event => {
-      'worklet';
-      callbacks.onTouchesUp(
-        event,
-        createControl(event.handlerTag, pendingActivation)
-      );
-    }
-  }) as unknown as SortableGesture;
+    })
+  );
 };
-
-type ConfigurableGesture = { config?: { enabled?: boolean } };
 
 const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   gesture,
   enabled
 ) => {
-  const configurable = gesture as ConfigurableGesture;
-  return {
-    ...configurable,
-    config: { ...configurable.config, enabled }
-  } as unknown as SortableGesture;
+  const current = gesture as { config?: object };
+  return asSortableGesture({
+    ...current,
+    config: { ...current.config, enabled }
+  });
 };
 
 const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
@@ -122,50 +113,40 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   onTouchesDown,
   onTouchesUp
 }) => {
-  // The external (drag) gesture is tracked with the cross-version
-  // `SortableGesture` type; cast it back to the v3 gesture type for the
-  // simultaneous relation.
-  const external = externalGesture as unknown as SingleGesture;
+  const simultaneousWith = externalGesture as object as SingleGesture;
 
-  // Hooks must run unconditionally, so every gesture is always created and the
-  // ones without a handler are simply disabled.
+  // Hooks run unconditionally, so every gesture is always created; the ones
+  // without a handler stay disabled.
   const tap = useTapGesture({
     enabled: !!onTap,
     maxDistance: failDistance,
     onActivate: onTap,
     runOnJS: true,
-    simultaneousWith: external
+    simultaneousWith
   });
-
   const doubleTap = useTapGesture({
     enabled: !!onDoubleTap,
     maxDistance: failDistance,
     numberOfTaps: 2,
     onActivate: onDoubleTap,
     runOnJS: true,
-    simultaneousWith: external
+    simultaneousWith
   });
-
   const longPress = useLongPressGesture({
     enabled: !!onLongPress,
     maxDistance: failDistance,
     onActivate: onLongPress,
     runOnJS: true,
-    simultaneousWith: external
+    simultaneousWith
   });
-
   const manual = useManualGesture({
     enabled: !!(onTouchesDown ?? onTouchesUp),
     onTouchesDown,
     onTouchesUp,
     runOnJS: true,
-    simultaneousWith: external
+    simultaneousWith
   });
 
-  // Both compositions are created (rules of hooks), but only the one matching
-  // the requested mode is returned and attached to a detector - the relations
-  // of a composition are applied when it is attached, so the unused one is
-  // inert.
   const exclusive = useExclusiveGestures(tap, doubleTap, longPress, manual);
   const simultaneous = useSimultaneousGestures(
     tap,
@@ -174,9 +155,9 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
     manual
   );
 
-  return (gestureMode === 'exclusive'
-    ? exclusive
-    : simultaneous) as unknown as SortableGesture;
+  return asSortableGesture(
+    gestureMode === 'exclusive' ? exclusive : simultaneous
+  );
 };
 
 export const adapter: GestureHandlerAdapter = {
