@@ -7,8 +7,6 @@ import type { HapticsAdapter } from './types';
 const ADAPTERS: Array<HapticsAdapter> = [
   Pulsar,
   ExpoHaptics,
-  // Must stay last - always returns a trigger (never null), so it is the
-  // terminal fallback.
   ReactNativeHapticFeedback
 ];
 
