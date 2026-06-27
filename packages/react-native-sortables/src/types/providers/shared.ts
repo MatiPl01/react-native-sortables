@@ -1,9 +1,6 @@
 import type { ReactNode } from 'react';
 import type { ScrollView, View } from 'react-native';
-import type {
-  GestureTouchEvent,
-  GestureType
-} from 'react-native-gesture-handler';
+import type { GestureTouchEvent } from 'react-native-gesture-handler';
 import type {
   AnimatedRef,
   MeasuredDimensions,
@@ -11,6 +8,7 @@ import type {
 } from 'react-native-reanimated';
 
 import type { DeepReadonly, Maybe, Simplify } from '../../helperTypes';
+import type { SortableGesture } from '../../integrations/gesture-handler';
 import type { AnimatedValues } from '../../integrations/reanimated';
 import type {
   DebugCrossUpdater,
@@ -157,7 +155,7 @@ export type ItemContextType = Simplify<
         activationAnimationProgress: SharedValue<number>;
       }
   > & {
-    gesture: GestureType;
+    gesture: SortableGesture;
   }
 >;
 

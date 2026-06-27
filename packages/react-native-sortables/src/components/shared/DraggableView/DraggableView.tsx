@@ -1,12 +1,12 @@
 import { Fragment, memo, useCallback, useEffect, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
 import {
   LayoutAnimationConfig,
   runOnUI,
   useDerivedValue
 } from 'react-native-reanimated';
 
+import { GestureDetector } from '../../../integrations/gesture-handler';
 import type {
   AnimatedStyleProp,
   LayoutAnimation

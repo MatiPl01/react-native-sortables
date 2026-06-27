@@ -1,9 +1,12 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { View } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
 import { runOnUI, useAnimatedRef } from 'react-native-reanimated';
 
+import {
+  GestureDetector,
+  useEnabledGesture
+} from '../../integrations/gesture-handler';
 import {
   useCustomHandleContext,
   useIsInPortalOutlet,
@@ -61,6 +64,7 @@ function CustomHandleComponent({
   const { registerHandle, updateActiveHandleMeasurements } =
     customHandleContext;
   const dragEnabled = mode === 'draggable';
+  const handleGesture = useEnabledGesture(gesture, dragEnabled);
 
   useEffect(() => {
     return registerHandle(itemKey, handleRef, mode === 'fixed-order');
@@ -74,7 +78,7 @@ function CustomHandleComponent({
   }, [itemKey, isActive, updateActiveHandleMeasurements]);
 
   return (
-    <GestureDetector gesture={gesture.enabled(dragEnabled)} userSelect='none'>
+    <GestureDetector gesture={handleGesture} userSelect='none'>
       <View
         collapsable={false}
         ref={handleRef}
