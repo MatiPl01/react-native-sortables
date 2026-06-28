@@ -1,7 +1,6 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { View } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
 import { runOnUI, useAnimatedRef } from 'react-native-reanimated';
 
 import {
@@ -10,6 +9,7 @@ import {
   useItemContext
 } from '../../providers';
 import { error } from '../../utils';
+import SortableGestureDetector from './SortableGestureDetector';
 
 /** Props for the Sortable Handle component */
 export type CustomHandleProps = PropsWithChildren<{
@@ -74,7 +74,7 @@ function CustomHandleComponent({
   }, [itemKey, isActive, updateActiveHandleMeasurements]);
 
   return (
-    <GestureDetector gesture={gesture.enabled(dragEnabled)} userSelect='none'>
+    <SortableGestureDetector gesture={gesture.enabled(dragEnabled)}>
       <View
         collapsable={false}
         ref={handleRef}
@@ -84,6 +84,6 @@ function CustomHandleComponent({
         }}>
         {children}
       </View>
-    </GestureDetector>
+    </SortableGestureDetector>
   );
 }
