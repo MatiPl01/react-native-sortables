@@ -3,6 +3,7 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { View } from 'react-native';
 import { runOnUI, useAnimatedRef } from 'react-native-reanimated';
 
+import { useEnabledGesture } from '../../integrations/gesture-handler';
 import {
   useCustomHandleContext,
   useIsInPortalOutlet,
@@ -61,6 +62,7 @@ function CustomHandleComponent({
   const { registerHandle, updateActiveHandleMeasurements } =
     customHandleContext;
   const dragEnabled = mode === 'draggable';
+  const handleGesture = useEnabledGesture(gesture, dragEnabled);
 
   useEffect(() => {
     return registerHandle(itemKey, handleRef, mode === 'fixed-order');
@@ -74,7 +76,7 @@ function CustomHandleComponent({
   }, [itemKey, isActive, updateActiveHandleMeasurements]);
 
   return (
-    <SortableGestureDetector gesture={gesture.enabled(dragEnabled)}>
+    <SortableGestureDetector gesture={handleGesture}>
       <View
         collapsable={false}
         ref={handleRef}

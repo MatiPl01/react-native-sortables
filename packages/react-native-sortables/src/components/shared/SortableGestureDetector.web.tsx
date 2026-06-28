@@ -29,6 +29,15 @@ export type SortableGestureDetectorProps = PropsWithChildren<{
   gesture: ComposedGesture | GestureType;
 }>;
 
+// Cast `GestureDetector` to its legacy props (plus web layout props) so it
+// accepts the cross-major `SortableGesture` union.
+const Detector = GestureDetector as (
+  props: SortableGestureDetectorProps & {
+    touchAction?: 'pan-x' | 'pan-y';
+    userSelect?: 'none';
+  }
+) => ReturnType<typeof GestureDetector>;
+
 /**
  * Web `GestureDetector`: relaxes `touch-action` to the scroll axis (so items
  * don't block scrolling the ScrollView) and blocks native scroll while dragging.
@@ -67,11 +76,8 @@ export default function SortableGestureDetector({
   useEffect(() => () => setBlocking(false), [setBlocking]);
 
   return (
-    <GestureDetector
-      gesture={gesture}
-      touchAction={touchAction}
-      userSelect='none'>
+    <Detector gesture={gesture} touchAction={touchAction} userSelect='none'>
       {children}
-    </GestureDetector>
+    </Detector>
   );
 }
