@@ -29,9 +29,8 @@ export type SortableGestureDetectorProps = PropsWithChildren<{
   gesture: ComposedGesture | GestureType;
 }>;
 
-// The exported `GestureDetector` is generic and infers its gesture prop to the
-// v3-only gesture type; pin it to the legacy props shape that accepts the
-// cross-major `SortableGesture` union, plus the web-only layout props.
+// Cast `GestureDetector` to its legacy props (plus web layout props) so it
+// accepts the cross-major `SortableGesture` union.
 const Detector = GestureDetector as (
   props: SortableGestureDetectorProps & {
     touchAction?: 'pan-x' | 'pan-y';
