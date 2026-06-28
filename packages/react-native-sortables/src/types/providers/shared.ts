@@ -98,8 +98,6 @@ export type CommonValuesContextType =
       animateLayoutOnReorderOnly: SharedValue<boolean>;
       customHandle: boolean;
       isStackingOrderDesc: boolean;
-      // Scroll axis of the surrounding scrollable. Used on web to scope the
-      // gesture detectors' `touch-action` to that axis.
       autoScrollDirection: AutoScrollSettings['autoScrollDirection'];
     };
 
