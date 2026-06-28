@@ -14,7 +14,6 @@ export type { GestureTouchEvent, TouchData };
  */
 export type SortableGesture = ComposedGesture | GestureType;
 
-/** Re-tags a version-specific gesture object as the unified {@link SortableGesture}. */
 export const asSortableGesture = (gesture: object): SortableGesture =>
   gesture as SortableGesture;
 
@@ -28,7 +27,6 @@ export type ManualGestureControl = {
   fail: () => void;
 };
 
-/** Touch lifecycle callbacks for the draggable item's manual gesture. */
 export type ManualGestureCallbacks = {
   onTouchesCancelled: (
     event: GestureTouchEvent,
@@ -48,7 +46,6 @@ export type ManualGestureCallbacks = {
   ) => void;
 };
 
-/** Configuration for the composed gesture used by `SortableTouchable`. */
 export type TouchableGestureConfig = {
   externalGesture: SortableGesture;
   failDistance: number;
