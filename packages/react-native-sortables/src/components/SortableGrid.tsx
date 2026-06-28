@@ -197,15 +197,18 @@ function SortableGridComponent<I>({
     useMeasurementsContext();
   const { mainGroupSize } = useGridLayoutContext();
 
-  const isFirstRenderRef = useRef(true);
+  const previousGroupsRef = useRef(groups);
 
   useOrderUpdater(strategy, GRID_STRATEGIES);
 
   useLayoutEffect(() => {
-    if (isFirstRenderRef.current) {
-      isFirstRenderRef.current = false;
+    // Reset only on a real column/row count change, not on a bare effect re-run
+    // (e.g. a react-freeze/Offscreen reveal) which would wipe valid measurements.
+    // https://github.com/MatiPl01/react-native-sortables/issues/519
+    if (previousGroupsRef.current === groups) {
       return;
     }
+    previousGroupsRef.current = groups;
     resetMeasurements();
   }, [groups, resetMeasurements]);
 
