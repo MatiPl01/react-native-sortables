@@ -9,6 +9,13 @@ export type SortableGestureDetectorProps = PropsWithChildren<{
   gesture: ComposedGesture | GestureType;
 }>;
 
+// The exported `GestureDetector` is generic and infers its gesture prop to the
+// v3-only gesture type; pin it to the legacy props shape that accepts the
+// cross-major `SortableGesture` union.
+const Detector = GestureDetector as (
+  props: SortableGestureDetectorProps
+) => ReturnType<typeof GestureDetector>;
+
 /**
  * Wrapper over gesture handler's `GestureDetector` used by all draggable item
  * parts. On native it is a passthrough; the web counterpart (`.web`) layers on
@@ -18,9 +25,5 @@ export default function SortableGestureDetector({
   children,
   gesture
 }: SortableGestureDetectorProps) {
-  // `gesture` spans both gesture-handler majors; cast to the installed
-  // detector's prop type.
-  return (
-    <GestureDetector gesture={gesture as never}>{children}</GestureDetector>
-  );
+  return <Detector gesture={gesture}>{children}</Detector>;
 }

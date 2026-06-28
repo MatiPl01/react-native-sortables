@@ -50,6 +50,8 @@ function createControl(
   };
 }
 
+// Unlike the v2 builder, v3 hooks re-apply their config (and worklet callbacks)
+// on every render, so the caller's `deps` list is not needed here.
 const useDragGesture: GestureHandlerAdapter['useDragGesture'] = callbacks => {
   const pendingActivation = useMutableValue(false);
 
