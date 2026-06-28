@@ -91,6 +91,7 @@ export default function SharedProvider({
     __DEV__ && debug && <DebugProvider />,
     // Provider used for shared values between all providers below
     <CommonValuesProvider
+      autoScrollDirection={autoScrollDirection}
       customHandle={customHandle}
       sortEnabled={sortEnabled}
       {...rest}

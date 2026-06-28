@@ -20,6 +20,7 @@ import type { Dimensions, ItemSizes, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
+  AutoScrollSettings,
   ItemDragSettings,
   ReorderTriggerOrigin
 } from '../props/shared';
@@ -95,6 +96,7 @@ export type CommonValuesContextType =
       animateLayoutOnReorderOnly: SharedValue<boolean>;
       customHandle: boolean;
       isStackingOrderDesc: boolean;
+      autoScrollDirection: AutoScrollSettings['autoScrollDirection'];
     };
 
 // MEASUREMENTS

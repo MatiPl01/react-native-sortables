@@ -2,11 +2,9 @@ import { type PropsWithChildren } from 'react';
 import type { ViewProps } from 'react-native';
 import { View } from 'react-native';
 
-import {
-  GestureDetector,
-  useTouchableGesture
-} from '../../integrations/gesture-handler';
+import { useTouchableGesture } from '../../integrations/gesture-handler';
 import { useItemContext } from '../../providers';
+import SortableGestureDetector from './SortableGestureDetector';
 
 type SortableTouchableProps = PropsWithChildren<
   ViewProps & {
@@ -45,10 +43,10 @@ export default function SortableTouchable({
   });
 
   return (
-    <GestureDetector gesture={gesture} userSelect='none'>
+    <SortableGestureDetector gesture={gesture}>
       <View {...viewProps} collapsable={false}>
         {children}
       </View>
-    </GestureDetector>
+    </SortableGestureDetector>
   );
 }

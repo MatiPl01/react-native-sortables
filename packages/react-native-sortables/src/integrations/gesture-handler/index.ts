@@ -16,7 +16,6 @@ export const useDragGesture = adapter.useDragGesture;
 export const useEnabledGesture = adapter.useEnabledGesture;
 export const useTouchableGesture = adapter.useTouchableGesture;
 
-export { default as GestureDetector } from './detector';
 export type {
   GestureTouchEvent,
   ManualGestureControl,

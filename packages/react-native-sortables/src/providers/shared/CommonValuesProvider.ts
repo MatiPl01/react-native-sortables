@@ -11,6 +11,7 @@ import {
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
+  AutoScrollSettings,
   CommonValuesContextType,
   ControlledDimensions,
   Dimensions,
@@ -31,6 +32,7 @@ type CommonValuesProviderProps = PropsWithChildren<
   ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'> & {
+      autoScrollDirection: AutoScrollSettings['autoScrollDirection'];
       sortEnabled: Animatable<boolean>;
       customHandle: boolean;
       controlledContainerDimensions: ControlledDimensions;
@@ -49,6 +51,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     activeItemOpacity: _activeItemOpacity,
     activeItemScale: _activeItemScale,
     activeItemShadowOpacity: _activeItemShadowOpacity,
+    autoScrollDirection,
     controlledContainerDimensions,
     controlledItemDimensions,
     customHandle,
@@ -153,6 +156,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activeItemScale,
         activeItemShadowOpacity,
         animateLayoutOnReorderOnly,
+        autoScrollDirection,
         containerHeight,
         containerId,
         containerRef,

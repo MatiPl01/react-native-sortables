@@ -6,7 +6,6 @@ import {
   useDerivedValue
 } from 'react-native-reanimated';
 
-import { GestureDetector } from '../../../integrations/gesture-handler';
 import type {
   AnimatedStyleProp,
   LayoutAnimation
@@ -22,6 +21,7 @@ import {
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
+import SortableGestureDetector from '../SortableGestureDetector';
 import ActiveItemPortal from './ActiveItemPortal';
 import ItemCell from './ItemCell';
 
@@ -100,9 +100,9 @@ function DraggableView({
         {customHandle ? (
           innerComponent
         ) : (
-          <GestureDetector gesture={gesture} userSelect='none'>
+          <SortableGestureDetector gesture={gesture}>
             {innerComponent}
-          </GestureDetector>
+          </SortableGestureDetector>
         )}
       </ItemContextProvider>
     );
