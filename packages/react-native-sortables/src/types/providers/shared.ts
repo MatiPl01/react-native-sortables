@@ -89,6 +89,8 @@ export type CommonValuesContextType =
       activeAnimationProgress: SharedValue<number>;
       inactiveAnimationProgress: SharedValue<number>;
       activeItemDropped: SharedValue<boolean>;
+      // True once the active item is dragged (not just long pressed)
+      activeItemBroughtToFront: SharedValue<boolean>;
 
       // OTHER
       containerRef: AnimatedRef<View>;
