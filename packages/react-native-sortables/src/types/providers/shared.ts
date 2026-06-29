@@ -71,6 +71,7 @@ export type CommonValuesContextType =
       touchPosition: SharedValue<null | Vector>;
       activeItemPosition: SharedValue<null | Vector>;
       itemPositions: SharedValue<Record<string, Vector>>;
+      layoutRequestId: SharedValue<number>;
 
       // DIMENSIONS
       controlledContainerDimensions: ControlledDimensions;

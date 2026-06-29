@@ -43,6 +43,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     controlledItemDimensions,
     itemHeights,
     itemWidths,
+    layoutRequestId,
     usesAbsoluteLayout
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
@@ -135,6 +136,15 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
           if (!isHeightControlled) {
             updateDimension('height', itemHeights);
           }
+
+          // Force the layout reaction to re-run a frame later. The reaction that
+          // reads these dimensions isn't guaranteed to re-fire when they settle,
+          // which can leave item positions stuck stale until a drag relayout
+          // (#565). The deferral keeps this on a separate frame from the
+          // dimensions write so it isn't coalesced into the same reaction run.
+          setAnimatedTimeout(() => {
+            layoutRequestId.value += 1;
+          });
 
           ctx.queuedMeasurements.clear();
           debounce.cancel();
