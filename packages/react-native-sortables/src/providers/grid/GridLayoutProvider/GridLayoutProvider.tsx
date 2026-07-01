@@ -39,6 +39,7 @@ export type GridLayoutProviderProps = PropsWithChildren<{
   rowGap: SharedValue<number>;
   columnGap: SharedValue<number>;
   rowHeight?: number;
+  masonry?: boolean;
 }>;
 
 const { GridLayoutProvider, useGridLayoutContext } = createProvider(
@@ -46,6 +47,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 )<GridLayoutProviderProps, GridLayoutContextType>(({
   columnGap,
   isVertical,
+  masonry,
   numGroups,
   rowGap,
   rowHeight
@@ -170,6 +172,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       isVertical,
       itemHeights: itemHeights.value,
       itemWidths: itemWidths.value,
+      masonry,
       numGroups,
       requestId: layoutRequestId.value // Helper to force layout re-calculation
     }),
