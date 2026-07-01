@@ -35,6 +35,7 @@ export default function DropIndicatorExample() {
             columns={COLUMNS}
             data={DATA}
             renderItem={renderItem}
+            reorderOnDrag={false}
             rowGap={spacing.xs}
             showDropIndicator
           />

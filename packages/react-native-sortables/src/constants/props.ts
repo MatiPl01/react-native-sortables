@@ -57,6 +57,7 @@ export const DEFAULT_SHARED_PROPS = {
   onOrderChange: undefined,
   overDrag: 'both',
   overflow: 'visible',
+  reorderOnDrag: true,
   reorderTriggerOrigin: 'center',
   scrollableRef: undefined,
   showDropIndicator: false,
