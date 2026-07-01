@@ -1,0 +1,289 @@
+---
+sidebar_position: 3
+description: 'Learn how to create custom sorting strategies'
+title: Custom Strategy
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Custom Ordering Strategy
+
+While `react-native-sortables` comes with built-in strategies for Grid and Flex layouts, you might need specific behavior that isn't covered by the defaults. In such cases, you can implement a **Custom Sort Strategy**.
+
+:::info
+
+This guide describes advanced customization. Familiarity with [Reanimated worklets](https://docs.swmansion.com/react-native-reanimated/docs/2.x/worklets/) is recommended as strategies run on the UI thread.
+
+:::
+
+## What is a Strategy?
+
+A strategy is a function that determines the **new order of items** based on the **active item's position**. It is called repeatedly while the user drags an item.
+
+Technically, a strategy is defined by a **Factory Function** (`SortStrategyFactory`) which returns an **Updater Function** (`OrderUpdater`).
+
+### `SortStrategyFactory`
+
+This is a **React Hook** that runs on the JS thread. It is called once when the component mounts or when dependencies change. Its primary purpose is to **prepare data** (like layout values, item sizes) needed for the updater function.
+
+```ts
+type SortStrategyFactory = () => OrderUpdater;
+```
+
+### `OrderUpdater`
+
+This is a **Worklet Function** that runs on the UI thread. It is called on every frame during the drag gesture.
+
+```ts
+type OrderUpdater = (params: {
+  activeKey: string;
+  activeIndex: number;
+  dimensions: { width: number; height: number };
+  position: { x: number; y: number };
+}) => Array<string> | undefined | null;
+```
+
+- **Returns**: A new array of item keys representing the new order, or `undefined`/`null` if the order hasn't changed.
+
+---
+
+## Tutorial: Simple Grid Strategy
+
+Let's build a simplified strategy for a **Grid** layout where all items have the **same size**. We will implement a basic "swap" behavior: when an item is dragged over another item, they swap places.
+
+### Step 1: Access Contexts
+
+First, we need to access the layout information. `react-native-sortables` exposes several hooks for this:
+
+- `useCommonValuesContext()`: Provides shared values like `indexToKey` (current order), `containerWidth`, `itemWidths`, etc.
+- `useGridLayoutContext()`: Specific to Grid, provides `columns`, `rows`, gaps, etc.
+
+### Step 2: Implement the Factory
+
+We create a factory hook that prepares the shared values.
+
+```tsx
+import { useCommonValuesContext } from 'react-native-sortables';
+import { useGridLayoutContext } from 'react-native-sortables';
+
+const useSimpleGridStrategy = () => {
+  // 1. Get shared values from context
+  const { indexToKey, itemWidths, itemHeights } = useCommonValuesContext();
+  const { columns, isVertical } = useGridLayoutContext();
+
+  // 2. Return the worklet function
+  return params => {
+    'worklet';
+    // Implementation will go here
+    return undefined;
+  };
+};
+```
+
+### Step 3: Implement the Worklet
+
+Inside the worklet, we calculate which index the dragged item is hovering over, and if it's different from the current index, we swap them.
+
+```tsx
+// Helper to swap items in array
+function swap(array: string[], from: number, to: number) {
+  'worklet';
+  const newArray = [...array];
+  [newArray[from], newArray[to]] = [newArray[to], newArray[from]];
+  return newArray;
+}
+
+// ... inside the returned function:
+return ({ activeIndex, position }) => {
+  'worklet';
+
+  // 1. Calculate the target index based on position
+  // (Simplified for this tutorial with constants)
+  const COLUMNS = 3;
+  const ITEM_WIDTH = 100;
+  const ITEM_HEIGHT = 100;
+  const GAP = 10;
+
+  // Approximate row and column from position
+  const col = Math.floor(
+    Math.max(0, position.x + ITEM_WIDTH / 2) / (ITEM_WIDTH + GAP)
+  );
+  const row = Math.floor(
+    Math.max(0, position.y + ITEM_HEIGHT / 2) / (ITEM_HEIGHT + GAP)
+  );
+
+  const targetIndex = row * COLUMNS + col;
+  const currentOrder = indexToKey.value;
+
+  // boundary check
+  if (targetIndex < 0 || targetIndex >= currentOrder.length) return;
+
+  // 2. If index changed, return new order
+  if (targetIndex !== activeIndex) {
+    return swap(currentOrder, activeIndex, targetIndex);
+  }
+
+  return undefined; // No change
+};
+```
+
+### Full Example
+
+Here is the complete code for a simple strategy that assumes a fixed 3-column grid.
+
+```tsx
+import { useCallback } from 'react';
+import {
+  useCommonValuesContext,
+  SortStrategyFactory
+} from 'react-native-sortables';
+
+// Simple reorder helper
+function swap(array: string[], from: number, to: number) {
+  'worklet';
+  const newArray = [...array];
+  [newArray[from], newArray[to]] = [newArray[to], newArray[from]];
+  return newArray;
+}
+
+export const useSimpleSwapStrategy: SortStrategyFactory = () => {
+  const { indexToKey } = useCommonValuesContext();
+
+  return ({ activeIndex, position, dimensions }) => {
+    'worklet';
+
+    const COLUMNS = 3;
+    const ITEM_WIDTH = 100;
+    const ITEM_HEIGHT = 100;
+    const GAP = 10;
+
+    // Calculate index based on center position of the dragged item
+    const centerX = position.x + dimensions.width / 2;
+    const centerY = position.y + dimensions.height / 2;
+
+    const col = Math.floor(centerX / (ITEM_WIDTH + GAP));
+    const row = Math.floor(centerY / (ITEM_HEIGHT + GAP));
+
+    const targetIndex = row * COLUMNS + col;
+    const currentOrder = indexToKey.value;
+
+    if (
+      targetIndex >= 0 &&
+      targetIndex < currentOrder.length &&
+      targetIndex !== activeIndex
+    ) {
+      return swap(currentOrder, activeIndex, targetIndex);
+    }
+
+    return undefined;
+  };
+};
+
+// Usage
+// <Sortable.Grid strategy={useSimpleSwapStrategy} ... />
+```
+
+### Usage Example
+
+Here is how you can use the custom strategy in a component.
+
+```tsx
+import React, { useCallback } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Sortable, { SortableGridRenderItem } from 'react-native-sortables';
+import { useSimpleSwapStrategy } from './useSimpleSwapStrategy'; // inner file import
+
+const DATA = Array.from({ length: 9 }, (_, i) => `Item ${i + 1}`);
+const COLUMNS = 3;
+
+export default function App() {
+  const renderItem = useCallback<SortableGridRenderItem<string>>(
+    ({ item }) => (
+      <View style={styles.card}>
+        <Text style={styles.text}>{item}</Text>
+      </View>
+    ),
+    []
+  );
+
+  return (
+    <View style={styles.container}>
+      <Sortable.Grid
+        data={DATA}
+        renderItem={renderItem}
+        columns={COLUMNS}
+        rowHeight={100}
+        columnGap={10}
+        rowGap={10}
+        strategy={useSimpleSwapStrategy}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f5'
+  },
+  card: {
+    flex: 1,
+    height: 100, // Matches ITEM_HEIGHT in strategy
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd'
+  },
+  text: {
+    fontWeight: 'bold',
+    fontSize: 16
+  }
+});
+```
+
+<div style={{ textAlign: 'center', margin: '20px 0' }}>
+  {/* <video src={require('@site/static/video/custom-strategy-demo.mp4').default} autoPlay loop muted playsInline style={{ maxWidth: '100%', borderRadius: 8 }} /> */}
+  <div
+    style={{
+      padding: '40px',
+      backgroundColor: '#f0f0f0',
+      borderRadius: '8px',
+      border: '2px dashed #ccc',
+      color: '#666'
+    }}>
+    Video Demo Placeholder
+  </div>
+</div>
+
+## Available Contexts
+
+When building specific strategies, you can access detailed state from these contexts:
+
+### `useCommonValuesContext`
+
+- `indexToKey`: Current order of items.
+- `containerWidth` / `containerHeight`: Dimensions of the sortable container.
+- `itemWidths` / `itemHeights`: Dimensions of individual items.
+- `activeItemKey`: Key of the item currently being dragged.
+
+### `useGridLayoutContext` (Grid Only)
+
+- `columns` / `rows`: Number of columns/rows.
+- `gap` / `rowGap` / `columnGap`: Spacing configuration.
+- `isVertical`: Orientation of the grid.
+
+### `useFlexLayoutContext` (Flex Only)
+
+- `flexDirection`: Layout direction.
+- `flexWrap`: Wrap behavior.
+
+:::tip
+
+Always use the `'worklet'` directive in your updater function and helper functions to ensure they run smoothly on the UI thread.
+
+:::

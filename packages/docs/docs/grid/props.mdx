@@ -216,10 +216,10 @@ Controls how items **are reordered** while the **active item** is being **dragge
   <summary>Type definitions</summary>
 
 ```tsx
-type SortableGridStrategy = 'insert' | 'swap' | SortableGridStrategyFactory;
+type SortableGridStrategy = 'insert' | 'swap' | SortStrategyFactory;
 ```
 
-{/* TODO: Add link to docs page explaining how to use SortableGridStrategyFactory */}
+[Read more about custom strategies](/customization/strategy)
 
 </details>
 
@@ -384,6 +384,16 @@ You can provide a **single number**, which will be used for both **top** and **b
 | type                                     | default | required |
 | ---------------------------------------- | ------- | -------- |
 | `Animatable<[number, number] \| number>` | 75      | NO       |
+
+---
+
+### autoScrollMaxOverscroll
+
+The maximum distance (in pixels) that the scrollable container can be overscrolled during auto-scrolling.
+
+| type                                     | default | required |
+| ---------------------------------------- | ------- | -------- |
+| `Animatable<[number, number] \| number>` | 50      | NO       |
 
 ---
 
