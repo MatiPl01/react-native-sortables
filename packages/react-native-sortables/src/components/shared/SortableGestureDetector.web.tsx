@@ -1,11 +1,8 @@
 import { type PropsWithChildren, useCallback, useEffect, useRef } from 'react';
-import type {
-  ComposedGesture,
-  GestureType
-} from 'react-native-gesture-handler';
-import { GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
+import type { SortableGesture } from '../../integrations/gesture-handler';
+import { SortableGestureDetectorView } from '../../integrations/gesture-handler';
 import { useCommonValuesContext, useItemContext } from '../../providers';
 
 // A single non-passive `touchmove` listener shared by all sortables, attached
@@ -26,17 +23,8 @@ function releaseNativeScroll() {
 }
 
 export type SortableGestureDetectorProps = PropsWithChildren<{
-  gesture: ComposedGesture | GestureType;
+  gesture: SortableGesture;
 }>;
-
-// Cast `GestureDetector` to its legacy props (plus web layout props) so it
-// accepts the cross-major `SortableGesture` union.
-const Detector = GestureDetector as (
-  props: SortableGestureDetectorProps & {
-    touchAction?: 'pan-x' | 'pan-y';
-    userSelect?: 'none';
-  }
-) => ReturnType<typeof GestureDetector>;
 
 /**
  * Web `GestureDetector`: relaxes `touch-action` to the scroll axis (so items
@@ -76,8 +64,11 @@ export default function SortableGestureDetector({
   useEffect(() => () => setBlocking(false), [setBlocking]);
 
   return (
-    <Detector gesture={gesture} touchAction={touchAction} userSelect='none'>
+    <SortableGestureDetectorView
+      gesture={gesture}
+      touchAction={touchAction}
+      userSelect='none'>
       {children}
-    </Detector>
+    </SortableGestureDetectorView>
   );
 }

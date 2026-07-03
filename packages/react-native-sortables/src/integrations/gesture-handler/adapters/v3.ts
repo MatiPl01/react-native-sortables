@@ -1,9 +1,12 @@
-import type { SingleGesture } from 'react-native-gesture-handler';
+import type {
+  ManualGesture,
+  ManualGestureConfig
+} from 'react-native-gesture-handler';
 import * as GestureHandler from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../reanimated';
-import type { ManualGestureControl } from '../types';
+import type { ManualGestureControl, SortableGesture } from '../types';
 import { asSortableGesture } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
@@ -24,6 +27,19 @@ const {
   useSimultaneousGestures,
   useTapGesture
 } = GestureHandler;
+
+// A SortableGesture reaching the v3 adapter was built by this adapter, so it is
+// always a v3 hook gesture. The item's drag/external gesture is a manual
+// gesture; unwrap it to read its config or to relate other gestures to it.
+const asManualGesture = (gesture: SortableGesture): ManualGesture =>
+  gesture as unknown as ManualGesture;
+
+// `simultaneousWith` accepts gesture-handler's `AnyGesture` union, which is not
+// exported by name; derive the accepted type from the hook config instead.
+const asExternalGesture = (
+  gesture: SortableGesture
+): ManualGestureConfig['simultaneousWith'] =>
+  gesture as unknown as ManualGestureConfig['simultaneousWith'];
 
 function createControl(
   handlerTag: number,
@@ -98,11 +114,13 @@ const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   gesture,
   enabled
 ) => {
-  const current = gesture as { config?: object };
-  return asSortableGesture({
-    ...current,
-    config: { ...current.config, enabled }
-  });
+  // v3 gestures are immutable plain objects with `enabled` inside `config`, so
+  // return a copy with the flag toggled. Typing it as the real `ManualGesture`
+  // means a future change to where `enabled` lives fails this build.
+  const current = asManualGesture(gesture);
+  const next = { ...current, config: { ...current.config } };
+  next.config.enabled = enabled;
+  return asSortableGesture(next);
 };
 
 const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
@@ -115,7 +133,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   onTouchesDown,
   onTouchesUp
 }) => {
-  const simultaneousWith = externalGesture as object as SingleGesture;
+  const simultaneousWith = asExternalGesture(externalGesture);
 
   // Hooks run unconditionally, so every gesture is always created; the ones
   // without a handler stay disabled.

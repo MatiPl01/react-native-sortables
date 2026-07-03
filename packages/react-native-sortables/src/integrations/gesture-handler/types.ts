@@ -1,18 +1,25 @@
 import type {
-  ComposedGesture,
   GestureTouchEvent,
-  GestureType,
   TouchData
 } from 'react-native-gesture-handler';
 
 export type { GestureTouchEvent, TouchData };
 
+declare const sortableGesture: unique symbol;
+
 /**
- * A gesture handed to `<GestureDetector />`. Typed with the only gesture names
- * exported by both gesture-handler majors, so published types resolve for
- * consumers on either version.
+ * Opaque handle to a gesture-handler gesture. It is built by the adapter for the
+ * installed major (v2 imperative builder or v3 hooks) and only ever handed back
+ * to `<GestureDetector />` through `SortableGestureDetector`.
+ *
+ * It is intentionally opaque. gesture-handler's own gesture types diverge across
+ * v2 and v3 - v3 even reuses the name `ComposedGesture` for a different shape -
+ * so naming a concrete type here would resolve differently for consumers on v2
+ * and on v3. Each adapter crosses this boundary explicitly: `asSortableGesture`
+ * wraps a freshly built gesture, and the adapter's own typed unwrap turns it
+ * back into that major's gesture when calling into gesture-handler.
  */
-export type SortableGesture = ComposedGesture | GestureType;
+export type SortableGesture = { readonly [sortableGesture]: true };
 
 export const asSortableGesture = (gesture: object): SortableGesture =>
   gesture as SortableGesture;

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { GestureType } from 'react-native-gesture-handler';
 import { Gesture } from 'react-native-gesture-handler';
 
+import type { SortableGesture } from '../types';
 import { asSortableGesture } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
@@ -11,6 +12,11 @@ import type { GestureHandlerAdapter } from './types';
  * path still has the upstream issue #349 limitation, which only the v3 hook API
  * fixes (see `./v3`).
  */
+
+// A SortableGesture reaching the v2 adapter was built by this adapter, so it is
+// always a v2 builder gesture; unwrap it to call the imperative builder API.
+const asV2Gesture = (gesture: SortableGesture): GestureType =>
+  gesture as unknown as GestureType;
 
 const useDragGesture: GestureHandlerAdapter['useDragGesture'] = (
   callbacks,
@@ -33,7 +39,7 @@ const useDragGesture: GestureHandlerAdapter['useDragGesture'] = (
 const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   gesture,
   enabled
-) => asSortableGesture((gesture as GestureType).enabled(enabled));
+) => asSortableGesture(asV2Gesture(gesture).enabled(enabled));
 
 const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   externalGesture,
@@ -48,28 +54,34 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   useMemo(() => {
     const decorate = <T extends GestureType>(gesture: T): T => {
       gesture
-        .simultaneousWithExternalGesture(externalGesture as GestureType)
+        .simultaneousWithExternalGesture(asV2Gesture(externalGesture))
         .runOnJS(true);
-      if ('maxDistance' in gesture) {
-        (
-          gesture as { maxDistance: (distance: number) => GestureType }
-        ).maxDistance(failDistance);
-      }
       return gesture;
     };
 
+    // `maxDistance` is applied on the concrete Tap/LongPress builders (which
+    // declare it) rather than inside `decorate`, whose generic `GestureType`
+    // does not expose it and would need a cast. `Manual` has no `maxDistance`.
     const gestures: Array<GestureType> = [];
 
     if (onTap) {
-      gestures.push(decorate(Gesture.Tap()).onStart(onTap));
+      gestures.push(
+        decorate(Gesture.Tap().maxDistance(failDistance)).onStart(onTap)
+      );
     }
     if (onDoubleTap) {
       gestures.push(
-        decorate(Gesture.Tap()).numberOfTaps(2).onStart(onDoubleTap)
+        decorate(
+          Gesture.Tap().numberOfTaps(2).maxDistance(failDistance)
+        ).onStart(onDoubleTap)
       );
     }
     if (onLongPress) {
-      gestures.push(decorate(Gesture.LongPress()).onStart(onLongPress));
+      gestures.push(
+        decorate(Gesture.LongPress().maxDistance(failDistance)).onStart(
+          onLongPress
+        )
+      );
     }
 
     if (onTouchesDown || onTouchesUp) {
