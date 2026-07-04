@@ -5,14 +5,10 @@ import type {
 
 export type { GestureTouchEvent, TouchData };
 
-declare const sortableGesture: unique symbol;
-
-// Opaque handle to a gesture-handler gesture. The v2 and v3 gesture types
-// diverge, so adapters wrap/unwrap it at the boundary rather than name one.
-export type SortableGesture = { readonly [sortableGesture]: true };
-
-export const asSortableGesture = (gesture: object): SortableGesture =>
-  gesture as SortableGesture;
+// A gesture-handler gesture. Kept loosely typed because the v2 (builder) and v3
+// (hook) gesture shapes diverge; each adapter narrows it to the concrete type it
+// needs, and `SortableGestureDetector` hands it back to gesture-handler.
+export type SortableGesture = object;
 
 // Imperative control over a manual gesture (v2 `manager` / v3 `GestureStateManager`).
 export type ManualGestureControl = {

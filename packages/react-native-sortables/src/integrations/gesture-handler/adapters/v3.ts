@@ -7,7 +7,6 @@ import type { SharedValue } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../reanimated';
 import type { ManualGestureControl } from '../types';
-import { asSortableGesture } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
 // gesture-handler v3 hook API, which fixes issue #349: hook gestures keep
@@ -52,43 +51,41 @@ function createControl(
 const useDragGesture: GestureHandlerAdapter['useDragGesture'] = callbacks => {
   const pendingActivation = useMutableValue(false);
 
-  return asSortableGesture(
-    useManualGesture({
-      onTouchesCancel: event => {
-        'worklet';
-        callbacks.onTouchesCancelled(
-          event,
-          createControl(event.handlerTag, pendingActivation)
-        );
-      },
-      onTouchesDown: event => {
-        'worklet';
+  return useManualGesture({
+    onTouchesCancel: event => {
+      'worklet';
+      callbacks.onTouchesCancelled(
+        event,
+        createControl(event.handlerTag, pendingActivation)
+      );
+    },
+    onTouchesDown: event => {
+      'worklet';
+      pendingActivation.value = false;
+      callbacks.onTouchesDown(
+        event,
+        createControl(event.handlerTag, pendingActivation)
+      );
+    },
+    onTouchesMove: event => {
+      'worklet';
+      if (pendingActivation.value) {
         pendingActivation.value = false;
-        callbacks.onTouchesDown(
-          event,
-          createControl(event.handlerTag, pendingActivation)
-        );
-      },
-      onTouchesMove: event => {
-        'worklet';
-        if (pendingActivation.value) {
-          pendingActivation.value = false;
-          GestureStateManager.activate(event.handlerTag);
-        }
-        callbacks.onTouchesMove(
-          event,
-          createControl(event.handlerTag, pendingActivation)
-        );
-      },
-      onTouchesUp: event => {
-        'worklet';
-        callbacks.onTouchesUp(
-          event,
-          createControl(event.handlerTag, pendingActivation)
-        );
+        GestureStateManager.activate(event.handlerTag);
       }
-    })
-  );
+      callbacks.onTouchesMove(
+        event,
+        createControl(event.handlerTag, pendingActivation)
+      );
+    },
+    onTouchesUp: event => {
+      'worklet';
+      callbacks.onTouchesUp(
+        event,
+        createControl(event.handlerTag, pendingActivation)
+      );
+    }
+  });
 };
 
 const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
@@ -96,10 +93,10 @@ const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   enabled
 ) => {
   // v3 gestures are immutable; return a copy with config.enabled toggled.
-  const current = gesture as unknown as ManualGesture;
+  const current = gesture as ManualGesture;
   const next = { ...current, config: { ...current.config } };
   next.config.enabled = enabled;
-  return asSortableGesture(next);
+  return next;
 };
 
 const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
@@ -156,9 +153,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
     manual
   );
 
-  return asSortableGesture(
-    gestureMode === 'exclusive' ? exclusive : simultaneous
-  );
+  return gestureMode === 'exclusive' ? exclusive : simultaneous;
 };
 
 export const adapter: GestureHandlerAdapter = {

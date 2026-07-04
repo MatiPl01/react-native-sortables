@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import type { GestureType } from 'react-native-gesture-handler';
 import { Gesture } from 'react-native-gesture-handler';
 
-import { asSortableGesture } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
 // gesture-handler v2 imperative builder, used when v2 is installed (Old
@@ -12,24 +11,22 @@ const useDragGesture: GestureHandlerAdapter['useDragGesture'] = (
   callbacks,
   deps
 ) =>
-  asSortableGesture(
-    useMemo(
-      () =>
-        Gesture.Manual()
-          .onTouchesDown(callbacks.onTouchesDown)
-          .onTouchesMove(callbacks.onTouchesMove)
-          .onTouchesCancelled(callbacks.onTouchesCancelled)
-          .onTouchesUp(callbacks.onTouchesUp),
-      // The dependency list is owned by the caller (useItemPanGesture).
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      deps
-    )
+  useMemo(
+    () =>
+      Gesture.Manual()
+        .onTouchesDown(callbacks.onTouchesDown)
+        .onTouchesMove(callbacks.onTouchesMove)
+        .onTouchesCancelled(callbacks.onTouchesCancelled)
+        .onTouchesUp(callbacks.onTouchesUp),
+    // The dependency list is owned by the caller (useItemPanGesture).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    deps
   );
 
 const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   gesture,
   enabled
-) => asSortableGesture((gesture as unknown as GestureType).enabled(enabled));
+) => (gesture as GestureType).enabled(enabled);
 
 const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   externalGesture,
@@ -44,9 +41,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   useMemo(() => {
     const decorate = <T extends GestureType>(gesture: T): T => {
       gesture
-        .simultaneousWithExternalGesture(
-          externalGesture as unknown as GestureType
-        )
+        .simultaneousWithExternalGesture(externalGesture as GestureType)
         .runOnJS(true);
       return gesture;
     };
@@ -87,11 +82,9 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
       }
     }
 
-    return asSortableGesture(
-      gestureMode === 'exclusive'
-        ? Gesture.Exclusive(...gestures)
-        : Gesture.Simultaneous(...gestures)
-    );
+    return gestureMode === 'exclusive'
+      ? Gesture.Exclusive(...gestures)
+      : Gesture.Simultaneous(...gestures);
   }, [
     failDistance,
     onTap,
