@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import type { ItemContextType } from '../../types';
 import { createProvider } from '../utils';
@@ -20,11 +21,16 @@ const { ItemContextProvider, useItemContextContext: useItemContext } =
   >(({ activationAnimationProgress, gesture, isActive, itemKey }) => {
     const {
       activationState,
+      activeItemBroughtToFront,
       activeItemKey,
       indexToKey,
       keyToIndex,
       prevActiveItemKey
     } = useCommonValuesContext();
+
+    const isDragging = useDerivedValue(
+      () => isActive.value && activeItemBroughtToFront.value
+    );
 
     return {
       value: {
@@ -34,6 +40,7 @@ const { ItemContextProvider, useItemContextContext: useItemContext } =
         gesture,
         indexToKey,
         isActive,
+        isDragging,
         itemKey,
         keyToIndex,
         prevActiveItemKey

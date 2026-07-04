@@ -8,6 +8,7 @@ export default function useItemZIndex(
   activationAnimationProgress: SharedValue<number>
 ): SharedValue<number> {
   const {
+    activeItemBroughtToFront,
     activeItemKey,
     indexToKey,
     isStackingOrderDesc,
@@ -17,15 +18,20 @@ export default function useItemZIndex(
 
   return useDerivedValue<number>(() => {
     const itemCount = indexToKey.value.length;
-
-    if (activeItemKey.value === key) {
-      return 2 * itemCount + 1;
-    }
-
     const realIndex = keyToIndex.value[key] ?? 0;
     const orderZIndex = isStackingOrderDesc
       ? itemCount - realIndex - 1
       : realIndex;
+
+    // Keep the order zIndex until the item is actually dragged. See
+    // https://github.com/MatiPl01/react-native-sortables/issues/417
+    if (!activeItemBroughtToFront.value) {
+      return orderZIndex;
+    }
+
+    if (activeItemKey.value === key) {
+      return 2 * itemCount + 1;
+    }
 
     if (activationAnimationProgress.value > 0) {
       if (prevActiveItemKey.value === key) {
