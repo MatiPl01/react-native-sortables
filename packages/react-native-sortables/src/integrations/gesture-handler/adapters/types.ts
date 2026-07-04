@@ -4,11 +4,8 @@ import type {
   TouchableGestureConfig
 } from '../types';
 
-/**
- * Unified gesture API used across the library. Each gesture-handler major
- * version provides its own implementation (v2 imperative builder, v3 hook API),
- * selected once at module load based on which version is installed.
- */
+// Gesture API implemented per gesture-handler major (v2 builder, v3 hooks); the
+// adapter is picked once at module load (see `../index`).
 export type GestureHandlerAdapter = {
   useDragGesture: (
     callbacks: ManualGestureCallbacks,

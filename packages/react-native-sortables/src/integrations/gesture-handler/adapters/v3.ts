@@ -10,15 +10,10 @@ import type { ManualGestureControl, SortableGesture } from '../types';
 import { asSortableGesture } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
-/**
- * gesture-handler v3 hook API, used when gesture-handler >= 3 is installed. This
- * is what fixes issue #349: v3 hook gestures keep receiving touches after a
- * screen is detached and re-attached, so a drag no longer gets stuck.
- *
- * The hooks are resolved through a namespace import so bundlers don't fail on
- * these (v3-only) names when an older gesture-handler is installed - this
- * adapter is only ever selected when they exist (see `../index`).
- */
+// gesture-handler v3 hook API, which fixes issue #349: hook gestures keep
+// receiving touches after a screen re-attaches. Hooks are read off a namespace
+// import so bundling never fails on these v3-only names under v2; this adapter
+// is only selected when they exist (see `../index`).
 const {
   GestureStateManager,
   useExclusiveGestures,
@@ -28,14 +23,11 @@ const {
   useTapGesture
 } = GestureHandler;
 
-// A SortableGesture reaching the v3 adapter was built by this adapter, so it is
-// always a v3 hook gesture. The item's drag/external gesture is a manual
-// gesture; unwrap it to read its config or to relate other gestures to it.
+// A SortableGesture in this adapter is always a v3 hook gesture.
 const asManualGesture = (gesture: SortableGesture): ManualGesture =>
   gesture as unknown as ManualGesture;
 
-// `simultaneousWith` accepts gesture-handler's `AnyGesture` union, which is not
-// exported by name; derive the accepted type from the hook config instead.
+// `simultaneousWith` wants the v3 `AnyGesture` union, which is not exported by name.
 const asExternalGesture = (
   gesture: SortableGesture
 ): ManualGestureConfig['simultaneousWith'] =>
@@ -66,8 +58,7 @@ function createControl(
   };
 }
 
-// Unlike the v2 builder, v3 hooks re-apply their config (and worklet callbacks)
-// on every render, so the caller's `deps` list is not needed here.
+// v3 hooks re-apply config every render, so the caller's `deps` are unused.
 const useDragGesture: GestureHandlerAdapter['useDragGesture'] = callbacks => {
   const pendingActivation = useMutableValue(false);
 
@@ -114,9 +105,7 @@ const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   gesture,
   enabled
 ) => {
-  // v3 gestures are immutable plain objects with `enabled` inside `config`, so
-  // return a copy with the flag toggled. Typing it as the real `ManualGesture`
-  // means a future change to where `enabled` lives fails this build.
+  // v3 gestures are immutable; return a copy with config.enabled toggled.
   const current = asManualGesture(gesture);
   const next = { ...current, config: { ...current.config } };
   next.config.enabled = enabled;
@@ -135,8 +124,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
 }) => {
   const simultaneousWith = asExternalGesture(externalGesture);
 
-  // Hooks run unconditionally, so every gesture is always created; the ones
-  // without a handler stay disabled.
+  // Hooks run unconditionally; gestures without a handler stay disabled.
   const tap = useTapGesture({
     enabled: !!onTap,
     maxDistance: failDistance,

@@ -6,15 +6,10 @@ import type { SortableGesture } from '../types';
 import { asSortableGesture } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
-/**
- * gesture-handler v2 imperative builder, used when gesture-handler < 3 is
- * installed (e.g. the Old Architecture / Paper). On iOS + New Architecture this
- * path still has the upstream issue #349 limitation, which only the v3 hook API
- * fixes (see `./v3`).
- */
+// gesture-handler v2 imperative builder, used when v2 is installed (Old
+// Architecture). The v3 hook API (`./v3`) is what fixes issue #349.
 
-// A SortableGesture reaching the v2 adapter was built by this adapter, so it is
-// always a v2 builder gesture; unwrap it to call the imperative builder API.
+// A SortableGesture in this adapter is always a v2 builder gesture.
 const asV2Gesture = (gesture: SortableGesture): GestureType =>
   gesture as unknown as GestureType;
 
@@ -59,9 +54,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
       return gesture;
     };
 
-    // `maxDistance` is applied on the concrete Tap/LongPress builders (which
-    // declare it) rather than inside `decorate`, whose generic `GestureType`
-    // does not expose it and would need a cast. `Manual` has no `maxDistance`.
+    // maxDistance only exists on the Tap/LongPress builders, so set it there.
     const gestures: Array<GestureType> = [];
 
     if (onTap) {

@@ -10,14 +10,8 @@ type SortableGestureDetectorViewProps = PropsWithChildren<{
   userSelect?: 'none';
 }>;
 
-/**
- * `GestureDetector` re-typed to accept the opaque {@link SortableGesture}. This
- * is the single place that handle is unwrapped back into a gesture-handler
- * gesture: gesture-handler's own prop types differ across majors (v2 is a plain
- * component, v3 a generic overload) and neither accepts the cross-major handle
- * through JSX, so the native and web wrappers share this one bridge instead of
- * each casting the detector themselves.
- */
+// The one place the opaque handle is cast back to what `GestureDetector` accepts
+// (its prop types differ across majors); shared by the native and web wrappers.
 export const SortableGestureDetectorView = GestureDetector as unknown as (
   props: SortableGestureDetectorViewProps
 ) => ReturnType<typeof GestureDetector>;
