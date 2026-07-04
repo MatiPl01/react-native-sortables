@@ -64,6 +64,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     itemHeights,
     itemPositions,
     itemWidths,
+    layoutRequestId,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
@@ -157,7 +158,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       itemHeights: itemHeights.value,
       itemWidths: itemWidths.value,
       limits: dimensionsLimits.value,
-      paddings
+      paddings,
+      requestId: layoutRequestId.value // Helper to force layout re-calculation
     }),
     (props, previousProps) => {
       const layout = calculateLayout(props);

@@ -43,6 +43,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     controlledItemDimensions,
     itemHeights,
     itemWidths,
+    layoutRequestId,
     usesAbsoluteLayout
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
@@ -135,6 +136,13 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
           if (!isHeightControlled) {
             updateDimension('height', itemHeights);
           }
+
+          // Re-run the layout reaction on the next frame - the dimensions write
+          // alone isn't guaranteed to re-trigger it on native, leaving positions
+          // stale until a drag (#565).
+          setAnimatedTimeout(() => {
+            layoutRequestId.value += 1;
+          });
 
           ctx.queuedMeasurements.clear();
           debounce.cancel();

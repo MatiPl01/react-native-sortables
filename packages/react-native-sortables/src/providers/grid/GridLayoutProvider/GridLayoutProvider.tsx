@@ -57,6 +57,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     itemHeights,
     itemPositions,
     itemWidths,
+    layoutRequestId,
     overriddenCellDimensions,
     shouldAnimateLayout
   } = useCommonValuesContext();
@@ -80,7 +81,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
   const crossGap = isVertical ? rowGap : columnGap;
 
   const mainGroupSize = useMutableValue<null | number>(null);
-  const layoutRequestId = useMutableValue(0);
 
   let updateShouldAnimateWeb: null | UpdateShouldAnimateWeb = null;
 
