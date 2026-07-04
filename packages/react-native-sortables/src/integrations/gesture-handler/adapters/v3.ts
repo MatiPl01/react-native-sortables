@@ -6,7 +6,7 @@ import * as GestureHandler from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../reanimated';
-import type { ManualGestureControl, SortableGesture } from '../types';
+import type { ManualGestureControl } from '../types';
 import { asSortableGesture } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
@@ -22,16 +22,6 @@ const {
   useSimultaneousGestures,
   useTapGesture
 } = GestureHandler;
-
-// A SortableGesture in this adapter is always a v3 hook gesture.
-const asManualGesture = (gesture: SortableGesture): ManualGesture =>
-  gesture as unknown as ManualGesture;
-
-// `simultaneousWith` wants the v3 `AnyGesture` union, which is not exported by name.
-const asExternalGesture = (
-  gesture: SortableGesture
-): ManualGestureConfig['simultaneousWith'] =>
-  gesture as unknown as ManualGestureConfig['simultaneousWith'];
 
 function createControl(
   handlerTag: number,
@@ -106,7 +96,7 @@ const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   enabled
 ) => {
   // v3 gestures are immutable; return a copy with config.enabled toggled.
-  const current = asManualGesture(gesture);
+  const current = gesture as unknown as ManualGesture;
   const next = { ...current, config: { ...current.config } };
   next.config.enabled = enabled;
   return asSortableGesture(next);
@@ -122,7 +112,10 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   onTouchesDown,
   onTouchesUp
 }) => {
-  const simultaneousWith = asExternalGesture(externalGesture);
+  // Related to every touchable gesture; `simultaneousWith` accepts v3's
+  // `AnyGesture` union, which is not exported by name.
+  const simultaneousWith =
+    externalGesture as unknown as ManualGestureConfig['simultaneousWith'];
 
   // Hooks run unconditionally; gestures without a handler stay disabled.
   const tap = useTapGesture({

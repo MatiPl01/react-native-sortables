@@ -2,16 +2,11 @@ import { useMemo } from 'react';
 import type { GestureType } from 'react-native-gesture-handler';
 import { Gesture } from 'react-native-gesture-handler';
 
-import type { SortableGesture } from '../types';
 import { asSortableGesture } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
 // gesture-handler v2 imperative builder, used when v2 is installed (Old
 // Architecture). The v3 hook API (`./v3`) is what fixes issue #349.
-
-// A SortableGesture in this adapter is always a v2 builder gesture.
-const asV2Gesture = (gesture: SortableGesture): GestureType =>
-  gesture as unknown as GestureType;
 
 const useDragGesture: GestureHandlerAdapter['useDragGesture'] = (
   callbacks,
@@ -34,7 +29,7 @@ const useDragGesture: GestureHandlerAdapter['useDragGesture'] = (
 const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   gesture,
   enabled
-) => asSortableGesture(asV2Gesture(gesture).enabled(enabled));
+) => asSortableGesture((gesture as unknown as GestureType).enabled(enabled));
 
 const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   externalGesture,
@@ -49,7 +44,9 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   useMemo(() => {
     const decorate = <T extends GestureType>(gesture: T): T => {
       gesture
-        .simultaneousWithExternalGesture(asV2Gesture(externalGesture))
+        .simultaneousWithExternalGesture(
+          externalGesture as unknown as GestureType
+        )
         .runOnJS(true);
       return gesture;
     };
