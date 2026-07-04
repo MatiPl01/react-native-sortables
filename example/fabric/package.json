@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "react-native": "0.85.3",
+    "react-native-gesture-handler": "3.0.2",
     "react-native-sortables": "workspace:*"
   },
   "installConfig": {

@@ -8499,6 +8499,7 @@ __metadata:
   resolution: "example-fabric@workspace:example/fabric"
   dependencies:
     react-native: "npm:0.85.3"
+    react-native-gesture-handler: "npm:3.0.2"
     react-native-sortables: "workspace:*"
   languageName: unknown
   linkType: soft
