@@ -78,15 +78,13 @@ This library is built with:
 Make sure to follow their installation instructions for your project.
 
 > [!NOTE]
-> On iOS + New Architecture, gesture-handler **2.x** has a known limitation: a
-> sortable stops recognizing drags after its screen is detached and re-attached
-> (for example bottom tabs with `detachInactiveScreens={false}`), which can make
-> a dragged item get "stuck" - see
-> [#349](https://github.com/MatiPl01/react-native-sortables/issues/349). This is
-> not fixable on the v2 API and is resolved by upgrading to
-> **gesture-handler 3** (which the library uses automatically when installed; v3
-> requires the New Architecture). On the Old Architecture (Paper) the issue does
-> not occur, so gesture-handler 2.x remains the right choice there.
+> On iOS + New Architecture, gesture-handler **2.x** can leave a dragged item
+> "stuck" after its screen is detached and re-attached (e.g. bottom tabs with
+> `detachInactiveScreens={false}`) - see
+> [#349](https://github.com/MatiPl01/react-native-sortables/issues/349).
+> **gesture-handler 3** fixes this, and the library uses it automatically when
+> installed (v3 requires the New Architecture). The Old Architecture is
+> unaffected, so 2.x is the right choice there.
 
 ## Quick Start
 
