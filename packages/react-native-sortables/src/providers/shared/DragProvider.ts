@@ -300,7 +300,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         multiZoneActiveItemDimensions.value = itemDimensions;
       }
 
-      // zIndex is elevated later, on the first drag move (see handleTouchesMove)
+      // zIndex is elevated on the first drag move (see handleTouchesMove)
 
       // We need to update the custom handle measurements if the custom handle
       // is used (touch position is relative to the handle in this case)
@@ -475,9 +475,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           touchData: touch
         });
 
-        // Bring the item to the front only once it is actually dragged, so a
-        // long press alone (e.g. to open a native context menu) doesn't change
-        // the stacking context and dismiss the menu.
+        // Elevate only once dragged, so a bare long press doesn't change the
+        // stacking context and dismiss a native context menu (#417)
         if (
           !activeItemBroughtToFront.value &&
           movedDistance >= dragActivationFailOffset.value
@@ -556,9 +555,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveAnimationProgress.value = animate();
       activeAnimationProgress.value = animate();
 
-      // Restore the layer zIndex only if it was elevated. The flag is left as
-      // is and reset on the next handleDragStart - resetting it here would race
-      // with a new overlapping drag and drop its item below its siblings.
+      // Restore the layer only if it was elevated. The flag resets on the next
+      // drag start, not here, to avoid racing an overlapping drag.
       const wasBroughtToFront = activeItemBroughtToFront.value;
       if (wasBroughtToFront) {
         updateLayer?.(LayerState.INTERMEDIATE);

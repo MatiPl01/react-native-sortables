@@ -23,8 +23,7 @@ export default function useItemZIndex(
       ? itemCount - realIndex - 1
       : realIndex;
 
-    // Keep the order zIndex until the item is actually dragged. See
-    // https://github.com/MatiPl01/react-native-sortables/issues/417
+    // Keep the order zIndex until the item is dragged (#417)
     if (!activeItemBroughtToFront.value) {
       return orderZIndex;
     }

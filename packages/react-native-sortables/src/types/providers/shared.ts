@@ -156,9 +156,8 @@ export type ItemContextType = Simplify<
       Pick<CommonValuesContextType, 'indexToKey' | 'keyToIndex'> & {
         itemKey: string;
         isActive: SharedValue<boolean>;
-        // True once the active item is actually dragged (moved past the drag
-        // fail offset), as opposed to just long pressed. Use it to disable
-        // interactive children (e.g. a native context menu) while dragging.
+        // True once the active item is dragged (moved), not just long pressed.
+        // Use it to disable interactive children while dragging.
         isDragging: SharedValue<boolean>;
         activationAnimationProgress: SharedValue<number>;
       }

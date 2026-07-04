@@ -11,12 +11,9 @@ import { getItems } from '@/utils';
 const DATA = getItems(6);
 const COLUMNS = 2;
 
-// The native menu appears on the OS long-press timeout (~500ms) and can't be
-// changed, so we tune the sortable side instead: it claims the gesture a bit
-// sooner and treats even a small move as a drag, so `isDragging` flips - and the
-// menu is dismissed - as soon as the item starts moving. Lower both to make the
-// sortable win the long press more eagerly.
-const DRAG_ACTIVATION_DELAY = 120; // ms until the item can be dragged (default 200)
+// The native menu opens on the OS long-press timeout (~500ms, not tunable), so
+// tune the sortable side: pick up sooner and treat a small move as a drag.
+const DRAG_ACTIVATION_DELAY = 120; // ms until draggable (default 200)
 const DRAG_FAIL_OFFSET = 3; // px of movement that counts as a drag (default 5)
 
 function MenuCard({ item }: { item: string }) {
@@ -32,9 +29,8 @@ function MenuCard({ item }: { item: string }) {
     }
   );
 
-  // Once the item is actually dragged, drop the context menu so it can't open
-  // (and it closes if it was already open) - the sortable owns the gesture from
-  // that point on. On a stationary long press the menu stays available.
+  // While dragging, drop the menu so it can't open (and closes if already open).
+  // A stationary long press keeps it.
   if (dragging) {
     return <GridCard>{item}</GridCard>;
   }
