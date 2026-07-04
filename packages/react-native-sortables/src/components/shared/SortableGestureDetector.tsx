@@ -1,12 +1,10 @@
 import type { PropsWithChildren } from 'react';
-import type {
-  ComposedGesture,
-  GestureType
-} from 'react-native-gesture-handler';
-import { GestureDetector } from 'react-native-gesture-handler';
+
+import type { SortableGesture } from '../../integrations/gesture-handler';
+import { SortableGestureDetectorView } from '../../integrations/gesture-handler';
 
 export type SortableGestureDetectorProps = PropsWithChildren<{
-  gesture: ComposedGesture | GestureType;
+  gesture: SortableGesture;
 }>;
 
 /**
@@ -18,5 +16,9 @@ export default function SortableGestureDetector({
   children,
   gesture
 }: SortableGestureDetectorProps) {
-  return <GestureDetector gesture={gesture}>{children}</GestureDetector>;
+  return (
+    <SortableGestureDetectorView gesture={gesture}>
+      {children}
+    </SortableGestureDetectorView>
+  );
 }

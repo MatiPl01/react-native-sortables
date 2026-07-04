@@ -14919,6 +14919,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-gesture-handler@npm:3.0.2":
+  version: 3.0.2
+  resolution: "react-native-gesture-handler@npm:3.0.2"
+  dependencies:
+    "@types/react-test-renderer": "npm:^19.1.0"
+    invariant: "npm:^2.2.4"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/06d2b1a621f73c148c4000692e55d5f2a44d44229cabc79829de0b0b3dbf3bcf4bc00e8635f82bd1062d7eac87f39ca5213eb1041e23a5543947e64773eaddfb
+  languageName: node
+  linkType: hard
+
 "react-native-gesture-handler@npm:~2.31.1":
   version: 2.31.2
   resolution: "react-native-gesture-handler@npm:2.31.2"
@@ -15126,7 +15139,7 @@ __metadata:
     react: "npm:19.2.3"
     react-native: "npm:0.85.3"
     react-native-builder-bob: "npm:0.40.13"
-    react-native-gesture-handler: "npm:2.31.1"
+    react-native-gesture-handler: "npm:3.0.2"
     react-native-haptic-feedback: "npm:>=2.0.0"
     react-native-reanimated: "npm:4.5.0"
     react-native-worklets: "npm:0.10.0"

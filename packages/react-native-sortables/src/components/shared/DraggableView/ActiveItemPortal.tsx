@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
-import type { GestureType } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
 import { useStableCallback } from '../../../hooks';
+import type { SortableGesture } from '../../../integrations/gesture-handler';
 import { useMutableValue } from '../../../integrations/reanimated';
 import {
   CommonValuesContext,
@@ -22,7 +22,7 @@ type ActiveItemPortalProps = Pick<
   'activationAnimationProgress' | 'baseStyle' | 'isActive' | 'itemKey'
 > & {
   commonValuesContext: CommonValuesContextType;
-  gesture: GestureType;
+  gesture: SortableGesture;
   onTeleport: (isTeleported: boolean) => void;
 };
 

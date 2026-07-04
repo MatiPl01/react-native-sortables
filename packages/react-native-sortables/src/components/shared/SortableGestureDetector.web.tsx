@@ -1,11 +1,8 @@
 import { type PropsWithChildren, useCallback, useEffect, useRef } from 'react';
-import type {
-  ComposedGesture,
-  GestureType
-} from 'react-native-gesture-handler';
-import { GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
+import type { SortableGesture } from '../../integrations/gesture-handler';
+import { SortableGestureDetectorView } from '../../integrations/gesture-handler';
 import { useCommonValuesContext, useItemContext } from '../../providers';
 
 // A single non-passive `touchmove` listener shared by all sortables, attached
@@ -26,7 +23,7 @@ function releaseNativeScroll() {
 }
 
 export type SortableGestureDetectorProps = PropsWithChildren<{
-  gesture: ComposedGesture | GestureType;
+  gesture: SortableGesture;
 }>;
 
 /**
@@ -67,11 +64,11 @@ export default function SortableGestureDetector({
   useEffect(() => () => setBlocking(false), [setBlocking]);
 
   return (
-    <GestureDetector
+    <SortableGestureDetectorView
       gesture={gesture}
       touchAction={touchAction}
       userSelect='none'>
       {children}
-    </GestureDetector>
+    </SortableGestureDetectorView>
   );
 }

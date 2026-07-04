@@ -1,9 +1,8 @@
-import { type PropsWithChildren, useMemo } from 'react';
+import { type PropsWithChildren } from 'react';
 import type { ViewProps } from 'react-native';
 import { View } from 'react-native';
-import type { GestureType } from 'react-native-gesture-handler';
-import { Gesture } from 'react-native-gesture-handler';
 
+import { useTouchableGesture } from '../../integrations/gesture-handler';
 import { useItemContext } from '../../providers';
 import SortableGestureDetector from './SortableGestureDetector';
 
@@ -32,65 +31,16 @@ export default function SortableTouchable({
 }: SortableTouchableProps) {
   const { gesture: externalGesture } = useItemContext();
 
-  const gesture = useMemo(() => {
-    const decorate = <T extends GestureType>(decoratedGesture: T): T => {
-      decoratedGesture
-        .simultaneousWithExternalGesture(externalGesture)
-        .runOnJS(true);
-      if ('maxDistance' in decoratedGesture) {
-        (
-          decoratedGesture as { maxDistance: (distance: number) => GestureType }
-        ).maxDistance(failDistance);
-      }
-      return decoratedGesture;
-    };
-
-    const gestures = [];
-
-    if (onTap) {
-      gestures.push(decorate(Gesture.Tap()).onStart(onTap));
-    }
-
-    if (onDoubleTap) {
-      gestures.push(
-        decorate(Gesture.Tap()).numberOfTaps(2).onStart(onDoubleTap)
-      );
-    }
-
-    if (onLongPress) {
-      gestures.push(decorate(Gesture.LongPress()).onStart(onLongPress));
-    }
-
-    if (onTouchesDown || onTouchesUp) {
-      // Reuse already added gesture if possible or create a manual gesture
-      // if there is no other gesture yet
-      if (!gestures.length) {
-        gestures.push(decorate(Gesture.Manual()));
-      }
-
-      const lastGesture = gestures[gestures.length - 1]!;
-
-      if (onTouchesDown) {
-        lastGesture.onTouchesDown(onTouchesDown);
-      }
-      if (onTouchesUp) {
-        lastGesture.onTouchesUp(onTouchesUp);
-      }
-    }
-
-    return gestureMode === 'exclusive'
-      ? Gesture.Exclusive(...gestures)
-      : Gesture.Simultaneous(...gestures);
-  }, [
+  const gesture = useTouchableGesture({
+    externalGesture,
     failDistance,
-    onTap,
+    gestureMode,
     onDoubleTap,
     onLongPress,
+    onTap,
     onTouchesDown,
-    onTouchesUp,
-    externalGesture,
-    gestureMode
-  ]);
+    onTouchesUp
+  });
 
   return (
     <SortableGestureDetector gesture={gesture}>
