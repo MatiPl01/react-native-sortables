@@ -27,6 +27,10 @@ const routes: Routes = {
             Component: SortableGrid.features.DragHandleExample,
             name: 'Drag Handle'
           },
+          ContextMenu: {
+            Component: SortableGrid.features.ContextMenuExample,
+            name: 'Context Menu'
+          },
           DataChange: {
             Component: SortableGrid.features.DataChangeExample,
             name: 'Data Change'
