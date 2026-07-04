@@ -12,7 +12,7 @@ import type {
   FlexLayoutContextType,
   SortableFlexStyle
 } from '../../../types';
-import { haveEqualPropValues } from '../../../utils';
+import { haveEqualPropValues, reconcilePositions } from '../../../utils';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
@@ -175,8 +175,11 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
       // Update current layout
       appliedLayout.value = layout;
-      // Update item positions
-      itemPositions.value = layout.itemPositions;
+      // Update item positions, keeping references for items that didn't move
+      itemPositions.value = reconcilePositions(
+        itemPositions.value,
+        layout.itemPositions
+      );
       // Update controlled container dimensions
       applyControlledContainerDimensions(layout.totalDimensions);
       // Update key to group

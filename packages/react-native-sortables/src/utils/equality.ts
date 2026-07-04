@@ -55,6 +55,26 @@ export const areVectorsDifferent = (
   );
 };
 
+// Returns a positions record that keeps the previous Vector reference for every
+// key whose value is unchanged, so shared values derived per key short-circuit
+// (reference equality) instead of firing for items that didn't actually move.
+export const reconcilePositions = (
+  prev: Record<string, Vector>,
+  next: Record<string, Vector>
+): Record<string, Vector> => {
+  'worklet';
+  const result: Record<string, Vector> = {};
+  for (const key in next) {
+    const prevPosition = prev[key];
+    const nextPosition = next[key]!;
+    result[key] =
+      prevPosition && !areVectorsDifferent(prevPosition, nextPosition)
+        ? prevPosition
+        : nextPosition;
+  }
+  return result;
+};
+
 export const haveEqualPropValues = <T extends AnyRecord>(
   obj1: Maybe<T>,
   obj2: Maybe<T>

@@ -13,6 +13,7 @@ import type {
   GridLayoutContextType,
   GridLayoutProps
 } from '../../../types';
+import { reconcilePositions } from '../../../utils';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
@@ -181,8 +182,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         return;
       }
 
-      // Update item positions
-      itemPositions.value = layout.itemPositions;
+      // Update item positions, keeping references for items that didn't move
+      itemPositions.value = reconcilePositions(
+        itemPositions.value,
+        layout.itemPositions
+      );
 
       // Update controlled container dimensions
       if (

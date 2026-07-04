@@ -152,10 +152,8 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     );
 
     // ACTIVE ITEM POSITION DISPATCHER
-    // A single reaction drives the active item's own position mutable from the
-    // shared activeItemPosition. This replaces a per-item reaction that made
-    // every item subscribe to activeItemPosition (which changes every frame
-    // during a drag), turning O(N) per-frame work into O(1).
+    // Drives only the active item's position mutable so inactive items don't
+    // subscribe to activeItemPosition (which changes every frame during a drag).
     useAnimatedReaction(
       () => ({ key: activeItemKey.value, position: activeItemPosition.value }),
       ({ key, position }) => {
@@ -163,10 +161,6 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
           return;
         }
         const positionValue = itemPositionValues.value[key];
-        // Skip when the active item's rendered position hasn't actually changed
-        // (e.g. pinned against a non-overdrag edge) so we don't re-run its
-        // layout style for nothing. This gate belongs here, on the per-item
-        // position write, not on the shared activeItemPosition/trigger origin.
         if (
           positionValue &&
           (!positionValue.value ||

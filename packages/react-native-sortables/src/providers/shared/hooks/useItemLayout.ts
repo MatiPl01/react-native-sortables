@@ -168,9 +168,8 @@ export default function useItemLayout(
 
   const position = positionRef.current;
 
-  // Register this item's position mutable so the single active-item-position
-  // dispatcher (in CommonValuesProvider) can drive it while it is active,
-  // without every item having to subscribe to activeItemPosition.
+  // Expose this item's position mutable so the dispatcher in CommonValuesProvider
+  // can drive it while this item is active.
   useEffect(() => {
     runOnUI(() => {
       itemPositionValues.value[key] = position;
