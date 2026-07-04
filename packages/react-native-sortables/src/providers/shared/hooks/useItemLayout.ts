@@ -1,9 +1,10 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   interpolate,
   makeMutable,
+  runOnUI,
   useAnimatedReaction,
   useDerivedValue,
   withTiming
@@ -146,6 +147,7 @@ export default function useItemLayout(
     activeItemPosition,
     animateLayoutOnReorderOnly,
     itemPositions,
+    itemPositionValues,
     shouldAnimateLayout
   } = useCommonValuesContext();
 
@@ -165,6 +167,20 @@ export default function useItemLayout(
   );
 
   const position = positionRef.current;
+
+  // Register this item's position mutable so the single active-item-position
+  // dispatcher (in CommonValuesProvider) can drive it while it is active,
+  // without every item having to subscribe to activeItemPosition.
+  useEffect(() => {
+    runOnUI(() => {
+      itemPositionValues.value[key] = position;
+    })();
+    return () => {
+      runOnUI(() => {
+        delete itemPositionValues.value[key];
+      })();
+    };
+  }, [key, position, itemPositionValues]);
 
   // Inactive item updater
   useAnimatedReaction(
@@ -235,19 +251,6 @@ export default function useItemLayout(
         position.value = withTiming(layoutPos);
       } else {
         position.value = layoutPos;
-      }
-    }
-  );
-
-  // Active item updater
-  useAnimatedReaction(
-    () => ({
-      active: isActive.value,
-      activePosition: activeItemPosition.value
-    }),
-    ({ active, activePosition }) => {
-      if (active && activePosition) {
-        position.value = activePosition;
       }
     }
   );

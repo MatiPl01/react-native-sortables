@@ -1,6 +1,11 @@
 import { type PropsWithChildren, useEffect, useMemo } from 'react';
 import type { View } from 'react-native';
-import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import {
+  useAnimatedReaction,
+  useAnimatedRef,
+  useDerivedValue
+} from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../constants';
 import type { Animatable } from '../../integrations/reanimated';
@@ -22,7 +27,7 @@ import type {
   Vector
 } from '../../types';
 import { DragActivationState } from '../../types';
-import { getKeyToIndex } from '../../utils';
+import { areVectorsDifferent, getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
 import { useItemsContext } from './ItemsProvider';
 
@@ -79,6 +84,9 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const touchPosition = useMutableValue<null | Vector>(null);
     const activeItemPosition = useMutableValue<null | Vector>(null);
     const itemPositions = useMutableValue<Record<string, Vector>>({});
+    const itemPositionValues = useMutableValue<
+      Record<string, SharedValue<null | Vector>>
+    >({});
 
     // DIMENSIONS
     const containerWidth = useMutableValue<null | number>(null);
@@ -143,6 +151,32 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       [getKeys, subscribeKeys, indexToKey]
     );
 
+    // ACTIVE ITEM POSITION DISPATCHER
+    // A single reaction drives the active item's own position mutable from the
+    // shared activeItemPosition. This replaces a per-item reaction that made
+    // every item subscribe to activeItemPosition (which changes every frame
+    // during a drag), turning O(N) per-frame work into O(1).
+    useAnimatedReaction(
+      () => ({ key: activeItemKey.value, position: activeItemPosition.value }),
+      ({ key, position }) => {
+        if (key === null || !position) {
+          return;
+        }
+        const positionValue = itemPositionValues.value[key];
+        // Skip when the active item's rendered position hasn't actually changed
+        // (e.g. pinned against a non-overdrag edge) so we don't re-run its
+        // layout style for nothing. This gate belongs here, on the per-item
+        // position write, not on the shared activeItemPosition/trigger origin.
+        if (
+          positionValue &&
+          (!positionValue.value ||
+            areVectorsDifferent(positionValue.value, position))
+        ) {
+          positionValue.value = position;
+        }
+      }
+    );
+
     return {
       value: {
         activationAnimationDuration,
@@ -175,6 +209,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         isStackingOrderDesc: stackingOrder === 'desc',
         itemHeights,
         itemPositions,
+        itemPositionValues,
         itemsLayoutTransitionMode,
         itemWidths,
         keyToIndex,

@@ -69,6 +69,12 @@ export type CommonValuesContextType =
       touchPosition: SharedValue<null | Vector>;
       activeItemPosition: SharedValue<null | Vector>;
       itemPositions: SharedValue<Record<string, Vector>>;
+      // Registry of per-item animated position mutables (the values rendered by
+      // each item's layout). A single reaction writes the active item's live
+      // position here so inactive items don't subscribe to activeItemPosition.
+      itemPositionValues: SharedValue<
+        Record<string, SharedValue<null | Vector>>
+      >;
 
       // DIMENSIONS
       controlledContainerDimensions: ControlledDimensions;
