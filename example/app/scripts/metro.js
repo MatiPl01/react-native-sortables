@@ -4,8 +4,12 @@ const {
   wrapWithReanimatedMetroConfig
 } = require('react-native-reanimated/metro-config');
 
+function blockDir(dir) {
+  return new RegExp(`^${escape(dir + path.sep)}.*$`);
+}
+
 function createMetroConfig(defaultConfig, currentAppDir, options = {}) {
-  const { excludeFromRoot = [] } = options;
+  const { excludeFromRoot = [], filterFromCommonApp = [] } = options;
 
   const monorepoRoot = path.resolve(currentAppDir, '../..');
 
@@ -38,13 +42,23 @@ function createMetroConfig(defaultConfig, currentAppDir, options = {}) {
 
   config.resolver.disableHierarchicalLookup = true;
 
-  if (excludeFromRoot.length > 0) {
-    config.resolver.blockList = excludeFromRoot.map(
-      m =>
-        new RegExp(
-          `^${escape(path.join(monorepoRoot, 'node_modules', m))}\\/.*$`
-        )
-    );
+  const commonAppNodeModules = path.resolve(
+    currentAppDir,
+    '../app/node_modules'
+  );
+  const blockList = [
+    ...excludeFromRoot.map(m =>
+      blockDir(path.join(monorepoRoot, 'node_modules', m))
+    ),
+    // A host app can pin a divergent major of a shared dependency (e.g. the
+    // fabric example on gesture-handler v3). Block the common app's copy so the
+    // bundle resolves the host's own version, matching what the native build links.
+    ...filterFromCommonApp.map(m =>
+      blockDir(path.join(commonAppNodeModules, m))
+    )
+  ];
+  if (blockList.length > 0) {
+    config.resolver.blockList = blockList;
   }
 
   return wrapWithReanimatedMetroConfig(config);
