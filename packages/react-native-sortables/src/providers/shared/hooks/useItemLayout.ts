@@ -146,14 +146,14 @@ export default function useItemLayout(
     activeItemKey,
     activeItemPosition,
     animateLayoutOnReorderOnly,
-    itemPositions,
-    itemPositionValues,
+    itemLayoutPositions,
+    itemRenderPositions,
     shouldAnimateLayout
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
   const layoutPosition = useDerivedValue(
-    () => itemPositions.value[key] ?? null
+    () => itemLayoutPositions.value[key] ?? null
   );
 
   const positionRef = useRef<SharedValue<null | Vector>>(null);
@@ -162,9 +162,7 @@ export default function useItemLayout(
     progress: number;
   }>(null);
 
-  // activeItemPosition only seeds the mutable for an item that mounts already
-  // active; ongoing active updates arrive via the CommonValuesProvider dispatcher
-  // through itemPositionValues.
+  // Seeds the mutable when an item mounts already-active; the dispatcher drives it after.
   positionRef.current ??= makeMutable(
     isActive.value ? activeItemPosition.value : layoutPosition.value
   );
@@ -175,12 +173,12 @@ export default function useItemLayout(
   // can drive it while this item is active.
   useEffect(() => {
     runOnUI(() => {
-      itemPositionValues.value[key] = position;
+      itemRenderPositions.value[key] = position;
     })();
     return runOnUI(() => {
-      delete itemPositionValues.value[key];
+      delete itemRenderPositions.value[key];
     });
-  }, [key, position, itemPositionValues]);
+  }, [key, position, itemRenderPositions]);
 
   // Inactive item updater
   useAnimatedReaction(

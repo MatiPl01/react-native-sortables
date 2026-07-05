@@ -56,7 +56,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     containerWidth,
     indexToKey,
     itemHeights,
-    itemPositions,
+    itemLayoutPositions,
     itemWidths,
     overriddenCellDimensions,
     shouldAnimateLayout
@@ -136,8 +136,6 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       if (isVertical) {
         itemWidths.value = value;
-        // Reuse the previous object when the width is unchanged so the N cell
-        // styles subscribed to overriddenCellDimensions don't all wake.
         const nextWidth = value + (IS_WEB ? 0 : mainGap.value);
         if (
           areValuesDifferent(overriddenCellDimensions.value.width, nextWidth)
@@ -188,8 +186,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       }
 
       // Update item positions, keeping references for items that didn't move
-      itemPositions.value = reconcilePositions(
-        itemPositions.value,
+      itemLayoutPositions.value = reconcilePositions(
+        itemLayoutPositions.value,
         layout.itemPositions
       );
 

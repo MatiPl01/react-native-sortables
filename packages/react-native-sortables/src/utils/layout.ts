@@ -95,8 +95,7 @@ export const isValidVector = (vector: Vector): boolean => {
   return isValidCoordinate(vector.x) && isValidCoordinate(vector.y);
 };
 
-// Reuse the previous Vector reference for unchanged keys (so per-key derived
-// values short-circuit on ===), and reuse the whole record when nothing moved.
+// Reuses prev Vector refs for unchanged keys so per-key derived values dedup on ===.
 export const reconcilePositions = (
   prev: Record<string, Vector>,
   next: Record<string, Vector>
@@ -116,7 +115,6 @@ export const reconcilePositions = (
       changed = true;
     }
   }
-  // Whole layout unchanged: reuse prev so the itemPositions write dedups.
   if (!changed && matched === Object.keys(prev).length) {
     return prev;
   }

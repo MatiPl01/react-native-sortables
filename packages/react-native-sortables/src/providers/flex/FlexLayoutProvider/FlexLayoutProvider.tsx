@@ -62,7 +62,7 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     controlledContainerDimensions,
     indexToKey,
     itemHeights,
-    itemPositions,
+    itemLayoutPositions,
     itemWidths,
     shouldAnimateLayout
   } = useCommonValuesContext();
@@ -174,8 +174,8 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       // Update current layout
       appliedLayout.value = layout;
       // Update item positions, keeping references for items that didn't move
-      itemPositions.value = reconcilePositions(
-        itemPositions.value,
+      itemLayoutPositions.value = reconcilePositions(
+        itemLayoutPositions.value,
         layout.itemPositions
       );
       // Update controlled container dimensions

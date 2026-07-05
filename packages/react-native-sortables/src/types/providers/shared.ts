@@ -68,10 +68,9 @@ export type CommonValuesContextType =
       // POSITIONS
       touchPosition: SharedValue<null | Vector>;
       activeItemPosition: SharedValue<null | Vector>;
-      itemPositions: SharedValue<Record<string, Vector>>;
-      // Per-item animated position mutables, keyed by item key (driven by the
-      // active item position dispatcher in CommonValuesProvider).
-      itemPositionValues: SharedValue<
+      itemLayoutPositions: SharedValue<Record<string, Vector>>;
+      // Per-item render-position mutables the active-item dispatcher writes.
+      itemRenderPositions: SharedValue<
         Record<string, SharedValue<null | Vector>>
       >;
 
