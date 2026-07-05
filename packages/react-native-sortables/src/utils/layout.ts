@@ -1,6 +1,6 @@
 import type { Maybe } from '../helperTypes';
 import type { Dimensions, Offset, Vector } from '../types';
-import { gt, lt } from './equality';
+import { areVectorsDifferent, gt, lt } from './equality';
 import { error } from './logs';
 
 const getOffsetDistance = (
@@ -93,4 +93,30 @@ const isValidCoordinate = (coordinate: number): boolean => {
 export const isValidVector = (vector: Vector): boolean => {
   'worklet';
   return isValidCoordinate(vector.x) && isValidCoordinate(vector.y);
+};
+
+// Reuses prev Vector refs for unchanged keys so per-key derived values dedup on ===.
+export const reconcilePositions = (
+  prev: Record<string, Vector>,
+  next: Record<string, Vector>
+): Record<string, Vector> => {
+  'worklet';
+  const result: Record<string, Vector> = {};
+  let changed = false;
+  let matched = 0;
+  for (const key in next) {
+    const prevPosition = prev[key];
+    const nextPosition = next[key]!;
+    if (prevPosition && !areVectorsDifferent(prevPosition, nextPosition)) {
+      result[key] = prevPosition;
+      matched++;
+    } else {
+      result[key] = nextPosition;
+      changed = true;
+    }
+  }
+  if (!changed && matched === Object.keys(prev).length) {
+    return prev;
+  }
+  return result;
 };

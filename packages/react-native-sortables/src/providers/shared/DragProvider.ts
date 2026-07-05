@@ -97,7 +97,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     inactiveItemScale,
     indexToKey,
     itemHeights,
-    itemPositions,
+    itemLayoutPositions,
     itemWidths,
     keyToIndex,
     prevActiveItemKey,
@@ -250,10 +250,16 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           touchPosition.value.x - snapOffset.x,
           touchPosition.value.y - snapOffset.y
         );
-        triggerOriginPosition.value = {
+        const newTriggerOrigin = {
           x: activeItemTargetPosition.x + activeDimensions.width / 2,
           y: activeItemTargetPosition.y + activeDimensions.height / 2
         };
+        if (
+          !triggerOriginPosition.value ||
+          areVectorsDifferent(newTriggerOrigin, triggerOriginPosition.value)
+        ) {
+          triggerOriginPosition.value = newTriggerOrigin;
+        }
       }
 
       // Portal-related values
@@ -409,7 +415,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           return;
         }
 
-        const itemPosition = itemPositions.value[key];
+        const itemPosition = itemLayoutPositions.value[key];
         const itemDimensions = getItemDimensions(
           key,
           itemWidths.value,
@@ -439,7 +445,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       handleDragStart,
       itemHeights,
       itemWidths,
-      itemPositions,
+      itemLayoutPositions,
       sortEnabled,
       usesAbsoluteLayout
     ]

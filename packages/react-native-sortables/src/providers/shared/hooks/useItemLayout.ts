@@ -1,9 +1,10 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   interpolate,
   makeMutable,
+  runOnUI,
   useAnimatedReaction,
   useDerivedValue,
   withTiming
@@ -145,13 +146,14 @@ export default function useItemLayout(
     activeItemKey,
     activeItemPosition,
     animateLayoutOnReorderOnly,
-    itemPositions,
+    itemCurrentPositions,
+    itemLayoutPositions,
     shouldAnimateLayout
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
   const layoutPosition = useDerivedValue(
-    () => itemPositions.value[key] ?? null
+    () => itemLayoutPositions.value[key] ?? null
   );
 
   const positionRef = useRef<SharedValue<null | Vector>>(null);
@@ -160,11 +162,23 @@ export default function useItemLayout(
     progress: number;
   }>(null);
 
+  // Seeds the mutable when an item mounts already-active; the dispatcher drives it after.
   positionRef.current ??= makeMutable(
     isActive.value ? activeItemPosition.value : layoutPosition.value
   );
 
   const position = positionRef.current;
+
+  // Expose this item's position mutable so the dispatcher in CommonValuesProvider
+  // can drive it while this item is active.
+  useEffect(() => {
+    runOnUI(() => {
+      itemCurrentPositions.value[key] = position;
+    })();
+    return runOnUI(() => {
+      delete itemCurrentPositions.value[key];
+    });
+  }, [key, position, itemCurrentPositions]);
 
   // Inactive item updater
   useAnimatedReaction(
@@ -235,19 +249,6 @@ export default function useItemLayout(
         position.value = withTiming(layoutPos);
       } else {
         position.value = layoutPos;
-      }
-    }
-  );
-
-  // Active item updater
-  useAnimatedReaction(
-    () => ({
-      active: isActive.value,
-      activePosition: activeItemPosition.value
-    }),
-    ({ active, activePosition }) => {
-      if (active && activePosition) {
-        position.value = activePosition;
       }
     }
   );

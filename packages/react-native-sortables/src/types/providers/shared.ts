@@ -68,7 +68,11 @@ export type CommonValuesContextType =
       // POSITIONS
       touchPosition: SharedValue<null | Vector>;
       activeItemPosition: SharedValue<null | Vector>;
-      itemPositions: SharedValue<Record<string, Vector>>;
+      itemLayoutPositions: SharedValue<Record<string, Vector>>;
+      // Per-item current on-screen position mutables, written by the dispatcher.
+      itemCurrentPositions: SharedValue<
+        Record<string, SharedValue<null | Vector>>
+      >;
 
       // DIMENSIONS
       controlledContainerDimensions: ControlledDimensions;

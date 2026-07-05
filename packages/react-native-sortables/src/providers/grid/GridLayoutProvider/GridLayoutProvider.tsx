@@ -13,6 +13,7 @@ import type {
   GridLayoutContextType,
   GridLayoutProps
 } from '../../../types';
+import { areValuesDifferent, reconcilePositions } from '../../../utils';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
@@ -55,7 +56,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     containerWidth,
     indexToKey,
     itemHeights,
-    itemPositions,
+    itemLayoutPositions,
     itemWidths,
     overriddenCellDimensions,
     shouldAnimateLayout
@@ -135,9 +136,12 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       if (isVertical) {
         itemWidths.value = value;
-        overriddenCellDimensions.value = {
-          width: value + (IS_WEB ? 0 : mainGap.value)
-        };
+        const nextWidth = value + (IS_WEB ? 0 : mainGap.value);
+        if (
+          areValuesDifferent(overriddenCellDimensions.value.width, nextWidth)
+        ) {
+          overriddenCellDimensions.value = { width: nextWidth };
+        }
       } else {
         itemHeights.value = value;
       }
@@ -181,8 +185,11 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         return;
       }
 
-      // Update item positions
-      itemPositions.value = layout.itemPositions;
+      // Update item positions, keeping references for items that didn't move
+      itemLayoutPositions.value = reconcilePositions(
+        itemLayoutPositions.value,
+        layout.itemPositions
+      );
 
       // Update controlled container dimensions
       if (

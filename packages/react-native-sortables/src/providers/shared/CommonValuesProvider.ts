@@ -1,6 +1,11 @@
 import { type PropsWithChildren, useEffect, useMemo } from 'react';
 import type { View } from 'react-native';
-import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import {
+  useAnimatedReaction,
+  useAnimatedRef,
+  useDerivedValue
+} from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../constants';
 import type { Animatable } from '../../integrations/reanimated';
@@ -22,7 +27,7 @@ import type {
   Vector
 } from '../../types';
 import { DragActivationState } from '../../types';
-import { getKeyToIndex } from '../../utils';
+import { areVectorsDifferent, getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
 import { useItemsContext } from './ItemsProvider';
 
@@ -78,7 +83,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // POSITIONS
     const touchPosition = useMutableValue<null | Vector>(null);
     const activeItemPosition = useMutableValue<null | Vector>(null);
-    const itemPositions = useMutableValue<Record<string, Vector>>({});
+    const itemLayoutPositions = useMutableValue<Record<string, Vector>>({});
+    const itemCurrentPositions = useMutableValue<
+      Record<string, SharedValue<null | Vector>>
+    >({});
 
     // DIMENSIONS
     const containerWidth = useMutableValue<null | number>(null);
@@ -143,6 +151,26 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       [getKeys, subscribeKeys, indexToKey]
     );
 
+    // ACTIVE ITEM POSITION DISPATCHER
+    // Drives only the active item's position mutable so inactive items don't
+    // subscribe to activeItemPosition (which changes every frame during a drag).
+    useAnimatedReaction(
+      () => ({ key: activeItemKey.value, position: activeItemPosition.value }),
+      ({ key, position }) => {
+        if (key === null || !position) {
+          return;
+        }
+        const positionValue = itemCurrentPositions.value[key];
+        if (
+          positionValue &&
+          (!positionValue.value ||
+            areVectorsDifferent(positionValue.value, position))
+        ) {
+          positionValue.value = position;
+        }
+      }
+    );
+
     return {
       value: {
         activationAnimationDuration,
@@ -173,8 +201,9 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         inactiveItemScale,
         indexToKey,
         isStackingOrderDesc: stackingOrder === 'desc',
+        itemCurrentPositions,
         itemHeights,
-        itemPositions,
+        itemLayoutPositions,
         itemsLayoutTransitionMode,
         itemWidths,
         keyToIndex,
