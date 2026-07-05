@@ -43,38 +43,34 @@ it('selects the v3 adapter and wires the drag callbacks into the manual hook', (
   expect(typeof config.onTouchesUp).toBe('function');
 });
 
-it('disables the reanimated detector for touchable JS callbacks', () => {
-  const onTap = jest.fn();
+it('keeps worklet touchable handlers on the reanimated detector and JS ones off it', () => {
+  const jsTap = jest.fn();
+  const workletLongPress = Object.assign(jest.fn(), { __workletHash: 1 });
 
   renderHook(() =>
     useTouchableGesture({
       externalGesture: {},
       failDistance: 10,
       gestureMode: 'exclusive',
-      onLongPress: jest.fn(),
-      onTap,
+      onLongPress: workletLongPress,
+      onTap: jsTap,
       onTouchesDown: jest.fn()
     })
   );
 
-  // Touchable handlers are plain JS callbacks, not worklets. Every gesture must
-  // set `disableReanimated` so reanimated's `useHandler` (which rejects
-  // non-worklet handlers) never runs - `runOnJS` alone does not skip that check.
   const configOf = (mock: jest.Mock) =>
     mock.mock.calls.map(([config]) => config as Record<string, unknown>);
 
-  for (const config of configOf(mocked.useTapGesture)) {
-    expect(config.disableReanimated).toBe(true);
-  }
-  for (const config of configOf(mocked.useLongPressGesture)) {
-    expect(config.disableReanimated).toBe(true);
-  }
-  for (const config of configOf(mocked.useManualGesture)) {
-    expect(config.disableReanimated).toBe(true);
-  }
+  // Plain JS handlers opt out of the reanimated detector (its `useHandler`
+  // rejects non-worklets); worklet handlers keep it and run on the UI thread.
+  const tapConfig = configOf(mocked.useTapGesture).find(
+    config => config.onActivate === jsTap
+  );
+  expect(tapConfig?.disableReanimated).toBe(true);
 
-  // The JS callback is forwarded untouched as the tap handler.
-  expect(
-    configOf(mocked.useTapGesture).some(config => config.onActivate === onTap)
-  ).toBe(true);
+  const [longPressConfig] = configOf(mocked.useLongPressGesture);
+  expect(longPressConfig?.onActivate).toBe(workletLongPress);
+  expect(longPressConfig?.disableReanimated).toBe(false);
+
+  expect(configOf(mocked.useManualGesture)[0]?.disableReanimated).toBe(true);
 });

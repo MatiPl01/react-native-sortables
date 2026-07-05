@@ -3,11 +3,16 @@ import type {
   ManualGestureConfig
 } from 'react-native-gesture-handler';
 import * as GestureHandler from 'react-native-gesture-handler';
-import type { SharedValue } from 'react-native-reanimated';
+import { isWorkletFunction, type SharedValue } from 'react-native-reanimated';
 
 import { useMutableValue } from '../../reanimated';
 import type { ManualGestureControl } from '../types';
 import type { GestureHandlerAdapter } from './types';
+
+// A plain-JS handler must opt out of the reanimated detector (its `useHandler`
+// rejects non-worklets); a worklet handler keeps it and runs on the UI thread.
+const runsOnJS = (handler?: () => void) =>
+  handler !== undefined && !isWorkletFunction(handler);
 
 // gesture-handler v3 hook API, which fixes issue #349: hook gestures keep
 // receiving touches after a screen re-attaches. Hooks are read off a namespace
@@ -114,21 +119,15 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   const simultaneousWith =
     externalGesture as unknown as ManualGestureConfig['simultaneousWith'];
 
-  // Touchable callbacks are plain JS functions, not worklets. In v3 that
-  // requires `disableReanimated` (not `runOnJS`): the reanimated detector runs
-  // `useHandler`, which rejects non-worklet handlers, so the reanimated path
-  // has to be turned off entirely - the same config gesture-handler's own
-  // Touchable/Pressable use for their JS handlers.
-  // Hooks run unconditionally; gestures without a handler stay disabled.
   const tap = useTapGesture({
-    disableReanimated: true,
+    disableReanimated: runsOnJS(onTap),
     enabled: !!onTap,
     maxDistance: failDistance,
     onActivate: onTap,
     simultaneousWith
   });
   const doubleTap = useTapGesture({
-    disableReanimated: true,
+    disableReanimated: runsOnJS(onDoubleTap),
     enabled: !!onDoubleTap,
     maxDistance: failDistance,
     numberOfTaps: 2,
@@ -136,14 +135,14 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
     simultaneousWith
   });
   const longPress = useLongPressGesture({
-    disableReanimated: true,
+    disableReanimated: runsOnJS(onLongPress),
     enabled: !!onLongPress,
     maxDistance: failDistance,
     onActivate: onLongPress,
     simultaneousWith
   });
   const manual = useManualGesture({
-    disableReanimated: true,
+    disableReanimated: runsOnJS(onTouchesDown) || runsOnJS(onTouchesUp),
     enabled: !!(onTouchesDown ?? onTouchesUp),
     onTouchesDown,
     onTouchesUp,
