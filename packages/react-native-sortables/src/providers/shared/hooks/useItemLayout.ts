@@ -162,6 +162,9 @@ export default function useItemLayout(
     progress: number;
   }>(null);
 
+  // activeItemPosition only seeds the mutable for an item that mounts already
+  // active; ongoing active updates arrive via the CommonValuesProvider dispatcher
+  // through itemPositionValues.
   positionRef.current ??= makeMutable(
     isActive.value ? activeItemPosition.value : layoutPosition.value
   );
@@ -174,11 +177,9 @@ export default function useItemLayout(
     runOnUI(() => {
       itemPositionValues.value[key] = position;
     })();
-    return () => {
-      runOnUI(() => {
-        delete itemPositionValues.value[key];
-      })();
-    };
+    return runOnUI(() => {
+      delete itemPositionValues.value[key];
+    });
   }, [key, position, itemPositionValues]);
 
   // Inactive item updater

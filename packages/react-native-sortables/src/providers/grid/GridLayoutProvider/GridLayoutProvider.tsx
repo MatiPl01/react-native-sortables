@@ -13,7 +13,7 @@ import type {
   GridLayoutContextType,
   GridLayoutProps
 } from '../../../types';
-import { reconcilePositions } from '../../../utils';
+import { areValuesDifferent, reconcilePositions } from '../../../utils';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
@@ -136,9 +136,14 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
 
       if (isVertical) {
         itemWidths.value = value;
-        overriddenCellDimensions.value = {
-          width: value + (IS_WEB ? 0 : mainGap.value)
-        };
+        // Reuse the previous object when the width is unchanged so the N cell
+        // styles subscribed to overriddenCellDimensions don't all wake.
+        const nextWidth = value + (IS_WEB ? 0 : mainGap.value);
+        if (
+          areValuesDifferent(overriddenCellDimensions.value.width, nextWidth)
+        ) {
+          overriddenCellDimensions.value = { width: nextWidth };
+        }
       } else {
         itemHeights.value = value;
       }
