@@ -44,7 +44,7 @@ it('selects the v3 adapter and wires the drag callbacks into the manual hook', (
   expect(typeof config.onTouchesUp).toBe('function');
 });
 
-it('wraps touchable handlers into worklets so JS callbacks do not reach the detector raw', () => {
+it('creates a gesture only for the handlers that are provided and wraps them as worklets', () => {
   const onTap = jest.fn();
 
   renderHook(() =>
@@ -52,22 +52,40 @@ it('wraps touchable handlers into worklets so JS callbacks do not reach the dete
       externalGesture: {},
       failDistance: 10,
       gestureMode: 'exclusive',
-      onTap,
-      onTouchesDown: jest.fn()
+      onTap
     })
   );
 
-  const configOf = (mock: jest.Mock) =>
-    mock.mock.calls.map(([config]) => config as Record<string, unknown>);
+  // Only onTap -> a single tap gesture; no long-press or manual gesture (so no
+  // native handlers for callbacks the user never set).
+  expect(mocked.useTapGesture).toHaveBeenCalledTimes(1);
+  expect(mocked.useLongPressGesture).not.toHaveBeenCalled();
+  expect(mocked.useManualGesture).not.toHaveBeenCalled();
 
   // The raw JS handler is wrapped into a worklet, so the reanimated detector's
   // `useHandler` never sees a non-worklet (which would throw at render).
-  const tapConfig = configOf(mocked.useTapGesture).find(
-    config => config.onActivate !== undefined
-  );
-  expect(tapConfig?.onActivate).not.toBe(onTap);
-  expect(isWorkletFunction(tapConfig?.onActivate)).toBe(true);
+  const [tapConfig] = mocked.useTapGesture.mock.calls[0] as [
+    Record<string, unknown>
+  ];
+  expect(tapConfig.onActivate).not.toBe(onTap);
+  expect(isWorkletFunction(tapConfig.onActivate)).toBe(true);
+});
 
-  const [manualConfig] = configOf(mocked.useManualGesture);
-  expect(isWorkletFunction(manualConfig?.onTouchesDown)).toBe(true);
+it('creates tap, double-tap, long-press and manual gestures when every handler is set', () => {
+  renderHook(() =>
+    useTouchableGesture({
+      externalGesture: {},
+      failDistance: 10,
+      gestureMode: 'exclusive',
+      onDoubleTap: jest.fn(),
+      onLongPress: jest.fn(),
+      onTap: jest.fn(),
+      onTouchesDown: jest.fn(),
+      onTouchesUp: jest.fn()
+    })
+  );
+
+  expect(mocked.useTapGesture).toHaveBeenCalledTimes(2);
+  expect(mocked.useLongPressGesture).toHaveBeenCalledTimes(1);
+  expect(mocked.useManualGesture).toHaveBeenCalledTimes(1);
 });

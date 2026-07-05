@@ -109,55 +109,69 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   onTouchesDown,
   onTouchesUp
 }) => {
-  // Related to every touchable gesture; `simultaneousWith` accepts v3's
-  // `AnyGesture` union, which is not exported by name.
+  // `simultaneousWith` accepts v3's `AnyGesture` union, which is not exported
+  // by name.
   const simultaneousWith =
     externalGesture as unknown as ManualGestureConfig['simultaneousWith'];
 
-  // Wrap into worklets so a worklet handler runs on the UI thread and a JS
-  // handler is marshalled to the JS thread - the reanimated detector requires
-  // worklets and rejects raw JS callbacks.
-  const tapHandler = useStableCallbackValue(onTap);
-  const doubleTapHandler = useStableCallbackValue(onDoubleTap);
-  const longPressHandler = useStableCallbackValue(onLongPress);
-  const touchesDownHandler = useStableCallbackValue(onTouchesDown);
-  const touchesUpHandler = useStableCallbackValue(onTouchesUp);
+  // Only the handlers the caller passed create a gesture (and a native
+  // handler), so a touchable with a single callback stays a single gesture.
+  // `useStableCallbackValue` makes each one a worklet - a worklet handler runs
+  // on the UI thread, a JS handler is marshalled to the JS thread - which the
+  // reanimated detector requires. SortableTouchable remounts when the set of
+  // handlers or the mode changes, keeping these gated hooks in a stable order.
+  /* eslint-disable react-hooks/rules-of-hooks */
+  const gestures: Parameters<typeof useExclusiveGestures> = [];
 
-  const tap = useTapGesture({
-    enabled: !!onTap,
-    maxDistance: failDistance,
-    onActivate: onTap ? tapHandler : undefined,
-    simultaneousWith
-  });
-  const doubleTap = useTapGesture({
-    enabled: !!onDoubleTap,
-    maxDistance: failDistance,
-    numberOfTaps: 2,
-    onActivate: onDoubleTap ? doubleTapHandler : undefined,
-    simultaneousWith
-  });
-  const longPress = useLongPressGesture({
-    enabled: !!onLongPress,
-    maxDistance: failDistance,
-    onActivate: onLongPress ? longPressHandler : undefined,
-    simultaneousWith
-  });
-  const manual = useManualGesture({
-    enabled: !!(onTouchesDown ?? onTouchesUp),
-    onTouchesDown: onTouchesDown ? touchesDownHandler : undefined,
-    onTouchesUp: onTouchesUp ? touchesUpHandler : undefined,
-    simultaneousWith
-  });
+  if (onTap) {
+    gestures.push(
+      useTapGesture({
+        maxDistance: failDistance,
+        onActivate: useStableCallbackValue(onTap),
+        simultaneousWith
+      })
+    );
+  }
+  if (onDoubleTap) {
+    gestures.push(
+      useTapGesture({
+        maxDistance: failDistance,
+        numberOfTaps: 2,
+        onActivate: useStableCallbackValue(onDoubleTap),
+        simultaneousWith
+      })
+    );
+  }
+  if (onLongPress) {
+    gestures.push(
+      useLongPressGesture({
+        maxDistance: failDistance,
+        onActivate: useStableCallbackValue(onLongPress),
+        simultaneousWith
+      })
+    );
+  }
+  if (onTouchesDown ?? onTouchesUp) {
+    gestures.push(
+      useManualGesture({
+        onTouchesDown: onTouchesDown
+          ? useStableCallbackValue(onTouchesDown)
+          : undefined,
+        onTouchesUp: onTouchesUp
+          ? useStableCallbackValue(onTouchesUp)
+          : undefined,
+        simultaneousWith
+      })
+    );
+  }
 
-  const exclusive = useExclusiveGestures(tap, doubleTap, longPress, manual);
-  const simultaneous = useSimultaneousGestures(
-    tap,
-    doubleTap,
-    longPress,
-    manual
-  );
+  const gesture =
+    gestureMode === 'exclusive'
+      ? useExclusiveGestures(...gestures)
+      : useSimultaneousGestures(...gestures);
+  /* eslint-enable react-hooks/rules-of-hooks */
 
-  return gestureMode === 'exclusive' ? exclusive : simultaneous;
+  return gesture;
 };
 
 export const adapter: GestureHandlerAdapter = {

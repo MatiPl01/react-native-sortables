@@ -19,7 +19,6 @@ type SortableTouchableProps = PropsWithChildren<
 >;
 
 export default function SortableTouchable({
-  children,
   failDistance = 10,
   gestureMode = 'exclusive',
   onDoubleTap,
@@ -27,8 +26,51 @@ export default function SortableTouchable({
   onTap,
   onTouchesDown,
   onTouchesUp,
-  ...viewProps
+  ...rest
 }: SortableTouchableProps) {
+  // The inner component creates a gesture only for the handlers that exist, so
+  // its hook order depends on which handlers are set. Remount when that set (or
+  // the mode) changes so the hook order stays stable within a mount.
+  const gesturesKey = `${gestureMode}:${+!!onTap}${+!!onDoubleTap}${+!!onLongPress}${+!!onTouchesDown}${+!!onTouchesUp}`;
+
+  return (
+    <TouchableGesture
+      failDistance={failDistance}
+      gestureMode={gestureMode}
+      key={gesturesKey}
+      onDoubleTap={onDoubleTap}
+      onLongPress={onLongPress}
+      onTap={onTap}
+      onTouchesDown={onTouchesDown}
+      onTouchesUp={onTouchesUp}
+      {...rest}
+    />
+  );
+}
+
+type TouchableGestureProps = PropsWithChildren<
+  ViewProps & {
+    failDistance: number;
+    gestureMode: 'exclusive' | 'simultaneous';
+    onTap?: () => void;
+    onDoubleTap?: () => void;
+    onLongPress?: () => void;
+    onTouchesDown?: () => void;
+    onTouchesUp?: () => void;
+  }
+>;
+
+function TouchableGesture({
+  children,
+  failDistance,
+  gestureMode,
+  onDoubleTap,
+  onLongPress,
+  onTap,
+  onTouchesDown,
+  onTouchesUp,
+  ...viewProps
+}: TouchableGestureProps) {
   const { gesture: externalGesture } = useItemContext();
 
   const gesture = useTouchableGesture({
