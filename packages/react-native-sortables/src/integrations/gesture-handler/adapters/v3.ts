@@ -114,34 +114,39 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   const simultaneousWith =
     externalGesture as unknown as ManualGestureConfig['simultaneousWith'];
 
+  // Touchable callbacks are plain JS functions, not worklets. In v3 that
+  // requires `disableReanimated` (not `runOnJS`): the reanimated detector runs
+  // `useHandler`, which rejects non-worklet handlers, so the reanimated path
+  // has to be turned off entirely - the same config gesture-handler's own
+  // Touchable/Pressable use for their JS handlers.
   // Hooks run unconditionally; gestures without a handler stay disabled.
   const tap = useTapGesture({
+    disableReanimated: true,
     enabled: !!onTap,
     maxDistance: failDistance,
     onActivate: onTap,
-    runOnJS: true,
     simultaneousWith
   });
   const doubleTap = useTapGesture({
+    disableReanimated: true,
     enabled: !!onDoubleTap,
     maxDistance: failDistance,
     numberOfTaps: 2,
     onActivate: onDoubleTap,
-    runOnJS: true,
     simultaneousWith
   });
   const longPress = useLongPressGesture({
+    disableReanimated: true,
     enabled: !!onLongPress,
     maxDistance: failDistance,
     onActivate: onLongPress,
-    runOnJS: true,
     simultaneousWith
   });
   const manual = useManualGesture({
+    disableReanimated: true,
     enabled: !!(onTouchesDown ?? onTouchesUp),
     onTouchesDown,
     onTouchesUp,
-    runOnJS: true,
     simultaneousWith
   });
 
