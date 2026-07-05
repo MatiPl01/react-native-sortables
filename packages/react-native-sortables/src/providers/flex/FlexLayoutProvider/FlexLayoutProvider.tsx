@@ -70,8 +70,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
   const { contentBounds } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
-  const keyToGroup = useMutableValue<Record<string, number>>({});
-
   const gaps = useMemo(
     () => ({
       column: columnGap,
@@ -182,10 +180,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       );
       // Update controlled container dimensions
       applyControlledContainerDimensions(layout.totalDimensions);
-      // Update key to group
-      keyToGroup.value = Object.fromEntries(
-        layout.itemGroups.flatMap((group, i) => group.map(key => [key, i]))
-      );
 
       // Update content bounds
       if (contentBounds) contentBounds.value = layout.contentBounds;
@@ -243,7 +237,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       calculateFlexLayout,
       columnGap,
       flexDirection,
-      keyToGroup,
       rowGap
     }
   };

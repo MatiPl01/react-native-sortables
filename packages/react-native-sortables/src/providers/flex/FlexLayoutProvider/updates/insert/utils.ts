@@ -1,5 +1,9 @@
 import type { ItemSizes } from '../../../../../types';
-import { reorderInsert, resolveDimension } from '../../../../../utils';
+import {
+  getKeyToIndex,
+  reorderInsert,
+  resolveDimension
+} from '../../../../../utils';
 
 export type ItemGroupSwapProps = {
   activeItemKey: string;
@@ -241,9 +245,7 @@ export const getSwappedToGroupBeforeIndices = (
     props.fixedKeys
   );
 
-  const keyToIndex = Object.fromEntries(
-    indexToKey.map((key, index) => [key, index])
-  );
+  const keyToIndex = getKeyToIndex(indexToKey);
 
   return { ...indexes, indexToKey, keyToIndex };
 };
@@ -262,9 +264,7 @@ export const getSwappedToGroupAfterIndices = (
     props.fixedKeys
   );
 
-  const keyToIndex = Object.fromEntries(
-    indexToKey.map((key, index) => [key, index])
-  );
+  const keyToIndex = getKeyToIndex(indexToKey);
 
   return { ...indexes, indexToKey, keyToIndex };
 };

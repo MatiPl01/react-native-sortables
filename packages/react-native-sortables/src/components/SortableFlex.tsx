@@ -17,7 +17,7 @@ import {
   useStrategyKey
 } from '../providers';
 import type { DragEndCallback, SortableFlexProps } from '../types';
-import { orderItems, processChildren } from '../utils';
+import { orderItems, processChildren, typedMemo } from '../utils';
 import { SortableContainer } from './shared';
 
 function SortableFlex(props: SortableFlexProps) {
@@ -32,7 +32,7 @@ function SortableFlex(props: SortableFlexProps) {
     ...rest
   } = usePropsWithDefaults(props, DEFAULT_SORTABLE_FLEX_PROPS);
 
-  const items = processChildren(children);
+  const items = useMemo(() => processChildren(children), [children]);
 
   const callbacks = useStableCallbackValues({
     onActiveItemDropped,
@@ -240,4 +240,4 @@ function SortableFlexComponent({
   );
 }
 
-export default SortableFlex;
+export default typedMemo(SortableFlex);

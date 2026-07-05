@@ -6,7 +6,6 @@ export type FlexLayoutContextType = {
   flexDirection: FlexDirection;
   columnGap: number;
   rowGap: number;
-  keyToGroup: SharedValue<Record<string, number>>;
   appliedLayout: SharedValue<FlexLayout | null>;
   calculateFlexLayout: (idxToKey: Array<string>) => FlexLayout | null;
 };
