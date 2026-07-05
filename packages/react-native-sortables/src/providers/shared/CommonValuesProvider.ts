@@ -84,7 +84,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const touchPosition = useMutableValue<null | Vector>(null);
     const activeItemPosition = useMutableValue<null | Vector>(null);
     const itemLayoutPositions = useMutableValue<Record<string, Vector>>({});
-    const itemRenderPositions = useMutableValue<
+    const itemCurrentPositions = useMutableValue<
       Record<string, SharedValue<null | Vector>>
     >({});
 
@@ -160,7 +160,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         if (key === null || !position) {
           return;
         }
-        const positionValue = itemRenderPositions.value[key];
+        const positionValue = itemCurrentPositions.value[key];
         if (
           positionValue &&
           (!positionValue.value ||
@@ -201,9 +201,9 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         inactiveItemScale,
         indexToKey,
         isStackingOrderDesc: stackingOrder === 'desc',
+        itemCurrentPositions,
         itemHeights,
         itemLayoutPositions,
-        itemRenderPositions,
         itemsLayoutTransitionMode,
         itemWidths,
         keyToIndex,

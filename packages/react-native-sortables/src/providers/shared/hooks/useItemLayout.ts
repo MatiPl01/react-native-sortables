@@ -146,8 +146,8 @@ export default function useItemLayout(
     activeItemKey,
     activeItemPosition,
     animateLayoutOnReorderOnly,
+    itemCurrentPositions,
     itemLayoutPositions,
-    itemRenderPositions,
     shouldAnimateLayout
   } = useCommonValuesContext();
 
@@ -173,12 +173,12 @@ export default function useItemLayout(
   // can drive it while this item is active.
   useEffect(() => {
     runOnUI(() => {
-      itemRenderPositions.value[key] = position;
+      itemCurrentPositions.value[key] = position;
     })();
     return runOnUI(() => {
-      delete itemRenderPositions.value[key];
+      delete itemCurrentPositions.value[key];
     });
-  }, [key, position, itemRenderPositions]);
+  }, [key, position, itemCurrentPositions]);
 
   // Inactive item updater
   useAnimatedReaction(
