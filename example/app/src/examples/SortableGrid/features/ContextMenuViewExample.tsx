@@ -13,8 +13,8 @@
 // with the OS lift (or a drag-handle UX - long press = menu, handle = reorder).
 import { useCallback, useState } from 'react';
 import { View } from 'react-native';
-import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import ContextMenu from 'react-native-context-menu-view';
+import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable, { useItemContext } from 'react-native-sortables';
 
@@ -33,7 +33,9 @@ const MENU_ACTIONS = [
   { destructive: true, systemIcon: 'trash', title: 'Delete' }
 ];
 
-function noop() {}
+function noop() {
+  // Menu actions are no-ops in this example.
+}
 
 // Baseline (no sortable): react-native-context-menu-view uses the real
 // UIContextMenuInteraction, so the view lifts and stays scaled up while the
@@ -47,15 +49,15 @@ function PlainMenuCard() {
     <ContextMenu
       actions={MENU_ACTIONS}
       borderRadius={radius.sm}
-      disableShadow
-      onPress={noop}
+      previewBackgroundColor='transparent'
+      style={{ alignSelf: 'flex-start' }}
       preview={
         <GridCard height={150} width={150}>
           Plain
         </GridCard>
       }
-      previewBackgroundColor='transparent'
-      style={{ alignSelf: 'flex-start' }}>
+      disableShadow
+      onPress={noop}>
       <GridCard height={150} width={150}>
         Plain
       </GridCard>
@@ -96,15 +98,15 @@ function MenuCard({ item }: { item: string }) {
     <ContextMenu
       actions={MENU_ACTIONS}
       borderRadius={radius.sm}
-      disableShadow
       disabled={dragging}
-      onPress={noop}
+      previewBackgroundColor='transparent'
       preview={
         <GridCard height={size.height} width={size.width}>
           {item}
         </GridCard>
       }
-      previewBackgroundColor='transparent'>
+      disableShadow
+      onPress={noop}>
       <View
         onLayout={({ nativeEvent: { layout } }) =>
           setSize({ height: layout.height, width: layout.width })

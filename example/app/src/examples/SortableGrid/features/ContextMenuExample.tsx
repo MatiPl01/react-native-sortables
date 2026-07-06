@@ -24,7 +24,9 @@ const MENU_ACTIONS = [
   { attributes: { destructive: true }, id: 'delete', title: 'Delete' }
 ];
 
-function noop() {}
+function noop() {
+  // Menu actions are no-ops in this example.
+}
 
 // Baseline for comparison: the native context menu on a PLAIN view (no
 // sortable). Long press it to see how the OS lifts the view and keeps it
@@ -36,10 +38,10 @@ function PlainMenuCard() {
     // card. Size it to the card so the hit area matches what you see.
     <MenuView
       actions={MENU_ACTIONS}
-      onPressAction={noop}
-      shouldOpenOnLongPress
       style={{ alignSelf: 'flex-start', height: 150, width: 150 }}
-      title='Plain'>
+      title='Plain'
+      shouldOpenOnLongPress
+      onPressAction={noop}>
       <GridCard height={150} width={150}>
         Plain
       </GridCard>
@@ -69,9 +71,9 @@ function MenuCard({ item }: { item: string }) {
   return (
     <MenuView
       actions={MENU_ACTIONS}
-      onPressAction={noop}
+      title={item}
       shouldOpenOnLongPress
-      title={item}>
+      onPressAction={noop}>
       <GridCard>{item}</GridCard>
     </MenuView>
   );
