@@ -5,7 +5,7 @@ import type {
 import * as GestureHandler from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 
-import { useMutableValue } from '../../reanimated';
+import { useMutableValue, useStableCallbackValue } from '../../reanimated';
 import type { ManualGestureControl } from '../types';
 import type { GestureHandlerAdapter } from './types';
 
@@ -99,6 +99,11 @@ const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   return next;
 };
 
+// Only the handlers that are passed create a gesture (and a native handler), so
+// a touchable with a single callback stays a single gesture. That makes the
+// hook order depend on which handlers exist, so a caller MUST keep that set
+// (and `gestureMode`) stable across renders, or remount when it changes -
+// SortableTouchable enforces this by keying its inner component on the set.
 const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   externalGesture,
   failDistance,
@@ -109,51 +114,66 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   onTouchesDown,
   onTouchesUp
 }) => {
-  // Related to every touchable gesture; `simultaneousWith` accepts v3's
-  // `AnyGesture` union, which is not exported by name.
+  // `simultaneousWith` accepts v3's `AnyGesture` union, which is not exported
+  // by name.
   const simultaneousWith =
     externalGesture as unknown as ManualGestureConfig['simultaneousWith'];
 
-  // Hooks run unconditionally; gestures without a handler stay disabled.
-  const tap = useTapGesture({
-    enabled: !!onTap,
-    maxDistance: failDistance,
-    onActivate: onTap,
-    runOnJS: true,
-    simultaneousWith
-  });
-  const doubleTap = useTapGesture({
-    enabled: !!onDoubleTap,
-    maxDistance: failDistance,
-    numberOfTaps: 2,
-    onActivate: onDoubleTap,
-    runOnJS: true,
-    simultaneousWith
-  });
-  const longPress = useLongPressGesture({
-    enabled: !!onLongPress,
-    maxDistance: failDistance,
-    onActivate: onLongPress,
-    runOnJS: true,
-    simultaneousWith
-  });
-  const manual = useManualGesture({
-    enabled: !!(onTouchesDown ?? onTouchesUp),
-    onTouchesDown,
-    onTouchesUp,
-    runOnJS: true,
-    simultaneousWith
-  });
+  // `useStableCallbackValue` wraps each handler into a worklet - a worklet runs
+  // on the UI thread, a JS handler is marshalled to the JS thread - which the
+  // reanimated detector requires.
+  /* eslint-disable react-hooks/rules-of-hooks */
+  const gestures: Parameters<typeof useExclusiveGestures> = [];
 
-  const exclusive = useExclusiveGestures(tap, doubleTap, longPress, manual);
-  const simultaneous = useSimultaneousGestures(
-    tap,
-    doubleTap,
-    longPress,
-    manual
-  );
+  if (onTap) {
+    gestures.push(
+      useTapGesture({
+        maxDistance: failDistance,
+        onActivate: useStableCallbackValue(onTap),
+        simultaneousWith
+      })
+    );
+  }
+  if (onDoubleTap) {
+    gestures.push(
+      useTapGesture({
+        maxDistance: failDistance,
+        numberOfTaps: 2,
+        onActivate: useStableCallbackValue(onDoubleTap),
+        simultaneousWith
+      })
+    );
+  }
+  if (onLongPress) {
+    gestures.push(
+      useLongPressGesture({
+        maxDistance: failDistance,
+        onActivate: useStableCallbackValue(onLongPress),
+        simultaneousWith
+      })
+    );
+  }
+  if (onTouchesDown ?? onTouchesUp) {
+    gestures.push(
+      useManualGesture({
+        onTouchesDown: onTouchesDown
+          ? useStableCallbackValue(onTouchesDown)
+          : undefined,
+        onTouchesUp: onTouchesUp
+          ? useStableCallbackValue(onTouchesUp)
+          : undefined,
+        simultaneousWith
+      })
+    );
+  }
 
-  return gestureMode === 'exclusive' ? exclusive : simultaneous;
+  const gesture =
+    gestureMode === 'exclusive'
+      ? useExclusiveGestures(...gestures)
+      : useSimultaneousGestures(...gestures);
+  /* eslint-enable react-hooks/rules-of-hooks */
+
+  return gesture;
 };
 
 export const adapter: GestureHandlerAdapter = {
