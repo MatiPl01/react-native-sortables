@@ -60,17 +60,12 @@ export default function SortableTouchable({
   );
 }
 
-type TouchableGestureProps = PropsWithChildren<
-  ViewProps & {
-    failDistance: number;
-    gestureMode: 'exclusive' | 'simultaneous';
-    onTap?: () => void;
-    onDoubleTap?: () => void;
-    onLongPress?: () => void;
-    onTouchesDown?: () => void;
-    onTouchesUp?: () => void;
-  }
->;
+// Same props as the public component, but the inner component receives
+// `failDistance`/`gestureMode` already resolved to defaults.
+type TouchableGestureProps = Required<
+  Pick<SortableTouchableProps, 'failDistance' | 'gestureMode'>
+> &
+  SortableTouchableProps;
 
 function TouchableGesture({
   children,
