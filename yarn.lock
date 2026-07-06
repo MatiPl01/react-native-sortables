@@ -2680,7 +2680,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@gorhom/portal@npm:^1.0.14":
+"@gorhom/portal@npm:1.0.14, @gorhom/portal@npm:^1.0.14":
   version: 1.0.14
   resolution: "@gorhom/portal@npm:1.0.14"
   dependencies:
@@ -4161,7 +4161,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/elements@npm:^2.2.5, @react-navigation/elements@npm:^2.3.8":
+"@react-navigation/elements@npm:2.3.8, @react-navigation/elements@npm:^2.2.5, @react-navigation/elements@npm:^2.3.8":
   version: 2.3.8
   resolution: "@react-navigation/elements@npm:2.3.8"
   dependencies:
@@ -8443,6 +8443,7 @@ __metadata:
     "@react-native/jest-preset": "npm:0.86.0"
     "@react-native/metro-config": "npm:0.86.0"
     "@react-navigation/bottom-tabs": "npm:7.3.10"
+    "@react-navigation/elements": "npm:2.3.8"
     "@react-navigation/native": "npm:7.0.14"
     "@react-navigation/native-stack": "npm:7.2.0"
     "@shopify/flash-list": "npm:2.3.1"
@@ -8476,13 +8477,28 @@ __metadata:
   resolution: "example-expo@workspace:example/expo"
   dependencies:
     "@babel/core": "npm:^7.25.2"
+    "@fortawesome/fontawesome-svg-core": "npm:6.5.2"
+    "@fortawesome/free-solid-svg-icons": "npm:6.5.2"
+    "@fortawesome/react-native-fontawesome": "npm:0.3.2"
+    "@gorhom/portal": "npm:1.0.14"
+    "@react-native-async-storage/async-storage": "npm:2.2.0"
+    "@react-navigation/bottom-tabs": "npm:7.3.10"
+    "@react-navigation/elements": "npm:2.3.8"
+    "@react-navigation/native": "npm:7.0.14"
+    "@react-navigation/native-stack": "npm:7.2.0"
+    "@shopify/flash-list": "npm:2.3.1"
     "@types/react": "npm:~19.2.0"
     expo: "npm:57.0.2"
     expo-status-bar: "npm:~57.0.0"
     react: "npm:19.2.3"
     react-native: "npm:0.86.0"
-    react-native-gesture-handler: "npm:~2.32.0"
+    react-native-gesture-handler: "npm:2.32.0"
+    react-native-haptic-feedback: "npm:2.3.3"
     react-native-reanimated: "npm:4.5.1"
+    react-native-safe-area-context: "npm:5.7.0"
+    react-native-screens: "npm:4.25.2"
+    react-native-sortables: "workspace:*"
+    react-native-svg: "npm:15.15.4"
     react-native-worklets: "npm:0.10.1"
     typescript: "npm:~5.9.2"
   languageName: unknown
@@ -14902,7 +14918,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:2.32.0, react-native-gesture-handler@npm:~2.32.0":
+"react-native-gesture-handler@npm:2.32.0":
   version: 2.32.0
   resolution: "react-native-gesture-handler@npm:2.32.0"
   dependencies:
