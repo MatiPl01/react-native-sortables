@@ -12,7 +12,7 @@
     "@shopify/flash-list": "2.3.1",
     "react": "19.2.3",
     "react-native": "0.86.0",
-    "react-native-context-menu-view": "patch:react-native-context-menu-view@npm%3A1.21.0#~/.yarn/patches/react-native-context-menu-view-npm-1.21.0-e518051dbe.patch",
+    "react-native-context-menu-view": "1.21.0",
     "react-native-gesture-handler": "2.32.0",
     "react-native-haptic-feedback": "2.3.3",
     "react-native-ios-context-menu": "3.1.0",

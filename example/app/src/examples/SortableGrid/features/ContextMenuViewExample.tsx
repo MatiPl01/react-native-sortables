@@ -2,17 +2,13 @@
 // Long press lifts the item and opens the menu (it stays open); a drag reorders
 // and dismisses it.
 //
-// iOS lift caveat: the library portals the item's LIVE view into the lift. Under
-// the New Architecture, when the sortable re-lays that view out mid-interaction
-// the OS tears the lift down (item goes blank, or snaps back). To avoid that this
-// example (a) passes a separate static `preview` view and (b) relies on a patch to
-// the library (see .yarn/patches) so the highlight lifts that static view too,
-// not the live one. Known remaining nuance: the lifted sortable item still shows a
-// small scale-down settle on commit that a plain (non-sortable) view does not;
-// fully removing it would need reworking how the sortable's activation coexists
-// with the OS lift (or a drag-handle UX - long press = menu, handle = reorder).
+// iOS lift nuance: the library lifts the item's live view for the menu preview.
+// A plain view lifts and stays scaled up; a sortable item - whose view the
+// sortable re-lays out as the gesture ends - shows a small scale-down settle as
+// the menu commits. Removing it entirely would need the library (or the sortable)
+// to lift a detached snapshot rather than the live view, or a drag-handle UX
+// (long press = menu, a handle = reorder). Left as a known nuance here.
 import { useCallback, useState } from 'react';
-import { View } from 'react-native';
 import ContextMenu from 'react-native-context-menu-view';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortables';
@@ -37,25 +33,15 @@ function noop() {
   // Menu actions are no-ops in this example.
 }
 
-// Baseline (no sortable): react-native-context-menu-view uses the real
-// UIContextMenuInteraction, so the view lifts and stays scaled up while the
-// menu is open (unlike @react-native-menu/menu).
+// Baseline (no sortable): the native menu lifts the card and keeps it scaled up
+// while the menu is open.
 function PlainMenuCard() {
   return (
-    // `preview` renders a SEPARATE static view for the lift. Our patched build of
-    // react-native-context-menu-view uses it for the highlight too (not just the
-    // commit), so the lift never portals the live RN view - it stays put and
-    // grows, immune to whatever the host does to the real view.
     <ContextMenu
       actions={MENU_ACTIONS}
       borderRadius={radius.sm}
       previewBackgroundColor='transparent'
       style={{ alignSelf: 'flex-start' }}
-      preview={
-        <GridCard height={150} width={150}>
-          Plain
-        </GridCard>
-      }
       disableShadow
       onPress={noop}>
       <GridCard height={150} width={150}>
@@ -68,17 +54,6 @@ function PlainMenuCard() {
 function MenuCard({ item }: { item: string }) {
   const { isDragging } = useItemContext();
   const [dragging, setDragging] = useState(false);
-  // Measure the cell so the lifted preview matches the item's size. Measure on a
-  // plain RN View (onLayout fires reliably), NOT on the native ContextMenu: its
-  // legacy-interop onLayout doesn't fire dependably on the New Architecture, so
-  // the size stayed null, the preview was undefined, and the OS fell back to
-  // lifting the live view -> the sortable snapped it.
-  const [size, setSize] = useState<{ height: number; width: number }>({
-    // Fallback so the preview is NEVER undefined (an undefined preview forces
-    // the live-view fallback). Real size overwrites this on first layout.
-    height: 170,
-    width: 170
-  });
 
   useAnimatedReaction(
     () => isDragging.value,
@@ -91,28 +66,16 @@ function MenuCard({ item }: { item: string }) {
 
   return (
     // Keep the ContextMenu mounted and just disable it while dragging - do NOT
-    // unmount it (its native subview would go nil mid-interaction and crash).
-    // `preview` is a SEPARATE static view; the patched library lifts THAT for
-    // both the highlight and the commit, so the sortable re-laying out the live
-    // item view never disturbs the lift (no blank, no snap-back).
+    // unmount it, or its native subview goes nil mid-interaction and the library
+    // crashes trying to lift it.
     <ContextMenu
       actions={MENU_ACTIONS}
       borderRadius={radius.sm}
       disabled={dragging}
       previewBackgroundColor='transparent'
-      preview={
-        <GridCard height={size.height} width={size.width}>
-          {item}
-        </GridCard>
-      }
       disableShadow
       onPress={noop}>
-      <View
-        onLayout={({ nativeEvent: { layout } }) =>
-          setSize({ height: layout.height, width: layout.width })
-        }>
-        <GridCard>{item}</GridCard>
-      </View>
+      <GridCard>{item}</GridCard>
     </ContextMenu>
   );
 }
