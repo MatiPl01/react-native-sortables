@@ -2,6 +2,7 @@ import { type PropsWithChildren } from 'react';
 import type { ViewProps } from 'react-native';
 import { View } from 'react-native';
 
+import type { RequiredBy } from '../../helperTypes';
 import { useTouchableGesture } from '../../integrations/gesture-handler';
 import { useItemContext } from '../../providers';
 import SortableGestureDetector from './SortableGestureDetector';
@@ -62,10 +63,10 @@ export default function SortableTouchable({
 
 // Same props as the public component, but the inner component receives
 // `failDistance`/`gestureMode` already resolved to defaults.
-type TouchableGestureProps = Required<
-  Pick<SortableTouchableProps, 'failDistance' | 'gestureMode'>
-> &
-  SortableTouchableProps;
+type TouchableGestureProps = RequiredBy<
+  SortableTouchableProps,
+  'failDistance' | 'gestureMode'
+>;
 
 function TouchableGesture({
   children,
