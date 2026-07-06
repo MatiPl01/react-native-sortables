@@ -8995,6 +8995,7 @@ __metadata:
     prettier: "npm:^3.3.2"
     react: "npm:19.2.3"
     react-native: "npm:0.86.0"
+    react-native-context-menu-view: "patch:react-native-context-menu-view@npm%3A1.21.0#~/.yarn/patches/react-native-context-menu-view-npm-1.21.0-e518051dbe.patch"
     react-native-gesture-handler: "npm:2.32.0"
     react-native-haptic-feedback: "npm:2.3.3"
     react-native-ios-context-menu: "npm:3.1.0"
@@ -15432,6 +15433,26 @@ __metadata:
   bin:
     bob: bin/bob
   checksum: 10c0/ea1da4db2ab919ba237cf8e090bd80ff6ddb35ba831d224f5c6866059c5a629c8c7a38af3ab327efbb1cf9a5d56c4295ba2cf34719cba1c19f5c0862282341eb
+  languageName: node
+  linkType: hard
+
+"react-native-context-menu-view@npm:1.21.0":
+  version: 1.21.0
+  resolution: "react-native-context-menu-view@npm:1.21.0"
+  peerDependencies:
+    react: ^16.8.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-native: ">=0.60.0-rc.0 <1.0.x"
+  checksum: 10c0/923a11c034da814ac24402af0308b219a319f8b22d9a0ca381cf820f3f863c15bc08fa3c6107cdc7127004f5ba0096374a764b511edb664acb53a9212b68ae26
+  languageName: node
+  linkType: hard
+
+"react-native-context-menu-view@patch:react-native-context-menu-view@npm%3A1.21.0#~/.yarn/patches/react-native-context-menu-view-npm-1.21.0-e518051dbe.patch":
+  version: 1.21.0
+  resolution: "react-native-context-menu-view@patch:react-native-context-menu-view@npm%3A1.21.0#~/.yarn/patches/react-native-context-menu-view-npm-1.21.0-e518051dbe.patch::version=1.21.0&hash=9b49f3"
+  peerDependencies:
+    react: ^16.8.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-native: ">=0.60.0-rc.0 <1.0.x"
+  checksum: 10c0/c7b5016d19f977310869202cb47760bf2063c8bd410caf6d7f57c3b3d340502997330a26f1bd75caf35d6b78ec0553130490175ddd01aa377dbc3c692e766294
   languageName: node
   linkType: hard
 

@@ -31,6 +31,10 @@ const routes: Routes = {
             Component: SortableGrid.features.ContextMenuExample,
             name: 'Context Menu'
           },
+          ContextMenuView: {
+            Component: SortableGrid.features.ContextMenuViewExample,
+            name: 'Context Menu (native lift)'
+          },
           DataChange: {
             Component: SortableGrid.features.DataChangeExample,
             name: 'Data Change'

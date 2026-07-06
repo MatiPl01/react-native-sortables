@@ -1,0 +1,24 @@
+diff --git a/ios/ContextMenuView.m b/ios/ContextMenuView.m
+index e10a830c1620d8def92d690e44d3ef058c7e78a5..da3fb5ab4f8d43b8df64c5e30d8d7b362e2f18bc 100644
+--- a/ios/ContextMenuView.m
++++ b/ios/ContextMenuView.m
+@@ -159,10 +159,16 @@ - (UIPreviewParameters *)getPreviewParams {
+ }
+ 
+ - (UITargetedPreview *)contextMenuInteraction:(UIContextMenuInteraction *)interaction previewForHighlightingMenuWithConfiguration:(UIContextMenuConfiguration *)configuration API_AVAILABLE(ios(13.0)) {
++    // PATCH (react-native-sortables example): lift the custom `preview` view (a
++    // separate static view) instead of the live RN subview when one is provided.
++    // Portaling the live subview breaks when its host re-lays it out mid-
++    // interaction (New Architecture commits a frame -> child onLayout ->
++    // UITargetedPreview invalidated -> lift dismissed, e.g. a sortable item
++    // snapping back or going blank).
++    UIView *previewView = _customView != nil ? _customView : self.reactSubviews.firstObject;
+     UIPreviewTarget* previewTarget = [[UIPreviewTarget alloc] initWithContainer:self center:self.reactSubviews.firstObject.center];
+-    
+-    
+-    return [[UITargetedPreview alloc] initWithView:self.reactSubviews.firstObject
++
++    return [[UITargetedPreview alloc] initWithView:previewView
+                                         parameters:[self getPreviewParams]
+                                             target:previewTarget];
+ }
