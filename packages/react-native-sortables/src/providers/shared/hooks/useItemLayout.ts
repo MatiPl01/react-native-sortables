@@ -88,14 +88,30 @@ function useItemLayoutFabric(
   position: SharedValue<null | Vector>,
   zIndex: SharedValue<number>
 ): SharedValue<ViewStyle> {
-  const { activeItemDropped, usesAbsoluteLayout } = useCommonValuesContext();
+  const { activeItemBroughtToFront, activeItemDropped, usesAbsoluteLayout } =
+    useCommonValuesContext();
   const transformStartPosition = useMutableValue<null | Vector>(null);
   const debounce = useAnimatedDebounce();
 
   useAnimatedReaction(
-    () => ({ current: position.value, dropped: activeItemDropped.value }),
-    ({ current, dropped }) => {
-      transformStartPosition.value ??= current;
+    () => ({
+      broughtToFront: activeItemBroughtToFront.value,
+      current: position.value,
+      dropped: activeItemDropped.value
+    }),
+    ({ broughtToFront, current, dropped }) => {
+      // Only switch to transform-based positioning once the item is actually
+      // dragged (brought to front). A bare long press that never turns into a
+      // drag then stays on a stable left/top-only style and never toggles the
+      // transform<->layout shape, so it never re-commits a frame to the item
+      // subtree. That matters on Fabric because a frame/onLayout on the item
+      // while a native context menu is lifting it (the menu portals the live
+      // view) invalidates the lift and snaps the item back into place. For a
+      // stationary item the transform deltas are always 0, so skipping the
+      // transform branch is visually identical.
+      if (broughtToFront) {
+        transformStartPosition.value ??= current;
+      }
       if (dropped) {
         debounce.schedule(() => {
           transformStartPosition.value = null;
