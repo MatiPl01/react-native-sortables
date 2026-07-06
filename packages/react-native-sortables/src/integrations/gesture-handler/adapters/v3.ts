@@ -99,6 +99,11 @@ const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
   return next;
 };
 
+// Only the handlers that are passed create a gesture (and a native handler), so
+// a touchable with a single callback stays a single gesture. That makes the
+// hook order depend on which handlers exist, so a caller MUST keep that set
+// (and `gestureMode`) stable across renders, or remount when it changes -
+// SortableTouchable enforces this by keying its inner component on the set.
 const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   externalGesture,
   failDistance,
@@ -114,12 +119,9 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   const simultaneousWith =
     externalGesture as unknown as ManualGestureConfig['simultaneousWith'];
 
-  // Only the handlers the caller passed create a gesture (and a native
-  // handler), so a touchable with a single callback stays a single gesture.
-  // `useStableCallbackValue` makes each one a worklet - a worklet handler runs
+  // `useStableCallbackValue` wraps each handler into a worklet - a worklet runs
   // on the UI thread, a JS handler is marshalled to the JS thread - which the
-  // reanimated detector requires. SortableTouchable remounts when the set of
-  // handlers or the mode changes, keeping these gated hooks in a stable order.
+  // reanimated detector requires.
   /* eslint-disable react-hooks/rules-of-hooks */
   const gestures: Parameters<typeof useExclusiveGestures> = [];
 

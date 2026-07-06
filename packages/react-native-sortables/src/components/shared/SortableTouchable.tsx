@@ -19,6 +19,7 @@ type SortableTouchableProps = PropsWithChildren<
 >;
 
 export default function SortableTouchable({
+  children,
   failDistance = 10,
   gestureMode = 'exclusive',
   onDoubleTap,
@@ -26,8 +27,18 @@ export default function SortableTouchable({
   onTap,
   onTouchesDown,
   onTouchesUp,
-  ...rest
+  ...viewProps
 }: SortableTouchableProps) {
+  // No callbacks means no gestures at all - render just the view and skip the
+  // gesture detector entirely.
+  if (!(onTap ?? onDoubleTap ?? onLongPress ?? onTouchesDown ?? onTouchesUp)) {
+    return (
+      <View {...viewProps} collapsable={false}>
+        {children}
+      </View>
+    );
+  }
+
   // The inner component creates a gesture only for the handlers that exist, so
   // its hook order depends on which handlers are set. Remount when that set (or
   // the mode) changes so the hook order stays stable within a mount.
@@ -43,8 +54,9 @@ export default function SortableTouchable({
       onTap={onTap}
       onTouchesDown={onTouchesDown}
       onTouchesUp={onTouchesUp}
-      {...rest}
-    />
+      {...viewProps}>
+      {children}
+    </TouchableGesture>
   );
 }
 
