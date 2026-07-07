@@ -1,13 +1,10 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import type { AnimatedStyle } from 'react-native-reanimated';
 import Animated, {
   interpolateColor,
-  runOnUI,
   useAnimatedStyle,
   useDerivedValue,
-  useSharedValue,
   withTiming
 } from 'react-native-reanimated';
 
@@ -28,40 +25,38 @@ export default function TabSelector<T extends number | string>({
   selectedTab,
   tabs
 }: TabSelectorProps<T>) {
-  const tabWidth = useSharedValue(0);
+  // Width is plain React-state layout, not an animated reanimated `width`:
+  // animating a layout prop while this bar mounts raced the grid's own layout
+  // commit and hit a debug-only Yoga assert on the New Architecture (RN 0.86).
+  const [tabWidth, setTabWidth] = useState(0);
+  const selectedIndex = Math.max(0, tabs.indexOf(selectedTab));
 
   const animatedIndicatorStyle = useAnimatedStyle(() => ({
-    opacity: tabWidth.value > 0 ? 1 : 0,
-    transform: [
-      { translateX: withTiming(tabWidth.value * tabs.indexOf(selectedTab)) }
-    ],
-    width: tabWidth.value
+    opacity: tabWidth > 0 ? 1 : 0,
+    transform: [{ translateX: withTiming(tabWidth * selectedIndex) }]
   }));
 
-  const animatedTabStyle = useAnimatedStyle(() => ({
-    width: tabWidth.value === 0 ? 'auto' : tabWidth.value
-  }));
+  const handleMeasureWidth = useCallback((width: number) => {
+    setTabWidth(prev => (width > prev ? width : prev));
+  }, []);
 
-  const handleMeasureWidth = useCallback(
-    (width: number) => {
-      runOnUI(() => {
-        tabWidth.value = Math.max(tabWidth.value, width);
-      })();
-    },
-    [tabWidth]
-  );
+  const tabWidthStyle: ViewStyle = tabWidth === 0 ? {} : { width: tabWidth };
 
   return (
     <View style={flex.center}>
       <View style={styles.tabBar}>
         <Animated.View
-          style={[styles.selectedTabIndicator, animatedIndicatorStyle]}
+          style={[
+            styles.selectedTabIndicator,
+            tabWidthStyle,
+            animatedIndicatorStyle
+          ]}
         />
         {tabs.map(tab => (
           <Tab
             isSelected={tab === selectedTab}
             key={tab}
-            style={animatedTabStyle}
+            style={tabWidthStyle}
             tab={tab}
             onMeasureWidth={handleMeasureWidth}
             onSelectTab={onSelectTab}
@@ -75,7 +70,7 @@ export default function TabSelector<T extends number | string>({
 type TabProps<T> = {
   isSelected: boolean;
   tab: T;
-  style: StyleProp<AnimatedStyle<ViewStyle>>;
+  style: StyleProp<ViewStyle>;
   onSelectTab: (tab: T) => void;
   onMeasureWidth: (width: number) => void;
 };
