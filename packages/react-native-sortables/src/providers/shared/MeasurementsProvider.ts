@@ -1,4 +1,5 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { AppState } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { runOnUI } from 'react-native-reanimated';
 
@@ -41,7 +42,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     containerWidth,
     controlledContainerDimensions,
     controlledItemDimensions,
+    itemCurrentPositions,
     itemHeights,
+    itemLayoutPositions,
     itemWidths,
     usesAbsoluteLayout
   } = useCommonValuesContext();
@@ -234,6 +237,40 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
     })();
   }, [itemHeights, itemWidths, context]);
+
+  // Re-establish the layout when the app returns to the foreground.
+  // After an extended background, the platform may recreate the sortable's
+  // native views (and Reanimated may not re-run the mappers that position them),
+  // which leaves the absolutely positioned items overlapping until the next
+  // drag re-runs the layout. Item positions live entirely in Reanimated shared
+  // values, so on resume we drop the JS-side dimension cache (so the onLayout
+  // events fired by recreated views are treated as fresh measurements instead
+  // of being diffed away) and re-emit each inactive item's position from the
+  // authoritative layout so the freshly committed views pick it up.
+  // https://github.com/MatiPl01/react-native-sortables/issues/592
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', state => {
+      if (state !== 'active') {
+        return;
+      }
+      previousItemDimensionsRef.current = {};
+      runOnUI(() => {
+        const activeKey = activeItemKey.value;
+        const layoutPositions = itemLayoutPositions.value;
+        for (const key in itemCurrentPositions.value) {
+          if (key === activeKey) {
+            continue;
+          }
+          const target = layoutPositions[key];
+          const position = itemCurrentPositions.value[key];
+          if (target && position) {
+            position.value = { x: target.x, y: target.y };
+          }
+        }
+      })();
+    });
+    return () => subscription.remove();
+  }, [activeItemKey, itemCurrentPositions, itemLayoutPositions]);
 
   return {
     value: {
