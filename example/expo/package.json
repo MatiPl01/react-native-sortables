@@ -21,7 +21,6 @@
     "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "5.7.0",
     "react-native-screens": "4.25.2",
-    "react-native-sortables": "workspace:*",
     "react-native-svg": "15.15.4",
     "react-native-worklets": "0.10.1"
   },
@@ -31,7 +30,6 @@
     "typescript": "~5.9.2"
   },
   "installConfig": {
-    "hoistingLimits": "workspaces",
     "selfReferences": false
   },
   "main": "index.ts",
