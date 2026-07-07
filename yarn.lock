@@ -8497,7 +8497,6 @@ __metadata:
     react-native-reanimated: "npm:4.5.1"
     react-native-safe-area-context: "npm:5.7.0"
     react-native-screens: "npm:4.25.2"
-    react-native-sortables: "workspace:*"
     react-native-svg: "npm:15.15.4"
     react-native-worklets: "npm:0.10.1"
     typescript: "npm:~5.9.2"
