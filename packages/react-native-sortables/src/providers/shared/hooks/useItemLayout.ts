@@ -241,9 +241,15 @@ export default function useItemLayout(
         shouldAnimateLayout.value &&
         (!animateLayoutOnReorderOnly.value || activeItemKey.value !== null)
       ) {
-        // Compare against the current position so sub-pixel changes accumulate
-        // (the previous reaction input advances even when the update is skipped)
-        if (!areVectorsDifferent(position.value, layoutPos, 1)) {
+        // Skip when already at the target and it did not just change. A
+        // re-order that flips the target back must re-animate even while the
+        // item is transiently near it, else it rides a stale animation to the
+        // wrong slot. The position check still lets sub-pixel resize accumulate.
+        if (
+          !areVectorsDifferent(position.value, layoutPos, 1) &&
+          (!prev?.layoutPos ||
+            !areVectorsDifferent(prev.layoutPos, layoutPos, 1))
+        ) {
           return;
         }
         position.value = withTiming(layoutPos);
