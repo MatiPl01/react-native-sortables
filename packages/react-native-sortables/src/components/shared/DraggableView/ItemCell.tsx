@@ -97,12 +97,9 @@ const styles = StyleSheet.create({
     }
   }),
   hidden: {
-    // We change the x position to hide items when teleported (we can't use
-    // non-layout props like opacity as they are sometimes not updated via
-    // Reanimated on the Old Architecture; we also can't use any props that
-    // affect item dimensions, etc., so the safest way is to put the item
-    // far away from the viewport to hide it)
-    left: HIDDEN_X_OFFSET
+    // left hides on Paper; opacity also hides on Fabric (left drops mid-scroll)
+    left: HIDDEN_X_OFFSET,
+    opacity: 0
   },
   inner: Platform.select<ViewStyle>({
     default: {},
