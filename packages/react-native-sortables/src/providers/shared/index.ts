@@ -12,7 +12,7 @@ export { LayerProvider } from './LayerProvider';
 export { useMeasurementsContext } from './MeasurementsProvider';
 export * from './MultiZoneProvider';
 export { useIsInPortalOutlet } from './PortalOutletProvider';
-export { PortalProvider, usePortalContext } from './PortalProvider';
+export { PortalProvider, Teleport, usePortalContext } from './PortalProvider';
 export {
   default as SharedProvider,
   type SharedProviderProps
