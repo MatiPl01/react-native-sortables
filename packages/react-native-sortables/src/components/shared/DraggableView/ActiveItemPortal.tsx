@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
-import { useStableCallback } from '../../../hooks';
 import type { SortableGesture } from '../../../integrations/gesture-handler';
 import { useMutableValue } from '../../../integrations/reanimated';
 import {
@@ -36,11 +35,9 @@ export default function ActiveItemPortal({
   onTeleport
 }: ActiveItemPortalProps) {
   const node = useItemNode(itemKey);
-  const { isTeleported, measurePortalOutlet, teleport } =
-    usePortalContext() ?? {};
+  const { measurePortalOutlet, teleport } = usePortalContext() ?? {};
 
   const teleportEnabled = useMutableValue(false);
-  const isFirstUpdateRef = useRef(true);
 
   const renderTeleportedItemCell = useCallback(
     () => (
@@ -75,35 +72,28 @@ export default function ActiveItemPortal({
 
   const teleportedItemId = `${commonValuesContext.containerId}-${itemKey}`;
 
-  const enableTeleport = useStableCallback(() => {
-    isFirstUpdateRef.current = true;
-    teleport?.(teleportedItemId, renderTeleportedItemCell());
-    onTeleport(true);
-  });
+  const [teleported, setTeleported] = useState(false);
 
-  const disableTeleport = useCallback(() => {
-    teleport?.(teleportedItemId, null);
-    onTeleport(false);
-  }, [teleport, teleportedItemId, onTeleport]);
-
-  useEffect(() => disableTeleport, [disableTeleport]);
-
+  // Hide the source item while teleported and clear the outlet on teardown.
+  // Deliberately independent of `renderTeleportedItemCell` so that re-pushing a
+  // collapsed cell (effect below) never toggles the source's hidden state -
+  // otherwise the source item stays visible under the teleported copy.
   useEffect(() => {
-    const checkTeleported = () => isTeleported?.(teleportedItemId);
-    if (!checkTeleported()) return;
+    if (!teleported) return;
+    onTeleport(true);
+    return () => {
+      teleport?.(teleportedItemId, null);
+      onTeleport(false);
+    };
+  }, [teleported, teleport, teleportedItemId, onTeleport]);
 
-    const update = () =>
-      checkTeleported() &&
-      teleport?.(teleportedItemId, renderTeleportedItemCell());
-
-    if (isFirstUpdateRef.current) {
-      isFirstUpdateRef.current = false;
-      // Needed for proper collapsible items behavior
-      setTimeout(update);
-    } else {
-      update();
-    }
-  }, [isTeleported, renderTeleportedItemCell, teleport, teleportedItemId]);
+  // Keep the outlet in sync with the current cell. `renderTeleportedItemCell`
+  // changes identity when the item node changes (e.g. a collapsible item shrinks
+  // on drag), so this re-pushes the up-to-date cell - no timer, no source toggle.
+  useEffect(() => {
+    if (!teleported) return;
+    teleport?.(teleportedItemId, renderTeleportedItemCell());
+  }, [teleported, teleport, teleportedItemId, renderTeleportedItemCell]);
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,
@@ -113,15 +103,14 @@ export default function ActiveItemPortal({
         progress > prevProgress &&
         !teleportEnabled.value
       ) {
-        // We have to ensure that the portal outlet ref is measured before the
-        // teleported item is rendered within it because portal outlet position
-        // must be known to calculate the teleported item position
+        // Measure the outlet before rendering into it - the teleported item's
+        // position is computed from the outlet's on-screen position.
         measurePortalOutlet?.();
         teleportEnabled.value = true;
-        runOnJS(enableTeleport)();
+        runOnJS(setTeleported)(true);
       } else if (progress === 0 && teleportEnabled.value) {
         teleportEnabled.value = false;
-        runOnJS(disableTeleport)();
+        runOnJS(setTeleported)(false);
       }
     }
   );

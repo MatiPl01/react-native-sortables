@@ -75,11 +75,6 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     }
   }, []);
 
-  const isTeleported = useCallback(
-    (id: string) => teleportedNodeIdsRef.current.has(id),
-    []
-  );
-
   const measurePortalOutlet = useCallback(() => {
     'worklet';
     portalOutletMeasurements.value = measure(portalOutletRef);
@@ -103,7 +98,6 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     ? outerPortalContext
     : {
         activeItemAbsolutePosition,
-        isTeleported,
         measurePortalOutlet,
         portalOutletMeasurements,
         teleport
