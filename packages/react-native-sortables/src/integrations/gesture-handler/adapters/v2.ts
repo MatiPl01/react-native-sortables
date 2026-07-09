@@ -69,11 +69,6 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
       );
     }
 
-    // Touch callbacks live on their own Manual gesture composed simultaneously
-    // (below) with the recognizers, so they keep firing after a recognizer wins.
-    // Attached to a recognizer inside Gesture.Exclusive they were dropped on web:
-    // a winning recognizer cancels the losing siblings, and web turns a cancelled
-    // handler's final touch into `onTouchesCancelled` instead of `onTouchesUp`.
     let touchTracker: GestureType | null = null;
     if (onTouchesDown || onTouchesUp) {
       touchTracker = decorate(Gesture.Manual());
