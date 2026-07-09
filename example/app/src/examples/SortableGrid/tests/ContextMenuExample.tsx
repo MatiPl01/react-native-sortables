@@ -4,7 +4,7 @@ import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 import type { SortableGridRenderItem } from 'react-native-sortables';
 import Sortable, { useItemContext } from 'react-native-sortables';
 
-import { GridCard, ScrollScreen, Section, Stagger } from '@/components';
+import { GridCard, Section } from '@/components';
 import { spacing } from '@/theme';
 import { getItems } from '@/utils';
 
@@ -86,27 +86,25 @@ export default function ContextMenuExample() {
   );
 
   return (
-    <ScrollScreen includeNavBarHeight>
-      <Stagger ParentComponent={Sortable.Layer}>
-        <Section
-          description='Baseline (no sortable): long press this plain view. The OS lifts it and keeps it scaled up while the menu is open. Compare this with the sortable items below.'
-          title='Plain view + context menu'>
-          <PlainMenuCard />
-        </Section>
-        <Section
-          description='The same native context menu, but each item is a sortable. A long press should behave like the plain card above; a drag should reorder and dismiss the menu.'
-          title='Sortable items + context menu'>
-          <Sortable.Grid
-            columnGap={spacing.xs}
-            columns={COLUMNS}
-            data={DATA}
-            dragActivationDelay={DRAG_ACTIVATION_DELAY}
-            dragActivationFailOffset={DRAG_FAIL_OFFSET}
-            renderItem={renderItem}
-            rowGap={spacing.xs}
-          />
-        </Section>
-      </Stagger>
-    </ScrollScreen>
+    <>
+      <Section
+        description='Baseline (no sortable): long press this plain view. The OS lifts it and keeps it scaled up while the menu is open. Compare this with the sortable items below.'
+        title='Plain view + context menu'>
+        <PlainMenuCard />
+      </Section>
+      <Section
+        description='The same native context menu, but each item is a sortable. A long press should behave like the plain card above; a drag should reorder and dismiss the menu.'
+        title='Sortable items + context menu'>
+        <Sortable.Grid
+          columnGap={spacing.xs}
+          columns={COLUMNS}
+          data={DATA}
+          dragActivationDelay={DRAG_ACTIVATION_DELAY}
+          dragActivationFailOffset={DRAG_FAIL_OFFSET}
+          renderItem={renderItem}
+          rowGap={spacing.xs}
+        />
+      </Section>
+    </>
   );
 }

@@ -27,14 +27,6 @@ const routes: Routes = {
             Component: SortableGrid.features.DragHandleExample,
             name: 'Drag Handle'
           },
-          ContextMenu: {
-            Component: SortableGrid.features.ContextMenuExample,
-            name: 'Context Menu'
-          },
-          ContextMenuView: {
-            Component: SortableGrid.features.ContextMenuViewExample,
-            name: 'Context Menu (native lift)'
-          },
           DataChange: {
             Component: SortableGrid.features.DataChangeExample,
             name: 'Data Change'
@@ -100,6 +92,12 @@ const routes: Routes = {
             Component: SortableGrid.tests.BottomTabsNavigatorExample,
             name: 'Bottom Tabs Navigator'
           },
+          ...(IS_IOS && {
+            ContextMenu: {
+              Component: SortableGrid.tests.ContextMenusExample,
+              name: 'Context Menu'
+            }
+          }),
           HidingItems: {
             Component: SortableGrid.tests.HidingItemsExample,
             name: 'Hiding Items'
