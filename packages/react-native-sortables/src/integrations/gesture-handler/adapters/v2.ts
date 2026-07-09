@@ -23,11 +23,6 @@ const useDragGesture: GestureHandlerAdapter['useDragGesture'] = (
     deps
   );
 
-const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
-  gesture,
-  enabled
-) => (gesture as GestureType).enabled(enabled);
-
 const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   externalGesture,
   failDistance,
@@ -105,6 +100,5 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
 
 export const adapter: GestureHandlerAdapter = {
   useDragGesture,
-  useEnabledGesture,
   useTouchableGesture
 };

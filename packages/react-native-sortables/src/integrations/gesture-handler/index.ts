@@ -12,7 +12,6 @@ const hasHookApi =
 const adapter = hasHookApi ? v3Adapter : v2Adapter;
 
 export const useDragGesture = adapter.useDragGesture;
-export const useEnabledGesture = adapter.useEnabledGesture;
 export const useTouchableGesture = adapter.useTouchableGesture;
 
 export { SortableGestureDetectorView } from './detector';

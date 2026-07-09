@@ -1,7 +1,4 @@
-import type {
-  ManualGesture,
-  ManualGestureConfig
-} from 'react-native-gesture-handler';
+import type { ManualGestureConfig } from 'react-native-gesture-handler';
 import * as GestureHandler from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -86,17 +83,6 @@ const useDragGesture: GestureHandlerAdapter['useDragGesture'] = callbacks => {
       );
     }
   });
-};
-
-const useEnabledGesture: GestureHandlerAdapter['useEnabledGesture'] = (
-  gesture,
-  enabled
-) => {
-  // v3 gestures are immutable; return a copy with config.enabled toggled.
-  const current = gesture as ManualGesture;
-  const next = { ...current, config: { ...current.config } };
-  next.config.enabled = enabled;
-  return next;
 };
 
 // Only the handlers that are passed create a gesture (and a native handler), so
@@ -188,6 +174,5 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
 
 export const adapter: GestureHandlerAdapter = {
   useDragGesture,
-  useEnabledGesture,
   useTouchableGesture
 };
