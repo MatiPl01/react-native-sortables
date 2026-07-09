@@ -11,9 +11,5 @@ export type GestureHandlerAdapter = {
     callbacks: ManualGestureCallbacks,
     deps: ReadonlyArray<unknown>
   ) => SortableGesture;
-  useEnabledGesture: (
-    gesture: SortableGesture,
-    enabled: boolean
-  ) => SortableGesture;
   useTouchableGesture: (config: TouchableGestureConfig) => SortableGesture;
 };
