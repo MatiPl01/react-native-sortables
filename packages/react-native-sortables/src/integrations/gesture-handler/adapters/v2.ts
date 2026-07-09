@@ -47,44 +47,51 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
     };
 
     // maxDistance only exists on the Tap/LongPress builders, so set it there.
-    const gestures: Array<GestureType> = [];
+    const recognizers: Array<GestureType> = [];
 
     if (onTap) {
-      gestures.push(
+      recognizers.push(
         decorate(Gesture.Tap().maxDistance(failDistance)).onStart(onTap)
       );
     }
     if (onDoubleTap) {
-      gestures.push(
+      recognizers.push(
         decorate(
           Gesture.Tap().numberOfTaps(2).maxDistance(failDistance)
         ).onStart(onDoubleTap)
       );
     }
     if (onLongPress) {
-      gestures.push(
+      recognizers.push(
         decorate(Gesture.LongPress().maxDistance(failDistance)).onStart(
           onLongPress
         )
       );
     }
 
+    let touchTracker: GestureType | null = null;
     if (onTouchesDown || onTouchesUp) {
-      const target = gestures.at(-1) ?? decorate(Gesture.Manual());
-      if (!gestures.length) {
-        gestures.push(target);
-      }
+      touchTracker = decorate(Gesture.Manual());
       if (onTouchesDown) {
-        target.onTouchesDown(onTouchesDown);
+        touchTracker.onTouchesDown(onTouchesDown);
       }
       if (onTouchesUp) {
-        target.onTouchesUp(onTouchesUp);
+        touchTracker.onTouchesUp(onTouchesUp);
       }
     }
 
-    return gestureMode === 'exclusive'
-      ? Gesture.Exclusive(...gestures)
-      : Gesture.Simultaneous(...gestures);
+    const recognizerGroup = recognizers.length
+      ? gestureMode === 'exclusive'
+        ? Gesture.Exclusive(...recognizers)
+        : Gesture.Simultaneous(...recognizers)
+      : null;
+
+    if (recognizerGroup && touchTracker) {
+      return Gesture.Simultaneous(recognizerGroup, touchTracker);
+    }
+    // SortableTouchable renders a plain View when no callback is set, so exactly
+    // one of these is non-null by the time we get here.
+    return recognizerGroup ?? touchTracker ?? Gesture.Manual();
   }, [
     failDistance,
     onTap,
