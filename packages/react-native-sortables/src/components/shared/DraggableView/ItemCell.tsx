@@ -12,7 +12,7 @@ import type {
 } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { HIDDEN_X_OFFSET, IS_WEB } from '../../../constants';
+import { HIDDEN_X_OFFSET, IS_WEB, isPaper } from '../../../constants';
 import type {
   AnimatedStyleProp,
   LayoutAnimation
@@ -75,7 +75,14 @@ export default function ItemCell({
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={[styles.inner, innerAnimatedStyle, hidden && styles.hidden]}
+        style={[
+          styles.inner,
+          innerAnimatedStyle,
+          hidden && {
+            left: isPaper() ? HIDDEN_X_OFFSET : undefined,
+            opacity: 0
+          }
+        ]}
         onLayout={onLayout}>
         {children}
       </AnimatedOnLayoutView>
@@ -96,11 +103,6 @@ const styles = StyleSheet.create({
       shadowRadius: 5
     }
   }),
-  hidden: {
-    // left hides on Paper; opacity also hides on Fabric (left drops mid-scroll)
-    left: HIDDEN_X_OFFSET,
-    opacity: 0
-  },
   inner: Platform.select<ViewStyle>({
     default: {},
     web: { flex: 1 }

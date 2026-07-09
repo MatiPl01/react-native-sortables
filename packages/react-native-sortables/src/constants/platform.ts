@@ -10,3 +10,7 @@ export function isFabric() {
   // eslint-disable-next-line no-underscore-dangle
   return !!(globalThis as { _IS_FABRIC?: boolean })._IS_FABRIC;
 }
+
+export function isPaper() {
+  return !IS_WEB && !isFabric();
+}

@@ -80,19 +80,33 @@ async function activateTeleport(root: Root) {
   });
 }
 
-function getHiddenSourceInnerStyles(
-  root: Root
-): Array<Record<string, unknown>> {
+// The hidden source's inner view always carries opacity:0 (plus a left offset
+// on Paper); collect that style to assert how it is hidden.
+function getHiddenSourceOpacityStyles(root: Root): Array<unknown> {
   const hiddenSource = getSourceCells(root).find(c => c.props.hidden === true);
   if (!hiddenSource) return [];
   return hiddenSource
     .findAll(
       node =>
         !!node.props?.style &&
-        JSON.stringify(node.props.style).includes(String(HIDDEN_X_OFFSET))
+        JSON.stringify(node.props.style).includes('"opacity":0')
     )
-    .map(node => node.props.style as Record<string, unknown>);
+    .map(node => node.props.style as unknown);
 }
+
+/* eslint-disable no-underscore-dangle */
+type FabricGlobal = { _IS_FABRIC?: boolean };
+
+async function withFabric<T>(value: boolean, fn: () => Promise<T>): Promise<T> {
+  const prev = (globalThis as FabricGlobal)._IS_FABRIC;
+  (globalThis as FabricGlobal)._IS_FABRIC = value;
+  try {
+    return await fn();
+  } finally {
+    (globalThis as FabricGlobal)._IS_FABRIC = prev;
+  }
+}
+/* eslint-enable no-underscore-dangle */
 
 it('teleports exactly one copy and hides the in-grid source', async () => {
   const tree = renderGridWithPortal();
@@ -115,18 +129,41 @@ it('teleports exactly one copy and hides the in-grid source', async () => {
   tree.unmount();
 });
 
-it('applies a static opacity:0 (not only left:9999) to the hidden source inner view', async () => {
-  const tree = renderGridWithPortal();
-  const root = tree.UNSAFE_root;
+it('hides the teleported source with opacity only (no off-screen offset) on Fabric', async () => {
+  await withFabric(true, async () => {
+    const tree = renderGridWithPortal();
+    const root = tree.UNSAFE_root;
 
-  await activateTeleport(root);
+    await activateTeleport(root);
 
-  const innerStyles = getHiddenSourceInnerStyles(root);
-  expect(innerStyles.length).toBeGreaterThan(0);
+    const opacityStyles = getHiddenSourceOpacityStyles(root);
+    expect(opacityStyles.length).toBeGreaterThan(0);
 
-  const flat = JSON.stringify(innerStyles);
-  expect(flat).toContain(`"left":${HIDDEN_X_OFFSET}`);
-  expect(flat).toContain('"opacity":0');
+    const flat = JSON.stringify(opacityStyles);
+    expect(flat).toContain('"opacity":0');
+    // No off-screen offset, so the source keeps its hit-test frame and its
+    // Sortable.Touchable Tap/LongPress are not cancelled while teleported.
+    expect(flat).not.toContain(`"left":${HIDDEN_X_OFFSET}`);
 
-  tree.unmount();
+    tree.unmount();
+  });
+});
+
+it('hides the teleported source with the off-screen offset on Paper', async () => {
+  await withFabric(false, async () => {
+    const tree = renderGridWithPortal();
+    const root = tree.UNSAFE_root;
+
+    await activateTeleport(root);
+
+    const opacityStyles = getHiddenSourceOpacityStyles(root);
+    expect(opacityStyles.length).toBeGreaterThan(0);
+
+    // Paper keeps the off-screen offset as its reliable hide.
+    expect(JSON.stringify(opacityStyles)).toContain(
+      `"left":${HIDDEN_X_OFFSET}`
+    );
+
+    tree.unmount();
+  });
 });

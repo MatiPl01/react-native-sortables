@@ -14,15 +14,10 @@ import ItemCell from './ItemCell';
 
 const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
-type TeleportedItemCellProps = PropsWithChildren<
-  Pick<
-    ItemCellProps,
-    'activationAnimationProgress' | 'baseStyle' | 'isActive' | 'itemKey'
-  > & {
-    commonValuesContext: CommonValuesContextType;
-    gesture: SortableGesture;
-  }
->;
+type TeleportedItemCellProps = TeleportedItemCellContentProps & {
+  commonValuesContext: CommonValuesContextType;
+  gesture: SortableGesture;
+};
 
 // Rendered in the portal outlet (a different subtree), so it re-provides the
 // contexts the cell and the user's renderItem depend on.
