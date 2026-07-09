@@ -16,6 +16,7 @@ jest.mock('react-native-gesture-handler', () => {
       'numberOfTaps',
       'onStart',
       'runOnJS',
+      'shouldCancelWhenOutside',
       'simultaneousWithExternalGesture'
     ]) {
       gesture[method] = jest.fn(() => gesture);
@@ -130,6 +131,28 @@ it('keeps onTouchesUp on a separate manual tracker composed simultaneously, not 
   expect(outer[0].kind).toBe('exclusive');
   expect(outer[1].kind).toBe('manual');
   expect(outer[1].handlers.onTouchesUp).toBe(onTouchesUp);
+});
+
+it('disables shouldCancelWhenOutside on the recognizers so they survive a teleported item hide', () => {
+  // Regression: the teleported item's still-mounted source cell is hidden
+  // (off-screen / opacity 0), which reads as "outside" and, with the default
+  // true, cancels Tap/LongPress - dropping onTap/onLongPress under the portal.
+  renderHook(() =>
+    useTouchableGesture({
+      ...baseConfig,
+      onLongPress: jest.fn(),
+      onTap: jest.fn()
+    })
+  );
+
+  const tap = mocked.Tap.mock.results[0]!.value as {
+    shouldCancelWhenOutside: jest.Mock;
+  };
+  const longPress = mocked.LongPress.mock.results[0]!.value as {
+    shouldCancelWhenOutside: jest.Mock;
+  };
+  expect(tap.shouldCancelWhenOutside).toHaveBeenCalledWith(false);
+  expect(longPress.shouldCancelWhenOutside).toHaveBeenCalledWith(false);
 });
 
 it('returns the bare manual tracker when only touch callbacks are set', () => {

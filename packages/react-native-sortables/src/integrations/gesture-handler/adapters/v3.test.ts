@@ -86,6 +86,30 @@ it('creates a gesture only for the handlers that are provided and wraps them as 
   expect(isWorkletFunction(tapConfig.onActivate)).toBe(true);
 });
 
+it('disables shouldCancelWhenOutside on the recognizers so they survive a teleported item hide', () => {
+  // Regression: the teleported item's still-mounted source cell is hidden
+  // (off-screen / opacity 0), which reads as "outside" and, with the default
+  // true, cancels Tap/LongPress - dropping onTap/onLongPress under the portal.
+  renderHook(() =>
+    useTouchableGesture({
+      externalGesture: {},
+      failDistance: 10,
+      gestureMode: 'exclusive',
+      onLongPress: jest.fn(),
+      onTap: jest.fn()
+    })
+  );
+
+  const [tapConfig] = mocked.useTapGesture.mock.calls[0] as [
+    Record<string, unknown>
+  ];
+  const [longPressConfig] = mocked.useLongPressGesture.mock.calls[0] as [
+    Record<string, unknown>
+  ];
+  expect(tapConfig.shouldCancelWhenOutside).toBe(false);
+  expect(longPressConfig.shouldCancelWhenOutside).toBe(false);
+});
+
 it('creates tap, double-tap, long-press and manual gestures when every handler is set', () => {
   renderHook(() =>
     useTouchableGesture({
