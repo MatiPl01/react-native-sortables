@@ -5,8 +5,9 @@
     "expo": "57.0.2",
     "react-dom": "19.2.3",
     "react-native": "0.86.0",
+    "react-native-gesture-handler": "3.0.2",
     "react-native-sortables": "workspace:*",
-    "react-native-web": "0.21.1"
+    "react-native-web": "0.21.2"
   },
   "devDependencies": {
     "@expo/metro-runtime": "~57.0.3",
