@@ -123,10 +123,10 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   // on the UI thread, a JS handler is marshalled to the JS thread - which the
   // reanimated detector requires.
   /* eslint-disable react-hooks/rules-of-hooks */
-  const gestures: Parameters<typeof useExclusiveGestures> = [];
+  const recognizers: Parameters<typeof useExclusiveGestures> = [];
 
   if (onTap) {
-    gestures.push(
+    recognizers.push(
       useTapGesture({
         maxDistance: failDistance,
         onActivate: useStableCallbackValue(onTap),
@@ -135,7 +135,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
     );
   }
   if (onDoubleTap) {
-    gestures.push(
+    recognizers.push(
       useTapGesture({
         maxDistance: failDistance,
         numberOfTaps: 2,
@@ -145,7 +145,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
     );
   }
   if (onLongPress) {
-    gestures.push(
+    recognizers.push(
       useLongPressGesture({
         maxDistance: failDistance,
         onActivate: useStableCallbackValue(onLongPress),
@@ -153,24 +153,34 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
       })
     );
   }
-  if (onTouchesDown ?? onTouchesUp) {
-    gestures.push(
-      useManualGesture({
-        onTouchesDown: onTouchesDown
-          ? useStableCallbackValue(onTouchesDown)
-          : undefined,
-        onTouchesUp: onTouchesUp
-          ? useStableCallbackValue(onTouchesUp)
-          : undefined,
-        simultaneousWith
-      })
-    );
-  }
 
-  const gesture =
+  // Touch callbacks live on their own Manual gesture composed simultaneously
+  // (below) with the recognizers, so they keep firing after a recognizer wins.
+  // An Exclusive relation cancels the losing siblings, which is what dropped
+  // `onTouchesUp` after a long press activated.
+  const touchTracker =
+    (onTouchesDown ?? onTouchesUp)
+      ? useManualGesture({
+          onTouchesDown: onTouchesDown
+            ? useStableCallbackValue(onTouchesDown)
+            : undefined,
+          onTouchesUp: onTouchesUp
+            ? useStableCallbackValue(onTouchesUp)
+            : undefined,
+          simultaneousWith
+        })
+      : null;
+
+  const composedRecognizers =
     gestureMode === 'exclusive'
-      ? useExclusiveGestures(...gestures)
-      : useSimultaneousGestures(...gestures);
+      ? useExclusiveGestures(...recognizers)
+      : useSimultaneousGestures(...recognizers);
+
+  const gesture = !touchTracker
+    ? composedRecognizers
+    : recognizers.length
+      ? useSimultaneousGestures(composedRecognizers, touchTracker)
+      : touchTracker;
   /* eslint-enable react-hooks/rules-of-hooks */
 
   return gesture;
