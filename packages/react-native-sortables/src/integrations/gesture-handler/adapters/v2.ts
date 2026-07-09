@@ -46,21 +46,28 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
 
     if (onTap) {
       recognizers.push(
-        decorate(Gesture.Tap().maxDistance(failDistance)).onStart(onTap)
+        decorate(
+          Gesture.Tap().maxDistance(failDistance).shouldCancelWhenOutside(false)
+        ).onStart(onTap)
       );
     }
     if (onDoubleTap) {
       recognizers.push(
         decorate(
-          Gesture.Tap().numberOfTaps(2).maxDistance(failDistance)
+          Gesture.Tap()
+            .numberOfTaps(2)
+            .maxDistance(failDistance)
+            .shouldCancelWhenOutside(false)
         ).onStart(onDoubleTap)
       );
     }
     if (onLongPress) {
       recognizers.push(
-        decorate(Gesture.LongPress().maxDistance(failDistance)).onStart(
-          onLongPress
-        )
+        decorate(
+          Gesture.LongPress()
+            .maxDistance(failDistance)
+            .shouldCancelWhenOutside(false)
+        ).onStart(onLongPress)
       );
     }
 

@@ -116,6 +116,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
       useTapGesture({
         maxDistance: failDistance,
         onActivate: useStableCallbackValue(onTap),
+        shouldCancelWhenOutside: false,
         simultaneousWith
       })
     );
@@ -126,6 +127,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
         maxDistance: failDistance,
         numberOfTaps: 2,
         onActivate: useStableCallbackValue(onDoubleTap),
+        shouldCancelWhenOutside: false,
         simultaneousWith
       })
     );
@@ -135,6 +137,7 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
       useLongPressGesture({
         maxDistance: failDistance,
         onActivate: useStableCallbackValue(onLongPress),
+        shouldCancelWhenOutside: false,
         simultaneousWith
       })
     );
