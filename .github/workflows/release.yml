@@ -2,14 +2,20 @@ name: 🚀 Release
 
 on:
   workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Dry run (verify auth and build, do not publish)'
+        type: boolean
+        default: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
-      packages: write
+      contents: write # push the changelog commit and tag
+      issues: write # @semantic-release/github opens a failure issue
+      id-token: write # OIDC trusted publishing and npm provenance
 
     steps:
       - name: 🛒 Checkout code
@@ -21,7 +27,7 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24' # ships npm >= 11.6, required for OIDC trusted publishing
           cache: 'yarn'
 
       - name: 📦 Install dependencies
@@ -30,8 +36,7 @@ jobs:
 
       - name: 🎉 Release
         working-directory: packages/react-native-sortables
-        run: yarn semantic-release
+        run: yarn semantic-release ${{ inputs.dry-run && '--dry-run' || '' }}
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           HUSKY: 0
