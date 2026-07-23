@@ -45,3 +45,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           HUSKY: 0
+          # npm version runs an implicit workspaces update, which fails on the
+          # examples' workspace: deps (npm does not support that protocol)
+          npm_config_workspaces_update: false
