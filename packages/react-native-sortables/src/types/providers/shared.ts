@@ -222,7 +222,7 @@ export type DebugContextType = {
 
 // ORDER UPDATER
 
-type OrderUpdaterCallbackProps = {
+export type OrderUpdaterCallbackProps = {
   activeKey: string;
   activeIndex: number;
   dimensions: Dimensions;
