@@ -108,6 +108,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const activeAnimationProgress = useMutableValue(0);
     const inactiveAnimationProgress = useMutableValue(0);
     const activeItemDropped = useMutableValue(true);
+    const activeItemBroughtToFront = useMutableValue(false);
 
     // ITEM ACTIVATION SETTINGS
     const dragActivationDelay = useAnimatableValue(_dragActivationDelay);
@@ -176,6 +177,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activationAnimationDuration,
         activationState,
         activeAnimationProgress,
+        activeItemBroughtToFront,
         activeItemDimensions,
         activeItemDropped,
         activeItemKey,

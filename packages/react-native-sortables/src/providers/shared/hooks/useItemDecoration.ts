@@ -17,6 +17,7 @@ export default function useItemDecoration(
 ): SharedValue<ViewStyle> {
   const {
     activationAnimationDuration,
+    activeItemBroughtToFront,
     activeItemOpacity,
     activeItemScale,
     activeItemShadowOpacity,
@@ -38,8 +39,23 @@ export default function useItemDecoration(
     );
   });
 
+  // Ramp the "picked up" progress in when the item is actually brought to front
+  // (the first drag move), so the scale/shadow animate up smoothly even if the
+  // activation timing already finished during a long hold. Gating the raw
+  // progress alone would make it jump 0 -> 1 in a single frame in that case.
+  const broughtToFrontProgress = useDerivedValue(() =>
+    activeItemBroughtToFront.value
+      ? withTiming(1, { duration: activationAnimationDuration.value })
+      : 0
+  );
+
   return useDerivedValue<ViewStyle>(() => {
-    const progress = activationAnimationProgress.value;
+    // Apply the "picked up" scale/shadow only once the item is actually dragged,
+    // not on a bare long press (otherwise a native context menu taking over the
+    // gesture makes the item scale up and then back down). The drop animation
+    // still runs via activationAnimationProgress falling back to 0.
+    const progress =
+      broughtToFrontProgress.value * activationAnimationProgress.value;
     const zeroProgressOpacity = interpolate(
       adjustedInactiveProgress.value,
       [0, 1],

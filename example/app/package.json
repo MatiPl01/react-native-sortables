@@ -5,6 +5,7 @@
     "@fortawesome/free-solid-svg-icons": "6.5.2",
     "@fortawesome/react-native-fontawesome": "0.3.2",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-menu/menu": "2.0.0",
     "@react-navigation/bottom-tabs": "7.3.10",
     "@react-navigation/elements": "2.3.8",
     "@react-navigation/native": "7.0.14",
@@ -12,14 +13,18 @@
     "@shopify/flash-list": "2.3.1",
     "react": "19.2.3",
     "react-native": "0.86.0",
+    "react-native-context-menu-view": "1.21.0",
     "react-native-gesture-handler": "2.32.0",
     "react-native-haptic-feedback": "2.3.3",
+    "react-native-ios-context-menu": "3.1.0",
+    "react-native-ios-utilities": "5.1.2",
     "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "5.7.0",
     "react-native-screens": "4.25.2",
     "react-native-sortables": "workspace:*",
     "react-native-svg": "15.15.4",
-    "react-native-worklets": "0.10.1"
+    "react-native-worklets": "0.10.1",
+    "zeego": "3.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

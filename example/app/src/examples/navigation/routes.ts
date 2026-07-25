@@ -92,6 +92,12 @@ const routes: Routes = {
             Component: SortableGrid.tests.BottomTabsNavigatorExample,
             name: 'Bottom Tabs Navigator'
           },
+          ...(IS_IOS && {
+            ContextMenu: {
+              Component: SortableGrid.tests.ContextMenusExample,
+              name: 'Context Menu'
+            }
+          }),
           HidingItems: {
             Component: SortableGrid.tests.HidingItemsExample,
             name: 'Hiding Items'

@@ -81,6 +81,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationAnimationDuration,
     activationState,
     activeAnimationProgress,
+    activeItemBroughtToFront,
     activeItemDimensions,
     activeItemDropped,
     activeItemKey,
@@ -295,6 +296,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemPosition.value = itemPosition;
       activeItemDimensions.value = itemDimensions;
       activationState.value = DragActivationState.ACTIVE;
+      activeItemBroughtToFront.value = false;
       ctx.dragStartIndex = keyToIndex.value[key] ?? -1;
 
       if (activeContainerId) {
@@ -304,7 +306,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         multiZoneActiveItemDimensions.value = itemDimensions;
       }
 
-      updateLayer?.(LayerState.FOCUSED);
+      // zIndex is elevated on the first drag move (see handleTouchesMove)
 
       // We need to update the custom handle measurements if the custom handle
       // is used (touch position is relative to the handle in this case)
@@ -355,6 +357,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeAnimationProgress,
       activeContainerId,
       activeHandleOffset,
+      activeItemBroughtToFront,
       activeItemDimensions,
       activeItemDropped,
       activationState,
@@ -372,7 +375,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       prevActiveItemKey,
       onDragStart,
       touchPosition,
-      updateLayer,
       updateActiveHandleMeasurements
     ]
   );
@@ -463,6 +465,14 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }
 
       const ctx = context.value;
+      const startTouch = ctx.touchStartTouch;
+
+      let movedDistance = 0;
+      if (startTouch) {
+        const dX = touch.absoluteX - startTouch.absoluteX;
+        const dY = touch.absoluteY - startTouch.absoluteY;
+        movedDistance = Math.sqrt(dX * dX + dY * dY);
+      }
 
       if (activeItemKey.value) {
         onDragMove({
@@ -470,25 +480,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           key: activeItemKey.value,
           touchData: touch
         });
-      }
 
-      if (activationState.value === DragActivationState.TOUCHED) {
-        if (!ctx.touchStartTouch) {
-          fail();
-          return;
-        }
-        const dX = touch.absoluteX - ctx.touchStartTouch.absoluteX;
-        const dY = touch.absoluteY - ctx.touchStartTouch.absoluteY;
-
-        // Cancel touch if the touch moved too far from the initial position
-        // before the item activation animation starts
-        const r = Math.sqrt(dX * dX + dY * dY);
+        // Elevate only once dragged, so a bare long press doesn't change the
+        // stacking context and dismiss a native context menu (#417)
         if (
-          // activeItemKey is set after the drag activation delay passes
-          // and we don't want to cancel the touch anymore after this time
-          activeItemKey.value === null &&
-          r >= dragActivationFailOffset.value
+          !activeItemBroughtToFront.value &&
+          movedDistance >= dragActivationFailOffset.value
         ) {
+          activeItemBroughtToFront.value = true;
+          updateLayer?.(LayerState.FOCUSED);
+        }
+      } else if (activationState.value === DragActivationState.TOUCHED) {
+        // Cancel the touch if it moves before activation (it is a scroll)
+        if (!startTouch || movedDistance >= dragActivationFailOffset.value) {
           fail();
           return;
         }
@@ -496,11 +500,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     },
     [
       activationState,
+      activeItemBroughtToFront,
       activeItemKey,
       dragActivationFailOffset,
       currentTouch,
       context,
-      onDragMove
+      onDragMove,
+      updateLayer
     ]
   );
 
@@ -555,7 +561,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveAnimationProgress.value = animate();
       activeAnimationProgress.value = animate();
 
-      updateLayer?.(LayerState.INTERMEDIATE);
+      // Restore the layer only if it was elevated. The flag resets on the next
+      // drag start, not here, to avoid racing an overlapping drag.
+      const wasBroughtToFront = activeItemBroughtToFront.value;
+      if (wasBroughtToFront) {
+        updateLayer?.(LayerState.INTERMEDIATE);
+      }
       haptics.medium();
 
       stableOnDragEnd({
@@ -568,7 +579,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       setAnimatedTimeout(() => {
         activeItemDropped.value = true;
-        updateLayer?.(LayerState.IDLE);
+        if (wasBroughtToFront) {
+          updateLayer?.(LayerState.IDLE);
+        }
         onActiveItemDropped({
           fromIndex,
           indexToKey: indexToKey.value,
@@ -580,6 +593,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     },
     [
       activeContainerId,
+      activeItemBroughtToFront,
       activeItemKey,
       activeItemDimensions,
       activeItemDropped,
