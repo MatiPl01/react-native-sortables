@@ -199,7 +199,7 @@ it('groups recognizers simultaneously when gestureMode is simultaneous', () => {
   expect(mocked.Simultaneous).toHaveBeenCalledTimes(2);
 });
 
-it('cleans up through onFinalize, which is the only callback guaranteed to run when a drag is cancelled', () => {
+it('also cleans up through onFinalize, which covers terminal states the touch callbacks miss', () => {
   renderHook(() => useDragGesture(dragCallbacks, []));
 
   const manual = mocked.Manual.mock.results[0]!.value as MockGesture;

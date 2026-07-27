@@ -18,8 +18,8 @@ export type ManualGestureControl = {
 };
 
 export type ManualGestureCallbacks = {
-  // Driven by handler state, so unlike the touch callbacks it also runs when a
-  // drag ends without the user lifting a finger (e.g. another gesture wins).
+  // Not a teardown hook: a handler detached mid-gesture reaches no terminal
+  // state and emits nothing.
   onFinalize: () => void;
   onTouchesCancelled: (
     event: GestureTouchEvent,

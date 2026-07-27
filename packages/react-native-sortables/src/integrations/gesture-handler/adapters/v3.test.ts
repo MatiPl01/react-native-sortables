@@ -175,11 +175,36 @@ it('returns the bare touch tracker when only touch callbacks are set (no recogni
   expect(mocked.useSimultaneousGestures).not.toHaveBeenCalled();
 });
 
-it('cleans up through onFinalize, which is the only callback guaranteed to run when a drag is cancelled', () => {
+it('also cleans up through onFinalize, which covers terminal states the touch callbacks miss', () => {
   renderHook(() => useDragGesture(callbacks, []));
 
   const [config] = useManualGesture.mock.calls[0] as [Record<string, unknown>];
   expect(typeof config.onFinalize).toBe('function');
   (config.onFinalize as () => void)();
   expect(callbacks.onFinalize).toHaveBeenCalled();
+});
+
+it('pushes the same config object on re-render, so the native handler is configured once', () => {
+  const { rerender } = renderHook(() => useDragGesture(callbacks, []));
+  rerender();
+  rerender();
+
+  expect(useManualGesture).toHaveBeenCalledTimes(3);
+  const configs = useManualGesture.mock.calls.map(
+    call => (call as [Record<string, unknown>])[0]
+  );
+  expect(configs[1]).toBe(configs[0]);
+  expect(configs[2]).toBe(configs[0]);
+});
+
+it('pushes a new config when the caller deps change', () => {
+  let dep = 'a';
+  const { rerender } = renderHook(() => useDragGesture(callbacks, [dep]));
+  dep = 'b';
+  rerender();
+
+  const configs = useManualGesture.mock.calls.map(
+    call => (call as [Record<string, unknown>])[0]
+  );
+  expect(configs[1]).not.toBe(configs[0]);
 });
