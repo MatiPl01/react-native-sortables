@@ -12,6 +12,15 @@ export default function useItemPanGesture(
 
   return useDragGesture(
     {
+      // The handler reaching a terminal state is the only signal guaranteed to
+      // arrive when a drag ends without the user lifting a finger (another
+      // gesture winning, or the handler being cancelled). The touch callbacks
+      // below still run the same cleanup so a touch released before the
+      // activation delay cancels its pending activation timeout.
+      onFinalize: () => {
+        'worklet';
+        handleDragEnd(key, activationAnimationProgress);
+      },
       onTouchesCancelled: (_event, control) => {
         'worklet';
         handleDragEnd(key, activationAnimationProgress);

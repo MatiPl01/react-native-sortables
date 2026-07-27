@@ -49,6 +49,10 @@ const useDragGesture: GestureHandlerAdapter['useDragGesture'] = callbacks => {
   const pendingActivation = useMutableValue(false);
 
   return useManualGesture({
+    onFinalize: () => {
+      'worklet';
+      callbacks.onFinalize();
+    },
     onTouchesCancel: event => {
       'worklet';
       callbacks.onTouchesCancelled(

@@ -22,6 +22,7 @@ jest.mock('react-native-gesture-handler', () => {
       gesture[method] = jest.fn(() => gesture);
     }
     for (const method of [
+      'onFinalize',
       'onTouchesCancelled',
       'onTouchesDown',
       'onTouchesMove',
@@ -68,6 +69,7 @@ const mocked = Gesture as unknown as {
 };
 
 const dragCallbacks: ManualGestureCallbacks = {
+  onFinalize: jest.fn(),
   onTouchesCancelled: jest.fn(),
   onTouchesDown: jest.fn(),
   onTouchesMove: jest.fn(),
@@ -195,4 +197,11 @@ it('groups recognizers simultaneously when gestureMode is simultaneous', () => {
   // that keeps the touch tracker observing also uses Simultaneous.
   expect(mocked.Exclusive).not.toHaveBeenCalled();
   expect(mocked.Simultaneous).toHaveBeenCalledTimes(2);
+});
+
+it('cleans up through onFinalize, which is the only callback guaranteed to run when a drag is cancelled', () => {
+  renderHook(() => useDragGesture(dragCallbacks, []));
+
+  const manual = mocked.Manual.mock.results[0]!.value as MockGesture;
+  expect(manual.handlers.onFinalize).toBe(dragCallbacks.onFinalize);
 });

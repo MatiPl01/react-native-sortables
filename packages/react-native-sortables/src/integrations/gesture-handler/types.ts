@@ -18,6 +18,11 @@ export type ManualGestureControl = {
 };
 
 export type ManualGestureCallbacks = {
+  // Runs when the handler reaches a terminal state (END, FAILED or CANCELLED).
+  // Unlike the touch callbacks it is driven by handler state transitions, so it
+  // is the only callback guaranteed to run when a drag is ended by something
+  // other than the user lifting a finger - e.g. another gesture winning.
+  onFinalize: () => void;
   onTouchesCancelled: (
     event: GestureTouchEvent,
     control: ManualGestureControl

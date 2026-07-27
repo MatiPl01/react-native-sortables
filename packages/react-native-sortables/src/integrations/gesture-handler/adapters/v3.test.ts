@@ -44,6 +44,7 @@ const mocked = GestureHandler as unknown as {
 const useManualGesture = mocked.useManualGesture;
 
 const callbacks: ManualGestureCallbacks = {
+  onFinalize: jest.fn(),
   onTouchesCancelled: jest.fn(),
   onTouchesDown: jest.fn(),
   onTouchesMove: jest.fn(),
@@ -172,4 +173,13 @@ it('returns the bare touch tracker when only touch callbacks are set (no recogni
   expect(mocked.useLongPressGesture).not.toHaveBeenCalled();
   expect(useManualGesture).toHaveBeenCalledTimes(1);
   expect(mocked.useSimultaneousGestures).not.toHaveBeenCalled();
+});
+
+it('cleans up through onFinalize, which is the only callback guaranteed to run when a drag is cancelled', () => {
+  renderHook(() => useDragGesture(callbacks, []));
+
+  const [config] = useManualGesture.mock.calls[0] as [Record<string, unknown>];
+  expect(typeof config.onFinalize).toBe('function');
+  (config.onFinalize as () => void)();
+  expect(callbacks.onFinalize).toHaveBeenCalled();
 });
