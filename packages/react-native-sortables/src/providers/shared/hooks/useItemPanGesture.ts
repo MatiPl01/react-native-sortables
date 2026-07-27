@@ -22,11 +22,8 @@ export default function useItemPanGesture(
 
   const callbacks = useMemo<ManualGestureCallbacks>(
     () => ({
-      // The touch callbacks repeat this cleanup because a touch that ends
-      // before the item activates never reaches onFinalize (measured on iOS: a
-      // tap emits onTouchesDown and onTouchesUp only). Without them the pending
-      // activation survives the tap and lifts the item with no finger down.
-      // Both may run for one gesture, so handleDragEnd has to stay idempotent.
+      // A touch that ends before the item activates never reaches onFinalize,
+      // so the touch callbacks below repeat this cleanup.
       onFinalize: () => {
         'worklet';
         handleDragEnd(key, activationAnimationProgress);

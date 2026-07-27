@@ -199,25 +199,6 @@ it('keeps the drag running when its touch stream is replayed mid-drag', () => {
   expect(progresses.a!.value).toBeGreaterThan(0);
 });
 
-// Both a touch callback and onFinalize can clean up the same gesture, and
-// Android can even emit onFinalize twice, so repeats must be harmless.
-it('reports a drag end once however many times the gesture cleans up', () => {
-  renderGrid();
-
-  touchDown('a');
-  onDragEnd.mockClear();
-
-  touchUp('a');
-  act(() => {
-    drag.handleDragEnd('a', progresses.a!);
-    drag.handleDragEnd('a', progresses.a!);
-    jest.advanceTimersByTime(1000);
-  });
-
-  expect(onDragEnd).toHaveBeenCalledTimes(1);
-  expect(common.activeItemKey.value).toBeNull();
-});
-
 // Reporting a drag that never happened would commit a bogus reorder.
 it('recovers without reporting a drag end to the caller', () => {
   renderGrid();

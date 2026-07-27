@@ -48,9 +48,8 @@ function createControl(
   };
 }
 
-// v3 memoizes on the config object identity alone, and re-applying a config
-// natively resets it before updating it, which briefly drops `needsPointerData`
-// and can swallow a touch event of a drag in progress.
+// Re-applying a config natively resets it first, which briefly drops
+// `needsPointerData` and can swallow a touch event of a drag in progress.
 const useDragGesture: GestureHandlerAdapter['useDragGesture'] = (
   callbacks,
   deps

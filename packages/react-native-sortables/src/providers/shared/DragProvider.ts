@@ -413,19 +413,16 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const touch = e.allTouches[0];
 
       if (activeItemKey.value === key) {
-        // No activation animation means the drag belongs to a previous mount,
-        // so nothing else will ever clear it.
+        // The drag belongs to a previous mount, so nothing else will clear it.
         if (activationAnimationProgress.value === 0) {
           discardAbandonedDrag(activationAnimationProgress);
         } else {
-          // A handler re-registering mid-drag, or a second finger. Neither is a
-          // new press, and failing here would kill the drag.
+          // Not a new press, and failing here would kill the drag.
           return;
         }
       }
 
-      // Nothing is left to animate this progress down, so the gate below would
-      // reject the item forever.
+      // Nothing is left to animate this progress down.
       const isProgressOutlivingItsDrag =
         activeItemKey.value === null &&
         activeItemDropped.value &&
@@ -454,8 +451,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       currentTouch.value = touch;
       activationState.value = DragActivationState.TOUCHED;
 
-      // A handler re-registering mid-touch replays onTouchesDown for the finger
-      // already down, and re-arming would push activation further away forever.
+      // A re-registering handler replays onTouchesDown for the finger already
+      // down, and re-arming would push activation further away forever.
       if (ctx.activationTimeoutKey === key) {
         return;
       }
