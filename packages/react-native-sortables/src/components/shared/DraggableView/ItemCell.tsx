@@ -12,7 +12,7 @@ import type {
 } from 'react-native-reanimated';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { HIDDEN_X_OFFSET, IS_WEB } from '../../../constants';
+import { HIDDEN_X_OFFSET, IS_WEB, isPaper } from '../../../constants';
 import type {
   AnimatedStyleProp,
   LayoutAnimation
@@ -64,7 +64,7 @@ export default function ItemCell({
     ...(!IS_WEB && overriddenCellDimensions.value)
   }));
 
-  let innerAnimatedStyle: AnimatedStyle | undefined;
+  let innerAnimatedStyle: AnimatedStyle<ViewStyle> | undefined;
   if (IS_WEB) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     innerAnimatedStyle = useAnimatedStyle(() => overriddenCellDimensions.value);
@@ -75,7 +75,14 @@ export default function ItemCell({
       <AnimatedOnLayoutView
         entering={entering}
         exiting={exiting}
-        style={[styles.inner, innerAnimatedStyle, hidden && styles.hidden]}
+        style={[
+          styles.inner,
+          innerAnimatedStyle,
+          hidden && {
+            left: isPaper() ? HIDDEN_X_OFFSET : undefined,
+            opacity: 0
+          }
+        ]}
         onLayout={onLayout}>
         {children}
       </AnimatedOnLayoutView>
@@ -96,14 +103,6 @@ const styles = StyleSheet.create({
       shadowRadius: 5
     }
   }),
-  hidden: {
-    // We change the x position to hide items when teleported (we can't use
-    // non-layout props like opacity as they are sometimes not updated via
-    // Reanimated on the Old Architecture; we also can't use any props that
-    // affect item dimensions, etc., so the safest way is to put the item
-    // far away from the viewport to hide it)
-    left: HIDDEN_X_OFFSET
-  },
   inner: Platform.select<ViewStyle>({
     default: {},
     web: { flex: 1 }

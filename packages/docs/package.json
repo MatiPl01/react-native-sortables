@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "docusaurus": "docusaurus",
-    "start": "docusaurus start",
-    "build": "docusaurus build",
+    "browserslist:update": "npx update-browserslist-db@latest",
+    "docusaurus": "BROWSERSLIST_IGNORE_OLD_DATA=1 docusaurus",
+    "start": "BROWSERSLIST_IGNORE_OLD_DATA=1 docusaurus start",
+    "build": "BROWSERSLIST_IGNORE_OLD_DATA=1 docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -21,16 +22,30 @@
     "@mdx-js/react": "^3.0.0",
     "clsx": "^2.0.0",
     "prism-react-renderer": "^2.3.0",
+    "process": "0.11.10",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-native-gesture-handler": "2.28.0",
+    "react-native-reanimated": "4.2.1",
+    "react-native-sortables": "npm:latest",
+    "react-native-web": "0.21.2",
+    "react-native-worklets": "0.7.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.26.0",
     "@docusaurus/module-type-aliases": "3.7.0",
     "@docusaurus/tsconfig": "3.7.0",
     "@docusaurus/types": "3.7.0",
+    "@types/react": "^19.0.0",
+    "babel-loader": "^9.2.1",
     "eslint": "^9.28.0",
     "eslint-plugin-mdx": "^3.4.2",
-    "typescript": "^5.8.3"
+    "raw-loader": "^4.0.2",
+    "react-native": "^0.84.0",
+    "typescript": "^5.8.3",
+    "webpack": "^5.97.1"
   },
   "browserslist": {
     "production": [
@@ -45,6 +60,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.0"
+    "node": "22.x"
   }
 }

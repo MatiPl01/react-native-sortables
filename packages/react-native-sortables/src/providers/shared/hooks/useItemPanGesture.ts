@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
-import { Gesture } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 
+import { useDragGesture } from '../../../integrations/gesture-handler';
 import { useDragContext } from '../DragProvider';
 
 export default function useItemPanGesture(
@@ -11,29 +10,33 @@ export default function useItemPanGesture(
   const { handleDragEnd, handleTouchesMove, handleTouchStart } =
     useDragContext();
 
-  return useMemo(
-    () =>
-      Gesture.Manual()
-        .onTouchesDown((e, manager) => {
-          handleTouchStart(
-            e,
-            key,
-            activationAnimationProgress,
-            manager.activate,
-            manager.fail
-          );
-        })
-        .onTouchesMove((e, manager) => {
-          handleTouchesMove(e, manager.fail);
-        })
-        .onTouchesCancelled((_, manager) => {
-          handleDragEnd(key, activationAnimationProgress);
-          manager.fail();
-        })
-        .onTouchesUp((_, manager) => {
-          handleDragEnd(key, activationAnimationProgress);
-          manager.end();
-        }),
+  return useDragGesture(
+    {
+      onTouchesCancelled: (_event, control) => {
+        'worklet';
+        handleDragEnd(key, activationAnimationProgress);
+        control.fail();
+      },
+      onTouchesDown: (event, control) => {
+        'worklet';
+        handleTouchStart(
+          event,
+          key,
+          activationAnimationProgress,
+          control.activate,
+          control.fail
+        );
+      },
+      onTouchesMove: (event, control) => {
+        'worklet';
+        handleTouchesMove(event, control.fail);
+      },
+      onTouchesUp: (_event, control) => {
+        'worklet';
+        handleDragEnd(key, activationAnimationProgress);
+        control.end();
+      }
+    },
     [
       handleDragEnd,
       handleTouchStart,

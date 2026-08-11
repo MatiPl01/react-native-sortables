@@ -1,0 +1,20 @@
+---
+sidebar_position: 5
+description: ''
+---
+
+# Touchable
+
+## Description
+
+This example shows why the [Sortable.Touchable](/helper-components/touchable) component is useful when you need to **properly detect press events** on **components nested inside** the sortable component item (more precisely, nested within the part of the item that detects the drag gesture - this might be the entire item or just a part of it if the custom handle, like [Sortable.Handle](/helper-components/handle), is used).
+
+In this **Sortable Flex** example, each item has a delete button that removes it only when **pressed, not when the item is dragged**.
+
+## Example
+
+import InteractiveExample from '@site/src/components/InteractiveExample';
+import FlexTouchableExample from '@site/src/examples/FlexTouchable';
+import FlexTouchableCode from '!!raw-loader!@site/src/examples/FlexTouchable';
+
+<InteractiveExample component={FlexTouchableExample} code={FlexTouchableCode} />

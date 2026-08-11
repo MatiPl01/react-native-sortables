@@ -44,7 +44,7 @@ React Native Sortables is a powerful and easy-to-use library that brings smooth,
 
   - **Auto-scrolling** beyond screen bounds
   - Customizable **layout animations** for items addition and removal
-  - Built-in **haptic feedback** integration (requires [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback) dependency)
+  - Built-in **haptic feedback** integration (optional) via [react-native-pulsar](https://github.com/software-mansion/pulsar), [expo-haptics](https://github.com/expo/expo/tree/main/packages/expo-haptics) or [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback)
   - Different **reordering strategies** (insertion, swapping)
 
 - 💡 **Developer Experience**
@@ -73,9 +73,18 @@ yarn add react-native-sortables
 This library is built with:
 
 - [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) (version 3.x, 4.x)
-- [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/) (version 2.x)
+- [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/) (version 2.x, 3.x)
 
 Make sure to follow their installation instructions for your project.
+
+> [!NOTE]
+> On iOS + New Architecture, gesture-handler **2.x** can leave a dragged item
+> "stuck" after its screen is detached and re-attached (e.g. bottom tabs with
+> `detachInactiveScreens={false}`) - see
+> [#349](https://github.com/MatiPl01/react-native-sortables/issues/349).
+> **gesture-handler 3** fixes this, and the library uses it automatically when
+> installed (v3 requires the New Architecture). The Old Architecture is
+> unaffected, so 2.x is the right choice there.
 
 ## Quick Start
 

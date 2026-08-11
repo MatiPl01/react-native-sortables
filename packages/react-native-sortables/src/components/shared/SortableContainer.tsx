@@ -1,5 +1,4 @@
 import { memo, useSyncExternalStore } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
 import Animated, {
   LinearTransition,
   useAnimatedStyle,
@@ -26,7 +25,7 @@ export type SortableContainerProps = DropIndicatorSettings &
     overflow: Overflow;
     itemStyle?: AnimatedStyleProp;
     debug?: boolean;
-    containerStyle?: StyleProp<ViewStyle>;
+    containerStyle?: AnimatedStyleProp;
     onLayout: (width: number, height: number) => void;
   };
 

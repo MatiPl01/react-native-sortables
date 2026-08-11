@@ -1,7 +1,6 @@
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { View } from 'react-native';
-import { GestureDetector } from 'react-native-gesture-handler';
 import { runOnUI, useAnimatedRef } from 'react-native-reanimated';
 
 import {
@@ -10,6 +9,7 @@ import {
   useItemContext
 } from '../../providers';
 import { error } from '../../utils';
+import SortableGestureDetector from './SortableGestureDetector';
 
 /** Props for the Sortable Handle component */
 export type CustomHandleProps = PropsWithChildren<{
@@ -60,7 +60,6 @@ function CustomHandleComponent({
 
   const { registerHandle, updateActiveHandleMeasurements } =
     customHandleContext;
-  const dragEnabled = mode === 'draggable';
 
   useEffect(() => {
     return registerHandle(itemKey, handleRef, mode === 'fixed-order');
@@ -73,15 +72,25 @@ function CustomHandleComponent({
     }
   }, [itemKey, isActive, updateActiveHandleMeasurements]);
 
-  return (
-    <GestureDetector gesture={gesture.enabled(dragEnabled)} userSelect='none'>
-      <View
-        collapsable={false}
-        ref={handleRef}
-        style={style}
-        onLayout={runOnUI(onLayout)}>
-        {children}
-      </View>
-    </GestureDetector>
+  const handle = (
+    <View
+      collapsable={false}
+      ref={handleRef}
+      style={style}
+      onLayout={() => {
+        runOnUI(onLayout)();
+      }}>
+      {children}
+    </View>
+  );
+
+  // Only a draggable handle attaches the drag gesture. A `non-draggable` or
+  // `fixed-order` handle leaves it off, so the item cannot be picked up.
+  return mode === 'draggable' ? (
+    <SortableGestureDetector gesture={gesture}>
+      {handle}
+    </SortableGestureDetector>
+  ) : (
+    handle
   );
 }

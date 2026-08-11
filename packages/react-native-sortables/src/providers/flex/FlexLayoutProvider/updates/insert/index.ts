@@ -37,7 +37,6 @@ const useInsertStrategy: SortStrategyFactory = () => {
     calculateFlexLayout,
     columnGap,
     flexDirection,
-    keyToGroup,
     rowGap
   } = useFlexLayoutContext();
   const { fixedItemKeys } = useCustomHandleContext() ?? {};
@@ -81,8 +80,13 @@ const useInsertStrategy: SortStrategyFactory = () => {
 
   const activeGroupIndex = useDerivedValue(() => {
     const key = activeItemKey.value;
-    if (key === null) return null;
-    return keyToGroup.value[key] ?? null;
+    const layout = appliedLayout.value;
+    if (key === null || layout === null) return null;
+    const groups = layout.itemGroups;
+    for (let i = 0; i < groups.length; i++) {
+      if (groups[i]!.includes(key)) return i;
+    }
+    return null;
   });
 
   useAnimatedReaction(

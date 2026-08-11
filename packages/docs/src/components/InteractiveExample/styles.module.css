@@ -1,0 +1,247 @@
+.wrapper {
+  margin-bottom: 2.5rem;
+}
+
+.container {
+  background-color: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: grid;
+  min-height: 500px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Side Sections shared styles */
+.codeSection,
+.demoSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.codeSection {
+  border-right: 1px solid var(--ifm-color-emphasis-200);
+  min-width: 300px;
+  overflow: hidden;
+  position: relative;
+}
+
+.codeAbsoluteWrapper {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.codeStickyWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(100vh - var(--ifm-navbar-height));
+  position: sticky;
+  top: var(--ifm-navbar-height);
+}
+
+.header {
+  align-items: center;
+  background-color: var(--ifm-color-emphasis-100);
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-emphasis-600);
+  display: flex;
+  font-size: 0.75rem;
+  font-weight: 700;
+  justify-content: space-between;
+  letter-spacing: 0.05em;
+  padding: 8px 16px;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.iconButton {
+  align-items: center;
+  background-color: transparent;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+  color: var(--ifm-color-emphasis-700);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  padding: 4px;
+}
+
+.iconButton.active {
+  background-color: var(--ifm-color-emphasis-200);
+}
+
+.iconButton.copied {
+  color: var(--ifm-color-success);
+}
+
+.mobileCodeToggle {
+  background-color: var(--ifm-color-emphasis-0);
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: 4px;
+  cursor: pointer;
+  display: none;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+}
+
+.codeContentWrapper {
+  background-color: var(--prism-background-color);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Hide default Docusaurus CodeBlock buttons within InteractiveExample */
+.codeContentWrapper :global(.clean-btn) {
+  display: none !important;
+}
+
+/* Force wrapping when "wrapped" state is active */
+.codeContentWrapper.codeWrapped pre,
+.codeContentWrapper.codeWrapped code {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
+.codeScrollContainer {
+  flex: 1;
+  overflow: auto;
+}
+
+.codeBlockOverride {
+  border-radius: 0 !important;
+  font-size: 0.85rem !important;
+  height: max-content !important;
+  margin: 0 !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+}
+
+.divider {
+  align-items: center;
+  background-color: var(--ifm-color-emphasis-200);
+  border-left: 1px solid var(--ifm-color-emphasis-200);
+  border-right: 1px solid var(--ifm-color-emphasis-200);
+  cursor: col-resize;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  transition: background-color 0.2s;
+  z-index: 10;
+}
+
+.divider.dragging {
+  background-color: var(--ifm-color-primary);
+}
+
+.dividerHandle {
+  background-color: var(--ifm-color-emphasis-500);
+  border-radius: 1px;
+  height: 24px;
+  width: 2px;
+}
+
+.demoSection {
+  background-color: var(--ifm-color-emphasis-100);
+  height: 100%;
+  min-width: 320px;
+}
+
+.resetButton {
+  background-color: var(--ifm-color-emphasis-0);
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: 4px;
+  color: var(--ifm-color-primary);
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  transition: all 0.15s ease;
+}
+
+.demoContent {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.deviceFrame {
+  background-color: var(--ifm-background-surface-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-width: 430px;
+  min-height: 400px;
+  min-width: 300px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.fallback {
+  padding: 2rem;
+  text-align: center;
+}
+
+.gestureHandlerRoot {
+  flex: 1;
+  min-height: 400px;
+}
+
+/* Mobile Layout Logic */
+.container.mobileLayout {
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  height: auto !important;
+}
+
+.container.mobileLayout .divider {
+  display: none !important;
+}
+
+.container.mobileLayout .codeSection {
+  width: 100% !important;
+  min-width: 0 !important;
+  border-right: none !important;
+  border-top: 1px solid var(--ifm-color-emphasis-300);
+  height: auto !important;
+}
+
+.container.mobileLayout .codeAbsoluteWrapper {
+  position: relative !important;
+  inset: auto !important;
+}
+
+.container.mobileLayout .demoSection {
+  width: 100% !important;
+  height: auto !important;
+}
+
+.container.mobileLayout .mobileCodeToggle {
+  display: block !important;
+}
+
+.container.mobileLayout .codeContentWrapper.collapsed {
+  display: none !important;
+}
+
+.container.mobileLayout .codeContentWrapper:not(.collapsed) {
+  height: 400px !important;
+}

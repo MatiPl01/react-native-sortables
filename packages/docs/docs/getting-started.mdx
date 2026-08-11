@@ -10,17 +10,28 @@ Before getting started, you need to install and configure the following dependen
 
 ### Required Dependencies
 
-- **react-native-reanimated**: Required for animations
+- **react-native-reanimated** (`3.x` or `4.x`): Required for animations
 
   - Follow the installation guide in [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) docs
 
-- **react-native-gesture-handler**: Required for gesture handling
+- **react-native-gesture-handler** (`2.x` or `3.x`): Required for gesture handling
   - Follow the installation guide in [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/) docs
+
+:::info Gesture Handler compatibility
+
+On iOS with the New Architecture, gesture-handler `2.x` has a known limitation: a sortable can stop recognizing drags after its screen is detached and re-attached (for example bottom tabs with `detachInactiveScreens={false}`), which can leave a dragged item stuck (see [#349](https://github.com/MatiPl01/react-native-sortables/issues/349)).
+
+This is not fixable on the `2.x` API and is resolved by gesture-handler `3.x`, which the library uses automatically when it is installed. Gesture Handler `3.x` requires the New Architecture, so on the Old Architecture (Paper) keep using `2.x`, where the issue does not occur.
+
+:::
 
 ### Optional Dependencies
 
-- **react-native-haptic-feedback**: For haptic feedback support
-  - Follow the installation guide in the [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback) README
+Haptic feedback is optional. The library automatically detects which haptics package is available and uses the first one it finds, in this order:
+
+- [react-native-pulsar](https://github.com/software-mansion/pulsar) - rich haptic presets, requires the New Architecture
+- [expo-haptics](https://github.com/expo/expo/tree/main/packages/expo-haptics) - for Expo apps
+- [react-native-haptic-feedback](https://github.com/mkuczera/react-native-haptic-feedback) - for the bare React Native workflow
 
 ## 2. Installation
 

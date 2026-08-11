@@ -65,7 +65,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       activeItemPosition,
       containerRef,
       enableActiveItemSnap,
-      itemPositions,
+      itemLayoutPositions,
       keyToIndex,
       prevActiveItemKey,
       snapOffsetX,
@@ -243,7 +243,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
 
           const prevActiveKey = prevActiveItemKey.value!;
           const oldCrossOffset =
-            itemPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
+            itemLayoutPositions.value[prevActiveKey]?.[crossCoordinate] ?? 0;
           const newCrossOffset = calculateItemCrossOffset({
             ...autoOffsetAdjustmentCommonProps,
             itemKey: prevActiveKey
@@ -303,7 +303,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         const activeItemIndex = keyToIndex.value[itemKey];
         const itemAtActiveIndexKey = indexToKey[activeItemIndex!];
         const itemAtActiveIndexOffset =
-          itemPositions.value[itemAtActiveIndexKey!]?.[crossCoordinate] ?? 0;
+          itemLayoutPositions.value[itemAtActiveIndexKey!]?.[crossCoordinate] ??
+          0;
 
         const startCrossOffset = Math.max(
           0,
@@ -329,7 +330,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         adjustScrollToKeepItemInView,
         disableAutoOffsetAdjustment,
         enableActiveItemSnap,
-        itemPositions,
+        itemLayoutPositions,
         keyToIndex,
         prevActiveItemKey,
         snapOffsetX,

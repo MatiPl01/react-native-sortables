@@ -18,6 +18,7 @@ import type { HapticOptions } from 'react-native-haptic-feedback';
 import { runOnJS } from 'react-native-reanimated';
 
 import { logger } from '../../../utils';
+import type { HapticsAdapter } from './types';
 
 const WARNINGS = {
   notAvailable: 'react-native-haptic-feedback is not available'
@@ -88,8 +89,9 @@ const load = () => {
   }
 };
 
-const ReactNativeHapticFeedback = {
-  load
+const ReactNativeHapticFeedback: HapticsAdapter = {
+  load,
+  name: 'react-native-haptic-feedback'
 };
 
 export default ReactNativeHapticFeedback;

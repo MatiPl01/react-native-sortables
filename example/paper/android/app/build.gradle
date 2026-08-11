@@ -3,7 +3,7 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
 def appRoot = "../.."
-def nodeModulesPath = "$appRoot/../../node_modules"
+def nodeModulesPath = "$appRoot/node_modules"
 
 /**
  * This is the configuration block to customize your React Native Android app.

@@ -34,7 +34,7 @@ function DebugOutlet() {
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     pointerEvents: 'none'
   }
 });

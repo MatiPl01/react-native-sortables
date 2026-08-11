@@ -1,9 +1,6 @@
 import type { ReactNode } from 'react';
 import type { ScrollView, View } from 'react-native';
-import type {
-  GestureTouchEvent,
-  GestureType
-} from 'react-native-gesture-handler';
+import type { GestureTouchEvent } from 'react-native-gesture-handler';
 import type {
   AnimatedRef,
   MeasuredDimensions,
@@ -11,6 +8,7 @@ import type {
 } from 'react-native-reanimated';
 
 import type { DeepReadonly, Maybe, Simplify } from '../../helperTypes';
+import type { SortableGesture } from '../../integrations/gesture-handler';
 import type { AnimatedValues } from '../../integrations/reanimated';
 import type {
   DebugCrossUpdater,
@@ -22,6 +20,7 @@ import type { Dimensions, ItemSizes, Vector } from '../layout/shared';
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
+  AutoScrollSettings,
   ItemDragSettings,
   ReorderTriggerOrigin
 } from '../props/shared';
@@ -69,7 +68,11 @@ export type CommonValuesContextType =
       // POSITIONS
       touchPosition: SharedValue<null | Vector>;
       activeItemPosition: SharedValue<null | Vector>;
-      itemPositions: SharedValue<Record<string, Vector>>;
+      itemLayoutPositions: SharedValue<Record<string, Vector>>;
+      // Per-item current on-screen position mutables, written by the dispatcher.
+      itemCurrentPositions: SharedValue<
+        Record<string, SharedValue<null | Vector>>
+      >;
 
       // DIMENSIONS
       controlledContainerDimensions: ControlledDimensions;
@@ -96,6 +99,8 @@ export type CommonValuesContextType =
       shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
       animateLayoutOnReorderOnly: SharedValue<boolean>;
       customHandle: boolean;
+      isStackingOrderDesc: boolean;
+      autoScrollDirection: AutoScrollSettings['autoScrollDirection'];
     };
 
 // MEASUREMENTS
@@ -156,7 +161,7 @@ export type ItemContextType = Simplify<
         activationAnimationProgress: SharedValue<number>;
       }
   > & {
-    gesture: GestureType;
+    gesture: SortableGesture;
   }
 >;
 
@@ -187,7 +192,6 @@ export type PortalContextType = {
   portalOutletMeasurements: SharedValue<MeasuredDimensions | null>;
   measurePortalOutlet: () => void;
   teleport: (id: string, node: ReactNode) => void;
-  isTeleported: (id: string) => boolean;
 };
 
 // MULTI ZONE

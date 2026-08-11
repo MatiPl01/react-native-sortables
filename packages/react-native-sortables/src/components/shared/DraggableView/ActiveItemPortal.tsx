@@ -1,28 +1,19 @@
-import { useCallback, useEffect, useRef } from 'react';
-import type { ManualGesture } from 'react-native-gesture-handler';
+import { useEffect, useState } from 'react';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
 
-import { useStableCallback } from '../../../hooks';
+import type { SortableGesture } from '../../../integrations/gesture-handler';
 import { useMutableValue } from '../../../integrations/reanimated';
-import {
-  CommonValuesContext,
-  ItemContextProvider,
-  useItemNode,
-  usePortalContext
-} from '../../../providers';
+import { Teleport, useItemNode, usePortalContext } from '../../../providers';
 import type { CommonValuesContextType } from '../../../types';
-import { getContextProvider } from '../../../utils';
 import type { ItemCellProps } from './ItemCell';
 import TeleportedItemCell from './TeleportedItemCell';
-
-const CommonValuesContextProvider = getContextProvider(CommonValuesContext);
 
 type ActiveItemPortalProps = Pick<
   ItemCellProps,
   'activationAnimationProgress' | 'baseStyle' | 'isActive' | 'itemKey'
 > & {
   commonValuesContext: CommonValuesContextType;
-  gesture: ManualGesture;
+  gesture: SortableGesture;
   onTeleport: (isTeleported: boolean) => void;
 };
 
@@ -36,74 +27,19 @@ export default function ActiveItemPortal({
   onTeleport
 }: ActiveItemPortalProps) {
   const node = useItemNode(itemKey);
-  const { isTeleported, measurePortalOutlet, teleport } =
-    usePortalContext() ?? {};
+  const { measurePortalOutlet } = usePortalContext() ?? {};
 
   const teleportEnabled = useMutableValue(false);
-  const isFirstUpdateRef = useRef(true);
-
-  const renderTeleportedItemCell = useCallback(
-    () => (
-      // We have to wrap the TeleportedItemCell in context providers as they won't
-      // be accessible otherwise, when the item is rendered in the portal outlet
-      <CommonValuesContextProvider value={commonValuesContext}>
-        <ItemContextProvider
-          activationAnimationProgress={activationAnimationProgress}
-          gesture={gesture}
-          isActive={isActive}
-          itemKey={itemKey}>
-          <TeleportedItemCell
-            activationAnimationProgress={activationAnimationProgress}
-            baseStyle={baseStyle}
-            isActive={isActive}
-            itemKey={itemKey}>
-            {node}
-          </TeleportedItemCell>
-        </ItemContextProvider>
-      </CommonValuesContextProvider>
-    ),
-    [
-      activationAnimationProgress,
-      baseStyle,
-      commonValuesContext,
-      gesture,
-      isActive,
-      node,
-      itemKey
-    ]
-  );
-
+  const [teleported, setTeleported] = useState(false);
   const teleportedItemId = `${commonValuesContext.containerId}-${itemKey}`;
 
-  const enableTeleport = useStableCallback(() => {
-    isFirstUpdateRef.current = true;
-    teleport?.(teleportedItemId, renderTeleportedItemCell());
-    onTeleport(true);
-  });
-
-  const disableTeleport = useCallback(() => {
-    teleport?.(teleportedItemId, null);
-    onTeleport(false);
-  }, [teleport, teleportedItemId, onTeleport]);
-
-  useEffect(() => disableTeleport, [disableTeleport]);
-
+  // Hide the source item while teleported. Keyed on `teleported` only, so a
+  // collapsing item re-rendering its teleported cell never toggles the source.
   useEffect(() => {
-    const checkTeleported = () => isTeleported?.(teleportedItemId);
-    if (!checkTeleported()) return;
-
-    const update = () =>
-      checkTeleported() &&
-      teleport?.(teleportedItemId, renderTeleportedItemCell());
-
-    if (isFirstUpdateRef.current) {
-      isFirstUpdateRef.current = false;
-      // Needed for proper collapsible items behavior
-      setTimeout(update);
-    } else {
-      update();
-    }
-  }, [isTeleported, renderTeleportedItemCell, teleport, teleportedItemId]);
+    if (!teleported) return;
+    onTeleport(true);
+    return () => onTeleport(false);
+  }, [teleported, onTeleport]);
 
   useAnimatedReaction(
     () => activationAnimationProgress.value,
@@ -113,18 +49,31 @@ export default function ActiveItemPortal({
         progress > prevProgress &&
         !teleportEnabled.value
       ) {
-        // We have to ensure that the portal outlet ref is measured before the
-        // teleported item is rendered within it because portal outlet position
-        // must be known to calculate the teleported item position
+        // Measure the outlet before rendering into it - the teleported item's
+        // position is computed from the outlet's on-screen position.
         measurePortalOutlet?.();
         teleportEnabled.value = true;
-        runOnJS(enableTeleport)();
+        runOnJS(setTeleported)(true);
       } else if (progress === 0 && teleportEnabled.value) {
         teleportEnabled.value = false;
-        runOnJS(disableTeleport)();
+        runOnJS(setTeleported)(false);
       }
     }
   );
 
-  return null;
+  if (!teleported) return null;
+
+  return (
+    <Teleport id={teleportedItemId}>
+      <TeleportedItemCell
+        activationAnimationProgress={activationAnimationProgress}
+        baseStyle={baseStyle}
+        commonValuesContext={commonValuesContext}
+        gesture={gesture}
+        isActive={isActive}
+        itemKey={itemKey}>
+        {node}
+      </TeleportedItemCell>
+    </Teleport>
+  );
 }

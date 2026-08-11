@@ -73,7 +73,7 @@ function ScrollViewExample() {
 }
 
 function FlatListExample() {
-  const scrollableRef = useAnimatedRef<Animated.FlatList<string>>();
+  const scrollableRef = useAnimatedRef<FlatList<string>>();
 
   return (
     <AnimatedFlatList
@@ -139,10 +139,10 @@ function FlashListExample() {
 
 type CategoriesSectionProps = {
   scrollableRef:
-    | AnimatedRef<Animated.FlatList>
     | AnimatedRef<Animated.ScrollView>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    | AnimatedRef<FlashListRef<any>>;
+    | AnimatedRef<FlashListRef<any>>
+    | AnimatedRef<FlatList<string>>;
 };
 
 function ManyCategories({ scrollableRef }: CategoriesSectionProps) {

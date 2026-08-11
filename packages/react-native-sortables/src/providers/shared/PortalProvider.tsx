@@ -75,11 +75,6 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     }
   }, []);
 
-  const isTeleported = useCallback(
-    (id: string) => teleportedNodeIdsRef.current.has(id),
-    []
-  );
-
   const measurePortalOutlet = useCallback(() => {
     'worklet';
     portalOutletMeasurements.value = measure(portalOutletRef);
@@ -103,7 +98,6 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
     ? outerPortalContext
     : {
         activeItemAbsolutePosition,
-        isTeleported,
         measurePortalOutlet,
         portalOutletMeasurements,
         teleport
@@ -121,4 +115,17 @@ const { PortalProvider, usePortalContext } = createProvider('Portal', {
   };
 });
 
-export { PortalProvider, usePortalContext };
+type TeleportProps = PropsWithChildren<{ id: string }>;
+
+// Renders `children` into the portal outlet, re-pushing on change and clearing on
+// unmount (so a re-rendering teleported cell - e.g. a collapsing item - stays in sync).
+function Teleport({ children, id }: TeleportProps) {
+  const { teleport } = usePortalContext() ?? {};
+  useEffect(() => {
+    teleport?.(id, children);
+    return () => teleport?.(id, null);
+  }, [children, id, teleport]);
+  return null;
+}
+
+export { PortalProvider, Teleport, usePortalContext };

@@ -1,3 +1,48 @@
+# [1.10.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.4...v1.10.0) (2026-07-23)
+
+
+### Bug Fixes
+
+* Add item zIndex preserving based on the order of items ([#534](https://github.com/MatiPl01/react-native-sortables/issues/534)) ([fb0be4e](https://github.com/MatiPl01/react-native-sortables/commit/fb0be4e32f3e87d6604040527a1fcac81ffe630c)), closes [#36877](https://github.com/MatiPl01/react-native-sortables/issues/36877)
+* allow scrolling the ScrollView from draggable items on web ([#574](https://github.com/MatiPl01/react-native-sortables/issues/574)) ([74879ed](https://github.com/MatiPl01/react-native-sortables/commit/74879ed8cb2bbf1337b78d82530c0032d3db0a74)), closes [#545](https://github.com/MatiPl01/react-native-sortables/issues/545)
+* Balance onTouchesUp on Sortable.Touchable long press ([#594](https://github.com/MatiPl01/react-native-sortables/issues/594)) ([f977567](https://github.com/MatiPl01/react-native-sortables/commit/f9775673341d2f7b49530be0a2ab3ebbd5b69205))
+* Deduplicate expo example native modules for expo-doctor ([#590](https://github.com/MatiPl01/react-native-sortables/issues/590)) ([e5af169](https://github.com/MatiPl01/react-native-sortables/commit/e5af1692ca111ed5c270535828230a7d3212aca7)), closes [#589](https://github.com/MatiPl01/react-native-sortables/issues/589)
+* disable dragging for fixed-order and non-draggable handles ([#598](https://github.com/MatiPl01/react-native-sortables/issues/598)) ([8ed2e81](https://github.com/MatiPl01/react-native-sortables/commit/8ed2e813deb59f6c430b7fe6fc413083c09f2e3e))
+* dragging stops after a screen is detached and re-attached (gesture-handler v3) ([#573](https://github.com/MatiPl01/react-native-sortables/issues/573)) ([c70a14f](https://github.com/MatiPl01/react-native-sortables/commit/c70a14f86055357d5c72ed9f5582ffd23472af2e)), closes [#349](https://github.com/MatiPl01/react-native-sortables/issues/349) [react-native-gesture-handler#3560](https://github.com/react-native-gesture-handler/issues/3560) [#349](https://github.com/MatiPl01/react-native-sortables/issues/349) [#349](https://github.com/MatiPl01/react-native-sortables/issues/349)
+* Item can settle on another item's slot after a rapid re-order ([#591](https://github.com/MatiPl01/react-native-sortables/issues/591)) ([9d63817](https://github.com/MatiPl01/react-native-sortables/commit/9d638178b25ff7706b77caddd0c2495d57387460)), closes [#586](https://github.com/MatiPl01/react-native-sortables/issues/586)
+* Item position drift on slow web container resize ([#562](https://github.com/MatiPl01/react-native-sortables/issues/562)) ([8973115](https://github.com/MatiPl01/react-native-sortables/commit/8973115ba0ed27c7143cb14e27b49083f3b8678d))
+* Keep npm version from walking yarn workspaces during release ([#609](https://github.com/MatiPl01/react-native-sortables/issues/609)) ([0d8d869](https://github.com/MatiPl01/react-native-sortables/commit/0d8d86990291967fae9883599ccce42c2af5e1c1))
+* Keep Sortable.Grid measurements when revealed after react-freeze ([#572](https://github.com/MatiPl01/react-native-sortables/issues/572)) ([609c73c](https://github.com/MatiPl01/react-native-sortables/commit/609c73c8227b87d2b2bac87f3bdde85b4b7aff75)), closes [#519](https://github.com/MatiPl01/react-native-sortables/issues/519) [#36877](https://github.com/MatiPl01/react-native-sortables/issues/36877)
+* keep Sortable.Touchable onTouchesUp firing on web ([#596](https://github.com/MatiPl01/react-native-sortables/issues/596)) ([8529fa8](https://github.com/MatiPl01/react-native-sortables/commit/8529fa83fd3af2e0fc870162f228b3cda73cabaf)), closes [#594](https://github.com/MatiPl01/react-native-sortables/issues/594)
+* Keep Sortable.Touchable tap and long press working on teleported items ([#602](https://github.com/MatiPl01/react-native-sortables/issues/602)) ([3efb111](https://github.com/MatiPl01/react-native-sortables/commit/3efb1118e1f9cab9a6aa36940d40318a571d0a8c))
+* Keep teleported item in sync with collapsed content ([#595](https://github.com/MatiPl01/react-native-sortables/issues/595)) ([1fbcf9e](https://github.com/MatiPl01/react-native-sortables/commit/1fbcf9e621763a4f203b5fffe4f4a8c4b54cab77))
+* New-Arch grid mount crash in the example and unrunnable expo example ([#589](https://github.com/MatiPl01/react-native-sortables/issues/589)) ([01aa1a8](https://github.com/MatiPl01/react-native-sortables/commit/01aa1a8887afab57f59488f26a530f542f07e58b))
+* Respect Sortable.Flex alignItems before items are measured ([#560](https://github.com/MatiPl01/react-native-sortables/issues/560)) ([5c84117](https://github.com/MatiPl01/react-native-sortables/commit/5c84117c2e04add3aad0bb4680ba591b25d335e8)), closes [#258](https://github.com/MatiPl01/react-native-sortables/issues/258)
+* Restore tap and long press on teleported items ([#599](https://github.com/MatiPl01/react-native-sortables/issues/599)) ([e73117b](https://github.com/MatiPl01/react-native-sortables/commit/e73117b4bdf27acef2bebd61484441af2f09757c))
+* Sortable.Touchable crash on gesture-handler v3 (onActivate not a worklet) ([#587](https://github.com/MatiPl01/react-native-sortables/issues/587)) ([4b3007e](https://github.com/MatiPl01/react-native-sortables/commit/4b3007e964e6b31b5b97050a12aeec525d408ed5))
+* Support react-native-gesture-handler 3.x types ([#553](https://github.com/MatiPl01/react-native-sortables/issues/553)) ([83754e0](https://github.com/MatiPl01/react-native-sortables/commit/83754e006b6d041a6c3869683774e76e375e61a2))
+* Support react-native-reanimated 4.5 / worklets 0.10 ([#566](https://github.com/MatiPl01/react-native-sortables/issues/566)) ([828c6d6](https://github.com/MatiPl01/react-native-sortables/commit/828c6d6f86c49c1479a37c2e5550ac8815191141)), closes [/github.com/MatiPl01/react-native-sortables/issues/552#issuecomment-4634261543](https://github.com//github.com/MatiPl01/react-native-sortables/issues/552/issues/issuecomment-4634261543) [#552](https://github.com/MatiPl01/react-native-sortables/issues/552)
+
+
+### Features
+
+* Add react-native-pulsar as a top-priority haptics adapter ([#568](https://github.com/MatiPl01/react-native-sortables/issues/568)) ([642e734](https://github.com/MatiPl01/react-native-sortables/commit/642e7340f13364fd5d32ef72aa44ba1570d19e1b))
+* Auto-detect expo-haptics when available ([#558](https://github.com/MatiPl01/react-native-sortables/issues/558)) ([a0d7602](https://github.com/MatiPl01/react-native-sortables/commit/a0d760281643cc2353ba87f16add15154638b05a)), closes [#554](https://github.com/MatiPl01/react-native-sortables/issues/554)
+* Reverse items stacking order  ([#535](https://github.com/MatiPl01/react-native-sortables/issues/535)) ([14c7d82](https://github.com/MatiPl01/react-native-sortables/commit/14c7d82681b6ccd7ffd70ee69485e104b0fa9f44)), closes [#36877](https://github.com/MatiPl01/react-native-sortables/issues/36877)
+
+
+### Performance Improvements
+
+* Drive active item position from a single reaction ([#586](https://github.com/MatiPl01/react-native-sortables/issues/586)) ([c498091](https://github.com/MatiPl01/react-native-sortables/commit/c498091cfede5b443435fc50ce5d2f80c4df8421)), closes [#584](https://github.com/MatiPl01/react-native-sortables/issues/584)
+
+## [1.9.4](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.3...v1.9.4) (2025-11-24)
+
+
+### Bug Fixes
+
+* Expo doctor check failures ([#516](https://github.com/MatiPl01/react-native-sortables/issues/516)) ([3b11dc7](https://github.com/MatiPl01/react-native-sortables/commit/3b11dc7dbbb2b3dbe06b8c11fade24f71a77fbff))
+* Webpack bundling issue caused by TurboModule import ([#522](https://github.com/MatiPl01/react-native-sortables/issues/522)) ([2c58bfd](https://github.com/MatiPl01/react-native-sortables/commit/2c58bfd51bf7bf6071a245c90247a7ba14c2d6cb))
+
 ## [1.9.3](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.2...v1.9.3) (2025-10-27)
 
 

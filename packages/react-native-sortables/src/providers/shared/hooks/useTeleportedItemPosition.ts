@@ -17,7 +17,7 @@ export default function useTeleportedItemPosition(
   activationAnimationProgress: SharedValue<number>
 ) {
   const { activeItemAbsolutePosition } = usePortalContext() ?? {};
-  const { containerRef, itemPositions } = useCommonValuesContext();
+  const { containerRef, itemLayoutPositions } = useCommonValuesContext();
 
   const dropStartValues = useMutableValue<null | {
     fromAbsolute: Vector;
@@ -35,12 +35,12 @@ export default function useTeleportedItemPosition(
         dropStartValues.value = null;
       } else if (
         activeItemAbsolutePosition?.value &&
-        itemPositions.value[key]
+        itemLayoutPositions.value[key]
       ) {
         dropStartValues.value = {
           fromAbsolute: activeItemAbsolutePosition.value,
           progress: activationAnimationProgress.value,
-          toRelative: itemPositions.value[key]
+          toRelative: itemLayoutPositions.value[key]
         };
       }
     }
@@ -73,7 +73,7 @@ export default function useTeleportedItemPosition(
 
   // Drop start values updater on target position change
   useAnimatedReaction(
-    () => itemPositions.value[key],
+    () => itemLayoutPositions.value[key],
     position => {
       if (
         isActive.value ||

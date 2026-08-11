@@ -1,6 +1,5 @@
 import { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
-import { StyleSheet } from 'react-native';
 import { runOnUI, useAnimatedStyle } from 'react-native-reanimated';
 
 import { DEFAULT_SORTABLE_FLEX_PROPS } from '../constants';
@@ -224,7 +223,8 @@ function SortableFlexComponent({
         }
       : {
           alignContent,
-          alignItems,
+          // Avoid the default `stretch` so items keep their measured size
+          alignItems: alignItems ?? 'flex-start',
           flexDirection,
           flexWrap,
           justifyContent
@@ -235,17 +235,9 @@ function SortableFlexComponent({
     <SortableContainer
       {...rest}
       containerStyle={[baseContainerStyle, animatedContainerStyle]}
-      itemStyle={styles.styleOverride}
       onLayout={runOnUI(handleContainerMeasurement)}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  styleOverride: {
-    // This is needed to prevent items from stretching (which is default behavior)
-    alignSelf: 'flex-start'
-  }
-});
 
 export default SortableFlex;

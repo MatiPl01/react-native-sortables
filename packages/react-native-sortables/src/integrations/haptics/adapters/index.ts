@@ -1,1 +1,5 @@
-export { default as ReactNativeHapticFeedback } from './react-native-haptic-feedback';
+export const Haptics = {
+  load: () => (_type?: string) => {
+    // noop on web
+  }
+};

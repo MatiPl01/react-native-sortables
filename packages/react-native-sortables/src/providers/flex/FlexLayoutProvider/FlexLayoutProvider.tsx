@@ -12,7 +12,7 @@ import type {
   FlexLayoutContextType,
   SortableFlexStyle
 } from '../../../types';
-import { haveEqualPropValues } from '../../../utils';
+import { haveEqualPropValues, reconcilePositions } from '../../../utils';
 import {
   useAutoScrollContext,
   useCommonValuesContext,
@@ -62,15 +62,13 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
     controlledContainerDimensions,
     indexToKey,
     itemHeights,
-    itemPositions,
+    itemLayoutPositions,
     itemWidths,
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
   const { contentBounds } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
-
-  const keyToGroup = useMutableValue<Record<string, number>>({});
 
   const gaps = useMemo(
     () => ({
@@ -175,14 +173,13 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
 
       // Update current layout
       appliedLayout.value = layout;
-      // Update item positions
-      itemPositions.value = layout.itemPositions;
+      // Update item positions, keeping references for items that didn't move
+      itemLayoutPositions.value = reconcilePositions(
+        itemLayoutPositions.value,
+        layout.itemPositions
+      );
       // Update controlled container dimensions
       applyControlledContainerDimensions(layout.totalDimensions);
-      // Update key to group
-      keyToGroup.value = Object.fromEntries(
-        layout.itemGroups.flatMap((group, i) => group.map(key => [key, i]))
-      );
 
       // Update content bounds
       if (contentBounds) contentBounds.value = layout.contentBounds;
@@ -240,7 +237,6 @@ const { FlexLayoutProvider, useFlexLayoutContext } = createProvider(
       calculateFlexLayout,
       columnGap,
       flexDirection,
-      keyToGroup,
       rowGap
     }
   };

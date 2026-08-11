@@ -30,7 +30,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
     activeItemDropped,
     activeItemKey,
     indexToKey,
-    itemPositions,
+    itemLayoutPositions,
     keyToIndex
   } = useCommonValuesContext();
 
@@ -50,7 +50,7 @@ function DropIndicator({ DropIndicatorComponent, style }: DropIndicatorProps) {
       dropped: activeItemDropped.value,
       key: activeItemKey.value,
       kToI: keyToIndex.value,
-      positions: itemPositions.value
+      positions: itemLayoutPositions.value
     }),
     ({ dropped, key, kToI, positions }) => {
       if (key !== null) {

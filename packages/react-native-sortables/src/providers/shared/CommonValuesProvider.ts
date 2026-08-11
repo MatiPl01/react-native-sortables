@@ -1,6 +1,11 @@
 import { type PropsWithChildren, useEffect, useMemo } from 'react';
 import type { View } from 'react-native';
-import { useAnimatedRef, useDerivedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
+import {
+  useAnimatedReaction,
+  useAnimatedRef,
+  useDerivedValue
+} from 'react-native-reanimated';
 
 import { EMPTY_OBJECT } from '../../constants';
 import type { Animatable } from '../../integrations/reanimated';
@@ -11,16 +16,18 @@ import {
 import type {
   ActiveItemDecorationSettings,
   ActiveItemSnapSettings,
+  AutoScrollSettings,
   CommonValuesContextType,
   ControlledDimensions,
   Dimensions,
   ItemDragSettings,
   ItemSizes,
   ItemsLayoutTransitionMode,
+  ItemsStackingOrder,
   Vector
 } from '../../types';
 import { DragActivationState } from '../../types';
-import { getKeyToIndex } from '../../utils';
+import { areVectorsDifferent, getKeyToIndex } from '../../utils';
 import { createProvider } from '../utils';
 import { useItemsContext } from './ItemsProvider';
 
@@ -30,11 +37,13 @@ type CommonValuesProviderProps = PropsWithChildren<
   ActiveItemDecorationSettings &
     ActiveItemSnapSettings &
     Omit<ItemDragSettings, 'overDrag' | 'reorderTriggerOrigin'> & {
+      autoScrollDirection: AutoScrollSettings['autoScrollDirection'];
       sortEnabled: Animatable<boolean>;
       customHandle: boolean;
       controlledContainerDimensions: ControlledDimensions;
       controlledItemDimensions: ControlledDimensions;
       itemsLayoutTransitionMode: ItemsLayoutTransitionMode;
+      stackingOrder: ItemsStackingOrder;
     }
 >;
 
@@ -47,6 +56,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     activeItemOpacity: _activeItemOpacity,
     activeItemScale: _activeItemScale,
     activeItemShadowOpacity: _activeItemShadowOpacity,
+    autoScrollDirection,
     controlledContainerDimensions,
     controlledItemDimensions,
     customHandle,
@@ -59,7 +69,8 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     itemsLayoutTransitionMode,
     snapOffsetX: _snapOffsetX,
     snapOffsetY: _snapOffsetY,
-    sortEnabled: _sortEnabled
+    sortEnabled: _sortEnabled,
+    stackingOrder
   }) => {
     const { getKeys, subscribeKeys } = useItemsContext();
 
@@ -72,7 +83,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // POSITIONS
     const touchPosition = useMutableValue<null | Vector>(null);
     const activeItemPosition = useMutableValue<null | Vector>(null);
-    const itemPositions = useMutableValue<Record<string, Vector>>({});
+    const itemLayoutPositions = useMutableValue<Record<string, Vector>>({});
+    const itemCurrentPositions = useMutableValue<
+      Record<string, SharedValue<null | Vector>>
+    >({});
 
     // DIMENSIONS
     const containerWidth = useMutableValue<null | number>(null);
@@ -137,6 +151,26 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
       [getKeys, subscribeKeys, indexToKey]
     );
 
+    // ACTIVE ITEM POSITION DISPATCHER
+    // Drives only the active item's position mutable so inactive items don't
+    // subscribe to activeItemPosition (which changes every frame during a drag).
+    useAnimatedReaction(
+      () => ({ key: activeItemKey.value, position: activeItemPosition.value }),
+      ({ key, position }) => {
+        if (key === null || !position) {
+          return;
+        }
+        const positionValue = itemCurrentPositions.value[key];
+        if (
+          positionValue &&
+          (!positionValue.value ||
+            areVectorsDifferent(positionValue.value, position))
+        ) {
+          positionValue.value = position;
+        }
+      }
+    );
+
     return {
       value: {
         activationAnimationDuration,
@@ -150,6 +184,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         activeItemScale,
         activeItemShadowOpacity,
         animateLayoutOnReorderOnly,
+        autoScrollDirection,
         containerHeight,
         containerId,
         containerRef,
@@ -165,8 +200,10 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         inactiveItemOpacity,
         inactiveItemScale,
         indexToKey,
+        isStackingOrderDesc: stackingOrder === 'desc',
+        itemCurrentPositions,
         itemHeights,
-        itemPositions,
+        itemLayoutPositions,
         itemsLayoutTransitionMode,
         itemWidths,
         keyToIndex,

@@ -1,9 +1,10 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   interpolate,
   makeMutable,
+  runOnUI,
   useAnimatedReaction,
   useDerivedValue,
   withTiming
@@ -145,13 +146,14 @@ export default function useItemLayout(
     activeItemKey,
     activeItemPosition,
     animateLayoutOnReorderOnly,
-    itemPositions,
+    itemCurrentPositions,
+    itemLayoutPositions,
     shouldAnimateLayout
   } = useCommonValuesContext();
 
   const zIndex = useItemZIndex(key, activationAnimationProgress);
   const layoutPosition = useDerivedValue(
-    () => itemPositions.value[key] ?? null
+    () => itemLayoutPositions.value[key] ?? null
   );
 
   const positionRef = useRef<SharedValue<null | Vector>>(null);
@@ -160,33 +162,41 @@ export default function useItemLayout(
     progress: number;
   }>(null);
 
+  // Seeds the mutable when an item mounts already-active; the dispatcher drives it after.
   positionRef.current ??= makeMutable(
     isActive.value ? activeItemPosition.value : layoutPosition.value
   );
 
   const position = positionRef.current;
 
+  // Expose this item's position mutable so the dispatcher in CommonValuesProvider
+  // can drive it while this item is active.
+  useEffect(() => {
+    runOnUI(() => {
+      itemCurrentPositions.value[key] = position;
+    })();
+    return runOnUI(() => {
+      delete itemCurrentPositions.value[key];
+    });
+  }, [key, position, itemCurrentPositions]);
+
   // Inactive item updater
   useAnimatedReaction(
     () => ({
       active: isActive.value,
-      itemPosition: layoutPosition.value,
+      layoutPos: layoutPosition.value,
       progress: activationAnimationProgress.value
     }),
-    ({ active, itemPosition, progress }, prev) => {
-      if (!itemPosition || active) {
+    ({ active, layoutPos, progress }, prev) => {
+      if (!layoutPos || active) {
         interpolationStartValues.value = null;
         return;
       }
 
       if (!position.value) {
-        position.value = itemPosition;
+        position.value = layoutPos;
         return;
       }
-
-      const positionChanged =
-        prev?.itemPosition &&
-        areVectorsDifferent(prev.itemPosition, itemPosition, 1);
 
       if (progress === 0) {
         // interpolationStartValues value is not set when the reduced motion
@@ -194,14 +204,16 @@ export default function useItemLayout(
         // and the second if branch below is never entered
         if (interpolationStartValues.value || prev?.active) {
           interpolationStartValues.value = null;
-          position.value = itemPosition;
+          position.value = layoutPos;
           return;
         }
       }
       // Set dropStartValues only if the item was previously active or if is
       // already during the drop animation and the target position changed
       else if (
-        interpolationStartValues.value ? positionChanged : prev?.active
+        interpolationStartValues.value
+          ? prev?.layoutPos && areVectorsDifferent(prev.layoutPos, layoutPos, 1)
+          : prev?.active
       ) {
         interpolationStartValues.value = {
           position: position.value,
@@ -220,12 +232,8 @@ export default function useItemLayout(
         position.value = interpolateVector(
           currentProgress,
           startPosition,
-          itemPosition
+          layoutPos
         );
-        return;
-      }
-
-      if (!positionChanged) {
         return;
       }
 
@@ -233,22 +241,20 @@ export default function useItemLayout(
         shouldAnimateLayout.value &&
         (!animateLayoutOnReorderOnly.value || activeItemKey.value !== null)
       ) {
-        position.value = withTiming(itemPosition);
+        // Skip when already at the target and it did not just change. A
+        // re-order that flips the target back must re-animate even while the
+        // item is transiently near it, else it rides a stale animation to the
+        // wrong slot. The position check still lets sub-pixel resize accumulate.
+        if (
+          !areVectorsDifferent(position.value, layoutPos, 1) &&
+          (!prev?.layoutPos ||
+            !areVectorsDifferent(prev.layoutPos, layoutPos, 1))
+        ) {
+          return;
+        }
+        position.value = withTiming(layoutPos);
       } else {
-        position.value = itemPosition;
-      }
-    }
-  );
-
-  // Active item updater
-  useAnimatedReaction(
-    () => ({
-      active: isActive.value,
-      activePosition: activeItemPosition.value
-    }),
-    ({ active, activePosition }) => {
-      if (active && activePosition) {
-        position.value = activePosition;
+        position.value = layoutPos;
       }
     }
   );

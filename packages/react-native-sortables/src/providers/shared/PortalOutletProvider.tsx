@@ -20,7 +20,9 @@ const { PortalOutletProvider, usePortalOutletContext } = createProvider(
         collapsable={false}
         ref={portalOutletRef}
         style={styles.container}
-        onLayout={runOnUI(measurePortalOutlet)}>
+        onLayout={() => {
+          runOnUI(measurePortalOutlet)();
+        }}>
         {children}
       </View>
     ),
@@ -30,7 +32,7 @@ const { PortalOutletProvider, usePortalOutletContext } = createProvider(
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     pointerEvents: 'box-none'
   }
 });

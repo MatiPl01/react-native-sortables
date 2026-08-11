@@ -2,15 +2,16 @@
   "name": "example-web",
   "version": "0.0.1",
   "dependencies": {
-    "expo": "^54.0.7",
-    "react-dom": "19.1.0",
-    "react-native": "0.81.4",
+    "expo": "57.0.2",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.0",
+    "react-native-gesture-handler": "3.0.2",
     "react-native-sortables": "workspace:*",
-    "react-native-web": "0.21.1"
+    "react-native-web": "0.21.2"
   },
   "devDependencies": {
-    "@expo/metro-runtime": "~6.1.2",
-    "babel-preset-expo": "~54.0.0",
+    "@expo/metro-runtime": "~57.0.3",
+    "babel-preset-expo": "~57.0.1",
     "serve": "^14.2.4"
   },
   "installConfig": {
