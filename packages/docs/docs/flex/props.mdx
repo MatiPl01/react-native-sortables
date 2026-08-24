@@ -68,9 +68,9 @@ Controls how items are positioned within groups along the main axis.
 
 Controls how items are aligned within the group along the cross axis.
 
-| type                                                   | default | required |
-| ------------------------------------------------------ | ------- | -------- |
-| `'flex-start' \| 'flex-end' \| 'center' \| 'baseline'` | NO      | NO       |
+| type                                                   | default      | required |
+| ------------------------------------------------------ | ------------ | -------- |
+| `'flex-start' \| 'flex-end' \| 'center' \| 'baseline'` | 'flex-start' | NO       |
 
 ---
 
@@ -130,7 +130,7 @@ Height of the flex container. If not specified, the height will be determined by
 
 | type               | default | required |
 | ------------------ | ------- | -------- |
-| `number` \| 'fill' | NO      | NO       |
+| `'fill' \| number` | NO      | NO       |
 
 ---
 
@@ -140,7 +140,7 @@ Width of the flex container. If not specified, the width will be determined by t
 
 | type               | default | required |
 | ------------------ | ------- | -------- |
-| `number` \| 'fill' | NO      | NO       |
+| `'fill' \| number` | NO      | NO       |
 
 ---
 
@@ -452,7 +452,7 @@ Horizontal snap offset of the item. When percentage is used, it is relative to t
 
 | type                 | default | required |
 | -------------------- | ------- | -------- |
-| `Animatable<Offset>` | 50%     | NO       |
+| `Animatable<Offset>` | '50%'   | NO       |
 
 <details>
   <summary>Type definitions</summary>
@@ -471,7 +471,7 @@ Vertical snap offset of the item. When percentage is used, it is relative to the
 
 | type                 | default | required |
 | -------------------- | ------- | -------- |
-| `Animatable<Offset>` | 50%     | NO       |
+| `Animatable<Offset>` | '50%'   | NO       |
 
 <details>
   <summary>Type definitions</summary>
@@ -512,21 +512,87 @@ An `AnimatedRef` to the scrollable container (e.g. `Animated.ScrollView` or `Ani
 
 Offset from the edge of the flex component at which the auto scroll is activated.
 
-You can provide a **single number**, which will be used for both **top** and **bottom** edges or an array of **two numbers**, first for **top** edge and second for **bottom** edge.
+You can provide a **single number**, which will be used for both edges or an array of **two numbers**, first for the **top/left** edge and second for the **bottom/right** edge.
 
-| type                                     | default | required |
-| ---------------------------------------- | ------- | -------- |
-| `Animatable<[number, number] \| number>` | 75      | NO       |
+| type                         | default | required |
+| ---------------------------- | ------- | -------- |
+| `[number, number] \| number` | 75      | NO       |
 
 ---
 
-### autoScrollSpeed
+### autoScrollDirection
 
-Speed of the auto scroll. Adjust it based on your preferences.
+Direction in which auto scrolling should occur.
 
-| type                 | default | required |
-| -------------------- | ------- | -------- |
-| `Animatable<number>` | 1       | NO       |
+| type                         | default      | required |
+| ---------------------------- | ------------ | -------- |
+| `'horizontal' \| 'vertical'` | `'vertical'` | NO       |
+
+---
+
+### autoScrollMaxVelocity
+
+Maximum scroll velocity in pixels per second when the active item is at the edge.
+
+You can provide a **single number**, which will be used for both edges or an array of **two numbers**, first for the **top/left** edge and second for the **bottom/right** edge.
+
+| type                         | default | required |
+| ---------------------------- | ------- | -------- |
+| `[number, number] \| number` | 1000    | NO       |
+
+---
+
+### autoScrollMaxOverscroll
+
+Maximum distance the scrollable container can be scrolled beyond its content bounds while auto scrolling.
+
+You can provide a **single number**, which will be used for both edges or an array of **two numbers**, first for the **top/left** edge and second for the **bottom/right** edge.
+
+| type                         | default | required |
+| ---------------------------- | ------- | -------- |
+| `[number, number] \| number` | 50      | NO       |
+
+---
+
+### autoScrollExtrapolation
+
+Controls how the scroll velocity behaves beyond the activation offset threshold.
+
+| type            | default                | required |
+| --------------- | ---------------------- | -------- |
+| `Extrapolation` | `Extrapolation.EXTEND` | NO       |
+
+:::info
+
+`Extrapolation` is imported from `react-native-reanimated`. Use `Extrapolation.CLAMP` to stop increasing the scroll velocity once the pointer moves past the activation offset.
+
+:::
+
+---
+
+### autoScrollInterval
+
+Interval between consecutive `scrollTo` calls, in milliseconds.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0\*     | NO       |
+
+\*Defaults to `300` on **Android** with the **New Architecture** and `0` everywhere else.
+
+---
+
+### animateScrollTo
+
+Whether `scrollTo` calls should be animated.
+
+The main purpose of this prop is to ensure that scroll position changes are animated when `autoScrollInterval` is set to a large value.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | false\* | NO       |
+
+\*Defaults to `true` on **Android** with the **New Architecture** and `false` everywhere else.
 
 ---
 
@@ -534,9 +600,9 @@ Speed of the auto scroll. Adjust it based on your preferences.
 
 Controls whether the auto scroll is enabled.
 
-| type                  | default | required |
-| --------------------- | ------- | -------- |
-| `Animatable<boolean>` | true    | NO       |
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | true    | NO       |
 
 :::important
 
@@ -564,9 +630,26 @@ Controls whether the drop indicator is shown.
 
 Style of the drop indicator. This is typically used to **customize the appearance** of the default drop indicator component.
 
-| type        | default | required |
-| ----------- | ------- | -------- |
-| `ViewStyle` | \{}     | NO       |
+| type        | default   | required |
+| ----------- | --------- | -------- |
+| `ViewStyle` | See below | NO       |
+
+**Default value:**
+
+```ts
+{
+  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  borderColor: 'black',
+  borderRadius: 10,
+  borderStyle: 'dashed',
+  borderWidth: 2,
+  flex: 1
+}
+```
+
+:::important
+Values you provide in the `dropIndicatorStyle` prop will be **merged** with the default values.
+:::
 
 ---
 
@@ -615,7 +698,6 @@ Layout animations control how items animate when their positions change and when
 
 There are some **differences** in the **layout animations** implementation on **Web**:
 
-- `itemLayout` is **ignored** since Web implementation doesn't use **Reanimated** layout transitions for items reordering
 - `itemEntering` and `itemExiting` don't have default values due to the inconsistent behavior, but you can provide your own animations that will be used instead
 
 :::
@@ -624,9 +706,9 @@ There are some **differences** in the **layout animations** implementation on **
 
 Layout animation to use when an item is added to the flex container after the initial render.
 
-| type              | default                           | required |
-| ----------------- | --------------------------------- | -------- |
-| `LayoutAnimation` | SortableItemEntering\* / null\*\* | NO       |
+| type                      | default                           | required |
+| ------------------------- | --------------------------------- | -------- |
+| `LayoutAnimation \| null` | SortableItemEntering\* / null\*\* | NO       |
 
 \*Library default `itemEntering` implementation for native platforms
 
@@ -650,9 +732,9 @@ type LayoutAnimation =
 
 Layout animation to use when an item is removed from the flex container (except when the entire flex container is unmounted).
 
-| type              | default                          | required |
-| ----------------- | -------------------------------- | -------- |
-| `LayoutAnimation` | SortableItemExiting\* / null\*\* | NO       |
+| type                      | default                          | required |
+| ------------------------- | -------------------------------- | -------- |
+| `LayoutAnimation \| null` | SortableItemExiting\* / null\*\* | NO       |
 
 \*Library default `itemExiting` implementation for native platforms
 
@@ -672,9 +754,7 @@ type LayoutAnimation =
 
 ---
 
----
-
-### itemPositionsAnimationMode
+### itemsLayoutTransitionMode
 
 Controls when items positions are animated.
 
@@ -911,9 +991,9 @@ You can also use any other haptics library but you will have to trigger haptics 
 
 Controls if the overflowing content should be clipped or visible. Applies only when no item is active.
 
-| type                    | default    | required |
-| ----------------------- | ---------- | -------- |
-| `'hidden' \| 'visible'` | `'hidden'` | NO       |
+| type                    | default     | required |
+| ----------------------- | ----------- | -------- |
+| `'hidden' \| 'visible'` | `'visible'` | NO       |
 
 ---
 
@@ -931,6 +1011,32 @@ Strategy for setting zIndex of items. This determines which items appear on top 
 :::info
 The currently dragged item is always rendered on top of all other items, regardless of this setting.
 :::
+
+---
+
+### bringToFrontWhenActive
+
+Controls whether the zIndex of the sortable container should be raised when a drag starts. This makes the dragged item render above sibling components outside of the flex component.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | true    | NO       |
+
+:::info
+If dragged items still appear under other components, wrap the surrounding content in a [Layer](/helper-components/layer) component.
+:::
+
+---
+
+### measureDebounceDelay
+
+Delay in milliseconds between the last item measurement and the measurements commit that triggers the layout calculation.
+
+Increase it if items of your flex component are measured in multiple batches and you see the layout being recalculated more than once.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
 
 ---
 
