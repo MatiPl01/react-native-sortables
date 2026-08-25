@@ -1,4 +1,5 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { AppState } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 import { runOnUI } from 'react-native-reanimated';
 
@@ -41,7 +42,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     containerWidth,
     controlledContainerDimensions,
     controlledItemDimensions,
+    itemCurrentPositions,
     itemHeights,
+    itemLayoutPositions,
     itemWidths,
     usesAbsoluteLayout
   } = useCommonValuesContext();
@@ -234,6 +237,59 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
     })();
   }, [itemHeights, itemWidths, context]);
+
+  // Re-establish the layout when the app returns to the foreground.
+  //
+  // Each item's absolute position lives only in a Reanimated shared value whose
+  // derived style is pushed to the native view exactly once, when the value
+  // changes. After a long background some platforms recreate the sortable's
+  // native views; the shared values survive but the freshly committed views
+  // never receive the last emitted style (the value did not change, so nothing
+  // re-pushes it), so absolutely positioned items collapse onto each other. The
+  // first drag is the only thing that mutates a position and thus re-pushes the
+  // style, which is why "a drag fixes it".
+  //
+  // On resume we reproduce that nudge without a drag: re-assign every inactive
+  // item's position to its authoritative layout target. The value is unchanged
+  // but the write is a fresh object, so Reanimated re-emits the style to the
+  // (possibly recreated) view. We also drop the JS dimension cache so a
+  // recreated view's onLayout is treated as a fresh measurement rather than
+  // diffed away, covering items whose size changed while backgrounded. The
+  // active item is skipped so a drag interrupted by backgrounding is not fought.
+  // Skipped entirely while still in relative layout, where there are no absolute
+  // positions to restore.
+  // https://github.com/MatiPl01/react-native-sortables/issues/592
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', state => {
+      if (state !== 'active') {
+        return;
+      }
+      previousItemDimensionsRef.current = {};
+      runOnUI(() => {
+        if (!usesAbsoluteLayout.value) {
+          return;
+        }
+        const activeKey = activeItemKey.value;
+        const layoutPositions = itemLayoutPositions.value;
+        for (const key in itemCurrentPositions.value) {
+          if (key === activeKey) {
+            continue;
+          }
+          const target = layoutPositions[key];
+          const position = itemCurrentPositions.value[key];
+          if (target && position) {
+            position.value = { x: target.x, y: target.y };
+          }
+        }
+      })();
+    });
+    return () => subscription.remove();
+  }, [
+    activeItemKey,
+    itemCurrentPositions,
+    itemLayoutPositions,
+    usesAbsoluteLayout
+  ]);
 
   return {
     value: {
