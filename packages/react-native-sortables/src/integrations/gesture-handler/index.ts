@@ -17,6 +17,7 @@ export const useTouchableGesture = adapter.useTouchableGesture;
 export { SortableGestureDetectorView } from './detector';
 export type {
   GestureTouchEvent,
+  ManualGestureCallbacks,
   ManualGestureControl,
   SortableGesture,
   TouchableGestureConfig,

@@ -1,4 +1,8 @@
-import type { ManualGestureConfig } from 'react-native-gesture-handler';
+import { useMemo } from 'react';
+import type {
+  GestureTouchEvent,
+  ManualGestureConfig
+} from 'react-native-gesture-handler';
 import * as GestureHandler from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 
@@ -44,45 +48,60 @@ function createControl(
   };
 }
 
-// v3 hooks re-apply config every render, so the caller's `deps` are unused.
-const useDragGesture: GestureHandlerAdapter['useDragGesture'] = callbacks => {
+// Re-applying a config natively resets it first, which briefly drops
+// `needsPointerData` and can swallow a touch event of a drag in progress.
+const useDragGesture: GestureHandlerAdapter['useDragGesture'] = (
+  callbacks,
+  deps
+) => {
   const pendingActivation = useMutableValue(false);
 
-  return useManualGesture({
-    onTouchesCancel: event => {
-      'worklet';
-      callbacks.onTouchesCancelled(
-        event,
-        createControl(event.handlerTag, pendingActivation)
-      );
-    },
-    onTouchesDown: event => {
-      'worklet';
-      pendingActivation.value = false;
-      callbacks.onTouchesDown(
-        event,
-        createControl(event.handlerTag, pendingActivation)
-      );
-    },
-    onTouchesMove: event => {
-      'worklet';
-      if (pendingActivation.value) {
+  const config = useMemo(
+    () => ({
+      onFinalize: () => {
+        'worklet';
+        callbacks.onFinalize();
+      },
+      onTouchesCancel: (event: GestureTouchEvent) => {
+        'worklet';
+        callbacks.onTouchesCancelled(
+          event,
+          createControl(event.handlerTag, pendingActivation)
+        );
+      },
+      onTouchesDown: (event: GestureTouchEvent) => {
+        'worklet';
         pendingActivation.value = false;
-        GestureStateManager.activate(event.handlerTag);
+        callbacks.onTouchesDown(
+          event,
+          createControl(event.handlerTag, pendingActivation)
+        );
+      },
+      onTouchesMove: (event: GestureTouchEvent) => {
+        'worklet';
+        if (pendingActivation.value) {
+          pendingActivation.value = false;
+          GestureStateManager.activate(event.handlerTag);
+        }
+        callbacks.onTouchesMove(
+          event,
+          createControl(event.handlerTag, pendingActivation)
+        );
+      },
+      onTouchesUp: (event: GestureTouchEvent) => {
+        'worklet';
+        callbacks.onTouchesUp(
+          event,
+          createControl(event.handlerTag, pendingActivation)
+        );
       }
-      callbacks.onTouchesMove(
-        event,
-        createControl(event.handlerTag, pendingActivation)
-      );
-    },
-    onTouchesUp: event => {
-      'worklet';
-      callbacks.onTouchesUp(
-        event,
-        createControl(event.handlerTag, pendingActivation)
-      );
-    }
-  });
+    }),
+    // The dependency list is owned by the caller (useItemPanGesture).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    deps
+  );
+
+  return useManualGesture(config);
 };
 
 // Only the handlers that are passed create a gesture (and a native handler), so

@@ -18,6 +18,9 @@ export type ManualGestureControl = {
 };
 
 export type ManualGestureCallbacks = {
+  // Not a teardown hook: a handler detached mid-gesture reaches no terminal
+  // state and emits nothing.
+  onFinalize: () => void;
   onTouchesCancelled: (
     event: GestureTouchEvent,
     control: ManualGestureControl

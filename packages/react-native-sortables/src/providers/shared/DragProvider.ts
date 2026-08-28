@@ -46,10 +46,12 @@ type StateContextType = {
   dragStartTouchPosition: null | Vector;
   dragStartIndex: number;
   activationTimeoutId: number;
+  activationTimeoutKey: null | string;
 };
 
 const INITIAL_STATE: StateContextType = {
   activationTimeoutId: -1,
+  activationTimeoutKey: null,
   dragStartIndex: -1,
   dragStartItemTouchOffset: null,
   dragStartTouchPosition: null,
@@ -377,6 +379,28 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     ]
   );
 
+  const discardAbandonedDrag = useCallback(
+    (activationAnimationProgress: SharedValue<number>) => {
+      'worklet';
+      clearAnimatedTimeout(context.value.activationTimeoutId);
+      context.value.activationTimeoutKey = null;
+      activeItemKey.value = null;
+      activationState.value = DragActivationState.INACTIVE;
+      activeItemDropped.value = true;
+      activationAnimationProgress.value = 0;
+      activeAnimationProgress.value = 0;
+      inactiveAnimationProgress.value = 0;
+    },
+    [
+      activationState,
+      activeAnimationProgress,
+      activeItemDropped,
+      activeItemKey,
+      context,
+      inactiveAnimationProgress
+    ]
+  );
+
   const handleTouchStart = useCallback(
     (
       e: GestureTouchEvent,
@@ -387,6 +411,27 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     ) => {
       'worklet';
       const touch = e.allTouches[0];
+
+      if (activeItemKey.value === key) {
+        // The drag belongs to a previous mount, so nothing else will clear it.
+        if (activationAnimationProgress.value === 0) {
+          discardAbandonedDrag(activationAnimationProgress);
+        } else {
+          // Not a new press, and failing here would kill the drag.
+          return;
+        }
+      }
+
+      // Nothing is left to animate this progress down.
+      const isProgressOutlivingItsDrag =
+        activeItemKey.value === null &&
+        activeItemDropped.value &&
+        activationAnimationProgress.value > 0;
+
+      if (isProgressOutlivingItsDrag) {
+        discardAbandonedDrag(activationAnimationProgress);
+      }
+
       if (
         !touch ||
         // Sorting is disabled
@@ -406,14 +451,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       currentTouch.value = touch;
       activationState.value = DragActivationState.TOUCHED;
 
+      // A re-registering handler replays onTouchesDown for the finger already
+      // down, and re-arming would push activation further away forever.
+      if (ctx.activationTimeoutKey === key) {
+        return;
+      }
+
       clearAnimatedTimeout(ctx.activationTimeoutId);
+      ctx.activationTimeoutKey = key;
 
       // Start handling touch after a delay to prevent accidental activation
       // e.g. while scrolling the ScrollView
       ctx.activationTimeoutId = setAnimatedTimeout(() => {
-        if (!usesAbsoluteLayout.value) {
-          return;
-        }
+        ctx.activationTimeoutKey = null;
 
         const itemPosition = itemLayoutPositions.value[key];
         const itemDimensions = getItemDimensions(
@@ -422,7 +472,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           itemHeights.value
         );
 
-        if (!itemPosition || !itemDimensions) {
+        if (!usesAbsoluteLayout.value || !itemPosition || !itemDimensions) {
+          fail();
           return;
         }
 
@@ -437,10 +488,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       }, dragActivationDelay.value);
     },
     [
+      activeItemDropped,
       activeItemKey,
       activationState,
       context,
       currentTouch,
+      discardAbandonedDrag,
       dragActivationDelay,
       handleDragStart,
       itemHeights,
@@ -507,18 +560,26 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
   const handleDragEnd = useCallback(
     (key: string, activationAnimationProgress: SharedValue<number>) => {
       'worklet';
-      if (activeItemKey.value && activeItemKey.value !== key) {
+      const ctx = context.value;
+      // Only the pressed item may cancel its own pending activation, or any
+      // sibling ending its gesture silently revokes it.
+      const ownsPendingActivation = ctx.activationTimeoutKey === key;
+      const endsActiveDrag = activeItemKey.value === key;
+
+      if (!ownsPendingActivation && !endsActiveDrag) {
         return;
       }
 
-      const ctx = context.value;
-      clearAnimatedTimeout(ctx.activationTimeoutId);
+      if (ownsPendingActivation) {
+        clearAnimatedTimeout(ctx.activationTimeoutId);
+        ctx.activationTimeoutKey = null;
+      }
 
       ctx.touchStartTouch = null;
       currentTouch.value = null;
       activationState.value = DragActivationState.INACTIVE;
 
-      if (activeItemKey.value === null) {
+      if (!endsActiveDrag) {
         return;
       }
       if (activeHandleMeasurements) {
