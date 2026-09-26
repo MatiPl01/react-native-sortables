@@ -17,7 +17,8 @@ const useDragGesture: GestureHandlerAdapter['useDragGesture'] = (
         .onTouchesDown(callbacks.onTouchesDown)
         .onTouchesMove(callbacks.onTouchesMove)
         .onTouchesCancelled(callbacks.onTouchesCancelled)
-        .onTouchesUp(callbacks.onTouchesUp),
+        .onTouchesUp(callbacks.onTouchesUp)
+        .onFinalize(callbacks.onFinalize),
     // The dependency list is owned by the caller (useItemPanGesture).
     // eslint-disable-next-line react-hooks/exhaustive-deps
     deps
