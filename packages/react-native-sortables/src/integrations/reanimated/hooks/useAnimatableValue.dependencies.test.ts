@@ -10,7 +10,7 @@ jest.mock('react-native-reanimated', () => ({
   useDerivedValue: jest.fn(() => ({ value: 0 }))
 }));
 
-jest.mock('../../../constants', () => ({
+jest.mock('../../../constants/platform', () => ({
   get IS_WEB() {
     return mockIsWeb;
   }
