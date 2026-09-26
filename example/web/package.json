@@ -2,9 +2,9 @@
   "name": "example-web",
   "version": "0.0.1",
   "dependencies": {
-    "expo": "57.0.2",
+    "expo": "57.0.25",
     "react-dom": "19.2.3",
-    "react-native": "0.86.0",
+    "react-native": "0.86.3",
     "react-native-gesture-handler": "3.0.2",
     "react-native-sortables": "workspace:*",
     "react-native-web": "0.21.2"
