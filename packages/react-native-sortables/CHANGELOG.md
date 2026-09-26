@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/MatiPl01/react-native-sortables/compare/v1.10.0...v1.10.1) (2026-09-26)
+
+
+### Bug Fixes
+
+* Stop passing useDerivedValue dependencies on native ([#614](https://github.com/MatiPl01/react-native-sortables/issues/614)) ([218c7e5](https://github.com/MatiPl01/react-native-sortables/commit/218c7e584224c5b4353aaeb014f86a1fe2d18557)), closes [#613](https://github.com/MatiPl01/react-native-sortables/issues/613)
+
 # [1.10.0](https://github.com/MatiPl01/react-native-sortables/compare/v1.9.4...v1.10.0) (2026-07-23)
 
 
