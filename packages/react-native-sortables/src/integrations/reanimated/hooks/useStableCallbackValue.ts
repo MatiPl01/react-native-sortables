@@ -46,6 +46,17 @@ export default function useStableCallbackValue<C extends AnyFunction>(
     }
   }, [callback, stableCallback]);
 
+  // A wrapped JS callback holds the JS function on the UI runtime, rooting the
+  // scope it was created in, and the mutable is never disposed - so it has to
+  // be cleared here. Kept separate from the effect above, whose cleanup would
+  // also run on every `callback` change and could blank the value mid-call.
+  useEffect(
+    () => () => {
+      stableCallback.value = null;
+    },
+    [stableCallback]
+  );
+
   return useCallback(
     (...args: Parameters<C>) => {
       'worklet';
