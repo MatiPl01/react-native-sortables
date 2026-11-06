@@ -69,9 +69,7 @@ describe('CommonValuesProvider', () => {
 
     render(<CommonValuesProvider {...props} />);
 
-    // Reanimated appends the worklet hash to the array it receives, and
-    // useAnimatableValue contributes arrays of its own, always two values wide.
-    // The provider's single dependency plus that hash is the only pair.
+    // Reanimated appends the worklet hash to the array it receives
     expect(dependenciesOf()).toContainEqual([
       props.itemsLayoutTransitionMode,
       expect.any(Number)
