@@ -2,20 +2,24 @@ import { renderHook } from '@testing-library/react-hooks';
 
 import useStableCallbackValue from './useStableCallbackValue';
 
-type ActualReact = { useState: <S>(init: () => S) => [S, unknown] };
-type ActualReanimated = { makeMutable: <T>(value: T) => { value: T } };
+type ActualReanimated = {
+  makeMutable: <T>(value: T) => { value: T };
+};
 
 // Wraps the shared value in a recording proxy, so the test can assert how many
 // times the hook writes a value to the UI runtime.
-jest.mock('./useMutableValue', () => {
-  const { useState: useActualState } = jest.requireActual<ActualReact>('react');
-  const { makeMutable: makeActualMutable } =
-    jest.requireActual<ActualReanimated>('react-native-reanimated');
+jest.mock('react-native-reanimated', () => {
+  const actual = jest.requireActual<ActualReanimated>(
+    'react-native-reanimated'
+  );
   const writes: Array<unknown> = [];
 
-  const useRecordingMutableValue = <T>(initialValue: T) =>
-    useActualState(() => {
-      const mutable = makeActualMutable(initialValue);
+  return {
+    ...actual,
+    __writes: writes,
+    makeMutable: <T>(initialValue: T) => {
+      const mutable = actual.makeMutable(initialValue);
+
       return {
         get value() {
           return mutable.value;
@@ -25,13 +29,12 @@ jest.mock('./useMutableValue', () => {
           mutable.value = next;
         }
       };
-    })[0];
-
-  return { __esModule: true, default: useRecordingMutableValue, writes };
+    }
+  };
 });
 
-const { writes } = jest.requireMock<{ writes: Array<unknown> }>(
-  './useMutableValue'
+const { __writes: writes } = jest.requireMock<{ __writes: Array<unknown> }>(
+  'react-native-reanimated'
 );
 
 const workletCallback = (fn: jest.Mock) => {

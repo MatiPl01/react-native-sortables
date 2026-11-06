@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { isWorkletFunction, runOnJS } from 'react-native-reanimated';
+import { useEffect, useState } from 'react';
+import {
+  isWorkletFunction,
+  makeMutable,
+  runOnJS
+} from 'react-native-reanimated';
 
 import type { AnyFunction } from '../../../helperTypes';
-import useMutableValue from './useMutableValue';
 
 // We cannot store a function as a SharedValue because reanimated will treat
 // it as an animation and will try to execute the animation when assigned
@@ -12,23 +15,35 @@ type WrappedCallback<C extends AnyFunction> = {
   call: C;
 };
 
-/** Built outside of the hook so that what is sent to the UI runtime captures
- * the ref alone. Built inside, it would capture the hook scope with the
- * callback in it, and the UI runtime holds on for longer than the shared value
- * does (#619).
+/** Everything one call of the hook owns, built once. Nothing in here is
+ * created inside the hook on purpose: a closure declared there would capture
+ * the hook scope with the callback in it, and the UI runtime holds on to what
+ * `runOnJS` is given for longer than the shared value does (#619).
  */
-const wrapCallbackRef = <C extends AnyFunction>(ref: {
-  current: C | undefined;
-}): WrappedCallback<C> => {
+const createCallbackStore = <C extends AnyFunction>() => {
+  const ref: { current: C | undefined } = { current: undefined };
+  const shared = makeMutable<null | WrappedCallback<C>>(null);
+
   const dispatch = (...args: Parameters<C>) => {
     ref.current?.(...args);
   };
 
   return {
-    call: ((...args: Parameters<C>) => {
+    /** Returned to the caller, so its identity has to stay stable. */
+    call: (...args: Parameters<C>) => {
       'worklet';
-      runOnJS(dispatch)(...args);
-    }) as C
+      shared.value?.call(...args);
+    },
+    /** Holds a JS callback. Emptied on unmount, refilled on every render. */
+    ref,
+    shared,
+    /** What a JS callback is stored as - a worklet is stored as it is. */
+    wrappedRef: {
+      call: ((...args: Parameters<C>) => {
+        'worklet';
+        runOnJS(dispatch)(...args);
+      }) as C
+    } satisfies WrappedCallback<C>
   };
 };
 
@@ -44,13 +59,7 @@ const wrapCallbackRef = <C extends AnyFunction>(ref: {
 export default function useStableCallbackValue<C extends AnyFunction>(
   callback?: C
 ) {
-  const stableCallback = useMutableValue<null | WrappedCallback<C>>(null);
-  const callbackRef = useRef(callback);
-
-  // Wrapping the ref rather than the callback keeps the value the UI runtime
-  // sees the same across renders, so the effect below runs once per mount
-  // instead of once per render.
-  const jsValue = useMemo(() => wrapCallbackRef<C>(callbackRef), []);
+  const [store] = useState(createCallbackStore<C>);
   const workletCallback = isWorkletFunction(callback) ? callback : undefined;
   const hasCallback = !!callback;
 
@@ -59,31 +68,27 @@ export default function useStableCallbackValue<C extends AnyFunction>(
   // ref when React reconnects effects without re-rendering - after an
   // `<Activity>` is shown again, for instance.
   useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
+    store.ref.current = callback;
+  }, [callback, store]);
 
+  // Wrapping the ref rather than the callback keeps the stored value the same
+  // across renders, so this runs once per mount instead of once per render.
   useEffect(() => {
     // A worklet is copied to the UI runtime and holds nothing on the JS side,
     // so only the JS branch has to be released on unmount (#619). Clearing the
     // shared value alone is not enough - the UI runtime keeps calling into the
     // dispatcher, which reads the ref.
     if (workletCallback) {
-      stableCallback.value = { call: workletCallback };
+      store.shared.value = { call: workletCallback };
       return;
     }
 
-    stableCallback.value = hasCallback ? jsValue : null;
+    store.shared.value = hasCallback ? store.wrappedRef : null;
     return () => {
-      stableCallback.value = null;
-      callbackRef.current = undefined;
+      store.shared.value = null;
+      store.ref.current = undefined;
     };
-  }, [workletCallback, hasCallback, jsValue, stableCallback]);
+  }, [workletCallback, hasCallback, store]);
 
-  return useCallback(
-    (...args: Parameters<C>) => {
-      'worklet';
-      stableCallback.value?.call(...args);
-    },
-    [stableCallback]
-  );
+  return store.call;
 }
