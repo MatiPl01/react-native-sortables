@@ -1,7 +1,7 @@
 import { View, type ViewProps } from 'react-native';
 import { useAnimatedRef } from 'react-native-reanimated';
 
-import { useStableCallbackValue } from '../../integrations/reanimated';
+import { useStableCallbackValues } from '../../integrations/reanimated';
 import type { ZoneHandlers } from '../../providers';
 import { useZoneHandlers } from '../../providers';
 
@@ -19,15 +19,13 @@ export default function BaseZone({
 }: BaseZoneProps) {
   const containerRef = useAnimatedRef<View>();
 
-  const stableOnItemEnter = useStableCallbackValue(onItemEnter);
-  const stableOnItemLeave = useStableCallbackValue(onItemLeave);
-  const stableOnItemDrop = useStableCallbackValue(onItemDrop);
-
-  useZoneHandlers(containerRef, minActivationDistance, {
-    onItemDrop: stableOnItemDrop,
-    onItemEnter: stableOnItemEnter,
-    onItemLeave: stableOnItemLeave
+  const handlers = useStableCallbackValues({
+    onItemDrop,
+    onItemEnter,
+    onItemLeave
   });
+
+  useZoneHandlers(containerRef, minActivationDistance, handlers);
 
   return <View ref={containerRef} {...rest} />;
 }
