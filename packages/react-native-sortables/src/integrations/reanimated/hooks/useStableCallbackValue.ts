@@ -46,7 +46,6 @@ export default function useStableCallbackValue<C extends AnyFunction>(
 ) {
   const stableCallback = useMutableValue<null | WrappedCallback<C>>(null);
   const callbackRef = useRef(callback);
-  callbackRef.current = callback;
 
   // Wrapping the ref rather than the callback keeps the value the UI runtime
   // sees the same across renders, so the effect below runs once per mount
@@ -55,9 +54,19 @@ export default function useStableCallbackValue<C extends AnyFunction>(
   const workletCallback = isWorkletFunction(callback) ? callback : undefined;
   const hasCallback = !!callback;
 
+  // Assigning a reference is all this re-run costs. It has no cleanup of its
+  // own, so there is no render in which the ref is empty, and it refills the
+  // ref when React reconnects effects without re-rendering - after an
+  // `<Activity>` is shown again, for instance.
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
   useEffect(() => {
     // A worklet is copied to the UI runtime and holds nothing on the JS side,
-    // so only the JS branch has to be released on unmount (#619).
+    // so only the JS branch has to be released on unmount (#619). Clearing the
+    // shared value alone is not enough - the UI runtime keeps calling into the
+    // dispatcher, which reads the ref.
     if (workletCallback) {
       stableCallback.value = { call: workletCallback };
       return;
