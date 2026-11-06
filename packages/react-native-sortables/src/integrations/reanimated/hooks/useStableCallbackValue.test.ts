@@ -2,6 +2,38 @@ import { renderHook } from '@testing-library/react-hooks';
 
 import useStableCallbackValue from './useStableCallbackValue';
 
+type ActualReact = { useState: <S>(init: () => S) => [S, unknown] };
+type ActualReanimated = { makeMutable: <T>(value: T) => { value: T } };
+
+// Wraps the shared value in a recording proxy, so the test can assert how many
+// times the hook writes a value to the UI runtime.
+jest.mock('./useMutableValue', () => {
+  const { useState: useActualState } = jest.requireActual<ActualReact>('react');
+  const { makeMutable: makeActualMutable } =
+    jest.requireActual<ActualReanimated>('react-native-reanimated');
+  const writes: Array<unknown> = [];
+
+  const useRecordingMutableValue = <T>(initialValue: T) =>
+    useActualState(() => {
+      const mutable = makeActualMutable(initialValue);
+      return {
+        get value() {
+          return mutable.value;
+        },
+        set value(next: T) {
+          writes.push(next);
+          mutable.value = next;
+        }
+      };
+    })[0];
+
+  return { __esModule: true, default: useRecordingMutableValue, writes };
+});
+
+const { writes } = jest.requireMock<{ writes: Array<unknown> }>(
+  './useMutableValue'
+);
+
 const workletCallback = (fn: jest.Mock) => {
   const callback = (...args: Array<unknown>) => {
     'worklet';
@@ -12,6 +44,7 @@ const workletCallback = (fn: jest.Mock) => {
 
 describe(useStableCallbackValue, () => {
   beforeEach(() => {
+    writes.length = 0;
     // A JS callback is dispatched through runOnJS, which queues a microtask;
     // real timers let awaiting a microtask actually flush it.
     jest.useRealTimers();
@@ -56,6 +89,25 @@ describe(useStableCallbackValue, () => {
       expect(nextCallback).toHaveBeenCalledWith('a');
       expect(callback).not.toHaveBeenCalled();
     });
+
+    it('writes a single value for the whole mount and clears it on unmount', () => {
+      const first = jest.fn();
+      const second = jest.fn();
+      const third = jest.fn();
+      const { rerender, unmount } = renderHook(
+        ({ cb }) => useStableCallbackValue(cb),
+        { initialProps: { cb: first } }
+      );
+
+      rerender({ cb: second });
+      rerender({ cb: third });
+
+      expect(writes).toHaveLength(1);
+
+      unmount();
+
+      expect(writes).toEqual([expect.any(Object), null]);
+    });
   });
 
   describe('when a worklet callback is passed', () => {
@@ -70,7 +122,25 @@ describe(useStableCallbackValue, () => {
       expect(fn).toHaveBeenCalledWith('a');
     });
 
-    it('does not call it after unmount', () => {
+    it('calls the latest worklet after the previous one is replaced', () => {
+      const fn = jest.fn();
+      const nextFn = jest.fn();
+      const { rerender, result } = renderHook(
+        ({ cb }) => useStableCallbackValue(cb),
+        { initialProps: { cb: workletCallback(fn) } }
+      );
+
+      rerender({ cb: workletCallback(nextFn) });
+      result.current('a');
+
+      expect(nextFn).toHaveBeenCalledWith('a');
+      expect(fn).not.toHaveBeenCalled();
+    });
+
+    // A worklet is copied to the UI runtime and holds no reference on the JS
+    // side, so it is intentionally left in place - clearing it would need a
+    // cleanup on an effect that re-runs whenever the worklet identity changes.
+    it('is not cleared on unmount', () => {
       const fn = jest.fn();
       const { result, unmount } = renderHook(() =>
         useStableCallbackValue(workletCallback(fn))
@@ -79,7 +149,21 @@ describe(useStableCallbackValue, () => {
       unmount();
       result.current('a');
 
-      expect(fn).not.toHaveBeenCalled();
+      expect(fn).toHaveBeenCalledWith('a');
+    });
+  });
+
+  describe('when no callback is passed', () => {
+    it('returns a worklet that does nothing', () => {
+      const { result } = renderHook(() => useStableCallbackValue());
+
+      expect(() => result.current('a')).not.toThrow();
+    });
+
+    it('stores null instead of dispatching to the JS thread', () => {
+      renderHook(() => useStableCallbackValue());
+
+      expect(writes).toEqual([null]);
     });
   });
 });
