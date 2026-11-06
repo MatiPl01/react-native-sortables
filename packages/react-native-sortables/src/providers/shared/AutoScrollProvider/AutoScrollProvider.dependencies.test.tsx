@@ -45,7 +45,7 @@ const props = {
 const dependenciesOf = () =>
   mockUseAnimatedReaction.mock.calls.map(([, , dependencies]) => dependencies);
 
-describe(AutoScrollProvider, () => {
+describe('AutoScrollProvider', () => {
   it('does not pass dependencies to useAnimatedReaction on native, where Reanimated warns about them', () => {
     mockIsWeb = false;
 
