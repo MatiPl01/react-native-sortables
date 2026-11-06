@@ -35,7 +35,6 @@ function useInactiveIndexToKey() {
     }),
     ({ excludedKey, fixedKeys, idxToKey }) => {
       if (excludedKey === null) {
-        result.value = EMPTY_ARRAY;
         return;
       }
 
