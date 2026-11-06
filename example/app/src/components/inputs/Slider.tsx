@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 
-import { webOnlyDependencies } from '@/utils';
+import { IS_WEB } from '@/constants';
 
 type SliderProps = {
   from: number;
@@ -67,7 +67,7 @@ function Slider({ current, from, to }: SliderProps) {
         }
       ]
     }),
-    webOnlyDependencies(from, to)
+    IS_WEB ? [from, to] : undefined
   );
 
   return (

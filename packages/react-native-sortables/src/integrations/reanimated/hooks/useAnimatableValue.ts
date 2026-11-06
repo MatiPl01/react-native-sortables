@@ -4,8 +4,8 @@
 import type { SharedValue } from 'react-native-reanimated';
 import { isSharedValue, useDerivedValue } from 'react-native-reanimated';
 
+import { IS_WEB } from '../../../constants/platform';
 import type { Animatable } from '../types';
-import { webOnlyDependencies } from '../utils/dependencies';
 
 export default function useAnimatableValue<V>(
   value: Animatable<V>
@@ -20,11 +20,13 @@ export default function useAnimatableValue<V, F extends (value: V) => any>(
   value: Animatable<V>,
   modify?: F
 ): SharedValue<ReturnType<F>> | SharedValue<V> {
+  // Reanimated only uses dependencies on web and warns about them on native, where they are
+  // derived from the worklet closure
   return useDerivedValue(
     () => {
       const inputValue = isSharedValue<V>(value) ? value.value : value;
       return modify ? modify(inputValue) : inputValue;
     },
-    webOnlyDependencies(value, modify)
+    IS_WEB ? [value, modify] : undefined
   );
 }

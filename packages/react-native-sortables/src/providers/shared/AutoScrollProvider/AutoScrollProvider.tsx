@@ -12,11 +12,8 @@ import {
   useScrollViewOffset
 } from 'react-native-reanimated';
 
-import { EMPTY_OBJECT } from '../../../constants';
-import {
-  useMutableValue,
-  webOnlyDependencies
-} from '../../../integrations/reanimated';
+import { EMPTY_OBJECT, IS_WEB } from '../../../constants';
+import { useMutableValue } from '../../../integrations/reanimated';
 import type {
   AutoScrollContextType,
   AutoScrollSettings,
@@ -322,7 +319,7 @@ function AutoScrollUpdater({
   useAnimatedReaction(
     () => isActive.value,
     active => (active ? enableAutoScroll() : disableAutoScroll()),
-    webOnlyDependencies(enableAutoScroll, disableAutoScroll)
+    IS_WEB ? [enableAutoScroll, disableAutoScroll] : undefined
   );
 
   useAnimatedReaction(
@@ -361,7 +358,7 @@ function AutoScrollUpdater({
         debug?.updateDebugRects?.(containerPos, scrollableSize);
       }
     },
-    webOnlyDependencies(debug)
+    IS_WEB ? [debug] : undefined
   );
 
   return null;

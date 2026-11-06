@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import Animated, { measure, useAnimatedStyle } from 'react-native-reanimated';
 
-import { webOnlyDependencies } from '../../integrations/reanimated';
+import { IS_WEB } from '../../constants';
 import type { DebugLineProps, WrappedProps } from '../../types/debug';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
@@ -10,6 +10,7 @@ import { useDebugContext } from '../providers/DebugProvider';
 export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
   const { debugOutletRef } = useDebugContext() ?? {};
   const screenDiagonal = useScreenDiagonal();
+  const dependencies = IS_WEB ? [screenDiagonal] : undefined;
 
   const animatedStyle = useAnimatedStyle(() => {
     const {
@@ -67,7 +68,7 @@ export default function DebugLine({ props }: WrappedProps<DebugLineProps>) {
       ],
       width: length
     };
-  }, webOnlyDependencies(screenDiagonal));
+  }, dependencies);
 
   const animatedInnerStyle = useAnimatedStyle(() => {
     const { color = 'black', style = 'dashed', thickness = 3 } = props.value;
