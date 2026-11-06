@@ -54,6 +54,7 @@ describe.each([
 
     render(renderComponent());
 
+    expect(dependenciesOf().length).toBeGreaterThan(0);
     expect(dependenciesOf().every(deps => deps === undefined)).toBe(true);
   });
 

@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import Animated, { measure, useAnimatedStyle } from 'react-native-reanimated';
 
-import { IS_WEB } from '../../constants';
+import { webOnlyDependencies } from '../../integrations/reanimated';
 import type { DebugRectProps, WrappedProps } from '../../types/debug';
 import { isPresent } from '../../utils';
 import { useScreenDiagonal } from '../hooks';
@@ -10,7 +10,6 @@ import { useDebugContext } from '../providers/DebugProvider';
 export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
   const { debugOutletRef } = useDebugContext() ?? {};
   const screenDiagonal = useScreenDiagonal();
-  const dependencies = IS_WEB ? [] : undefined;
 
   const animatedStyle = useAnimatedStyle(() => {
     let { height = 0, width = 0 } = props.value;
@@ -76,7 +75,7 @@ export default function DebugRect({ props }: WrappedProps<DebugRectProps>) {
       ],
       width
     };
-  }, dependencies);
+  }, webOnlyDependencies());
 
   const animatedInnerStyle = useAnimatedStyle(() => {
     const { backgroundColor = 'black', backgroundOpacity = 0.5 } = props.value;

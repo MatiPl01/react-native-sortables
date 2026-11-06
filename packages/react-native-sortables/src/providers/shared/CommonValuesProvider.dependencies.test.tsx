@@ -54,12 +54,13 @@ const props = {
 const dependenciesOf = () =>
   mockUseDerivedValue.mock.calls.map(([, dependencies]) => dependencies);
 
-describe(CommonValuesProvider, () => {
+describe('CommonValuesProvider', () => {
   it('does not pass dependencies to useDerivedValue on native, where Reanimated warns about them', () => {
     mockIsWeb = false;
 
     render(<CommonValuesProvider {...props} />);
 
+    expect(dependenciesOf().length).toBeGreaterThan(0);
     expect(dependenciesOf().every(deps => deps === undefined)).toBe(true);
   });
 
@@ -68,6 +69,13 @@ describe(CommonValuesProvider, () => {
 
     render(<CommonValuesProvider {...props} />);
 
-    expect(dependenciesOf().some(deps => Array.isArray(deps))).toBe(true);
+    // Reanimated appends the worklet hash to the array it receives, and
+    // useAnimatableValue contributes arrays of its own, so match the provider's
+    // own call by the dependency only it passes.
+    expect(
+      dependenciesOf().some(
+        deps => deps?.[0] === props.itemsLayoutTransitionMode
+      )
+    ).toBe(true);
   });
 });

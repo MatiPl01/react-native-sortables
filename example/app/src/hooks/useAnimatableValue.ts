@@ -5,6 +5,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import { isSharedValue, useDerivedValue } from 'react-native-reanimated';
 
 import type { Animatable } from '@/types';
+import { webOnlyDependencies } from '@/utils';
 
 export default function useAnimatableValue<V>(
   value: Animatable<V>
@@ -19,8 +20,11 @@ export default function useAnimatableValue<V, F extends (value: V) => any>(
   value: Animatable<V>,
   modify?: F
 ): SharedValue<ReturnType<F>> | SharedValue<V> {
-  return useDerivedValue(() => {
-    const inputValue = isSharedValue<V>(value) ? value.value : value;
-    return modify ? modify(inputValue) : inputValue;
-  }, [value, modify]);
+  return useDerivedValue(
+    () => {
+      const inputValue = isSharedValue<V>(value) ? value.value : value;
+      return modify ? modify(inputValue) : inputValue;
+    },
+    webOnlyDependencies(value, modify)
+  );
 }

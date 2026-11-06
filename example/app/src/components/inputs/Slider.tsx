@@ -7,6 +7,8 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated';
 
+import { webOnlyDependencies } from '@/utils';
+
 type SliderProps = {
   from: number;
   to: number;
@@ -65,7 +67,7 @@ function Slider({ current, from, to }: SliderProps) {
         }
       ]
     }),
-    [from, to]
+    webOnlyDependencies(from, to)
   );
 
   return (
