@@ -274,6 +274,15 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           };
         }
 
+        // At-rest cross-size change (e.g. a "collapse all"/"expand all" toggle)
+        // with no active drag: `itemKey` above fell back to a stale
+        // `prevActiveItemKey` from the previous drag. Applying an offset here
+        // would shift the whole layout and set `sortEnabled = false` with no
+        // drop event ever coming to restore it, permanently disabling sorting.
+        if (activeItemKey.value === null) {
+          return props;
+        }
+
         let snapBasedOffset = 0;
 
         if (
