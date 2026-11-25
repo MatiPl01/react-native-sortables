@@ -18,5 +18,18 @@ export default [
       '**/CHANGELOG.md'
     ]
   },
-  ...baseConfig
+  ...baseConfig,
+  {
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          message:
+            'Reanimated warns about dependencies on native, pass `IS_WEB ? [...] : undefined` instead.',
+          selector:
+            'CallExpression[callee.name=/^use(DerivedValue|Animated(Reaction|Style|Props)|Handler)$/] > ArrayExpression'
+        }
+      ]
+    }
+  }
 ];
