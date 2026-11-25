@@ -187,8 +187,8 @@ const getIndexesWhenSwappedToGroupAfter = ({
 
   const includeItem = (key: string, newIndex: number) => {
     const itemMainSize = getItemMainSize(key);
-    // An empty line never wraps (same rule as in the layout)
-    if (totalGroupSize > 0 && doesNotFitInGroup(key)) {
+    // The first item of a line never wraps (same rule as in the layout)
+    if (newIndex > firstInGroupIndex && doesNotFitInGroup(key)) {
       groupIndex++;
       totalGroupSize = 0;
       firstInGroupIndex = newIndex;

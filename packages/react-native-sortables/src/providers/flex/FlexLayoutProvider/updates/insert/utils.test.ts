@@ -55,3 +55,23 @@ it('keeps an item wider than the limit in the line it starts', () => {
     })
   ).toMatchObject({ groupIndex: 1, itemIndex: 1 });
 });
+
+it('wraps an item wider than the limit after an item without a size', () => {
+  // a z | B  ->  z | B | a (z has no size, but B still cannot join its line)
+  const indexToKey = ['a', 'z', 'b'];
+
+  expect(
+    getSwappedToGroupAfterIndices({
+      activeItemIndex: 0,
+      activeItemKey: 'a',
+      currentGroupIndex: 0,
+      fixedKeys: undefined,
+      groupSizeLimit: 100,
+      indexToKey,
+      itemGroups: [['a', 'z'], ['b']],
+      keyToIndex: getKeyToIndex(indexToKey),
+      mainGap: 0,
+      mainItemSizes: { a: 40, b: 120, z: 0 }
+    })
+  ).toMatchObject({ groupIndex: 2, itemIndex: 2 });
+});
