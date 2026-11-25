@@ -208,6 +208,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         touchPosition.value = newTouchPosition;
       }
 
+      // Bring to front only once dragged, so that a bare long press doesn't
+      // change the stacking order and dismiss a native context menu
+      if (
+        !activeItemBroughtToFront.value &&
+        Math.hypot(
+          newTouchPosition.x - startTouchPosition.x,
+          newTouchPosition.y - startTouchPosition.y
+        ) >= dragActivationFailOffset.value
+      ) {
+        activeItemBroughtToFront.value = true;
+        updateLayer?.(LayerState.FOCUSED);
+      }
+
       // Active item position
 
       const translate = (from: number, to: number) =>
@@ -470,21 +483,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           key: activeItemKey.value,
           touchData: touch
         });
-
-        // Bring to front only once dragged, so that a bare long press doesn't
-        // change the stacking order and dismiss a native context menu
-        const start = ctx.touchStartTouch;
-        if (
-          !activeItemBroughtToFront.value &&
-          start &&
-          Math.hypot(
-            touch.absoluteX - start.absoluteX,
-            touch.absoluteY - start.absoluteY
-          ) >= dragActivationFailOffset.value
-        ) {
-          activeItemBroughtToFront.value = true;
-          updateLayer?.(LayerState.FOCUSED);
-        }
       }
 
       if (activationState.value === DragActivationState.TOUCHED) {
@@ -511,13 +509,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     },
     [
       activationState,
-      activeItemBroughtToFront,
       activeItemKey,
       dragActivationFailOffset,
       currentTouch,
       context,
-      onDragMove,
-      updateLayer
+      onDragMove
     ]
   );
 

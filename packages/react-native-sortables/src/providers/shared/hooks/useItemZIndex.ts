@@ -23,22 +23,21 @@ export default function useItemZIndex(
       ? itemCount - realIndex - 1
       : realIndex;
 
-    // A bare long press must not change the stacking order, as this
-    // dismisses a native context menu rendered in the item
-    if (!activeItemBroughtToFront.value) {
+    const isActive = activeItemKey.value === key;
+    const isDropped = prevActiveItemKey.value === key;
+
+    // A bare long press must not change the stacking order of the item, as
+    // this dismisses a native context menu rendered in it
+    if ((isActive || isDropped) && !activeItemBroughtToFront.value) {
       return orderZIndex;
     }
 
-    if (activeItemKey.value === key) {
+    if (isActive) {
       return 2 * itemCount + 1;
     }
 
     if (activationAnimationProgress.value > 0) {
-      if (prevActiveItemKey.value === key) {
-        return 2 * itemCount;
-      }
-
-      return itemCount + orderZIndex;
+      return isDropped ? 2 * itemCount : itemCount + orderZIndex;
     }
 
     return orderZIndex;

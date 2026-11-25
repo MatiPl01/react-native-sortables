@@ -54,10 +54,12 @@ const advance = (ms: number) =>
     jest.advanceTimersByTime(ms);
   });
 
-const moveTo = (absoluteX: number) =>
+function moveTo(absoluteX: number) {
   act(() => {
     drag.handleTouchesMove(touchEvent(absoluteX), noop);
   });
+  advance(50); // lets reactions settle
+}
 
 function longPress() {
   render(
@@ -111,5 +113,22 @@ describe('useItemZIndex', () => {
 
     expect(zIndex.value).toBe(ACTIVE_Z_INDEX);
     expect(mockUpdateLayer).toHaveBeenLastCalledWith(LayerState.FOCUSED);
+  });
+
+  it('keeps a dropped item above the others when the next drag starts', () => {
+    longPress();
+    moveTo(160);
+    advance(300); // activation animation
+    act(() => {
+      drag.handleDragEnd('b', progress);
+    });
+
+    act(() => {
+      drag.handleTouchStart(touchEvent(50), 'a', makeMutable(0), noop, noop);
+    });
+    advance(250); // 'a' is active, 'b' is still being dropped
+
+    expect(common.activeItemKey.value).toBe('a');
+    expect(zIndex.value).toBe(KEYS.length + ORDER_Z_INDEX);
   });
 });
