@@ -16,11 +16,6 @@ type StoredCallback<C extends AnyFunction> = {
   worklet?: C;
 };
 
-/** Stored for a JS callback: the UI runtime needs nothing but the fact
- * that there is one.
- */
-const JS_CALLBACK: StoredCallback<never> = Object.freeze({});
-
 /** Everything one call of the hook owns. Built outside of the hook on purpose:
  * a closure created there would capture the hook scope with the callback in
  * it, and the UI runtime holds on to what `runOnJS` is given for longer than
@@ -79,11 +74,7 @@ export default function useStableCallbackValue<C extends AnyFunction>(
   // Nothing here depends on a JS callback itself, so for such a callback it
   // runs once per mount rather than once per render.
   useEffect(() => {
-    if (workletCallback) {
-      store.shared.value = { worklet: workletCallback };
-    } else {
-      store.shared.value = hasCallback ? JS_CALLBACK : null;
-    }
+    store.shared.value = hasCallback ? { worklet: workletCallback } : null;
   }, [workletCallback, hasCallback, store]);
 
   // What stays in the store keeps the callback and this hook's state alive
