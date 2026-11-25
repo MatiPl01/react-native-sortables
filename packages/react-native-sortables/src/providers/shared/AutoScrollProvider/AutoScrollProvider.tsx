@@ -222,7 +222,8 @@ function AutoScrollUpdater({
         );
       } else return;
 
-      if (Math.abs(newScrollOffset - ctx.targetScrollOffset) < 1) {
+      // Sub-pixel steps must add up, otherwise slow speeds would never scroll
+      if (newScrollOffset === ctx.targetScrollOffset) {
         return;
       }
 
