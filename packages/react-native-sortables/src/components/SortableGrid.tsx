@@ -209,8 +209,12 @@ function SortableGridComponent<I>({
       return;
     }
     previousGroupsRef.current = groups;
-    resetMeasurements();
-  }, [groups, resetMeasurements]);
+    // Item widths of a horizontal grid don't depend on the number of rows, so
+    // items would never report them again after a reset.
+    if (isVertical) {
+      resetMeasurements();
+    }
+  }, [groups, isVertical, resetMeasurements]);
 
   const animatedInnerStyle = useAnimatedStyle(() =>
     isVertical
