@@ -55,7 +55,7 @@ jobs:
           path: example/expo/dist/
           retention-days: 7
 
-  # Build React Native apps (Fabric and Paper)
+  # Build the React Native app
   build-react-native:
     name: 📱 Build ${{ matrix.app }} (${{ matrix.platform }})
     runs-on: macos-15
@@ -64,7 +64,7 @@ jobs:
       cancel-in-progress: true
     strategy:
       matrix:
-        app: [fabric, paper]
+        app: [fabric]
         platform: [ios, android]
       fail-fast: false
 
@@ -113,7 +113,7 @@ jobs:
       - name: 🍎 Build iOS
         if: matrix.platform == 'ios'
         working-directory: example/${{ matrix.app }}
-        run: yarn react-native run-ios --no-packager --scheme "reactNativeSortable${{ matrix.app == 'fabric' && 'Fabric' || 'Paper' }}"
+        run: yarn react-native run-ios --no-packager --scheme "reactNativeSortableFabric"
 
       - name: 🤖 Build Android
         if: matrix.platform == 'android'

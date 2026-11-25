@@ -18,17 +18,16 @@ function getRootPath(moduleName, currentAppDir) {
   }
 }
 
-function getDependencies(currentAppDir = '.', excludeCommon = []) {
+function getDependencies(currentAppDir = '.') {
   const commonAppPkg = require(path.resolve(commonAppDir, 'package.json'));
   const currentAppPkg = require(path.resolve(currentAppDir, 'package.json'));
 
-  const excluded = new Set(excludeCommon);
   const names = [
     ...Object.keys(commonAppPkg.dependencies ?? {}),
     ...Object.keys(commonAppPkg.devDependencies ?? {}),
     ...Object.keys(currentAppPkg.dependencies ?? {}),
     ...Object.keys(currentAppPkg.devDependencies ?? {})
-  ].filter(name => !excluded.has(name));
+  ];
 
   const result = {};
   for (const name of new Set(names)) {
