@@ -13,8 +13,17 @@ export const defaultKeyExtractor = <I>(item: I): string => {
     if (hasProp(item, 'key')) {
       return String(item.key);
     }
-    return JSON.stringify(item);
   }
 
-  return String(item);
+  const key = String(item);
+  if (key !== '[object Object]') {
+    return key;
+  }
+
+  // Plain objects all have the same string value, so their content is used
+  try {
+    return JSON.stringify(item);
+  } catch {
+    return key;
+  }
 };

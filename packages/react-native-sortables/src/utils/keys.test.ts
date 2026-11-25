@@ -16,4 +16,15 @@ describe(defaultKeyExtractor, () => {
       defaultKeyExtractor({ title: 'b' })
     );
   });
+
+  it('keeps the string value of items that are not plain objects', () => {
+    expect(defaultKeyExtractor(['a', 1])).toBe('a,1');
+  });
+
+  it('does not throw for an object that cannot be serialized', () => {
+    const item: Record<string, unknown> = {};
+    item.self = item;
+
+    expect(defaultKeyExtractor(item)).toBe('[object Object]');
+  });
 });
