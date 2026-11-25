@@ -36,7 +36,9 @@ const createStableCallback = <C extends AnyFunction>() => {
     store.js?.(...args);
   };
 
-  return Object.assign(store, {
+  // The worklet is returned next to the store, not in it. The UI runtime keeps
+  // `dispatch` alive, so a worklet reachable from it would never be released.
+  return {
     /** Returned to the caller, so its identity has to stay stable. */
     stable: (...args: Parameters<C>) => {
       'worklet';
@@ -44,8 +46,9 @@ const createStableCallback = <C extends AnyFunction>() => {
       if (!stored) return;
       if (stored.worklet) stored.worklet(...args);
       else runOnJS(dispatch)(...args);
-    }
-  });
+    },
+    store
+  };
 };
 
 /** Creates a stable worklet callback that can be called from the UI runtime
@@ -60,7 +63,7 @@ const createStableCallback = <C extends AnyFunction>() => {
 export default function useStableCallbackValue<C extends AnyFunction>(
   callback?: C
 ) {
-  const [store] = useState(createStableCallback<C>);
+  const [{ stable, store }] = useState(createStableCallback<C>);
   const workletCallback = isWorkletFunction(callback) ? callback : undefined;
   const hasCallback = !!callback;
 
@@ -73,23 +76,26 @@ export default function useStableCallbackValue<C extends AnyFunction>(
     store.js = callback;
   }, [callback, store]);
 
-  // Nothing here depends on the callback itself, so it runs once per mount
-  // rather than once per render.
+  // Nothing here depends on a JS callback itself, so for such a callback it
+  // runs once per mount rather than once per render.
   useEffect(() => {
-    // A worklet is copied to the UI runtime and holds nothing on the JS side,
-    // so it needs no cleanup. A JS callback is reachable from the UI runtime
-    // through the dispatcher until it is dropped here (#619).
     if (workletCallback) {
       store.shared.value = { worklet: workletCallback };
-      return;
+    } else {
+      store.shared.value = hasCallback ? JS_CALLBACK : null;
     }
-
-    store.shared.value = hasCallback ? JS_CALLBACK : null;
-    return () => {
-      store.shared.value = null;
-      store.js = undefined;
-    };
   }, [workletCallback, hasCallback, store]);
 
-  return store.stable;
+  // What stays in the store keeps the callback and this hook's state alive
+  // (#619). Kept out of the effect above, whose cleanup would also run when the
+  // worklet changes and could blank the value mid-call.
+  useEffect(
+    () => () => {
+      store.shared.value = null;
+      store.js = undefined;
+    },
+    [store]
+  );
+
+  return stable;
 }

@@ -140,10 +140,7 @@ describe(useStableCallbackValue, () => {
       expect(fn).not.toHaveBeenCalled();
     });
 
-    // A worklet is copied to the UI runtime and holds no reference on the JS
-    // side, so it is intentionally left in place - clearing it would need a
-    // cleanup on an effect that re-runs whenever the worklet identity changes.
-    it('is not cleared on unmount', () => {
+    it('does not call it after unmount', () => {
       const fn = jest.fn();
       const { result, unmount } = renderHook(() =>
         useStableCallbackValue(workletCallback(fn))
@@ -152,7 +149,7 @@ describe(useStableCallbackValue, () => {
       unmount();
       result.current('a');
 
-      expect(fn).toHaveBeenCalledWith('a');
+      expect(fn).not.toHaveBeenCalled();
     });
   });
 
