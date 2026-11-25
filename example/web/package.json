@@ -7,7 +7,7 @@
     "react-native": "0.86.3",
     "react-native-gesture-handler": "3.0.2",
     "react-native-sortables": "workspace:*",
-    "react-native-web": "0.21.2"
+    "react-native-web": "0.21.4"
   },
   "devDependencies": {
     "@expo/metro-runtime": "~57.0.3",
