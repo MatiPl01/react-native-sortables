@@ -23,7 +23,9 @@ This is the simplest implementation of the **Drop Indicator** component where we
 
 ```tsx
 import { View } from 'react-native';
-import type { DropIndicatorComponentProps } from 'react-native-sortables';
+import Sortable, {
+  type DropIndicatorComponentProps
+} from 'react-native-sortables';
 
 function CustomDropIndicator({
   style // style from the `dropIndicatorStyle` prop or a default style
@@ -45,20 +47,20 @@ export default function Grid() {
 
 Props in the `DropIndicatorComponentProps` type.
 
-### activationProgress
+### activeAnimationProgress
 
-A shared value that represents the **long-press activation state** of an item. This value animates from **0 to 1** during the long-press gesture, before the dragging interaction begins. You can use this value to create **smooth visual transitions** or feedback during the activation phase.
+A shared value that represents the **progress of the active item animation**. This value animates from **0 to 1** when an item becomes active and back to **0** when it is dropped. You can use this value to create **smooth visual transitions**.
 
-- `0`: Item is **not being pressed**
-- `1`: Item has been **fully activated** and is ready to be dragged
+- `0`: No item is active
+- `1`: An item is **fully activated** and is being dragged
 
 | type                  | default |
 | --------------------- | ------- |
 | `SharedValue<number>` | 0       |
 
-### touchedItemKey
+### activeItemKey
 
-A shared value that represents the **key of the item that is currently being touched**. This value is updated when the touched item activation animation starts.
+A shared value that represents the **key of the item that is currently being dragged**, or `null` when no item is active.
 
 | type                          | default |
 | ----------------------------- | ------- |

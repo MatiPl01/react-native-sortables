@@ -131,7 +131,7 @@ const Sortable = {
    *
    * @props
    * - children: Content to render within the handle (e.g. an icon)
-   * - disabled: When true, prevents the handle from activating drag gesture
+   * - mode: 'draggable' | 'non-draggable' | 'fixed-order' (default: 'draggable')
    *
    * @example
    * ```tsx

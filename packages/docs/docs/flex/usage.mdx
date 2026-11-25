@@ -55,17 +55,8 @@ const styles = StyleSheet.create({
 
 ## Details
 
-To create a grid, you need to import the `Sortable` object from the `react-native-sortables` package and then, use the `Sortable.Grid` component.
+To create a sortable flex container, you need to import the `Sortable` object from the `react-native-sortables` package and then, use the `Sortable.Flex` component.
 
-The `Sortable.Grid` component requires the following props which are similar to the ones in the `FlatList` component:
+The `Sortable.Flex` component has no required props. Pass the items as its `children` and give every child a unique `key`, which identifies the item when items are reordered.
 
-- `data`: The data to render in the grid.
-- `renderItem`: A function that renders a single item in the grid.
-
-You can customize the grid appearance and behavior by using other props. See the [Props](./props) section for more information.
-
-:::important
-
-Remember to to wrap your `renderItem` function in a `useCallback` hook to avoid unnecessary re-renders.
-
-:::
+You can customize the flex appearance and behavior by using other props. See the [Props](./props) section for more information.

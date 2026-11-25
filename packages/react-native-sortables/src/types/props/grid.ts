@@ -117,15 +117,15 @@ export type SortableGridProps<I> = Simplify<
       keyExtractor?: (item: I) => string;
       /** Number of columns in the grid.
        *
-       * Used to create a vertical grid layout where items flow from top to bottom,
-       * then left to right.
+       * Used to create a vertical grid layout where items flow from left to right,
+       * then top to bottom.
        * @default 1
        */
       columns?: number;
       /** Number of rows in the grid.
        *
-       * Used to create a horizontal grid layout where items flow from left to right,
-       * then top to bottom.
+       * Used to create a horizontal grid layout where items flow from top to bottom,
+       * then left to right.
        * @important Setting this property switches the grid to horizontal layout.
        * Requires rowHeight to be set.
        */
