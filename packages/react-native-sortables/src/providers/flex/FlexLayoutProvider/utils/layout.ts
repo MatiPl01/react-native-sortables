@@ -81,7 +81,8 @@ const calculateAlignment = (
   let startOffset = 0;
   let adjustedGap = providedGap;
 
-  const getTotalSize = (gap: number) => sum(sizes) + gap * (sizes.length - 1);
+  const getTotalSize = (gap: number) =>
+    sum(sizes) + gap * Math.max(sizes.length - 1, 0);
 
   const totalSize = getTotalSize(providedGap);
   const clampedTotalSize = Math.min(
@@ -293,20 +294,8 @@ const handleLayoutCalculation = (
     }
   }
 
-  let additionalOffset = 0;
-  if (isRow && isReverse) {
-    // row-reverse
-    additionalOffset = paddings.bottom;
-  } else if (isRow) {
-    // row
-    additionalOffset = paddings.top;
-  } else if (isReverse) {
-    // column-reverse
-    additionalOffset = paddings.right;
-  } else {
-    // column
-    additionalOffset = paddings.left;
-  }
+  // Reverse directions flip only the main axis
+  const additionalOffset = isRow ? paddings.top : paddings.left;
 
   const crossAxisGroupOffsets = contentAlignment.offsets.map(
     offset => offset + additionalOffset
