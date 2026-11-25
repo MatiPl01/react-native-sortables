@@ -42,7 +42,8 @@ const createGroups = (
     const currentTotalSize =
       totalGroupItemsMainSize + currentGroup.length * gap + mainItemDimension;
 
-    if (currentTotalSize > groupMainSizeLimit) {
+    // An item wider than the limit doesn't wrap if it starts the line
+    if (currentGroup.length && currentTotalSize > groupMainSizeLimit) {
       groups.push(currentGroup);
       crossAxisGroupSizes.push(groupCrossSize);
       currentGroup = [];

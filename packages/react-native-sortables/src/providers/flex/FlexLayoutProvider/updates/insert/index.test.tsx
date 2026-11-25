@@ -101,3 +101,9 @@ it('moves an item wider than half of the line to the end of the line', () => {
 
   expect(drag(0, { x: 290, y: 25 })).toEqual([b, c, a]);
 });
+
+it('does not leave an empty line before a first item wider than the container', () => {
+  const { context, keys } = setup([300, 80], 250, { rowGap: 12 });
+
+  expect(context.itemLayoutPositions.value[keys[0]!]).toEqual({ x: 0, y: 0 });
+});

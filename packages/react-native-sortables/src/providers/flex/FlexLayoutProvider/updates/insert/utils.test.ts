@@ -35,3 +35,23 @@ it.each([
     });
   }
 );
+
+it('keeps an item wider than the limit in the line it starts', () => {
+  // a | B | c  ->  B | a c (B is wider than the limit and never wraps alone)
+  const indexToKey = ['a', 'b', 'c'];
+
+  expect(
+    getSwappedToGroupAfterIndices({
+      activeItemIndex: 0,
+      activeItemKey: 'a',
+      currentGroupIndex: 0,
+      fixedKeys: undefined,
+      groupSizeLimit: 100,
+      indexToKey,
+      itemGroups: [['a'], ['b'], ['c']],
+      keyToIndex: getKeyToIndex(indexToKey),
+      mainGap: 0,
+      mainItemSizes: { a: 40, b: 120, c: 40 }
+    })
+  ).toMatchObject({ groupIndex: 1, itemIndex: 1 });
+});
