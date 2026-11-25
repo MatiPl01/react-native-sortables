@@ -358,7 +358,15 @@ function AutoScrollUpdater({
         debug?.updateDebugRects?.(containerPos, scrollableSize);
       }
     },
-    IS_WEB ? [debug] : undefined
+    IS_WEB
+      ? [
+          debug,
+          isVertical,
+          autoScrollExtrapolation,
+          ...activationOffset,
+          ...maxOverscroll
+        ]
+      : undefined
   );
 
   return null;
