@@ -6,9 +6,11 @@ export const IS_ANDROID = Platform.OS === 'android';
 
 export const IS_REACT_19 = reactVersion.startsWith('19.');
 
+// Reanimated no longer sets its `_IS_FABRIC` global (since worklets 0.9), so
+// the global installed by the React Native renderer is checked instead
 export function isFabric() {
-  // eslint-disable-next-line no-underscore-dangle
-  return !!(globalThis as { _IS_FABRIC?: boolean })._IS_FABRIC;
+  return !!(globalThis as { nativeFabricUIManager?: unknown })
+    .nativeFabricUIManager;
 }
 
 export function isPaper() {
