@@ -8607,6 +8607,7 @@ __metadata:
   resolution: "example-app@workspace:example/app"
   dependencies:
     "@babel/core": "npm:^7.25.2"
+    "@babel/plugin-transform-export-namespace-from": "npm:^7.25.9"
     "@babel/preset-env": "npm:^7.25.3"
     "@babel/runtime": "npm:^7.25.0"
     "@fortawesome/fontawesome-svg-core": "npm:6.7.2"
@@ -8630,6 +8631,7 @@ __metadata:
     "@types/react": "npm:^19.2.0"
     "@types/react-test-renderer": "npm:^19.1.0"
     babel-plugin-module-resolver: "npm:^5.0.2"
+    escape-string-regexp: "npm:^4.0.0"
     eslint: "npm:^9.28.0"
     jest: "npm:^29.7.0"
     lint-staged: "npm:^15.5.0"
