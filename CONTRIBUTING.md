@@ -49,7 +49,6 @@ This project uses GitHub to host code, track issues and feature requests, and ac
    Available example apps:
 
    - `fabric` - React Native Fabric example
-   - `paper` - React Native Paper example
    - `expo` - Expo example
    - `web` - Web example
 
@@ -57,7 +56,7 @@ This project uses GitHub to host code, track issues and feature requests, and ac
 
    ```bash
    yarn example:fabric start
-   yarn example:paper android
+   yarn example:fabric android
    yarn example:expo ios
    ```
 
@@ -71,9 +70,6 @@ This project uses GitHub to host code, track issues and feature requests, and ac
 7. Make sure your code passes prettier/eslint/typescript checks
 8. Update or create a new example in the example app if applicable
 9. Submit that pull request
-
-> [!TIP]  
-> All example commands shown above can also be run with the **Old Architecture (Paper)** example app by replacing `example:fabric` with `example:paper` in the commands.
 
 ## Discussions
 

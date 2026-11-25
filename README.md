@@ -151,7 +151,6 @@ For detailed usage and examples, check out the [Documentation](https://react-nat
    Available example apps:
 
    - `fabric` - React Native Fabric example
-   - `paper` - React Native Paper example
    - `expo` - Expo example
    - `web` - Web example
 
@@ -159,7 +158,7 @@ For detailed usage and examples, check out the [Documentation](https://react-nat
 
    ```bash
    yarn example:fabric start
-   yarn example:paper android
+   yarn example:fabric android
    yarn example:expo ios
    ```
 

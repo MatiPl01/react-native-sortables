@@ -27,6 +27,9 @@
   },
   "packageManager": "yarn@4.9.2",
   "private": true,
+  "resolutions": {
+    "@types/react": "19.2.17"
+  },
   "scripts": {
     "build": "yarn workspace react-native-sortables build",
     "clean": "yarn workspace react-native-sortables clean",
@@ -34,7 +37,6 @@
     "example:app": "yarn workspace example-app",
     "example:expo": "yarn workspace example-expo",
     "example:fabric": "yarn workspace example-fabric",
-    "example:paper": "yarn workspace example-paper",
     "example:web": "yarn workspace example-web",
     "format": "yarn format:code && yarn format:deps",
     "format:check": "prettier --check . --ignore-unknown",
@@ -56,13 +58,9 @@
     "packages": [
       "example/app",
       "example/fabric",
-      "example/paper",
       "example/expo",
       "example/web",
       "packages/react-native-sortables"
     ]
-  },
-  "resolutions": {
-    "@types/react": "19.2.17"
   }
 }
