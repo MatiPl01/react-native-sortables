@@ -296,7 +296,6 @@ const useInsertStrategy: SortStrategyFactory = () => {
     // Item after
     let swapItemAfterOffset = -Infinity;
     let swapItemAfterBound = -Infinity;
-    let totalGroupSize = 0;
 
     do {
       if (swapItemAfterBound !== -Infinity) {
@@ -340,11 +339,6 @@ const useInsertStrategy: SortStrategyFactory = () => {
       const additionalSwapOffset = getAdditionalSwapOffset(sizeToAdd);
       swapItemAfterBound =
         averageOffset + (isCurrentBeforeNext ? 1 : -1) * additionalSwapOffset;
-
-      totalGroupSize += itemMainSize + mainGap;
-      if (totalGroupSize + activeItemMainSize > currentLayout.groupSizeLimit) {
-        break;
-      }
     } while (
       itemIndexInGroup < currentGroup.length - 1 &&
       gt(mainAxisPosition, swapItemAfterBound)

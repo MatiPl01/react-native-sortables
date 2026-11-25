@@ -94,3 +94,10 @@ it('keeps a fixed last item when the target line does not exist', () => {
 
   expect(drag(1, { x: 150, y: 125 })).toEqual(keys);
 });
+
+it('moves an item wider than half of the line to the end of the line', () => {
+  const { drag, keys } = setup([200, 50, 50], 300);
+  const [a, b, c] = keys;
+
+  expect(drag(0, { x: 290, y: 25 })).toEqual([b, c, a]);
+});
