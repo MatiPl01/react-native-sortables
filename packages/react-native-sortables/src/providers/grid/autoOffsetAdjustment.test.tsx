@@ -30,9 +30,9 @@ const useCapturingStrategy: SortStrategyFactory = () => {
 
 const noop = jest.fn();
 
-const touchEvent = (absoluteY: number) =>
+const touchEvent = (absoluteY: number, absoluteX = 10) =>
   ({
-    allTouches: [{ absoluteX: 10, absoluteY, id: 0, x: 10, y: 10 }]
+    allTouches: [{ absoluteX, absoluteY, id: 0, x: 10, y: 10 }]
   }) as unknown as GestureTouchEvent;
 
 const advance = (ms: number) =>
@@ -47,10 +47,16 @@ const setHeights = (height: number) =>
     );
   });
 
-const Grid = ({ keys = KEYS }: { keys?: Array<string> }) => (
+const Grid = ({
+  columns = 1,
+  keys = KEYS
+}: {
+  columns?: number;
+  keys?: Array<string>;
+}) => (
   <GestureHandlerRootView>
     <Sortable.Grid
-      columns={1}
+      columns={columns}
       data={keys}
       renderItem={() => <View />}
       strategy={useCapturingStrategy}
@@ -86,9 +92,9 @@ function dragAndDrop(key: string) {
   advance(2000); // drop animation + autoAdjustOffsetResetTimeout
 }
 
-function moveTo(absoluteY: number) {
+function moveTo(absoluteY: number, absoluteX?: number) {
   act(() => {
-    drag.handleTouchesMove(touchEvent(absoluteY), noop);
+    drag.handleTouchesMove(touchEvent(absoluteY, absoluteX), noop);
   });
   advance(50); // lets reactions settle
 }
@@ -148,5 +154,23 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
     advance(0);
 
     expect(common.containerHeight.value).toBe(3 * EXPANDED);
+  });
+
+  it('shrinks the container when a reorder during the drag makes the grid shorter', () => {
+    render(<Grid columns={2} keys={['a', 'b', 'c']} />);
+    act(() => {
+      common.containerWidth.value = 300;
+      common.itemHeights.value = { a: 100, b: 100, c: 20 };
+    });
+    advance(200);
+
+    startDrag('c', 110);
+    moveTo(50, 225); // c takes the place of b, which moves to the second row
+    expect(common.indexToKey.value).toEqual(['a', 'c', 'b']);
+    expect(common.containerHeight.value).toBe(200);
+
+    moveTo(110, 10);
+    expect(common.indexToKey.value).toEqual(['a', 'b', 'c']);
+    expect(common.containerHeight.value).toBe(120);
   });
 });
