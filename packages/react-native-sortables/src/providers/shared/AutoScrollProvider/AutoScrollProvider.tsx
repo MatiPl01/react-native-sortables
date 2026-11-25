@@ -293,11 +293,9 @@ function AutoScrollUpdater({
 
   const enableAutoScroll = useCallback(() => {
     'worklet';
-    if (context.value) {
-      return;
-    }
-
-    context.value = {
+    // The context is kept if auto scroll was disabled and enabled again during
+    // a drag, but the frame callback of the new updater still has to be started
+    context.value ??= {
       progress: 0,
       sortableOffset: getSortableOffset() ?? 0,
       startScrollOffset: scrollOffset.value,
