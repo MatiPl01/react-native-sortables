@@ -94,19 +94,17 @@ function getHiddenSourceOpacityStyles(root: Root): Array<unknown> {
     .map(node => node.props.style as unknown);
 }
 
-/* eslint-disable no-underscore-dangle */
-type FabricGlobal = { _IS_FABRIC?: boolean };
+type FabricGlobal = { nativeFabricUIManager?: unknown };
 
 async function withFabric<T>(value: boolean, fn: () => Promise<T>): Promise<T> {
-  const prev = (globalThis as FabricGlobal)._IS_FABRIC;
-  (globalThis as FabricGlobal)._IS_FABRIC = value;
+  const prev = (globalThis as FabricGlobal).nativeFabricUIManager;
+  (globalThis as FabricGlobal).nativeFabricUIManager = value ? {} : undefined;
   try {
     return await fn();
   } finally {
-    (globalThis as FabricGlobal)._IS_FABRIC = prev;
+    (globalThis as FabricGlobal).nativeFabricUIManager = prev;
   }
 }
-/* eslint-enable no-underscore-dangle */
 
 it('teleports exactly one copy and hides the in-grid source', async () => {
   const tree = renderGridWithPortal();
