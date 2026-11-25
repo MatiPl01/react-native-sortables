@@ -3,10 +3,12 @@ import type { DragEndParams } from '../types';
 export const orderItems = <I>(
   data: Array<I>,
   items: Array<[string, unknown]>,
-  { fromIndex, keyToIndex, toIndex }: DragEndParams,
+  { keyToIndex }: DragEndParams,
   skipIfNoChange?: boolean
 ): Array<I> => {
-  if (skipIfNoChange && fromIndex === toIndex) {
+  // fromIndex === toIndex doesn't mean no change, as other items may have
+  // changed places (swap strategy) or fromIndex may be stale (data changed)
+  if (skipIfNoChange && items.every(([key], i) => keyToIndex[key] === i)) {
     return data;
   }
 
