@@ -50,23 +50,26 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
   const context = useMutableValue<null | StateContextType>(null);
   const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
-  const debounce = useAnimatedDebounce();
+  const { cancel: cancelDebounce, schedule: scheduleDebounce } =
+    useAnimatedDebounce();
 
-  // Ask the currently rendered items whether the batch is complete, rather than
-  // comparing how many were measured: a count stops matching for good once a key
-  // the component no longer renders enters the tally, which a layout event
-  // delivered after React unmounted that item does.
+  // A count of measured keys stops matching for good once a layout event
+  // arrives for an item React already unmounted, so check the current keys.
   const areAllItemsMeasured = useCallback(
     (ctx: StateContextType) => {
       'worklet';
+      const { height: isHeightControlled, width: isWidthControlled } =
+        controlledItemDimensions;
       return indexToKey.value.every(
         key =>
           ctx.queuedMeasurements.has(key) ||
-          (resolveDimension(itemWidths.value, key) !== null &&
-            resolveDimension(itemHeights.value, key) !== null)
+          ((isWidthControlled ||
+            resolveDimension(itemWidths.value, key) !== null) &&
+            (isHeightControlled ||
+              resolveDimension(itemHeights.value, key) !== null))
       );
     },
-    [indexToKey, itemHeights, itemWidths]
+    [controlledItemDimensions, indexToKey, itemHeights, itemWidths]
   );
 
   const applyQueuedMeasurements = useCallback(
@@ -94,9 +97,9 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       ctx.queuedMeasurements.clear();
-      debounce.cancel();
+      cancelDebounce();
     },
-    [controlledItemDimensions, debounce, itemHeights, itemWidths]
+    [cancelDebounce, controlledItemDimensions, itemHeights, itemWidths]
   );
 
   const handleItemMeasurement = useStableCallback(
@@ -174,7 +177,7 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         } else {
           // In all other cases, debounce the update to reduce the number of
           // updates when dimensions change many times within a short period of time
-          debounce.schedule(() => {
+          scheduleDebounce(() => {
             'worklet';
             applyQueuedMeasurements(ctx);
           }, measureDebounceDelay);
@@ -208,9 +211,8 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         ctx.measuredItemKeys.delete(key);
         ctx.queuedMeasurements.delete(key);
 
-        // Removing an item can be what completes a batch that was waiting for
-        // it, and nothing else would retry: the items already measured report
-        // no further layout, so their sizes would stay queued indefinitely.
+        // The removed item may be the one a queued batch was waiting for, and
+        // the items already measured will not report another layout.
         if (ctx.queuedMeasurements.size > 0 && areAllItemsMeasured(ctx)) {
           applyQueuedMeasurements(ctx);
         }

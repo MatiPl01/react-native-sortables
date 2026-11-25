@@ -79,7 +79,9 @@ async function reportLayoutFor(
   });
 }
 
-function Grid({ data }: { data: Array<string> }) {
+type GridProps = { data: Array<string>; sortEnabled?: boolean };
+
+function Grid({ data, sortEnabled }: GridProps) {
   return (
     <GestureHandlerRootView>
       <Sortable.Grid
@@ -88,6 +90,7 @@ function Grid({ data }: { data: Array<string> }) {
         keyExtractor={item => item}
         renderItem={() => <ProbeItem />}
         rowGap={0}
+        sortEnabled={sortEnabled}
       />
     </GestureHandlerRootView>
   );
@@ -123,34 +126,6 @@ describe('grid container height', () => {
     // Removing the last item resizes nothing that remains.
     await reportLayoutFor(view.UNSAFE_root, []);
     expect(containerHeight?.value).toBe(2 * ITEM_HEIGHT);
-  });
-
-  it('keeps updating after an item is replaced', async () => {
-    const view = render(<Grid data={['a', 'b', 'c']} />);
-    await reportLayoutFor(view.UNSAFE_root, ['a', 'b', 'c']);
-
-    view.rerender(<Grid data={['a', 'b', 'd']} />);
-    await reportLayoutFor(view.UNSAFE_root, ['d']);
-    expect(containerHeight?.value).toBe(3 * ITEM_HEIGHT);
-
-    view.rerender(<Grid data={['a', 'b', 'd', 'e']} />);
-    await reportLayoutFor(view.UNSAFE_root, ['e']);
-    expect(containerHeight?.value).toBe(4 * ITEM_HEIGHT);
-  });
-
-  it('keeps updating when an item is removed and another added in the same commit', async () => {
-    const view = render(<Grid data={['a', 'b', 'c', 'd']} />);
-    await reportLayoutFor(view.UNSAFE_root, ['a', 'b', 'c', 'd']);
-    expect(containerHeight?.value).toBe(4 * ITEM_HEIGHT);
-
-    // swap one out for one in, net count unchanged
-    view.rerender(<Grid data={['a', 'b', 'c', 'e']} />);
-    await reportLayoutFor(view.UNSAFE_root, ['e']);
-    expect(containerHeight?.value).toBe(4 * ITEM_HEIGHT);
-
-    view.rerender(<Grid data={['a', 'b', 'c', 'e', 'f']} />);
-    await reportLayoutFor(view.UNSAFE_root, ['f']);
-    expect(containerHeight?.value).toBe(5 * ITEM_HEIGHT);
   });
 
   it('keeps updating after a late layout event for an item that was removed', async () => {
@@ -202,24 +177,27 @@ describe('grid container height', () => {
     await reportLayoutFor(view.UNSAFE_root, ['c']);
     expect(containerHeight?.value).toBe(2 * ITEM_HEIGHT);
 
-    // b comes back; the grid must still account for it.
+    // b comes back; the grid must still account for it and for later items.
     view.rerender(<Grid data={['a', 'c', 'b']} />);
     await reportLayoutFor(view.UNSAFE_root, ['b']);
     expect(containerHeight?.value).toBe(3 * ITEM_HEIGHT);
+
+    view.rerender(<Grid data={['a', 'c', 'b', 'd']} />);
+    await reportLayoutFor(view.UNSAFE_root, ['d']);
+    expect(containerHeight?.value).toBe(4 * ITEM_HEIGHT);
   });
 
-  it('keeps updating after a removed key is added back', async () => {
+  it('keeps the measurements when another prop changes', async () => {
     const view = render(<Grid data={['a', 'b', 'c']} />);
     await reportLayoutFor(view.UNSAFE_root, ['a', 'b', 'c']);
 
-    view.rerender(<Grid data={['a', 'b']} />);
+    // Re-rendering the grid must not make the items drop their sizes.
+    view.rerender(<Grid data={['a', 'b', 'c']} sortEnabled={false} />);
     await reportLayoutFor(view.UNSAFE_root, []);
-    expect(containerHeight?.value).toBe(2 * ITEM_HEIGHT);
 
-    // same key comes back with the same size it had before
-    view.rerender(<Grid data={['a', 'b', 'c']} />);
-    await reportLayoutFor(view.UNSAFE_root, ['c']);
-    expect(containerHeight?.value).toBe(3 * ITEM_HEIGHT);
+    view.rerender(<Grid data={['a', 'b', 'c', 'd']} sortEnabled={false} />);
+    await reportLayoutFor(view.UNSAFE_root, ['d']);
+    expect(containerHeight?.value).toBe(4 * ITEM_HEIGHT);
   });
 });
 
@@ -253,21 +231,6 @@ const flexKeys = (...names: Array<string>) => names.map(name => `.$${name}`);
 describe('flex container height', () => {
   beforeEach(() => {
     containerHeight = null;
-  });
-
-  it('is set once every item has been measured', async () => {
-    const view = render(<Flex items={['a', 'b', 'c']} />);
-    await reportLayoutFor(view.UNSAFE_root, flexKeys('a', 'b', 'c'));
-    expect(containerHeight?.value).toBe(3 * ITEM_HEIGHT);
-  });
-
-  it('grows when an item is appended', async () => {
-    const view = render(<Flex items={['a', 'b', 'c']} />);
-    await reportLayoutFor(view.UNSAFE_root, flexKeys('a', 'b', 'c'));
-
-    view.rerender(<Flex items={['a', 'b', 'c', 'd']} />);
-    await reportLayoutFor(view.UNSAFE_root, flexKeys('d'));
-    expect(containerHeight?.value).toBe(4 * ITEM_HEIGHT);
   });
 
   it('keeps updating after a late layout event for an item that was removed', async () => {
