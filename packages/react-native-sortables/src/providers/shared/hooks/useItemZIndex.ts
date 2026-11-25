@@ -8,6 +8,7 @@ export default function useItemZIndex(
   activationAnimationProgress: SharedValue<number>
 ): SharedValue<number> {
   const {
+    activeItemBroughtToFront,
     activeItemKey,
     indexToKey,
     isStackingOrderDesc,
@@ -17,15 +18,20 @@ export default function useItemZIndex(
 
   return useDerivedValue<number>(() => {
     const itemCount = indexToKey.value.length;
-
-    if (activeItemKey.value === key) {
-      return 2 * itemCount + 1;
-    }
-
     const realIndex = keyToIndex.value[key] ?? 0;
     const orderZIndex = isStackingOrderDesc
       ? itemCount - realIndex - 1
       : realIndex;
+
+    // A bare long press must not change the stacking order, as this
+    // dismisses a native context menu rendered in the item
+    if (!activeItemBroughtToFront.value) {
+      return orderZIndex;
+    }
+
+    if (activeItemKey.value === key) {
+      return 2 * itemCount + 1;
+    }
 
     if (activationAnimationProgress.value > 0) {
       if (prevActiveItemKey.value === key) {

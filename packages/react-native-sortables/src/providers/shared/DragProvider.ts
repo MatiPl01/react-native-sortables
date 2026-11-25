@@ -81,6 +81,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationAnimationDuration,
     activationState,
     activeAnimationProgress,
+    activeItemBroughtToFront,
     activeItemDimensions,
     activeItemDropped,
     activeItemKey,
@@ -295,6 +296,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemPosition.value = itemPosition;
       activeItemDimensions.value = itemDimensions;
       activationState.value = DragActivationState.ACTIVE;
+      activeItemBroughtToFront.value = false;
       ctx.dragStartIndex = keyToIndex.value[key] ?? -1;
 
       if (activeContainerId) {
@@ -303,8 +305,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       if (multiZoneActiveItemDimensions) {
         multiZoneActiveItemDimensions.value = itemDimensions;
       }
-
-      updateLayer?.(LayerState.FOCUSED);
 
       // We need to update the custom handle measurements if the custom handle
       // is used (touch position is relative to the handle in this case)
@@ -355,6 +355,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeAnimationProgress,
       activeContainerId,
       activeHandleOffset,
+      activeItemBroughtToFront,
       activeItemDimensions,
       activeItemDropped,
       activationState,
@@ -372,7 +373,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       prevActiveItemKey,
       onDragStart,
       touchPosition,
-      updateLayer,
       updateActiveHandleMeasurements
     ]
   );
@@ -470,6 +470,21 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           key: activeItemKey.value,
           touchData: touch
         });
+
+        // Bring to front only once dragged, so that a bare long press doesn't
+        // change the stacking order and dismiss a native context menu
+        const start = ctx.touchStartTouch;
+        if (
+          !activeItemBroughtToFront.value &&
+          start &&
+          Math.hypot(
+            touch.absoluteX - start.absoluteX,
+            touch.absoluteY - start.absoluteY
+          ) >= dragActivationFailOffset.value
+        ) {
+          activeItemBroughtToFront.value = true;
+          updateLayer?.(LayerState.FOCUSED);
+        }
       }
 
       if (activationState.value === DragActivationState.TOUCHED) {
@@ -496,11 +511,13 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     },
     [
       activationState,
+      activeItemBroughtToFront,
       activeItemKey,
       dragActivationFailOffset,
       currentTouch,
       context,
-      onDragMove
+      onDragMove,
+      updateLayer
     ]
   );
 
@@ -555,7 +572,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveAnimationProgress.value = animate();
       activeAnimationProgress.value = animate();
 
-      updateLayer?.(LayerState.INTERMEDIATE);
+      if (activeItemBroughtToFront.value) {
+        updateLayer?.(LayerState.INTERMEDIATE);
+      }
       haptics.medium();
 
       stableOnDragEnd({
@@ -580,6 +599,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     },
     [
       activeContainerId,
+      activeItemBroughtToFront,
       activeItemKey,
       activeItemDimensions,
       activeItemDropped,

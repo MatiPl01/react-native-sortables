@@ -91,6 +91,7 @@ export type CommonValuesContextType =
       activeAnimationProgress: SharedValue<number>;
       inactiveAnimationProgress: SharedValue<number>;
       activeItemDropped: SharedValue<boolean>;
+      activeItemBroughtToFront: SharedValue<boolean>;
 
       // OTHER
       containerRef: AnimatedRef<View>;
