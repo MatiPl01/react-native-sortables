@@ -537,18 +537,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const fromIndex = ctx.dragStartIndex;
       const toIndex = keyToIndex.value[key]!;
 
-      // The drag ended before the delayed start callback was called
-      if (ctx.dragStartTimeoutId !== -1) {
-        clearAnimatedTimeout(ctx.dragStartTimeoutId);
-        ctx.dragStartTimeoutId = -1;
-        onDragStart({
-          fromIndex,
-          indexToKey: indexToKey.value,
-          key,
-          keyToIndex: keyToIndex.value
-        });
-      }
-
       prevActiveItemKey.value = activeItemKey.value;
       ctx.dragStartItemTouchOffset = null;
       ctx.dragStartTouchPosition = null;
@@ -572,6 +560,18 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
 
       updateLayer?.(LayerState.INTERMEDIATE);
       haptics.medium();
+
+      // The drag ended before the delayed start callback was called
+      if (ctx.dragStartTimeoutId !== -1) {
+        clearAnimatedTimeout(ctx.dragStartTimeoutId);
+        ctx.dragStartTimeoutId = -1;
+        onDragStart({
+          fromIndex,
+          indexToKey: indexToKey.value,
+          key,
+          keyToIndex: keyToIndex.value
+        });
+      }
 
       stableOnDragEnd({
         fromIndex,
