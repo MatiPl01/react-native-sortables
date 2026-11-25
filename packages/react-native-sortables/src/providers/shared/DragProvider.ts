@@ -20,6 +20,7 @@ import {
 import type {
   Dimensions,
   DragContextType,
+  DragStartParams,
   OverDrag,
   ReorderTriggerOrigin,
   SortableCallbacks,
@@ -45,7 +46,8 @@ type StateContextType = {
   dragStartItemTouchOffset: null | Vector;
   dragStartTouchPosition: null | Vector;
   dragStartIndex: number;
-  dragStartTimeoutId: number;
+  pendingDragStart: DragStartParams | null;
+  dropTimeoutId: number;
   activationTimeoutId: number;
 };
 
@@ -53,8 +55,9 @@ const INITIAL_STATE: StateContextType = {
   activationTimeoutId: -1,
   dragStartIndex: -1,
   dragStartItemTouchOffset: null,
-  dragStartTimeoutId: -1,
   dragStartTouchPosition: null,
+  dropTimeoutId: -1,
+  pendingDragStart: null,
   touchStartTouch: null
 };
 
@@ -343,14 +346,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // Use timeout to ensure that the callback is called after all animated
       // reactions are computed in the library (e.g. for the portal and collapsible
       // items case when the size of the active item must change after it is teleported)
-      ctx.dragStartTimeoutId = setAnimatedTimeout(() => {
-        ctx.dragStartTimeoutId = -1;
-        onDragStart({
-          fromIndex: ctx.dragStartIndex,
-          indexToKey: indexToKey.value,
-          key,
-          keyToIndex: keyToIndex.value
-        });
+      const dragStartParams = {
+        fromIndex: ctx.dragStartIndex,
+        indexToKey: indexToKey.value,
+        key,
+        keyToIndex: keyToIndex.value
+      };
+      ctx.pendingDragStart = dragStartParams;
+      setAnimatedTimeout(() => {
+        // Already called if the drag ended in the meantime
+        if (ctx.pendingDragStart === dragStartParams) {
+          ctx.pendingDragStart = null;
+          onDragStart(dragStartParams);
+        }
       });
     },
     [
@@ -562,15 +570,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       haptics.medium();
 
       // The drag ended before the delayed start callback was called
-      if (ctx.dragStartTimeoutId !== -1) {
-        clearAnimatedTimeout(ctx.dragStartTimeoutId);
-        ctx.dragStartTimeoutId = -1;
-        onDragStart({
-          fromIndex,
-          indexToKey: indexToKey.value,
-          key,
-          keyToIndex: keyToIndex.value
-        });
+      if (ctx.pendingDragStart) {
+        onDragStart(ctx.pendingDragStart);
+        ctx.pendingDragStart = null;
       }
 
       stableOnDragEnd({
@@ -581,9 +583,12 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         toIndex
       });
 
-      setAnimatedTimeout(() => {
-        // Another item may have been picked up before this one was dropped
-        if (activeItemKey.value === null) {
+      const dropTimeoutId = setAnimatedTimeout(() => {
+        // Another item may have been picked up or dropped in the meantime
+        if (
+          activeItemKey.value === null &&
+          ctx.dropTimeoutId === dropTimeoutId
+        ) {
           activeItemDropped.value = true;
           updateLayer?.(LayerState.IDLE);
         }
@@ -595,6 +600,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
           toIndex
         });
       }, dropDuration);
+      ctx.dropTimeoutId = dropTimeoutId;
     },
     [
       activeContainerId,

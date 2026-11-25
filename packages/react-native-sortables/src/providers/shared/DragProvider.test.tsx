@@ -106,4 +106,40 @@ describe('DragProvider', () => {
     expect(common.activeItemKey.value).toBe('b');
     expect(common.activeItemDropped.value).toBe(false);
   });
+
+  it('reports the order from the drag start when the drag ends right away', () => {
+    const orders: Array<Array<string>> = [];
+    renderGrid({
+      onDragStart: ({ indexToKey }) => orders.push(indexToKey)
+    });
+
+    const progress = activate('a');
+    act(() => {
+      common.indexToKey.value = ['b', 'a', 'c']; // reordered before the end
+      drag.handleDragEnd('a', progress);
+    });
+    advance(1000);
+
+    expect(orders).toEqual([KEYS]);
+  });
+
+  it('finishes the drop only when the last dropped item is dropped', () => {
+    renderGrid();
+
+    const progressA = activate('a');
+    advance(300); // activation animation
+    act(() => {
+      drag.handleDragEnd('a', progressA); // dropped after 300ms
+    });
+    const progressB = activate('b');
+    advance(80);
+    act(() => {
+      drag.handleDragEnd('b', progressB); // dropped later than the first item
+    });
+    advance(40); // the drop animation of the first item ends
+
+    expect(common.activeItemDropped.value).toBe(false);
+    advance(300);
+    expect(common.activeItemDropped.value).toBe(true);
+  });
 });
