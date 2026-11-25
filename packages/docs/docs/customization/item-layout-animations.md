@@ -16,7 +16,7 @@ The library provides one default animation for both cases:
 
 ## Usage
 
-You can override default animations by passing a custom animation to the `layoutAnimation` prop of the sortable component.
+You can override default animations by passing custom animations to the `itemEntering` and `itemExiting` props of the sortable component (pass `null` to disable an animation).
 
 To learn more about how to create custom animations, you can read the [Custom Animations](https://docs.swmansion.com/react-native-reanimated/docs/layout-animations/custom-animations) page in the `react-native-reanimated` docs.
 

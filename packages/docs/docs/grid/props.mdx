@@ -105,7 +105,7 @@ Number of columns in the grid.
 
 Number of rows in the grid.
 
-Setting this prop switches the grid to a **horizontal layout**, in which items flow from left to right, then top to bottom.
+Setting this prop switches the grid to a **horizontal layout**, in which items flow from top to bottom, then left to right.
 
 | type     | default | required |
 | -------- | ------- | -------- |
@@ -838,6 +838,12 @@ Called when the drag gesture ends. Data passed to the callback is sorted accordi
 | type                             | default | required |
 | -------------------------------- | ------- | -------- |
 | `SortableGridDragEndCallback<T>` | NO      | NO       |
+
+:::warning
+
+The `data` param is available only when `onDragEnd` is a **plain JS function**. In a worklet it is `undefined`, so use `indexToKey` / `keyToIndex` there or pass a JS callback.
+
+:::
 
 <details>
   <summary>Type definitions</summary>

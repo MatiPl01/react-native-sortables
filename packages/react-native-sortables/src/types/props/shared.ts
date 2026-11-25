@@ -144,7 +144,7 @@ export type AutoScrollSettings = {
    * The main purpose of this prop is to ensure that scroll position changes
    * are animated when the autoScrollInterval is set to a large value.
    *
-   * @default false on iOS, true on Android
+   * @default true on Android with the New Architecture, false otherwise
    */
   animateScrollTo: boolean;
 };

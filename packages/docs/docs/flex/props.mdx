@@ -402,7 +402,7 @@ Shadow opacity of the active item.
 
 :::info
 
-If you want to use shadows on **Android**, please refer to the [Custom Shadow](/grid/examples/custom-shadow) example.
+If you want to use shadows on **Android**, please refer to the [Custom Shadow](/flex/examples/custom-shadow) example.
 
 :::
 
@@ -903,6 +903,12 @@ Called when the drag gesture ends. Data passed to the callback is the new order 
 | type                          | default | required |
 | ----------------------------- | ------- | -------- |
 | `SortableFlexDragEndCallback` | NO      | NO       |
+
+:::warning
+
+The `order` param is available only when `onDragEnd` is a **plain JS function**. In a worklet it is `undefined`, so use `indexToKey` / `keyToIndex` there or pass a JS callback.
+
+:::
 
 <details>
   <summary>Type definitions</summary>

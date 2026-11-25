@@ -17,7 +17,7 @@ export type CustomHandleProps = PropsWithChildren<{
   /** Controls how the item behaves in the sortable component
    * - 'draggable': Item can be dragged and moves with reordering (default)
    * - 'non-draggable': Item cannot be dragged but moves with reordering
-   * - 'fixed': Item stays in place and cannot be dragged
+   * - 'fixed-order': Item stays in place and cannot be dragged
    * @default 'draggable'
    */
   mode?: 'draggable' | 'fixed-order' | 'non-draggable';
