@@ -21,19 +21,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     return true
   }
-
-  func application(
-    _ application: UIApplication,
-    configurationForConnecting connectingSceneSession: UISceneSession,
-    options: UIScene.ConnectionOptions
-  ) -> UISceneConfiguration {
-    let configuration = UISceneConfiguration(
-      name: nil,
-      sessionRole: connectingSceneSession.role
-    )
-    configuration.delegateClass = SceneDelegate.self
-    return configuration
-  }
 }
 
 /// The iOS 26 SDK makes an app that never adopts the UIScene life cycle trap at
