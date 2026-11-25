@@ -13,6 +13,7 @@ export const defaultKeyExtractor = <I>(item: I): string => {
     if (hasProp(item, 'key')) {
       return String(item.key);
     }
+    return JSON.stringify(item);
   }
 
   return String(item);
