@@ -11,7 +11,7 @@ on:
   workflow_dispatch: # Allow manual triggering
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 
 jobs:
   # Build Expo app locally (no EAS required)
