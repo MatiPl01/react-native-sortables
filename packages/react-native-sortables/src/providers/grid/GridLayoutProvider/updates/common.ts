@@ -44,20 +44,14 @@ export const createGridStrategy =
     const othersIndexToKey = useInactiveIndexToKey();
     const debugBox = useDebugBoundingBox();
 
-    // Cross sizes captured at each drag start. Used to detect a mid-drag size
-    // change (e.g. items collapsing on drag start) that is still in flight
-    // before the auto offset is applied - see the gate in the order updater.
-    // Re-captured on every drag start (activeItemKey null -> key), so it stays
-    // correct even when the same item is dragged twice in a row.
+    const crossSizes = isVertical ? itemHeights : itemWidths;
     const dragStartCrossSizes = useMutableValue<ItemSizes>(null);
 
     useAnimatedReaction(
       () => activeItemKey.value,
       key => {
         if (key !== null) {
-          dragStartCrossSizes.value = isVertical
-            ? itemHeights.value
-            : itemWidths.value;
+          dragStartCrossSizes.value = crossSizes.value;
         }
       }
     );
@@ -73,7 +67,7 @@ export const createGridStrategy =
         itemHeights: itemHeights.value,
         itemWidths: itemWidths.value,
         numGroups,
-        startCrossOffset: additionalCrossOffset?.value ?? 0
+        startCrossOffset: additionalCrossOffset?.value
       })
     );
 
@@ -99,22 +93,11 @@ export const createGridStrategy =
 
     return ({ activeIndex, dimensions, position }) => {
       'worklet';
-      // While the auto offset is enabled (additionalCrossOffset defined) but not
-      // yet applied (value still null), hold ordering only during a mid-drag
-      // size transition - when the cross sizes changed since the drag started.
-      // In that window othersLayout (new sizes, offset 0) is inconsistent with
-      // the on-screen layout and the finger position, so the bounds walk would
-      // fire a far-jump reorder that the offset block then anchors on. Ordering
-      // resumes as soon as the offset is applied. Drags with no size change
-      // (uniform or already-collapsed items) are unaffected - the snapshot
-      // stays reference-equal, so ordering works from the first move.
-      const currentCrossSizes = isVertical
-        ? itemHeights.value
-        : itemWidths.value;
+      // Item sizes changed during the drag and the auto offset is not applied
+      // yet, so othersLayout doesn't match positions of items on the screen
       if (
-        additionalCrossOffset &&
-        additionalCrossOffset.value === null &&
-        dragStartCrossSizes.value !== currentCrossSizes
+        additionalCrossOffset?.value === null &&
+        dragStartCrossSizes.value !== crossSizes.value
       ) {
         return;
       }

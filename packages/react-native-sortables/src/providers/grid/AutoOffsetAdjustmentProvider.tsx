@@ -93,7 +93,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     contextRef.current ??= makeMutable<StateContextType>({
       keepInViewData: null,
       prevSortEnabled: sortEnabled.value,
-      resetTimeoutId: 0,
+      resetTimeoutId: -1,
       state: AutoOffsetAdjustmentState.DISABLED
     });
     const context = contextRef.current;
@@ -274,11 +274,8 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           };
         }
 
-        // At-rest cross-size change (e.g. a "collapse all"/"expand all" toggle)
-        // with no active drag: `itemKey` above fell back to a stale
-        // `prevActiveItemKey` from the previous drag. Applying an offset here
-        // would shift the whole layout and set `sortEnabled = false` with no
-        // drop event ever coming to restore it, permanently disabling sorting.
+        // A size change with no active item must not apply the offset: the key
+        // comes from the previous drag and no drop follows to re-enable sorting
         if (activeItemKey.value === null) {
           return props;
         }
