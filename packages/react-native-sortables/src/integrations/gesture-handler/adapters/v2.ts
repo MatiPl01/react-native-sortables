@@ -44,13 +44,8 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
     // maxDistance only exists on the Tap/LongPress builders, so set it there.
     const recognizers: Array<GestureType> = [];
 
-    if (onTap) {
-      recognizers.push(
-        decorate(
-          Gesture.Tap().maxDistance(failDistance).shouldCancelWhenOutside(false)
-        ).onStart(onTap)
-      );
-    }
+    // The double tap goes first, as an exclusive gesture waits only for the
+    // gestures before it and the single tap would always win otherwise
     if (onDoubleTap) {
       recognizers.push(
         decorate(
@@ -59,6 +54,13 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
             .maxDistance(failDistance)
             .shouldCancelWhenOutside(false)
         ).onStart(onDoubleTap)
+      );
+    }
+    if (onTap) {
+      recognizers.push(
+        decorate(
+          Gesture.Tap().maxDistance(failDistance).shouldCancelWhenOutside(false)
+        ).onStart(onTap)
       );
     }
     if (onLongPress) {

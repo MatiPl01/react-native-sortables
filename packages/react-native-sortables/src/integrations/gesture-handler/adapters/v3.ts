@@ -111,22 +111,24 @@ const useTouchableGesture: GestureHandlerAdapter['useTouchableGesture'] = ({
   /* eslint-disable react-hooks/rules-of-hooks */
   const recognizers: Parameters<typeof useExclusiveGestures> = [];
 
-  if (onTap) {
-    recognizers.push(
-      useTapGesture({
-        maxDistance: failDistance,
-        onActivate: useStableCallbackValue(onTap),
-        shouldCancelWhenOutside: false,
-        simultaneousWith
-      })
-    );
-  }
+  // The double tap goes first, as an exclusive gesture waits only for the
+  // gestures before it and the single tap would always win otherwise
   if (onDoubleTap) {
     recognizers.push(
       useTapGesture({
         maxDistance: failDistance,
         numberOfTaps: 2,
         onActivate: useStableCallbackValue(onDoubleTap),
+        shouldCancelWhenOutside: false,
+        simultaneousWith
+      })
+    );
+  }
+  if (onTap) {
+    recognizers.push(
+      useTapGesture({
+        maxDistance: failDistance,
+        onActivate: useStableCallbackValue(onTap),
         shouldCancelWhenOutside: false,
         simultaneousWith
       })

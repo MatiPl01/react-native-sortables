@@ -173,3 +173,22 @@ it('returns the bare touch tracker when only touch callbacks are set (no recogni
   expect(useManualGesture).toHaveBeenCalledTimes(1);
   expect(mocked.useSimultaneousGestures).not.toHaveBeenCalled();
 });
+
+it('creates the double tap before the single tap, so that the single tap waits for it', () => {
+  renderHook(() =>
+    useTouchableGesture({
+      externalGesture: {},
+      failDistance: 10,
+      gestureMode: 'exclusive',
+      onDoubleTap: jest.fn(),
+      onTap: jest.fn()
+    })
+  );
+
+  const [[doubleTap], [tap]] = mocked.useTapGesture.mock.calls.slice(-2) as [
+    [{ numberOfTaps?: number }],
+    [{ numberOfTaps?: number }]
+  ];
+  expect(doubleTap.numberOfTaps).toBe(2);
+  expect(tap.numberOfTaps).toBeUndefined();
+});
