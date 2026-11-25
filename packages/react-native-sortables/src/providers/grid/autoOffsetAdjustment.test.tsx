@@ -47,23 +47,26 @@ const setHeights = (height: number) =>
     );
   });
 
+const Grid = ({ keys = KEYS }: { keys?: Array<string> }) => (
+  <GestureHandlerRootView>
+    <Sortable.Grid
+      columns={1}
+      data={keys}
+      renderItem={() => <View />}
+      strategy={useCapturingStrategy}
+      autoAdjustOffsetDuringDrag
+    />
+  </GestureHandlerRootView>
+);
+
 function renderGrid() {
-  render(
-    <GestureHandlerRootView>
-      <Sortable.Grid
-        columns={1}
-        data={KEYS}
-        renderItem={() => <View />}
-        strategy={useCapturingStrategy}
-        autoAdjustOffsetDuringDrag
-      />
-    </GestureHandlerRootView>
-  );
+  const result = render(<Grid />);
   act(() => {
     common.containerWidth.value = 300;
   });
   setHeights(EXPANDED);
   advance(200); // absolute layout is enabled after a timeout
+  return result;
 }
 
 function startDrag(key: string, absoluteY: number) {
@@ -73,6 +76,14 @@ function startDrag(key: string, absoluteY: number) {
   });
   advance(300); // drag activation delay
   return progress;
+}
+
+function dragAndDrop(key: string) {
+  const progress = startDrag(key, 10);
+  act(() => {
+    drag.handleDragEnd(key, progress);
+  });
+  advance(2000); // drop animation + autoAdjustOffsetResetTimeout
 }
 
 function moveTo(absoluteY: number) {
@@ -126,5 +137,16 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
     moveTo(13);
 
     expect(common.indexToKey.value).toEqual(KEYS);
+  });
+
+  it('shrinks the container when an item is removed after drags', () => {
+    const { rerender } = renderGrid();
+    dragAndDrop('a');
+    dragAndDrop('a');
+
+    rerender(<Grid keys={KEYS.slice(0, 3)} />);
+    advance(0);
+
+    expect(common.containerHeight.value).toBe(3 * EXPANDED);
   });
 });

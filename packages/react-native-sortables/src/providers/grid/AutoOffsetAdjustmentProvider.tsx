@@ -101,11 +101,11 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const disableAutoOffsetAdjustment = useCallback(() => {
       'worklet';
       const ctx = context.value;
+      clearAnimatedTimeout(ctx.resetTimeoutId);
+      ctx.state = AutoOffsetAdjustmentState.DISABLED;
       if (ctx.prevSortEnabled === null) {
         return;
       }
-      clearAnimatedTimeout(ctx.resetTimeoutId);
-      ctx.state = AutoOffsetAdjustmentState.DISABLED;
       sortEnabled.value = ctx.prevSortEnabled;
       ctx.prevSortEnabled = null;
       additionalCrossOffset.value = null;
