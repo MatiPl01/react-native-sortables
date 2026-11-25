@@ -59,6 +59,21 @@ it('selects the v3 adapter and wires the drag callbacks into the manual hook', (
   expect(typeof config.onTouchesUp).toBe('function');
 });
 
+it('reuses the drag gesture config until the caller deps change', () => {
+  const { rerender } = renderHook(
+    ({ dep }) => useDragGesture({ ...callbacks }, [dep]),
+    { initialProps: { dep: 1 } }
+  );
+  rerender({ dep: 1 });
+  rerender({ dep: 2 });
+
+  const [first, second, third] = useManualGesture.mock.calls.map(
+    ([config]: [unknown]) => config
+  );
+  expect(second).toBe(first);
+  expect(third).not.toBe(first);
+});
+
 it('creates a gesture only for the handlers that are provided and wraps them as worklets', () => {
   const onTap = jest.fn();
 
