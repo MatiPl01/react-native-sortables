@@ -27,4 +27,14 @@ describe(defaultKeyExtractor, () => {
 
     expect(defaultKeyExtractor(item)).toBe('[object Object]');
   });
+
+  it('keeps a string item that looks like an object unchanged', () => {
+    expect(defaultKeyExtractor('[object Object]')).toBe('[object Object]');
+  });
+
+  it('returns a string for an object that serializes to nothing', () => {
+    expect(defaultKeyExtractor({ toJSON: () => undefined })).toBe(
+      '[object Object]'
+    );
+  });
 });

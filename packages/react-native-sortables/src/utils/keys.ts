@@ -16,14 +16,15 @@ export const defaultKeyExtractor = <I>(item: I): string => {
   }
 
   const key = String(item);
-  if (key !== '[object Object]') {
-    return key;
-  }
 
   // Plain objects all have the same string value, so their content is used
-  try {
-    return JSON.stringify(item);
-  } catch {
-    return key;
+  if (typeof item === 'object' && key === '[object Object]') {
+    try {
+      return JSON.stringify(item) ?? key;
+    } catch {
+      // Not serializable, the string value is used
+    }
   }
+
+  return key;
 };
