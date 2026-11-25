@@ -45,6 +45,7 @@ type StateContextType = {
   dragStartItemTouchOffset: null | Vector;
   dragStartTouchPosition: null | Vector;
   dragStartIndex: number;
+  dragStartTimeoutId: number;
   activationTimeoutId: number;
 };
 
@@ -52,6 +53,7 @@ const INITIAL_STATE: StateContextType = {
   activationTimeoutId: -1,
   dragStartIndex: -1,
   dragStartItemTouchOffset: null,
+  dragStartTimeoutId: -1,
   dragStartTouchPosition: null,
   touchStartTouch: null
 };
@@ -126,7 +128,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     overDrag === 'horizontal' || overDrag === 'both';
   const hasVerticalOverDrag = overDrag === 'vertical' || overDrag === 'both';
 
-  const context = useMutableValue<StateContextType>(INITIAL_STATE);
+  const context = useMutableValue<StateContextType>({ ...INITIAL_STATE });
 
   const currentTouch = useMutableValue<null | TouchData>(null);
   // Used to trigger order change of items when the active item is dragged around
@@ -341,7 +343,8 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       // Use timeout to ensure that the callback is called after all animated
       // reactions are computed in the library (e.g. for the portal and collapsible
       // items case when the size of the active item must change after it is teleported)
-      setAnimatedTimeout(() => {
+      ctx.dragStartTimeoutId = setAnimatedTimeout(() => {
+        ctx.dragStartTimeoutId = -1;
         onDragStart({
           fromIndex: ctx.dragStartIndex,
           indexToKey: indexToKey.value,
@@ -534,6 +537,18 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const fromIndex = ctx.dragStartIndex;
       const toIndex = keyToIndex.value[key]!;
 
+      // The drag ended before the delayed start callback was called
+      if (ctx.dragStartTimeoutId !== -1) {
+        clearAnimatedTimeout(ctx.dragStartTimeoutId);
+        ctx.dragStartTimeoutId = -1;
+        onDragStart({
+          fromIndex,
+          indexToKey: indexToKey.value,
+          key,
+          keyToIndex: keyToIndex.value
+        });
+      }
+
       prevActiveItemKey.value = activeItemKey.value;
       ctx.dragStartItemTouchOffset = null;
       ctx.dragStartTouchPosition = null;
@@ -567,8 +582,11 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       });
 
       setAnimatedTimeout(() => {
-        activeItemDropped.value = true;
-        updateLayer?.(LayerState.IDLE);
+        // Another item may have been picked up before this one was dropped
+        if (activeItemKey.value === null) {
+          activeItemDropped.value = true;
+          updateLayer?.(LayerState.IDLE);
+        }
         onActiveItemDropped({
           fromIndex,
           indexToKey: indexToKey.value,
@@ -596,6 +614,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       keyToIndex,
       multiZoneActiveItemDimensions,
       onActiveItemDropped,
+      onDragStart,
       stableOnDragEnd,
       touchPosition,
       updateLayer,
