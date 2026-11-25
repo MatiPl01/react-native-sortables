@@ -69,10 +69,12 @@ describe('CommonValuesProvider', () => {
 
     render(<CommonValuesProvider {...props} />);
 
-    // Reanimated appends the worklet hash to the array it receives
-    expect(dependenciesOf()).toContainEqual([
-      props.itemsLayoutTransitionMode,
-      expect.any(Number)
-    ]);
+    // Reanimated 4.5 appends the worklet hash to the array it receives and 4.7
+    // leaves it untouched, so only the dependency itself is compared
+    expect(
+      dependenciesOf().some(
+        deps => deps?.[0] === props.itemsLayoutTransitionMode
+      )
+    ).toBe(true);
   });
 });
