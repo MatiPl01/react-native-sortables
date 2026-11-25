@@ -17,7 +17,6 @@ import type {
 import { areValuesDifferent, resolveDimension } from '../../utils';
 import { createProvider } from '../utils';
 import { useCommonValuesContext } from './CommonValuesProvider';
-import { useItemsContext } from './ItemsProvider';
 import { useMultiZoneContext } from './MultiZoneProvider';
 
 type StateContextType = {
@@ -41,17 +40,67 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
     containerWidth,
     controlledContainerDimensions,
     controlledItemDimensions,
+    indexToKey,
     itemHeights,
     itemWidths,
     usesAbsoluteLayout
   } = useCommonValuesContext();
   const { activeItemDimensions: multiZoneActiveItemDimensions } =
     useMultiZoneContext() ?? {};
-  const { getKeys } = useItemsContext();
 
   const context = useMutableValue<null | StateContextType>(null);
   const previousItemDimensionsRef = useRef<Record<string, Dimensions>>({});
-  const debounce = useAnimatedDebounce();
+  const { cancel: cancelDebounce, schedule: scheduleDebounce } =
+    useAnimatedDebounce();
+
+  // A count of measured keys stops matching for good once a layout event
+  // arrives for an item React already unmounted, so check the current keys.
+  const areAllItemsMeasured = useCallback(
+    (ctx: StateContextType) => {
+      'worklet';
+      const { height: isHeightControlled, width: isWidthControlled } =
+        controlledItemDimensions;
+      return indexToKey.value.every(
+        key =>
+          ctx.queuedMeasurements.has(key) ||
+          ((isWidthControlled ||
+            resolveDimension(itemWidths.value, key) !== null) &&
+            (isHeightControlled ||
+              resolveDimension(itemHeights.value, key) !== null))
+      );
+    },
+    [controlledItemDimensions, indexToKey, itemHeights, itemWidths]
+  );
+
+  const applyQueuedMeasurements = useCallback(
+    (ctx: StateContextType) => {
+      'worklet';
+      const { height: isHeightControlled, width: isWidthControlled } =
+        controlledItemDimensions;
+
+      const updateDimension = (
+        dimension: Dimension,
+        sizes: SharedValue<ItemSizes>
+      ) => {
+        const newSizes = { ...(sizes.value as Record<string, number>) };
+        for (const [k, dims] of ctx.queuedMeasurements.entries()) {
+          newSizes[k] = dims[dimension];
+        }
+        sizes.value = newSizes;
+      };
+
+      if (!isWidthControlled) {
+        updateDimension('width', itemWidths);
+      }
+      if (!isHeightControlled) {
+        updateDimension('height', itemHeights);
+      }
+
+      ctx.queuedMeasurements.clear();
+      cancelDebounce();
+    },
+    [cancelDebounce, controlledItemDimensions, itemHeights, itemWidths]
+  );
 
   const handleItemMeasurement = useStableCallback(
     (key: string, dimensions: Dimensions) => {
@@ -83,7 +132,6 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
       }
 
       previousItemDimensionsRef.current[key] = dimensions;
-      const itemsCount = getKeys().length;
 
       runOnUI(() => {
         context.value ??= {
@@ -113,43 +161,26 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
 
         // Update the array of item dimensions only after all items have been
         // measured to reduce the number of times animated reactions are triggered
-        if (ctx.measuredItemKeys.size !== itemsCount) {
+        if (!areAllItemsMeasured(ctx)) {
           return;
         }
 
-        const updateDimensions = () => {
-          const updateDimension = (
-            dimension: Dimension,
-            sizes: SharedValue<ItemSizes>
-          ) => {
-            const newSizes = { ...(sizes.value as Record<string, number>) };
-            for (const [k, dims] of ctx.queuedMeasurements.entries()) {
-              newSizes[k] = dims[dimension];
-            }
-            sizes.value = newSizes;
-          };
-
-          if (!isWidthControlled) {
-            updateDimension('width', itemWidths);
-          }
-          if (!isHeightControlled) {
-            updateDimension('height', itemHeights);
-          }
-
-          ctx.queuedMeasurements.clear();
-          debounce.cancel();
-        };
-
-        if (isNewItem || ctx.queuedMeasurements.size === itemsCount) {
+        if (
+          isNewItem ||
+          ctx.queuedMeasurements.size === indexToKey.value.length
+        ) {
           // Update dimensions immediately to avoid unnecessary delays when:
           // - measurements were triggered because of adding new items and all new items have been measured
           // - all sortable container items' dimensions have changed (e.g. when someone creates collapsible
           //   items which change their height when the user starts dragging them)
-          updateDimensions();
+          applyQueuedMeasurements(ctx);
         } else {
           // In all other cases, debounce the update to reduce the number of
           // updates when dimensions change many times within a short period of time
-          debounce.schedule(updateDimensions, measureDebounceDelay);
+          scheduleDebounce(
+            () => applyQueuedMeasurements(ctx),
+            measureDebounceDelay
+          );
         }
       })();
     }
@@ -171,10 +202,30 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         if (itemHeights.value && typeof itemHeights.value === 'object') {
           delete itemHeights.value[key];
         }
-        context.value?.measuredItemKeys.delete(key);
+
+        const ctx = context.value;
+        if (!ctx) {
+          return;
+        }
+
+        ctx.measuredItemKeys.delete(key);
+        ctx.queuedMeasurements.delete(key);
+
+        // The removed item may be the one a queued batch was waiting for, and
+        // the items already measured will not report another layout.
+        if (ctx.queuedMeasurements.size > 0 && areAllItemsMeasured(ctx)) {
+          applyQueuedMeasurements(ctx);
+        }
       })();
     },
-    [controlledItemDimensions, itemHeights, itemWidths, context]
+    [
+      applyQueuedMeasurements,
+      areAllItemsMeasured,
+      controlledItemDimensions,
+      itemHeights,
+      itemWidths,
+      context
+    ]
   );
 
   const handleContainerMeasurement = useCallback(
