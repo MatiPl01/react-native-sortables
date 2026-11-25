@@ -266,7 +266,10 @@ const useInsertStrategy: SortStrategyFactory = () => {
     const currentGroup = currentLayout.itemGroups[groupIndex];
     if (!currentGroup) {
       const lastItemIndex = indexToKey.value.length - 1;
-      if (activeIndex === lastItemIndex) {
+      if (
+        activeIndex === lastItemIndex ||
+        fixedItemKeys?.value?.[indexToKey.value[lastItemIndex]!]
+      ) {
         return null;
       }
       return reorderInsert(
@@ -468,8 +471,10 @@ const useInsertStrategy: SortStrategyFactory = () => {
       }
     }
 
-    const newIndex =
-      firstAvailableInGroupIndex + (itemIndexInGroup - initialItemIndexInGroup);
+    const newIndex = Math.min(
+      firstAvailableInGroupIndex + (itemIndexInGroup - initialItemIndexInGroup),
+      indexToKey.value.length - 1
+    );
 
     if (
       newIndex === activeIndex ||

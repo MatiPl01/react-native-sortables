@@ -76,3 +76,21 @@ it('moves an item to the next line when rounded sizes overflow the line', () => 
 
   expect(drag(0, { x: 60, y: 75 })).toEqual([b, c, d, a, e, f]);
 });
+
+it('moves an item next to a fixed last item without replacing it', () => {
+  // a b | c D  ->  b | c a D
+  const { drag, keys } = setup([50, 200, 100, 50], 250, { fixedIndex: 3 });
+  const [a, b, c, d] = keys;
+
+  expect(drag(0, { x: 130, y: 75 })).toEqual([b, c, a, d]);
+  // The fixed item cannot be passed
+  expect(drag(0, { x: 240, y: 75 })).toEqual(keys);
+});
+
+it('keeps a fixed last item when the target line does not exist', () => {
+  // a | b c | d | E: with b taken out, c joins a, so the layout has one line
+  // less than the strategy expects
+  const { drag, keys } = setup([220, 210, 70, 240, 90], 300, { fixedIndex: 4 });
+
+  expect(drag(1, { x: 150, y: 125 })).toEqual(keys);
+});
