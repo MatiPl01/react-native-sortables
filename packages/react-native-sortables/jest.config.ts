@@ -8,7 +8,7 @@ const config: JestConfigWithTsJest = {
   moduleDirectories: ['node_modules', '../../node_modules', '<rootDir>'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   preset: '@react-native/jest-preset',
-  resolver: 'react-native-worklets/jest/resolver.js',
+  resolver: 'react-native-reanimated/jest/resolver.js',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transform: {
     '^.+\\.[jt]sx?$': [
