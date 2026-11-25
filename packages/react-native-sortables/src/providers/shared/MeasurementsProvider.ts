@@ -177,10 +177,10 @@ const { MeasurementsProvider, useMeasurementsContext } = createProvider(
         } else {
           // In all other cases, debounce the update to reduce the number of
           // updates when dimensions change many times within a short period of time
-          scheduleDebounce(() => {
-            'worklet';
-            applyQueuedMeasurements(ctx);
-          }, measureDebounceDelay);
+          scheduleDebounce(
+            () => applyQueuedMeasurements(ctx),
+            measureDebounceDelay
+          );
         }
       })();
     }
