@@ -80,7 +80,12 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
       activeHandleOffset.value = {
         // The handle might be measured when the item is already hidden (put outside
         // of the viewport) so we need to adjust the measured x position accordingly
-        x: ((handleX + HIDDEN_X_OFFSET) % HIDDEN_X_OFFSET) - containerX - itemX,
+        x:
+          (handleX > HIDDEN_X_OFFSET / 2
+            ? handleX - HIDDEN_X_OFFSET
+            : handleX) -
+          containerX -
+          itemX,
         y: handleY - containerY - itemY
       };
     },
