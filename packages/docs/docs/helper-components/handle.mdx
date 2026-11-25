@@ -37,13 +37,13 @@ To use a custom handle component, you **must** set the `customHandle` prop on th
 
 Determines the reordering behavior of the item.
 
-| type                                        | default       | required |
-| ------------------------------------------- | ------------- | -------- |
-| `'draggable' \| 'fixed' \| 'non-draggable'` | `'draggable'` | NO       |
+| type                                              | default       | required |
+| ------------------------------------------------- | ------------- | -------- |
+| `'draggable' \| 'fixed-order' \| 'non-draggable'` | `'draggable'` | NO       |
 
 - `'draggable'` - the item **can be dragged** and **moves** when other items are reordered.
 - `'non-draggable'` - the item **cannot be dragged** but **moves** when other items are reordered.
-- `'fixed'` - the item **cannot be dragged** and **does not move** when other items are reordered.
+- `'fixed-order'` - the item **cannot be dragged** and **does not move** when other items are reordered.
 
 ### children
 
@@ -52,6 +52,16 @@ The handle component (can be anything, e.g. an icon, image, etc.).
 | type        | default | required |
 | ----------- | ------- | -------- |
 | `ReactNode` | NO      | NO       |
+
+---
+
+### style
+
+Style applied to the view wrapping the handle component.
+
+| type                   | default | required |
+| ---------------------- | ------- | -------- |
+| `StyleProp<ViewStyle>` | NO      | NO       |
 
 :::info
 

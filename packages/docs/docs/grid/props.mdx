@@ -101,6 +101,32 @@ Number of columns in the grid.
 
 ---
 
+### rows
+
+Number of rows in the grid.
+
+Setting this prop switches the grid to a **horizontal layout**, in which items flow from left to right, then top to bottom.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | NO      | NO\*     |
+
+\*Required to create a horizontal grid. Must be used together with `rowHeight` and cannot be combined with `columns`.
+
+---
+
+### rowHeight
+
+Fixed height of each row, in pixels. All rows of a horizontal grid have the same height.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | NO      | NO\*     |
+
+\*Required when `rows` is set. Has no effect on vertical grids.
+
+---
+
 ### rowGap
 
 Gap between rows in the grid.
@@ -379,21 +405,87 @@ An `AnimatedRef` to the scrollable container (e.g. `Animated.ScrollView` or `Ani
 
 Offset from the edge of the grid at which the auto scroll is activated.
 
-You can provide a **single number**, which will be used for both **top** and **bottom** edges or an array of **two numbers**, first for **top** edge and second for **bottom** edge.
+You can provide a **single number**, which will be used for both edges or an array of **two numbers**, first for the **top/left** edge and second for the **bottom/right** edge.
 
-| type                                     | default | required |
-| ---------------------------------------- | ------- | -------- |
-| `Animatable<[number, number] \| number>` | 75      | NO       |
+| type                         | default | required |
+| ---------------------------- | ------- | -------- |
+| `[number, number] \| number` | 75      | NO       |
 
 ---
 
-### autoScrollSpeed
+### autoScrollDirection
 
-Speed of the auto scroll. Adjust it based on your preferences.
+Direction in which auto scrolling should occur.
 
-| type                 | default | required |
-| -------------------- | ------- | -------- |
-| `Animatable<number>` | 1       | NO       |
+| type                         | default      | required |
+| ---------------------------- | ------------ | -------- |
+| `'horizontal' \| 'vertical'` | `'vertical'` | NO       |
+
+---
+
+### autoScrollMaxVelocity
+
+Maximum scroll velocity in pixels per second when the active item is at the edge.
+
+You can provide a **single number**, which will be used for both edges or an array of **two numbers**, first for the **top/left** edge and second for the **bottom/right** edge.
+
+| type                         | default | required |
+| ---------------------------- | ------- | -------- |
+| `[number, number] \| number` | 1000    | NO       |
+
+---
+
+### autoScrollMaxOverscroll
+
+Maximum distance the scrollable container can be scrolled beyond its content bounds while auto scrolling.
+
+You can provide a **single number**, which will be used for both edges or an array of **two numbers**, first for the **top/left** edge and second for the **bottom/right** edge.
+
+| type                         | default | required |
+| ---------------------------- | ------- | -------- |
+| `[number, number] \| number` | 50      | NO       |
+
+---
+
+### autoScrollExtrapolation
+
+Controls how the scroll velocity behaves beyond the activation offset threshold.
+
+| type            | default                | required |
+| --------------- | ---------------------- | -------- |
+| `Extrapolation` | `Extrapolation.EXTEND` | NO       |
+
+:::info
+
+`Extrapolation` is imported from `react-native-reanimated`. Use `Extrapolation.CLAMP` to stop increasing the scroll velocity once the pointer moves past the activation offset.
+
+:::
+
+---
+
+### autoScrollInterval
+
+Interval between consecutive `scrollTo` calls, in milliseconds.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0\*     | NO       |
+
+\*Defaults to `300` on **Android** with the **New Architecture** and `0` everywhere else.
+
+---
+
+### animateScrollTo
+
+Whether `scrollTo` calls should be animated.
+
+The main purpose of this prop is to ensure that scroll position changes are animated when `autoScrollInterval` is set to a large value.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | false\* | NO       |
+
+\*Defaults to `true` on **Android** with the **New Architecture** and `false` everywhere else.
 
 ---
 
@@ -401,14 +493,58 @@ Speed of the auto scroll. Adjust it based on your preferences.
 
 Controls whether the auto scroll is enabled.
 
-| type                  | default | required |
-| --------------------- | ------- | -------- |
-| `Animatable<boolean>` | true    | NO       |
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | true    | NO       |
 
 :::important
 
 Use this prop to **disable** auto scroll instead of removing the `scrollableRef` prop. The `scrollableRef` prop cannot be changed on the fly.
 
+:::
+
+---
+
+### autoAdjustOffsetDuringDrag
+
+Whether the scroll offset of the scrollable container should be adjusted automatically when items change their size during a drag.
+
+This keeps the content under the finger visually stable when the grid grows or shrinks while an item is being dragged.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | false   | NO       |
+
+:::info
+Takes effect only when the `scrollableRef` prop is provided.
+:::
+
+---
+
+### autoAdjustOffsetResetTimeout
+
+Timeout in milliseconds to wait for layout updates after the active item is released.
+
+React state updates happen asynchronously after the drag end callback fires. During this period the released item must still be treated as active to prevent content jumps.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 1000    | NO       |
+
+---
+
+### autoAdjustOffsetScrollPadding
+
+Padding used when adjusting the scroll offset after the active item is released, keeping the released item visible with some distance from the container edges.
+
+You can provide a **single number**, which will be used for both edges or an array of **two numbers**, first for the **top/left** edge and second for the **bottom/right** edge. Pass `null` to disable scrolling to the released item.
+
+| type                                 | default | required |
+| ------------------------------------ | ------- | -------- |
+| `[number, number] \| null \| number` | 25      | NO       |
+
+:::info
+Takes effect only when `autoAdjustOffsetDuringDrag` is `true` and the `scrollableRef` prop is provided.
 :::
 
 ---
@@ -498,7 +634,6 @@ Layout animations control how items animate when their positions change and when
 :::warning Warning (Web)
 There are some **differences** in the **layout animations** implementation on **Web**:
 
-- `itemLayout` is **ignored** since Web implementation doesn't use **Reanimated** layout transitions for items reordering
 - `itemEntering` and `itemExiting` don't have default values due to the inconsistent behavior, but you can provide your own animations that will be used instead
   :::
 
@@ -506,9 +641,9 @@ There are some **differences** in the **layout animations** implementation on **
 
 Layout animation to use when an item is added to the grid after the initial render of the grid.
 
-| type              | default                           | required |
-| ----------------- | --------------------------------- | -------- |
-| `LayoutAnimation` | SortableItemEntering\* / null\*\* | NO       |
+| type                      | default                           | required |
+| ------------------------- | --------------------------------- | -------- |
+| `LayoutAnimation \| null` | SortableItemEntering\* / null\*\* | NO       |
 
 \*Library default `itemEntering` implementation for native platforms
 
@@ -532,9 +667,9 @@ type LayoutAnimation =
 
 Layout animation to use when an item is removed from the grid (except when the entire grid is unmounted).
 
-| type              | default                          | required |
-| ----------------- | -------------------------------- | -------- |
-| `LayoutAnimation` | SortableItemExiting\* / null\*\* | NO       |
+| type                      | default                          | required |
+| ------------------------- | -------------------------------- | -------- |
+| `LayoutAnimation \| null` | SortableItemExiting\* / null\*\* | NO       |
 
 \*Library default `itemExiting` implementation for native platforms
 
@@ -554,9 +689,7 @@ type LayoutAnimation =
 
 ---
 
----
-
-### itemPositionsAnimationMode
+### itemsLayoutTransitionMode
 
 Controls when items positions are animated.
 
@@ -818,8 +951,31 @@ Strategy for setting zIndex of items. This determines which items appear on top 
 The currently dragged item is always rendered on top of all other items, regardless of this setting.
 :::
 
-| ----------------------- | ---------- | -------- |
-| `'hidden' \| 'visible'` | `'hidden'` | NO |
+---
+
+### bringToFrontWhenActive
+
+Controls whether the zIndex of the sortable container should be raised when a drag starts. This makes the dragged item render above sibling components outside of the grid.
+
+| type      | default | required |
+| --------- | ------- | -------- |
+| `boolean` | true    | NO       |
+
+:::info
+If dragged items still appear under other components, wrap the surrounding content in a [Layer](/helper-components/layer) component.
+:::
+
+---
+
+### measureDebounceDelay
+
+Delay in milliseconds between the last item measurement and the measurements commit that triggers the layout calculation.
+
+Increase it if items of your grid are measured in multiple batches and you see the layout being recalculated more than once.
+
+| type     | default | required |
+| -------- | ------- | -------- |
+| `number` | 0       | NO       |
 
 ---
 

@@ -36,7 +36,7 @@ The `useItemContext` hook returns an object with the following properties:
 
 ```tsx
 type ItemContextType = {
-  gesture: GestureType;
+  gesture: SortableGesture;
   itemKey: string;
   isActive: ReadonlySharedValue<boolean>;
   activationAnimationProgress: ReadonlySharedValue<number>;
@@ -48,7 +48,9 @@ type ItemContextType = {
 };
 ```
 
-where `ReadonlySharedValue` has the same type as `DerivedValue` from `react-native-reanimated` and works in a similar way to the `SharedValue` type but it doesn't allow setting the value.
+where `SortableGesture` is an opaque gesture object created by the library for the installed `react-native-gesture-handler` version. Pass it to `Sortable.Handle` or another gesture detector without inspecting it.
+
+`ReadonlySharedValue` has the same type as `DerivedValue` from `react-native-reanimated` and works in a similar way to the `SharedValue` type but it doesn't allow setting the value.
 
 ```ts
 type ReadonlySharedValue<V> = Readonly<Omit<SharedValue<V>, 'set'>>;

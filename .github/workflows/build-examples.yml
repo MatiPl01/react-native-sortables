@@ -101,7 +101,7 @@ jobs:
 
       - name: 🤖 Setup Android SDK (Android only)
         if: matrix.platform == 'android'
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: 🍎 Install pods (iOS only)
         if: matrix.platform == 'ios'

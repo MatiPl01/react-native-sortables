@@ -2,14 +2,25 @@ name: 🚀 Release
 
 on:
   workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Dry run (verify auth and build, do not publish)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false # never interrupt an in-progress publish
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
-      packages: write
+      contents: write # push the changelog commit and tag, create the GitHub release
+      issues: write # @semantic-release/github comments on released issues
+      pull-requests: write # @semantic-release/github comments on released pull requests
+      id-token: write # OIDC trusted publishing and npm provenance
 
     steps:
       - name: 🛒 Checkout code
@@ -21,7 +32,7 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24' # ships npm >= 11.6, required for OIDC trusted publishing
           cache: 'yarn'
 
       - name: 📦 Install dependencies
@@ -30,8 +41,10 @@ jobs:
 
       - name: 🎉 Release
         working-directory: packages/react-native-sortables
-        run: yarn semantic-release
+        run: yarn semantic-release ${{ inputs.dry-run && '--dry-run' || '' }}
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           HUSKY: 0
+          # npm version runs an implicit workspaces update, which fails on the
+          # examples' workspace: deps (npm does not support that protocol)
+          npm_config_workspaces_update: false

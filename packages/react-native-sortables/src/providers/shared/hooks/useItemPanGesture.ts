@@ -1,12 +1,14 @@
 import type { SharedValue } from 'react-native-reanimated';
 
 import { useDragGesture } from '../../../integrations/gesture-handler';
+import { useCommonValuesContext } from '../CommonValuesProvider';
 import { useDragContext } from '../DragProvider';
 
 export default function useItemPanGesture(
   key: string,
   activationAnimationProgress: SharedValue<number>
 ) {
+  const { activeItemKey } = useCommonValuesContext();
   const { handleDragEnd, handleTouchesMove, handleTouchStart } =
     useDragContext();
 
@@ -33,8 +35,19 @@ export default function useItemPanGesture(
       },
       onTouchesUp: (_event, control) => {
         'worklet';
+        // handleDragEnd clears the active key, so read it before that.
+        const wasPickedUp = activeItemKey.value === key;
         handleDragEnd(key, activationAnimationProgress);
-        control.end();
+
+        // Ending a Manual gesture marks it recognized, and on iOS a recognized
+        // gesture cancels the touches already delivered to the views below it,
+        // swallowing a press on any button inside the item
+        // (https://github.com/MatiPl01/react-native-sortables/issues/617).
+        if (wasPickedUp) {
+          control.end();
+        } else {
+          control.fail();
+        }
       }
     },
     [
@@ -42,7 +55,8 @@ export default function useItemPanGesture(
       handleTouchStart,
       handleTouchesMove,
       key,
-      activationAnimationProgress
+      activationAnimationProgress,
+      activeItemKey
     ]
   );
 }

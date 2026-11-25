@@ -46,6 +46,17 @@ export default function useStableCallbackValue<C extends AnyFunction>(
     }
   }, [callback, stableCallback]);
 
+  // A wrapped JS callback roots its scope on the UI runtime, and the mutable is
+  // never disposed. Kept out of the effect above, whose cleanup would also run
+  // on every `callback` change and could blank the value mid-call.
+  // https://github.com/MatiPl01/react-native-sortables/issues/619
+  useEffect(
+    () => () => {
+      stableCallback.value = null;
+    },
+    [stableCallback]
+  );
+
   return useCallback(
     (...args: Parameters<C>) => {
       'worklet';

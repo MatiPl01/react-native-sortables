@@ -145,7 +145,7 @@
         "changelogFile": "CHANGELOG.md"
       }
     ],
-    "semantic-release-yarn",
+    "@semantic-release/npm",
     [
       "@semantic-release/git",
       {

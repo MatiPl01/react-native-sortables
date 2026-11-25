@@ -7,7 +7,7 @@ import {
   useDerivedValue
 } from 'react-native-reanimated';
 
-import { EMPTY_OBJECT } from '../../constants';
+import { EMPTY_OBJECT, IS_WEB } from '../../constants';
 import type { Animatable } from '../../integrations/reanimated';
 import {
   useAnimatableValue,
@@ -140,7 +140,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     const shouldAnimateLayout = useMutableValue(true);
     const animateLayoutOnReorderOnly = useDerivedValue(
       () => itemsLayoutTransitionMode === 'reorder',
-      [itemsLayoutTransitionMode]
+      IS_WEB ? [itemsLayoutTransitionMode] : undefined
     );
 
     useEffect(
