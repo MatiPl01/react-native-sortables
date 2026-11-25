@@ -1,26 +1,48 @@
-import { useCallback, useEffect } from 'react';
-import { isWorkletFunction, runOnJS } from 'react-native-reanimated';
+import { useEffect, useState } from 'react';
+import {
+  isWorkletFunction,
+  makeMutable,
+  runOnJS
+} from 'react-native-reanimated';
 
 import type { AnyFunction } from '../../../helperTypes';
-import useMutableValue from './useMutableValue';
 
 // We cannot store a function as a SharedValue because reanimated will treat
 // it as an animation and will try to execute the animation when assigned
-// to the SharedValue. Since we want the function to be treated as a value,
-// we wrap it in an object and store the object in the SharedValue.
-type WrappedCallback<C extends AnyFunction> = {
-  call: C;
+// to the SharedValue, so it is wrapped in an object. Only a worklet goes in
+// there: a JS callback is called from the JS thread, so the UI runtime needs
+// to know nothing about it beyond that there is one.
+type StoredCallback<C extends AnyFunction> = {
+  worklet?: C;
 };
 
-const wrap = <C extends AnyFunction>(callback: C): WrappedCallback<C> => {
-  if (isWorkletFunction(callback)) {
-    return { call: callback };
-  }
+/** Everything one call of the hook owns. Built outside of the hook on purpose:
+ * a closure created there would capture the hook scope with the callback in
+ * it, and the UI runtime holds on to what `runOnJS` is given for longer than
+ * the shared value does (#619).
+ */
+const createStableCallback = <C extends AnyFunction>() => {
+  const shared = makeMutable<null | StoredCallback<C>>(null);
+  // `js` is swapped on every render and read on the JS thread only, so it is
+  // kept out of the shared value, which would copy it to the UI runtime.
+  const store = { js: undefined as C | undefined, shared };
+
+  const dispatch = (...args: Parameters<C>) => {
+    store.js?.(...args);
+  };
+
+  // The worklet is returned next to the store, not in it. The UI runtime keeps
+  // `dispatch` alive, so a worklet reachable from it would never be released.
   return {
-    call: ((...args: Parameters<C>) => {
+    /** Returned to the caller, so its identity has to stay stable. */
+    stable: (...args: Parameters<C>) => {
       'worklet';
-      runOnJS(callback)(...args);
-    }) as C
+      const stored = shared.value;
+      if (!stored) return;
+      if (stored.worklet) stored.worklet(...args);
+      else runOnJS(dispatch)(...args);
+    },
+    store
   };
 };
 
@@ -36,32 +58,35 @@ const wrap = <C extends AnyFunction>(callback: C): WrappedCallback<C> => {
 export default function useStableCallbackValue<C extends AnyFunction>(
   callback?: C
 ) {
-  const stableCallback = useMutableValue<null | WrappedCallback<C>>(null);
+  const [{ stable, store }] = useState(createStableCallback<C>);
+  const workletCallback = isWorkletFunction(callback) ? callback : undefined;
+  const hasCallback = !!callback;
 
+  // Swapping a reference is all this re-run costs, and nothing is sent to the
+  // UI runtime. It has no cleanup of its own, so there is no render in which
+  // the callback is missing, and it puts the callback back when React
+  // reconnects effects without re-rendering - after an `<Activity>` is shown
+  // again, for instance.
   useEffect(() => {
-    if (callback) {
-      stableCallback.value = wrap(callback);
-    } else {
-      stableCallback.value = null;
-    }
-  }, [callback, stableCallback]);
+    store.js = callback;
+  }, [callback, store]);
 
-  // A wrapped JS callback roots its scope on the UI runtime, and the mutable is
-  // never disposed. Kept out of the effect above, whose cleanup would also run
-  // on every `callback` change and could blank the value mid-call.
-  // https://github.com/MatiPl01/react-native-sortables/issues/619
+  // Nothing here depends on a JS callback itself, so for such a callback it
+  // runs once per mount rather than once per render.
+  useEffect(() => {
+    store.shared.value = hasCallback ? { worklet: workletCallback } : null;
+  }, [workletCallback, hasCallback, store]);
+
+  // What stays in the store keeps the callback and this hook's state alive
+  // (#619). Kept out of the effect above, whose cleanup would also run when the
+  // worklet changes and could blank the value mid-call.
   useEffect(
     () => () => {
-      stableCallback.value = null;
+      store.shared.value = null;
+      store.js = undefined;
     },
-    [stableCallback]
+    [store]
   );
 
-  return useCallback(
-    (...args: Parameters<C>) => {
-      'worklet';
-      stableCallback.value?.call(...args);
-    },
-    [stableCallback]
-  );
+  return stable;
 }
