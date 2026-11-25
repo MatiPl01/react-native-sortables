@@ -174,6 +174,14 @@ const handleLayoutCalculation = (
     maxCrossContainerSize = limits.maxWidth - paddingHorizontal;
   }
 
+  // A single line takes the container cross size (alignContent has no effect)
+  if (!shouldWrap && crossAxisGroupSizes.length) {
+    crossAxisGroupSizes[0] = Math.min(
+      Math.max(crossAxisGroupSizes[0]!, minCrossContainerSize),
+      maxCrossContainerSize
+    );
+  }
+
   // ALIGN CONTENT
   // position groups on the cross axis
   const contentAlignment = calculateAlignment(
