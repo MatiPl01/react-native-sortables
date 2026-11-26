@@ -85,7 +85,12 @@ export function createItemsStore<I>(
 
       const info = { index, item };
       meta.set(k, info);
-      nodes.set(k, renderItem ? renderItem(info) : (item as ReactNode));
+      // getNode returns undefined only for a key that is not in the store, so
+      // an item rendered as undefined is stored as null
+      nodes.set(
+        k,
+        (renderItem ? renderItem(info) : (item as ReactNode)) ?? null
+      );
       touched.add(k);
     });
 
