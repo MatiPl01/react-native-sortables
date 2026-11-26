@@ -92,7 +92,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const contextRef = useRef<null | SharedValue<StateContextType>>(null);
     contextRef.current ??= makeMutable<StateContextType>({
       keepInViewData: null,
-      prevSortEnabled: sortEnabled.value,
+      prevSortEnabled: null,
       resetTimeoutId: -1,
       state: AutoOffsetAdjustmentState.DISABLED
     });
