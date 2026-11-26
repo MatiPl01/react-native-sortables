@@ -104,6 +104,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     snapOffsetX,
     snapOffsetY,
     sortEnabled,
+    sortLocked,
     touchPosition,
     usesAbsoluteLayout
   } = useCommonValuesContext();
@@ -389,8 +390,10 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       const touch = e.allTouches[0];
       if (
         !touch ||
-        // Sorting is disabled
+        // Sorting is disabled, or locked until the auto offset adjustment
+        // is reset
         !sortEnabled.value ||
+        sortLocked.value ||
         // Absolute layout is not applied yet
         !usesAbsoluteLayout.value ||
         // Another item is already being touched/activated
@@ -447,6 +450,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       itemWidths,
       itemLayoutPositions,
       sortEnabled,
+      sortLocked,
       usesAbsoluteLayout
     ]
   );

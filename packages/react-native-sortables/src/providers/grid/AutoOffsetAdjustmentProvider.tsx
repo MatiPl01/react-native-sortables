@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import {
   clamp,
@@ -42,7 +42,6 @@ type KeepInViewData = {
 type StateContextType = {
   state: AutoOffsetAdjustmentState;
   resetTimeoutId: number;
-  prevSortEnabled: boolean | null;
   keepInViewData: KeepInViewData | null;
 };
 
@@ -70,7 +69,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       prevActiveItemKey,
       snapOffsetX,
       snapOffsetY,
-      sortEnabled,
+      sortLocked,
       touchPosition
     } = useCommonValuesContext();
     const { activeHandleMeasurements, activeHandleOffset } =
@@ -92,8 +91,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const contextRef = useRef<null | SharedValue<StateContextType>>(null);
     contextRef.current ??= makeMutable<StateContextType>({
       keepInViewData: null,
-      prevSortEnabled: sortEnabled.value,
-      resetTimeoutId: 0,
+      resetTimeoutId: -1,
       state: AutoOffsetAdjustmentState.DISABLED
     });
     const context = contextRef.current;
@@ -101,21 +99,33 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     const disableAutoOffsetAdjustment = useCallback(() => {
       'worklet';
       const ctx = context.value;
-      if (ctx.prevSortEnabled === null) {
-        return;
-      }
       clearAnimatedTimeout(ctx.resetTimeoutId);
       ctx.state = AutoOffsetAdjustmentState.DISABLED;
-      sortEnabled.value = ctx.prevSortEnabled;
-      ctx.prevSortEnabled = null;
+      sortLocked.value = false;
       additionalCrossOffset.value = null;
-    }, [context, sortEnabled, additionalCrossOffset]);
+    }, [context, sortLocked, additionalCrossOffset]);
+
+    // The lock is kept in the common values, which stay mounted when this
+    // provider is removed with the offset still applied
+    useEffect(
+      () => () => {
+        sortLocked.value = false;
+      },
+      [sortLocked]
+    );
 
     useAnimatedReaction(
-      () => activeItemDropped.value,
-      dropped => {
+      () => ({
+        dropped: activeItemDropped.value,
+        isActive: activeItemKey.value !== null
+      }),
+      ({ dropped, isActive }) => {
         clearAnimatedTimeout(context.value.resetTimeoutId);
-        if (
+        // Enabled only from the drag start, so that a finished drag doesn't
+        // leave it waiting for size changes that are not related to a drag
+        if (isActive) {
+          context.value.state = AutoOffsetAdjustmentState.ENABLED;
+        } else if (
           dropped &&
           context.value.state !== AutoOffsetAdjustmentState.DISABLED
         ) {
@@ -123,8 +133,6 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
             disableAutoOffsetAdjustment,
             autoAdjustOffsetResetTimeout
           );
-        } else {
-          context.value.state = AutoOffsetAdjustmentState.ENABLED;
         }
       }
     );
@@ -310,8 +318,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         );
 
         additionalCrossOffset.value = startCrossOffset;
-        ctx.prevSortEnabled ??= sortEnabled.value;
-        sortEnabled.value = false;
+        sortLocked.value = true;
 
         return {
           ...props,
@@ -337,7 +344,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
         scrollPadding,
         scrollBy,
         context,
-        sortEnabled,
+        sortLocked,
         scrollableRef
       ]
     );

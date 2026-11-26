@@ -1,8 +1,14 @@
-import { type SharedValue, useDerivedValue } from 'react-native-reanimated';
+import {
+  type SharedValue,
+  useAnimatedReaction,
+  useDerivedValue
+} from 'react-native-reanimated';
 
+import { useMutableValue } from '../../../../integrations/reanimated';
 import type {
   Coordinate,
   Dimension,
+  ItemSizes,
   ReorderFunction,
   SortStrategyFactory
 } from '../../../../types';
@@ -23,6 +29,7 @@ export const createGridStrategy =
   ): SortStrategyFactory =>
   () => {
     const {
+      activeItemKey,
       containerHeight,
       containerWidth,
       indexToKey,
@@ -37,21 +44,31 @@ export const createGridStrategy =
     const othersIndexToKey = useInactiveIndexToKey();
     const debugBox = useDebugBoundingBox();
 
+    const crossSizes = isVertical ? itemHeights : itemWidths;
+    const dragStartCrossSizes = useMutableValue<ItemSizes>(null);
+
+    useAnimatedReaction(
+      () => activeItemKey.value,
+      key => {
+        if (key !== null) {
+          dragStartCrossSizes.value = crossSizes.value;
+        }
+      }
+    );
+
     const othersLayout = useDerivedValue(() =>
-      additionalCrossOffset?.value === null
-        ? null
-        : calculateLayout({
-            gaps: {
-              cross: crossGap.value,
-              main: mainGap.value
-            },
-            indexToKey: othersIndexToKey.value,
-            isVertical,
-            itemHeights: itemHeights.value,
-            itemWidths: itemWidths.value,
-            numGroups,
-            startCrossOffset: additionalCrossOffset?.value
-          })
+      calculateLayout({
+        gaps: {
+          cross: crossGap.value,
+          main: mainGap.value
+        },
+        indexToKey: othersIndexToKey.value,
+        isVertical,
+        itemHeights: itemHeights.value,
+        itemWidths: itemWidths.value,
+        numGroups,
+        startCrossOffset: additionalCrossOffset?.value
+      })
     );
 
     let mainContainerSize: SharedValue<null | number>;
@@ -76,6 +93,15 @@ export const createGridStrategy =
 
     return ({ activeIndex, dimensions, position }) => {
       'worklet';
+      // Item sizes changed during the drag and the auto offset is not applied
+      // yet, so othersLayout doesn't match positions of items on the screen
+      if (
+        additionalCrossOffset?.value === null &&
+        dragStartCrossSizes.value !== crossSizes.value
+      ) {
+        return;
+      }
+
       if (
         !othersLayout.value ||
         crossContainerSize.value === null ||

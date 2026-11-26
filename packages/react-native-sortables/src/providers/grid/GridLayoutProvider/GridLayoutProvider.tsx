@@ -62,7 +62,8 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
     shouldAnimateLayout
   } = useCommonValuesContext();
   const { applyControlledContainerDimensions } = useMeasurementsContext();
-  const { adaptLayoutProps } = useAutoOffsetAdjustmentContext() ?? {};
+  const { adaptLayoutProps, additionalCrossOffset } =
+    useAutoOffsetAdjustmentContext() ?? {};
   const { contentBounds } = useAutoScrollContext() ?? {};
   const debugContext = useDebugContext();
 
@@ -175,6 +176,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
       itemHeights: itemHeights.value,
       itemWidths: itemWidths.value,
       numGroups,
+      offset: additionalCrossOffset?.value, // Not used, removes the offset from the layout when it is reset
       requestId: layoutRequestId.value // Helper to force layout re-calculation
     }),
     (props, prevProps) => {

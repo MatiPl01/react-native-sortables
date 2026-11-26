@@ -95,6 +95,7 @@ export type CommonValuesContextType =
       // OTHER
       containerRef: AnimatedRef<View>;
       sortEnabled: SharedValue<boolean>;
+      sortLocked: SharedValue<boolean>; // blocks new drags without touching sortEnabled
       usesAbsoluteLayout: SharedValue<boolean>;
       shouldAnimateLayout: SharedValue<boolean>; // is set to false on web when the browser window is resized
       animateLayoutOnReorderOnly: SharedValue<boolean>;
