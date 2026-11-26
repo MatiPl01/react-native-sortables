@@ -60,6 +60,7 @@ const setHeights = (height: number) =>
   });
 
 type GridProps = {
+  autoAdjustOffsetDuringDrag?: boolean;
   columns?: number;
   keys?: Array<string>;
   scrollable?: boolean;
@@ -67,6 +68,7 @@ type GridProps = {
 };
 
 const Grid = ({
+  autoAdjustOffsetDuringDrag = true,
   columns = 1,
   keys = KEYS,
   scrollable,
@@ -74,13 +76,13 @@ const Grid = ({
 }: GridProps) => (
   <GestureHandlerRootView>
     <Sortable.Grid
+      autoAdjustOffsetDuringDrag={autoAdjustOffsetDuringDrag}
       columns={columns}
       data={keys}
       renderItem={() => <View />}
       scrollableRef={scrollable ? scrollableRef : undefined}
       sortEnabled={sortEnabled}
       strategy={useCapturingStrategy}
-      autoAdjustOffsetDuringDrag
     />
   </GestureHandlerRootView>
 );
@@ -122,6 +124,12 @@ function moveTo(absoluteY: number, absoluteX?: number) {
 const getItemOffsets = () =>
   KEYS.map(key => common.itemLayoutPositions.value[key]?.y);
 
+// Sorting is locked while the offset is applied, so no drag can start then
+const canStartDrag = () => {
+  startDrag('a', 10);
+  return common.activeItemKey.value === 'a';
+};
+
 describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
   it('reorders when no item changes size during the drag', () => {
     renderGrid();
@@ -148,8 +156,8 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
 
       setHeights(COLLAPSED);
 
-      expect(common.sortEnabled.value).toBe(true);
       expect(getItemOffsets()).toEqual([0, 40, 80, 120]);
+      expect(canStartDrag()).toBe(true);
     }
   );
 
@@ -160,18 +168,67 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
 
     setHeights(COLLAPSED);
 
-    expect(common.sortEnabled.value).toBe(true);
     expect(getItemOffsets()).toEqual([0, 40, 80, 120]);
+    expect(canStartDrag()).toBe(true);
   });
 
-  it('keeps the sortEnabled value set after mount when the first drag ends', () => {
-    const { rerender } = renderGrid({ sortEnabled: false });
-    rerender(<Grid sortEnabled />);
-    advance(0);
+  it('unlocks sorting when the adjustment is turned off with the offset applied', () => {
+    const { rerender } = renderGrid();
+    const progress = startDrag('c', 210);
+    setHeights(COLLAPSED); // the offset is applied and sorting is locked
+    act(() => {
+      drag.handleDragEnd('c', progress);
+    });
 
-    dragAndDrop('a');
+    rerender(<Grid autoAdjustOffsetDuringDrag={false} />);
+    advance(200);
+    setHeights(COLLAPSED); // the items were mounted again
 
-    expect(common.sortEnabled.value).toBe(true);
+    expect(canStartDrag()).toBe(true);
+  });
+
+  describe('when sortEnabled changes', () => {
+    it('keeps sorting enabled when it is enabled after mount', () => {
+      const { rerender } = renderGrid({ sortEnabled: false });
+      rerender(<Grid sortEnabled />);
+      advance(0);
+
+      dragAndDrop('a');
+
+      expect(canStartDrag()).toBe(true);
+    });
+
+    it('keeps sorting enabled when it is disabled only during the drag', () => {
+      const { rerender } = renderGrid();
+      const progress = startDrag('c', 210);
+      rerender(<Grid sortEnabled={false} />); // disabled on drag start
+      advance(0);
+      setHeights(COLLAPSED);
+      act(() => {
+        drag.handleDragEnd('c', progress);
+      });
+      rerender(<Grid sortEnabled />); // and enabled again on drag end
+      advance(0);
+      setHeights(EXPANDED);
+      advance(2000);
+
+      expect(canStartDrag()).toBe(true);
+    });
+
+    it('keeps sorting disabled when it is disabled during the drag', () => {
+      const { rerender } = renderGrid();
+      const progress = startDrag('c', 210);
+      setHeights(COLLAPSED);
+      rerender(<Grid sortEnabled={false} />);
+      advance(0);
+      act(() => {
+        drag.handleDragEnd('c', progress);
+      });
+      setHeights(EXPANDED);
+      advance(2000);
+
+      expect(canStartDrag()).toBe(false);
+    });
   });
 
   it('keeps the released item in place when items are resized right after the release', () => {
@@ -187,8 +244,8 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
     setHeights(EXPANDED); // and items expand again after the drop
     advance(2000);
 
-    expect(common.sortEnabled.value).toBe(true);
     expect(getItemOffsets()).toEqual([0, 100, 200, 300]);
+    expect(canStartDrag()).toBe(true);
   });
 
   it('adjusts the offset in a drag started before the previous drop finished', () => {
@@ -216,6 +273,7 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
     act(() => {
       drag.handleDragEnd('c', progress);
     });
+    expect(canStartDrag()).toBe(false); // locked while the offset is applied
     advance(2000); // drop animation + autoAdjustOffsetResetTimeout
 
     expect(getItemOffsets()).toEqual([0, 40, 80, 120]);
