@@ -196,3 +196,19 @@ it('groups recognizers simultaneously when gestureMode is simultaneous', () => {
   expect(mocked.Exclusive).not.toHaveBeenCalled();
   expect(mocked.Simultaneous).toHaveBeenCalledTimes(2);
 });
+
+it('puts the double tap before the single tap, so that the single tap waits for it', () => {
+  renderHook(() =>
+    useTouchableGesture({
+      ...baseConfig,
+      onDoubleTap: jest.fn(),
+      onTap: jest.fn()
+    })
+  );
+
+  const [doubleTap, tap] = mocked.Exclusive.mock.calls[0] as Array<{
+    numberOfTaps: jest.Mock;
+  }>;
+  expect(doubleTap!.numberOfTaps).toHaveBeenCalledWith(2);
+  expect(tap!.numberOfTaps).not.toHaveBeenCalled();
+});

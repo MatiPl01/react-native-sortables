@@ -65,6 +65,8 @@ Called when the user taps the component.
 
 Called when the user double taps the component.
 
+If `onTap` is also provided in the `'exclusive'` [gestureMode](#gesturemode), it is called only after the double tap fails, so a single tap is reported with a short delay.
+
 | type         | default | required |
 | ------------ | ------- | -------- |
 | `() => void` | NO      | NO       |

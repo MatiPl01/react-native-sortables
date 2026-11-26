@@ -173,3 +173,31 @@ it('returns the bare touch tracker when only touch callbacks are set (no recogni
   expect(useManualGesture).toHaveBeenCalledTimes(1);
   expect(mocked.useSimultaneousGestures).not.toHaveBeenCalled();
 });
+
+it('puts the double tap before the single tap, so that the single tap waits for it', () => {
+  renderHook(() =>
+    useTouchableGesture({
+      externalGesture: {},
+      failDistance: 10,
+      gestureMode: 'exclusive',
+      onDoubleTap: jest.fn(),
+      onTap: jest.fn()
+    })
+  );
+
+  const [[doubleTap], [tap]] = mocked.useTapGesture.mock.calls.slice(-2) as [
+    [{ numberOfTaps?: number }],
+    [{ numberOfTaps?: number }]
+  ];
+  expect(doubleTap.numberOfTaps).toBe(2);
+  expect(tap.numberOfTaps).toBeUndefined();
+
+  // The mocked hook returns a new object on every call, so the order of the
+  // exclusive gestures can be checked by identity
+  const [doubleTapGesture, tapGesture] = mocked.useTapGesture.mock.results
+    .slice(-2)
+    .map(({ value }) => value as unknown);
+  const exclusive = mocked.useExclusiveGestures.mock.calls[0] as Array<unknown>;
+  expect(exclusive[0]).toBe(doubleTapGesture);
+  expect(exclusive[1]).toBe(tapGesture);
+});
