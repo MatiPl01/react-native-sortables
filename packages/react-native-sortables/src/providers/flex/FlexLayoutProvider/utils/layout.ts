@@ -189,11 +189,16 @@ const handleLayoutCalculation = (
   let totalHeight = 0;
   let totalWidth = 0;
 
+  // The container is never smaller than its paddings, also when it is empty
   if (isRow) {
     totalHeight = contentAlignment.totalSize + paddingVertical;
-    totalWidth = expandMultiGroup ? limits.maxWidth : limits.minWidth;
+    totalWidth = expandMultiGroup
+      ? limits.maxWidth
+      : Math.max(limits.minWidth, paddingHorizontal);
   } else {
-    totalHeight = expandMultiGroup ? limits.maxHeight : limits.minHeight;
+    totalHeight = expandMultiGroup
+      ? limits.maxHeight
+      : Math.max(limits.minHeight, paddingVertical);
     totalWidth = contentAlignment.totalSize + paddingHorizontal;
   }
 

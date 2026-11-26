@@ -60,4 +60,27 @@ describe('calculateLayout', () => {
 
     expect(layout.totalDimensions).toEqual({ height: 32, width: 100 });
   });
+
+  it.each(['column', 'row'] as const)(
+    'keeps main axis paddings in the size of an empty %s container',
+    flexDirection => {
+      const layout = calculateLayout(
+        createProps({
+          flexDirection,
+          flexWrap: 'nowrap',
+          gaps: { column: 10, row: 10 },
+          indexToKey: [],
+          limits: {
+            maxHeight: Infinity,
+            maxWidth: Infinity,
+            minHeight: 0,
+            minWidth: 0
+          },
+          paddings: { bottom: 16, left: 16, right: 16, top: 16 }
+        })
+      )!;
+
+      expect(layout.totalDimensions).toEqual({ height: 32, width: 32 });
+    }
+  );
 });
