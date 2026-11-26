@@ -136,6 +136,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
     // OTHER
     const containerRef = useAnimatedRef<View>();
     const sortEnabled = useAnimatableValue(_sortEnabled);
+    const sortLocked = useMutableValue(false);
     const usesAbsoluteLayout = useMutableValue(false);
     const shouldAnimateLayout = useMutableValue(true);
     const animateLayoutOnReorderOnly = useDerivedValue(
@@ -213,6 +214,7 @@ const { CommonValuesContext, CommonValuesProvider, useCommonValuesContext } =
         snapOffsetX,
         snapOffsetY,
         sortEnabled,
+        sortLocked,
         touchPosition,
         usesAbsoluteLayout
       }
