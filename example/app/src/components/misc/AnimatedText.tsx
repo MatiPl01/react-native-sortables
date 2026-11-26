@@ -43,6 +43,8 @@ const AnimatedText = (props: TextProps) => {
     () =>
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       ({
+        // React renders the text from defaultValue, so a re-render doesn't clear it
+        defaultValue: textInternal.value,
         text: textInternal.value
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }) as any
