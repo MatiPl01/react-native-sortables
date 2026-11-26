@@ -63,3 +63,7 @@ Child components whose `zIndex` will be managed by the Layer component. The Laye
 | type      | default | required |
 | --------- | ------- | -------- |
 | `boolean` | `false` | NO       |
+
+### Additional Props
+
+The component also accepts all standard React Native `ViewProps` which are passed through to the underlying View component. The `zIndex` is managed by the layer, so a `zIndex` passed in `style` is ignored.
