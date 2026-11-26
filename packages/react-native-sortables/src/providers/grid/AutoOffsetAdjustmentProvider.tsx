@@ -207,6 +207,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           isVertical,
           itemHeights,
           itemWidths,
+          masonry,
           numGroups
         } = props;
         const crossItemSizes = isVertical ? itemHeights : itemWidths;
@@ -226,6 +227,7 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
           crossGap: gaps.cross,
           crossItemSizes,
           indexToKey: indexToKey,
+          masonry,
           numGroups
         } as const;
 

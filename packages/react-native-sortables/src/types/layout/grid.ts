@@ -14,6 +14,7 @@ export type GridLayoutProps = {
   shouldAnimateLayout?: boolean;
   requestNextLayout?: boolean;
   startCrossOffset?: Maybe<number>;
+  masonry?: boolean;
 };
 
 export type GridLayout = {
@@ -29,4 +30,5 @@ export type AutoOffsetAdjustmentProps = {
   crossItemSizes: ItemSizes;
   indexToKey: Array<string>;
   numGroups: number;
+  masonry?: boolean;
 };
