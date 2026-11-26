@@ -948,14 +948,16 @@ Strategy for setting zIndex of items. This determines which items appear on top 
 - `'desc'` - items with higher index have lower zIndex. This means items at the beginning of the list of items are rendered on top of items at the end.
 
 :::info
-The currently dragged item is always rendered on top of all other items, regardless of this setting.
+Once it is moved, the currently dragged item is rendered on top of all other items, regardless of this setting.
 :::
 
 ---
 
 ### bringToFrontWhenActive
 
-Controls whether the zIndex of the sortable container should be raised when a drag starts. This makes the dragged item render above sibling components outside of the grid.
+Controls whether the zIndex of the sortable container should be raised while an item is dragged. This makes the dragged item render above sibling components outside of the grid.
+
+The dragged item and the container are brought to front once the finger moves by [`dragActivationFailOffset`](#dragactivationfailoffset), so a long press alone (e.g. one that opens a native context menu) does not change the stacking order.
 
 | type      | default | required |
 | --------- | ------- | -------- |

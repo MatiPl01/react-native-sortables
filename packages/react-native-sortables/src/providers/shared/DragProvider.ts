@@ -81,6 +81,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     activationAnimationDuration,
     activationState,
     activeAnimationProgress,
+    activeItemBroughtToFront,
     activeItemDimensions,
     activeItemDropped,
     activeItemKey,
@@ -207,6 +208,19 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
         touchPosition.value = newTouchPosition;
       }
 
+      // Bring to front only once dragged, so that a bare long press doesn't
+      // change the stacking order and dismiss a native context menu
+      if (
+        !activeItemBroughtToFront.value &&
+        Math.hypot(
+          newTouchPosition.x - startTouchPosition.x,
+          newTouchPosition.y - startTouchPosition.y
+        ) >= dragActivationFailOffset.value
+      ) {
+        activeItemBroughtToFront.value = true;
+        updateLayer?.(LayerState.FOCUSED);
+      }
+
       // Active item position
 
       const translate = (from: number, to: number) =>
@@ -295,6 +309,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeItemPosition.value = itemPosition;
       activeItemDimensions.value = itemDimensions;
       activationState.value = DragActivationState.ACTIVE;
+      activeItemBroughtToFront.value = false;
       ctx.dragStartIndex = keyToIndex.value[key] ?? -1;
 
       if (activeContainerId) {
@@ -303,8 +318,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       if (multiZoneActiveItemDimensions) {
         multiZoneActiveItemDimensions.value = itemDimensions;
       }
-
-      updateLayer?.(LayerState.FOCUSED);
 
       // We need to update the custom handle measurements if the custom handle
       // is used (touch position is relative to the handle in this case)
@@ -355,6 +368,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       activeAnimationProgress,
       activeContainerId,
       activeHandleOffset,
+      activeItemBroughtToFront,
       activeItemDimensions,
       activeItemDropped,
       activationState,
@@ -372,7 +386,6 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       prevActiveItemKey,
       onDragStart,
       touchPosition,
-      updateLayer,
       updateActiveHandleMeasurements
     ]
   );
@@ -555,7 +568,9 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
       inactiveAnimationProgress.value = animate();
       activeAnimationProgress.value = animate();
 
-      updateLayer?.(LayerState.INTERMEDIATE);
+      if (activeItemBroughtToFront.value) {
+        updateLayer?.(LayerState.INTERMEDIATE);
+      }
       haptics.medium();
 
       stableOnDragEnd({
@@ -580,6 +595,7 @@ const { DragProvider, useDragContext } = createProvider('Drag')<
     },
     [
       activeContainerId,
+      activeItemBroughtToFront,
       activeItemKey,
       activeItemDimensions,
       activeItemDropped,
