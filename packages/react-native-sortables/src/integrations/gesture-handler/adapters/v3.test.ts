@@ -174,7 +174,7 @@ it('returns the bare touch tracker when only touch callbacks are set (no recogni
   expect(mocked.useSimultaneousGestures).not.toHaveBeenCalled();
 });
 
-it('creates the double tap before the single tap, so that the single tap waits for it', () => {
+it('puts the double tap before the single tap, so that the single tap waits for it', () => {
   renderHook(() =>
     useTouchableGesture({
       externalGesture: {},
@@ -191,4 +191,13 @@ it('creates the double tap before the single tap, so that the single tap waits f
   ];
   expect(doubleTap.numberOfTaps).toBe(2);
   expect(tap.numberOfTaps).toBeUndefined();
+
+  // The mocked hook returns a new object on every call, so the order of the
+  // exclusive gestures can be checked by identity
+  const [doubleTapGesture, tapGesture] = mocked.useTapGesture.mock.results
+    .slice(-2)
+    .map(({ value }) => value as unknown);
+  const exclusive = mocked.useExclusiveGestures.mock.calls[0] as Array<unknown>;
+  expect(exclusive[0]).toBe(doubleTapGesture);
+  expect(exclusive[1]).toBe(tapGesture);
 });
