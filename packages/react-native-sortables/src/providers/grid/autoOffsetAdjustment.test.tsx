@@ -146,6 +146,23 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
     expect(getItemOffsets()).toEqual([0, 100, 200, 300]);
   });
 
+  it('adjusts the offset in a drag started before the previous drop finished', () => {
+    renderGrid();
+    const progress = startDrag('c', 210);
+    setHeights(COLLAPSED); // items collapse on drag start
+    act(() => {
+      common.activeAnimationProgress.value = 1; // the drop takes its full time
+      drag.handleDragEnd('c', progress);
+    });
+    setHeights(EXPANDED); // and expand again while the drop animates
+    advance(50);
+
+    startDrag('d', 310);
+    setHeights(COLLAPSED);
+
+    expect(getItemOffsets()[0]).toBeGreaterThan(0);
+  });
+
   it('removes the offset from the layout when the reset timeout fires', () => {
     renderGrid();
     const progress = startDrag('c', 210);

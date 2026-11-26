@@ -112,14 +112,20 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
     }, [context, sortEnabled, additionalCrossOffset]);
 
     useAnimatedReaction(
-      () => activeItemDropped.value,
-      dropped => {
+      () => ({
+        dropped: activeItemDropped.value,
+        isActive: activeItemKey.value !== null
+      }),
+      ({ dropped, isActive }) => {
         clearAnimatedTimeout(context.value.resetTimeoutId);
         // Enabled only from the drag start, so that a finished drag doesn't
         // leave it waiting for size changes that are not related to a drag
-        if (!dropped) {
+        if (isActive) {
           context.value.state = AutoOffsetAdjustmentState.ENABLED;
-        } else if (context.value.state !== AutoOffsetAdjustmentState.DISABLED) {
+        } else if (
+          dropped &&
+          context.value.state !== AutoOffsetAdjustmentState.DISABLED
+        ) {
           context.value.resetTimeoutId = setAnimatedTimeout(
             disableAutoOffsetAdjustment,
             autoAdjustOffsetResetTimeout
