@@ -266,7 +266,10 @@ const useInsertStrategy: SortStrategyFactory = () => {
     const currentGroup = currentLayout.itemGroups[groupIndex];
     if (!currentGroup) {
       const lastItemIndex = indexToKey.value.length - 1;
-      if (activeIndex === lastItemIndex) {
+      if (
+        activeIndex === lastItemIndex ||
+        fixedItemKeys?.value?.[indexToKey.value[lastItemIndex]!]
+      ) {
         return null;
       }
       return reorderInsert(
@@ -293,7 +296,6 @@ const useInsertStrategy: SortStrategyFactory = () => {
     // Item after
     let swapItemAfterOffset = -Infinity;
     let swapItemAfterBound = -Infinity;
-    let totalGroupSize = 0;
 
     do {
       if (swapItemAfterBound !== -Infinity) {
@@ -337,11 +339,6 @@ const useInsertStrategy: SortStrategyFactory = () => {
       const additionalSwapOffset = getAdditionalSwapOffset(sizeToAdd);
       swapItemAfterBound =
         averageOffset + (isCurrentBeforeNext ? 1 : -1) * additionalSwapOffset;
-
-      totalGroupSize += itemMainSize + mainGap;
-      if (totalGroupSize + activeItemMainSize > currentLayout.groupSizeLimit) {
-        break;
-      }
     } while (
       itemIndexInGroup < currentGroup.length - 1 &&
       gt(mainAxisPosition, swapItemAfterBound)
@@ -468,8 +465,10 @@ const useInsertStrategy: SortStrategyFactory = () => {
       }
     }
 
-    const newIndex =
-      firstAvailableInGroupIndex + (itemIndexInGroup - initialItemIndexInGroup);
+    const newIndex = Math.min(
+      firstAvailableInGroupIndex + (itemIndexInGroup - initialItemIndexInGroup),
+      indexToKey.value.length - 1
+    );
 
     if (
       newIndex === activeIndex ||

@@ -42,7 +42,8 @@ const createGroups = (
     const currentTotalSize =
       totalGroupItemsMainSize + currentGroup.length * gap + mainItemDimension;
 
-    if (currentTotalSize > groupMainSizeLimit + 0.1) {
+    // An item wider than the limit doesn't wrap if it starts the line
+    if (currentGroup.length && currentTotalSize > groupMainSizeLimit) {
       groups.push(currentGroup);
       crossAxisGroupSizes.push(groupCrossSize);
       currentGroup = [];
@@ -368,6 +369,9 @@ export const calculateLayout = ({
   if (groupSizeLimit <= 0) {
     return null;
   }
+  // Tolerance for rounding errors, kept in the limit so that the sort
+  // strategy wraps items exactly as the layout does
+  groupSizeLimit += 0.1;
 
   const groupingResult = createGroups(
     indexToKey,

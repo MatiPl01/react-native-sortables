@@ -185,12 +185,13 @@ const getIndexesWhenSwappedToGroupAfter = ({
   const doesNotFitInGroup = (key: string) =>
     totalGroupSize + getItemMainSize(key) > groupSizeLimit;
 
-  const includeItem = (key: string) => {
+  const includeItem = (key: string, newIndex: number) => {
     const itemMainSize = getItemMainSize(key);
-    if (doesNotFitInGroup(key)) {
+    // The first item of a line never wraps (same rule as in the layout)
+    if (newIndex > firstInGroupIndex && doesNotFitInGroup(key)) {
       groupIndex++;
       totalGroupSize = 0;
-      firstInGroupIndex = keyToIndex[key]!;
+      firstInGroupIndex = newIndex;
     }
     totalGroupSize += itemMainSize + mainGap;
   };
@@ -204,9 +205,9 @@ const getIndexesWhenSwappedToGroupAfter = ({
 
     // Fill the empty slot with the current item and add all fixed
     // position items that were before this item
-    includeItem(key);
+    includeItem(key, emptyIndex);
     for (let j = emptyIndex + 1; j < i; j++) {
-      includeItem(indexToKey[j]!);
+      includeItem(indexToKey[j]!, j);
     }
     emptyIndex = i;
 
