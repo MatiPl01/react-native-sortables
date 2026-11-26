@@ -263,15 +263,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
     // MAIN AXIS BOUNDS
     // currentGroup is the updated group after new layout calculation
     // that contains the active item
-    let currentGroup = currentLayout.itemGroups[groupIndex];
-    // Taking the active item out of its line can let the next item join the
-    // previous line, so the active item is one line before the expected one
-    if (
-      !currentGroup?.includes(activeKey) &&
-      currentLayout.itemGroups[groupIndex - 1]?.includes(activeKey)
-    ) {
-      currentGroup = currentLayout.itemGroups[--groupIndex];
-    }
+    const currentGroup = currentLayout.itemGroups[groupIndex];
     if (!currentGroup) {
       const lastItemIndex = indexToKey.value.length - 1;
       if (
@@ -289,10 +281,13 @@ const useInsertStrategy: SortStrategyFactory = () => {
     }
     const mainAxisPosition = position[mainCoordinate];
 
-    // The layout knows where in its line the active item really is
-    const activeIndexInGroup = currentGroup.indexOf(activeKey);
-    if (activeIndexInGroup !== -1) {
-      itemIndexInGroup = activeIndexInGroup;
+    // Find the itemIndexInGroup of the active item if it is in the same group
+    if (groupIndex === activeGroupIndex.value) {
+      const firstItemKey = currentGroup[0];
+      if (firstItemKey === undefined) return;
+      const firstItemIndex = keyToIndex.value[firstItemKey];
+      if (firstItemIndex === undefined) return;
+      itemIndexInGroup = activeIndex - firstItemIndex;
     }
 
     const initialItemIndexInGroup = itemIndexInGroup;
@@ -470,19 +465,10 @@ const useInsertStrategy: SortStrategyFactory = () => {
       }
     }
 
-    let newIndex = Math.min(
+    const newIndex = Math.min(
       firstAvailableInGroupIndex + (itemIndexInGroup - initialItemIndexInGroup),
       indexToKey.value.length - 1
     );
-    // A fixed item cannot be replaced, so take the closest free slot on the
-    // way to it
-    const step = Math.sign(firstAvailableInGroupIndex - newIndex);
-    while (
-      newIndex !== firstAvailableInGroupIndex &&
-      fixedItemKeys?.value?.[indexToKey.value[newIndex]!]
-    ) {
-      newIndex += step;
-    }
 
     if (
       newIndex === activeIndex ||

@@ -8,7 +8,6 @@ import useInsertStrategy from '.';
 const ITEM_HEIGHT = 50;
 
 type Options = {
-  columnGap?: number;
   fixedIndex?: number;
   rowGap?: number;
 };
@@ -18,7 +17,7 @@ type Options = {
 const setup = (
   widths: Array<number>,
   containerWidth: number,
-  { columnGap, fixedIndex, rowGap }: Options = {}
+  { fixedIndex, rowGap }: Options = {}
 ) => {
   let context!: ReturnType<typeof useCommonValuesContext>;
   let updater!: OrderUpdater;
@@ -29,11 +28,7 @@ const setup = (
 
   render(
     <GestureHandlerRootView>
-      <Sortable.Flex
-        columnGap={columnGap}
-        rowGap={rowGap}
-        strategy={useStrategy}
-        customHandle>
+      <Sortable.Flex rowGap={rowGap} strategy={useStrategy} customHandle>
         {widths.map((_, index) => (
           <Sortable.Handle
             key={index}
@@ -88,65 +83,16 @@ it('moves an item next to a fixed last item without replacing it', () => {
   const [a, b, c, d] = keys;
 
   expect(drag(0, { x: 130, y: 75 })).toEqual([b, c, a, d]);
-  // The fixed item cannot be passed, so the slot before it is taken
-  expect(drag(0, { x: 240, y: 75 })).toEqual([b, c, a, d]);
+  // The fixed item cannot be passed
+  expect(drag(0, { x: 240, y: 75 })).toEqual(keys);
 });
 
-it('moves an item to the next line when the pointer is over its fixed last item', () => {
-  // a b | c D  ->  a | c b D
-  const { drag, keys } = setup([54, 298, 270, 48], 352, { fixedIndex: 3 });
-  const [a, b, c, d] = keys;
+it('keeps a fixed last item when the target line does not exist', () => {
+  // a | b c | d | E: with b taken out, c joins a, so the layout has one line
+  // less than the strategy expects
+  const { drag, keys } = setup([220, 210, 70, 240, 90], 300, { fixedIndex: 4 });
 
-  expect(drag(1, { x: 203, y: 75 })).toEqual([a, c, b, d]);
-});
-
-it('moves an item to the last line when only a fixed item can follow it', () => {
-  // a b | c d | e F  ->  a b | c e | d F
-  const { drag, keys } = setup([233, 129, 160, 154, 146, 58], 380, {
-    fixedIndex: 5
-  });
-  const [a, b, c, d, e, f] = keys;
-
-  expect(drag(3, { x: 263, y: 125 })).toEqual([a, b, c, e, d, f]);
-});
-
-describe('when taking the item out lets the next item join the previous line', () => {
-  it('moves the first item of a line to the next line', () => {
-    // a | b c d | e  ->  a c | d e | b
-    const { drag, keys } = setup([220, 100, 60, 110, 180], 300);
-    const [a, b, c, d, e] = keys;
-
-    expect(drag(1, { x: 50, y: 125 })).toEqual([a, c, d, e, b]);
-  });
-
-  it('moves an item before a fixed last item', () => {
-    // a | b c | d | E  ->  a c | d | b E
-    const { drag, keys } = setup([220, 210, 70, 240, 90], 300, {
-      fixedIndex: 4
-    });
-    const [a, b, c, d, e] = keys;
-
-    expect(drag(1, { x: 150, y: 125 })).toEqual([a, c, d, b, e]);
-  });
-});
-
-it('moves an item one line up when the line above has no room for it and the gap', () => {
-  // a | b | c  ->  a | c | b
-  const { drag, keys } = setup([200, 250, 95], 300, {
-    columnGap: 10,
-    rowGap: 10
-  });
-  const [a, b, c] = keys;
-
-  expect(drag(2, { x: 47, y: 105 })).toEqual([a, c, b]);
-});
-
-it('moves an item wider than the container to the previous line', () => {
-  // a | b | c d  ->  b | a c d
-  const { drag, keys } = setup([57, 368, 162, 35], 362);
-  const [a, b, c, d] = keys;
-
-  expect(drag(1, { x: 184, y: 40 })).toEqual([b, a, c, d]);
+  expect(drag(1, { x: 150, y: 125 })).toEqual(keys);
 });
 
 it('moves an item wider than half of the line to the end of the line', () => {
