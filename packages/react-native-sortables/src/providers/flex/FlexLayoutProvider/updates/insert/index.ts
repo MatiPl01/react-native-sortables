@@ -29,6 +29,26 @@ import {
   getTotalGroupSize
 } from './utils';
 
+// The line the active item really is in after the swap. The predicted one is
+// one too far when the item taking the place of the active item joins the
+// previous line.
+const getSwappedGroupIndex = (
+  indexes: ItemGroupSwapResult,
+  layout: FlexLayout | null,
+  activeKey: string
+) => {
+  'worklet';
+  const groups = layout?.itemGroups;
+  if (
+    groups &&
+    !groups[indexes.groupIndex]?.includes(activeKey) &&
+    groups[indexes.groupIndex - 1]?.includes(activeKey)
+  ) {
+    return indexes.groupIndex - 1;
+  }
+  return indexes.groupIndex;
+};
+
 const useInsertStrategy: SortStrategyFactory = () => {
   const { activeItemKey, indexToKey, itemHeights, itemWidths, keyToIndex } =
     useCommonValuesContext();
@@ -216,7 +236,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
       if (swapGroupAfterBound !== -Infinity) {
         swappedAfterGroupsCount =
           swappedAfterLayout.value?.itemGroups.length ?? 0;
-        groupIndex = afterIndexes.groupIndex;
+        groupIndex = getSwappedGroupIndex(afterIndexes, afterLayout, activeKey);
         firstAvailableInGroupIndex = afterIndexes.itemIndex;
         itemIndexInGroup = afterIndexes.itemIndexInGroup;
 
@@ -238,10 +258,15 @@ const useInsertStrategy: SortStrategyFactory = () => {
       swapGroupAfterOffset =
         currentGroupBeforeOffset +
         (currentLayout.crossAxisGroupSizes[groupIndex] ?? 0);
+      const afterGroupIndex = getSwappedGroupIndex(
+        afterIndexes,
+        afterLayout,
+        activeKey
+      );
       const afterSwapGroupBeforeOffset =
-        afterLayout?.crossAxisGroupOffsets[afterIndexes.groupIndex] ?? 0;
+        afterLayout?.crossAxisGroupOffsets[afterGroupIndex] ?? 0;
       const afterSwapGroupSize = Math.max(
-        afterLayout?.crossAxisGroupSizes?.[afterIndexes.groupIndex] ?? 0,
+        afterLayout?.crossAxisGroupSizes?.[afterGroupIndex] ?? 0,
         activeItemDimensions[crossDimension]
       );
       const swapOffset = afterSwapGroupBeforeOffset
@@ -251,7 +276,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
           2
         : swapGroupAfterOffset;
       const additionalSwapOffset = getAdditionalSwapOffset(
-        afterLayout?.crossAxisGroupSizes?.[afterIndexes.groupIndex] ?? 0
+        afterLayout?.crossAxisGroupSizes?.[afterGroupIndex] ?? 0
       );
       swapGroupAfterBound = swapOffset + additionalSwapOffset;
     } while (
@@ -263,7 +288,15 @@ const useInsertStrategy: SortStrategyFactory = () => {
     // MAIN AXIS BOUNDS
     // currentGroup is the updated group after new layout calculation
     // that contains the active item
-    const currentGroup = currentLayout.itemGroups[groupIndex];
+    let currentGroup = currentLayout.itemGroups[groupIndex];
+    // Taking the active item out of its line can let the next item join the
+    // previous line, so the active item is one line before the expected one
+    if (
+      !currentGroup?.includes(activeKey) &&
+      currentLayout.itemGroups[groupIndex - 1]?.includes(activeKey)
+    ) {
+      currentGroup = currentLayout.itemGroups[--groupIndex];
+    }
     if (!currentGroup) {
       const lastItemIndex = indexToKey.value.length - 1;
       if (
@@ -281,13 +314,10 @@ const useInsertStrategy: SortStrategyFactory = () => {
     }
     const mainAxisPosition = position[mainCoordinate];
 
-    // Find the itemIndexInGroup of the active item if it is in the same group
-    if (groupIndex === activeGroupIndex.value) {
-      const firstItemKey = currentGroup[0];
-      if (firstItemKey === undefined) return;
-      const firstItemIndex = keyToIndex.value[firstItemKey];
-      if (firstItemIndex === undefined) return;
-      itemIndexInGroup = activeIndex - firstItemIndex;
+    // The layout knows where in its line the active item really is
+    const activeIndexInGroup = currentGroup.indexOf(activeKey);
+    if (activeIndexInGroup !== -1) {
+      itemIndexInGroup = activeIndexInGroup;
     }
 
     const initialItemIndexInGroup = itemIndexInGroup;
@@ -465,10 +495,19 @@ const useInsertStrategy: SortStrategyFactory = () => {
       }
     }
 
-    const newIndex = Math.min(
+    let newIndex = Math.min(
       firstAvailableInGroupIndex + (itemIndexInGroup - initialItemIndexInGroup),
       indexToKey.value.length - 1
     );
+    // A fixed item cannot be replaced, so take the closest free slot on the
+    // way to it
+    const step = Math.sign(firstAvailableInGroupIndex - newIndex);
+    while (
+      newIndex !== firstAvailableInGroupIndex &&
+      fixedItemKeys?.value?.[indexToKey.value[newIndex]!]
+    ) {
+      newIndex += step;
+    }
 
     if (
       newIndex === activeIndex ||

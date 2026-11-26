@@ -121,7 +121,11 @@ const getIndexesWhenSwappedToGroupBefore = ({
       if (itemKey === undefined) {
         return null;
       }
-      if (totalGroupSize + activeMainSize > groupSizeLimit) {
+      // The first item of a line never wraps (same rule as in the layout)
+      if (
+        itemIndex > firstInGroupBeforeIndex &&
+        totalGroupSize + activeMainSize > groupSizeLimit
+      ) {
         break;
       }
 
@@ -196,7 +200,14 @@ const getIndexesWhenSwappedToGroupAfter = ({
     totalGroupSize += itemMainSize + mainGap;
   };
 
-  for (let i = activeItemIndex + 1; i < indexToKey.length; i++) {
+  // Fixed items at the end cannot be passed, so the slot before them is the
+  // last one the active item can take
+  let lastFreeIndex = indexToKey.length - 1;
+  while (fixedKeys?.[indexToKey[lastFreeIndex]!]) {
+    lastFreeIndex--;
+  }
+
+  for (let i = activeItemIndex + 1; i <= lastFreeIndex; i++) {
     const key = indexToKey[i]!;
 
     if (fixedKeys?.[key]) {
@@ -212,8 +223,7 @@ const getIndexesWhenSwappedToGroupAfter = ({
     emptyIndex = i;
 
     if (doesNotFitInGroup(activeItemKey)) {
-      const nextItemKey = indexToKey[i + 1];
-      if (nextItemKey === undefined || doesNotFitInGroup(nextItemKey)) {
+      if (i === lastFreeIndex || doesNotFitInGroup(indexToKey[i + 1]!)) {
         return {
           groupIndex: groupIndex + 1,
           itemIndex: i,
