@@ -198,7 +198,7 @@ const { GridLayoutProvider, useGridLayoutContext } = createProvider(
         shouldUpdateContainerDimensions(
           isVertical ? containerHeight.value : containerWidth.value,
           layout.containerCrossSize,
-          adaptedProps.startCrossOffset !== undefined
+          typeof adaptedProps.startCrossOffset === 'number'
         )
       ) {
         applyControlledContainerDimensions({
