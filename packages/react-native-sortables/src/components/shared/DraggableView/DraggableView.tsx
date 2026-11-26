@@ -18,6 +18,7 @@ import {
   useDragContext,
   useItemLayout,
   useItemPanGesture,
+  useItemsContext,
   useMeasurementsContext,
   usePortalContext
 } from '../../../providers';
@@ -43,6 +44,7 @@ function DraggableView({
   const { handleItemMeasurement, removeItemMeasurements } =
     useMeasurementsContext();
   const { handleDragEnd } = useDragContext();
+  const { getNode } = useItemsContext();
   const { activeItemKey, customHandle } = commonValuesContext;
 
   const [isHidden, setIsHidden] = useState(false);
@@ -57,12 +59,23 @@ function DraggableView({
 
   useEffect(() => {
     return () => {
-      removeItemMeasurements(key);
+      // This cleanup also runs when the item is only hidden (e.g. by Activity).
+      // The item doesn't report its layout again when it is shown, so the
+      // measurements are removed only if it is no longer rendered.
+      if (getNode(key) === undefined) {
+        removeItemMeasurements(key);
+      }
       runOnUI(() => {
         handleDragEnd(key, activationAnimationProgress);
       })();
     };
-  }, [activationAnimationProgress, handleDragEnd, key, removeItemMeasurements]);
+  }, [
+    activationAnimationProgress,
+    getNode,
+    handleDragEnd,
+    key,
+    removeItemMeasurements
+  ]);
 
   const onLayout = useCallback(
     ({

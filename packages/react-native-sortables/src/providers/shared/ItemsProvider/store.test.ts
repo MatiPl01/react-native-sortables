@@ -14,6 +14,16 @@ describe('createItemsStore', () => {
     expect(store.getNode('a')).toBe('LARGE:Item a');
   });
 
+  it('returns undefined only for a key that is not in the store', () => {
+    const store = createItemsStore(
+      [['a', 'Item a']],
+      asRenderItem((() => undefined) as never)
+    );
+
+    expect(store.getNode('a')).toBeNull();
+    expect(store.getNode('missing')).toBeUndefined();
+  });
+
   // Regression coverage for the collapsible-items case: when only the
   // renderItem identity changes (e.g. an item collapses on drag), the store
   // must re-render the node and notify subscribers. The teleported active item
