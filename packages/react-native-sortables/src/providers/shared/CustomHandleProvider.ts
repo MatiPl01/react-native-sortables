@@ -3,7 +3,7 @@ import type { View } from 'react-native';
 import type { AnimatedRef, MeasuredDimensions } from 'react-native-reanimated';
 import { measure, runOnUI } from 'react-native-reanimated';
 
-import { HIDDEN_X_OFFSET } from '../../constants';
+import { HIDDEN_X_OFFSET, isPaper } from '../../constants';
 import {
   useAnimatedDebounce,
   useMutableValue
@@ -22,6 +22,9 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
 )<CustomHandleProviderProps, CustomHandleContextType>(() => {
   const { containerRef, itemLayoutPositions } = useCommonValuesContext();
   const debounce = useAnimatedDebounce();
+  // Only Paper moves a hidden item outside of the viewport (see ItemCell).
+  // It is read here, because isPaper can't be called on the UI thread
+  const hidesOffScreen = isPaper();
 
   const fixedItemKeys = useMutableValue<Record<string, boolean>>({});
   const handleRefs = useMutableValue<Record<string, AnimatedRef<View>>>({});
@@ -81,7 +84,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
         // The handle might be measured when the item is already hidden (put outside
         // of the viewport) so we need to adjust the measured x position accordingly
         x:
-          (handleX > HIDDEN_X_OFFSET / 2
+          (hidesOffScreen && handleX > HIDDEN_X_OFFSET / 2
             ? handleX - HIDDEN_X_OFFSET
             : handleX) -
           containerX -
@@ -94,6 +97,7 @@ const { CustomHandleProvider, useCustomHandleContext } = createProvider(
       activeHandleOffset,
       containerRef,
       handleRefs,
+      hidesOffScreen,
       itemLayoutPositions
     ]
   );

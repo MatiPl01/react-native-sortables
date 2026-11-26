@@ -26,6 +26,14 @@ jest.mock('react-native-reanimated', () => {
   };
 });
 
+// Set by the tests, so that they don't depend on what isPaper detects under jest
+let mockIsPaper = false;
+
+jest.mock('../../constants/platform', () => ({
+  ...jest.requireActual<object>('../../constants/platform'),
+  isPaper: () => mockIsPaper
+}));
+
 const CONTAINER_X = 20;
 
 let common: CommonValuesContextType;
@@ -84,7 +92,15 @@ describe('CustomHandleProvider', () => {
     expect(getHandleOffsetX(-30)).toBe(-30 - CONTAINER_X);
   });
 
-  it('ignores the offset of an item that is hidden off the screen', () => {
+  it('ignores the offset of an item that is hidden off the screen on Paper', () => {
+    mockIsPaper = true;
+
     expect(getHandleOffsetX(HIDDEN_X_OFFSET + 50)).toBe(50 - CONTAINER_X);
+  });
+
+  it('keeps the offset of a handle far to the right when not on Paper', () => {
+    mockIsPaper = false;
+
+    expect(getHandleOffsetX(5050)).toBe(5050 - CONTAINER_X);
   });
 });
