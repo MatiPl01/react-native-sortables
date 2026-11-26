@@ -81,7 +81,8 @@ const calculateAlignment = (
   let startOffset = 0;
   let adjustedGap = providedGap;
 
-  const getTotalSize = (gap: number) => sum(sizes) + gap * (sizes.length - 1);
+  const getTotalSize = (gap: number) =>
+    sum(sizes) + gap * Math.max(sizes.length - 1, 0);
 
   const totalSize = getTotalSize(providedGap);
   const clampedTotalSize = Math.min(
@@ -188,11 +189,16 @@ const handleLayoutCalculation = (
   let totalHeight = 0;
   let totalWidth = 0;
 
+  // The container is never smaller than its paddings, also when it is empty
   if (isRow) {
     totalHeight = contentAlignment.totalSize + paddingVertical;
-    totalWidth = expandMultiGroup ? limits.maxWidth : limits.minWidth;
+    totalWidth = expandMultiGroup
+      ? limits.maxWidth
+      : Math.max(limits.minWidth, paddingHorizontal);
   } else {
-    totalHeight = expandMultiGroup ? limits.maxHeight : limits.minHeight;
+    totalHeight = expandMultiGroup
+      ? limits.maxHeight
+      : Math.max(limits.minHeight, paddingVertical);
     totalWidth = contentAlignment.totalSize + paddingHorizontal;
   }
 
@@ -293,20 +299,8 @@ const handleLayoutCalculation = (
     }
   }
 
-  let additionalOffset = 0;
-  if (isRow && isReverse) {
-    // row-reverse
-    additionalOffset = paddings.bottom;
-  } else if (isRow) {
-    // row
-    additionalOffset = paddings.top;
-  } else if (isReverse) {
-    // column-reverse
-    additionalOffset = paddings.right;
-  } else {
-    // column
-    additionalOffset = paddings.left;
-  }
+  // Reverse directions flip only the main axis
+  const additionalOffset = isRow ? paddings.top : paddings.left;
 
   const crossAxisGroupOffsets = contentAlignment.offsets.map(
     offset => offset + additionalOffset
