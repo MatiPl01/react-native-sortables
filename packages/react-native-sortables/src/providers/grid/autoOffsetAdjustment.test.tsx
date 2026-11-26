@@ -2,7 +2,7 @@ import { act, render } from '@testing-library/react-native';
 import { View } from 'react-native';
 import type { GestureTouchEvent } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { makeMutable } from 'react-native-reanimated';
+import { type AnimatedRef, makeMutable } from 'react-native-reanimated';
 
 import Sortable from '../../index';
 import type {
@@ -16,6 +16,18 @@ import { GRID_STRATEGIES } from './GridLayoutProvider';
 const KEYS = ['a', 'b', 'c', 'd'];
 const EXPANDED = 100;
 const COLLAPSED = 40;
+
+const mockScrollOffset = makeMutable(0);
+const scrollableRef = { current: null } as unknown as AnimatedRef<View>;
+
+// measure and scrollTo are not available in jest
+jest.mock('react-native-reanimated', () => ({
+  ...jest.requireActual<object>('react-native-reanimated'),
+  __esModule: true,
+  measure: () => null,
+  scrollTo: () => undefined,
+  useScrollViewOffset: () => mockScrollOffset
+}));
 
 let common: CommonValuesContextType;
 let drag: DragContextType;
@@ -47,26 +59,34 @@ const setHeights = (height: number) =>
     );
   });
 
-const Grid = ({
-  columns = 1,
-  keys = KEYS
-}: {
+type GridProps = {
   columns?: number;
   keys?: Array<string>;
-}) => (
+  scrollable?: boolean;
+  sortEnabled?: boolean;
+};
+
+const Grid = ({
+  columns = 1,
+  keys = KEYS,
+  scrollable,
+  sortEnabled
+}: GridProps) => (
   <GestureHandlerRootView>
     <Sortable.Grid
       columns={columns}
       data={keys}
       renderItem={() => <View />}
+      scrollableRef={scrollable ? scrollableRef : undefined}
+      sortEnabled={sortEnabled}
       strategy={useCapturingStrategy}
       autoAdjustOffsetDuringDrag
     />
   </GestureHandlerRootView>
 );
 
-function renderGrid() {
-  const result = render(<Grid />);
+function renderGrid(props?: GridProps) {
+  const result = render(<Grid {...props} />);
   act(() => {
     common.containerWidth.value = 300;
   });
@@ -111,21 +131,27 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
     expect(common.indexToKey.value).toEqual(['b', 'c', 'a', 'd']);
   });
 
-  it('keeps sorting enabled when items are resized with no drag in progress', () => {
-    renderGrid();
-    const progress = startDrag('c', 210);
-    setHeights(COLLAPSED); // items collapse on drag start
-    act(() => {
-      drag.handleDragEnd('c', progress);
-    });
-    setHeights(EXPANDED); // and expand again while the drop animates
-    advance(2000);
+  it.each([
+    ['without', false],
+    ['with', true]
+  ])(
+    'keeps sorting enabled when items are resized with no drag in progress (%s scrollableRef)',
+    (_, scrollable) => {
+      renderGrid({ scrollable });
+      const progress = startDrag('c', 210);
+      setHeights(COLLAPSED); // items collapse on drag start
+      act(() => {
+        drag.handleDragEnd('c', progress);
+      });
+      setHeights(EXPANDED); // and expand again while the drop animates
+      advance(2000);
 
-    setHeights(COLLAPSED);
+      setHeights(COLLAPSED);
 
-    expect(common.sortEnabled.value).toBe(true);
-    expect(getItemOffsets()).toEqual([0, 40, 80, 120]);
-  });
+      expect(common.sortEnabled.value).toBe(true);
+      expect(getItemOffsets()).toEqual([0, 40, 80, 120]);
+    }
+  );
 
   it('keeps sorting enabled when items are resized after drags with no size change', () => {
     renderGrid();
@@ -136,6 +162,16 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
 
     expect(common.sortEnabled.value).toBe(true);
     expect(getItemOffsets()).toEqual([0, 40, 80, 120]);
+  });
+
+  it('keeps the sortEnabled value set after mount when the first drag ends', () => {
+    const { rerender } = renderGrid({ sortEnabled: false });
+    rerender(<Grid sortEnabled />);
+    advance(0);
+
+    dragAndDrop('a');
+
+    expect(common.sortEnabled.value).toBe(true);
   });
 
   it('keeps the released item in place when items are resized right after the release', () => {
@@ -197,6 +233,19 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
 
     rerender(<Grid keys={KEYS.slice(0, 3)} />);
     advance(0);
+
+    expect(common.containerHeight.value).toBe(3 * EXPANDED);
+  });
+
+  it('shrinks the container when an item is removed right after the release', () => {
+    const { rerender } = renderGrid();
+    const progress = startDrag('d', 310);
+    act(() => {
+      drag.handleDragEnd('d', progress);
+    });
+
+    rerender(<Grid keys={KEYS.slice(0, 3)} />);
+    advance(50);
 
     expect(common.containerHeight.value).toBe(3 * EXPANDED);
   });
