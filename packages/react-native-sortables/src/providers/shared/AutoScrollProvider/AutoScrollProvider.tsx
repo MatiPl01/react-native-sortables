@@ -206,18 +206,26 @@ function AutoScrollUpdater({
       const scrollableSize =
         scrollableMeasurements[isVertical ? 'height' : 'width'];
 
+      // Start from the real offset when the target is behind it, which happens
+      // when the direction changes after the target went past what the scrollable
+      // can reach (differences below 1px are just rounding of the real offset)
+      const lead =
+        (scrollOffset.value - ctx.targetScrollOffset) * Math.sign(distance);
+      const baseOffset =
+        lead >= 1 ? scrollOffset.value : ctx.targetScrollOffset;
+
       let newScrollOffset = 0;
 
       if (distance > 0) {
         // scroll down
         newScrollOffset = Math.min(
-          ctx.targetScrollOffset + distance,
+          baseOffset + distance,
           ctx.sortableOffset - scrollableSize + bounds[1] + maxOverscroll[1]
         );
       } else if (distance < 0) {
         // scroll up
         newScrollOffset = Math.max(
-          ctx.targetScrollOffset + distance,
+          baseOffset + distance,
           ctx.sortableOffset + bounds[0] - maxOverscroll[0]
         );
       } else return;
@@ -232,6 +240,7 @@ function AutoScrollUpdater({
     },
     [
       context,
+      scrollOffset,
       scrollToOffset,
       contentAxisBounds,
       maxOverscroll,
@@ -245,6 +254,10 @@ function AutoScrollUpdater({
       'worklet';
       const ctx = context.value;
       if (!ctx?.progress) {
+        // The time outside the activation zone must not count as elapsed time
+        if (ctx) {
+          ctx.lastUpdateTimestamp = undefined;
+        }
         return;
       }
 

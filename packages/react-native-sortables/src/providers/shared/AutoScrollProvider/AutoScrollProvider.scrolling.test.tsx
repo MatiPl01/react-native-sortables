@@ -102,4 +102,34 @@ describe('AutoScrollProvider', () => {
 
     expect(mockScrollOffset.value).toBeCloseTo(50, -1);
   });
+
+  it('scrolls back without a delay after the item was held at the content end', async () => {
+    await startDrag(1400);
+
+    // The scrollable stays at 1400, the target offset goes on to 1450
+    await dragTo(2000);
+    await advance(500);
+
+    // 20% into the start activation zone (1400-1475) is 200px/s
+    await dragTo(1460);
+    await advance(68);
+
+    expect(mockScrollOffset.value).toBeLessThan(1400);
+  });
+
+  it('does not jump when the item returns to the activation zone', async () => {
+    await startDrag(0);
+
+    // The end of the scrollable is 1000px/s
+    await dragTo(600);
+    await advance(500);
+    await dragTo(mockScrollOffset.value + 300);
+    await advance(1000);
+
+    const scrollOffset = mockScrollOffset.value;
+    await dragTo(scrollOffset + 600);
+
+    // dragTo takes 32ms, which is at most 32px at 1000px/s
+    expect(mockScrollOffset.value - scrollOffset).toBeLessThanOrEqual(32);
+  });
 });
