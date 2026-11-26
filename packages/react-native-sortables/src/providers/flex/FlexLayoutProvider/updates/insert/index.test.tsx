@@ -9,17 +9,21 @@ const ITEM_HEIGHT = 50;
 
 type Options = {
   columnGap?: number;
-  fixedIndex?: number;
+  fixedIndex?: Array<number> | number;
+  heights?: Array<number>;
   rowGap?: number;
 };
 
 // Renders a wrapping row of items with the given widths and returns their keys
-// with a function that drags one of them.
+// with functions that drag one of them.
 const setup = (
   widths: Array<number>,
   containerWidth: number,
-  { columnGap, fixedIndex, rowGap }: Options = {}
+  { columnGap, fixedIndex = [], heights, rowGap }: Options = {}
 ) => {
+  const fixedIndexes = [fixedIndex].flat();
+  const heightOf = (index: number) => heights?.[index] ?? ITEM_HEIGHT;
+
   let context!: ReturnType<typeof useCommonValuesContext>;
   let updater!: OrderUpdater;
   const useStrategy = () => {
@@ -37,7 +41,7 @@ const setup = (
         {widths.map((_, index) => (
           <Sortable.Handle
             key={index}
-            mode={index === fixedIndex ? 'fixed-order' : 'draggable'}
+            mode={fixedIndexes.includes(index) ? 'fixed-order' : 'draggable'}
           />
         ))}
       </Sortable.Flex>
@@ -47,7 +51,9 @@ const setup = (
   const keys = context.indexToKey.value;
   act(() => {
     context.containerWidth.value = containerWidth;
-    context.itemHeights.value = ITEM_HEIGHT;
+    context.itemHeights.value = Object.fromEntries(
+      keys.map((key, index) => [key, heightOf(index)])
+    );
     context.itemWidths.value = Object.fromEntries(
       keys.map((key, index) => [key, widths[index]!])
     );
@@ -65,13 +71,48 @@ const setup = (
       updater({
         activeIndex,
         activeKey,
-        dimensions: { height: ITEM_HEIGHT, width: widths[activeIndex]! },
+        dimensions: {
+          height: heightOf(activeIndex),
+          width: widths[activeIndex]!
+        },
         position
       }) ?? keys
     );
   };
 
-  return { context, drag, keys };
+  const applyOrder = (order: Array<string>) =>
+    act(() => {
+      context.indexToKey.value = order;
+      jest.runAllTimers();
+    });
+
+  // Keeps the item at the given position, applies every order the strategy
+  // returns (as when the finger moves by a pixel) and returns all of them
+  const hold = (activeIndex: number, position: Vector) => {
+    const activeKey = keys[activeIndex]!;
+    act(() => {
+      context.activeItemKey.value = activeKey;
+      jest.runAllTimers();
+    });
+    const orders: Array<Array<string>> = [];
+    for (let i = 0; i < 6; i++) {
+      const order = updater({
+        activeIndex: context.keyToIndex.value[activeKey]!,
+        activeKey,
+        dimensions: {
+          height: heightOf(activeIndex),
+          width: widths[activeIndex]!
+        },
+        position
+      });
+      if (!order) break;
+      orders.push(order);
+      applyOrder(order);
+    }
+    return orders;
+  };
+
+  return { context, drag, hold, keys };
 };
 
 it('moves an item to the next line when rounded sizes overflow the line', () => {
@@ -149,4 +190,58 @@ it('does not leave an empty line before a first item wider than the container', 
   const { context, keys } = setup([300, 80], 250, { rowGap: 12 });
 
   expect(context.itemLayoutPositions.value[keys[0]!]).toEqual({ x: 0, y: 0 });
+});
+
+describe('with the item held at one position', () => {
+  it('settles above a tall fixed line', () => {
+    // a b | C | d E, where C and E are fixed and C is 150 high
+    const { hold, keys } = setup([150, 100, 300, 200, 50], 300, {
+      fixedIndex: [2, 4],
+      heights: [50, 50, 150, 50, 50]
+    });
+    const [a, b, c, d, e] = keys;
+
+    expect(hold(3, { x: 100, y: 110 })).toEqual([
+      [d, a, c, b, e],
+      [a, d, c, b, e]
+    ]);
+  });
+
+  it('settles above three fixed lines', () => {
+    // a b | C | D | E | f G, where C, D, E and G are fixed
+    const { hold, keys } = setup([150, 100, 300, 300, 300, 200, 50], 300, {
+      fixedIndex: [2, 3, 4, 6]
+    });
+    const [a, b, c, d, e, f, g] = keys;
+
+    expect(hold(5, { x: 100, y: 112 })).toEqual([
+      [f, a, c, d, e, b, g],
+      [a, f, c, d, e, b, g]
+    ]);
+  });
+
+  it('settles when the item is wider than the container', () => {
+    // a | b c | D | e, where D is fixed and 150 high
+    const { hold, keys } = setup([200, 150, 100, 300, 320], 300, {
+      fixedIndex: 3,
+      heights: [50, 50, 50, 150, 50]
+    });
+    const [a, b, c, d, e] = keys;
+
+    expect(hold(4, { x: 150, y: 160 })).toEqual([
+      [a, e, b, d, c],
+      [a, b, e, d, c]
+    ]);
+  });
+
+  it('ends on the line under the pointer when lines have gaps', () => {
+    // a | b | c | d | e | f g, the pointer is in the line of c
+    const { hold, keys } = setup([100, 120, 140, 160, 100, 140, 40], 200, {
+      columnGap: 16,
+      rowGap: 8
+    });
+    const [a, b, c, d, e, f, g] = keys;
+
+    expect(hold(6, { x: 6, y: 150 }).at(-1)).toEqual([a, b, c, g, d, e, f]);
+  });
 });

@@ -29,6 +29,26 @@ import {
   getTotalGroupSize
 } from './utils';
 
+// The line the active item really is in after the swap. The predicted one is
+// one too far when the item taking the place of the active item joins the
+// previous line.
+const getSwappedGroupIndex = (
+  indexes: ItemGroupSwapResult,
+  layout: FlexLayout | null,
+  activeKey: string
+) => {
+  'worklet';
+  const groups = layout?.itemGroups;
+  if (
+    groups &&
+    !groups[indexes.groupIndex]?.includes(activeKey) &&
+    groups[indexes.groupIndex - 1]?.includes(activeKey)
+  ) {
+    return indexes.groupIndex - 1;
+  }
+  return indexes.groupIndex;
+};
+
 const useInsertStrategy: SortStrategyFactory = () => {
   const { activeItemKey, indexToKey, itemHeights, itemWidths, keyToIndex } =
     useCommonValuesContext();
@@ -216,7 +236,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
       if (swapGroupAfterBound !== -Infinity) {
         swappedAfterGroupsCount =
           swappedAfterLayout.value?.itemGroups.length ?? 0;
-        groupIndex = afterIndexes.groupIndex;
+        groupIndex = getSwappedGroupIndex(afterIndexes, afterLayout, activeKey);
         firstAvailableInGroupIndex = afterIndexes.itemIndex;
         itemIndexInGroup = afterIndexes.itemIndexInGroup;
 
@@ -238,10 +258,15 @@ const useInsertStrategy: SortStrategyFactory = () => {
       swapGroupAfterOffset =
         currentGroupBeforeOffset +
         (currentLayout.crossAxisGroupSizes[groupIndex] ?? 0);
+      const afterGroupIndex = getSwappedGroupIndex(
+        afterIndexes,
+        afterLayout,
+        activeKey
+      );
       const afterSwapGroupBeforeOffset =
-        afterLayout?.crossAxisGroupOffsets[afterIndexes.groupIndex] ?? 0;
+        afterLayout?.crossAxisGroupOffsets[afterGroupIndex] ?? 0;
       const afterSwapGroupSize = Math.max(
-        afterLayout?.crossAxisGroupSizes?.[afterIndexes.groupIndex] ?? 0,
+        afterLayout?.crossAxisGroupSizes?.[afterGroupIndex] ?? 0,
         activeItemDimensions[crossDimension]
       );
       const swapOffset = afterSwapGroupBeforeOffset
@@ -251,7 +276,7 @@ const useInsertStrategy: SortStrategyFactory = () => {
           2
         : swapGroupAfterOffset;
       const additionalSwapOffset = getAdditionalSwapOffset(
-        afterLayout?.crossAxisGroupSizes?.[afterIndexes.groupIndex] ?? 0
+        afterLayout?.crossAxisGroupSizes?.[afterGroupIndex] ?? 0
       );
       swapGroupAfterBound = swapOffset + additionalSwapOffset;
     } while (
