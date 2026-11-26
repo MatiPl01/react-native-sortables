@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import {
   type AnimatedTimeoutID,
@@ -36,5 +36,5 @@ export default function useAnimatedDebounce() {
     [updateTimeoutId]
   );
 
-  return { cancel, schedule };
+  return useMemo(() => ({ cancel, schedule }), [cancel, schedule]);
 }

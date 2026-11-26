@@ -53,11 +53,16 @@ export default function useItemDecoration(
 
     let shadow;
     if (!IS_ANDROID) {
-      const shadowColor = interpolateColor(
-        interpolate(progress, [0, 1], [0, activeItemShadowOpacity.value]),
+      const shadowOpacity = interpolate(
+        progress,
         [0, 1],
-        ['transparent', 'black']
+        [0, activeItemShadowOpacity.value]
       );
+      // Skips the color interpolation for all items that are not being dragged
+      const shadowColor =
+        shadowOpacity === 0
+          ? 'transparent'
+          : interpolateColor(shadowOpacity, [0, 1], ['transparent', 'black']);
       shadow = IS_WEB
         ? { filter: `drop-shadow(0px 0px 5px ${shadowColor})` }
         : { shadowColor };
