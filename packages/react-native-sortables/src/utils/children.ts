@@ -17,7 +17,11 @@ export const processChildren = (
         const fragmentChildren = processChildren(
           (child.props as { children: ReactNode }).children
         );
-        return [...acc, ...fragmentChildren];
+        // Keys are unique only within a fragment, so prefix them with its key
+        for (const [key, element] of fragmentChildren) {
+          acc.push([`${child.key}:${key}`, element]);
+        }
+        return acc;
       }
 
       const key = child.key as string;
