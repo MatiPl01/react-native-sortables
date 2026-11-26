@@ -14,8 +14,8 @@ export type SortableLayerProps = PropsWithChildren<
 >;
 
 export default function SortableLayer({
-  children,
-  disabled = false
+  disabled = false,
+  ...rest
 }: SortableLayerProps) {
-  return <LayerProvider disabled={disabled}>{children}</LayerProvider>;
+  return <LayerProvider disabled={disabled} {...rest} />;
 }
