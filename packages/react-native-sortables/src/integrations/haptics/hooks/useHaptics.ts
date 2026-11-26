@@ -1,7 +1,7 @@
-import { useCallback, useMemo } from 'react';
-import { useDerivedValue } from 'react-native-reanimated';
+import { useMemo } from 'react';
 
 import { IS_WEB } from '../../../constants';
+import { useStableCallbackValue } from '../../reanimated';
 import { Haptics } from '../adapters';
 
 type HapticImpact = {
@@ -12,32 +12,24 @@ type HapticImpact = {
 let hapticFeedback: null | ReturnType<typeof Haptics.load> = null;
 
 export default function useHaptics(enabled: boolean): HapticImpact {
-  const isEnabled = !IS_WEB && enabled;
-  const enabledValue = useDerivedValue(() => isEnabled);
-
-  if (isEnabled && !hapticFeedback) {
-    hapticFeedback = Haptics.load();
-  }
-
-  const light = useCallback(() => {
-    'worklet';
-    if (enabledValue.value) {
-      hapticFeedback?.('impactLight');
-    }
-  }, [enabledValue]);
-
-  const medium = useCallback(() => {
-    'worklet';
-    if (enabledValue.value) {
-      hapticFeedback?.('impactMedium');
-    }
-  }, [enabledValue]);
+  const loadedTrigger =
+    !IS_WEB && enabled ? (hapticFeedback ??= Haptics.load()) : null;
+  // Worklets capture the trigger when they are created, so it is read from a
+  // shared value instead. This picks up a trigger loaded when haptics are
+  // enabled after the first render and keeps the returned worklets the same.
+  const trigger = useStableCallbackValue(loadedTrigger ?? undefined);
 
   return useMemo(
     () => ({
-      light,
-      medium
+      light: () => {
+        'worklet';
+        trigger('impactLight');
+      },
+      medium: () => {
+        'worklet';
+        trigger('impactMedium');
+      }
     }),
-    [light, medium]
+    [trigger]
   );
 }
