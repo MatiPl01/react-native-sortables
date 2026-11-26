@@ -39,7 +39,10 @@ const advance = (ms: number) =>
   });
 
 function renderGrid(
-  callbacks: Pick<SortableGridProps<string>, 'onDragEnd' | 'onDragStart'> = {}
+  callbacks: Pick<
+    SortableGridProps<string>,
+    'onActiveItemDropped' | 'onDragEnd' | 'onDragStart'
+  > = {}
 ) {
   render(
     <GestureHandlerRootView>
@@ -59,13 +62,13 @@ function renderGrid(
   advance(200); // absolute layout is enabled after a timeout
 }
 
-function activate(key: string) {
+function activate(key: string, sortable = { common, drag }) {
   const progress = makeMutable(0);
   act(() => {
-    drag.handleTouchStart(touchEvent, key, progress, noop, noop);
+    sortable.drag.handleTouchStart(touchEvent, key, progress, noop, noop);
   });
   // Stops right after the activation, before the delayed start callback
-  for (let i = 0; i < 500 && common.activeItemKey.value !== key; i++) {
+  for (let i = 0; i < 500 && sortable.common.activeItemKey.value !== key; i++) {
     advance(1);
   }
   return progress;
@@ -90,6 +93,23 @@ describe('DragProvider', () => {
       ['start', 1],
       ['end', 1]
     ]);
+  });
+
+  it('calls onDragStart once when the drag ends after it was delivered', () => {
+    const calls: Array<string> = [];
+    renderGrid({
+      onDragEnd: () => calls.push('end'),
+      onDragStart: () => calls.push('start')
+    });
+
+    const progress = activate('b');
+    advance(100); // the delayed start callback is called
+    act(() => {
+      drag.handleDragEnd('b', progress);
+    });
+    advance(1000);
+
+    expect(calls).toEqual(['start', 'end']);
   });
 
   it('does not finish the previous drop while the next item is dragged', () => {
@@ -124,7 +144,11 @@ describe('DragProvider', () => {
   });
 
   it('finishes the drop only when the last dropped item is dropped', () => {
-    renderGrid();
+    const drops: Array<[string, boolean]> = [];
+    renderGrid({
+      onActiveItemDropped: ({ key }) =>
+        drops.push([key, common.activeItemDropped.value])
+    });
 
     const progressA = activate('a');
     advance(300); // activation animation
@@ -136,10 +160,32 @@ describe('DragProvider', () => {
     act(() => {
       drag.handleDragEnd('b', progressB); // dropped later than the first item
     });
-    advance(40); // the drop animation of the first item ends
+    advance(1000);
 
-    expect(common.activeItemDropped.value).toBe(false);
-    advance(300);
-    expect(common.activeItemDropped.value).toBe(true);
+    expect(drops).toEqual([
+      ['a', false],
+      ['b', true]
+    ]);
+  });
+
+  it('does not share the drag state between sortables', () => {
+    renderGrid();
+    const first = { common, drag };
+    renderGrid();
+    const second = { common, drag };
+
+    const progress = activate('a', first);
+    advance(300); // activation animation
+    act(() => {
+      first.drag.handleDragEnd('a', progress); // dropped after 300ms
+    });
+    // A quick press and release in the other sortable in the meantime
+    const otherProgress = activate('b', second);
+    act(() => {
+      second.drag.handleDragEnd('b', otherProgress);
+    });
+    advance(1000);
+
+    expect(first.common.activeItemDropped.value).toBe(true);
   });
 });
