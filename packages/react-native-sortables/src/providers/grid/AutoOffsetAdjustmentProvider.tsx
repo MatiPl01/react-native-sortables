@@ -115,16 +115,15 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
       () => activeItemDropped.value,
       dropped => {
         clearAnimatedTimeout(context.value.resetTimeoutId);
-        if (
-          dropped &&
-          context.value.state !== AutoOffsetAdjustmentState.DISABLED
-        ) {
+        // Enabled only from the drag start, so that a finished drag doesn't
+        // leave it waiting for size changes that are not related to a drag
+        if (!dropped) {
+          context.value.state = AutoOffsetAdjustmentState.ENABLED;
+        } else if (context.value.state !== AutoOffsetAdjustmentState.DISABLED) {
           context.value.resetTimeoutId = setAnimatedTimeout(
             disableAutoOffsetAdjustment,
             autoAdjustOffsetResetTimeout
           );
-        } else {
-          context.value.state = AutoOffsetAdjustmentState.ENABLED;
         }
       }
     );
@@ -272,12 +271,6 @@ const { AutoOffsetAdjustmentProvider, useAutoOffsetAdjustmentContext } =
             shouldAnimateLayout: false,
             startCrossOffset
           };
-        }
-
-        // A size change with no active item must not apply the offset: the key
-        // comes from the previous drag and no drop follows to re-enable sorting
-        if (activeItemKey.value === null) {
-          return props;
         }
 
         let snapBasedOffset = 0;

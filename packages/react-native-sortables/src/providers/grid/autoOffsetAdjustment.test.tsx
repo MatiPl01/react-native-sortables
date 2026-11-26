@@ -127,6 +127,34 @@ describe('Sortable.Grid autoAdjustOffsetDuringDrag', () => {
     expect(getItemOffsets()).toEqual([0, 40, 80, 120]);
   });
 
+  it('keeps sorting enabled when items are resized after drags with no size change', () => {
+    renderGrid();
+    dragAndDrop('a');
+    dragAndDrop('a');
+
+    setHeights(COLLAPSED);
+
+    expect(common.sortEnabled.value).toBe(true);
+    expect(getItemOffsets()).toEqual([0, 40, 80, 120]);
+  });
+
+  it('keeps the released item in place when items are resized right after the release', () => {
+    renderGrid();
+    const progress = startDrag('c', 210);
+    act(() => {
+      drag.handleDragEnd('c', progress);
+    });
+    setHeights(COLLAPSED); // the state update from onDragStart lands late
+
+    expect(getItemOffsets()).toEqual([120, 160, 200, 240]);
+
+    setHeights(EXPANDED); // and items expand again after the drop
+    advance(2000);
+
+    expect(common.sortEnabled.value).toBe(true);
+    expect(getItemOffsets()).toEqual([0, 100, 200, 300]);
+  });
+
   it('removes the offset from the layout when the reset timeout fires', () => {
     renderGrid();
     const progress = startDrag('c', 210);
